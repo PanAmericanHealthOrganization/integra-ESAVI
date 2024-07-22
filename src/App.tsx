@@ -42,9 +42,7 @@ const App = () => {
 			<Resource
 				name="dashboard"
 				list={dashboard.list}
-
 			/>
-			
 			<Resource
 				name="esavis"
 				list={esavis.list}
@@ -62,6 +60,7 @@ const App = () => {
 			/>
 
 		</Admin>
+		
 	);
 };
 

@@ -60,7 +60,7 @@ class Http {
             withCredentials: true,
 
         });
-
+        console.log('baseURL', process.env.REACT_APP_INTEGRA_ESAVI_API_URL)
         //http.interceptors.request.use(injectToken, (error) => Promise.reject(error));
 
         http.interceptors.response.use(

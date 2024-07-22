@@ -26,7 +26,8 @@ import {
  */
 export const clienteDataProvider: DataProvider = {
 	getList: async (resource: string, params: GetListParams): Promise<GetListResult<any>> => {
-		const response = await fetch('http://[::1]:3031/api/paciente');
+		const URL_ESAVI_PACIENTE: string = String(process.env.REACT_API_ESAVI_PACIENTE);
+		const response = await fetch(URL_ESAVI_PACIENTE);
 		const data = await response.json();
 
 		console.log('data:: ', data);

@@ -7,13 +7,11 @@ const MyAuthProvider = {
         localStorage.setItem('username', username);
         // accept all username/password combinations
 
-
         if(username === 'krivadeneira') {
             return Promise.resolve();
         } else {
             return Promise.reject(new Error('Error usuario o contraseña'));
         }
-
 
     },
     logout: () => {

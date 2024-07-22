@@ -1,50 +1,14 @@
-import { useEffect, useState } from 'react';
-
-import { dashboardDataProvider } from '../../dataProviders/dashboard.dataprovider';
-
-ChartJS.register(ArcElement, Tooltip, Legend);
-
-import {
-	Chart as ChartJS,
-	CategoryScale,
-	LinearScale,
-	BarElement,
-	Title,
-	Tooltip,
-	Legend,
-	ArcElement
-} from 'chart.js';
-import { Bar } from 'react-chartjs-2';
-import { Pie } from 'react-chartjs-2';
-
-// import { Document, Page } from 'react-pdf/dist/esm/entry.vite';
-
-import useStateRef from 'react-usestateref';
+import React, { useEffect, useState } from 'react';
 import { Box, Grid } from '@mui/material';
+import { Bar, Pie } from 'react-chartjs-2';
+import { dashboardDataProvider } from '../../dataProviders/dashboard.dataprovider';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
-const labels = [
-	{ mes: 'Enero', graves: 10, noGraves: 25 },
-	{ mes: 'Febrero', graves: 20, noGraves: 25 },
-	{ mes: 'Marzo', graves: 30, noGraves: 25 },
-	{ mes: 'Abril', graves: 50, noGraves: 25 },
-	{ mes: 'Mayo', graves: 60, noGraves: 25 },
-	{ mes: 'Junio', graves: 50, noGraves: 25 },
-	{ mes: 'Julio', graves: 50, noGraves: 25 },
-	{ mes: 'Agosto', graves: 80, noGraves: 25 },
-	{ mes: 'Septiembre', graves: 70, noGraves: 25 },
-	{ mes: 'Octubre', graves: 50, noGraves: 25 },
-	{ mes: 'Noviembre', graves: 90, noGraves: 25 },
-	{ mes: 'Diciembre', graves: 100, noGraves: 25 }
-];
-
-
-
-export const optionsGrave = {
+const optionsGrave = {
 	responsive: true,
 	maintainAspectRatio: false,
-
 	plugins: {
 		legend: {
 			position: 'top' as const
@@ -56,10 +20,9 @@ export const optionsGrave = {
 	}
 };
 
-export const optionsNoGrave = {
+const optionsNoGrave = {
 	responsive: true,
 	maintainAspectRatio: false,
-
 	plugins: {
 		legend: {
 			position: 'top' as const
@@ -67,15 +30,13 @@ export const optionsNoGrave = {
 		title: {
 			display: true,
 			text: 'Casos esavi por sexo no grave'
-		},
-		
+		}
 	}
 };
 
-export const optionsPorAnio = {
+const optionsPorAnio = {
 	responsive: true,
 	maintainAspectRatio: false,
-
 	plugins: {
 		legend: {
 			position: 'top' as const
@@ -86,6 +47,7 @@ export const optionsPorAnio = {
 		}
 	}
 };
+
 const DashBoardList = () => {
 	const [dataCasosEsaviPorSexoGrave, setDataCasosEsaviPorSexoGrave] = useState({
 		labels: ['NO REGISTRA', 'DESCONOCIDO', 'HOMBRE', 'MUJER'],
@@ -134,19 +96,9 @@ const DashBoardList = () => {
 	});
 
 	const [datosCasosEsaviPorMes, setDatosCasosEsaviPorMes] = useState({
-		labels:[
-			'Enero',
-			'Febrero',
-			'Marzo', 
-			'Abril',
-			'Mayo',
-			'Junio', 
-			'Julio', 
-			'Agosto', 
-			'Septiembre',
-			'Octubre', 
-			'Noviembre', 
-			'Diciembre' 
+		labels: [
+			'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
+			'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 		],
 		datasets: [
 			{
@@ -163,106 +115,135 @@ const DashBoardList = () => {
 	});
 
 	const consultar = async () => {
-		const respuesta = await dashboardDataProvider.casosEsaviPorSexoGrave();
-		if (respuesta.msg === 'OK') {
-			const cantidad = respuesta.data.map((d: any) => d.cantidad);
-			const labels = respuesta.data.map((d: any) => d.sexo);
-			console.log('cantidad::: ', cantidad);
-
-			const data = {
-				labels: labels,
-				datasets: [
-					{
-						label: 'CANTIDAD',
-						data: cantidad,
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',
-							'rgba(54, 162, 235, 0.2)',
-							'rgba(255, 206, 86, 0.2)',
-							'rgba(75, 192, 192, 0.2)'
-						],
-						borderColor: [
-							'rgba(255, 99, 132, 1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)'
-						],
-						borderWidth: 1
-					}
-				]
-			};
-
-			setDataCasosEsaviPorSexoGrave(data);
+		try {
+			console.log('*** INICIO consultar', process.env.REACT_APP_ESAVI_GRAVE);
+			const respuesta = await dashboardDataProvider.casosEsaviPorSexoGrave();
+			console.log('*** casosEsaviPorSexoGrave', respuesta);
+	
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
+				const labels = respuesta.data.map((d: any) => d.sexo);
+	
+				const data = {
+					labels: labels,
+					datasets: [
+						{
+							label: 'CANTIDAD',
+							data: cantidad,
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.2)',
+								'rgba(54, 162, 235, 0.2)',
+								'rgba(255, 206, 86, 0.2)',
+								'rgba(75, 192, 192, 0.2)'
+							],
+							borderColor: [
+								'rgba(255, 99, 132, 1)',
+								'rgba(54, 162, 235, 1)',
+								'rgba(255, 206, 86, 1)',
+								'rgba(75, 192, 192, 1)'
+							],
+							borderWidth: 1
+						}
+					]
+				};
+	
+				setDataCasosEsaviPorSexoGrave(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorSexoGrave: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorSexoGrave:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
 		}
 	};
 
 	const consultar2 = async () => {
-		const respuesta = await dashboardDataProvider.casosEsaviPorSexoNoGrave();
-		if (respuesta.msg === 'OK') {
-			const cantidad = respuesta.data.map((d: any) => d.cantidad);
-			const labels = respuesta.data.map((d: any) => d.sexo);
-			console.log('cantidad::: ', cantidad);
-
-			const data = {
-				labels: labels,
-				datasets: [
-					{
-						label: 'CANTIDAD',
-						data: cantidad,
-						backgroundColor: [
-							'rgba(255, 99, 132, 0.2)',
-							'rgba(54, 162, 235, 0.2)',
-							'rgba(255, 206, 86, 0.2)',
-							'rgba(75, 192, 192, 0.2)'
-						],
-						borderColor: [
-							'rgba(255, 99, 132, 1)',
-							'rgba(54, 162, 235, 1)',
-							'rgba(255, 206, 86, 1)',
-							'rgba(75, 192, 192, 1)'
-						],
-						borderWidth: 1
-					}
-				]
-			};
-
-			setDataCasosEsaviPorSexoNoGrave(data);
+		try {
+			const respuesta = await dashboardDataProvider.casosEsaviPorSexoNoGrave();
+			console.log('*** casosEsaviPorSexoNoGrave', respuesta);
+	
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
+				const labels = respuesta.data.map((d: any) => d.sexo);
+	
+				const data = {
+					labels: labels,
+					datasets: [
+						{
+							label: 'CANTIDAD',
+							data: cantidad,
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.2)',
+								'rgba(54, 162, 235, 0.2)',
+								'rgba(255, 206, 86, 0.2)',
+								'rgba(75, 192, 192, 0.2)'
+							],
+							borderColor: [
+								'rgba(255, 99, 132, 1)',
+								'rgba(54, 162, 235, 1)',
+								'rgba(255, 206, 86, 1)',
+								'rgba(75, 192, 192, 1)'
+							],
+							borderWidth: 1
+						}
+					]
+				};
+	
+				setDataCasosEsaviPorSexoNoGrave(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorSexoNoGrave: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorSexoNoGrave:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
 		}
 	};
-
-
+	
 	const consultar3 = async () => {
-		const respuesta = await dashboardDataProvider.casosEsaviPorMes();
-		if (respuesta.msg === 'OK') {
-			const labels = respuesta.data.map((d: any) => d.mes);
-			const graves = respuesta.data.map((d: any) => d.grave );
-			const noGraves = respuesta.data.map((d: any) => d.nograve);
-
-			const data = {
-				labels: labels,
-
-				datasets: [
-					{
-						label: 'Graves',
-						data: graves,
-						backgroundColor: 'rgba(255, 99, 132, 0.5)'
-					},
-					{
-						label: 'No graves',
-						data: noGraves,
-						backgroundColor: 'rgba(53, 162, 235, 0.5)'
-					}
-				]
-
-
-
-
-			};
-
-			setDatosCasosEsaviPorMes(data);
+		try {
+			const respuesta = await dashboardDataProvider.casosEsaviPorMes();
+			console.log('*** casosEsaviPorMes', respuesta);
+	
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+				const labels = respuesta.data.map((d: any) => d.mes);
+				const graves = respuesta.data.map((d: any) => parseInt(d.grave));
+				const noGraves = respuesta.data.map((d: any) => parseInt(d.nograve));
+	
+				const data = {
+					labels: labels,
+					datasets: [
+						{
+							label: 'Graves',
+							data: graves,
+							backgroundColor: 'rgba(255, 99, 132, 0.5)'
+						},
+						{
+							label: 'No graves',
+							data: noGraves,
+							backgroundColor: 'rgba(53, 162, 235, 0.5)'
+						}
+					]
+				};
+	
+				setDatosCasosEsaviPorMes(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorMes: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorMes:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
 		}
 	};
-
+	
 	useEffect(() => {
 		consultar();
 		consultar2();
@@ -270,44 +251,19 @@ const DashBoardList = () => {
 	}, []);
 
 	return (
-		<>
-			<Box sx={{ flexGrow: 1 }}>
-				<Grid container border={1} borderColor={'divider'} margin={1}>
-					<Grid
-						xs={6}
-						md={6}
-						xl={6}
-						// bgcolor={'blue'}
-						alignSelf={'center'}
-						minHeight={300}
-					>
-						<Pie data={dataCasosEsaviPorSexoNoGrave as any} options={optionsNoGrave} />
-					</Grid>
-
-					<Grid
-						xs={6}
-						md={6}
-						xl={6}
-						// bgcolor={'blue'}
-						alignSelf={'center'}
-						minHeight={300}
-					>
-						<Pie data={dataCasosEsaviPorSexoGrave as any} options={optionsGrave} />
-					</Grid>
+		<Box sx={{ flexGrow: 1 }}>
+			<Grid container spacing={2}>
+				<Grid item xs={12} md={6}>
+					<Pie data={dataCasosEsaviPorSexoNoGrave as any} options={optionsNoGrave} />
 				</Grid>
-
-				<Grid
-					xs={6}
-					md={6}
-					xl={6}
-					// bgcolor={'green'}
-					alignSelf={'center'}
-					minHeight={300}
-				>
-					<Bar options={optionsPorAnio} data={datosCasosEsaviPorMes} />
+				<Grid item xs={12} md={6}>
+					<Pie data={dataCasosEsaviPorSexoGrave as any} options={optionsGrave} />
 				</Grid>
-			</Box>
-		</>
+				<Grid item xs={12}>
+					<Bar data={datosCasosEsaviPorMes} options={optionsPorAnio} />
+				</Grid>
+			</Grid>
+		</Box>
 	);
 };
 
