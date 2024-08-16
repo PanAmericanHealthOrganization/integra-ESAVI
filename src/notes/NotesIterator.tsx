@@ -6,28 +6,28 @@ import { Note } from './Note';
 import { NewNote } from './NewNote';
 
 export const NotesIterator = ({
-    showStatus,
-    reference,
+	showStatus,
+	reference
 }: {
-    showStatus?: boolean;
-    reference: 'contacts' | 'deals';
+	showStatus?: boolean;
+	reference: 'contacts' | 'deals';
 }) => {
-    const { data, isLoading } = useListContext();
-    if (isLoading) return null;
-    return (
-        <>
-            <NewNote showStatus={showStatus} reference={reference} />
-            <Box mt="0.5em">
-                {data.map((note, index) => (
-                    <Note
-                        note={note}
-                        isLast={index === data.length - 1}
-                        showStatus={showStatus}
-                        reference={reference}
-                        key={index}
-                    />
-                ))}
-            </Box>
-        </>
-    );
+	const { data, isLoading } = useListContext();
+	if (isLoading) return null;
+	return (
+		<>
+			<NewNote showStatus={showStatus} reference={reference} />
+			<Box mt="0.5em">
+				{data.map((note, index) => (
+					<Note
+						note={note}
+						isLast={index === data.length - 1}
+						showStatus={showStatus}
+						reference={reference}
+						key={index}
+					/>
+				))}
+			</Box>
+		</>
+	);
 };

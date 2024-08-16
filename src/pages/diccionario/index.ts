@@ -1,4 +1,3 @@
-
 import DataObject from '@mui/icons-material/DataObject';
 import DiccionarioList from './DiccionarioList';
 

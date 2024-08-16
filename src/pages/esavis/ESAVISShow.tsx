@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { AppBar, Show, SimpleShowLayout, TextField } from 'react-admin';
 import Tabs from '@mui/material/Tabs';
@@ -36,7 +35,7 @@ function TabPanel(props: TabPanelProps) {
 function a11yProps(index: number) {
 	return {
 		id: `full-width-tab-${index}`,
-		'aria-controls': `full-width-tabpanel-${index}`,
+		'aria-controls': `full-width-tabpanel-${index}`
 	};
 }
 
@@ -54,7 +53,7 @@ export const ESAVISShow = () => {
 	return (
 		<Show>
 			<SimpleShowLayout>
-				<Box sx={{ bgcolor: 'background.paper', width: "100%" }}>
+				<Box sx={{ bgcolor: 'background.paper', width: '100%' }}>
 					<Tabs
 						value={value}
 						onChange={handleChange}
@@ -72,17 +71,14 @@ export const ESAVISShow = () => {
 
 					<TabPanel value={value} index={0} dir={theme.direction}>
 						<Show>
-							<SimpleShowLayout >
-								<table style={{ width: "100%" }}>
+							<SimpleShowLayout>
+								<table style={{ width: '100%' }}>
 									<tr>
-										<td >
+										<td>
 											<TextField source="id" />
 										</td>
+										<td></td>
 										<td>
-
-										</td>
-										<td>
-
 											<TextField source="origen" />
 										</td>
 									</tr>
@@ -98,26 +94,46 @@ export const ESAVISShow = () => {
 										</td>
 									</tr>
 									<tr>
-										<td><TextField source="tipoIdentificacion" /></td>
-										<td><TextField source="identificacion" /></td>
-										<td><TextField source="nombres" /></td>
+										<td>
+											<TextField source="tipoIdentificacion" />
+										</td>
+										<td>
+											<TextField source="identificacion" />
+										</td>
+										<td>
+											<TextField source="nombres" />
+										</td>
 									</tr>
 
-
-
 									<tr>
-										<td><TextField source="apellidos" /></td>
-										<td><TextField source="fechaNacimiento" /></td>
-										<td><TextField source="sexo" /></td>
+										<td>
+											<TextField source="apellidos" />
+										</td>
+										<td>
+											<TextField source="fechaNacimiento" />
+										</td>
+										<td>
+											<TextField source="sexo" />
+										</td>
 									</tr>
 									<tr>
-										<td><TextField source="estadoCivi" /></td>
-										<td><TextField source="nacionalidad" /></td>
-										<td><TextField source="autoIdentificacion" /></td>
+										<td>
+											<TextField source="estadoCivi" />
+										</td>
+										<td>
+											<TextField source="nacionalidad" />
+										</td>
+										<td>
+											<TextField source="autoIdentificacion" />
+										</td>
 									</tr>
 									<tr>
-										<td><TextField source="nacionalidadEtnica" /></td>
-										<td><TextField source="pueblo" /></td>
+										<td>
+											<TextField source="nacionalidadEtnica" />
+										</td>
+										<td>
+											<TextField source="pueblo" />
+										</td>
 										<td></td>
 									</tr>
 								</table>
@@ -126,7 +142,7 @@ export const ESAVISShow = () => {
 					</TabPanel>
 					<TabPanel value={value} index={1} dir={theme.direction}>
 						<Show>
-							<SimpleShowLayout >
+							<SimpleShowLayout>
 								<TextField source="id" />
 								<TextField source="establecimiento" />
 								<TextField source="fechaEvento" />
@@ -139,7 +155,7 @@ export const ESAVISShow = () => {
 					</TabPanel>
 					<TabPanel value={value} index={2} dir={theme.direction}>
 						<Show>
-							<SimpleShowLayout >
+							<SimpleShowLayout>
 								<TextField source="sexo" />
 								<TextField source="estadoCivi" />
 								<TextField source="nacionalidad" />
@@ -150,6 +166,7 @@ export const ESAVISShow = () => {
 						</Show>
 					</TabPanel>
 				</Box>
-			</SimpleShowLayout >
-		</Show >)
-}
+			</SimpleShowLayout>
+		</Show>
+	);
+};

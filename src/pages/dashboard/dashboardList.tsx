@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import { Bar, Pie } from 'react-chartjs-2';
 import { dashboardDataProvider } from '../../dataProviders/dashboard.dataprovider';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
+import {
+	Chart as ChartJS,
+	CategoryScale,
+	LinearScale,
+	BarElement,
+	Title,
+	Tooltip,
+	Legend,
+	ArcElement
+} from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -97,8 +106,18 @@ const DashBoardList = () => {
 
 	const [datosCasosEsaviPorMes, setDatosCasosEsaviPorMes] = useState({
 		labels: [
-			'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
-			'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+			'Enero',
+			'Febrero',
+			'Marzo',
+			'Abril',
+			'Mayo',
+			'Junio',
+			'Julio',
+			'Agosto',
+			'Septiembre',
+			'Octubre',
+			'Noviembre',
+			'Diciembre'
 		],
 		datasets: [
 			{
@@ -119,12 +138,12 @@ const DashBoardList = () => {
 			console.log('*** INICIO consultar', process.env.REACT_APP_ESAVI_GRAVE);
 			const respuesta = await dashboardDataProvider.casosEsaviPorSexoGrave();
 			console.log('*** casosEsaviPorSexoGrave', respuesta);
-	
+
 			// Verificar si la respuesta es válida antes de parsearla como JSON
 			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
 				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
 				const labels = respuesta.data.map((d: any) => d.sexo);
-	
+
 				const data = {
 					labels: labels,
 					datasets: [
@@ -147,10 +166,13 @@ const DashBoardList = () => {
 						}
 					]
 				};
-	
+
 				setDataCasosEsaviPorSexoGrave(data);
 			} else {
-				console.error('Error en la solicitud casosEsaviPorSexoGrave: Respuesta inválida', respuesta);
+				console.error(
+					'Error en la solicitud casosEsaviPorSexoGrave: Respuesta inválida',
+					respuesta
+				);
 				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
 			}
 		} catch (error) {
@@ -164,12 +186,12 @@ const DashBoardList = () => {
 		try {
 			const respuesta = await dashboardDataProvider.casosEsaviPorSexoNoGrave();
 			console.log('*** casosEsaviPorSexoNoGrave', respuesta);
-	
+
 			// Verificar si la respuesta es válida antes de parsearla como JSON
 			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
 				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
 				const labels = respuesta.data.map((d: any) => d.sexo);
-	
+
 				const data = {
 					labels: labels,
 					datasets: [
@@ -192,10 +214,13 @@ const DashBoardList = () => {
 						}
 					]
 				};
-	
+
 				setDataCasosEsaviPorSexoNoGrave(data);
 			} else {
-				console.error('Error en la solicitud casosEsaviPorSexoNoGrave: Respuesta inválida', respuesta);
+				console.error(
+					'Error en la solicitud casosEsaviPorSexoNoGrave: Respuesta inválida',
+					respuesta
+				);
 				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
 			}
 		} catch (error) {
@@ -204,18 +229,18 @@ const DashBoardList = () => {
 			// Ej. mostrar un mensaje de error al usuario
 		}
 	};
-	
+
 	const consultar3 = async () => {
 		try {
 			const respuesta = await dashboardDataProvider.casosEsaviPorMes();
 			console.log('*** casosEsaviPorMes', respuesta);
-	
+
 			// Verificar si la respuesta es válida antes de parsearla como JSON
 			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
 				const labels = respuesta.data.map((d: any) => d.mes);
 				const graves = respuesta.data.map((d: any) => parseInt(d.grave));
 				const noGraves = respuesta.data.map((d: any) => parseInt(d.nograve));
-	
+
 				const data = {
 					labels: labels,
 					datasets: [
@@ -231,7 +256,7 @@ const DashBoardList = () => {
 						}
 					]
 				};
-	
+
 				setDatosCasosEsaviPorMes(data);
 			} else {
 				console.error('Error en la solicitud casosEsaviPorMes: Respuesta inválida', respuesta);
@@ -243,7 +268,7 @@ const DashBoardList = () => {
 			// Ej. mostrar un mensaje de error al usuario
 		}
 	};
-	
+
 	useEffect(() => {
 		consultar();
 		consultar2();

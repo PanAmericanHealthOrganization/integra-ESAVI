@@ -9,7 +9,6 @@ import reportes from './pages/reportes';
 import dashboard from './pages/dashboard';
 import diccionario from './pages/diccionario';
 
-
 const config: KeycloakConfig = {
 	url: 'http://localhost:8090',
 	realm: 'integra-esavi-realm',
@@ -32,17 +31,21 @@ const getPermissions = (decoded: KeycloakTokenParsed) => {
 	return false;
 };
 
-console.log('process.env.REACT_APP_INTEGRA_ESAVI_API_URL:::: ', process.env.REACT_APP_INTEGRA_ESAVI_API_URL);
-
+console.log(
+	'process.env.REACT_APP_INTEGRA_ESAVI_API_URL:::: ',
+	process.env.REACT_APP_INTEGRA_ESAVI_API_URL
+);
 
 //
 const App = () => {
 	return (
-		<Admin dataProvider={dataProvider} authProvider={MyAuthProvider} layout={CustomLayout} loginPage={CustomLoginPage}>
-			<Resource
-				name="dashboard"
-				list={dashboard.list}
-			/>
+		<Admin
+			dataProvider={dataProvider}
+			authProvider={MyAuthProvider}
+			layout={CustomLayout}
+			loginPage={CustomLoginPage}
+		>
+			<Resource name="dashboard" list={dashboard.list} />
 			<Resource
 				name="esavis"
 				list={esavis.list}
@@ -50,17 +53,9 @@ const App = () => {
 				edit={esavis.update}
 				show={esavis.show}
 			/>
-			<Resource
-				name="reportes"
-				list={reportes.list}		
-			/>
-			<Resource
-				name="diccionarios"
-				list={diccionario.list}	
-			/>
-
+			<Resource name="reportes" list={reportes.list} />
+			<Resource name="diccionarios" list={diccionario.list} />
 		</Admin>
-		
 	);
 };
 

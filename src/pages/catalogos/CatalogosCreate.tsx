@@ -9,7 +9,7 @@ export const CatalogosCreate = () => {
 		create('posts', { data });
 	};
 	return (
-		<Create >
+		<Create>
 			<Form onSubmit={postSave}>
 				<Stack>
 					<TextInput source="title" />

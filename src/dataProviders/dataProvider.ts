@@ -5,7 +5,6 @@ import { patientProvider } from './patient.dataprovider';
 import { reporteDataProvider } from './reportes.dataprovider';
 import { dashboardDataProvider } from './dashboard.dataprovider';
 
-
 export const dataProvider = combineDataProviders((resource) => {
 	switch (resource) {
 		case 'dashboard':

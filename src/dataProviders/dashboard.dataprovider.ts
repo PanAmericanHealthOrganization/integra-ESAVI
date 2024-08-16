@@ -38,7 +38,7 @@ export const dashboardDataProvider: DataProvider = {
 
 	casosEsaviPorSexoNoGrave: async () => {
 		const URL_ESAVI_NO_GRAVE: string = String(process.env.REACT_APP_ESAVI_NO_GRAVE);
-		const response = await fetch( URL_ESAVI_NO_GRAVE, {
+		const response = await fetch(URL_ESAVI_NO_GRAVE, {
 			headers: {
 				'X-API-KEY': '6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h'
 			}
@@ -49,7 +49,7 @@ export const dashboardDataProvider: DataProvider = {
 
 	casosEsaviPorMes: async () => {
 		const URL_ESAVI_POR_MES: string = String(process.env.REACT_APP_ESAVI_POR_MES);
-		const response = await fetch( URL_ESAVI_POR_MES, {
+		const response = await fetch(URL_ESAVI_POR_MES, {
 			headers: {
 				'X-API-KEY': '6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h'
 			}
