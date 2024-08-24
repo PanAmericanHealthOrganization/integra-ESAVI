@@ -20,15 +20,16 @@ import {
 	UpdateParams,
 	UpdateResult
 } from 'react-admin';
+import { INT_ESAV_API, INT_API_KEY } from './fetch.integra.esavi.client';
 
 /**
  *
  */
 export const reporteDataProvider: DataProvider = {
 	obtenerReporte: async () => {
-		const response = await fetch('http://localhos:8080/integrator/reports/retrivePdf', {
+		const response = await fetch(`${INT_ESAV_API}/integrator/reports/retrivePdf`, {
 			headers: {
-				'X-API-KEY': '6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h'
+				'X-API-KEY': INT_API_KEY || ''
 			}
 		});
 

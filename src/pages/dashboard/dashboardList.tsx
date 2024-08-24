@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Grid } from '@mui/material';
 import { Bar, Pie } from 'react-chartjs-2';
 import { dashboardDataProvider } from '../../dataProviders/dashboard.dataprovider';
@@ -58,6 +58,7 @@ const optionsPorAnio = {
 };
 
 const DashBoardList = () => {
+	console.log('En DashBoardList');
 	const [dataCasosEsaviPorSexoGrave, setDataCasosEsaviPorSexoGrave] = useState({
 		labels: ['NO REGISTRA', 'DESCONOCIDO', 'HOMBRE', 'MUJER'],
 		datasets: [

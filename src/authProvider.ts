@@ -31,7 +31,4 @@ const MyAuthProvider = {
 	getPermissions: () => Promise.resolve('')
 };
 
-const generarSessionCookie = () => {
-	// Generar session cookie
-};
 export default MyAuthProvider;

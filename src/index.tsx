@@ -1,11 +1,21 @@
 import App from './App';
+import keycloak from './keycloak';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
 
 const container = document.getElementById('root');
-const root = createRoot(container as Element); // createRoot(container!) if you use TypeScript
-root.render(<App />);
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+const root = createRoot(container as Element);
+
+keycloak
+	.init({ onLoad: 'login-required' })
+	.then((authenticated) => {
+		if (authenticated) {
+			root.render(<App />);
+		} else {
+			console.error('Authentication failed');
+		}
+	})
+	.catch((error) => {
+		console.error('Failed to initialize Keycloak', error);
+	});
 reportWebVitals();

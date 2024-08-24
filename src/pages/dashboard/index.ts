@@ -3,6 +3,5 @@ import DashBoardList from './dashboardList';
 
 export default {
 	list: DashBoardList,
-
 	icon: OrderIcon
 };

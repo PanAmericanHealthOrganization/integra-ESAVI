@@ -21,33 +21,28 @@ import {
 	UpdateParams,
 	UpdateResult
 } from 'react-admin';
-import { INT_ESAV_API } from './fetch.integra.esavi.client';
+import { INT_ESAV_API, INT_API_KEY } from './fetch.integra.esavi.client';
 
 export const esaviDataProvider: DataProvider = {
 	getList: async function <RecordType extends RaRecord<Identifier> = any>(
 		resource: string,
 		params: GetListParams
 	): Promise<GetListResult<RecordType>> {
-		const { filter } = params;
-		console.log('params', params);
-		// TODO: crear un cliente
+		const { filter, pagination } = params;
+		const { page, perPage } = pagination;
 		const myHeaders = new Headers();
-		myHeaders.append('X-API-KEY', `6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h`);
+		myHeaders.append('X-API-KEY', INT_API_KEY || '');
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,
 			redirect: 'follow'
 		};
 
-		// TODO: REALIZAR LO MISMO PERO PAGINADO
 		return new Promise((resolve, reject) => {
 			fetch(`${INT_ESAV_API}/integrator/notificacion/findAll`, requestOptions)
 				.then((res) => res.json())
 				.then((data) => {
-					const { page, perPage } = params.pagination;
-					const dataLength = data.length;
 					console.log('data:::', data);
-					// filtro nombres
 					if (filter.origen)
 						data = data.filter((esavi: any) =>
 							`${esavi.tipo}`.toUpperCase().includes(`${filter.origen}`.toUpperCase())
@@ -59,10 +54,15 @@ export const esaviDataProvider: DataProvider = {
 								.includes(`${filter.identificacion}`.toUpperCase())
 						);
 
-					const pagi = data.slice(page * (perPage + 1), page * (perPage + 1) + perPage + 1);
+					// Aplicar paginación después del filtrado
+					const dataLength = data.length;
+					const start = (page - 1) * perPage;
+					const end = start + perPage;
+					const paginatedData = data.slice(start, end);
+
 					resolve({
-						data: pagi as any,
-						total: dataLength
+						data: paginatedData as any,
+						total: dataLength,
 					});
 				})
 				.catch((err) => {
@@ -74,9 +74,8 @@ export const esaviDataProvider: DataProvider = {
 		resource: string,
 		params: GetOneParams<RecordType>
 	): Promise<GetOneResult<RecordType>> {
-		// TODO: crear un cliente
 		const myHeaders = new Headers();
-		myHeaders.append('X-API-KEY', `6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h`);
+		myHeaders.append('X-API-KEY', INT_API_KEY || '');
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,
@@ -99,9 +98,8 @@ export const esaviDataProvider: DataProvider = {
 		resource: string,
 		params: GetManyParams
 	): Promise<GetManyResult<RecordType>> {
-		// TODO: crear un cliente
 		const myHeaders = new Headers();
-		myHeaders.append('X-API-KEY', `6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h`);
+		myHeaders.append('X-API-KEY', INT_API_KEY || '');
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,

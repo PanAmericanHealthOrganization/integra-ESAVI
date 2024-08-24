@@ -3,6 +3,5 @@ import ReportesList from './reportesList';
 
 export default {
 	list: ReportesList,
-
 	icon: OrderIcon
 };

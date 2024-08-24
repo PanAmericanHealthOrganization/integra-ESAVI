@@ -1,6 +1,5 @@
 import { AppBar, AppBarProps } from 'react-admin';
 import Typography from '@mui/material/Typography';
-import Logo from './logo.svg';
 
 export const CustomAppBar = (props: AppBarProps) => (
 	<AppBar

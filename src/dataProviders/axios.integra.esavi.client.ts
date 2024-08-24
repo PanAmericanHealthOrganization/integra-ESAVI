@@ -1,6 +1,5 @@
-// http.ts
-
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { INT_API_KEY } from './fetch.integra.esavi.client';
 
 enum StatusCode {
 	Unauthorized = 401,
@@ -19,18 +18,17 @@ const headers: Readonly<Record<string, string | boolean>> = {
 	'Access-Control-Allow-Origin': '*',
 	'Access-Control-Allow-Methods': 'POST, OPTIONS, GET, PUT, DELETE',
 	'X-Requested-With': 'XMLHttpRequest',
-	'X-API-KEY': '6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h',
+	'X-API-KEY': INT_API_KEY || '',
 	'Cache-Control': 'no-cache'
 };
 
-// We can use the following function to inject the JWT token through an interceptor
-// We get the `accessToken` from the localStorage that we set when we authenticate
+// Podemos usar la siguiente función para inyectar el token JWT a través de un interceptor
+// Obtenemos el 'AccessToken` del LocalStorage que establecemos cuando autenticamos
 const injectToken = (config: any): any => {
 	try {
 		const token = localStorage.getItem('accessToken');
 
 		if (token != null) {
-			//  config?.headers?.Authorization = `Bearer ${token}`;
 			config.headers = {
 				...config.headers,
 				Authorization: `Bearer ${token}`
@@ -53,12 +51,10 @@ class Http {
 	initHttp() {
 		const http = axios.create({
 			baseURL: process.env.REACT_APP_INTEGRA_ESAVI_API_URL,
-			// baseURL: 'http://localhost:8080',
 			headers,
 			withCredentials: true
 		});
 		console.log('baseURL', process.env.REACT_APP_INTEGRA_ESAVI_API_URL);
-		//http.interceptors.request.use(injectToken, (error) => Promise.reject(error));
 
 		http.interceptors.response.use(
 			(response) => response,
@@ -100,8 +96,8 @@ class Http {
 		return this.http.delete<T, R>(url, config);
 	}
 
-	// Handle global app errors
-	// We can handle generic app errors depending on the status code
+	// Manejar errores de aplicación global
+	// Podemos manejar los errores genéricos de la aplicación según el código de estado
 	private handleError(error: any) {
 		if (!error) {
 			return Promise.reject();

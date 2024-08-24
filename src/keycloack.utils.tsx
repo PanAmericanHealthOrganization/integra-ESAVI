@@ -1,14 +1,5 @@
 import Keycloak, { KeycloakConfig, KeycloakTokenParsed, KeycloakInitOptions } from 'keycloak-js';
 import { DataProvider } from 'react-admin';
-/**
- *
- * Parametros de configuración
- */
-export const mspKeycloakConfig: KeycloakConfig = {
-	url: 'http://localhost:8090/auth',
-	realm: 'dhis2Integraciones',
-	clientId: 'front-dhis2Integracion'
-};
 
 /**
  *

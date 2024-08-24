@@ -1,44 +1,51 @@
-import jwt_decode from 'jwt-decode';
 import Keycloak, { KeycloakTokenParsed } from 'keycloak-js';
 import { AuthProvider } from 'react-admin';
+import jwt_decode from 'jwt-decode';
 
 export type PermissionsFunction = (decoded: KeycloakTokenParsed) => any;
 
 /**
- * An authProvider which handles authentication via the Keycloak server.
+ * Un AuthProvider que maneja la autenticación a través del servidor KeyCloak.
  *
- * @param client the keycloak client
- * @param options.onPermissions function used to transform the permissions fetched from Keycloak into a permissions object in the form of what your react-admin app expects
+ * @param client Cliente de keycloak
+ * @param options.onPermissions Función utilizada para transformar los permisos obtenidos de KeyCloak en un objeto de permisos en forma de lo que su aplicación React-Admin espera
  * @param options.loginRedirectUri URI used to override the redirect URI after successful login
  * @param options.logoutRedirectUri URI used to override the redirect URI after successful logout
  *
- * @returns an authProvider ready to be used by React-Admin.
+ * @returns Un authprovider listo para ser utilizado por React-Admin.
  */
 export const myAuthKeyCloakProvider = (
 	client: Keycloak,
 	options: {
-		onPermissions?: PermissionsFunction;
+		onPermissions?: (token: KeycloakTokenParsed) => any;
 		loginRedirectUri?: string;
 		logoutRedirectUri?: string;
 	} = {}
 ): AuthProvider => ({
 	async login() {
-		return client.login({
-			redirectUri: options.loginRedirectUri ?? window.location.origin
-		});
-	},
-	async logout() {
-		return client.logout({
-			redirectUri: options.logoutRedirectUri ?? window.location.origin
-		});
-	},
-	async checkError() {
+		if (!client.authenticated) {
+			return Promise.reject('Usuario no autenticado');
+		}
 		return Promise.resolve();
 	},
+	async logout() {
+		if (client) {
+			return client
+				.logout()
+				.then(() => Promise.resolve())
+				.catch(() => Promise.reject('Falló el cierre de sesión'));
+		} else {
+			return Promise.reject('Keycloak no está inicializado');
+		}
+	},
 	async checkAuth() {
-		return client.authenticated && client.token
-			? Promise.resolve()
-			: Promise.reject('Failed to obtain access token.');
+		return client.authenticated ? Promise.resolve() : Promise.reject();
+	},
+	async checkError(error) {
+		if (error.status === 401) {
+			return Promise.reject();
+		}
+		return Promise.resolve();
 	},
 	async getPermissions() {
 		if (!client.token) {
@@ -54,6 +61,6 @@ export const myAuthKeyCloakProvider = (
 			const fullName = decoded.preferred_username;
 			return Promise.resolve({ id, fullName });
 		}
-		return Promise.reject('Failed to get identity.');
+		return Promise.reject('No se pudo obtener identidad');
 	}
 });

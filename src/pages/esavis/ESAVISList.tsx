@@ -48,15 +48,11 @@ export const ESAVISList = () => {
 						label="Id"
 						source="id"
 						render={(record: any) => (
-							<>
-								<table>
+							<table>
+								<tbody>
 									<tr>
 										<td>
-											<div
-												onClick={() => {
-													navigator.clipboard.writeText(record.id);
-												}}
-											>
+											<div onClick={() => { navigator.clipboard.writeText(record.id); }}>
 												<ContentCopyIcon color="primary" sx={{ fontSize: 15 }} />
 											</div>
 										</td>
@@ -71,8 +67,8 @@ export const ESAVISList = () => {
 											</label>
 										</td>
 									</tr>
-								</table>
-							</>
+								</tbody>
+							</table>
 						)}
 					/>
 					<FunctionField
