@@ -20,9 +20,6 @@ const App = () => {
 			<Resource
 				name="esavis"
 				list={esavis.list}
-				create={esavis.create}
-				edit={esavis.update}
-				show={esavis.show}
 			/>
 			<Resource name="reportes" list={reportes.list} />
 		</Admin>

@@ -1,5 +1,5 @@
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import { Card } from '@mui/material';
+import { Button, Card } from '@mui/material';
 import { useState } from 'react';
 import {
 	Datagrid,
@@ -11,16 +11,34 @@ import {
 	TextInput,
 	TopToolbar
 } from 'react-admin';
+import BulkDialog from './BulkDialog';
+
 const postFilters = [
 	<TextInput label="Origen" source="origen" alwaysOn />,
 	<TextInput label="Identificación" source="identificacion" alwaysOn />
 ];
 
-const ListActions = () => (
-	<TopToolbar>
-		<ExportButton label="CSV" />
-	</TopToolbar>
-);
+const ListActions = () => {
+	const [open, setOpen] = useState(false);
+
+	const handleClickOpen = () => {
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+	};
+
+	return (
+		<TopToolbar>
+			<ExportButton label="CSV" />
+			<Button variant="contained" color="primary" onClick={handleClickOpen} style={{ marginLeft: '10px' }}>
+				Importar datos
+			</Button>
+			<BulkDialog open={open} onClose={handleClose} />
+		</TopToolbar>
+	);
+};
 export const ESAVISList = () => {
 	const [isHover, setIsHover] = useState(false);
 
@@ -73,8 +91,8 @@ export const ESAVISList = () => {
 					/>
 					<FunctionField
 						label="Origen"
-						sortBy="tipo"
-						render={(record: any) => `${record.tipo !== 'dhis2' ? 'VIGI-FLOW' : 'DHIS2'}`}
+						sortBy="origen"
+						render={(record: any) => `${record.origen}`}
 					/>
 					<FunctionField
 						label="Código Origen"
