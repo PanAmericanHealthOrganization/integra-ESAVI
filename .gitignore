@@ -27,4 +27,5 @@ yarn-error.log*
 pnpm-lock.yaml
 package-lock.json
 
+# Ignorar archivo de configuración de entorno
 .env
