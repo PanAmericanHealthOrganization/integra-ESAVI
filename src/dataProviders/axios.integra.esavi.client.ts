@@ -55,7 +55,7 @@ class Http {
 			withCredentials: true
 		});
 		console.log('baseURL', process.env.REACT_APP_INTEGRA_ESAVI_API_URL);
-
+		console.log('Headers ::' , headers)
 		http.interceptors.response.use(
 			(response) => response,
 			(error) => {
@@ -73,6 +73,8 @@ class Http {
 	}
 
 	get<T = any, R = AxiosResponse<T>>(url: string, config?: AxiosRequestConfig): Promise<R> {
+		console.log("Config:::" , config);
+		
 		return this.http.get<T, R>(url, config);
 	}
 

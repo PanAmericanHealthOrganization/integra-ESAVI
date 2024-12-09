@@ -7,10 +7,10 @@ export const dataProvider = combineDataProviders((resource) => {
 	switch (resource) {
 		case 'dashboard':
 			return dashboardDataProvider;
-		case 'reportes':
-			return reporteDataProvider;
 		case 'esavis':
 			return esaviDataProvider;
+		case 'reportes':
+			return reporteDataProvider;
 		default:
 			throw new Error(`Unknown resource: ${resource}`);
 	}

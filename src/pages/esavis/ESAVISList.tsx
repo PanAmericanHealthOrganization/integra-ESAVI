@@ -66,6 +66,11 @@ export const ESAVISList = () => {
 						label="Id"
 						source="id"
 						render={(record: any) => (
+							<>
+							{
+								console.log("Record :::" , record)
+								
+							}
 							<table>
 								<tbody>
 									<tr>
@@ -87,12 +92,13 @@ export const ESAVISList = () => {
 									</tr>
 								</tbody>
 							</table>
+							</>
 						)}
 					/>
 					<FunctionField
 						label="Origen"
 						sortBy="origen"
-						render={(record: any) => `${record.origen}`}
+						render={(record: any) => `${record.tipo}`}
 					/>
 					<FunctionField
 						label="Código Origen"
@@ -100,7 +106,18 @@ export const ESAVISList = () => {
 							`${record.codigoVigiflow !== '' ? (record.codigoDhis2Evento ?? '--') : '--'}`
 						}
 					/>
-					<TextField label="Fecha Notificación" source="fechaNotificacion" />
+					{/* <TextField label="Fecha Notificación" source="fechaNotificacion" /> */}
+
+					<DateField
+						label="Fecha Notificación"
+						source="fechaNotificacion"
+						options={{
+							year: 'numeric',
+							month: 'numeric',
+							day: 'numeric'
+						}}
+					/>
+
 					<DateField
 						label="Fecha Nacimiento"
 						source="fechaNacimiento"
@@ -112,9 +129,9 @@ export const ESAVISList = () => {
 					/>
 					<FunctionField
 						label="Identificación"
-						render={(record: any) => `${record.identificacion ?? '--'}`}
+						render={(record: any) => `${record.paciente?.identificacion ?? '--'}`}
 					/>
-					<FunctionField label="Nombres" render={(record: any) => `${record.nombres ?? '--'}`} />
+					<FunctionField label="Nombres" render={(record: any) => `${record.paciente?.nombre ?? '--'}`} />
 				</Datagrid>
 			</List>
 		</Card>

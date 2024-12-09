@@ -5,25 +5,28 @@ import { CustomLoginPage } from './layout/CustomLogin';
 import esavis from './pages/esavis';
 import reportes from './pages/reportes';
 import dashboard from './pages/dashboard';
-import { myAuthKeyCloakProvider } from './myAuthKeyCloakProvider';
 import keycloak from './keycloak';
+import { useContext } from 'react';
+import { myAuthKeyCloakProvider } from './myAuthKeyCloakProvider';
+import { AuthenticationContext } from './contexts/AuthContext ';
 
 const App = () => {
-	return (
-		<Admin
-			dataProvider={dataProvider}
-			authProvider={myAuthKeyCloakProvider(keycloak)}
-			layout={CustomLayout}
-			loginPage={CustomLoginPage}
-		>
-			<Resource name="dashboard" list={dashboard.list} />
-			<Resource
-				name="esavis"
-				list={esavis.list}
-			/>
-			<Resource name="reportes" list={reportes.list} />
-		</Admin>
-	);
+    const { updateInformationUser, authState } = useContext(AuthenticationContext);
+
+    return (
+        <Admin
+            dataProvider={dataProvider}
+            // authProvider={myAuthKeyCloakProvider(keycloak, { updateInformationUser })}
+            layout={CustomLayout}
+            loginPage={CustomLoginPage}
+        >
+            <Resource name="dashboard" list={dashboard.list} />
+            <Resource name="esavis" list={esavis.list} />
+            <Resource name="reportes" list={reportes.list} />
+
+        </Admin>
+    );
 };
 
 export default App;
+

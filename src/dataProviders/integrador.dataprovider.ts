@@ -26,8 +26,10 @@ import { INT_ESAV_API, INT_API_KEY } from './fetch.integra.esavi.client';
  *
  */
 export const integradorDataProvider: DataProvider = {
-	importDataVigiflow: async () => {
-		const response = await fetch(`${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=20230501&fechaFin=20230630`, {
+	importDataVigiflow: async (startDate: string, endDate: string) => {
+	const response = await fetch(`${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=${startDate}&fechaFin=${endDate}`, {
+			// const response = await fetch(`${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=20240702&fechaFin=20240706`, {
+
 			headers: {
 				'X-API-KEY': INT_API_KEY || ''
 			}
@@ -36,8 +38,8 @@ export const integradorDataProvider: DataProvider = {
 		const data = await response.json();
 		return data;
 	},
-	importDataDHIS2: async () => {
-		const response = await fetch(`${INT_ESAV_API}/integrator/dhis2/bulk`, {
+	importDataDHIS2: async (startDate: string, endDate: string) => {
+		const response = await fetch(`${INT_ESAV_API}/integrator/dhis2/bulk?codigoATC=J07&fechaInicio=${startDate}&fechaFin=${endDate}`, {
 			headers: {
 				'X-API-KEY': INT_API_KEY || ''
 			}

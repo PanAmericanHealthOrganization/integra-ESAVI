@@ -32,6 +32,8 @@ export const esaviDataProvider: DataProvider = {
 		const { page, perPage } = pagination;
 		const myHeaders = new Headers();
 		myHeaders.append('X-API-KEY', INT_API_KEY || '');
+		console.log("MyHeaders:::" , myHeaders);
+
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,
@@ -39,10 +41,12 @@ export const esaviDataProvider: DataProvider = {
 		};
 
 		return new Promise((resolve, reject) => {
+			console.log("VerInfoo:::" , `${INT_ESAV_API}`)
+			
 			fetch(`${INT_ESAV_API}/integrator/notificacion/findAll`, requestOptions)
 				.then((res) => res.json())
 				.then((data) => {
-					console.log('data:::', data);
+					console.log('dataConsulta:::', data);
 					if (filter.origen)
 						data = data.filter((esavi: any) =>
 							`${esavi.tipo}`.toUpperCase().includes(`${filter.origen}`.toUpperCase())
@@ -76,6 +80,9 @@ export const esaviDataProvider: DataProvider = {
 	): Promise<GetOneResult<RecordType>> {
 		const myHeaders = new Headers();
 		myHeaders.append('X-API-KEY', INT_API_KEY || '');
+		console.log("MyHeaders:::" , myHeaders);
+		
+
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,
@@ -100,6 +107,8 @@ export const esaviDataProvider: DataProvider = {
 	): Promise<GetManyResult<RecordType>> {
 		const myHeaders = new Headers();
 		myHeaders.append('X-API-KEY', INT_API_KEY || '');
+		console.log("MyHeaders:::" , myHeaders);
+
 		const requestOptions: RequestInit = {
 			method: 'GET',
 			headers: myHeaders,

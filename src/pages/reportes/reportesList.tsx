@@ -1,187 +1,173 @@
 import { useEffect, useState } from 'react';
 import { reporteDataProvider } from '../../dataProviders/reportes.dataprovider';
-
 import { Document, Page, pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-
 import useStateRef from 'react-usestateref';
 
 import './pdf.css';
 
 import { Grid } from '@mui/joy';
-import { Box, Button, Container, FormLabel, Input } from '@mui/material';
+import { Box, Button, Container, FormLabel, Input, CircularProgress } from '@mui/material';
 
 const ReportesList = () => {
-	const [numPages, setNumPages] = useState(0);
+  const [numPages, setNumPages] = useState(0);
+  const [source, setSource, sourceRef] = useStateRef<string>();
+  const [desde, setDesde] = useState<string>('');
+  const [hasta, setHasta] = useState<string>('');
+  const [isPdfAvailable, setIsPdfAvailable] = useState(false); // Estado para controlar si el PDF está disponible
+  const [loading, setLoading] = useState(false); // Estado de carga para el botón "Buscar"
 
-	const [source, setSource, sourceRef] = useStateRef<string>();
+  const consultar = async () => {
+    if (!desde || !hasta) {
+      return; // Si falta alguna fecha, no realizar la consulta
+    }
 
-	const consultar = async () => {
-		const respuesta = await reporteDataProvider.obtenerReporte();
-		console.log('respuesta:: ', respuesta);
-		if (respuesta.msg === 'OK') {
-			setSource(respuesta.data);
-		}
-	};
+    if (new Date(desde) > new Date(hasta)) {
+      alert('La fecha "Desde" no puede ser mayor que la fecha "Hasta"');
+      return;
+    }
 
-	const filtrar = async () => {
-		const respuesta = await reporteDataProvider.obtenerReporte();
-		console.log('respuesta:: ', respuesta);
-		if (respuesta.msg === 'OK') {
-			setSource(respuesta.data);
-		}
-	};
+    setLoading(true); // Activar el estado de carga
 
-	useEffect(() => {
-		consultar();
-	}, []);
+    const respuesta = await reporteDataProvider.obtenerReporte(desde, hasta);
+    console.log('respuesta:: ', respuesta);
+    setLoading(false); // Desactivar el estado de carga después de la consulta
 
-	function onDocumentLoadSuccess({ numPages }: any) {
-		setNumPages(numPages);
-	}
+    if (respuesta.msg === 'OK') {
+      setSource(respuesta.data);
+      setIsPdfAvailable(true); // Si se recibe un PDF, habilitar el botón PDF
+    }
+  };
 
-	const descargarpdf = async () => {
-		const link = document.createElement('a');
-		link.href = `data:application/pdf;base64,${sourceRef.current}`;
-		link.download = 'reporteEsavi.pdf';
-		link.click();
-	};
+  const limpiar = () => {
+    setDesde('');
+    setHasta('');
+    setSource('');
+    setIsPdfAvailable(false); // Deshabilitar el botón PDF al limpiar
+    setLoading(false); // Deshabilitar el estado de carga
+  };
 
-	return (
-		<div className="RaDatagrid-tableWrapper">
-			<Container>
-				<Box sx={{ flexGrow: 1 }}>
-					<Grid container border={1} borderColor={'divider'} margin={1}>
-						<Grid
-							container
-							xs={12}
-							sm={6}
-							md={6}
-							maxHeight={50}
-							marginTop={3}
-							alignSelf={'flex-start'}
-						>
-							<Grid xs={1} md={3} xl={3} />
-							<Grid xs={2} md={2} xl={2} alignSelf={'center'}>
-								<FormLabel>Desde: </FormLabel>
-							</Grid>
-							<Grid xs={1} md={1} xl={1} />
-							<Grid xs={6} md={6} xl={6} alignSelf={'center'}>
-								<Input
-									slotProps={{
-										input: {
-											type: 'date'
-										}
-									}}
-								/>
-							</Grid>
-						</Grid>
+  useEffect(() => {
+    consultar();
+  }, []);
 
-						<Grid
-							container
-							xs={12}
-							sm={6}
-							md={6}
-							maxHeight={50}
-							marginTop={3}
-							alignSelf={'flex-start'}
-						>
-							<Grid xs={1} md={1} xl={1} />
-							<Grid
-								xs={2}
-								md={2}
-								xl={2}
-								display={'flex'}
-								flexDirection={'column'}
-								textAlign={'right'}
-								alignItems={'flex-end'}
-								alignSelf={'center'}
-							>
-								<FormLabel>Hasta:</FormLabel>
-							</Grid>
+  function onDocumentLoadSuccess({ numPages }: any) {
+    setNumPages(numPages);
+  }
 
-							<Grid xs={1} md={1} xl={1} />
+  const descargarpdf = async () => {
+    if (!sourceRef.current) return;
 
-							<Grid xs={6} md={5} xl={5} alignSelf={'center'}>
-								<Input
-									slotProps={{
-										input: {
-											type: 'date'
-										}
-									}}
-								/>
-							</Grid>
-						</Grid>
+    const link = document.createElement('a');
+    link.href = `data:application/pdf;base64,${sourceRef.current}`;
+    link.download = 'reporteEsavi.pdf';
+    link.click();
+  };
 
-						{/* botones */}
-						<Grid container xs={12} sm={12} md={12} maxHeight={50} marginTop={1}>
-							<Grid container xs={12} sm={6} md={6} lg={6} maxHeight={50} marginTop={1}>
-								<Grid xs={12} sm={4} md={4} lg={8} maxHeight={50}></Grid>
-								<Grid
-									xs={12}
-									sm={4}
-									md={4}
-									lg={2}
-									maxHeight={50}
-									alignSelf={'center'}
-									textAlign={'center'}
-								>
-									<Button variant="contained">Buscar</Button>
-								</Grid>
-								<Grid
-									xs={12}
-									sm={4}
-									md={4}
-									lg={2}
-									maxHeight={50}
-									alignSelf={'center'}
-									textAlign={'center'}
-								>
-									<Button variant="contained">Limpiar</Button>
-								</Grid>
-							</Grid>
+  return (
+    <div className="RaDatagrid-tableWrapper">
+      <Container>
+        <Box sx={{ flexGrow: 1 }}>
+          <Grid container border={1} borderColor={'divider'} margin={1}>
+            {/* Fecha Desde */}
+            <Grid container xs={12} sm={6} md={6} maxHeight={50} marginTop={3} alignSelf={'flex-start'}>
+              <Grid xs={1} md={3} xl={3} />
+              <Grid xs={2} md={2} xl={2} alignSelf={'center'}>
+                <FormLabel>Desde: </FormLabel>
+              </Grid>
+              <Grid xs={1} md={1} xl={1} />
+              <Grid xs={6} md={6} xl={6} alignSelf={'center'}>
+                <Input
+                  value={desde}
+                  onChange={(e) => setDesde(e.target.value)}
+                  slotProps={{
+                    input: {
+                      type: 'date'
+                    }
+                  }}
+                />
+              </Grid>
+            </Grid>
 
-							<Grid container xs={12} sm={6} md={6} lg={6} maxHeight={50} marginTop={1}>
-								<Grid
-									xs={12}
-									sm={4}
-									md={4}
-									lg={3}
-									maxHeight={50}
-									alignSelf={'center'}
-									textAlign={'center'}
-								>
-									<Button variant="contained" onClick={descargarpdf}>
-										PDF
-									</Button>
-								</Grid>
-								<Grid xs={12} sm={4} md={4} lg={3} maxHeight={50}>
-									<Button variant="contained" onClick={filtrar}>
-										CSV
-									</Button>
-								</Grid>
-								<Grid xs={12} sm={4} md={4} lg={6} maxHeight={50} marginTop={2}></Grid>
-							</Grid>
-						</Grid>
-					</Grid>
-				</Box>
+            {/* Fecha Hasta */}
+            <Grid container xs={12} sm={6} md={6} maxHeight={50} marginTop={3} alignSelf={'flex-start'}>
+              <Grid xs={1} md={1} xl={1} />
+              <Grid xs={2} md={2} xl={2} display={'flex'} flexDirection={'column'} textAlign={'right'} alignItems={'flex-end'} alignSelf={'center'}>
+                <FormLabel>Hasta:</FormLabel>
+              </Grid>
+              <Grid xs={1} md={1} xl={1} />
+              <Grid xs={6} md={5} xl={5} alignSelf={'center'}>
+                <Input
+                  value={hasta}
+                  onChange={(e) => setHasta(e.target.value)}
+                  slotProps={{
+                    input: {
+                      type: 'date'
+                    }
+                  }}
+                />
+              </Grid>
+            </Grid>
 
-				<Document
-					file={`data:application/pdf;base64,${sourceRef.current}`}
-					onLoadSuccess={onDocumentLoadSuccess}
-				>
-					{Array.from(new Array(numPages), (el, index) => (
-						<Page
-							key={`page_${index + 1}`}
-							pageNumber={index + 1}
-							renderTextLayer={false}
-							renderAnnotationLayer={false}
-						/>
-					))}
-				</Document>
-			</Container>
-		</div>
-	);
+            {/* Botones */}
+            <Grid container xs={12} sm={12} md={12} spacing={2} marginTop={1}>
+              <Grid container xs={12} sm={6} md={6} alignItems="center">
+                <Grid xs={12} sm={4}>
+                  {/* Espacio vacío para mantener alineación */}
+                </Grid>
+                <Grid xs={12} sm={4} textAlign="center">
+                  <Button 
+                    variant="contained" 
+                    onClick={consultar} 
+                    disabled={!desde || !hasta || loading} // Deshabilitado si no hay fechas o si está cargando
+                  >
+                    {loading ? <CircularProgress size={24} /> : 'Buscar'}
+                  </Button>
+                </Grid>
+                <Grid xs={12} sm={4} textAlign="center">
+                  <Button variant="contained" onClick={limpiar}>Limpiar</Button>
+                </Grid>
+              </Grid>
+
+              <Grid container xs={12} sm={6} md={6} spacing={1} alignItems="center">
+                <Grid xs={12} sm={4} textAlign="center">
+                  {/* Botón CSV comentado */}
+                  {/* <Button variant="contained" onClick={filtrar}>CSV</Button> */}
+                </Grid>
+                <Grid xs={12} sm={4} textAlign="center">
+                  <Button variant="contained" onClick={descargarpdf} disabled={!isPdfAvailable}>
+                    PDF
+                  </Button>
+                </Grid>
+                <Grid xs={12} sm={4}>
+                  {/* Espacio vacío para mantener alineación */}
+                </Grid>
+              </Grid>
+            </Grid>
+
+          </Grid>
+        </Box>
+
+        {/* Visualización del PDF */}
+        {source && (
+          <Document
+            file={`data:application/pdf;base64,${sourceRef.current}`}
+            onLoadSuccess={onDocumentLoadSuccess}
+          >
+            {Array.from(new Array(numPages), (el, index) => (
+              <Page
+                key={`page_${index + 1}`}
+                pageNumber={index + 1}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+              />
+            ))}
+          </Document>
+        )}
+
+      </Container>
+    </div>
+  );
 };
 
 export default ReportesList;

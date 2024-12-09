@@ -24,7 +24,7 @@ const optionsGrave = {
 		},
 		title: {
 			display: true,
-			text: 'Casos esavi por sexo grave'
+			text: ' Casos esvai por sexo grave'
 		}
 	}
 };
@@ -142,6 +142,8 @@ const DashBoardList = () => {
 
 			// Verificar si la respuesta es válida antes de parsearla como JSON
 			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+				console.log("Respuesta Esavi Grave");
+				
 				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
 				const labels = respuesta.data.map((d: any) => d.sexo);
 
