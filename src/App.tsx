@@ -9,6 +9,7 @@ import keycloak from './keycloak';
 import { useContext } from 'react';
 import { myAuthKeyCloakProvider } from './myAuthKeyCloakProvider';
 import { AuthenticationContext } from './contexts/AuthContext ';
+import analisis from './pages/analisis';
 
 const App = () => {
     const { updateInformationUser, authState } = useContext(AuthenticationContext);
@@ -16,13 +17,15 @@ const App = () => {
     return (
         <Admin
             dataProvider={dataProvider}
-            // authProvider={myAuthKeyCloakProvider(keycloak, { updateInformationUser })}
+            authProvider={myAuthKeyCloakProvider(keycloak, { updateInformationUser })}
             layout={CustomLayout}
             loginPage={CustomLoginPage}
         >
             <Resource name="dashboard" list={dashboard.list} />
             <Resource name="esavis" list={esavis.list} />
             <Resource name="reportes" list={reportes.list} />
+            <Resource name="analisis" list={analisis.list} />
+
 
         </Admin>
     );

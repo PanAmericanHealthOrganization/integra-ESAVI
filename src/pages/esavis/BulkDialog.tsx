@@ -44,7 +44,7 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
                 // Si es necesario manejar la respuesta, puedes procesarla aquí
                 setResponse(`${respuesta.msg}`);
             } else {
-                setResponse(`Error: ${respuesta.status}`);
+                setResponse(`${respuesta.status}`);
             }
         }
 

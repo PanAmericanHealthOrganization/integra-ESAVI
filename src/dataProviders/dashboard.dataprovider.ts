@@ -37,6 +37,36 @@ export const dashboardDataProvider: DataProvider = {
 		return data;
 	},
 
+	casosCruzadosMeddra: async () => {
+		const response = await fetch(`${INT_ESAV_API}/integrator/reports/casosCruzadosMeddra`, {
+			headers: {
+				'X-API-KEY': INT_API_KEY || ''
+			}
+		});
+		const data = await response.json();
+		return data;
+	},
+
+	casosNoCruzadosMeddra: async () => {
+		const response = await fetch(`${INT_ESAV_API}/integrator/reports/casosNoCruzadosMeddra`, {
+			headers: {
+				'X-API-KEY': INT_API_KEY || ''
+			}
+		});
+		const data = await response.json();
+		return data;
+	},
+	
+	casosCruzadosWhodrug: async () => {
+		const response = await fetch(`${INT_ESAV_API}/integrator/reports/casosCruzadosWhodrug`, {
+			headers: {
+				'X-API-KEY': INT_API_KEY || ''
+			}
+		});
+		const data = await response.json();
+		return data;
+	},
+
 	casosEsaviPorMes: async () => {
 		const response = await fetch(`${INT_ESAV_API}/integrator/reports/casosEsaviPorMes`, {
 			headers: {

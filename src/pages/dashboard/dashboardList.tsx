@@ -10,8 +10,10 @@ import {
 	Title,
 	Tooltip,
 	Legend,
-	ArcElement
+	ArcElement,
+	ChartOptions
 } from 'chart.js';
+import { size } from 'lodash';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
@@ -56,6 +58,65 @@ const optionsPorAnio = {
 		}
 	}
 };
+
+
+const cruceMeddra = {
+	responsive: true,
+	maintainAspectRatio: false,
+	plugins: {
+		legend: {
+			position: 'top' as const
+		},
+		title: {
+			display: true,
+			text: 'DATOS CRUZADOS MEDDRA',
+		}
+	}
+};
+
+const cruceWhoDrug = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: 'top' as const
+    },
+    title: {
+      display: true,
+      text: 'DATOS CRUZADOS WhoDrug',
+    }
+  },
+  options: {
+    scales: {
+      y: {
+        beginAtZero: true,
+        min: 0,
+        max: 100,
+        ticks: {
+          stepSize: 10,
+        },
+        type: 'logarithmic',
+      },
+    },
+  },
+};
+
+const crucenoMeddra = {
+	responsive: true,
+	maintainAspectRatio: false,
+	plugins: {
+		legend: {
+			position: 'top' as const
+		},
+		title: {
+			display: true,
+			text: 'DATOS NO CRUZADOS MEDDRA',
+		}
+	}
+};
+
+
+
 
 const DashBoardList = () => {
 	console.log('En DashBoardList');
@@ -134,6 +195,92 @@ const DashBoardList = () => {
 		]
 	});
 
+
+	
+
+	const dataInicialMeddra = {
+		total_registros: '0',
+		total_llt: '0',
+		total_pt: '0',
+		total_soc: '0',
+	}
+
+	const dataInicialWhoDrug = {
+		total_registros: '0',
+		total_whudrug: '0',
+		total_no_whudrug: '0'
+		
+	}
+
+
+
+	const [datosCruceMeddra, setDatosCruceMeddra] = useState({
+		labels: ['T. Registros', 'LLT', 'PT', 'SOC'],
+		datasets: [
+			{
+				label: '',
+				data: [
+					parseInt(dataInicialMeddra.total_registros, 10) || 0,
+					parseInt(dataInicialMeddra.total_llt, 10) || 0,
+					parseInt(dataInicialMeddra.total_pt, 10) || 0,
+					parseInt(dataInicialMeddra.total_soc, 10) || 0
+				],
+				backgroundColor: [
+					'rgba(255, 99, 132, 0.5)',
+					'rgba(53, 162, 235, 0.5)',
+					'rgba(255, 159, 64, 0.5)',
+					'rgba(75, 192, 192, 0.5)',
+				]
+			},
+		],
+	});
+
+	const [datosNoCruceMeddra, setNoDatosCruceMeddra] = useState({
+		labels: ['T. Registros', 'LLT', 'PT', 'SOC'],
+		datasets: [
+			{
+				label: '',
+				data: [
+					parseInt(dataInicialMeddra.total_registros, 10) || 0,
+					parseInt(dataInicialMeddra.total_llt, 10) || 0,
+					parseInt(dataInicialMeddra.total_pt, 10) || 0,
+					parseInt(dataInicialMeddra.total_soc, 10) || 0
+				],
+				backgroundColor: [
+					'rgba(255, 99, 132, 0.5)',
+					'rgba(53, 162, 235, 0.5)',
+					'rgba(255, 159, 64, 0.5)',
+					'rgba(75, 192, 192, 0.5)',
+				]
+			},
+		],
+	});
+
+	const [datosCruceWhoDrug, setDatosCruceWhoDrug] = useState({
+		labels: ['T. Registros', 'Cruzados', 'Sin Cruce'],
+
+		datasets: [
+			{
+				label: '',
+				data: [
+					parseInt(dataInicialWhoDrug.total_registros, 100) || 0,
+					parseInt(dataInicialWhoDrug.total_whudrug, 100) || 0,
+					parseInt(dataInicialWhoDrug.total_no_whudrug, 100) || 0,
+					
+				],
+				backgroundColor: [
+					'rgba(255, 99, 132, 0.5)',
+					'rgba(53, 162, 235, 0.5)',
+					'rgba(255, 159, 64, 0.5)',
+				]
+			},
+		],
+	});
+
+
+
+
+
 	const consultar = async () => {
 		try {
 			console.log('*** INICIO consultar', process.env.REACT_APP_ESAVI_GRAVE);
@@ -143,7 +290,7 @@ const DashBoardList = () => {
 			// Verificar si la respuesta es válida antes de parsearla como JSON
 			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
 				console.log("Respuesta Esavi Grave");
-				
+
 				const cantidad = respuesta.data.map((d: any) => parseInt(d.cantidad));
 				const labels = respuesta.data.map((d: any) => d.sexo);
 
@@ -272,10 +419,155 @@ const DashBoardList = () => {
 		}
 	};
 
+
+	const consultar4 = async () => {
+		try {
+			const respuesta = await dashboardDataProvider.casosCruzadosMeddra();
+			console.log('*** casosEsaviPorMes', respuesta);
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+
+				const total_registros = respuesta.data.map((d: any) => d.total_registros);
+				const total_llt = respuesta.data.map((d: any) => d.total_llt);
+				const total_pt = respuesta.data.map((d: any) => d.total_pt);
+				const total_soc = respuesta.data.map((d: any) => d.total_soc);
+
+
+				const data = {
+
+					labels: ['T. Registros', 'LLT', 'PT', 'SOC'],
+					datasets: [
+						{
+							label: '',
+							data: [
+								parseInt(total_registros, 10) || 0,
+								parseInt(total_llt, 10) || 0,
+								parseInt(total_pt, 10) || 0,
+								parseInt(total_soc, 10) || 0
+							],
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.5)',
+								'rgba(53, 162, 235, 0.5)',
+								'rgba(255, 159, 64, 0.5)',
+								'rgba(75, 192, 192, 0.5)',
+							]
+						},
+					],
+				}
+
+				setDatosCruceMeddra(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorMes: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorMes:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
+		}
+	};
+
+	const consultar5 = async () => {
+		try {
+			const respuesta = await dashboardDataProvider.casosNoCruzadosMeddra();
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+
+				const total_registros = respuesta.data.map((d: any) => d.total_registros);
+				const total_llt = respuesta.data.map((d: any) => d.total_llt);
+				const total_pt = respuesta.data.map((d: any) => d.total_pt);
+				const total_soc = respuesta.data.map((d: any) => d.total_soc);
+
+
+				const data = {
+
+					labels: ['T. Registros', 'LLT', 'PT', 'SOC'],
+					datasets: [
+						{
+							label: '',
+							data: [
+								parseInt(total_registros, 10) || 0,
+								parseInt(total_llt, 10) || 0,
+								parseInt(total_pt, 10) || 0,
+								parseInt(total_soc, 10) || 0
+							],
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.5)',
+								'rgba(53, 162, 235, 0.5)',
+								'rgba(255, 159, 64, 0.5)',
+								'rgba(75, 192, 192, 0.5)',
+							]
+						},
+					],
+				}
+
+				setNoDatosCruceMeddra(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorMes: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorMes:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
+		}
+	};
+
+	const consultar6 = async () => {
+		try {
+			const respuesta = await dashboardDataProvider.casosCruzadosWhodrug();
+			// Verificar si la respuesta es válida antes de parsearla como JSON
+			if (respuesta && respuesta.msg === 'OK' && respuesta.data) {
+
+				const total_registros = respuesta.data.map((d: any) => d.total_registros);
+				const total_whudrug = respuesta.data.map((d: any) => d.total_whudrug);
+				const total_no_whudrug = respuesta.data.map((d: any) => d.total_no_whudrug);
+				
+
+				const data = {
+
+					labels: ['T. Registros', 'Cruzados', 'Sin Cruce'],
+					datasets: [
+						{
+							label: '',
+							data: [
+								parseInt(total_registros, 10) || 0,
+								parseInt(total_whudrug, 10) || 0,
+								parseInt(total_no_whudrug, 10) || 0,
+								
+							],
+							backgroundColor: [
+								'rgba(255, 99, 132, 0.5)',
+								'rgba(53, 162, 235, 0.5)',
+								'rgba(255, 159, 64, 0.5)',
+							]
+						},
+					],
+				}
+				
+
+				setDatosCruceWhoDrug(data);
+			} else {
+				console.error('Error en la solicitud casosEsaviPorMes: Respuesta inválida', respuesta);
+				// Manejar el error como consideres adecuado (ej. mostrar un mensaje al usuario)
+			}
+		} catch (error) {
+			console.error('Error en la solicitud casosEsaviPorMes:', error);
+			// Manejar error de red u otros errores
+			// Ej. mostrar un mensaje de error al usuario
+		}
+	};
+
+
+
+
 	useEffect(() => {
 		consultar();
 		consultar2();
 		consultar3();
+		consultar4();
+		consultar5();
+		consultar6();
 	}, []);
 
 	return (
@@ -288,8 +580,21 @@ const DashBoardList = () => {
 					<Pie data={dataCasosEsaviPorSexoGrave as any} options={optionsGrave} />
 				</Grid>
 				<Grid item xs={12}>
-					<Bar data={datosCasosEsaviPorMes} options={optionsPorAnio} />
+					{/* <Bar data={datosCasosEsaviPorMes} options={optionsPorAnio} /> */}
 				</Grid>
+				<Grid item xs={12}>
+					{/* <Bar data={datosCruceMeddra} options={} /> */}
+					<Bar data={datosCruceMeddra} options={cruceMeddra} />
+				</Grid>
+				<Grid item xs={12}>
+					{/* <Bar data={datosCruceMeddra} options={} /> */}
+					<Bar data={datosNoCruceMeddra} options={crucenoMeddra} />
+				</Grid>
+				<Grid item xs={12}>
+					{/* <Bar data={datosCruceMeddra} options={} /> */}
+					<Bar data={datosCruceWhoDrug} options={cruceWhoDrug} />
+				</Grid>
+				
 			</Grid>
 		</Box>
 	);

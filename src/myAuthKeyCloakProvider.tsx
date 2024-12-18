@@ -71,7 +71,7 @@ export const myAuthKeyCloakProvider = (
 			resource_access: decoded.resource_access || null,
 		  };
 		  if (options.updateInformationUser) {
-			//  options.updateInformationUser(user);
+			 options.updateInformationUser(user);
 		  }
 		 // Extraer roles del token
 		 const roles = decoded.realm_access?.roles || [];
