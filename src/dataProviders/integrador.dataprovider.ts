@@ -39,7 +39,7 @@ export const integradorDataProvider: DataProvider = {
 		return data;
 	},
 	importDataDHIS2: async (startDate: string, endDate: string) => {
-		const response = await fetch(`${INT_ESAV_API}/integrator/dhis2/bulk?codigoATC=J07&fechaInicio=${startDate}&fechaFin=${endDate}`, {
+		const response = await fetch(`${INT_ESAV_API}/integrator/dhis2/bulk?codigoATC=''&fechaInicio=${startDate}&fechaFin=${endDate}`, {
 			headers: {
 				'X-API-KEY': INT_API_KEY || ''
 			}
