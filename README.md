@@ -1,58 +1,104 @@
-# React-admin CRM
+# INTEGRA-ESAVI
 
-This is a demo of the [react-admin](https://github.com/marmelab/react-admin) library for React.js. It's a CRM for a fake Web agency with a few sales. You can test it online at https://marmelab.com/react-admin-crm.
+Aplicación web para el sistema INTEGRA-ESAVI desarrollada con React, TypeScript y Vite.
 
-https://user-images.githubusercontent.com/99944/116970434-4a926480-acb8-11eb-8ce2-0602c680e45e.mp4
+## Requisitos Previos
 
-React-admin usually requires a REST/GraphQL server to provide data. In this demo however, the API is simulated by the browser (using [FakeRest](https://github.com/marmelab/FakeRest)). The source data is generated at runtime by a package called [data-generator](https://github.com/marmelab/react-admin/tree/master/examples/data-generator).
+- **Node.js**: v20.10.0 (especificado en `.nvmrc`)
+- **pnpm**: Gestor de paquetes recomendado
 
-To explore the source code, start with [src/App.tsx](https://github.com/marmelab/react-admin/blob/master/examples/crm/src/App.tsx).
+## Instalación
 
-**Note**: This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app).
+1. **Verificar la versión de Node.js:**
+   ```bash
+   node --version
+   # Debe mostrar: v20.10.0
+   ```
 
-## How to run
+2. **Instalar pnpm (si no está instalado):**
+   ```bash
+   npm install -g pnpm
+   ```
 
-After having cloned the react-admin repository, run the following commands at the react-admin root:
+3. **Instalar dependencias:**
+   ```bash
+   pnpm install
+   ```
 
-```sh
-make install
+## Scripts Disponibles
 
-make build
+- **Desarrollo:**
+  ```bash
+  pnpm dev
+  ```
+  Inicia el servidor de desarrollo en `http://localhost:5173`
 
-make run-crm
+- **Build de producción:**
+  ```bash
+  pnpm build
+  ```
+  Genera los archivos optimizados en la carpeta `dist/`
+
+- **Preview del build:**
+  ```bash
+  pnpm preview
+  ```
+  Sirve los archivos de producción localmente
+
+- **Linting:**
+  ```bash
+  pnpm lint
+  ```
+  Ejecuta ESLint para verificar el código
+
+## Tecnologías Utilizadas
+
+- **React 18** - Biblioteca de interfaz de usuario
+- **TypeScript** - Tipado estático
+- **Vite 5** - Herramienta de build y desarrollo
+- **React Admin** - Framework para aplicaciones administrativas
+- **Material-UI** - Componentes de UI
+- **Keycloak** - Autenticación y autorización
+- **pnpm** - Gestor de paquetes
+
+## Estructura del Proyecto
+
+```
+src/
+├── components/          # Componentes reutilizables
+├── pages/              # Páginas de la aplicación
+├── contexts/           # Contextos de React
+├── dataProviders/      # Proveedores de datos
+├── layout/             # Componentes de layout
+└── types.ts           # Definiciones de tipos TypeScript
 ```
 
-## Available Scripts
+## Configuración de Desarrollo
 
-In the project directory, you can run:
+El proyecto está configurado para usar:
+- **Node.js v20.10.0** (especificado en `.nvmrc`)
+- **pnpm** como gestor de paquetes
+- **Vite 5** para desarrollo y build
+- **TypeScript** para tipado estático
 
-### `npm start`
+## Despliegue
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Para desplegar la aplicación:
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+1. Ejecutar el build de producción:
+   ```bash
+   pnpm build
+   ```
 
-### `npm test`
+2. Los archivos optimizados se generarán en la carpeta `dist/`
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](#running-tests) for more information.
+3. Servir la carpeta `dist/` con cualquier servidor web estático
 
-### `npm run build`
+## Notas Importantes
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-### `npm run deploy`
-
-Deploy the build to GitHub gh-pages.
-
-
-pm2 serve build 8082 --spa
-pm2 serve build 8080 --spa
+- El proyecto usa **pnpm** como gestor de paquetes principal
+- La versión de Node.js está fijada en v20.10.0
+- Vite está configurado para desarrollo rápido y builds optimizados
+- Se incluye configuración para Keycloak para autenticación
 
 
