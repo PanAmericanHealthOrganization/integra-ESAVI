@@ -1,0 +1,5 @@
+"0","consulta1 <- dbGetQuery(con, dosis)
+"
+"2","Error in .jcall(conn@jc, ""Ljava/sql/Statement;"", ""createStatement"") : 
+  RcallMethod: attempt to call a method of a NULL object.
+"

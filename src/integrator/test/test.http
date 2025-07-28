@@ -1,0 +1,16 @@
+### Prueba del servicio de seed
+
+# Limpiar datos existentes
+DELETE http://localhost:8081/seed
+
+###
+
+# Cargar datos de ejemplo
+POST http://localhost:8081/seed
+
+###
+
+# Verificar que se cargaron los datos (opcional)
+GET http://localhost:8081/notificacion
+
+###

@@ -1,0 +1,59 @@
+### Prueba del método findAll de notificaciones
+
+# Obtener todas las notificaciones
+GET http://localhost:8081/integrator/notificacion/findAll
+Content-Type: application/json
+
+###
+
+# Obtener todas las notificaciones (método alternativo)
+GET http://localhost:8081/integrator/notificacion
+Content-Type: application/json
+
+###
+
+# Obtener una notificación específica por UUID
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}
+Content-Type: application/json
+
+###
+
+# Obtener una notificación con relaciones específicas
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}?r=paciente
+Content-Type: application/json
+
+###
+
+# Obtener medicina por notificación UUID
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/medicina
+Content-Type: application/json
+
+###
+
+# Buscar medicina específica por UUID perteneciente a una notificación
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/medicina/{{medicina_uuid}}
+Content-Type: application/json
+
+###
+
+# Buscar antecedente de embarazo por UUID de notificación
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/antecedente-embarazo
+Content-Type: application/json
+
+###
+
+# Buscar antecedente de evento por UUID de notificación
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/antecedente-evento
+Content-Type: application/json
+
+###
+
+# Buscar antecedente médico por UUID de notificación
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/antecedente-medico
+Content-Type: application/json
+
+###
+
+# Buscar antecedente de preexistencia por UUID de notificación
+GET http://localhost:8081/integrator/notificacion/{{notificacion_uuid}}/antecedente-preexistencia
+Content-Type: application/json 

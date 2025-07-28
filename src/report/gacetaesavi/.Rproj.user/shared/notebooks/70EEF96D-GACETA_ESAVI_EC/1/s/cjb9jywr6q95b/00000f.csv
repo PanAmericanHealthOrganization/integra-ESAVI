@@ -1,0 +1,18 @@
+"0","#| label: conf-formato
+"
+"2","Loading required package: RJDBC
+"
+"2","Loading required package: rJava
+"
+"2","Error: package or namespace load failed for ‘rJava’:
+ .onLoad failed in loadNamespace() for 'rJava', details:
+  call: fun(libname, pkgname)
+  error: JAVA_HOME cannot be determined from the Registry
+"
+"2","Failed with error:  "
+"2",""
+"2","‘package ‘rJava’ could not be loaded’"
+"2",""
+"2","
+"
+"0","options(scipen=999)"

@@ -1,0 +1,8 @@
+"0","fecha_corte<- dbGetQuery(con,""select TO_DATE(valor, 'YYYYMMDD') FechaCorte from dhi_esavi.tc_parametro p where clave = 'FechaFin2'"") 
+"
+"2","Error in dbSendQuery(conn, statement, ...) : 
+  Unable to retrieve JDBC result set
+  JDBC ERROR: ERROR: no existe la relación «dhi_esavi.tc_parametro»
+  Position: 51
+  Statement: select TO_DATE(valor, 'YYYYMMDD') FechaCorte from dhi_esavi.tc_parametro p where clave = 'FechaFin2'
+"

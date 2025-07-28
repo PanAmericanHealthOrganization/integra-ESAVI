@@ -1,0 +1,91 @@
+---
+title: "Vigilancia de Eventos Adversos posteriores a la vacunación contra el COVID-19 en Ecuador Periodo de reporte"
+format: 
+  pdf:
+    include-in-header: 
+      - header.tex
+    include-before-body:
+      - before-body.tex
+    include-after-body:
+      - after-body.tex 
+    toc: true
+    toc-title: "Tabla de contenidos"
+    toc-depth: 4
+    documentclass: scrreprt
+    papersize: A4
+    number-sections: true
+    colorlinks: true
+    lot: true
+    lof: true
+    fig-pos: 'H'
+execute:
+  echo: false
+  error: false
+  warning: false
+crossref: 
+  lof-title: "Lista de Figuras"
+  lot-title: "Lista de Tablas"
+  fig-title: Figura
+  tbl-title: Tabla
+lang: es  
+bibliography: bibliografia_esavi.bib
+csl: din-1505-2-numeric.csl
+---
+
+```{r}
+#| label: carga_librerias
+#pacman::p_load(RPostgreSQL, tidyverse, sf, leaflet, flextable, lubridate, colorspace, sqldf, scales, stringi, janitor, kableExtra, emojifont, cowplot)
+#
+pacman::p_load(libgdal, tidyverse, sf, leaflet) 
+#, RPostgreSQL, tidyverse, sf, leaflet, magrittr, dplyr, flextable, lubridate, colorspace, sqldf, scales, stringi, janitor, kableExtra, emojifont, cowplot)
+#install.packages("dplyr")
+#install.packages("magrittr")
+#library(dplyr)
+#library(magrittr)
+
+#theme_set(theme_minimal())
+```
+
+```{r}
+#| label: conf-formato
+options(scipen=999)
+form_dec <- scales::label_comma(accuracy = .2, big.mark = "", decimal.mark = ",")
+form_mil <- scales::label_comma(big.mark = " ")
+```
+
+```{r}
+#| label: conexion_db
+
+library(DBI)
+library(RJDBC)
+
+dsn_database <- "dhis2"
+dsn_hostname <- "10.64.102.66"
+dsn_port <- 5432
+dsn_uid <- "usr_dhis2esavi"
+dsn_pwd <- "aaaDHIS2"
+
+drv <- JDBC("org.postgresql.Driver","./jdbc/postgresql-42.6.0.jar")
+con <- dbConnect(drv, url="jdbc:postgresql://10.64.102.66:5432/dhis2", user="usr_dhis2esavi", password="aaaDHIS2")
+
+
+```
+
+# Antecedentes
+
+El 31 de diciembre de 2019 se identificaron los primeros casos de neumonía de origen desconocido en China, y el 7 de enero de 2020 se conoció por primera vez un nuevo coronavirus SARS-CoV-2 en humanos [@SAGE_marco]. El primer caso de esta enfermedad en Ecuador fue reportado el 29 de febrero de 2020 [@caso1covid].
+
+El 21 de enero de 2021 inició el proceso de vacunación en el Ecuador. Al momento, en el Ecuador se aplican las vacunas Pfizer/BioNTech, AstraZeneca, Sinovac y la vacuna Cansino. Todas las vacunas fueron aprobadas por la \ac{arcsa} [@caso1covid].
+
+En la tabla se evidencia la tasa de reporte de ESAVI NO GRAVE Y ESAVI GRAVE en la Región de las Américas, las cuales son reportadas a la Organización Mundial de la Salud.
+
+```{r}
+
+
+# Conclusiones
+
+1.  Las tasas reportadas de los ESAVI GRAVES, están dentro lo esperable, son similares en otros países de la región y corresponde al reporte de la región de las Américas. El reporte de los ESAVI está dentro de los parámetros, en otros lugares de las Américas no hay señales de alarma con respecto a la seguridad de las vacunas.
+
+2.  La tasa de reporte de ESAVI GRAVE por tipo de vacuna es similar en los cuatro grupos, encontrándose dentro del rango de la ficha técnica del fabricante.
+
+# Bibliografía

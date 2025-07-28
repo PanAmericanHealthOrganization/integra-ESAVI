@@ -1,0 +1,5 @@
+[2,"\n"]
+[1,"pandoc \n  to: latex\n  output-file: cabecera.tex\n  standalone: true\n  shift-heading-level-by: -1\n  pdf-engine: xelatex\n  variables:\n    graphics: true\n    tables: true\n  default-image-extension: pdf\n  toc: true\n  toc-depth: 4\n  number-sections: true\n  \nmetadata\n"]
+[1,"  documentclass: scrreprt\n  classoption:\n    - DIV=11\n    - numbers=noendperiod\n  papersize: A4\n  header-includes:\n    - '\\KOMAoption{captions}{tableheading}'\n  block-headings: true\n  title: Vigilancia de Eventos Adversos posteriores a la vacunación contra el COVID-19 en Ecuador Periodo de reporte  `r params$mes` - `r params$anio`\n  crossref:\n    lof-title: Lista de Figuras\n    lot-title: Lista de Tablas\n    fig-title: Figura\n    tbl-title: Tabla\n  lang: es\n  bibliography:\n    - bibliografia_esavi.bib\n  csl: din-1505-2-numeric.csl\n  toc-title: Tabla de contenidos\n  colorlinks: true\n  lot: true\n  lof: true\n  \n"]
+[1,"running xelatex - 1\n"]
+[1,"  This is XeTeX, Version 3.141592653-2.6-0.999995 (TeX Live 2023) (preloaded format=xelatex)\n   restricted \\write18 enabled.\n  entering extended mode\n  \nupdating tlmgr\n"]

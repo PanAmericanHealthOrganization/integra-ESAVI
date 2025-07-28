@@ -1,0 +1,15 @@
+"0","consulta <- dbGetQuery(con, 'select to_char(tn.""FECHAREPORTENACIONAL"", ""yyyy"") Año
+from dhi_esavi.""TR_PACIENTE"" tp inner join 
+	 dhi_esavi.""TR_NOTIFICACION"" tn on tp.""PACIENTE_ID"" = tn.""PACIENTE_ID""  inner join 
+	 dhi_esavi.""TC_CATALOGO"" tc on tp.""CTSEXO_ID"" = tc.""CATALOGO_ID"" 
+')
+"
+"2","Error in dbSendQuery(conn, statement, ...) : 
+  Unable to retrieve JDBC result set
+  JDBC ERROR: ERROR: no existe la columna «yyyy»
+  Position: 43
+  Statement: select to_char(tn.""FECHAREPORTENACIONAL"", ""yyyy"") Año
+from dhi_esavi.""TR_PACIENTE"" tp inner join 
+	 dhi_esavi.""TR_NOTIFICACION"" tn on tp.""PACIENTE_ID"" = tn.""PACIENTE_ID""  inner join 
+	 dhi_esavi.""TC_CATALOGO"" tc on tp.""CTSEXO_ID"" = tc.""CATALOGO_ID"" 
+"

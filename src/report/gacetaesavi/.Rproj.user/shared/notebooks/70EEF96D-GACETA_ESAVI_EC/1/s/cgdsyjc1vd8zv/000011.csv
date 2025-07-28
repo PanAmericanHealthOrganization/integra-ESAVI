@@ -1,0 +1,23 @@
+"0","pacman::p_load(tidyverse,sf,leaflet,flextable,lubridate,colorspace,RPostgreSQL, sqldf, scales, stringi)
+"
+"2","Installing package into ‘C:/Users/elena/AppData/Local/R/win-library/4.3’
+(as ‘lib’ is unspecified)
+"
+"2","also installing the dependencies ‘proxy’, ‘e1071’, ‘wk’, ‘classInt’, ‘s2’, ‘units’
+
+"
+"2","Warning: downloaded length 0 != reported length 0"
+"2","Warning: cannot open URL 'https://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/4.3/PACKAGES.rds': HTTP status was '404 Not Found'"
+"2","Warning: downloaded length 0 != reported length 0"
+"2","Warning: cannot open URL 'https://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/4.3/PACKAGES.gz': HTTP status was '404 Not Found'"
+"2","Warning: downloaded length 0 != reported length 0"
+"2","Warning: cannot open URL 'https://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/4.3/PACKAGES': HTTP status was '404 Not Found'"
+"2","Warning: unable to access index for repository http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/4.3:
+  cannot open URL 'http://www.stats.ox.ac.uk/pub/RWin/bin/windows/contrib/4.3/PACKAGES'"
+"1","
+"
+"1",""
+"1","  There is a binary version available but the source version is later"
+"1",""
+"1",":
+"

@@ -1,0 +1,24 @@
+
+### Ejemplo para el método findAll de NotificacionController
+
+GET http://localhost:8081/integrator/notificacion/findAll
+Accept: application/json
+
+
+### Ejemplo para el método findAllPaginated de NotificacionController
+
+POST http://localhost:8081/integrator/notificacion/findAllPaginated
+Content-Type: application/json
+Accept: application/json
+
+{
+  "page": 1,
+  "rowsPerPage": 10,
+  "filters": {
+    "isActive": true
+  },
+  "fields": [],
+  "sorterFields": [
+    { "field": "fechaNacimiento", "order": "DESC" }
+  ]
+}

@@ -1,0 +1,5 @@
+"0","drv <- JDBC(""org.postgresql.Driver"",""/integraEsavi/JDBC/postgresql-42.6.0.jar"")
+"
+"2","Error in JDBC(""org.postgresql.Driver"", ""/integraEsavi/JDBC/postgresql-42.6.0.jar"") : 
+  java.lang.ClassNotFoundException
+"
