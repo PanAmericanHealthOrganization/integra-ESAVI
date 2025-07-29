@@ -7,6 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_INTEGRA_ESAVI_API_URL: string
   readonly VITE_API_KEY: string
   readonly VITE_ESAVI_GRAVE: string
+  readonly VITE_DATA_ANALISIS_URL: string
 }
 
 interface ImportMeta {

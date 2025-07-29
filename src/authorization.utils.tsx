@@ -1,31 +1,22 @@
-import React, { useContext } from 'react';
-import { AuthenticationContext } from './contexts/AuthContext ';
+import React, { useContext } from "react"
+import { AuthenticationContext } from "./contexts/AuthContext "
 
+const Authorize = ({ allowedRoles, deniedRoles, children }: any) => {
+  const { authState } = useContext(AuthenticationContext)
+  // const roles = authState?.realm_access?.roles || [];
 
-const Authorize = ({ allowedRoles, deniedRoles, children } : any) => {
-    const { authState } = useContext(AuthenticationContext);
-    // const roles = authState?.realm_access?.roles || [];
-    
-    const roles = authState?.resource_access?.['api-integra-esavi']?.roles || [];
-    console.log("RolesData:::" , authState?.resource_access );
-    
+  const roles = authState?.resource_access?.["api-integra-esavi"]?.roles || []
+  // Función para verificar si el usuario tiene un rol específico
+  const hasRole = (role: any) => roles.includes(role)
 
+  // Lógica para determinar si el usuario tiene acceso
+  const hasAccess = () => {
+    const hasAllowedRole = allowedRoles.some((role: any) => hasRole(role))
+    const hasDeniedRole = deniedRoles.some((role: any) => hasRole(role))
+    return hasAllowedRole && !hasDeniedRole
+  }
 
-    // Función para verificar si el usuario tiene un rol específico
-    const hasRole = (role : any) => roles.includes(role);
+  return <>{hasAccess() ? children : null}</>
+}
 
-    // Lógica para determinar si el usuario tiene acceso
-    const hasAccess = () => {
-        const hasAllowedRole = allowedRoles.some((role : any) => hasRole(role));
-        const hasDeniedRole = deniedRoles.some((role : any) => hasRole(role));
-        return hasAllowedRole && !hasDeniedRole;
-    };
-
-    return (
-        <>
-            {hasAccess() ? children : null}
-        </>
-    );
-};
-
-export default Authorize;
+export default Authorize
