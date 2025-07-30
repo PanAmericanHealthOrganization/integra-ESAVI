@@ -1,7 +1,6 @@
-import Keycloak, { KeycloakTokenParsed } from "keycloak-js"
-import { AuthContext, AuthProvider } from "react-admin"
 import jwt_decode from "jwt-decode"
-import { useContext } from "react"
+import Keycloak, { KeycloakTokenParsed } from "keycloak-js"
+import { AuthProvider } from "react-admin"
 import { AuthState } from "./contexts/AuthContext "
 
 export type PermissionsFunction = (decoded: KeycloakTokenParsed) => any
@@ -21,7 +20,6 @@ export const myAuthKeyCloakProvider = (
   client: Keycloak,
   options: {
     onPermissions?: (token: KeycloakTokenParsed) => any
-
     loginRedirectUri?: string
     logoutRedirectUri?: string
     updateInformationUser?: (user: AuthState) => any

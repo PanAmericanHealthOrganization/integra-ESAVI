@@ -1,11 +1,10 @@
-import React, { useContext } from "react"
+import { useContext } from "react"
 import { AuthenticationContext } from "./contexts/AuthContext "
 
 const Authorize = ({ allowedRoles, deniedRoles, children }: any) => {
   const { authState } = useContext(AuthenticationContext)
-  // const roles = authState?.realm_access?.roles || [];
 
-  const roles = authState?.resource_access?.["api-integra-esavi"]?.roles || []
+  const roles = authState?.resource_access?.["app-integra-esavi"]?.roles || []
   // Función para verificar si el usuario tiene un rol específico
   const hasRole = (role: any) => roles.includes(role)
 
