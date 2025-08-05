@@ -41,6 +41,12 @@ importers:
       '@nestjs/typeorm':
         specifier: ^9.0.1
         version: 9.0.1(@nestjs/common@9.4.3(cache-manager@5.7.6)(class-transformer@0.5.1)(class-validator@0.14.2)(reflect-metadata@0.1.14)(rxjs@7.8.2))(@nestjs/core@9.4.3)(reflect-metadata@0.1.14)(rxjs@7.8.2)(typeorm@0.3.25(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.15.11)(typescript@4.9.5)))
+      '@nestjsx/crud':
+        specifier: 5.0.0-alpha.3
+        version: 5.0.0-alpha.3(class-transformer@0.5.1)(class-validator@0.14.2)
+      '@nestjsx/crud-typeorm':
+        specifier: 5.0.0-alpha.3
+        version: 5.0.0-alpha.3
       axios:
         specifier: ^1.4.0
         version: 1.10.0
@@ -651,6 +657,21 @@ packages:
       rxjs: ^7.2.0
       typeorm: ^0.3.0
 
+  '@nestjsx/crud-request@5.0.0-alpha.3':
+    resolution: {integrity: sha512-EFeGgh/sSHhD3px9aj4hyjvOqBepMcRFAi5lrYuSUDmnj/eQOa4dg4orehU8gKrSAmgKNe9r0dx0kel7Zgivzg==}
+
+  '@nestjsx/crud-typeorm@5.0.0-alpha.3':
+    resolution: {integrity: sha512-9FN4iBELmhhSoVJj8457kaNGFKhm7IA7zJbLJRGuIb0+12WwCOhY0/bhMg1pWgZ1qUYtkYoELyMiMDroPPtARw==}
+
+  '@nestjsx/crud@5.0.0-alpha.3':
+    resolution: {integrity: sha512-LPFtrrE4nGT1vvzM+IpA4CNazO67Tz8gc4lAfSjwujIeOHPGfj3vJKUlcU/ESRUW/t+bLOF3S1tY/N0GQ/SRyg==}
+    peerDependencies:
+      class-transformer: '*'
+      class-validator: '*'
+
+  '@nestjsx/util@5.0.0-alpha.3':
+    resolution: {integrity: sha512-UTYIxtyx80M42gOZ0VIInSiOLn78P6k1BCziiN8gE3FglzivQ1RGvPpmsRwioYEWG27gOgnMwOQnXv8Zbq8dzQ==}
+
   '@noble/hashes@1.8.0':
     resolution: {integrity: sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==}
     engines: {node: ^14.21.3 || >=16}
@@ -941,6 +962,9 @@ packages:
 
   '@xtuc/long@4.2.2':
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
+
+  '@zmotivat0r/o0@1.0.2':
+    resolution: {integrity: sha512-wQ/sHqJEtYb+QtgxtWlBpGASFZ2avpoRWbvpginEuy7howZHTZTy3zYMRMaBKok4bZwIGU5bjmzE59+m1IWqKQ==}
 
   accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
@@ -1487,6 +1511,10 @@ packages:
 
   deep-is@0.1.4:
     resolution: {integrity: sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==}
+
+  deepmerge@3.3.0:
+    resolution: {integrity: sha512-GRQOafGHwMHpjPx9iCvTgpu9NojZ49q794EEL94JVEw6VaeA8XTUyBKvAkOOjBX9oJNiV6G3P+T+tihFjo2TqA==}
+    engines: {node: '>=0.10.0'}
 
   deepmerge@4.3.1:
     resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
@@ -4340,6 +4368,26 @@ snapshots:
       typeorm: 0.3.25(pg@8.16.3)(reflect-metadata@0.1.14)(ts-node@10.9.2(@types/node@18.15.11)(typescript@4.9.5))
       uuid: 8.3.2
 
+  '@nestjsx/crud-request@5.0.0-alpha.3':
+    dependencies:
+      '@nestjsx/util': 5.0.0-alpha.3
+      qs: 6.14.0
+
+  '@nestjsx/crud-typeorm@5.0.0-alpha.3':
+    dependencies:
+      '@zmotivat0r/o0': 1.0.2
+
+  '@nestjsx/crud@5.0.0-alpha.3(class-transformer@0.5.1)(class-validator@0.14.2)':
+    dependencies:
+      '@nestjsx/crud-request': 5.0.0-alpha.3
+      '@nestjsx/util': 5.0.0-alpha.3
+      class-transformer: 0.5.1
+      class-validator: 0.14.2
+      deepmerge: 3.3.0
+      pluralize: 8.0.0
+
+  '@nestjsx/util@5.0.0-alpha.3': {}
+
   '@noble/hashes@1.8.0': {}
 
   '@nodelib/fs.scandir@2.1.5':
@@ -4710,6 +4758,8 @@ snapshots:
   '@xtuc/ieee754@1.2.0': {}
 
   '@xtuc/long@4.2.2': {}
+
+  '@zmotivat0r/o0@1.0.2': {}
 
   accepts@1.3.8:
     dependencies:
@@ -5309,6 +5359,8 @@ snapshots:
   dedent@1.6.0: {}
 
   deep-is@0.1.4: {}
+
+  deepmerge@3.3.0: {}
 
   deepmerge@4.3.1: {}
 

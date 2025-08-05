@@ -1,16 +1,17 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Notificacion } from '../entity/notificacion.entity';
+import { GetListParams } from 'src/utils/interfaces/pagination';
+import { Repository } from 'typeorm';
 import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
+import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
-import { MedicamentoService } from './medicamento.service';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { AntecedenteMedicoService } from './antecedente-medico.service';
 import { AntecedenteEmbarazoService } from './antecedente-embarazo.service';
 import { AntecedenteEventoService } from './antecedente-evento.service';
+import { AntecedenteMedicoService } from './antecedente-medico.service';
 import { AntecedentePreexistenciaService } from './antecedente-preexistencia.service';
+import { MedicamentoService } from './medicamento.service';
 
 @Injectable()
 export class NotificacionService {
@@ -109,24 +110,16 @@ export class NotificacionService {
   }
 
   /**
-   * Obtiene las notificaciones de forma paginada utilizando QueryBuilder y filtros avanzados.
-   * @param params Objeto con los siguientes campos:
-   *  - page: número de página (opcional, por defecto 1)
-   *  - rowsPerPage: cantidad de resultados por página (opcional, por defecto 10)
-   *  - filters: objeto con los filtros dinámicos (opcional)
-   *  - fields: array de campos a seleccionar (opcional)
-   *  - sorterFields: array de objetos { field: string, order: 'ASC' | 'DESC' } para ordenamiento (opcional)
+   *
+   * @param params
+   * @returns
    */
-  async findAllPaginated(params: {
-    page?: number;
-    rowsPerPage?: number;
-    filters?: any;
-    fields?: string[];
-    sorterFields?: { field: string; order: 'ASC' | 'DESC' }[];
-  }) {
-    const page = params.page ? parseInt(params.page as any, 10) : 1;
-    const limit = params.rowsPerPage
-      ? parseInt(params.rowsPerPage as any, 10)
+  async findAllPaginated(params: GetListParams) {
+    const page = params.pagination.page
+      ? parseInt(params.pagination.page as any, 10)
+      : 1;
+    const limit = params.pagination.perPage
+      ? parseInt(params.pagination.perPage as any, 10)
       : 10;
     const skip = (page - 1) * limit;
 
@@ -134,20 +127,16 @@ export class NotificacionService {
       this.notificacionRepository.createQueryBuilder('notificacion');
 
     // Selección de campos específicos si se solicita
-    if (
-      params.fields &&
-      Array.isArray(params.fields) &&
-      params.fields.length > 0
-    ) {
-      const selectFields = params.fields.map(
+    if (params.meta && Array.isArray(params.meta) && params.meta.length > 0) {
+      const selectFields = params.meta?.fields?.map(
         (field) => `notificacion.${field}`,
       );
       query.select(selectFields);
     }
 
     // Aplicar filtros dinámicos
-    if (params.filters && typeof params.filters === 'object') {
-      Object.entries(params.filters).forEach(([key, value]) => {
+    if (params.filter && typeof params.filter === 'object') {
+      Object.entries(params.filter).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
           // Puedes personalizar aquí para filtros especiales como rangos de fechas, etc.
           if (key === 'fechaDesde') {
@@ -168,12 +157,8 @@ export class NotificacionService {
     query.skip(skip).take(limit);
 
     // Ordenamiento avanzado
-    if (
-      params.sorterFields &&
-      Array.isArray(params.sorterFields) &&
-      params.sorterFields.length > 0
-    ) {
-      params.sorterFields.forEach((sorter, idx) => {
+    if (params.sort && Array.isArray(params.sort) && params.sort.length > 0) {
+      params.sort.forEach((sorter, idx) => {
         if (idx === 0) {
           query.orderBy(`notificacion.${sorter.field}`, sorter.order);
         } else {

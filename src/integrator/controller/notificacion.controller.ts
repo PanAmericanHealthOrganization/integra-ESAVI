@@ -13,6 +13,7 @@ import {
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { NotificacionService } from '../service/notificacion.service';
+import { GetListParams } from 'src/utils/interfaces/pagination';
 
 @ApiTags('Notificacion')
 @Controller('integrator/notificacion')
@@ -131,7 +132,7 @@ export class NotificacionController {
    * @returns
    */
   @Post('findAllPaginated')
-  async findAllPaginated(@Body() body: any) {
+  async findAllPaginated(@Body() body: GetListParams) {
     // Los parámetros de paginación, filtros, campos y ordenamiento vienen en el body
     // Ejemplo de body esperado:
     // {

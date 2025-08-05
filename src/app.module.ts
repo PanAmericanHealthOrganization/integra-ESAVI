@@ -35,7 +35,6 @@ import { HttpExceptionFilter } from './providers/http-exception.filter';
 import { HeaderApiKeyStrategy } from './strategy/header-api-key.strategy';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
-import { VacunasAgregadoModule } from './vacunas-agregado/vacunas-agregado.module';
 
 @Module({
   imports: [
@@ -83,15 +82,12 @@ import { VacunasAgregadoModule } from './vacunas-agregado/vacunas-agregado.modul
       retryDelay: Number(process.env.RETRYDELAY_DATABASE),
       retryAttempts: Number(process.env.RETRYATTEMPTS_DATABASE),
       synchronize: true,
-      logging: 'all',
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
     VigiflowIntegratorModule,
-    // ScheduleModule,
     WhodrugsModule,
     MeddraModule,
-    VacunasAgregadoModule,
   ],
   providers: [
     HeaderApiKeyStrategy,

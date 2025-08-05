@@ -24,3 +24,4 @@ export * from './parametro.entity';
 export * from './tipo-catalogo.entity';
 export * from './vacunacion.entity';
 export * from './vacunometro.entity';
+export * from './sync.entity';

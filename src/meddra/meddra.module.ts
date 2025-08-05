@@ -28,7 +28,6 @@ import { MeddraPtController } from './controllers/meddra.pt.controller';
 import { MeddraLLTService } from './services/meddra-lt-service';
 import { MeddraLltController } from './controllers/meddra.llt.controller';
 
-
 export const MEDDRA_DS = 'meddra';
 @Module({
   imports: [
@@ -58,7 +57,17 @@ export const MEDDRA_DS = 'meddra';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature(
-      [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
+      [
+        MeddraQuery,
+        LLT,
+        PT,
+        SOC,
+        MappingDefinition,
+        Mappings,
+        cie10Meddra,
+        CIE10ES,
+        MeddraSync,
+      ],
       MEDDRA_DS,
     ),
     HttpModule,
@@ -76,8 +85,13 @@ export const MEDDRA_DS = 'meddra';
       useClass: CacheInterceptor,
     },
   ],
-  controllers: [MeddraController, MeddraVersionController, MeddraSocController , MeddraPtController, MeddraLltController ],
-  exports: [ MeddraSocService , MeddraPtService, MeddraLLTService ],
-
+  controllers: [
+    MeddraController,
+    MeddraVersionController,
+    MeddraSocController,
+    MeddraPtController,
+    MeddraLltController,
+  ],
+  exports: [MeddraSocService, MeddraPtService, MeddraLLTService],
 })
 export class MeddraModule {}

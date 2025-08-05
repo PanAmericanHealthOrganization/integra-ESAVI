@@ -32,6 +32,8 @@
     "@nestjs/schedule": "^3.0.3",
     "@nestjs/swagger": "^6.3.0",
     "@nestjs/typeorm": "^9.0.1",
+    "@nestjsx/crud": "5.0.0-alpha.3",
+    "@nestjsx/crud-typeorm": "5.0.0-alpha.3",
     "axios": "^1.4.0",
     "cache-manager": "^5.6.1",
     "class-transformer": "^0.5.1",

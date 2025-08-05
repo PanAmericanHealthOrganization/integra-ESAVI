@@ -12,9 +12,11 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "page": 1,
-  "rowsPerPage": 10,
-  "filters": {
+  "pagination": {
+    "page": 1,
+    "perPage": 10
+  },
+  "filter": {
     "isActive": true
   },
   "fields": [],

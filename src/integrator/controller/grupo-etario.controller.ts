@@ -8,14 +8,12 @@ import {
   Put,
   Req,
   UseFilters,
-  UseGuards,
 } from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { CreateGrupoEtarioDto } from '../dto/create-grupo-etario.dto';
 import { UpdateGrupoEtarioDto } from '../dto/update-grupo-etario.dto';
 import { GrupoEtarioService } from '../service/grupo-etario.service';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Integrador')
 @Controller('integrator/grupo-etario')

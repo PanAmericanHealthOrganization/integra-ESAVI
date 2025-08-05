@@ -1,4 +1,5 @@
 import { BaseEntity, Column, Entity } from 'typeorm';
+import { ISync } from '../dto/sync.dto';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -6,7 +7,7 @@ import { BaseEntity, Column, Entity } from 'typeorm';
   comment:
     'Registra los procesos de sincronización con las diferentes fuentes de datos',
 })
-export class SyncProcess extends BaseEntity {
+export class SyncProcess extends BaseEntity implements ISync {
   @Column({ name: 'ID', primary: true })
   id: string;
 
