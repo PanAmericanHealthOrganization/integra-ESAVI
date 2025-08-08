@@ -38,51 +38,26 @@ interface ESAVIData {
   [key: string]: any
 }
 
-// Función helper para filtrar datos
-const filterESAVIData = (data: ESAVIData[], filter: any): ESAVIData[] => {
-  let filteredData = [...data]
-
-  if (filter.origen) {
-    filteredData = filteredData.filter((esavi) =>
-      esavi.tipo?.toUpperCase().includes(filter.origen.toUpperCase())
-    )
-  }
-
-  if (filter.identificacion) {
-    filteredData = filteredData.filter((esavi) =>
-      esavi.paciente?.identificacion
-        ?.toUpperCase()
-        .includes(filter.identificacion.toUpperCase())
-    )
-  }
-
-  return filteredData
-}
-
-// Función helper para manejar errores
-const handleError = (error: any): Promise<never> => {
-  console.error("Error en ESAVI DataProvider:", error)
-  return Promise.reject(error)
-}
-
 export const esaviDataProvider: DataProvider = {
   getList: async function <RecordType extends RaRecord<Identifier> = any>(
     resource: string,
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
+    console.log("params", params)
     const { filter = {}, pagination } = params
     const { page = 1, perPage = 10 } = pagination
 
     try {
-      const response = await intESAVIClient.get(ENDPOINTS.FIND_ALL)
-
+      const response = await intESAVIClient.post(ENDPOINTS.FIND_ALL, {
+        filter,
+        pagination,
+      })
       return {
         data: response.data.data as any[],
         total: response.data.total,
       }
     } catch (error) {
-      alert(error)
-      return handleError(error)
+      throw new Error("Error al obtener la lista de ESAVIs")
     }
   },
 
@@ -90,6 +65,7 @@ export const esaviDataProvider: DataProvider = {
     resource: string,
     params: GetOneParams<RecordType>
   ): Promise<GetOneResult<RecordType>> {
+    console.log("params", params)
     const { id } = params
 
     try {
@@ -101,7 +77,7 @@ export const esaviDataProvider: DataProvider = {
         data: response.data as any,
       }
     } catch (error) {
-      return handleError(error)
+      throw new Error("Error al obtener la lista de ESAVIs")
     }
   },
 
@@ -124,7 +100,7 @@ export const esaviDataProvider: DataProvider = {
         data: filteredData as any,
       }
     } catch (error) {
-      return handleError(error)
+      throw new Error("Error al obtener la lista de ESAVIs")
     }
   },
 

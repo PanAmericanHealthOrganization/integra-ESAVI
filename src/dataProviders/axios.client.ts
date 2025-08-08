@@ -5,7 +5,6 @@ import ENV_CONFIG from "../utils/env_utils"
 const intESAVIClient = axios.create({
   baseURL: ENV_CONFIG.INT_ESAV_API,
   headers: {
-    "Access-Control-Allow-Origin": "*",
     "X-API-KEY": ENV_CONFIG.INT_API_KEY || "",
     "Content-Type": "application/json",
   },
@@ -17,6 +16,7 @@ intESAVIClient.interceptors.request.use(
     // Puedes modificar la solicitud aquí antes de enviarla
     // Por ejemplo, agregar más headers si es necesario
     // console.log("Solicitud enviada:", config)
+    console.log("config", config)
     return config
   },
   function (error) {
