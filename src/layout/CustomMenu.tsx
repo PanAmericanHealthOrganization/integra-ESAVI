@@ -26,13 +26,7 @@ export const CustomMenu = () => (
 
     <Authorize
       allowedRoles={["Administrador", "Analista de Información"]}
-      deniedRoles={[""]}>
-      <Menu.Item
-        to="/analisis"
-        primaryText="Analitica"
-        leftIcon={<InsightsIcon />}
-      />
-    </Authorize>
+      deniedRoles={[""]}></Authorize>
 
     <Authorize allowedRoles={["Administrador"]} deniedRoles={[""]}>
       <Menu.Item

@@ -11,6 +11,7 @@ import { myAuthKeyCloakProvider } from "./myAuthKeyCloakProvider"
 import { AuthenticationContext } from "./contexts/AuthContext "
 import analisis from "./pages/analisis"
 import vacunasAgregado from "./pages/vacunas-agregado"
+import Authorize from "./authorization.utils"
 
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
