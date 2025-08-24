@@ -1,0 +1,10 @@
+### Ejemplo: Cargar datos de ejemplo (POST /seed)
+POST http://localhost:8081/seed
+Content-Type: application/json
+X-API-KEY: TU_API_KEY_AQUI
+
+###
+
+### Ejemplo: Limpiar datos de ejemplo (DELETE /seed)
+DELETE http://localhost:3000/seed
+X-API-KEY: TU_API_KEY_AQUI

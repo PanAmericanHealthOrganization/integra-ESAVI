@@ -1,22 +1,21 @@
+import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { faker } from '@faker-js/faker';
-import * as moment from 'moment';
 
 // Entidades
 import { Catalogo } from '../entity/catalogo.entity';
-import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
-import { GrupoEtario } from '../entity/grupo-etario.entity';
-import { Paciente } from '../entity/paciente.entity';
-import { Notificacion } from '../entity/notificacion.entity';
-import { DatoEsavi } from '../entity/dato-esavi.entity';
-import { Medicamento } from '../entity/medicamento.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
-import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
-import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
+import { DatoEsavi } from '../entity/dato-esavi.entity';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
+import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
+import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
+import { GrupoEtario } from '../entity/grupo-etario.entity';
+import { Medicamento } from '../entity/medicamento.entity';
+import { Notificacion } from '../entity/notificacion.entity';
+import { Paciente } from '../entity/paciente.entity';
+import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
 
 @Injectable()
 export class SeedService {

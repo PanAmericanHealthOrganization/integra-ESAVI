@@ -1,16 +1,14 @@
-version: '3.8'
-
 services:
-  db:
-    image: postgres:15
+  db_dhis2_esavi:
+    image: postgis/postgis:15-3.3
     container_name: postgres_db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${NAME_DATABASE}
-      POSTGRES_USER: ${USER_DATABASE}
-      POSTGRES_PASSWORD: ${PASS_DATABASE}
+      POSTGRES_DB: dhi_esavi
+      POSTGRES_USER: dhis
+      POSTGRES_PASSWORD: dhis
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
     
