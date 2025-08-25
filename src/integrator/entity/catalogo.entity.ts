@@ -7,20 +7,72 @@ import {
 } from 'typeorm';
 import { TipoCatalogo } from './tipo-catalogo.entity';
 
-@Entity({ schema: 'dhi_esavi' , name: 'TC_CATALOGO' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TC_CATALOGO',
+  comment: 'Catálogo de valores de homologaciones de Vigiflow a DHIS2',
+})
 export class Catalogo {
-  @PrimaryGeneratedColumn('uuid', { name: 'CATALOGO_ID' })
+  /**
+   *
+   */
+  @PrimaryGeneratedColumn('uuid', {
+    name: 'CATALOGO_ID',
+    comment: 'Identificador del catálogo',
+  })
   id: string;
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTCATALOGO_ID' })
+
+  /**
+   *
+   */
+  @ManyToOne(() => Catalogo, { nullable: true })
+  @JoinColumn({
+    name: 'CATALOGO_ID_PADRE',
+  })
   padre: Catalogo;
-  @Column({ name: 'DESCRIPCIONVIGIFLOW' })
+
+  /**
+   *
+   */
+  @Column({
+    name: 'DESCRIPCION_VIGIFLOW',
+    comment: 'Descripción en Vigiflow',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   vigiflow: string;
-  @Column({ name: 'DESCRIPCIONDHIS2' })
+
+  /**
+   *
+   */
+  @Column({
+    name: 'DESCRIPCION_DHIS2',
+    comment: 'Descripción en DHIS2',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   dhis2: string;
-  @Column({ name: 'DESCRIPCIONHOMOLOGADA' })
+
+  /**
+   *
+   */
+  @Column({
+    name: 'DESCRIPCION_HOMOLOGADA',
+    comment: 'Descripción homologada',
+    type: 'varchar',
+    length: 255,
+    nullable: false,
+  })
   homologada: string;
+
+  /**
+   *
+   */
   @ManyToOne(() => TipoCatalogo)
-  @JoinColumn({ name: 'CTTIPOCATALOGO_ID' })
+  @JoinColumn({
+    name: 'CTTIPOCATALOGO_ID',
+  })
   tipoCatalogo: TipoCatalogo;
 }

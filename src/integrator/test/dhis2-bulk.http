@@ -1,0 +1,38 @@
+### Ejemplo para consumir el controlador DHIS2 Integrador
+### Endpoint: GET /integrator/dhis2/bulk
+### Descripción: Importa datos en lote desde DHIS2 basado en fechas y código ATC
+
+
+# Ejemplo 1: Importación básica con fechas y código ATC
+GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07BX03
+X-API-KEY: tu-api-key-aqui
+Content-Type: application/json
+
+###
+
+# Ejemplo 2: Importación para un período de 3 meses
+GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20240101&fechaFin=20240331&codigoATC=J07BX01
+X-API-KEY: tu-api-key-aqui
+Content-Type: application/json
+
+###
+
+# Ejemplo 3: Importación para el año 2023 completo
+GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20230101&fechaFin=20231231&codigoATC=J07BX02
+X-API-KEY: tu-api-key-aqui
+Content-Type: application/json
+
+###
+
+# Ejemplo 4: Importación con código ATC de vacuna COVID-19
+GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20240601&fechaFin=20240630&codigoATC=J07BX03
+X-API-KEY: tu-api-key-aqui
+Content-Type: application/json
+
+###
+
+# Notas:
+# - fechaInicio y fechaFin deben estar en formato YYYYMMDD
+# - codigoATC es el código de la vacuna (ej: J07BX03 para COVID-19)
+# - X-API-KEY es requerido para autenticación
+# - El endpoint devuelve status: "OK" o "ERROR" con mensaje correspondiente

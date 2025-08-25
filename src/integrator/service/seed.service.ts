@@ -195,13 +195,13 @@ export class SeedService {
       // Sexo
       {
         vigiflow: 'Masculino',
-        dhis2: 'Male',
+        dhis2: 'Hombre',
         homologada: 'Masculino',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },
       {
         vigiflow: 'Femenino',
-        dhis2: 'Female',
+        dhis2: 'Mujer',
         homologada: 'Femenino',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },

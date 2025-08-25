@@ -14,7 +14,7 @@ export class CatalogoService {
   constructor(
     @InjectRepository(Catalogo)
     private readonly catalogoRepository: Repository<Catalogo>,
-  ) { }
+  ) {}
 
   async create(createDto: CreateCatalogoDto): Promise<Catalogo> {
     try {
@@ -49,12 +49,12 @@ export class CatalogoService {
   async findByDescriptionToDhis2(name: string) {
     const catalogo = await this.catalogoRepository.findOne({
       where: {
-        dhis2:ILike( name.toUpperCase()),
+        dhis2: ILike(name.toUpperCase()),
       },
     });
     if (catalogo) {
-      console.log("CatalogoEncontrado ::" , catalogo);
-      
+      console.log('CatalogoEncontrado ::', catalogo);
+
       return catalogo;
     }
     throw new EntityNotFoundException(`Catalogo ${name} not found`);
@@ -63,7 +63,7 @@ export class CatalogoService {
   async findByDescriptionToVigiflow(name: string) {
     const catalogo = await this.catalogoRepository.findOne({
       where: {
-        vigiflow:ILike( name.toUpperCase()),
+        vigiflow: ILike(name.toUpperCase()),
       },
     });
     if (catalogo) {
