@@ -23,8 +23,12 @@ export class VigiflowCrawlerService {
     const username = this.configService.get<string>('VIGIFLOW_USERNAME');
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
 
-    const browser = await puppeteer.launch({ headless: false });
-
+    //const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({
+      headless: false,
+      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Ruta al ejecutable de Chrome
+    });
+    
     const page = await browser.newPage();
     await page.setRequestInterception(true);
     //Avoid loading the images

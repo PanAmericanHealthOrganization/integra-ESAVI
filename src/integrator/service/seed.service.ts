@@ -138,13 +138,16 @@ export class SeedService {
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_GRUPOETARIO" CASCADE;',
       );
+      /**
+       * 
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_CATALOGO" CASCADE;',
       );
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_TIPOCATALOGO" CASCADE;',
       );
-
+      
+      */
       // Restaurar las restricciones de clave foránea
       await queryRunner.query('SET session_replication_role = DEFAULT;');
 

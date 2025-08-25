@@ -6,5 +6,5 @@ X-API-KEY: TU_API_KEY_AQUI
 ###
 
 ### Ejemplo: Limpiar datos de ejemplo (DELETE /seed)
-DELETE http://localhost:3000/seed
+DELETE http://localhost:8081/seed
 X-API-KEY: TU_API_KEY_AQUI

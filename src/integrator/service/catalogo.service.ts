@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
@@ -49,7 +49,7 @@ export class CatalogoService {
   async findByDescriptionToDhis2(name: string) {
     const catalogo = await this.catalogoRepository.findOne({
       where: {
-        dhis2: name.toUpperCase(),
+        dhis2:ILike( name.toUpperCase()),
       },
     });
     if (catalogo) {
@@ -63,7 +63,7 @@ export class CatalogoService {
   async findByDescriptionToVigiflow(name: string) {
     const catalogo = await this.catalogoRepository.findOne({
       where: {
-        vigiflow: name.toUpperCase(),
+        vigiflow:ILike( name.toUpperCase()),
       },
     });
     if (catalogo) {
