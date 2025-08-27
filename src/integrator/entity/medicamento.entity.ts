@@ -10,32 +10,81 @@ import { Auditoria } from './auditoria.entity';
 import { Notificacion } from './notificacion.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_MEDICAMENTO' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_MEDICAMENTO',
+  comment: 'Tabla de medicamentos',
+})
 export class Medicamento extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'MEDICAMENTO_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-  @Column({ name: 'ROLMEDICAMENTO', nullable: true })
+  @Column({
+    name: 'ROL_MEDICAMENTO',
+    nullable: true,
+    comment:
+      'Rol del medicamento en el evento (sospechoso, concomitante, etc.)',
+  })
   rolMedicamento: string;
-  @Column({ name: 'CODIGOATC', nullable: true })
+  @Column({
+    name: 'CODIGO_ATC',
+    nullable: true,
+    comment: 'Código ATC (Anatomical Therapeutic Chemical) del medicamento',
+  })
   codigoATC: string;
-  @Column({ name: 'SISTEMADECODIFICACION', nullable: true })
+  @Column({
+    name: 'SISTEMA_DE_CODIFICACION',
+    nullable: true,
+    comment: 'Sistema de codificación utilizado para el medicamento',
+  })
   sistemaCodificacion: string;
 
-  @Column({ name: 'CODIGOMEDICAMENTO', nullable: true })
+  @Column({
+    name: 'CODIGO_MEDICAMENTO',
+    nullable: true,
+    comment: 'Código identificador del medicamento',
+  })
   codigo: string;
-  @Column({ name: 'NOMBREMEDICAMENTO', nullable: true })
+  @Column({
+    name: 'NOMBRE_MEDICAMENTO',
+    nullable: true,
+    comment: 'Nombre comercial del medicamento',
+  })
   nombre: string;
-  @Column({ name: 'NOMBRENORMALIZADOMEDICAMENTO', nullable: true })
+  @Column({
+    name: 'NOMBRE_NORMALIZADO_MEDICAMENTO',
+    nullable: true,
+    comment: 'Nombre normalizado del medicamento',
+  })
   nombreNormalizado: string;
 
-  @Column({ name: 'CODIGOFORMAFARMACEUTICA', nullable: true, length: 64 })
+  @Column({
+    name: 'CODIGO_FORMA_FARMACEUTICA',
+    nullable: true,
+    length: 64,
+    comment: 'Código de la forma farmacéutica',
+  })
   codigoFormaFarmaceutica: string;
-  @Column({ name: 'NOMBREFORMAFARMACEUTICA', nullable: true, length: 128 })
+  @Column({
+    name: 'NOMBRE_FORMA_FARMACEUTICA',
+    nullable: true,
+    length: 128,
+    comment: 'Nombre de la forma farmacéutica (tableta, jarabe, etc.)',
+  })
   nombreFormaFarmaceutica: string;
 
-  @Column({ name: 'CODIGOVIAADMINISTRACION', nullable: true, length: 64 })
+  @Column({
+    name: 'CODIGO_VIA_ADMINISTRACION',
+    nullable: true,
+    length: 64,
+    comment: 'Código de la vía de administración',
+  })
   codigoViaAdministracion: string;
-  @Column({ name: 'NOMBREVIAADMINISTRACION', nullable: true, length: 64 })
+  @Column({
+    name: 'NOMBRE_VIA_ADMINISTRACION',
+    nullable: true,
+    length: 64,
+    comment: 'Nombre de la vía de administración (oral, intravenosa, etc.)',
+  })
   nombreViaAdministracion: string;
 
   @ManyToOne(() => Notificacion)

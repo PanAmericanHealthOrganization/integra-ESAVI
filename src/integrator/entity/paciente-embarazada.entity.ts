@@ -10,13 +10,26 @@ import { Auditoria } from './auditoria.entity';
 import { Notificacion } from './notificacion.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_PACIENTEEMBARAZADA' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_PACIENTEEMBARAZADA',
+  comment: 'Tabla de pacientes embarazadas',
+})
 export class PacienteEmbarazada extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'PACIENTEEMBARAZADA_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-  @Column({ name: 'EMBARAZADAMOMENTOVACUNA', nullable: true })
+  @Column({
+    name: 'EMBARAZADA_MOMENTO_VACUNA',
+    nullable: true,
+    comment:
+      'Indica si la paciente estaba embarazada al momento de la vacunación',
+  })
   momentoVacuna: boolean;
-  @Column({ name: 'EMBARAZADAMOMENTOESAVI', default: false })
+  @Column({
+    name: 'EMBARAZADA_MOMENTO_ESAVI',
+    default: false,
+    comment: 'Indica si la paciente estaba embarazada al momento del ESAVI',
+  })
   momentoEsavi: boolean;
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })

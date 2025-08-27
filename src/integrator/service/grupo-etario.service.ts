@@ -61,19 +61,19 @@ export class GrupoEtarioService {
   }
 
   async findGrupoEtarioByAge(age: number) {
-    console.log("EdadLlegaB:::" , age);
-    
     const grupoEtario = await this.grupoEtarioServiceRepository.findOne({
       where: {
-        inicio: LessThanOrEqual(age), 
-        fin: MoreThanOrEqual(age),   
+        inicioEdad: LessThanOrEqual(age),
+        finEdad: MoreThanOrEqual(age),
+        isActive: true,
+        isEnabled: true,
       },
     });
 
     if (grupoEtario) {
-      console.log("GrupooEta:::" , grupoEtario);
-      
-      return grupoEtario; 
+      console.log('GrupooEta:::', grupoEtario);
+
+      return grupoEtario;
     }
 
     throw new Error('No se encontró un grupo etario para esta edad.');

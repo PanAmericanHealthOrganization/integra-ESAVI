@@ -6,23 +6,34 @@ export enum IntegrationGroup {
   HL7FIRE = 'HL7FIRE',
 }
 
-@Entity({ schema: 'dhi_esavi' , name: 'TC_PARAMETRO' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TC_PARAMETRO',
+  comment: 'Tabla de parámetros de configuración',
+})
 export class Parametro {
-  @PrimaryGeneratedColumn('uuid', { name: 'PARAMETRO_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
   @Column({
     name: 'CLAVE',
     nullable: false,
     unique: true,
     length: 32,
+    comment: 'Clave única del parámetro de configuración',
   })
   clave: string;
-  @Column({ name: 'VALOR', type: 'text', nullable: true })
+  @Column({
+    name: 'VALOR',
+    type: 'text',
+    nullable: true,
+    comment: 'Valor asociado al parámetro de configuración',
+  })
   valor: string;
   @Column({
     name: 'DESCRIPCION',
     nullable: true,
     length: 512,
+    comment: 'Descripción detallada del parámetro',
   })
   descripcion: string;
 }

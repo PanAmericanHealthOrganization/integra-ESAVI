@@ -5,16 +5,23 @@ import * as moment from 'moment/moment';
 import { Notificacion } from './notificacion.entity';
 
 //TODO: ralopez, aplicar clean-code a nombre de modelo ER
-@Entity({ schema: 'dhi_esavi' , name: 'TR_ANTECEDENTESENFERMEDADESPREVIAS' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_ENFERMEDADESPREVIAS' })
 export class AntecedentePreexistencia extends Antecedente {
-  @Column({ name: 'DESCRIPCIONENFPREVIA', type: 'text' })
+  @Column({
+    name: 'DESCRIPCION_ENF_PREVIAS',
+    type: 'text',
+    comment: 'Descripción de la enfermedad previa del paciente',
+  })
   descripcion: string;
   //TODO: ralopez, este catalogo a quien apunta. no hay relacion
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CTLLTMEDDRA_ID' })
   catalogoMedra: Catalogo;
-  
-  @Column({ name: 'CODIGOESAVICIE10' })
+
+  @Column({
+    name: 'CODIGO_ESAVI_CIE10',
+    comment: 'Código CIE-10 de la enfermedad previa',
+  })
   codigoEsaviCIE10: string;
 
   //Id Notificacion

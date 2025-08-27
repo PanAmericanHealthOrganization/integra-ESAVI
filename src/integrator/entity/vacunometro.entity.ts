@@ -3,7 +3,11 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 /**
  *
  */
-@Entity({ schema: 'dhi_esavi', name: 'TR_VACUNOMETRO', comment: 'Vacunometro' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_VACUNOMETRO',
+  comment: 'Conteo de vacunas para el analisis de los datos',
+})
 export class Vacunometro {
   /**
    *

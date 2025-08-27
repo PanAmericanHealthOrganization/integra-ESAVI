@@ -11,31 +11,35 @@ import { Notificacion } from './notificacion.entity';
 import { Catalogo } from './catalogo.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi' , name: 'TR_DATOVACUNACION' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_DATOVACUNACION',
+  comment: 'Tabla de datos de vacunación',
+})
 export class Vacunacion extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'DATOVACUNACION_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-  @Column({ name: 'FECHAVACUNACION' , nullable : true })
+  @Column({ name: 'FECHA_VACUNACION', nullable: true })
   fechaVacunacion: Date;
-  @Column({ name: 'HORAVACUNACION' ,  nullable : true})
+  @Column({ name: 'HORA_VACUNACION', nullable: true })
   horaVacunacion: Date;
-  @Column({ name: 'FECHARECONSTITUCIONVACUNA' , nullable : true })
+  @Column({ name: 'FECHA_RECONSTITUCION_VACUNA', nullable: true })
   fechaReconstitucion: Date;
-  @Column({ name: 'HORARECONSTITUCIONVACUNA'  , nullable : true })
+  @Column({ name: 'HORA_RECONSTITUCION_VACUNA', nullable: true })
   horaReconstitucion: Date;
   /////////////////Se puede crear una entidad llamada vacunatorio/////////
   // @Column()
   // nombreVacunatorio: string;
-  @Column({nullable : true})
+  @Column({ nullable: true })
   direccionVacunatorio: string;
   @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTPROVINCIAVACUNATORIO_ID' })
+  @JoinColumn({ name: 'CT_PROVINCIA_VACUNATORIO_ID' })
   provincia: Catalogo;
   @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTCANTONNOTIFICADOR_ID' })
+  @JoinColumn({ name: 'CT_CANTON_VACUNATORIO_ID' })
   canton: Catalogo;
   @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTPARROQUIANOTIFICADOR_ID' })
+  @JoinColumn({ name: 'CT_PARROQUIA_VACUNATORIO_ID' })
   parroquia: Catalogo;
   ////////////////////////////////////
   @ManyToOne(() => Notificacion)

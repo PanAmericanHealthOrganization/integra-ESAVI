@@ -20,32 +20,16 @@ export class AntecedenteEmbarazoService {
     private readonly notificacionService: NotificacionService,
   ) {}
 
-  // async create(
-  //   notificacion: Notificacion,
-  //   createDto: CreateAntecedenteEmbarazoDto,
-  // ): Promise<AntecedenteEmbarazo> {
-  //   try {
-  //     const antecedenteEmbarazo = plainToClass(AntecedenteEmbarazo, createDto);
-  //     antecedenteEmbarazo.notificacion = notificacion;
-  //     antecedenteEmbarazo.createdBy = 'AUTOMATICO';
-  //     return this.antecedenteEmbarazoRepository.save(antecedenteEmbarazo);
-  //   } catch (e) {
-  //     throw e;
-  //   } finally {
-  //     this.logger.log(
-  //       `AntecedenteEmbarazo has been created: ${JSON.stringify(createDto)}`,
-  //     );
-  //   }
-  // }
-
   async create(
     notificacion: Notificacion,
     createDto: CreateAntecedenteEmbarazoDto,
   ): Promise<AntecedenteEmbarazo> {
     try {
       // Usamos el método para verificar si ya existe un AntecedenteEmbarazo asociado a esa notificación
-      const antecedenteEmbarazoExistente = await this.findByNotificacion(notificacion.id);
-  
+      const antecedenteEmbarazoExistente = await this.findByNotificacion(
+        notificacion.id,
+      );
+
       if (antecedenteEmbarazoExistente) {
         // Si ya existe, actualizamos los campos con los nuevos valores del DTO
         Object.keys(createDto).forEach((key) => {
@@ -55,24 +39,33 @@ export class AntecedenteEmbarazoService {
         });
         antecedenteEmbarazoExistente.notificacion = notificacion; // Aseguramos que la notificación esté asociada
         // Devolvemos el registro actualizado
-        return this.antecedenteEmbarazoRepository.save(antecedenteEmbarazoExistente);
+        return this.antecedenteEmbarazoRepository.save(
+          antecedenteEmbarazoExistente,
+        );
       } else {
         // Si no existe, creamos un nuevo objeto de AntecedenteEmbarazo
-        const antecedenteEmbarazo = plainToClass(AntecedenteEmbarazo, createDto);
+        const antecedenteEmbarazo = plainToClass(
+          AntecedenteEmbarazo,
+          createDto,
+        );
         antecedenteEmbarazo.notificacion = notificacion; // Asociamos la notificación
         // Guardamos y devolvemos el nuevo registro
         return this.antecedenteEmbarazoRepository.save(antecedenteEmbarazo);
       }
     } catch (e) {
-      this.logger.error(`Error al procesar el antecedente de embarazo: ${e.message}`);
-      throw new Error('Hubo un problema al crear o actualizar el antecedente de embarazo');
+      this.logger.error(
+        `Error al procesar el antecedente de embarazo: ${e.message}`,
+      );
+      throw new Error(
+        'Hubo un problema al crear o actualizar el antecedente de embarazo',
+      );
     } finally {
-      this.logger.log(`AntecedenteEmbarazo ha sido procesado: ${JSON.stringify(createDto)}`);
+      this.logger.log(
+        `AntecedenteEmbarazo ha sido procesado: ${JSON.stringify(createDto)}`,
+      );
     }
   }
-  
 
-  
   async createWithNotificacionUUID(
     createDto: CreateAntecedenteEmbarazoDto,
   ): Promise<AntecedenteEmbarazo> {
@@ -140,17 +133,22 @@ export class AntecedenteEmbarazoService {
   }
 
   // Método para buscar AntecedenteEmbarazo por notificación
-private async findByNotificacion(notificacionId: string): Promise<AntecedenteEmbarazo | null> {
-  try {
-    // Realizamos la búsqueda por el ID de notificación
-    const antecedenteEmbarazo = await this.antecedenteEmbarazoRepository.findOne({
-      where: { notificacion: { id: notificacionId } }, // Filtrar por notificación ID
-    });
-    return antecedenteEmbarazo || null; // Si no se encuentra, retornamos null
-  } catch (error) {
-    console.error('Error al buscar AntecedenteEmbarazo por ID de notificación:', error);
-    return null; // Si hay un error, devolvemos null
+  private async findByNotificacion(
+    notificacionId: string,
+  ): Promise<AntecedenteEmbarazo | null> {
+    try {
+      // Realizamos la búsqueda por el ID de notificación
+      const antecedenteEmbarazo =
+        await this.antecedenteEmbarazoRepository.findOne({
+          where: { notificacion: { id: notificacionId } }, // Filtrar por notificación ID
+        });
+      return antecedenteEmbarazo || null; // Si no se encuentra, retornamos null
+    } catch (error) {
+      console.error(
+        'Error al buscar AntecedenteEmbarazo por ID de notificación:',
+        error,
+      );
+      return null; // Si hay un error, devolvemos null
+    }
   }
-}
-
 }

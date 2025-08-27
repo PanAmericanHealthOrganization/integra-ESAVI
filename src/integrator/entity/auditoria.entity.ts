@@ -8,7 +8,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_FECHACREACION',
+    name: 'AUD_FECHA_CREACION',
     type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de creación',
@@ -19,7 +19,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_USUARIOCREACION',
+    name: 'AUD_USUARIO_CREACION',
     length: 60,
     nullable: true,
     comment: 'Usuario que creó el registro',
@@ -30,7 +30,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_FECHAACTUALIZACION',
+    name: 'AUD_FECHA_ACTUALIZACION',
     type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de actualización',
@@ -41,7 +41,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_USUARIOACTUALIZACION',
+    name: 'AUD_USUARIO_ACTUALIZACION',
     nullable: true,
     length: 60,
     comment: 'Usuario que actualizó el registro',
@@ -52,7 +52,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_FECHAELIMINACION',
+    name: 'AUD_FECHA_ELIMINACION',
     type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de eliminación',
@@ -63,7 +63,7 @@ export abstract class Auditoria {
    *
    */
   @Column({
-    name: 'AUD_USUARIOELIMINACION',
+    name: 'AUD_USUARIO_ELIMINACION',
     nullable: true,
     length: 60,
     comment: 'Usuario que eliminó el registro',

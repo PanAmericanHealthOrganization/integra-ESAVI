@@ -11,42 +11,128 @@ import { Notificacion } from './notificacion.entity';
 import * as moment from 'moment/moment';
 import { Catalogo } from './catalogo.entity';
 
-@Entity({ schema: 'dhi_esavi' , name: 'TR_DESENLACEESAVI' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_DESENLACEESAVI',
+  comment: 'Tabla de desenlace del ESAVI',
+})
 export class DesenlaceEsavi extends Auditoria {
   @PrimaryGeneratedColumn('uuid', { name: 'DESENLACEESAVI_ID' })
   id: string;
 
-  @Column({ name: 'CODDESENLACEESAVI', nullable: true, length: 16 })
+  /**
+   *
+   */
+  @Column({
+    name: 'CODDESENLACEESAVI',
+    nullable: true,
+    length: 16,
+    comment: 'Código del desenlace del ESAVI',
+  })
   codigo: string;
 
-  @Column({ name: 'FECHAMUERTE', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'FECHAMUERTE',
+    nullable: true,
+    comment: 'Fecha de fallecimiento del paciente',
+  })
   fechaMuerte: Date;
 
-  @Column({ name: 'AUTOPSIA', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'AUTOPSIA',
+    nullable: true,
+    comment: 'Indica si se realizó autopsia (0=No, 1=Sí)',
+  })
   autopsia: number;
 
-  @Column({ name: 'FECHANOTIFICAMUERTE', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'FECHANOTIFICAMUERTE',
+    nullable: true,
+    comment: 'Fecha de notificación del fallecimiento',
+  })
   fechaNotificacionMuerte: Date;
 
-  @Column({ name: 'AUTOPSIAFETAL', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'AUTOPSIAFETAL',
+    nullable: true,
+    comment: 'Indica si se realizó autopsia fetal (0=No, 1=Sí)',
+  })
   autopsiaFetal: number;
 
-  @Column({ name: 'FECHANOTIFICAMUERTEFETAL', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'FECHANOTIFICAMUERTEFETAL',
+    nullable: true,
+    comment: 'Fecha de notificación de muerte fetal',
+  })
   fechaNotififacionMuerteFetal: Date;
 
-  @Column({ name: 'COMENTARIOS', type: 'text', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'COMENTARIOS',
+    type: 'text',
+    nullable: true,
+    comment: 'Comentarios adicionales sobre el desenlace',
+  })
   comentarios: string;
 
-  @Column({ name: 'FECHAINICIOINVESTIGACION', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'FECHAINICIOINVESTIGACION',
+    nullable: true,
+    comment: 'Fecha de inicio de la investigación del caso',
+  })
   fechaInicioInvestigacion: Date;
 
-  @Column({ name: 'CLASIFICACIONFINALCASO', type: 'text', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'CLASIFICACIONFINALCASO',
+    type: 'text',
+    nullable: true,
+    comment: 'Clasificación final del caso',
+  })
   clasificacionFinalCaso: string;
 
-  @Column({ name: 'CLASIFICACIONFINALCASOA', type: 'text', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'CLASIFICACIONFINALCASOA',
+    type: 'text',
+    nullable: true,
+    comment: 'Clasificación final del caso - Opción A',
+  })
   clasificacionFinalCasoA: string;
 
-  @Column({ name: 'CLASIFICACIONFINALCASOB', type: 'text', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'CLASIFICACIONFINALCASOB',
+    type: 'text',
+    nullable: true,
+    comment: 'Clasificación final del caso - Opción B',
+  })
   clasificacionFinalCasoB: string;
 
   @ManyToOne(() => Notificacion)

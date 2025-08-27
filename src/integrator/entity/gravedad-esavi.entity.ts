@@ -10,40 +10,132 @@ import { Notificacion } from './notificacion.entity';
 import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi' , name: 'TR_GRAVEDADESAVI' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_GRAVEDAD_ESAVI' })
 export class GravedadEsavi extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'GRAVEDADESAVI_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-  @Column({ name: 'TIPOGRAVEDAD', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'TIPO_GRAVEDAD',
+    nullable: true,
+    comment: 'Tipo de gravedad del ESAVI',
+  })
   tipo: string;
-  @Column({ name: 'GRAVMUERTE', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'MUERTE',
+    nullable: true,
+    comment: 'Indica si el ESAVI resultó en muerte',
+  })
   muerte: boolean;
-  @Column({ name: 'GRAVRIESGOVIDA', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'RIESGO_VIDA',
+    nullable: true,
+    comment: 'Indica si el ESAVI puso en riesgo la vida del paciente',
+  })
   riesgoVida: boolean;
-  @Column({ name: 'GRAVDISCAPACIDAD', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'DISCAPACIDAD',
+    nullable: true,
+    comment: 'Indica si el ESAVI resultó en discapacidad',
+  })
   discapacidad: boolean;
-  @Column({ name: 'GRAVHOSPITALIZACION', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'HOSPITALIZACION',
+    nullable: true,
+    comment: 'Indica si el ESAVI requirió hospitalización',
+  })
   hospitalizacion: boolean;
-  @Column({ name: 'GRAVANOMALIACONGENITA', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'ANOMALIA_CONGENITA',
+    nullable: true,
+    comment: 'Indica si el ESAVI causó anomalía congénita',
+  })
   anomaliaCongenita: boolean;
-  @Column({ name: 'GRAVABORTO', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'ABORTO',
+    nullable: true,
+    comment: 'Indica si el ESAVI resultó en aborto',
+  })
   aborto: boolean;
-  @Column({ name: 'GRAVMUERTEFETAL', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'MUERTE_FETAL',
+    nullable: true,
+    comment: 'Indica si el ESAVI resultó en muerte fetal',
+  })
   muerteFetal: boolean;
-  @Column({ name: 'OTROSEVENTOSIMPORTANTES', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'OTROS_EVENTOS_IMPORTANTES',
+    nullable: true,
+    comment: 'Indica si hubo otros eventos importantes',
+  })
   eventoImportante: boolean;
-  @Column({ name: 'OTROSEVENTOSIMPORTANTESTX', nullable: true, length: 2000 })
+  /**
+   *
+   */
+  @Column({
+    name: 'OTROS_EVENTOS_IMPORTANTES_TX',
+    nullable: true,
+    length: 2000,
+    comment: 'Descripción de otros eventos importantes',
+  })
   comentarioEventoImportante: string;
 
-  @Column({ name: 'PARTEEVENTOSPREOCUPACION', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'PARTE_EVENTOS_PREOCUPACION',
+    nullable: true,
+    comment: 'Indica si forma parte de eventos de especial preocupación',
+  })
   parteEventosPreocupacion: boolean;
 
-  @Column({ name: 'NUEVOEVENTOS', nullable: true })
+  /**
+   *
+   */
+  @Column({
+    name: 'NUEVO_EVENTOS',
+    nullable: true,
+    comment: 'Indica si es un evento nuevo no reportado anteriormente',
+  })
   nuevoEventos: boolean;
 
-  @Column({ name: 'CONDICIONEGRESO', nullable: true, length: 2000 })
+  /**
+   *
+   */
+  @Column({
+    name: 'CONDICION_EGRESO',
+    nullable: true,
+    length: 2000,
+    comment: 'Descripción de la condición del paciente al egreso',
+  })
   condicionEgreso: string;
-
 
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })

@@ -1,13 +1,27 @@
-import { BeforeInsert, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
-import { Notificacion } from './notificacion.entity';
-import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment';
-
-
+import {
+  BeforeInsert,
+  Column,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { Notificacion } from './notificacion.entity';
 
 export abstract class Antecedente extends Auditoria {
-  @PrimaryColumn({ name: 'NOTIFICACION_ID' })
+  /**
+   *
+   */
+  @PrimaryGeneratedColumn('uuid', {
+    name: 'NOTIFICACION_ID',
+    comment: 'Identificador de la notificación asociada al antecedente',
+  })
   id: string;
+
+  /**
+   *
+   */
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;
