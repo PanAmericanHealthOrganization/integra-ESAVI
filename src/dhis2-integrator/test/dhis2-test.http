@@ -1,0 +1,148 @@
+### Variables de configuración
+@baseUrl = http://localhost:8081
+@apiPath = /integrator/dhis2
+
+### Headers comunes
+@contentType = application/json
+@accept = application/json
+
+###
+# Test de conexión básica
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Enero 2024
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Febrero 2024
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240201&fechaFin=20240229&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Marzo 2024
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240301&fechaFin=20240331&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Rango personalizado (último trimestre 2023)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20231001&fechaFin=20231231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Código ATC diferente (Antibacterianos)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Importación en lote - Código ATC para antivirales
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J05
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test con fechas del año actual
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20250101&fechaFin=20250131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test con período de una semana
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240115&fechaFin=20240121&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test con período de un día específico
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240115&fechaFin=20240115&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# CONFIGURACIÓN PARA DIFERENTES ENTORNOS
+
+### Desarrollo local
+@devUrl = http://localhost:3000
+@devApiPath = /integrator/dhis2
+
+### Staging
+@stagingUrl = https://staging-api.integra-esavi.com
+@stagingApiPath = /integrator/dhis2
+
+### Producción
+@prodUrl = https://api.integra-esavi.com
+@prodApiPath = /integrator/dhis2
+
+###
+# Test en ambiente de desarrollo
+GET {{devUrl}}{{devApiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test en ambiente de staging
+GET {{stagingUrl}}{{stagingApiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test en ambiente de producción
+GET {{prodUrl}}{{prodApiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# CASOS DE PRUEBA PARA VALIDACIÓN DE ERRORES
+
+### Test con fecha inválida (formato incorrecto)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=2024-01-01&fechaFin=2024-01-31&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test sin parámetros (debería dar error)
+GET {{baseUrl}}{{apiPath}}/bulk
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con fechaFin menor que fechaInicio
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240131&fechaFin=20240101&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con código ATC vacío
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# CÓDIGOS ATC COMUNES PARA PRUEBAS
+# J07 - Vacunas
+# J01 - Antibacterianos para uso sistémico
+# J05 - Antivirales para uso sistémico
+# N02 - Analgésicos
+# R03 - Medicamentos para enfermedades obstructivas de las vías respiratorias
+# C09 - Medicamentos que actúan sobre el sistema renina-angiotensina
+
+###
+# Test con diferentes códigos ATC
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=N02
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=R03
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=C09
+Accept: {{accept}}
+Content-Type: {{contentType}}

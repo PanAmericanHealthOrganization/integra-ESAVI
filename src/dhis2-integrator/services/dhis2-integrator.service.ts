@@ -31,8 +31,8 @@ import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-
 import { CreateDatoVacunaDto } from 'src/integrator/dto/create-dato-vacuna.dto';
 import { DatoVacuna } from 'src/integrator/entity/dato-vacuna.entity';
 import { CreateAntecedenteMedicoDto } from 'src/integrator/dto/create-antecedente-medico.dto';
-
-
+import * as fs from 'fs';
+import * as path from 'path';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -43,7 +43,7 @@ export class Dhis2IntegratorService {
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
     private readonly dhis2AnalyticsService: Dhis2AnalyticsService,
-  ) { }
+  ) {}
 
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
@@ -60,7 +60,7 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) { }
+    } catch (error) {}
     return resultado;
   };
 
@@ -71,29 +71,53 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) { }
+    } catch (error) {}
     return resultado;
   };
 
-  async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC?) {
-
+  async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC: string) {
     //const eventos = await this.dhis2EventsService.getEventos('NrEU7cRCZd7');
-    const data = await this.dhis2AnalyticsService.getEventsReports('NrEU7cRCZd7' , fechaInicio , fechaFin);
+    const data = await this.dhis2AnalyticsService.getEventsReports(
+      'NrEU7cRCZd7',
+      fechaInicio,
+      fechaFin,
+    );
 
-    const transformedData = await this.transformDataFromApi(data)
+    const transformedData = await this.transformDataFromApi(data);
 
     try {
+      console.log('transformedData:', transformedData);
+
+      // Escribir el archivo JSON en la carpeta de test
+      const jsonString = JSON.stringify(transformedData, null, 2);
+      const filePath = path.join(
+        __dirname,
+        '../test/transformedData-output.json',
+      );
+
+      try {
+        // Asegurar que el directorio existe
+        const dir = path.dirname(filePath);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(filePath, jsonString, 'utf8');
+        console.log(`JSON object successfully written to ${filePath}`);
+      } catch (writeError) {
+        console.error('Error writing JSON to file:', writeError);
+      }
+
       await this.extractedFromDHIS2ToPersist(transformedData);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-
   }
 
   async transformDataFromApi(data): Promise<IData> {
     // Verificar si los datos cumplen con la estructura esperada
     if (!Array.isArray(data.headers) || !Array.isArray(data.rows)) {
-      throw new Error("Estructura de datos inesperada");
+      throw new Error('Estructura de datos inesperada');
     }
 
     // Transformar los headers
@@ -104,12 +128,12 @@ export class Dhis2IntegratorService {
       type: header.type,
       hidden: header.hidden,
       meta: header.meta,
-      optionSet: header.optionSet // Puede ser undefined si no existe
+      optionSet: header.optionSet, // Puede ser undefined si no existe
     }));
 
     // Transformar las rows
     const rows: (string | null)[][] = data.rows.map((row: any[]) =>
-      row.map(value => (value !== "" ? String(value) : null))
+      row.map((value) => (value !== '' ? String(value) : null)),
     );
 
     return { headers, rows };
@@ -121,42 +145,45 @@ export class Dhis2IntegratorService {
 
     switch (normalizedValue) {
       case 'si':
-        return 1;  // Si es 'SI'
+        return 1; // Si es 'SI'
       case 'no':
-        return 2;  // Si es 'NO'
+        return 2; // Si es 'NO'
       case 'no sabe':
       case 'ignorando':
       case 'desconoce':
-        return 3;  // Si es 'NO SABE', 'IGNORADO' o 'DESCONOCE'
+        return 3; // Si es 'NO SABE', 'IGNORADO' o 'DESCONOCE'
       default:
-        return 3;  // Si no se encuentra en los valores conocidos, consideramos '3' (como un valor por defecto)
+        return 3; // Si no se encuentra en los valores conocidos, consideramos '3' (como un valor por defecto)
     }
   }
 
-  separarCodigoYDescripcion(texto: string | null | undefined): { codigo: string, descripcion: string } {
+  separarCodigoYDescripcion(texto: string | null | undefined): {
+    codigo: string;
+    descripcion: string;
+  } {
     try {
       // Verificamos si el texto es null o undefined antes de proceder
       if (!texto) {
-        return { codigo: '', descripcion: '' };  // Si es null, undefined o vacío, no hacemos nada y devolvemos vacío.
+        return { codigo: '', descripcion: '' }; // Si es null, undefined o vacío, no hacemos nada y devolvemos vacío.
       }
 
-      const regex = /^([A-Za-z0-9]+)\s*(.*)$/;  // Expresión regular para detectar el código y el resto del texto
+      const regex = /^([A-Za-z0-9]+)\s*(.*)$/; // Expresión regular para detectar el código y el resto del texto
       const match = texto.trim().match(regex);
 
       if (match) {
         return {
-          codigo: match[1],  // Primer grupo: el código (letras, números o ambos)
-          descripcion: match[2].trim()  // Segundo grupo: la descripción (el resto del texto)
+          codigo: match[1], // Primer grupo: el código (letras, números o ambos)
+          descripcion: match[2].trim(), // Segundo grupo: la descripción (el resto del texto)
         };
       } else {
         return {
-          codigo: '',  // Si no hay coincidencia, devolvemos vacío
-          descripcion: texto.trim()  // El texto completo como descripción
+          codigo: '', // Si no hay coincidencia, devolvemos vacío
+          descripcion: texto.trim(), // El texto completo como descripción
         };
       }
     } catch (error) {
-      console.error("Error al procesar el texto:", error);
-      return { codigo: '', descripcion: '' };  // En caso de error, devolvemos valores vacíos
+      console.error('Error al procesar el texto:', error);
+      return { codigo: '', descripcion: '' }; // En caso de error, devolvemos valores vacíos
     }
   }
 
@@ -171,121 +198,466 @@ export class Dhis2IntegratorService {
   };
 
   extractedFromDHIS2ToPersist = async (data: IData) => {
-
     // data.rows.map(async (row, i) => {
     // for (let i = 0; i < data.rows.length; i++) {
     //   const row = data.rows[i];
     for (const row of data.rows) {
       // Create Paciente
-      const semanasEmbarazo = 42
+      const semanasEmbarazo = 42;
       const paciente = new CreatePacienteDhis2Dto();
-      paciente.identificacion = row[data.headers.findIndex(header => header.column === "Nro. de identificación")];
-      paciente.sexoPaciente = row[data.headers.findIndex(header => header.column === "Sexo")];
-      paciente.codigoDhis2 = row[data.headers.findIndex(header => header.column === "Nro. de identificación")];
-      paciente.autoIdentificacionPaciente = row[data.headers.findIndex(header => header.column === "Autoidentificación")];
-      const nombre = row[data.headers.findIndex(header => header.column === "Nombres")];
-      const apellido = row[data.headers.findIndex(header => header.column === "Apellidos")];
-      paciente.nombre = `${nombre} ${apellido}`
+      paciente.identificacion =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Nro. de identificación',
+          )
+        ];
+      paciente.sexoPaciente =
+        row[data.headers.findIndex((header) => header.column === 'Sexo')];
+      paciente.codigoDhis2 =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Nro. de identificación',
+          )
+        ];
+      paciente.autoIdentificacionPaciente =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Autoidentificación',
+          )
+        ];
+      const nombre =
+        row[data.headers.findIndex((header) => header.column === 'Nombres')];
+      const apellido =
+        row[data.headers.findIndex((header) => header.column === 'Apellidos')];
+      paciente.nombre = `${nombre} ${apellido}`;
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
-      notificacion.fechaNacimiento = this.formatoFecha(row[data.headers.findIndex(header => header.column === "Fecha de nacimiento")]);
-      notificacion.edad = this.formatoInteger(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Edad")]);
-      notificacion.unidadEdadPaciente = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Tipo edad")];
-      console.log("Unidad de Edad:::", notificacion.edad, notificacion.unidadEdadPaciente);
+      notificacion.fechaNacimiento = this.formatoFecha(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Fecha de nacimiento',
+          )
+        ],
+      );
+      notificacion.edad = this.formatoInteger(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Edad',
+          )
+        ],
+      );
+      notificacion.unidadEdadPaciente =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Tipo edad',
+          )
+        ];
+      console.log(
+        'Unidad de Edad:::',
+        notificacion.edad,
+        notificacion.unidadEdadPaciente,
+      );
 
-      notificacion.unidadEdadPaciente = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Tipo edad")];
-      notificacion.organizacion = row[data.headers.findIndex(header => header.column === "Organisation unit name")];
+      notificacion.unidadEdadPaciente =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Tipo edad',
+          )
+        ];
+      notificacion.organizacion =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Organisation unit name',
+          )
+        ];
 
-      notificacion.organizacionUnitCode = row[data.headers.findIndex(header => header.column === "Organisation unit code")];
-      notificacion.organizacionUnit = row[data.headers.findIndex(header => header.column === "Organisation unit")];
+      notificacion.organizacionUnitCode =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Organisation unit code',
+          )
+        ];
+      notificacion.organizacionUnit =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Organisation unit',
+          )
+        ];
 
-      notificacion.codigoDhis2Evento = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Código del caso")];
-      notificacion.fechaNotificacion = this.formatoFecha(row[data.headers.findIndex(header => header.column === "Fecha de notificación")])
-      notificacion.fechaAtencion = this.formatoFecha(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Fecha de atención")])
-      notificacion.fechaLlenadoFicha = this.formatoFecha(row[data.headers.findIndex(header => header.column === "Incident date")])
+      notificacion.codigoDhis2Evento =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Código del caso',
+          )
+        ];
+      notificacion.fechaNotificacion = this.formatoFecha(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'Fecha de notificación',
+          )
+        ],
+      );
+      notificacion.fechaAtencion = this.formatoFecha(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Fecha de atención',
+          )
+        ],
+      );
+      notificacion.fechaLlenadoFicha = this.formatoFecha(
+        row[
+          data.headers.findIndex((header) => header.column === 'Incident date')
+        ],
+      );
       // Ubicacion residencia paciente
       const ubicacionResidencia = new UbicacionDto();
-      ubicacionResidencia.provincia = (row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Provincia residencia")])
-      ubicacionResidencia.canton = (row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Canton residencia")])
-      ubicacionResidencia.parroquia = (row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Parroquia residencia")]);
+      ubicacionResidencia.provincia =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Provincia residencia',
+          )
+        ];
+      ubicacionResidencia.canton =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Canton residencia',
+          )
+        ];
+      ubicacionResidencia.parroquia =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Parroquia residencia',
+          )
+        ];
       notificacion.residencia = ubicacionResidencia;
       // Profesion quien notifica
-      notificacion.profesionNotificadorParam = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Profesión de quien notifica")];
+      notificacion.profesionNotificadorParam =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Profesión de quien notifica',
+          )
+        ];
       // Presenta eventos adversos
-      const antecedenteEventoPrevio = this.obtenerValorNumerico(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Evento adverso anterior")]);
-      notificacion.antecedenteEventoPrevio = antecedenteEventoPrevio
+      const antecedenteEventoPrevio = this.obtenerValorNumerico(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Evento adverso anterior',
+          )
+        ],
+      );
+      notificacion.antecedenteEventoPrevio = antecedenteEventoPrevio;
       // Tiene antecedente vacunal
-      const antecedenteVacunal = this.obtenerValorNumerico(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Tiene antecedente vacunal")]);
+      const antecedenteVacunal = this.obtenerValorNumerico(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Tiene antecedente vacunal',
+          )
+        ],
+      );
       // Establecimiento de salud
-      notificacion.codigoUnidadSalud = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Unicódigo")];
-      notificacion.monitorioEstablecimientoSalud = this.obtenerValorNumerico(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Monitoreo del establecimiento de salud")]);
-      notificacion.antecedenteVacunal = antecedenteVacunal
-      // Caso Narrativo - Observaciones 
-      notificacion.casoNarrativo = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Observaciones")];
+      notificacion.codigoUnidadSalud =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Unicódigo',
+          )
+        ];
+      notificacion.monitorioEstablecimientoSalud = this.obtenerValorNumerico(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Monitoreo del establecimiento de salud',
+          )
+        ],
+      );
+      notificacion.antecedenteVacunal = antecedenteVacunal;
+      // Caso Narrativo - Observaciones
+      notificacion.casoNarrativo =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Observaciones',
+          )
+        ];
 
       // Create Antecedente Medico
       const antecedenteMedico = new CreateAntecedenteMedicoDto();
-      const comorbilidadPrincipal = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Especificar la comorbilidad 1")]);
-      antecedenteMedico.comorbilidadPrincipalCIE10 = comorbilidadPrincipal.codigo;
-      antecedenteMedico.descripcionPrincipal = comorbilidadPrincipal.descripcion
-      const comorbilidadDos = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Especificar la comorbilidad 2")]);
+      const comorbilidadPrincipal = this.separarCodigoYDescripcion(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Especificar la comorbilidad 1',
+          )
+        ],
+      );
+      antecedenteMedico.comorbilidadPrincipalCIE10 =
+        comorbilidadPrincipal.codigo;
+      antecedenteMedico.descripcionPrincipal =
+        comorbilidadPrincipal.descripcion;
+      const comorbilidadDos = this.separarCodigoYDescripcion(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Especificar la comorbilidad 2',
+          )
+        ],
+      );
       antecedenteMedico.comorbilidadDosCIE10 = comorbilidadDos.codigo;
-      antecedenteMedico.descripcionDos = comorbilidadDos.descripcion
-      const comorbilidadTres = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Especificar la comorbilidad 3")]);
+      antecedenteMedico.descripcionDos = comorbilidadDos.descripcion;
+      const comorbilidadTres = this.separarCodigoYDescripcion(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Especificar la comorbilidad 3',
+          )
+        ],
+      );
       antecedenteMedico.comorbilidadTresCIE10 = comorbilidadTres.codigo;
-      antecedenteMedico.descripcionTres = comorbilidadTres.descripcion
+      antecedenteMedico.descripcionTres = comorbilidadTres.descripcion;
 
       // Create Antecedente evento adverso
-      const antecedenteEventoAdverso = new CreateAntecedenteEventoDto()
-      antecedenteEventoAdverso.antecedente = this.obtenerValorNumerico(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Evento adverso anterior")]);
-      antecedenteEventoAdverso.alergiaMedicamento = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Alergia Medicamentos")]);
-      antecedenteEventoAdverso.alergiaAlimentos = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Alergia Alimentos")]);
-      antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Alergia Insectos")]);
-      antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Alergia Polvo")]);
-      antecedenteEventoAdverso.otrasAlergias = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Otro Alergias")];
-
+      const antecedenteEventoAdverso = new CreateAntecedenteEventoDto();
+      antecedenteEventoAdverso.antecedente = this.obtenerValorNumerico(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Evento adverso anterior',
+          )
+        ],
+      );
+      antecedenteEventoAdverso.alergiaMedicamento = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Alergia Medicamentos',
+          )
+        ],
+      );
+      antecedenteEventoAdverso.alergiaAlimentos = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos',
+          )
+        ],
+      );
+      antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Alergia Insectos',
+          )
+        ],
+      );
+      antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Alergia Polvo',
+          )
+        ],
+      );
+      antecedenteEventoAdverso.otrasAlergias =
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Otro Alergias',
+          )
+        ];
 
       // Create AntecedenteEnfermedadesPrevias
       const antecedentePreexistencia = new CreateAntecedentePreexistenciaDto();
-      const antecedentePrevio = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Antecedente patológico personal 1")]);
+      const antecedentePrevio = this.separarCodigoYDescripcion(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Antecedente patológico personal 1',
+          )
+        ],
+      );
       antecedentePreexistencia.codigoEsaviCIE10 = antecedentePrevio.codigo;
-      antecedentePreexistencia.descripcion = antecedentePrevio.descripcion
+      antecedentePreexistencia.descripcion = antecedentePrevio.descripcion;
 
       //Create Gravedad
       const grave = new CreateGravedadEsaviDto();
       grave.tipo = 'GRAVE';
-      grave.riesgoVida = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - amenaza a la vida")]);
-      grave.discapacidad = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - discapacidad")]);
-      grave.hospitalizacion = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - hospitalización")]);
-      grave.anomaliaCongenita = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - anomalía congénita")]);
-      grave.aborto = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - aborto")]);
-      grave.muerteFetal = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - muerte fetal")]);
-      grave.muerte = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de notificación - muerte")]);
-      grave.parteEventosPreocupacion = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de investigación - parte de eventos preocupación")]);
-      grave.nuevoEventos = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Criterio de investigación - nuevos eventos")]);
-      grave.condicionEgreso = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Condición de egreso")]
+      grave.riesgoVida = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - amenaza a la vida',
+          )
+        ],
+      );
+      grave.discapacidad = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - discapacidad',
+          )
+        ],
+      );
+      grave.hospitalizacion = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - hospitalización',
+          )
+        ],
+      );
+      grave.anomaliaCongenita = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - anomalía congénita',
+          )
+        ],
+      );
+      grave.aborto = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - aborto',
+          )
+        ],
+      );
+      grave.muerteFetal = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - muerte fetal',
+          )
+        ],
+      );
+      grave.muerte = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de notificación - muerte',
+          )
+        ],
+      );
+      grave.parteEventosPreocupacion = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de investigación - parte de eventos preocupación',
+          )
+        ],
+      );
+      grave.nuevoEventos = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Criterio de investigación - nuevos eventos',
+          )
+        ],
+      );
+      grave.condicionEgreso =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Condición de egreso',
+          )
+        ];
 
       // Define Desenlace esavi
       const desenlaceEsavi = new CreateDesenlaceEsaviDto();
-      desenlaceEsavi.autopsia = this.obtenerValorNumerico(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Se realizó autopsia")]);
-      desenlaceEsavi.fechaMuerte = this.formatoFecha(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Fecha fallecimiento")]);
-      desenlaceEsavi.fechaInicioInvestigacion = this.formatoFecha(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Fecha de investigación")]);
-      desenlaceEsavi.clasificacionFinalCaso = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Clasificación final del caso")]
-      desenlaceEsavi.clasificacionFinalCasoA = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Clasificación final del caso A")]
-      desenlaceEsavi.clasificacionFinalCasoB = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Clasificación final del caso B")]
-
+      desenlaceEsavi.autopsia = this.obtenerValorNumerico(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Se realizó autopsia',
+          )
+        ],
+      );
+      desenlaceEsavi.fechaMuerte = this.formatoFecha(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Fecha fallecimiento',
+          )
+        ],
+      );
+      desenlaceEsavi.fechaInicioInvestigacion = this.formatoFecha(
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Fecha de investigación',
+          )
+        ],
+      );
+      desenlaceEsavi.clasificacionFinalCaso =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Clasificación final del caso',
+          )
+        ];
+      desenlaceEsavi.clasificacionFinalCasoA =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Clasificación final del caso A',
+          )
+        ];
+      desenlaceEsavi.clasificacionFinalCasoB =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Clasificación final del caso B',
+          )
+        ];
 
       // DatoEsavi
-      const numeroIncidencias = 3
+      const numeroIncidencias = 3;
       const datoEsavis: CreateDatoEsaviDto[] = [];
 
       for (let i = 1; i <= numeroIncidencias; i++) {
-        const dato = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Diagnóstico inicial ${i}`)]);
-        const fechaInicio = row[data.headers.findIndex(h => h.column === "DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI")]?.split(" ")[0];
-        const horaInicio = row[data.headers.findIndex(h => h.column === "DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI")];
-        const fechaEsavi = fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
-
+        const dato = this.separarCodigoYDescripcion(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column === `DNVE ESAVI TRK - Diagnóstico inicial ${i}`,
+            )
+          ],
+        );
+        const fechaInicio =
+          row[
+            data.headers.findIndex(
+              (h) =>
+                h.column ===
+                'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
+            )
+          ]?.split(' ')[0];
+        const horaInicio =
+          row[
+            data.headers.findIndex(
+              (h) =>
+                h.column ===
+                'DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI',
+            )
+          ];
+        const fechaEsavi =
+          fechaInicio && horaInicio
+            ? new Date(`${fechaInicio}T${horaInicio}:00Z`)
+            : null;
 
         // Verifica que nombre y código no estén vacíos
         if (dato.descripcion && dato.codigo) {
@@ -293,21 +665,43 @@ export class Dhis2IntegratorService {
           datoEsaviInicial.nombre = dato.descripcion;
           // datoEsavi.codigoEsaviCie10 = dato.codigo;
           datoEsaviInicial.fechaEsavi = fechaEsavi;
-          datoEsaviInicial.descripcion = `Diagnostico inicial ${i}`
+          datoEsaviInicial.descripcion = `Diagnostico inicial ${i}`;
           datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
-          
+
           datoEsavis.push(datoEsaviInicial);
-          console.log("DatooEsaviInicial::" , datoEsaviInicial);
-          
+          console.log('DatooEsaviInicial::', datoEsaviInicial);
         }
       }
 
       for (let i = 1; i <= numeroIncidencias; i++) {
-        const dato = this.separarCodigoYDescripcion(row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Diagnostico final ${i}`)]);
-        const fechaInicio = row[data.headers.findIndex(h => h.column === "DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI")]?.split(" ")[0];
-        const horaInicio = row[data.headers.findIndex(h => h.column === "DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI")];
-        const fechaEsavi = fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
-
+        const dato = this.separarCodigoYDescripcion(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column === `DNVE ESAVI TRK - Diagnostico final ${i}`,
+            )
+          ],
+        );
+        const fechaInicio =
+          row[
+            data.headers.findIndex(
+              (h) =>
+                h.column ===
+                'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
+            )
+          ]?.split(' ')[0];
+        const horaInicio =
+          row[
+            data.headers.findIndex(
+              (h) =>
+                h.column ===
+                'DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI',
+            )
+          ];
+        const fechaEsavi =
+          fechaInicio && horaInicio
+            ? new Date(`${fechaInicio}T${horaInicio}:00Z`)
+            : null;
 
         // Verifica que nombre y código no estén vacíos
         if (dato.descripcion && dato.codigo) {
@@ -315,36 +709,68 @@ export class Dhis2IntegratorService {
           datoEsavi.nombre = dato.descripcion;
           // datoEsavi.codigoEsaviCie10 = dato.codigo;
           datoEsavi.fechaEsavi = fechaEsavi;
-          datoEsavi.descripcion = `Diagnostico final ${i}`
+          datoEsavi.descripcion = `Diagnostico final ${i}`;
           datoEsavi.codigoCaso = notificacion.codigoDhis2Evento;
 
           datoEsavis.push(datoEsavi);
         }
       }
 
-      console.log("DtaoooEsaviiiiii:::" , datoEsavis);
-      
-      
+      console.log('DtaoooEsaviiiiii:::', datoEsavis);
 
+      // Datos Lugar vacunacion
+      const datoLugarVacuna = new CreateDatoVacunacionDto();
+      datoLugarVacuna.nombreVacunatorio =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1',
+          )
+        ];
 
-      // Datos Lugar vacunacion 
-      const datoLugarVacuna = new CreateDatoVacunacionDto()
-      datoLugarVacuna.nombreVacunatorio = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1")]
-
-      // Paciente embarazada 
+      // Paciente embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
-      const embarazadaMomentoVacuna = row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Semanas gestación al recibir la vacuna")]
+      const embarazadaMomentoVacuna =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
+          )
+        ];
       embarazada.momentoVacuna = embarazadaMomentoVacuna ? true : false;
-      embarazada.momentoEsavi = this.esValorAfirmativo(row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Embarazada")]);
+      embarazada.momentoEsavi = this.esValorAfirmativo(
+        row[
+          data.headers.findIndex(
+            (header) => header.column === 'DNVE ESAVI TRK - Embarazada',
+          )
+        ],
+      );
 
       // Antecedentes embarazo
       const antecedenteEmbarazada = new CreateAntecedenteEmbarazoDto();
 
-      const semanaGestacion = (row[data.headers.findIndex(header => header.column === "DNVE ESAVI TRK - Semanas gestación al recibir la vacuna")])
-      antecedenteEmbarazada.edadGestacional = semanaGestacion ? Number(semanaGestacion) : null
+      const semanaGestacion =
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
+          )
+        ];
+      antecedenteEmbarazada.edadGestacional = semanaGestacion
+        ? Number(semanaGestacion)
+        : null;
       if (antecedenteEmbarazada.edadGestacional && notificacion.fechaAtencion) {
-        antecedenteEmbarazada.fechaUltimaMenstruacion = this.ajustarFecha(notificacion.fechaAtencion, -antecedenteEmbarazada.edadGestacional * 7);
-        antecedenteEmbarazada.fechaParto = this.ajustarFecha(antecedenteEmbarazada.fechaUltimaMenstruacion, semanasEmbarazo * 7);
+        antecedenteEmbarazada.fechaUltimaMenstruacion = this.ajustarFecha(
+          notificacion.fechaAtencion,
+          -antecedenteEmbarazada.edadGestacional * 7,
+        );
+        antecedenteEmbarazada.fechaParto = this.ajustarFecha(
+          antecedenteEmbarazada.fechaUltimaMenstruacion,
+          semanasEmbarazo * 7,
+        );
       }
 
       //Dato Vacuna
@@ -365,14 +791,70 @@ export class Dhis2IntegratorService {
 
       for (let i = 1; i <= numeroVacunas; i++) {
         const datoVacuna = new CreateDatoVacunaDto();
-        datoVacuna.nombreVacuna = row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`)];
-        datoVacuna.nombreFabricante = row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Casa comercial vacuna ${i}`)];
-        datoVacuna.numeroLote = row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Lote de la vacuna ${i}`)];
-        datoVacuna.fechaVencimientoVacuna = this.formatoFecha(row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de caducidad de la vacuna ${i}`)]);
-        datoVacuna.viaAdministracion = row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Vía de aplicación vacuna ${i}`)];
-        datoVacuna.fechaVencimientoDiluyente = this.formatoFecha(row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de expiración del diluyente vacuna ${i}`)]);
-        datoVacuna.nombreDiluyenteVacuna = row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Nombre del diluyente usado vacuna ${i}`)];
-        datoVacuna.inicioAdministracion = this.formatoFecha(row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`)]);
+        datoVacuna.nombreVacuna =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`,
+            )
+          ];
+        datoVacuna.nombreFabricante =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column === `DNVE ESAVI TRK - Casa comercial vacuna ${i}`,
+            )
+          ];
+        datoVacuna.numeroLote =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column === `DNVE ESAVI TRK - Lote de la vacuna ${i}`,
+            )
+          ];
+        datoVacuna.fechaVencimientoVacuna = this.formatoFecha(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Fecha de caducidad de la vacuna ${i}`,
+            )
+          ],
+        );
+        datoVacuna.viaAdministracion =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Vía de aplicación vacuna ${i}`,
+            )
+          ];
+        datoVacuna.fechaVencimientoDiluyente = this.formatoFecha(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Fecha de expiración del diluyente vacuna ${i}`,
+            )
+          ],
+        );
+        datoVacuna.nombreDiluyenteVacuna =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Nombre del diluyente usado vacuna ${i}`,
+            )
+          ];
+        datoVacuna.inicioAdministracion = this.formatoFecha(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`,
+            )
+          ],
+        );
         // datoVacuna.numeroDosisVacuna = (row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`)])
 
         if (
@@ -397,37 +879,35 @@ export class Dhis2IntegratorService {
       create.pacienteDhis2 = paciente;
       create.notificacion = notificacion;
       create.datoEsavi = datoEsavis;
-      create.datoVacuna = datoVacunas
+      create.datoVacuna = datoVacunas;
       create.gravedadEsavi = grave;
       create.desenlaceEsavi = desenlaceEsavi;
       if (antecedentePreexistencia.descripcion) {
         create.antecedentePreexistencia = antecedentePreexistencia;
       }
-      //Validar para crear 
+      //Validar para crear
       if (embarazada.momentoEsavi) {
         create.pacienteEmbarazada = embarazada;
-        create.antecedenteEmbarazo = antecedenteEmbarazada
+        create.antecedenteEmbarazo = antecedenteEmbarazada;
       }
-      if(antecedenteMedico.descripcionPrincipal && antecedenteMedico.descripcionPrincipal.length > 0){
-        create.antecedenteMedico = antecedenteMedico
+      if (
+        antecedenteMedico.descripcionPrincipal &&
+        antecedenteMedico.descripcionPrincipal.length > 0
+      ) {
+        create.antecedenteMedico = antecedenteMedico;
       }
-      create.antecedenteEvento = antecedenteEventoAdverso
+      create.antecedenteEvento = antecedenteEventoAdverso;
 
       try {
         if (notificacion.codigoDhis2Evento) {
           await this.integradorService.create(create);
         }
-
-
-
       } catch (error) {
         console.log(error);
       }
     }
     // );
-  }
-
-
+  };
 
   // no usado
   // generarArchivo = async (
