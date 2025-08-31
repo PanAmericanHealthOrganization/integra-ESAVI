@@ -60,7 +60,7 @@ export class SeedService {
       await this.seedCatalogos();
 
       // 3. Crear grupos etarios
-      await this.seedGruposEtarios();
+      /*await this.seedGruposEtarios();
 
       // 4. Crear pacientes
       await this.seedPacientes();
@@ -87,7 +87,7 @@ export class SeedService {
       await this.seedDatosVacunas();
 
       // 12. Crear datos de vacunación
-      await this.seedDatosVacunacion();
+      await this.seedDatosVacunacion();*/
 
       console.log('✅ Datos de ejemplo cargados exitosamente');
     } catch (error) {
@@ -108,12 +108,12 @@ export class SeedService {
       await queryRunner.query('SET session_replication_role = replica;');
 
       // Limpiar todas las tablas usando TRUNCATE (más rápido que DELETE)
-      await queryRunner.query(
+      /*await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNACION" CASCADE;',
       );
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;',
-      );
+      );*/
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;',
       );
@@ -135,9 +135,9 @@ export class SeedService {
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;',
       );
-      await queryRunner.query(
+      /*await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
-      );
+      );*/
       /**
        * 
       await queryRunner.query(

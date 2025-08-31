@@ -146,3 +146,67 @@ Content-Type: {{contentType}}
 GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=C09
 Accept: {{accept}}
 Content-Type: {{contentType}}
+
+###
+# EJEMPLOS ADICIONALES PRÁCTICOS
+
+### Test con período de vacunación masiva (COVID-19)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de campaña de influenza
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240301&fechaFin=20240531&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de un mes completo (formato YYYYMM)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con código ATC específico para vacunas COVID-19
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de fin de año
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241225&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de inicio de año
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20250101&fechaFin=20250107&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# EJEMPLOS PARA DIFERENTES TIPOS DE VACUNAS
+
+### Vacunas para niños (período escolar)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240901&fechaFin=20241031&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Vacunas de rutina (todo el año)
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# EJEMPLOS PARA TESTING Y DESARROLLO
+
+### Test rápido con período de 3 días
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241201&fechaFin=20241203&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de 1 semana para desarrollo
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241201&fechaFin=20241207&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de 1 mes para QA
+GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241101&fechaFin=20241130&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
