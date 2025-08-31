@@ -12,7 +12,7 @@ import * as moment from 'moment/moment';
 
 @Entity({
   schema: 'dhi_esavi',
-  name: 'TR_PACIENTEEMBARAZADA',
+  name: 'TR_PACIENTE_EMBARAZADA',
   comment: 'Tabla de pacientes embarazadas',
 })
 export class PacienteEmbarazada extends Auditoria {

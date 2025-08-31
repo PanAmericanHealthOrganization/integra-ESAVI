@@ -1,7 +1,6 @@
 import * as moment from 'moment';
 import {
   BeforeInsert,
-  Column,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,

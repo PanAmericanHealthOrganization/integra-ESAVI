@@ -13,11 +13,11 @@ import { Catalogo } from './catalogo.entity';
 
 @Entity({
   schema: 'dhi_esavi',
-  name: 'TR_DESENLACEESAVI',
+  name: 'TR_DESENLACE_ESAVI',
   comment: 'Tabla de desenlace del ESAVI',
 })
 export class DesenlaceEsavi extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'DESENLACEESAVI_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'DESENLACE_ESAVI_ID' })
   id: string;
 
   /**

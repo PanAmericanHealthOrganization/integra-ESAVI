@@ -1,7 +1,7 @@
 import { Column, Entity } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTEEVENTOADVERSO' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_EVENTO_ADVERSO' })
 export class AntecedenteEvento extends Antecedente {
   @Column({
     name: 'ANTECEDENTES_ADVSIMILAR',

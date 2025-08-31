@@ -10,7 +10,7 @@ import { Notificacion } from './notificacion.entity';
 import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ESAVIDURANTEEMBARAZO' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_ESAVI_DURANTE_EMBARAZO' })
 export class EmbarazoEsavi extends Auditoria {
   @PrimaryColumn({
     name: 'NOTIFICACION_ID',

@@ -2,7 +2,7 @@ import { Antecedente } from './antecedente.entity';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTESEMBARAZO' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_EMBARAZO' })
 export class AntecedenteEmbarazo extends Antecedente {
   /**
    *

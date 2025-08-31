@@ -13,7 +13,7 @@ import * as moment from 'moment/moment';
 
 @Entity({
   schema: 'dhi_esavi',
-  name: 'TR_DATOVACUNACION',
+  name: 'TR_DATO_VACUNACION',
   comment: 'Tabla de datos de vacunación',
 })
 export class Vacunacion extends Auditoria {

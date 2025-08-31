@@ -109,25 +109,25 @@ export class SeedService {
 
       // Limpiar todas las tablas usando TRUNCATE (más rápido que DELETE)
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATOVACUNACION" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNACION" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATOVACUNA" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DESENLACEESAVI" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDADESAVI" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDAD_ESAVI" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDADESAVI" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDAD_ESAVI" CASCADE;',
       );
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_MEDICAMENTO" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATOSESAVI" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;',
       );
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;',
@@ -136,7 +136,7 @@ export class SeedService {
         'TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TC_GRUPOETARIO" CASCADE;',
+        'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
       );
       /**
        * 

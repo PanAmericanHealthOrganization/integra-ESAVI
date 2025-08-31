@@ -18,6 +18,7 @@ export class GrupoEtario extends Auditoria {
    */
   @Column({
     name: 'INICIO_EDAD',
+    nullable: true,
     comment: 'Edad de inicio del grupo etario en años',
   })
   inicioEdad: number;
@@ -25,7 +26,11 @@ export class GrupoEtario extends Auditoria {
   /**
    *
    */
-  @Column({ name: 'FIN_EDAD', comment: 'Edad de fin del grupo etario en años' })
+  @Column({
+    name: 'FIN_EDAD',
+    nullable: true,
+    comment: 'Edad de fin del grupo etario en años',
+  })
   finEdad: number;
 
   /**
