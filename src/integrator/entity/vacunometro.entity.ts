@@ -32,12 +32,19 @@ export class Vacunometro {
   /**
    *
    */
-  @Column({ name: 'NOMBRE_VACUNA', comment: 'Nombre de la vacuna' })
+  @Column({ 
+    name: 'NOMBRE_VACUNA', 
+    comment: 'Nombre de la vacuna',
+  })
   nombreVacuna: string;
   /**
    *
    */
-  @Column({ name: 'DOSIS_APLICADA', nullable: true, comment: 'Dosis aplicada' })
+  @Column({ 
+    name: 'DOSIS_APLICADA', 
+    nullable: true, 
+    comment: 'Dosis aplicada', 
+  })
   dosisAplicada: number;
   /**
    *

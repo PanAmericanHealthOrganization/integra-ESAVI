@@ -19,13 +19,32 @@ import * as moment from 'moment/moment';
 export class Vacunacion extends Auditoria {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-  @Column({ name: 'FECHA_VACUNACION', nullable: true })
+  @Column({ 
+    name: 'FECHA_VACUNACION', 
+    nullable: true,
+    comment: 'Fecha de vacunación',
+   })
   fechaVacunacion: Date;
-  @Column({ name: 'HORA_VACUNACION', nullable: true })
+
+  @Column({ 
+    name: 'HORA_VACUNACION', 
+    nullable: true,
+    comment: 'Hora de vacunación',
+   })
   horaVacunacion: Date;
-  @Column({ name: 'FECHA_RECONSTITUCION_VACUNA', nullable: true })
+
+  @Column({ 
+    name: 'FECHA_RECONSTITUCION_VACUNA', 
+    nullable: true,
+    comment: 'Fecha de reconstitución de la vacuna',
+  })
   fechaReconstitucion: Date;
-  @Column({ name: 'HORA_RECONSTITUCION_VACUNA', nullable: true })
+
+  @Column({ 
+    name: 'HORA_RECONSTITUCION_VACUNA', 
+    nullable: true, 
+    comment: 'Hora de reconstitución de la vacuna', 
+  })
   horaReconstitucion: Date;
   /////////////////Se puede crear una entidad llamada vacunatorio/////////
   // @Column()

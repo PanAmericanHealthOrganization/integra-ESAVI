@@ -8,6 +8,13 @@ import {
 import { Auditoria } from './auditoria.entity';
 import { Notificacion } from './notificacion.entity';
 
+// Estructura básica o plantilla para crear 
+// las entidades de antecedentes (...
+// TR_ANTECEDENTES_EMBARAZO, 
+// TR_ANTECEDENTES_ENFERMEDADES_PREVIAS, 
+// TR_ANTECEDENTES_EVENTO_ADVERSO, 
+// TR_ANTECEDENTES_MEDICO
+// )
 export abstract class Antecedente extends Auditoria {
   /**
    *

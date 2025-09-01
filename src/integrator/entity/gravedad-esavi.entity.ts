@@ -10,7 +10,7 @@ import { Notificacion } from './notificacion.entity';
 import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_GRAVEDAD_ESAVI' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_GRAVEDAD_ESAVI', comment: 'Tabla de gravedad del ESAVI' })
 export class GravedadEsavi extends Auditoria {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;

@@ -118,7 +118,7 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'PRINCIPIO_ACTIVO_WHO_DRUG',
     nullable: true,
-    comment: 'Principio activo de la vacuna según WHO Drug',
+    comment: 'Principio activo de la vacuna según WHODrug',
   })
   principioActivoWhoDrug: string;
 
@@ -158,7 +158,7 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'NOMBRE_FABRICANTE_WHO_DRUG',
     nullable: true,
-    comment: 'Nombre del fabricante según WHO Drug',
+    comment: 'Nombre del fabricante según WHODrug',
   })
   nombreFabricanteWhoDrug: string;
 
@@ -168,7 +168,7 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'CODIGO_FABRICANTE_WHO_DRUG',
     nullable: true,
-    comment: 'Código del fabricante según WHO Drug',
+    comment: 'Código del fabricante según WHODrug',
   })
   codigoFabricanteWhoDrug: string;
 

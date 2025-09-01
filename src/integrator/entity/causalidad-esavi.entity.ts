@@ -10,7 +10,7 @@ import { Notificacion } from './notificacion.entity';
 import { DatoEsavi } from './dato-esavi.entity';
 import { DatoVacuna } from './dato-vacuna.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_CAUSALIDAD_ESAVI' })
+@Entity({ schema: 'dhi_esavi', name: 'TR_CAUSALIDAD_ESAVI', comment: 'Tabla de causalidad del ESAVI' })
 export class CausalidadEsavi extends Auditoria {
   @PrimaryGeneratedColumn('uuid', { name: 'CAUSALIDAD_ESAVI_ID' })
   id: string;
