@@ -5,8 +5,8 @@ import { ApiTags } from '@nestjs/swagger';
 /**
  * Controlador para sincronización de datos de vacunación desde Oracle
  */
-@ApiTags('Para Datos Agregados Vacunación')
-@Controller({ path: 'vacunacion-nominal', version: '1' })
+@ApiTags('Vacunacion Nominal Sync')
+@Controller({ path: 'vacunacion-nominal-sync', version: '1' })
 export class VacunacionNominalSyncController {
   constructor(private readonly vacunacionService: VacunacionNominalService) {}
 
@@ -17,6 +17,7 @@ export class VacunacionNominalSyncController {
    */
   @Get('/sync')
   async sync(@Query('fecha') fecha: string): Promise<void> {
+    console.log('fecha', fecha);
     return this.vacunacionService.procesarVacunasAgregadas(new Date(fecha));
   }
 
