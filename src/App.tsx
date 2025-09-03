@@ -1,17 +1,16 @@
+import { useContext } from "react"
 import { Admin, Resource } from "react-admin"
+import { AuthenticationContext } from "./contexts/AuthContext "
 import { dataProvider } from "./dataProviders/dataProvider"
+import keycloak from "./keycloak"
 import { CustomLayout } from "./layout/CustomLayout"
 import { CustomLoginPage } from "./layout/CustomLogin"
+import { myAuthKeyCloakProvider } from "./myAuthKeyCloakProvider"
+import analisis from "./pages/analisis"
+import dashboard from "./pages/dashboard"
 import esavis from "./pages/esavis"
 import reportes from "./pages/reportes"
-import dashboard from "./pages/dashboard"
-import keycloak from "./keycloak"
-import { useContext } from "react"
-import { myAuthKeyCloakProvider } from "./myAuthKeyCloakProvider"
-import { AuthenticationContext } from "./contexts/AuthContext "
-import analisis from "./pages/analisis"
-import vacunasAgregado from "./pages/vacunas-agregado"
-import Authorize from "./authorization.utils"
+import vacunometro from "./pages/vacunometro"
 
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
@@ -26,8 +25,7 @@ const App = () => {
       <Resource name="esavis" list={esavis.list} />
       <Resource name="reportes" list={reportes.list} />
       <Resource name="analisis" list={analisis.list} />
-
-      <Resource name="vacunas-agregado" {...vacunasAgregado} />
+      <Resource name="vacunometro" {...vacunometro} />
     </Admin>
   )
 }
