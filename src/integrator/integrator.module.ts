@@ -38,6 +38,7 @@ import {
   ReporteService,
   SeedService,
 } from './service';
+import { VacunometroService } from './service/vacunometro.service';
 import { IntegradorService } from './facade/integrador.service';
 import {
   AntecedenteEmbarazo,
@@ -142,6 +143,7 @@ import {
     DatoEsaviService,
     AntecedenteEmbarazoService,
     SeedService,
+    VacunometroService,
   ],
   exports: [
     IntegradorService,
@@ -154,6 +156,7 @@ import {
     PacienteEmbarazadaServive,
     DatoEsaviService,
     AntecedenteEmbarazoService,
+    VacunometroService,
   ],
 })
 export class IntegratorModule {}
