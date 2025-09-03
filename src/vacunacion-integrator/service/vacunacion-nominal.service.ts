@@ -2,38 +2,66 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as _ from 'lodash';
-import { Vacunometro } from 'src/integrator/entity';
+import { SyncProcess, Vacunometro } from 'src/integrator/entity';
 import { VacunometroService } from 'src/integrator/service/vacunometro.service';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion';
+import { SyncService } from 'src/integrator/service/sycn.service';
 
 @Injectable()
-export class VacunacionService {
+export class VacunacionNominalService {
   constructor(
     @InjectRepository(VacunacionNominal)
     private readonly vacunacionRepository: Repository<VacunacionNominal>,
     private readonly vacunometroService: VacunometroService,
+    private readonly syncService: SyncService,
   ) {}
 
-  private readonly logger = new Logger(VacunacionService.name);
+  private readonly logger = new Logger(VacunacionNominalService.name);
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async procesarVacunasAgregadasCron() {
+    // procesar dia anterior
+    const dia = new Date();
+    dia.setDate(dia.getDate() - 1);
+    // procesar vacunas agregadas
+    await this.procesarVacunasAgregadas(dia);
+  }
+
   async procesarVacunasAgregadas(dia: Date): Promise<void> {
     try {
+      const startTime = new Date();
+      // EXTRACT, extracción de datos
       const vacunas = await this.vacunacionRepository.find({
         where: { fecha_aplicacion: dia },
       });
-      const vacunasAgregadas = this.procesarVacunaToVacunaAgregada(
+
+      // TRANSFORM, mutación de datos/ transformación de datos
+      const vacunasAgregadas = this.procesarVacunaNominalToVacunaAgregada(
         vacunas,
         dia,
       );
+
+      // LOAD, ALMACENAMIENTO DE LOS DATOS
       await this.vacunometroService.createMany(vacunasAgregadas);
+
+      // SYNC, registro de proceso de sincronización
+      const syncProcess = {
+        name: 'VacunacionNomanalService.procesarVacunasAgregadas',
+        status: 'COMPLETED',
+        startTime: startTime,
+        endTime: new Date(),
+        errorMessage: '',
+        errorStack: '',
+        errorTrace: '',
+      };
+      await this.syncService.createSyncProcess(syncProcess as SyncProcess);
     } catch (error) {
       this.logger.error(error);
     }
   }
 
-  private procesarVacunaToVacunaAgregada(
+  private procesarVacunaNominalToVacunaAgregada(
     vacunados: VacunacionNominal[],
     fecha: Date,
   ): Vacunometro[] {
@@ -65,6 +93,8 @@ export class VacunacionService {
 
         vacunasAgregadas.push(vacunaAgregada);
       });
+
+      // TODO: AGREGAR A LA TABLA DE SINCRONIZACIÓN
 
       this.logger.log(
         `Procesadas ${

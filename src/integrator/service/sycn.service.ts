@@ -12,4 +12,8 @@ export class SyncService extends TypeOrmCrudService<SyncProcess> {
   ) {
     super(syncProcessRepository);
   }
+
+  async createSyncProcess(syncProcess: SyncProcess): Promise<SyncProcess> {
+    return this.syncProcessRepository.save(syncProcess);
+  }
 }

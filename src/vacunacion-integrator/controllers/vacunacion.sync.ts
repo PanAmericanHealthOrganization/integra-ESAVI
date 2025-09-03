@@ -1,12 +1,12 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { VacunacionService } from '../service/vacunacion.service';
+import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
 
 /**
  * Controlador para sincronización de datos de vacunación desde Oracle
  */
-@Controller({ path: 'vacunacion', version: '1' })
-export class VacunacionSyncController {
-  constructor(private readonly vacunacionService: VacunacionService) {}
+@Controller({ path: 'vacunacion-nominal', version: '1' })
+export class VacunacionNominalSyncController {
+  constructor(private readonly vacunacionService: VacunacionNominalService) {}
 
   /**
    * Endpoint para sincronizar vacunaciones por fecha

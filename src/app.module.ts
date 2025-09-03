@@ -29,6 +29,7 @@ import { Parametro } from './integrator/entity/parametro.entity';
 import { TipoCatalogo } from './integrator/entity/tipo-catalogo.entity';
 import { Vacunacion } from './integrator/entity/vacunacion.entity';
 import { Vacunometro } from './integrator/entity/vacunometro.entity';
+import { SyncProcess } from './integrator/entity/sync.entity';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { HttpExceptionFilter } from './providers/http-exception.filter';
@@ -76,6 +77,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
         PacienteDhis2,
         PacienteEmbarazada,
         Parametro,
+        SyncProcess,
         TipoCatalogo,
         Vacunacion,
         Vacunometro,

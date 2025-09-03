@@ -66,7 +66,9 @@ import {
   Catalogo,
   CausalidadEsavi,
   DatoEsavi,
+  SyncProcess,
 } from './entity';
+import { SyncService } from './service/sycn.service';
 
 @Module({
   imports: [
@@ -96,6 +98,7 @@ import {
       TipoCatalogo,
       Vacunacion,
       Vacunometro,
+      SyncProcess,
     ]),
   ],
   controllers: [
@@ -117,6 +120,7 @@ import {
     // GrupoEtarioController
   ],
   providers: [
+    SyncService,
     AntecedenteEmbarazoService,
     AntecedenteEventoService,
     AntecedenteMedicoService,
@@ -146,6 +150,7 @@ import {
     VacunometroService,
   ],
   exports: [
+    SyncService,
     IntegradorService,
     PacienteVigiflowService,
     PacienteDhis2Service,

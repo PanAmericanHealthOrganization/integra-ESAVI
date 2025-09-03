@@ -89,6 +89,9 @@ importers:
       moment:
         specifier: ^2.29.4
         version: 2.30.1
+      node-oracledb:
+        specifier: ^1.0.2
+        version: 1.0.2
       oracledb:
         specifier: ^6.9.0
         version: 6.9.0
@@ -2970,6 +2973,9 @@ packages:
 
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
+
+  node-oracledb@1.0.2:
+    resolution: {integrity: sha512-uniHRXnh3TefPNR6hSWSMYFnRlSbAhYau0KSWsEnQcp37ENWj91+wWdczZmez/Gs0H98b/IWak8uVNKw79xmIA==}
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
@@ -7579,6 +7585,8 @@ snapshots:
     optional: true
 
   node-int64@0.4.0: {}
+
+  node-oracledb@1.0.2: {}
 
   node-releases@2.0.19: {}
 
