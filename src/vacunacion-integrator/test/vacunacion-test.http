@@ -1,0 +1,220 @@
+### Variables de configuración
+@baseUrl = http://localhost:8081
+@apiPath = /v1/vacunacion-nominal
+
+### Headers comunes
+@contentType = application/json
+@accept = application/json
+
+###
+# Test de conexión básica - Sincronización por fecha específica
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por fecha específica - Día actual
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-15
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por fecha específica - Día anterior
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-14
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Una semana
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-01&hasta=2024-12-07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Un mes
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-11-01&hasta=2024-11-30
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Trimestre
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-10-01&hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Año completo
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-01-01&hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Período de vacunación masiva
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-01&hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Campaña de influenza
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-03-01&hasta=2024-05-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Sincronización por rango de fechas - Período escolar (vacunas para niños)
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-09-01&hasta=2024-10-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# CONFIGURACIÓN PARA DIFERENTES ENTORNOS
+
+### Desarrollo local
+@devUrl = http://localhost:3000
+@devApiPath = /v1/vacunacion-nominal
+
+### Staging
+@stagingUrl = https://staging-api.integra-esavi.com
+@stagingApiPath = /v1/vacunacion-nominal
+
+### Producción
+@prodUrl = https://api.integra-esavi.com
+@prodApiPath = /v1/vacunacion-nominal
+
+###
+# Test en ambiente de desarrollo
+GET {{devUrl}}{{devApiPath}}/sync?fecha=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test en ambiente de staging
+GET {{stagingUrl}}{{stagingApiPath}}/sync-range?desde=2024-12-01&hasta=2024-12-07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# Test en ambiente de producción
+GET {{prodUrl}}{{prodApiPath}}/sync?fecha=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# CASOS DE PRUEBA PARA VALIDACIÓN DE ERRORES
+
+### Test con fecha inválida (formato incorrecto)
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024/12/01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test sin parámetro fecha
+GET {{baseUrl}}{{apiPath}}/sync
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con fecha vacía
+GET {{baseUrl}}{{apiPath}}/sync?fecha=
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango de fechas inválido (desde > hasta)
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-31&hasta=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango sin parámetro desde
+GET {{baseUrl}}{{apiPath}}/sync-range?hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango sin parámetro hasta
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango con fechas vacías
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=&hasta=
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# EJEMPLOS PARA TESTING Y DESARROLLO
+
+### Test rápido con fecha específica
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-15
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de 3 días
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-13&hasta=2024-12-15
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de 1 semana para desarrollo
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-09&hasta=2024-12-15
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con período de 1 mes para QA
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2023-02-01&hasta=2023-02-20
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# EJEMPLOS CON FECHAS ESPECÍFICAS
+
+### Test con fecha de fin de año
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con fecha de inicio de año
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2025-01-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con fecha de fin de mes
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con fecha de inicio de mes
+GET {{baseUrl}}{{apiPath}}/sync?fecha=2024-12-01
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# EJEMPLOS CON RANGOS ESPECÍFICOS
+
+### Test con rango de fin de año
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-25&hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango de inicio de año
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2025-01-01&hasta=2025-01-07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango de fin de mes
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-25&hasta=2024-12-31
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Test con rango de inicio de mes
+GET {{baseUrl}}{{apiPath}}/sync-range?desde=2024-12-01&hasta=2024-12-07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+###
+# NOTAS IMPORTANTES
+# 
+# 1. Formato de fechas: YYYY-MM-DD (ejemplo: 2024-12-01)
+# 2. El endpoint /sync procesa vacunas agregadas para una fecha específica
+# 3. El endpoint /sync-range procesa vacunas agregadas en un rango de fechas
+# 4. Ambos endpoints retornan void (sin respuesta específica)
+# 5. Los endpoints están versionados en v1
+# 6. Para testing, usar períodos cortos para evitar timeouts
+# 7. Para producción, considerar el volumen de datos al seleccionar rangos
+
+GET http://localhost:8081/vacunacion-nominal/sync-range?desde=2025-02-01&hasta=2025-02-20

@@ -9,7 +9,11 @@ import { VacunacionNominalService } from './service/vacunacion-nominal.service';
 // Nombre de la conexión Oracle
 export const ORACLE_VACUNACION_DS = 'ORACLE_VACUNACION_DS';
 
-@Module({})
+@Module({
+  //imports: [TypeOrmModule.forFeature([VacunacionNominal])],
+  //providers: [VacunacionNominalService],
+  //Scontrollers: [VacunacionNominalSyncController],
+})
 export class VacunacionIntegratorModule {
   static forRoot(): DynamicModule {
     return {

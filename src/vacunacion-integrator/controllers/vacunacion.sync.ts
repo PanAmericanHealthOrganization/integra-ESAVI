@@ -1,9 +1,11 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
+import { ApiTags } from '@nestjs/swagger';
 
 /**
  * Controlador para sincronización de datos de vacunación desde Oracle
  */
+@ApiTags('Para Datos Agregados Vacunación')
 @Controller({ path: 'vacunacion-nominal', version: '1' })
 export class VacunacionNominalSyncController {
   constructor(private readonly vacunacionService: VacunacionNominalService) {}
