@@ -13,11 +13,10 @@ export class PacienteDhis2Service {
   private readonly logger = new Logger(PacienteDhis2Service.name);
 
   constructor(
-    @InjectRepository(PacienteDhis2)
+    @InjectRepository(PacienteDhis2, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacienteDhis2Repository: Repository<PacienteDhis2>,
     private readonly catalogoService: CatalogoService,
-  ) { }
-
+  ) {}
 
   // async create(createDto: CreatePacienteDhis2Dto): Promise<PacienteDhis2> {
   //   console.log("CrearPciente::", createDto);
@@ -62,7 +61,7 @@ export class PacienteDhis2Service {
 
   //       // Retornamos el paciente recién creado.
   //       return pacienteCreado;
-        
+
   //     }
 
   //   } catch (error) {
@@ -72,64 +71,75 @@ export class PacienteDhis2Service {
   //   }
   // }
 
-
   async create(createDto: CreatePacienteDhis2Dto): Promise<PacienteDhis2> {
-    console.log("CrearPaciente::", createDto);
-  
+    console.log('CrearPaciente::', createDto);
+
     try {
       // Primero, verificamos si el paciente ya existe en la base de datos.
-      const pacienteExistente = await this.findByDhis2Code(createDto.codigoDhis2.trim());
-      console.log("DatosPacienteExistente::", pacienteExistente);
+      const pacienteExistente = await this.findByDhis2Code(
+        createDto.codigoDhis2.trim(),
+      );
+      console.log('DatosPacienteExistente::', pacienteExistente);
 
       const pacienteTodos = await this.findAll();
-      console.log("QuePasaenBase:::" , pacienteTodos);
-      
-  
+      console.log('QuePasaenBase:::', pacienteTodos);
+
       if (pacienteExistente) {
         // Si el paciente ya existe, lo actualizamos y salimos de la función.
-        console.log("Paciente ya existe, actualizando...");
+        console.log('Paciente ya existe, actualizando...');
         await this.update(pacienteExistente.id, createDto);
-        console.log("Paciente actualizado correctamente.");
-        return pacienteExistente;  // Devuelves el paciente actualizado.
+        console.log('Paciente actualizado correctamente.');
+        return pacienteExistente; // Devuelves el paciente actualizado.
       } else {
-        console.log("Paciente no existe, creando nuevo...");
-  
+        console.log('Paciente no existe, creando nuevo...');
+
         const paciente = plainToClass(PacienteDhis2, createDto);
-  
+
         // Asignamos el sexo si está presente en el DTO.
         if (createDto.sexoPaciente) {
-          const sexo = await this.catalogoService.findByDescriptionToDhis2(createDto.sexoPaciente);
+          const sexo = await this.catalogoService.findByDescriptionToDhis2(
+            createDto.sexoPaciente,
+          );
           paciente.sexo = sexo;
         }
-  
+
         // Asignamos la autoidentificación si está presente en el DTO.
         if (createDto.autoIdentificacionPaciente) {
-          const autoIdentificacionPaciente = createDto.autoIdentificacionPaciente
-            .toUpperCase()
-            .replace('Í', 'I'); // Aseguramos que 'Í' sea reemplazado por 'I' (en caso de que esté mal escrito)
-          const autoIdentificacion = await this.catalogoService.findByDescriptionToDhis2(autoIdentificacionPaciente);
+          const autoIdentificacionPaciente =
+            createDto.autoIdentificacionPaciente
+              .toUpperCase()
+              .replace('Í', 'I'); // Aseguramos que 'Í' sea reemplazado por 'I' (en caso de que esté mal escrito)
+          const autoIdentificacion =
+            await this.catalogoService.findByDescriptionToDhis2(
+              autoIdentificacionPaciente,
+            );
           paciente.autoIdentificacion = autoIdentificacion;
         }
-  
+
         // Asignamos el usuario que está creando el registro.
         paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-  
+
         // Finalmente, guardamos el nuevo paciente.
-        const nuevoPaciente = await this.pacienteDhis2Repository.create(paciente)
-        const pacienteCreado = await this.pacienteDhis2Repository.save(nuevoPaciente);
-        console.log("Nuevo paciente creado:", pacienteCreado);
-  
+        const nuevoPaciente = await this.pacienteDhis2Repository.create(
+          paciente,
+        );
+        const pacienteCreado = await this.pacienteDhis2Repository.save(
+          nuevoPaciente,
+        );
+        console.log('Nuevo paciente creado:', pacienteCreado);
+
         // Retornamos el paciente recién creado.
         return pacienteCreado;
       }
-  
     } catch (error) {
       // Capturamos cualquier error y lo registramos.
-      console.error("Error en la creación o actualización del paciente:", error);
+      console.error(
+        'Error en la creación o actualización del paciente:',
+        error,
+      );
       throw new Error('Hubo un problema al crear o actualizar el paciente');
     }
   }
-  
 
   delete(uuid: string): Promise<PacienteDhis2> {
     return Promise.resolve(undefined);
@@ -160,16 +170,20 @@ export class PacienteDhis2Service {
     uuid: string,
     pacienteDto: UpdatePacienteDto,
   ): Promise<PacienteDhis2> {
-    console.log("SexoPaciente", pacienteDto.sexoPaciente);
-    console.log("AutoIdentificaPaciente", pacienteDto.autoIdentificacionPaciente);
+    console.log('SexoPaciente', pacienteDto.sexoPaciente);
+    console.log(
+      'AutoIdentificaPaciente',
+      pacienteDto.autoIdentificacionPaciente,
+    );
     try {
       if (!pacienteDto.sexoPaciente) {
         throw new Error('Sexo del paciente no definido');
       }
 
-
       // Obtener los valores para los campos 'sexo' y 'autoIdentificacion' a partir de los DTO
-      const sexo = await this.catalogoService.findByDescriptionToDhis2(pacienteDto?.sexoPaciente);
+      const sexo = await this.catalogoService.findByDescriptionToDhis2(
+        pacienteDto?.sexoPaciente,
+      );
       // const autoIdentificacion = await this.catalogoService.findByDescriptionToDhis2(pacienteDto?.autoIdentificacionPaciente);
 
       // Buscar el paciente en la base de datos usando su código único (uuid)
@@ -188,7 +202,6 @@ export class PacienteDhis2Service {
 
       // Opcional: Si deseas devolver el objeto actualizado, puedes buscarlo nuevamente
       return await this.findByDhis2Code(uuid);
-
     } catch (error) {
       console.error('Error al actualizar el paciente:', error);
       throw error; // Lanza el error para que el controlador lo maneje
@@ -196,22 +209,18 @@ export class PacienteDhis2Service {
   }
 
   async findByDhis2Code(code: string) {
-    console.log("PacienteBusqueda::" , code);
-    
+    console.log('PacienteBusqueda::', code);
+
     const paciente = await this.pacienteDhis2Repository.findOne({
       where: {
         codigoDhis2: code,
       },
     });
-    console.log("PacienteBusquedaPcient::" , paciente);
-    
+    console.log('PacienteBusquedaPcient::', paciente);
+
     if (paciente) {
       return paciente;
     }
     return null;
   }
-
-  
-
-
 }

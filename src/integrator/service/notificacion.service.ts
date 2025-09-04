@@ -18,7 +18,7 @@ export class NotificacionService {
   private readonly logger = new Logger(NotificacionService.name);
 
   constructor(
-    @InjectRepository(Notificacion)
+    @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly notificacionRepository: Repository<Notificacion>,
     private readonly medicamentoService: MedicamentoService,
     private readonly antecedenteMedicoService: AntecedenteMedicoService,

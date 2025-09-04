@@ -14,7 +14,7 @@ export class AntecedenteEmbarazoService {
   private readonly logger = new Logger(AntecedenteEmbarazoService.name);
 
   constructor(
-    @InjectRepository(AntecedenteEmbarazo)
+    @InjectRepository(AntecedenteEmbarazo, 'POSTGRES_INTEGRATOR_DS')
     private readonly antecedenteEmbarazoRepository: Repository<AntecedenteEmbarazo>,
     @Inject(forwardRef(() => NotificacionService))
     private readonly notificacionService: NotificacionService,

@@ -1,6 +1,6 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
 import { ApiTags } from '@nestjs/swagger';
+import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
 
 /**
  * Controlador para sincronización de datos de vacunación desde Oracle
@@ -15,10 +15,11 @@ export class VacunacionNominalSyncController {
    * @param fecha - Fecha en formato YYYY-MM-DD
    * @returns Promesa que se resuelve cuando el procesamiento termina
    */
+  // TODO: implemntar cache interceptor para evitar llamadas repetidas en un corto periodo de tiempo
   @Get('/sync')
-  async sync(@Query('fecha') fecha: string): Promise<void> {
-    console.log('fecha', fecha);
-    return this.vacunacionService.procesarVacunasAgregadas(new Date(fecha));
+  async sync(@Query('fecha') fecha: string): Promise<{ message: string }> {
+    this.vacunacionService.procesarVacunasAgregadas(new Date(fecha));
+    return { message: 'Proceso iniciado' };
   }
 
   /**

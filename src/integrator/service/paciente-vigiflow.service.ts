@@ -12,7 +12,7 @@ export class PacienteVigiflowService {
   private readonly logger = new Logger(PacienteVigiflowService.name);
 
   constructor(
-    @InjectRepository(PacienteVigiflow)
+    @InjectRepository(PacienteVigiflow, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacienteVigiflowRepository: Repository<PacienteVigiflow>,
     private readonly catalogoService: CatalogoService,
   ) {}

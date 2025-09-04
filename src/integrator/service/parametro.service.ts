@@ -12,7 +12,7 @@ export class ParametroService {
   private readonly logger = new Logger(ParametroService.name);
 
   constructor(
-    @InjectRepository(Parametro)
+    @InjectRepository(Parametro, 'POSTGRES_INTEGRATOR_DS')
     private readonly parametroRepository: Repository<Parametro>,
   ) {}
 

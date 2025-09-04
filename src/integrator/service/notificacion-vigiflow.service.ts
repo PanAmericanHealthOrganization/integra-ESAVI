@@ -1,82 +1,74 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
 import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
+import { UpdateNotificacionDto } from '../dto/update-notificacion.dto';
 import { NotificacionVigiflow } from '../entity/notificacion-vigiflow.entity';
+import { PacienteVigiflow } from '../entity/paciente-vigiflow.entity';
+import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 import { CatalogoService } from './catalogo.service';
 import { GrupoEtarioService } from './grupo-etario.service';
 import { PacienteVigiflowService } from './paciente-vigiflow.service';
-import { PacienteVigiflow } from '../entity/paciente-vigiflow.entity';
-import { UpdateNotificacionDto } from '../dto/update-notificacion.dto';
-import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { log } from 'console';
 
 @Injectable()
 export class NotificacionVigiflowService {
   private readonly logger = new Logger(NotificacionVigiflowService.name);
 
   constructor(
-    @InjectRepository(NotificacionVigiflow)
+    @InjectRepository(NotificacionVigiflow, 'POSTGRES_INTEGRATOR_DS')
     private readonly notificacionRepository: Repository<NotificacionVigiflow>,
     private readonly pacienteService: PacienteVigiflowService,
     private readonly catalogoService: CatalogoService,
     private readonly grupoEtarioService: GrupoEtarioService,
-  ) { }
+  ) {}
 
   async create(
     createDto: CreateNotificacionDto,
     pacienteUUID: PacienteVigiflow,
   ): Promise<NotificacionVigiflow> {
-    console.log("DatosVerificarNotificacion", createDto);
-    console.log("DatosVerificarNotificacionPaciente", pacienteUUID);
-
+    console.log('DatosVerificarNotificacion', createDto);
+    console.log('DatosVerificarNotificacionPaciente', pacienteUUID);
 
     if (pacienteUUID) {
-      const notificacion = await this.findByVigiflowCode(createDto.codigoVigiflow);
+      const notificacion = await this.findByVigiflowCode(
+        createDto.codigoVigiflow,
+      );
       if (notificacion) {
-        return notificacion
-      }
-      else {
-
+        return notificacion;
+      } else {
         const notificacion = plainToClass(NotificacionVigiflow, createDto);
         notificacion.paciente = pacienteUUID;
         console.log(notificacion);
         if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.provincia)) {
           try {
             notificacion.provinciaResidencia =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residencia.provincia,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residencia.provincia,
+              );
           } catch (error) {
-            console.log("Provincia no encontrada");
-            
+            console.log('Provincia no encontrada');
           }
-          
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.canton)) {
           try {
             notificacion.cantonResidencia =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residencia.canton,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residencia.canton,
+              );
           } catch (error) {
-            console.log("Canton no encontrada");
-            
+            console.log('Canton no encontrada');
           }
-          
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.parroquia)) {
           try {
             notificacion.parroquiaResidencia =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residencia.parroquia,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residencia.parroquia,
+              );
           } catch (error) {
-            console.log("Parroquia no encontrada");
-            
+            console.log('Parroquia no encontrada');
           }
-          
         }
         if (
           !this.isNullOrUndefinedOrEmpty(
@@ -85,28 +77,24 @@ export class NotificacionVigiflowService {
         ) {
           try {
             notificacion.provinciaNotificador =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.provincia,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residenciaNotificador.provincia,
+              );
           } catch (error) {
-            console.log("Provincia notificador no encontrada");
-            
+            console.log('Provincia notificador no encontrada');
           }
-          
         }
         if (
           !this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)
         ) {
           try {
             notificacion.cantonNotificador =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.canton,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residenciaNotificador.canton,
+              );
           } catch (error) {
-            console.log("Canton notificador no encontrado");
-            
+            console.log('Canton notificador no encontrado');
           }
-          
         }
         if (
           !this.isNullOrUndefinedOrEmpty(
@@ -115,40 +103,34 @@ export class NotificacionVigiflowService {
         ) {
           try {
             notificacion.parroquiaNotificador =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.parroquia,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.residenciaNotificador.parroquia,
+              );
           } catch (error) {
-            console.log("Parroquia notificador no encontrado");
-            
+            console.log('Parroquia notificador no encontrado');
           }
-          
         }
 
         if (!this.isNullOrUndefinedOrEmpty(createDto.unidadEdadPaciente)) {
           try {
             notificacion.unidadEdad =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.unidadEdadPaciente,
-            );  
+              await this.catalogoService.findByDescriptionToVigiflow(
+                createDto.unidadEdadPaciente,
+              );
           } catch (error) {
-            console.log("Unidad Edad paciente no encontrada");
-            
+            console.log('Unidad Edad paciente no encontrada');
           }
-          
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.grupoEtarioPaciente)) {
-          console.log("EsteGrupoEtario:::" , createDto.grupoEtarioPaciente);
-          
+          console.log('EsteGrupoEtario:::', createDto.grupoEtarioPaciente);
+
           try {
             notificacion.grupoEtario = await this.grupoEtarioService.findOne(
               createDto.grupoEtarioPaciente,
-            );  
+            );
           } catch (error) {
-            console.log("Grupo etario no encontrado");
-            
+            console.log('Grupo etario no encontrado');
           }
-          
         }
         //Grupo etario
         // if (createDto.edad) {
@@ -160,13 +142,12 @@ export class NotificacionVigiflowService {
         //   }
         // }
 
-
         if (createDto.edad && createDto.unidadEdadPaciente) {
           try {
             // Aseguramos que la unidad de edad esté en mayúsculas
             let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
             let edadFinal = createDto.edad;
-        
+
             // Si la unidad no es "AÑO" o "AÑOS", realizar la conversión
             if (unidadEdad !== 'AÑO' && unidadEdad !== 'AÑOS') {
               if (unidadEdad === 'DÉCADA') {
@@ -186,18 +167,17 @@ export class NotificacionVigiflowService {
                 edadFinal = ~~(createDto.edad / 12);
               }
             }
-        
+
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+            const grupoEtarioPaciente =
+              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
             notificacion.grupoEtario = grupoEtarioPaciente;
-        
           } catch (error) {
-            console.error(`Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`);
+            console.error(
+              `Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`,
+            );
           }
         }
-        
-        
-        
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
         const not = await this.notificacionRepository.save(notificacion);
@@ -213,35 +193,40 @@ export class NotificacionVigiflowService {
     }
   }
 
-  async update(notificacion: NotificacionVigiflow, updateNotificacion: UpdateNotificacionDto) {
-
+  async update(
+    notificacion: NotificacionVigiflow,
+    updateNotificacion: UpdateNotificacionDto,
+  ) {
     try {
       if (updateNotificacion.profesionNotificadorParam) {
         try {
-            const profesionNotificador = await this.catalogoService.findByDescriptionToVigiflow(updateNotificacion.profesionNotificadorParam)
-            notificacion.profesionNotificador = profesionNotificador
+          const profesionNotificador =
+            await this.catalogoService.findByDescriptionToVigiflow(
+              updateNotificacion.profesionNotificadorParam,
+            );
+          notificacion.profesionNotificador = profesionNotificador;
         } catch (error) {
-          console.log("Profesion no encontrada");
-
+          console.log('Profesion no encontrada');
         }
       }
 
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
       notificacion.comentario = updateNotificacion.comentario;
       notificacion.tipoReporte = updateNotificacion.tipoReporte;
-      notificacion.identificacionNotificador = updateNotificacion.identificacionNotificador;
-      notificacion.delegadoOrganizacion = updateNotificacion.delegadoOrganizacion;
-      notificacion.ultimaEdicionRegistrada = updateNotificacion.ultimaEdicionRegistrada;
+      notificacion.identificacionNotificador =
+        updateNotificacion.identificacionNotificador;
+      notificacion.delegadoOrganizacion =
+        updateNotificacion.delegadoOrganizacion;
+      notificacion.ultimaEdicionRegistrada =
+        updateNotificacion.ultimaEdicionRegistrada;
       notificacion.lactando = updateNotificacion.lactando;
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
 
       await this.notificacionRepository.update(notificacion.id, notificacion);
-
     } catch (error) {
       console.error('Error al actualizar el paciente:', error);
       throw error;
     }
-
   }
 
   delete(uuid: string): Promise<NotificacionVigiflow> {
@@ -287,5 +272,4 @@ export class NotificacionVigiflowService {
     }
     return null;
   }
-
 }

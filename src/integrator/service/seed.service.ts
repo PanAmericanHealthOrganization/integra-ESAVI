@@ -20,29 +20,29 @@ import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
 @Injectable()
 export class SeedService {
   constructor(
-    @InjectRepository(TipoCatalogo)
+    @InjectRepository(TipoCatalogo, 'POSTGRES_INTEGRATOR_DS')
     private tipoCatalogoRepository: Repository<TipoCatalogo>,
-    @InjectRepository(Catalogo)
+    @InjectRepository(Catalogo, 'POSTGRES_INTEGRATOR_DS')
     private catalogoRepository: Repository<Catalogo>,
-    @InjectRepository(GrupoEtario)
+    @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
     private grupoEtarioRepository: Repository<GrupoEtario>,
-    @InjectRepository(Paciente)
+    @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private pacienteRepository: Repository<Paciente>,
-    @InjectRepository(Notificacion)
+    @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
     private notificacionRepository: Repository<Notificacion>,
-    @InjectRepository(DatoEsavi)
+    @InjectRepository(DatoEsavi, 'POSTGRES_INTEGRATOR_DS')
     private datoEsaviRepository: Repository<DatoEsavi>,
-    @InjectRepository(Medicamento)
+    @InjectRepository(Medicamento, 'POSTGRES_INTEGRATOR_DS')
     private medicamentoRepository: Repository<Medicamento>,
-    @InjectRepository(CausalidadEsavi)
+    @InjectRepository(CausalidadEsavi, 'POSTGRES_INTEGRATOR_DS')
     private causalidadEsaviRepository: Repository<CausalidadEsavi>,
-    @InjectRepository(GravedadEsavi)
+    @InjectRepository(GravedadEsavi, 'POSTGRES_INTEGRATOR_DS')
     private gravedadEsaviRepository: Repository<GravedadEsavi>,
-    @InjectRepository(DesenlaceEsavi)
+    @InjectRepository(DesenlaceEsavi, 'POSTGRES_INTEGRATOR_DS')
     private desenlaceEsaviRepository: Repository<DesenlaceEsavi>,
-    @InjectRepository(DatoVacuna)
+    @InjectRepository(DatoVacuna, 'POSTGRES_INTEGRATOR_DS')
     private datoVacunaRepository: Repository<DatoVacuna>,
-    @InjectRepository(DatoVacunacion)
+    @InjectRepository(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS')
     private datoVacunacionRepository: Repository<DatoVacunacion>,
   ) {}
 

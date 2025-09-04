@@ -12,7 +12,7 @@ export class CatalogoService {
   private readonly logger = new Logger(CatalogoService.name);
 
   constructor(
-    @InjectRepository(Catalogo)
+    @InjectRepository(Catalogo, 'POSTGRES_INTEGRATOR_DS')
     private readonly catalogoRepository: Repository<Catalogo>,
   ) {}
 
@@ -29,6 +29,7 @@ export class CatalogoService {
   }
 
   delete(uuid: string): Promise<Catalogo> {
+    // TODO: Implementar método delete
     return Promise.resolve(undefined);
   }
 

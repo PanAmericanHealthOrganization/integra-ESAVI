@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { VacunacionNominalSyncController } from './controllers/vacunacion-nominal-sync.controller';
-import { VacunacionNominalService } from './service/vacunacion-nominal.service';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { VacunacionNominal } from './entity/vacunacion.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { VacunometroService } from 'src/integrator/service/vacunometro.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { IntegratorModule } from 'src/integrator/integrator.module';
+import { VacunacionNominalSyncController } from './controllers/vacunacion-nominal-sync.controller';
+import { VacunacionNominal } from './entity/vacunacion.entity';
+import { VacunacionNominalService } from './service/vacunacion-nominal.service';
 
 // Nombre de la conexión Oracle
 export const ORACLE_VACUNACION_DS = 'ORACLE_VACUNACION_DS';

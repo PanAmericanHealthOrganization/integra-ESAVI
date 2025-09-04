@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, PrimaryColumn } from 'typeorm';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ISync } from '../dto/sync.dto';
 
 @Entity({
@@ -11,7 +11,7 @@ export class SyncProcess extends BaseEntity implements ISync {
   /**
    *
    */
-  @PrimaryColumn({
+  @PrimaryGeneratedColumn({
     name: 'ID',
     comment: 'Identificador único del proceso de sincronización',
   })

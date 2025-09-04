@@ -6,7 +6,7 @@ import { Vacunometro } from '../entity/vacunometro.entity';
 @Injectable()
 export class VacunometroService {
   constructor(
-    @InjectRepository(Vacunometro)
+    @InjectRepository(Vacunometro, 'POSTGRES_INTEGRATOR_DS')
     private readonly vacunometroRepository: Repository<Vacunometro>,
   ) {}
 

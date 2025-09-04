@@ -13,7 +13,7 @@ export class DatoVacunaService {
   private readonly logger = new Logger(DatoVacunaService.name);
 
   constructor(
-    @InjectRepository(DatoVacuna)
+    @InjectRepository(DatoVacuna, 'POSTGRES_INTEGRATOR_DS')
     private readonly datoVacunaRepository: Repository<DatoVacuna>,
   ) {}
 
@@ -24,7 +24,6 @@ export class DatoVacunaService {
   //   console.log("PacienteDto::" , createDto);
   //   console.log("PacienteNoti::" , notificacion);
 
-    
   //   try {
   //     const datoVacuna = plainToClass(DatoVacuna, createDto);
   //     datoVacuna.notificacion = notificacion;
@@ -40,32 +39,31 @@ export class DatoVacunaService {
   //   }
   // }
 
-
   // async create(
   //   notificacion: Notificacion,
   //   createDto: CreateDatoVacunaDto | CreateDatoVacunaDto[], // Aceptar tanto un solo objeto como un arreglo
   // ): Promise<DatoVacuna | DatoVacuna[]> {
   //   console.log("PacienteDtoVacuna::", createDto);
   //   console.log("PacienteNotiVacuna::", notificacion);
-  
+
   //   try {
   //     // Buscar todos los datos de vacuna relacionados con la notificación
   //     const datosVacunaExistentes = await this.findByNotificacionId(notificacion.id);
-  
+
   //     let datosVacuna: DatoVacuna[] = [];
-  
+
   //     // Si es un arreglo de objetos
   //     if (Array.isArray(createDto)) {
   //       // Iteramos sobre cada objeto en el arreglo
   //       datosVacuna = await Promise.all(createDto.map(async (dto) => {
   //         const datoVacuna = plainToClass(DatoVacuna, dto);
   //         datoVacuna.notificacion = notificacion; // Asociamos la notificación
-  
+
   //         // Verificamos si ya existe un registro para este dto en los registros existentes
   //         const datoVacunaExistente = datosVacunaExistentes.find(
   //           (vacuna) => vacuna.id === datoVacuna.id // Comparamos por ID o algún otro campo clave
   //         );
-  
+
   //         if (datoVacunaExistente) {
   //           // Si existe, actualizamos sus campos
   //           Object.keys(dto).forEach((key) => {
@@ -85,11 +83,11 @@ export class DatoVacunaService {
   //       const dto = createDto;
   //       const datoVacuna = plainToClass(DatoVacuna, dto);
   //       datoVacuna.notificacion = notificacion;
-  
+
   //       const datoVacunaExistente = datosVacunaExistentes.find(
   //         (vacuna) => vacuna.id === datoVacuna.id
   //       );
-  
+
   //       if (datoVacunaExistente) {
   //         // Si ya existe, actualizamos sus campos
   //         Object.keys(dto).forEach((key) => {
@@ -103,10 +101,10 @@ export class DatoVacunaService {
   //         datosVacuna = [datoVacuna];
   //       }
   //     }
-  
+
   //     // Guardamos los datos vacunales, ya sean nuevos o actualizados
   //     const result = await this.datoVacunaRepository.save(datosVacuna); // Aquí se guarda o actualiza
-  
+
   //     return result;
   //   } catch (e) {
   //     this.logger.error(`Error al procesar los datos de vacuna: ${e.message}`);
@@ -119,7 +117,8 @@ export class DatoVacunaService {
   async createVigiflow(
     notificacion: Notificacion,
     createDto: CreateDatoVacunaDto, // Ahora solo aceptamos un único objeto
-  ): Promise<DatoVacuna> { // Retornamos un solo objeto
+  ): Promise<DatoVacuna> {
+    // Retornamos un solo objeto
     try {
       // 1. Buscar si ya existe un DatoVacuna con los mismos valores (nombreVacuna, codigoAtc, numeroLote, notificacion)
       const existingDatoVacuna = await this.datoVacunaRepository.findOne({
@@ -130,7 +129,7 @@ export class DatoVacunaService {
           notificacion: notificacion, // Asociamos la notificación al buscar
         },
       });
-  
+
       if (existingDatoVacuna) {
         // Si existe, actualizamos los campos necesarios
         Object.assign(existingDatoVacuna, createDto); // Actualizamos los valores del registro existente
@@ -142,14 +141,20 @@ export class DatoVacunaService {
         return this.datoVacunaRepository.save(nuevoDatoVacuna); // Guardamos el nuevo registro
       }
     } catch (e) {
-      this.logger.error(`Error al procesar los datos de vacuna para Vigiflow: ${e.message}`);
-      throw new Error('Hubo un problema al crear o actualizar los datos de vacuna para Vigiflow');
+      this.logger.error(
+        `Error al procesar los datos de vacuna para Vigiflow: ${e.message}`,
+      );
+      throw new Error(
+        'Hubo un problema al crear o actualizar los datos de vacuna para Vigiflow',
+      );
     } finally {
-      this.logger.log(`DatoVacuna para Vigiflow ha sido procesado: ${JSON.stringify(createDto)}`);
+      this.logger.log(
+        `DatoVacuna para Vigiflow ha sido procesado: ${JSON.stringify(
+          createDto,
+        )}`,
+      );
     }
   }
-  
-  
 
   async create(
     notificacion: Notificacion,
@@ -157,19 +162,19 @@ export class DatoVacunaService {
   ): Promise<DatoVacuna | DatoVacuna[]> {
     // Aseguramos que createDto sea siempre un arreglo, incluso si es un solo objeto
     const createDtos = Array.isArray(createDto) ? createDto : [createDto];
-  
+
     try {
       const datoVacunaArray: DatoVacuna[] = [];
-  
+
       // Procesar cada objeto en el arreglo (o el único objeto si es un solo elemento)
       for (const dto of createDtos) {
         const datoVacuna = plainToClass(DatoVacuna, dto);
         datoVacuna.notificacion = notificacion;
-  
+
         // Crear una instancia de notificación para la búsqueda
         const notificacionInstancia = new Notificacion();
         notificacionInstancia.id = notificacion.id;
-  
+
         // Buscar si ya existe un DatoVacuna con la misma notificación y nombreVacuna
         const existingDatoVacuna = await this.datoVacunaRepository.findOne({
           where: {
@@ -177,7 +182,7 @@ export class DatoVacunaService {
             nombreVacuna: dto.nombreVacuna, // Buscar por nombreVacuna además de la notificación
           },
         });
-  
+
         if (existingDatoVacuna) {
           // Si existe, actualizamos el objeto
           Object.assign(existingDatoVacuna, dto);
@@ -189,21 +194,23 @@ export class DatoVacunaService {
           datoVacunaArray.push(datoVacuna); // Añadimos al arreglo
         }
       }
-  
+
       // Retornamos un solo objeto o un arreglo según el caso
       return createDtos.length === 1 ? datoVacunaArray[0] : datoVacunaArray;
     } catch (e) {
       // En caso de error, mostramos un mensaje claro
       this.logger.error(`Error al procesar datos vacuna: ${e.message}`);
-      throw new Error('Hubo un problema al crear o actualizar los datos de vacuna');
+      throw new Error(
+        'Hubo un problema al crear o actualizar los datos de vacuna',
+      );
     } finally {
       // Registro de la operación
-      this.logger.log(`DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`);
+      this.logger.log(
+        `DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`,
+      );
     }
   }
-  
-  
-  
+
   async findByNotificacionId(uuidNotificacion: string): Promise<DatoVacuna[]> {
     try {
       const datosVacuna = await this.datoVacunaRepository.find({
@@ -213,16 +220,13 @@ export class DatoVacunaService {
       });
       return datosVacuna || []; // Devolver un arreglo vacío si no se encuentran registros
     } catch (error) {
-      console.error('Error al buscar DatoVacuna por ID de Notificacion:', error);
+      console.error(
+        'Error al buscar DatoVacuna por ID de Notificacion:',
+        error,
+      );
       return [];
     }
   }
-  
-  
-
- 
-  
-  
 
   delete(uuid: string): Promise<DatoVacuna> {
     return Promise.resolve(undefined);
@@ -257,7 +261,4 @@ export class DatoVacunaService {
     this.datoVacunaRepository.merge(datoVacuna, vacunaDto);
     return this.datoVacunaRepository.save(datoVacuna);
   }
-
-
-  
 }

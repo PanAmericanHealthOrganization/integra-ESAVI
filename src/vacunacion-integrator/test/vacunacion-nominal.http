@@ -11,7 +11,7 @@
 
 ### 1. Sincronizar vacunas agregadas para una fecha específica
 # Procesa las vacunas aplicadas en una fecha determinada y las agrega al vacunómetro
-GET {{host}}/vacunacion-nominal-sync/sync?fecha=2024-01-15
+GET {{host}}/vacunacion-nominal-sync/sync?fecha=2023-06-15
 X-API-KEY: {{api_key}}
 Content-Type: application/json
 

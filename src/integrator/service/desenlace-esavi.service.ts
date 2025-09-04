@@ -13,7 +13,7 @@ export class DesenlaceEsaviService {
   private readonly logger = new Logger(DesenlaceEsaviService.name);
 
   constructor(
-    @InjectRepository(DesenlaceEsavi)
+    @InjectRepository(DesenlaceEsavi, 'POSTGRES_INTEGRATOR_DS')
     private readonly desenlaceEsaviRepository: Repository<DesenlaceEsavi>,
   ) {}
 
@@ -22,14 +22,14 @@ export class DesenlaceEsaviService {
   //   createDto: CreateDesenlaceEsaviDto,
   // ): Promise<DesenlaceEsavi> {
   //   if (notificacion) {
-  //     try {      
+  //     try {
   //       const desenlaceEsavi = await this.findByNotificacionId(notificacion.id);
   //       if (desenlaceEsavi)
   //       {
   //         return desenlaceEsavi
   //       }
-  //       else 
-  //       {  
+  //       else
+  //       {
   //         const desenlaceEsavi = plainToClass(DesenlaceEsavi, createDto);
   //         desenlaceEsavi.notificacion = notificacion;
   //         desenlaceEsavi.createdBy = 'AUTOMATICO';
@@ -45,7 +45,7 @@ export class DesenlaceEsaviService {
   //   }
   // }
   // }
-  
+
   async create(
     notificacion: Notificacion,
     createDto: CreateDesenlaceEsaviDto,
@@ -54,11 +54,11 @@ export class DesenlaceEsaviService {
       try {
         // Verificamos si ya existe un registro de DesenlaceEsavi para la notificación
         const desenlaceEsavi = await this.findByNotificacionId(notificacion.id);
-  
+
         if (desenlaceEsavi) {
           // Si ya existe, actualizamos los campos con los nuevos datos del DTO
-          console.log("DesenlaceEsavi ya existe, actualizando...");
-  
+          console.log('DesenlaceEsavi ya existe, actualizando...');
+
           // Actualizamos los campos relevantes de desenlaceEsavi con la información de createDto
           Object.keys(createDto).forEach((key) => {
             // Solo actualizamos el campo si su valor no es undefined ni null
@@ -66,47 +66,56 @@ export class DesenlaceEsaviService {
               desenlaceEsavi[key] = createDto[key];
             }
           });
-  
+
           // Actualizamos la entidad en la base de datos
-          this.logger.log(`DesenlaceEsavi ha sido actualizada: ${JSON.stringify(createDto)}`);
-  
+          this.logger.log(
+            `DesenlaceEsavi ha sido actualizada: ${JSON.stringify(createDto)}`,
+          );
+
           return this.desenlaceEsaviRepository.save(desenlaceEsavi); // Utilizamos save() para actualizar el registro
         } else {
           // Si no existe, creamos un nuevo registro de DesenlaceEsavi
-          console.log("DesenlaceEsavi no existe, creando nueva...");
-  
+          console.log('DesenlaceEsavi no existe, creando nueva...');
+
           const nuevoDesenlaceEsavi = plainToClass(DesenlaceEsavi, createDto);
-  
+
           // Asignamos los valores de createDto a la nueva instancia de DesenlaceEsavi
           Object.keys(createDto).forEach((key) => {
             if (createDto[key] !== undefined && createDto[key] !== null) {
               nuevoDesenlaceEsavi[key] = createDto[key];
             }
           });
-  
+
           // Asociamos la notificación a la nueva instancia
           nuevoDesenlaceEsavi.notificacion = notificacion;
           nuevoDesenlaceEsavi.createdBy = 'AUTOMATICO'; // Guardamos quien inserta el registro
-  
+
           // Guardamos el nuevo DesenlaceEsavi
-          this.logger.log(`DesenlaceEsavi ha sido creada: ${JSON.stringify(createDto)}`);
-  
+          this.logger.log(
+            `DesenlaceEsavi ha sido creada: ${JSON.stringify(createDto)}`,
+          );
+
           return this.desenlaceEsaviRepository.save(nuevoDesenlaceEsavi); // Utilizamos save() para crear el registro
         }
       } catch (e) {
-        this.logger.error(`Error al procesar la creación o actualización de DesenlaceEsavi: ${e.message}`);
-        throw new Error('Hubo un problema al crear o actualizar DesenlaceEsavi');
+        this.logger.error(
+          `Error al procesar la creación o actualización de DesenlaceEsavi: ${e.message}`,
+        );
+        throw new Error(
+          'Hubo un problema al crear o actualizar DesenlaceEsavi',
+        );
       } finally {
         this.logger.log(
-          `DesenlaceEsavi ha sido procesado: ${JSON.stringify(createDto)}`
+          `DesenlaceEsavi ha sido procesado: ${JSON.stringify(createDto)}`,
         );
       }
     } else {
-      throw new Error('El campo notificacion es obligatorio para DesenlaceEsavi');
+      throw new Error(
+        'El campo notificacion es obligatorio para DesenlaceEsavi',
+      );
     }
   }
-  
-  
+
   delete(uuid: string): Promise<DesenlaceEsavi> {
     return Promise.resolve(undefined);
   }
@@ -125,7 +134,9 @@ export class DesenlaceEsaviService {
     throw new EntityNotFoundException('DesenlaceEsavi', uuid);
   }
 
-  async findByNotificacionId(uuidNotificacion: string): Promise<DesenlaceEsavi | null> {
+  async findByNotificacionId(
+    uuidNotificacion: string,
+  ): Promise<DesenlaceEsavi | null> {
     try {
       const desenlaceEsavi = await this.desenlaceEsaviRepository.findOne({
         where: {
@@ -134,7 +145,10 @@ export class DesenlaceEsaviService {
       });
       return desenlaceEsavi || null; // Devolver null si no se encuentra
     } catch (error) {
-      console.error('Error al buscar desenlaceEsavi por ID de Notificacion:', error);
+      console.error(
+        'Error al buscar desenlaceEsavi por ID de Notificacion:',
+        error,
+      );
       return null;
     }
   }

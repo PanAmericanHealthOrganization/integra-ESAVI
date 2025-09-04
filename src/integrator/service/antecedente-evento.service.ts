@@ -1,21 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { CreateAntecedenteEventoDto } from '../dto/create-antecedente-evento.dto';
+import { UpdateAntecedenteEventoDto } from '../dto/update-antecedente-evento.dto';
 import { AntecedenteEvento } from '../entity/antecedente-evento.entity';
-import { plainToClass } from 'class-transformer';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { UpdateAntecedenteEmbarazoDto } from '../dto/update-antecedente-embarazo.dto';
-import { AntecedenteEmbarazo } from '../entity/antecedente-embarazo.entity';
-import { UpdateAntecedenteEventoDto } from '../dto/update-antecedente-evento.dto';
 
 @Injectable()
 export class AntecedenteEventoService {
   private readonly logger = new Logger(AntecedenteEventoService.name);
 
   constructor(
-    @InjectRepository(AntecedenteEvento)
+    @InjectRepository(AntecedenteEvento, 'POSTGRES_INTEGRATOR_DS')
     private readonly antecedenteEventoRepository: Repository<AntecedenteEvento>,
   ) {}
 

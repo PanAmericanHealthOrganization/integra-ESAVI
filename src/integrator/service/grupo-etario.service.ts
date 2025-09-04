@@ -12,7 +12,7 @@ export class GrupoEtarioService {
   private readonly logger = new Logger(GrupoEtarioService.name);
 
   constructor(
-    @InjectRepository(GrupoEtario)
+    @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
     private readonly grupoEtarioServiceRepository: Repository<GrupoEtario>,
   ) {}
 

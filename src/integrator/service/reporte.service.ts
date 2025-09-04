@@ -14,7 +14,7 @@ export class ReporteService {
   private readonly logger = new Logger(ReporteService.name);
 
   constructor(
-    @InjectRepository(Paciente)
+    @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacientRepository: Repository<Paciente>,
   ) {}
 

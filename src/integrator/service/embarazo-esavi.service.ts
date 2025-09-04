@@ -13,7 +13,7 @@ export class EmbarazoEsaviService {
   private readonly logger = new Logger(EmbarazoEsaviService.name);
 
   constructor(
-    @InjectRepository(EmbarazoEsavi)
+    @InjectRepository(EmbarazoEsavi, 'POSTGRES_INTEGRATOR_DS')
     private readonly embarazoEsaviRepository: Repository<EmbarazoEsavi>,
   ) {}
 

@@ -13,7 +13,7 @@ export class MedicamentoService {
   private readonly logger = new Logger(MedicamentoService.name);
 
   constructor(
-    @InjectRepository(Medicamento)
+    @InjectRepository(Medicamento, 'POSTGRES_INTEGRATOR_DS')
     private readonly medicamentoRepository: Repository<Medicamento>,
   ) {}
 
@@ -31,13 +31,15 @@ export class MedicamentoService {
       return medicinaList;
     } catch (e) {
       console.log('*******************************************************');
-      console.log(e)
+      console.log(e);
       console.log('*******************************************************');
       this.logger.error(e);
       throw e;
     } finally {
       this.logger.log(
-        `Medicamento has been created(createOneToMany): ${JSON.stringify(createDto)}`,
+        `Medicamento has been created(createOneToMany): ${JSON.stringify(
+          createDto,
+        )}`,
       );
     }
   }
@@ -68,7 +70,7 @@ export class MedicamentoService {
   ): Promise<Medicamento> {
     try {
       // Verificar si ya existe un medicamento con los mismos datos
-      const notificacionExistente = new Notificacion()
+      const notificacionExistente = new Notificacion();
       notificacionExistente.id = notificacion.id;
       const existingMedicamento = await this.medicamentoRepository.findOne({
         where: {
@@ -77,42 +79,44 @@ export class MedicamentoService {
           codigoATC: createDto.codigoATC,
         },
       });
-  
+
       // Si existe, lo actualizamos
       if (existingMedicamento) {
-        this.logger.log('Medicamento existe, se actualizará con los nuevos datos.');
-  
+        this.logger.log(
+          'Medicamento existe, se actualizará con los nuevos datos.',
+        );
+
         // Actualizamos el registro con los nuevos datos
         Object.assign(existingMedicamento, createDto); // Actualizamos las propiedades del registro
-  
+
         // También actualizamos la notificación, por si se cambia
         existingMedicamento.notificacion = notificacion;
-  
+
         // Actualizamos el campo de quién lo está creando
         existingMedicamento.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-  
+
         // Guardamos el registro actualizado
         return this.medicamentoRepository.save(existingMedicamento);
       }
-  
+
       // Si no existe, creamos uno nuevo
       const medicamento = plainToClass(Medicamento, createDto);
       medicamento.notificacion = notificacion;
       medicamento.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-  
+
       // Guardamos el nuevo Medicamento
       return this.medicamentoRepository.save(medicamento);
-  
     } catch (e) {
       this.logger.error(e);
       throw e;
     } finally {
       this.logger.log(
-        `Medicamento ha sido procesado (createOneToOne): ${JSON.stringify(createDto)}`,
+        `Medicamento ha sido procesado (createOneToOne): ${JSON.stringify(
+          createDto,
+        )}`,
       );
     }
   }
-  
 
   delete(uuid: string): Promise<Medicamento> {
     return Promise.resolve(undefined);

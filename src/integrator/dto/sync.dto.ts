@@ -7,7 +7,7 @@ export interface ISync {
   /**
    * Identificador único del proceso de sincronización
    */
-  id: string;
+  id?: string;
   /**
    * Nombre del proceso de sincronización
    */

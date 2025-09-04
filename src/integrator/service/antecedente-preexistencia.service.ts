@@ -12,7 +12,7 @@ export class AntecedentePreexistenciaService {
   private readonly logger = new Logger(AntecedentePreexistenciaService.name);
 
   constructor(
-    @InjectRepository(AntecedentePreexistencia)
+    @InjectRepository(AntecedentePreexistencia, 'POSTGRES_INTEGRATOR_DS')
     private readonly antecedentePreexistenciaRepository: Repository<AntecedentePreexistencia>,
   ) {}
 
@@ -50,7 +50,7 @@ export class AntecedentePreexistenciaService {
       await this.antecedentePreexistenciaRepository.delete({
         notificacion: { id: notificacion.id }, // Eliminar registros con la misma notificación
       });
-  
+
       // 2. Crear un nuevo objeto de AntecedentePreexistencia a partir del DTO
       const antecedentePreexistencia = plainToClass(
         AntecedentePreexistencia,
@@ -58,19 +58,26 @@ export class AntecedentePreexistenciaService {
       );
       antecedentePreexistencia.notificacion = notificacion;
       antecedentePreexistencia.createdBy = 'AUTOMATICO'; // Asignamos el campo 'createdBy'
-  
+
       // 3. Guardar el nuevo registro
-      return this.antecedentePreexistenciaRepository.save(antecedentePreexistencia);
+      return this.antecedentePreexistenciaRepository.save(
+        antecedentePreexistencia,
+      );
     } catch (e) {
-      this.logger.error(`Error al procesar AntecedentePreexistencia: ${e.message}`);
-      throw new Error('Hubo un problema al crear o eliminar AntecedentePreexistencia');
+      this.logger.error(
+        `Error al procesar AntecedentePreexistencia: ${e.message}`,
+      );
+      throw new Error(
+        'Hubo un problema al crear o eliminar AntecedentePreexistencia',
+      );
     } finally {
       this.logger.log(
-        `AntecedentePreexistencia ha sido procesado: ${JSON.stringify(createDto)}`,
+        `AntecedentePreexistencia ha sido procesado: ${JSON.stringify(
+          createDto,
+        )}`,
       );
     }
   }
-  
 
   delete(uuid: string): Promise<AntecedentePreexistencia> {
     return Promise.resolve(undefined);

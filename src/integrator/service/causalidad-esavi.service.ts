@@ -12,7 +12,7 @@ export class CausalidadEsaviService {
   private readonly logger = new Logger(CausalidadEsaviService.name);
 
   constructor(
-    @InjectRepository(CausalidadEsavi)
+    @InjectRepository(CausalidadEsavi, 'POSTGRES_INTEGRATOR_DS')
     private readonly causalidadEsaviRepository: Repository<CausalidadEsavi>,
   ) {}
 

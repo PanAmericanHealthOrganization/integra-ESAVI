@@ -2,17 +2,19 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as _ from 'lodash';
+import { ISync } from 'src/integrator/dto/sync.dto';
 import { Vacunometro } from 'src/integrator/entity';
+import { SyncService, VacunometroService } from 'src/integrator/service';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
-import { VacunometroService } from 'src/integrator/service';
 
 @Injectable()
 export class VacunacionNominalService {
   constructor(
     @InjectRepository(VacunacionNominal, 'ORACLE_VACUNACION_DS')
     private readonly vacunacionRepository: Repository<VacunacionNominal>,
-    private readonly vacunometroService: VacunometroService, //private readonly syncService: SyncService,
+    private readonly vacunometroService: VacunometroService,
+    private readonly syncProcessService: SyncService,
   ) {}
 
   private readonly logger = new Logger(VacunacionNominalService.name);
@@ -44,7 +46,7 @@ export class VacunacionNominalService {
       await this.vacunometroService.createMany(vacunasAgregadas);
 
       // SYNC, registro de proceso de sincronización
-      const syncProcess = {
+      const syncProcess: ISync = {
         name: 'VacunacionNomanalService.procesarVacunasAgregadas',
         status: 'COMPLETED',
         startTime: startTime,
@@ -53,7 +55,8 @@ export class VacunacionNominalService {
         errorStack: '',
         errorTrace: '',
       };
-      //  await this.syncService.createSyncProcess(syncProcess as SyncProcess);
+      await this.syncProcessService.createSyncProcess(syncProcess);
+      return;
     } catch (error) {
       this.logger.error(error);
     }

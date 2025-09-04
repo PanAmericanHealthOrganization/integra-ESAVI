@@ -13,7 +13,7 @@ export class AntecedenteMedicoService {
   private readonly logger = new Logger(AntecedenteMedicoService.name);
 
   constructor(
-    @InjectRepository(AntecedenteMedico)
+    @InjectRepository(AntecedenteMedico, 'POSTGRES_INTEGRATOR_DS')
     private readonly antecedenteMedicoRepository: Repository<AntecedenteMedico>,
   ) {}
 
@@ -21,8 +21,8 @@ export class AntecedenteMedicoService {
     notificacion: Notificacion,
     createDto: CreateAntecedenteMedicoDto,
   ): Promise<AntecedenteMedico> {
-    console.log("AntecedenteMedicoBooo:::" , createDto);
-    
+    console.log('AntecedenteMedicoBooo:::', createDto);
+
     try {
       const antecedenteMedico = plainToClass(AntecedenteMedico, createDto);
       antecedenteMedico.notificacion = notificacion;
@@ -64,10 +64,8 @@ export class AntecedenteMedicoService {
 
   async update(
     uuid: string,
-    updateAntecedenteMedicoDto: UpdateAntecedenteMedicoDto,
-  )
-  // : Promise<AntecedenteMedico>
-   {
+    updateAntecedenteMedicoDto: UpdateAntecedenteMedicoDto, // : Promise<AntecedenteMedico>
+  ) {
     // const antecedenteMedico = await this.findOne(uuid);
     // this.antecedenteMedicoRepository.merge(
     //   antecedenteMedico,
