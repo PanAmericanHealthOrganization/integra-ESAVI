@@ -69,6 +69,7 @@ import {
   SyncProcess,
 } from './entity';
 import { SyncService } from './service/sycn.service';
+import { VacunometroController } from './controller/vacunometro.controller';
 
 @Module({
   imports: [
@@ -117,6 +118,7 @@ import { SyncService } from './service/sycn.service';
     DatoEsaviController,
     AntecedenteEmbarazoController,
     SeedController,
+    VacunometroController,
     // GrupoEtarioController
   ],
   providers: [

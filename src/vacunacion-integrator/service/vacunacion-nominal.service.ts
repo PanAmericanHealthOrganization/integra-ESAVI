@@ -2,19 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as _ from 'lodash';
-import { SyncProcess, Vacunometro } from 'src/integrator/entity';
-import { VacunometroService } from 'src/integrator/service/vacunometro.service';
+import { Vacunometro } from 'src/integrator/entity';
 import { Repository } from 'typeorm';
-import { VacunacionNominal } from '../entity/vacunacion';
-import { SyncService } from 'src/integrator/service/sycn.service';
+import { VacunacionNominal } from '../entity/vacunacion.entity';
+import { VacunometroService } from 'src/integrator/service';
 
 @Injectable()
 export class VacunacionNominalService {
   constructor(
-    @InjectRepository(VacunacionNominal)
+    @InjectRepository(VacunacionNominal, 'ORACLE_VACUNACION_DS')
     private readonly vacunacionRepository: Repository<VacunacionNominal>,
-    private readonly vacunometroService: VacunometroService,
-    private readonly syncService: SyncService,
+    private readonly vacunometroService: VacunometroService, //private readonly syncService: SyncService,
   ) {}
 
   private readonly logger = new Logger(VacunacionNominalService.name);
@@ -55,7 +53,7 @@ export class VacunacionNominalService {
         errorStack: '',
         errorTrace: '',
       };
-      await this.syncService.createSyncProcess(syncProcess as SyncProcess);
+      //  await this.syncService.createSyncProcess(syncProcess as SyncProcess);
     } catch (error) {
       this.logger.error(error);
     }
@@ -128,5 +126,9 @@ export class VacunacionNominalService {
     } catch (error) {
       this.logger.error(error);
     }
+  }
+
+  async getVacunadosCount(): Promise<number> {
+    return this.vacunacionRepository.count();
   }
 }

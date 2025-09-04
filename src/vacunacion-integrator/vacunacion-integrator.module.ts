@@ -1,31 +1,37 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { IntegratorModule } from 'src/integrator/integrator.module';
 import { VacunacionNominalSyncController } from './controllers/vacunacion-nominal-sync.controller';
-import { VacunacionNominal } from './entity/vacunacion';
 import { VacunacionNominalService } from './service/vacunacion-nominal.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { VacunacionNominal } from './entity/vacunacion.entity';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { VacunometroService } from 'src/integrator/service/vacunometro.service';
+import { IntegratorModule } from 'src/integrator/integrator.module';
 
 // Nombre de la conexión Oracle
 export const ORACLE_VACUNACION_DS = 'ORACLE_VACUNACION_DS';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: 'oracle',
-      host: process.env.DB_VACUNACION_DB_HOST,
-      port: Number(process.env.DB_VACUNACION_DB_PORT),
-      username: process.env.DB_VACUNACION_DB_USER,
-      password: process.env.DB_VACUNACION_DB_PASS,
-      schema: process.env.DB_VACUNACION_DB_SCHEMA,
-      serviceName: process.env.DB_VACUNACION_DB_NAME,
-      synchronize: true,
+    ConfigModule,
+    IntegratorModule,
+    TypeOrmModule.forRootAsync({
+      name: ORACLE_VACUNACION_DS,
+      useFactory: (configService: ConfigService) => ({
+        name: ORACLE_VACUNACION_DS,
+        type: 'oracle',
+        host: configService.get('DB_VACUNACION_DB_HOST'),
+        port: +configService.get('DB_VACUNACION_DB_PORT'),
+        username: configService.get('DB_VACUNACION_DB_USER'),
+        password: configService.get('DB_VACUNACION_DB_PASS'),
+        serviceName: configService.get('DB_VACUNACION_DB_NAME'),
+        entities: [VacunacionNominal],
+        synchronize: false,
+        poolSize: 5,
+      }),
+      imports: [ConfigModule],
+      inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([VacunacionNominal], ORACLE_VACUNACION_DS),
-    ScheduleModule.forRoot(),
-    IntegratorModule,
   ],
   providers: [VacunacionNominalService],
   controllers: [VacunacionNominalSyncController],

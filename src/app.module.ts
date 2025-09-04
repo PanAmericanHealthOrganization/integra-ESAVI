@@ -53,7 +53,6 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
       password: process.env.PASS_DATABASE,
       database: process.env.NAME_DATABASE,
       schema: process.env.SCHEMA_DATABASE,
-
       entities: [
         AntecedenteEvento,
         AntecedenteEmbarazo,
@@ -88,8 +87,8 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
+    VacunacionIntegratorModule,
     VigiflowIntegratorModule,
-    VacunacionIntegratorModule.forRoot(),
     WhodrugsModule,
     MeddraModule,
   ],
