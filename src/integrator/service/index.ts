@@ -21,5 +21,5 @@ export * from './paciente-vigiflow.service';
 export * from './parametro.service';
 export * from './reporte.service';
 export * from './seed.service';
-export * from './sycn.service';
+export * from './sync.service';
 export * from './vacunometro.service';

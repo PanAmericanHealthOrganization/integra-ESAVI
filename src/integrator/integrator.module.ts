@@ -68,7 +68,7 @@ import {
   DatoEsavi,
   SyncProcess,
 } from './entity';
-import { SyncService } from './service/sycn.service';
+import { SyncService } from './service/sync.service';
 import { VacunometroController } from './controller/vacunometro.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GrupoEtarioController } from './controller/grupo-etario.controller';

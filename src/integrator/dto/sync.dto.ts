@@ -1,9 +1,10 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
+import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
 
 /**
  *
  */
-export interface ISync {
+export interface ISync extends IBaseEntity {
   /**
    * Identificador único del proceso de sincronización
    */

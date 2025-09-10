@@ -1,10 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
+import { endOfDay, startOfDay } from 'date-fns';
 import * as _ from 'lodash';
 import { ISync } from 'src/integrator/dto/sync.dto';
 import { Vacunometro } from 'src/integrator/entity';
 import { SyncService, VacunometroService } from 'src/integrator/service';
+import { CRUD } from 'src/utils/interfaces/baseEntity';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
 
@@ -32,9 +34,25 @@ export class VacunacionNominalService {
     try {
       const startTime = new Date();
       // EXTRACT, extracción de datos
-      const vacunas = await this.vacunacionRepository.find({
-        where: { fecha_aplicacion: dia },
-      });
+      const startDay = startOfDay(new Date('2021-01-01'));
+      const endDay = endOfDay(dia);
+      const vacunas = await this.vacunacionRepository
+        .createQueryBuilder('v')
+        .where(
+          'v.fecha_aplicacion > :startDay AND v.fecha_aplicacion < :endDay',
+          {
+            startDay,
+            endDay,
+          },
+        )
+        .limit(100)
+
+        .getMany();
+      this.logger.log(
+        `Encontradas ${vacunas.length} vacunas aplicadas para el día ${
+          dia.toISOString().split('T')[0]
+        }`,
+      );
 
       // TRANSFORM, mutación de datos/ transformación de datos
       const vacunasAgregadas = this.procesarVacunaNominalToVacunaAgregada(
@@ -54,6 +72,12 @@ export class VacunacionNominalService {
         errorMessage: '',
         errorStack: '',
         errorTrace: '',
+        enabled: true, // or the appropriate default value
+        state: true, // set appropriate value
+        action: CRUD.C, // set appropriate value
+        createdAt: new Date(),
+        updatedAt: new Date(), // add any other required fields with default values
+        actionBy: 'SCHEDULE', // or set to the appropriate user identifier
       };
       await this.syncProcessService.createSyncProcess(syncProcess);
       return;

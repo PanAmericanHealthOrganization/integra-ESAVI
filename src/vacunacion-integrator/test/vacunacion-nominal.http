@@ -11,7 +11,7 @@
 
 ### 1. Sincronizar vacunas agregadas para una fecha específica
 # Procesa las vacunas aplicadas en una fecha determinada y las agrega al vacunómetro
-GET {{host}}/vacunacion-nominal-sync/sync?fecha=2023-06-15
+GET {{host}}/vacunacion-nominal-sync/sync?fecha=2025-01-01
 X-API-KEY: {{api_key}}
 Content-Type: application/json
 
@@ -21,95 +21,3 @@ GET {{host}}/vacunacion-nominal-sync/count
 X-API-KEY: {{api_key}}
 Content-Type: application/json
 
-###
-
-### 2. Sincronizar vacunas agregadas para el día anterior (ejemplo)
-# Útil para procesar datos del día anterior
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync?fecha=2024-01-14
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### 3. Sincronizar vacunas en un rango de fechas
-# Procesa todas las vacunas aplicadas entre dos fechas (inclusive)
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync-range?desde=2024-01-01&hasta=2024-01-31
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### 4. Sincronizar vacunas para una semana específica
-# Ejemplo de procesamiento semanal
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync-range?desde=2024-01-08&hasta=2024-01-14
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### 5. Sincronizar vacunas para un mes específico
-# Ejemplo de procesamiento mensual completo
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync-range?desde=2024-02-01&hasta=2024-02-29
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### 6. Sincronizar vacunas para el día actual
-# Procesar vacunas aplicadas hoy (usar fecha actual)
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync?fecha=2024-01-16
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### 7. Ejemplo de sincronización para un período corto (3 días)
-# Útil para reprocesar datos de pocos días
-GET {{host}}/{{api_version}}/vacunacion-nominal/sync-range?desde=2024-01-13&hasta=2024-01-15
-X-API-KEY: {{api_key}}
-Content-Type: application/json
-
-###
-
-### Notas importantes:
-# 
-# 1. FORMATO DE FECHAS:
-#    - Todas las fechas deben estar en formato ISO: YYYY-MM-DD
-#    - Ejemplo válido: 2024-01-15
-#    - Ejemplo inválido: 15/01/2024 o 01-15-2024
-#
-# 2. AUTENTICACIÓN:
-#    - Reemplaza {{api_key}} con tu clave API real
-#    - La clave debe enviarse en el header X-API-KEY
-#
-# 3. PROCESAMIENTO:
-#    - /sync: Procesa una fecha específica
-#    - /sync-range: Procesa un rango de fechas (desde-hasta inclusive)
-#
-# 4. FUNCIONALIDAD:
-#    - Extrae datos de vacunación nominal de Oracle
-#    - Transforma los datos agrupándolos por:
-#      * fecha_aplicacion
-#      * unicodigo (código de unidad)
-#      * uni_nombre (nombre de unidad)
-#      * nombre_vacuna
-#      * sexo
-#      * lote_vacuna
-#    - Carga los datos agregados en la tabla Vacunometro
-#    - Registra el proceso en la tabla SyncProcess
-#
-# 5. CRON AUTOMÁTICO:
-#    - El servicio se ejecuta automáticamente todos los días a la 1:00 AM
-#    - Procesa automáticamente el día anterior
-#
-# 6. RESPUESTA:
-#    - Los endpoints devuelven void (sin contenido)
-#    - El éxito se indica con status HTTP 200
-#    - Los errores se registran en los logs del servidor
-#
-# 7. MONITOREO:
-#    - Revisa los logs del servidor para verificar el procesamiento
-#    - Los errores se capturan y registran automáticamente
-#    - Cada proceso se registra en la tabla sync_process
-
-###

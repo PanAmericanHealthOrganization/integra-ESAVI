@@ -16,6 +16,9 @@ import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
 import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
+import { SyncProcess } from '../entity';
+import { CRUD } from 'src/utils/interfaces/baseEntity';
+import { ISync } from '../dto/sync.dto';
 
 @Injectable()
 export class SeedService {
@@ -44,6 +47,8 @@ export class SeedService {
     private datoVacunaRepository: Repository<DatoVacuna>,
     @InjectRepository(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS')
     private datoVacunacionRepository: Repository<DatoVacunacion>,
+    @InjectRepository(SyncProcess, 'POSTGRES_INTEGRATOR_DS')
+    private syncProcessRepository: Repository<SyncProcess>,
   ) {}
 
   async seedData() {
@@ -60,7 +65,7 @@ export class SeedService {
       await this.seedCatalogos();
 
       // 3. Crear grupos etarios
-      /*await this.seedGruposEtarios();
+      await this.seedGruposEtarios();
 
       // 4. Crear pacientes
       await this.seedPacientes();
@@ -87,8 +92,10 @@ export class SeedService {
       await this.seedDatosVacunas();
 
       // 12. Crear datos de vacunación
-      await this.seedDatosVacunacion();*/
+      await this.seedDatosVacunacion();
 
+      await this.createSyncProcess();
+      // Finalizar
       console.log('✅ Datos de ejemplo cargados exitosamente');
     } catch (error) {
       console.error('❌ Error al cargar datos de ejemplo:', error);
@@ -186,6 +193,33 @@ export class SeedService {
     }
   }
 
+  private async createSyncProcess() {
+    const l = [];
+    for (let i = 0; i < 25; i++) {
+      console.log('🔄 Creando proceso de sincronización...');
+      const syncProcess: ISync = {
+        name: 'Data Seeding',
+        status: 'COMPLETED',
+        startTime: new Date(),
+        endTime: new Date(),
+        errorMessage:
+          'Proceso de carga de datos de ejemplo completado exitosamente.',
+        errorStack: null,
+        errorTrace: null,
+        id: undefined, // or null, depending on your entity definition
+
+        // Add required properties with default or mock values
+        enabled: true,
+        state: true,
+        action: CRUD.C,
+        actionBy: 'system', // or any appropriate user identifier
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      l.push(syncProcess);
+    }
+    await this.syncProcessRepository.save(l);
+  }
   private async seedCatalogos() {
     console.log('📚 Creando catálogos...');
 

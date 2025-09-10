@@ -7,9 +7,10 @@ import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { HttpExceptionFilter } from './providers/http-exception.filter';
 import { HeaderApiKeyStrategy } from './strategy/header-api-key.strategy';
-import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
+//import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
+import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 
 @Module({
   imports: [

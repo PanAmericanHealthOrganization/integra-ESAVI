@@ -1,4 +1,9 @@
-import { BeforeUpdate, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 /**
  *

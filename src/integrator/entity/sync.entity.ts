@@ -1,5 +1,6 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ISync } from '../dto/sync.dto';
+import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -7,11 +8,11 @@ import { ISync } from '../dto/sync.dto';
   comment:
     'Registra los procesos de sincronización con las diferentes fuentes de datos',
 })
-export class SyncProcess extends BaseEntity implements ISync {
+export class SyncProcess extends CustomBaseEntity implements ISync {
   /**
    *
    */
-  @PrimaryGeneratedColumn({
+  @PrimaryGeneratedColumn('uuid', {
     name: 'ID',
     comment: 'Identificador único del proceso de sincronización',
   })

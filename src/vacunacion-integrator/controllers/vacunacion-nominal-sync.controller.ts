@@ -33,6 +33,7 @@ export class VacunacionNominalSyncController {
     @Query('desde') desde: string,
     @Query('hasta') hasta: string,
   ): Promise<void> {
+    console.log(`Syncing from ${desde} to ${hasta}`);
     return this.vacunacionService.procesarVacunasAgregadasFull(
       new Date(desde),
       new Date(hasta),
