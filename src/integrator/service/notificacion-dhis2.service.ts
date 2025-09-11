@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
+import { CreateCompleteDto } from '../dto/create-complete.dto';
 import { NotificacionDhis2 } from '../entity/notificacion-dhis2.entity';
 import { PacienteDhis2Service } from './paciente-dhis2.service';
 import { PacienteDhis2 } from '../entity/paciente-dhis2.entity';
@@ -253,6 +254,60 @@ export class NotificacionDhis2Service {
       return notificacion;
     }
     return null;
+  }
+
+  /**
+   * Busca notificaciones por identificación de paciente y rango de fechas
+   */
+  async findByIdentificacionAndDateRange(
+    identificacion: string,
+    fechaInicio: Date,
+    fechaFin: Date
+  ) {
+    return this.notificacionRepository
+      .createQueryBuilder('notificacion')
+      .leftJoinAndSelect('notificacion.paciente', 'paciente')
+      .where('paciente.identificacion = :identificacion', { identificacion })
+      .andWhere('notificacion.fechaNotificacion >= :fechaInicio', { fechaInicio })
+      .andWhere('notificacion.fechaNotificacion <= :fechaFin', { fechaFin })
+      .getMany();
+  }
+
+  /**
+   * Busca registros similares para actualización masiva
+   */
+  async findSimilarRecords(identificacion: string, fechaNotificacion: string) {
+    const fecha = new Date(fechaNotificacion);
+    const fechaInicio = new Date(fecha);
+    fechaInicio.setDate(fechaInicio.getDate() - 7); // 7 días antes
+    const fechaFin = new Date(fecha);
+    fechaFin.setDate(fechaFin.getDate() + 7); // 7 días después
+
+    return this.notificacionRepository
+      .createQueryBuilder('notificacion')
+      .leftJoinAndSelect('notificacion.paciente', 'paciente')
+      .where('paciente.identificacion = :identificacion', { identificacion })
+      .andWhere('notificacion.fechaNotificacion >= :fechaInicio', { fechaInicio })
+      .andWhere('notificacion.fechaNotificacion <= :fechaFin', { fechaFin })
+      .getMany();
+  }
+
+  /**
+   * Actualiza una notificación por código DHIS2
+   */
+  async updateByCodigoDhis2Evento(codigoDhis2Evento: string, updateData: any) {
+    const notificacionExistente = await this.findByCodeDhis2(codigoDhis2Evento);
+    
+    if (!notificacionExistente) {
+      throw new Error(`Notificación con código DHIS2 ${codigoDhis2Evento} no encontrada`);
+    }
+
+    // Actualizar los campos de la notificación
+    if (updateData.notificacion) {
+      Object.assign(notificacionExistente, updateData.notificacion);
+    }
+
+    return this.notificacionRepository.save(notificacionExistente);
   }
 
   async update(

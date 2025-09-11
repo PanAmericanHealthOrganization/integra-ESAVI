@@ -158,4 +158,46 @@ export class IntegradorService {
     }
     return;
   }
+
+  /**
+   * Busca una notificación por código DHIS2
+   */
+  async findByCodigoDhis2Evento(codigoDhis2Evento: string) {
+    return this.notificacionDhis2Service.findByCodeDhis2(codigoDhis2Evento);
+  }
+
+  /**
+   * Busca notificaciones por identificación de paciente y rango de fechas
+   */
+  async findByIdentificacionAndDateRange(
+    identificacion: string,
+    fechaInicio: Date,
+    fechaFin: Date
+  ) {
+    return this.notificacionDhis2Service.findByIdentificacionAndDateRange(
+      identificacion,
+      fechaInicio,
+      fechaFin
+    );
+  }
+
+  /**
+   * Busca registros similares para actualización masiva
+   */
+  async findSimilarRecords(identificacion: string, fechaNotificacion: string) {
+    return this.notificacionDhis2Service.findSimilarRecords(
+      identificacion,
+      fechaNotificacion
+    );
+  }
+
+  /**
+   * Actualiza una notificación por código DHIS2
+   */
+  async updateByCodigoDhis2Evento(codigoDhis2Evento: string, updateData: CreateCompleteDto) {
+    return this.notificacionDhis2Service.updateByCodigoDhis2Evento(
+      codigoDhis2Evento,
+      updateData
+    );
+  }
 }

@@ -25,7 +25,7 @@ Content-Type: application/json
 ###
 
 # Ejemplo 4: Importación con código ATC de vacuna COVID-19
-GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20240601&fechaFin=20240630&codigoATC=J07BX03
+GET http://localhost:8081/integrator/dhis2/bulk?fechaInicio=20240515&fechaFin=20240705&codigoATC=J07BX03
 X-API-KEY: tu-api-key-aqui
 Content-Type: application/json
 
