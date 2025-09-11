@@ -66,7 +66,8 @@ export class SeedService {
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
-
+      //----fin catalogos---------------------------------------------------------------------------------------------------------
+      /*
       // 4. Crear pacientes
       await this.seedPacientes();
 
@@ -92,7 +93,7 @@ export class SeedService {
       await this.seedDatosVacunas();
 
       // 12. Crear datos de vacunación
-      await this.seedDatosVacunacion();
+      await this.seedDatosVacunacion();*/
 
       await this.createSyncProcess();
       // Finalizar
@@ -244,6 +245,14 @@ export class SeedService {
       {
         vigiflow: 'Mestizo',
         dhis2: 'Mestizo',
+        homologada: 'Mestizo',
+        tipoCatalogo: tiposCatalogo.find(
+          (t) => t.descripcion === 'Autoidentificación Étnica',
+        ),
+      },
+      {
+        vigiflow: 'MESTIZO/A',
+        dhis2: 'MESTIZO/A',
         homologada: 'Mestizo',
         tipoCatalogo: tiposCatalogo.find(
           (t) => t.descripcion === 'Autoidentificación Étnica',

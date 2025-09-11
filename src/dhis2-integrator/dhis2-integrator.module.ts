@@ -9,6 +9,8 @@ import { Dhis2ProgramStageService } from './services/dhis2-program-stage.service
 import { Dhis2ProgramService } from './services/dhis2-program.service';
 import { Dhis2EventsService } from './services/dhis2-events.service';
 import { Dhis2AnalyticsService } from './services/dhis2-analytics.service';
+import { Dhis2ProcessingLogService } from './services/dhis2-processing-log.service';
+import { Dhis2DuplicateHandlerService } from './services/dhis2-duplicate-handler.service';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { Dhis2AnalyticsService } from './services/dhis2-analytics.service';
     Dhis2ProgramStageService,
     Dhis2EventsService,
     Dhis2AnalyticsService,
+    Dhis2ProcessingLogService,
+    Dhis2DuplicateHandlerService,
   ],
   controllers: [Dhis2IntegradorController],
 })

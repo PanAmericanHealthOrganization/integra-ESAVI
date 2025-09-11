@@ -210,3 +210,105 @@ Content-Type: {{contentType}}
 GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20241101&fechaFin=20241130&codigoATC=J07
 Accept: {{accept}}
 Content-Type: {{contentType}}
+
+###
+# NUEVOS ENDPOINTS PARA MANEJO DE DUPLICADOS
+
+### Importación masiva con manejo de duplicados (omisión por defecto)
+GET {{baseUrl}}{{apiPath}}/bulk-with-duplicate-handling?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Importación masiva con configuración de duplicados (actualizar individual)
+POST {{baseUrl}}{{apiPath}}/bulk-with-duplicate-handling?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "accionPorDefecto": "UPDATE_INDIVIDUAL",
+  "confirmarAntesDeProcesar": false,
+  "logDetallado": true
+}
+
+### Importación masiva con configuración de duplicados (actualizar todos)
+POST {{baseUrl}}{{apiPath}}/bulk-with-duplicate-handling?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "accionPorDefecto": "UPDATE_ALL",
+  "confirmarAntesDeProcesar": false,
+  "logDetallado": true
+}
+
+### Importación masiva con configuración de duplicados (solicitar confirmación)
+POST {{baseUrl}}{{apiPath}}/bulk-with-duplicate-handling?fechaInicio=20241201&fechaFin=20241231&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "accionPorDefecto": "ASK_CONFIRMATION",
+  "confirmarAntesDeProcesar": true,
+  "logDetallado": true
+}
+
+### Obtener duplicados pendientes de confirmación
+GET {{baseUrl}}{{apiPath}}/duplicates/pending
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Obtener duplicado pendiente específico
+GET {{baseUrl}}{{apiPath}}/duplicates/pending/EVENTO_123456
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Confirmar acción para duplicado (omitir)
+POST {{baseUrl}}{{apiPath}}/duplicates/confirm
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "codigoDhis2Evento": "EVENTO_123456",
+  "accion": "SKIP",
+  "aplicarATodos": false,
+  "motivo": "Registro duplicado sin cambios significativos"
+}
+
+### Confirmar acción para duplicado (actualizar individual)
+POST {{baseUrl}}{{apiPath}}/duplicates/confirm
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "codigoDhis2Evento": "EVENTO_123456",
+  "accion": "UPDATE_INDIVIDUAL",
+  "aplicarATodos": false,
+  "motivo": "Actualizar con datos más recientes"
+}
+
+### Confirmar acción para duplicado (actualizar todos)
+POST {{baseUrl}}{{apiPath}}/duplicates/confirm
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+{
+  "codigoDhis2Evento": "EVENTO_123456",
+  "accion": "UPDATE_ALL",
+  "aplicarATodos": true,
+  "motivo": "Aplicar actualización a todos los registros similares"
+}
+
+### Obtener logs de procesamiento por lote
+GET {{baseUrl}}{{apiPath}}/logs/DHIS2_1703123456789_J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Obtener todos los logs de procesamiento
+GET {{baseUrl}}{{apiPath}}/logs
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
+### Obtener resumen de procesamiento por lote
+GET {{baseUrl}}{{apiPath}}/summary/DHIS2_1703123456789_J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
