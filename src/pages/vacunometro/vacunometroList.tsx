@@ -1,4 +1,14 @@
-import { Datagrid, List, TextField, TextInput } from "react-admin"
+import { useState } from "react"
+import {
+  CreateButton,
+  Datagrid,
+  FilterButton,
+  List,
+  TextField,
+  TextInput,
+  TopToolbar,
+} from "react-admin"
+import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
 
 export const VacunometroFilters = [
   <TextInput label="Unicode" source="unicode" />,
@@ -7,8 +17,17 @@ export const VacunometroFilters = [
 ]
 
 const VacunometroList = () => {
+  const [open, setOpen] = useState<boolean>(false)
+
+  const ListActions = () => (
+    <TopToolbar>
+      <SyncVacunometroDialog open={open} setOpen={setOpen} />
+      <FilterButton />
+      <CreateButton />
+    </TopToolbar>
+  )
   return (
-    <List filters={VacunometroFilters}>
+    <List filters={VacunometroFilters} actions={<ListActions />}>
       <Datagrid>
         <TextField source="id" />
         <TextField source="unicode" />

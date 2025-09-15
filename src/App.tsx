@@ -11,6 +11,7 @@ import dashboard from "./pages/dashboard"
 import esavis from "./pages/esavis"
 import reportes from "./pages/reportes"
 import vacunometro from "./pages/vacunometro"
+import syncs from "./pages/syncs"
 
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
@@ -26,6 +27,7 @@ const App = () => {
       <Resource name="reportes" list={reportes.list} />
       <Resource name="analisis" list={analisis.list} />
       <Resource name="vacunometro" {...vacunometro} />
+      <Resource name="syncs" {...syncs} />
     </Admin>
   )
 }

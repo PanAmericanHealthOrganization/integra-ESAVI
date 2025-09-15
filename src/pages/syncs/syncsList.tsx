@@ -1,10 +1,22 @@
 import React from "react"
-import { Datagrid, List, TextField } from "react-admin"
+import {
+  CreateButton,
+  Datagrid,
+  List,
+  TextField,
+  TopToolbar,
+} from "react-admin"
+
+const ListActions = () => (
+  <TopToolbar>
+    <CreateButton />
+  </TopToolbar>
+)
 
 export class SyncsList extends React.Component {
   render() {
     return (
-      <List>
+      <List actions={<ListActions />} {...this.props}>
         <Datagrid>
           <TextField source="id" />
           <TextField source="name" />

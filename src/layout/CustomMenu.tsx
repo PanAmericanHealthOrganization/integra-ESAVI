@@ -1,8 +1,9 @@
 import InsightsIcon from "@mui/icons-material/Insights"
 import PieChartIcon from "@mui/icons-material/PieChart"
 import SettingsIcon from "@mui/icons-material/Settings"
-import TableChartIcon from "@mui/icons-material/TableChart"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
+import SyncIcon from "@mui/icons-material/Sync"
+import TableChartIcon from "@mui/icons-material/TableChart"
 import { Menu } from "react-admin"
 import Authorize from "../authorization.utils"
 import SickIcon from "@mui/icons-material/Sick"
@@ -47,6 +48,11 @@ export const CustomMenu = () => (
       to="/vacunometro"
       primaryText="Vacunometro"
       leftIcon={<VaccinesIcon />}
+    />
+    <Menu.Item
+      to="/syncs"
+      primaryText="Procesos de sincronización"
+      leftIcon={<SyncIcon />}
     />
 
     {/* Puedes agregar más elementos al menú aquí siguiendo el mismo patrón */}
