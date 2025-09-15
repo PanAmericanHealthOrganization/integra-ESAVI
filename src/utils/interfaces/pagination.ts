@@ -4,7 +4,7 @@ export interface IPaginationRequest<T> {
   query: T;
 }
 export interface IPaginationResponse<T> {
-  data: T;
+  data: T[];
   total: number;
 }
 

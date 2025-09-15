@@ -27,7 +27,7 @@ export class SyncService {
    */
   public async getMany(
     params: IPaginationRequest<SyncProcess>,
-  ): Promise<IPaginationResponse<SyncProcess[]>> {
+  ): Promise<IPaginationResponse<SyncProcess>> {
     try {
       const { page, size } = params;
       const [data, total] = await this.syncProcessRepository.findAndCount({

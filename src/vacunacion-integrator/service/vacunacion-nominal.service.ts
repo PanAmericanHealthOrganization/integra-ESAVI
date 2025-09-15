@@ -4,9 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { endOfDay, startOfDay } from 'date-fns';
 import * as _ from 'lodash';
 import { ISync } from 'src/integrator/dto/sync.dto';
-import { Vacunometro } from 'src/integrator/entity';
+import { IVacunometro, Vacunometro } from 'src/integrator/entity';
 import { SyncService, VacunometroService } from 'src/integrator/service';
-import { CRUD } from 'src/utils/interfaces/baseEntity';
+import { CRUD, IBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
 
@@ -61,7 +61,9 @@ export class VacunacionNominalService {
       );
 
       // LOAD, ALMACENAMIENTO DE LOS DATOS
-      await this.vacunometroService.createMany(vacunasAgregadas);
+      await this.vacunometroService.createMany(
+        vacunasAgregadas as Vacunometro[],
+      );
 
       // SYNC, registro de proceso de sincronización
       const syncProcess: ISync = {
@@ -89,21 +91,30 @@ export class VacunacionNominalService {
   private procesarVacunaNominalToVacunaAgregada(
     vacunados: VacunacionNominal[],
     fecha: Date,
-  ): Vacunometro[] {
+  ): IVacunometro[] {
     try {
       // Utilizar lodash para agrupar y procesar los datos
       const gruposVacunas = _.groupBy(vacunados, (vacuna) => {
         return `${vacuna.fecha_aplicacion}_${vacuna.unicodigo}_${vacuna.uni_nombre}_${vacuna.nombre_vacuna}_${vacuna.sexo}_${vacuna.lote_vacuna}`;
       });
 
-      const vacunasAgregadas: Vacunometro[] = [];
+      const vacunasAgregadas: IVacunometro[] = [];
 
       // Procesar cada grupo y contar
       _.forEach(gruposVacunas, (grupo) => {
         const primerElemento = grupo[0]; // Tomar el primer elemento como referencia
         const cantidad = grupo.length; // Contar elementos en el grupo
 
-        const vacunaAgregada: Vacunometro = {
+        const auditInfo: IBaseEntity = {
+          enabled: true,
+          state: true,
+          action: CRUD.C,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          actionBy: 'SCHEDULE',
+        };
+
+        const vacunaAgregada: IVacunometro = {
           id: '', // Se generará automáticamente
           unicode: primerElemento.unicodigo || '',
           nombreVacuna: primerElemento.nombre_vacuna || '',
@@ -113,7 +124,8 @@ export class VacunacionNominalService {
           anioAplicacion: fecha.getFullYear(),
           fechaAplicacion: fecha,
           sexo: primerElemento.sexo || '',
-          cantidad: cantidad,
+          total: cantidad,
+          ...auditInfo,
         };
 
         vacunasAgregadas.push(vacunaAgregada);

@@ -17,7 +17,7 @@ export class SyncController {
   @Get('/many')
   public async getMany(
     params: IPaginationRequest<SyncProcess>,
-  ): Promise<IPaginationResponse<SyncProcess[]>> {
+  ): Promise<IPaginationResponse<SyncProcess>> {
     try {
       return this.syncService.getMany(params);
     } catch (error) {

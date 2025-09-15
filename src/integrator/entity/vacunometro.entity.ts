@@ -1,3 +1,4 @@
+import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 /**
@@ -8,7 +9,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
   name: 'TR_VACUNOMETRO',
   comment: 'Conteo de vacunas para el analisis de los datos',
 })
-export class Vacunometro {
+export class Vacunometro extends CustomBaseEntity implements IVacunometro {
   /**
    *
    */
@@ -32,18 +33,18 @@ export class Vacunometro {
   /**
    *
    */
-  @Column({ 
-    name: 'NOMBRE_VACUNA', 
+  @Column({
+    name: 'NOMBRE_VACUNA',
     comment: 'Nombre de la vacuna',
   })
   nombreVacuna: string;
   /**
    *
    */
-  @Column({ 
-    name: 'DOSIS_APLICADA', 
-    nullable: true, 
-    comment: 'Dosis aplicada', 
+  @Column({
+    name: 'DOSIS_APLICADA',
+    nullable: true,
+    comment: 'Dosis aplicada',
   })
   dosisAplicada: number;
   /**
@@ -99,5 +100,18 @@ export class Vacunometro {
     nullable: true,
     comment: 'Cantidad de vacunas aplicadas',
   })
-  cantidad: number;
+  total: number;
+}
+
+export interface IVacunometro {
+  id: string;
+  unicode: string;
+  nombreVacuna: string;
+  dosisAplicada: number;
+  diaAplicacion: number;
+  mesAplicacion: number;
+  anioAplicacion: number;
+  fechaAplicacion: Date;
+  sexo: string;
+  total: number;
 }

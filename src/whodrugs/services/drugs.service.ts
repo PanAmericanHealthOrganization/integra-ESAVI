@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationRequest, IPaginationResponse } from 'src/utils/interfaces/pagination';
+import {
+  IPaginationRequest,
+  IPaginationResponse,
+} from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
 import { Drug } from '../models/drug.entity';
 
@@ -17,7 +20,7 @@ export class DrugService {
     drugCode: number,
     country: string,
     atcCode: string,
-  ): Promise<IPaginationResponse<any[]>> {
+  ): Promise<IPaginationResponse<any>> {
     const drugPartial = await this.drugRepository.find({
       select: {
         id: true,
@@ -50,8 +53,14 @@ export class DrugService {
       .filter(
         (drug) =>
           (!drugName && !drugCode) ||
-          (drugName && `${drug.drugName}`.toUpperCase().includes(`${drugName}`.toUpperCase())) ||
-          (drugCode && `${drug.drugCode}`.toUpperCase().includes(`${drugCode}`.toUpperCase())),
+          (drugName &&
+            `${drug.drugName}`
+              .toUpperCase()
+              .includes(`${drugName}`.toUpperCase())) ||
+          (drugCode &&
+            `${drug.drugCode}`
+              .toUpperCase()
+              .includes(`${drugCode}`.toUpperCase())),
       )
       .slice(request.page * request.size, request.size);
 
@@ -60,7 +69,6 @@ export class DrugService {
       total: final.length,
     };
   }
-
 
   public async getDrugsOnly(
     drugName: string,
@@ -88,7 +96,7 @@ export class DrugService {
         },
       ],
     });
-  
+
     const final = drugPartial
       .map((drug) => {
         drug.drugName = `${drug.drugName}`.toUpperCase(); // Convertimos el nombre del medicamento a mayúsculas
@@ -96,17 +104,13 @@ export class DrugService {
       })
       .filter(
         (drug) =>
-          (!drugName) ||
-          (drugName && `${drug.drugName}`.toUpperCase() === `${drugName}`.toUpperCase()) // Comparación exacta
+          !drugName ||
+          (drugName &&
+            `${drug.drugName}`.toUpperCase() === `${drugName}`.toUpperCase()), // Comparación exacta
       );
-  
+
     return final;
   }
-  
-  
-  
-
-  
 
   private async getDrugs(skip: number, take: number): Promise<Drug[]> {
     const drugPartial = await this.drugRepository.find({
