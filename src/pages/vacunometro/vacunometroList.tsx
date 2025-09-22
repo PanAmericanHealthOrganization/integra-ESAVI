@@ -27,8 +27,8 @@ const VacunometroList = () => {
     </TopToolbar>
   )
   return (
-    <List filters={VacunometroFilters} actions={<ListActions />}>
-      <Datagrid>
+    <List filters={VacunometroFilters} actions={<ListActions />} empty={false}>
+      <Datagrid rowClick="edit" bulkActionButtons={false} optimized>
         <TextField source="id" />
         <TextField source="unicode" />
         <TextField source="nombreVacuna" />

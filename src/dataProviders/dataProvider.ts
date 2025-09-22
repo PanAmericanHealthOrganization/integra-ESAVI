@@ -1,7 +1,7 @@
 import { combineDataProviders } from "react-admin"
+import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { reporteDataProvider } from "./reportes.dataprovider"
-import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { syncsDataProvider } from "./syncs.dataprovider"
 import { vacunometroDataProvider } from "./vacunometro.dataprovider"
 

@@ -21,8 +21,7 @@ import {
   UpdateParams,
   UpdateResult,
 } from "ra-core"
-import { INT_ESAV_API } from "./fetch.integra.esavi.client"
-import axios from "axios"
+import intESAVIClient from "./axios.client"
 
 export const vacunometroDataProvider: DataProvider = {
   getList: async function <RecordType extends RaRecord = any>(
@@ -30,10 +29,11 @@ export const vacunometroDataProvider: DataProvider = {
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
     try {
-      const response = await axios.get(
-        `${INT_ESAV_API}/integrator/${resource}/findAllPaginated`,
+      console.log("params", params)
+      const response = await intESAVIClient.post(
+        `integrator/${resource}/getPaginated`,
         {
-          params,
+          ...params,
         }
       )
       return {
@@ -53,7 +53,7 @@ export const vacunometroDataProvider: DataProvider = {
     params: GetOneParams<RecordType>
   ): Promise<GetOneResult<RecordType>> {
     try {
-      const response = await axios.get(
+      const response = await intESAVIClient.get(
         `${INT_ESAV_API}/integrator/vacunometro/findOne`,
         {
           params,
@@ -71,7 +71,7 @@ export const vacunometroDataProvider: DataProvider = {
     params: GetManyParams
   ): Promise<GetManyResult<RecordType>> {
     try {
-      const response = await axios.get(
+      const response = await intESAVIClient.get(
         `${INT_ESAV_API}/integrator/vacunometro/findAll`,
         {
           params,
@@ -89,7 +89,7 @@ export const vacunometroDataProvider: DataProvider = {
     params: GetManyReferenceParams
   ): Promise<GetManyReferenceResult<RecordType>> {
     try {
-      const response = await axios.get(
+      const response = await intESAVIClient.get(
         `${INT_ESAV_API}/integrator/vacunometro/findAll`,
         {
           params,
