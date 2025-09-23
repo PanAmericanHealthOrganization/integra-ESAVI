@@ -21,7 +21,7 @@ import {
   UpdateParams,
   UpdateResult,
 } from "ra-core"
-import { axiosClient } from "./axios.integra.esavi.client"
+import intESAVIClient from "./axios.client"
 
 export const syncsDataProvider: DataProvider = {
   getList: async function <RecordType extends RaRecord = any>(
@@ -29,15 +29,23 @@ export const syncsDataProvider: DataProvider = {
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
     try {
-      const response = await axiosClient.get(`/${resource}/many`, {
-        params,
-      })
+      console.log("params", params)
+      const response = await intESAVIClient.post(
+        `integrator/${resource}/paginated`,
+        {
+          ...params,
+        }
+      )
       return {
         data: response.data.data,
         total: response.data.total,
+        pageInfo: {
+          hasNextPage: response.data.hasNextPage,
+          hasPreviousPage: response.data.hasPreviousPage,
+        },
       }
     } catch (error) {
-      throw new Error("Error al obtener la lista de sincronizaciones")
+      throw new Error("Error al obtener la lista de vacunometro")
     }
   },
   getOne: async function <RecordType extends RaRecord = any>(
@@ -45,7 +53,9 @@ export const syncsDataProvider: DataProvider = {
     params: GetOneParams<RecordType>
   ): Promise<GetOneResult<RecordType>> {
     try {
-      const response = await axiosClient.get(`/${resource}/${params.id}`)
+      const response = await intESAVIClient.get(
+        `integrator/${resource}/${params.id}`
+      )
       return {
         data: response.data,
       }
@@ -58,9 +68,12 @@ export const syncsDataProvider: DataProvider = {
     params: GetManyParams
   ): Promise<GetManyResult<RecordType>> {
     try {
-      const response = await axiosClient.get(`/${resource}/many`, {
-        params,
-      })
+      const response = await intESAVIClient.get(
+        `integrator/${resource}/getMany`,
+        {
+          params,
+        }
+      )
       return {
         data: response.data.data,
       }
@@ -94,7 +107,7 @@ export const syncsDataProvider: DataProvider = {
     params: CreateParams
   ): Promise<CreateResult<ResultRecordType>> {
     try {
-      const response = await axiosClient.post(`/${resource}`, params)
+      const response = await intESAVIClient.post(`/${resource}`, params)
       return {
         data: response.data,
       }

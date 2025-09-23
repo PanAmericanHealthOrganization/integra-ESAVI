@@ -4,8 +4,8 @@ import {
   Datagrid,
   DateField,
   List,
+  SearchInput,
   TextField,
-  TextInput,
   TopToolbar,
 } from "react-admin"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
@@ -14,9 +14,9 @@ const defaultValues = {
   hasta: endOfMonth(new Date()),
 }
 export const VacunometroFilters = [
-  <TextInput label="Unicode" source="unicode" />,
-  <TextInput label="Nombre Vacuna" source="nombreVacuna" />,
-  <TextInput label="Dosis Aplicada" source="fechaAplicacion" />,
+  <SearchInput source="unicode" alwaysOn />,
+  <SearchInput source="nombreVacuna" />,
+  <SearchInput source="sexo" />,
 ]
 
 const VacunometroList = () => {
@@ -29,11 +29,7 @@ const VacunometroList = () => {
   )
   return (
     <>
-      <List
-        filters={VacunometroFilters}
-        actions={<ListActions />}
-        perPage={25}
-        empty={false}>
+      <List actions={<ListActions />} perPage={25} empty={false}>
         <Datagrid rowClick="edit" bulkActionButtons={false}>
           <TextField source="unicode" />
           <TextField source="nombreVacuna" />

@@ -1,33 +1,19 @@
-import React from "react"
-import {
-  CreateButton,
-  Datagrid,
-  List,
-  TextField,
-  TopToolbar,
-} from "react-admin"
+import { Datagrid, List, TextField, TopToolbar } from "react-admin"
 
-const ListActions = () => (
-  <TopToolbar>
-    <CreateButton />
-  </TopToolbar>
-)
+const ListActions = () => <TopToolbar></TopToolbar>
 
-export class SyncsList extends React.Component {
-  render() {
-    return (
-      <List actions={<ListActions />} {...this.props}>
-        <Datagrid>
-          <TextField source="id" />
-          <TextField source="name" />
-          <TextField source="status" />
-          <TextField source="startTime" />
-          <TextField source="endTime" />
-          <TextField source="errorMessage" />
-          <TextField source="errorStack" />
-          <TextField source="errorTrace" />
-        </Datagrid>
-      </List>
-    )
-  }
+export const SyncsList = () => {
+  return (
+    <List>
+      <Datagrid>
+        <TextField source="name" />
+        <TextField source="status" />
+        <TextField source="startTime" />
+        <TextField source="endTime" />
+        <TextField source="errorMessage" />
+        <TextField source="errorStack" />
+        <TextField source="errorTrace" />
+      </Datagrid>
+    </List>
+  )
 }
