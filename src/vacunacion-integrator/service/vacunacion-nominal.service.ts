@@ -65,7 +65,7 @@ export class VacunacionNominalService {
 
       // SYNC, registro de proceso de sincronización
       const syncProcess: ISync = {
-        name: 'VacunacionNomanalService.procesarVacunasAgregadas',
+        name: `VacunacionNominalService.procesarVacunasAgregadas ${startDay} to ${endDay}`,
         status: 'COMPLETED',
         startTime: startTime,
         endTime: new Date(),

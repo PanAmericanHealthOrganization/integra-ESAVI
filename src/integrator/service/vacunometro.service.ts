@@ -48,12 +48,16 @@ export class VacunometroService
    * @returns
    */
   public async getPaginated(paginated: GetListParams): Promise<IPaginationResponse<Vacunometro>> {
-    const { pagination } = paginated;
+    const { pagination, sort } = paginated;
     const { page, perPage } = pagination;
-
+    const sortOrder = sort.order === 'ASC' ? 'ASC' : 'DESC';
+    const sortField = sort.field || 'createdAt';
+    const csort = {};
+    csort[sortField] = sortOrder;
     const [data, total] = await this.vacunometroRepository.findAndCount({
       skip: (page - 1) * perPage,
       take: perPage,
+      order: { ...csort },
     });
     return { data, total };
   }
