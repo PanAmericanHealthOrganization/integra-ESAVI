@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  IPaginationRequest,
-  IPaginationResponse,
-} from 'src/utils/interfaces/pagination';
+import { IPaginationRequest, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
 import { ISync } from '../dto/sync.dto';
 import { SyncProcess } from '../entity';

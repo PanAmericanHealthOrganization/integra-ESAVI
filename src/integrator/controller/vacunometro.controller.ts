@@ -1,27 +1,18 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-} from '@nestjs/common';
-import {
-  IController,
-  Identificator,
-  IGetManyParams,
-} from 'src/utils/IController';
-import { GetListParams } from 'src/utils/interfaces/pagination';
-import { VacunometroService } from '../service';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
+import { GetListParams } from 'src/utils/interfaces/pagination';
+import { VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto } from '../dto/vacunometro.dto';
+import { VacunometroService } from '../service';
 
 /**
  *
  */
 @ApiTags('Vacunometro')
-@Controller({ path: 'vacunometro', version: '1' })
-export class VacunometroController implements IController<any, any, any> {
+@Controller({ path: 'integrator/vacunometro', version: '1' })
+export class VacunometroController
+  implements IController<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto>
+{
   constructor(private readonly vacunometroService: VacunometroService) {}
 
   /**
@@ -46,9 +37,8 @@ export class VacunometroController implements IController<any, any, any> {
    *
    */
   @Post('getPaginated')
-  public getPaginated(
-    @Body() params: GetListParams,
-  ): Promise<{ data: any[]; total: number }> {
+  public getPaginated(@Body() params: GetListParams): Promise<{ data: any[]; total: number }> {
+    console.log(params);
     return this.vacunometroService.getPaginated(params);
   }
 
@@ -64,10 +54,7 @@ export class VacunometroController implements IController<any, any, any> {
    *
    */
   @Put('update/:id')
-  public update(
-    @Param('id') id: Identificator,
-    @Body() data: any,
-  ): Promise<any> {
+  public update(@Param('id') id: Identificator, @Body() data: any): Promise<any> {
     return this.vacunometroService.update(id, data);
   }
 

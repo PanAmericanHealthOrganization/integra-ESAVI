@@ -1,15 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { endOfDay, startOfDay } from 'date-fns';
-import * as _ from 'lodash';
+import { add, endOfDay, format, startOfDay } from 'date-fns';
 import { ISync } from 'src/integrator/dto/sync.dto';
-import { IVacunometro, Vacunometro } from 'src/integrator/entity';
 import { SyncService, VacunometroService } from 'src/integrator/service';
-import { CRUD, IBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { CRUD } from 'src/utils/interfaces/baseEntity';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
-
 @Injectable()
 export class VacunacionNominalService {
   constructor(
@@ -25,45 +22,46 @@ export class VacunacionNominalService {
   async procesarVacunasAgregadasCron() {
     // procesar dia anterior
     const dia = new Date();
-    dia.setDate(dia.getDate() - 1);
     // procesar vacunas agregadas
     await this.procesarVacunasAgregadas(dia);
   }
 
+  /**
+   *
+   * @param dia
+   * @returns
+   */
   async procesarVacunasAgregadas(dia: Date): Promise<void> {
     try {
       const startTime = new Date();
       // EXTRACT, extracción de datos
-      const startDay = startOfDay(new Date('2021-01-01'));
-      const endDay = endOfDay(dia);
-      const vacunas = await this.vacunacionRepository
-        .createQueryBuilder('v')
-        .where(
-          'v.fecha_aplicacion > :startDay AND v.fecha_aplicacion < :endDay',
-          {
-            startDay,
-            endDay,
-          },
-        )
-        .limit(100)
+      const startDay = format(startOfDay(add(dia, { days: -1 })), 'yyyy-MM-dd');
+      const endDay = format(endOfDay(add(dia, { days: 1 })), 'yyyy-MM-dd');
 
-        .getMany();
-      this.logger.log(
-        `Encontradas ${vacunas.length} vacunas aplicadas para el día ${
-          dia.toISOString().split('T')[0]
-        }`,
-      );
+      // Ejecutar consulta consolidada directamente
+      const query = `
+        SELECT 
+          dvcdc.FECHA_APLICACION as fecha_aplicacion,
+          dvcdc.UNICODIGO as unicode,
+          dvcdc.SEXO as sexo,
+          dvcdc.NOMBRE_VACUNA as nombre_vacuna,
+          COUNT(*) AS total
+        FROM HCUE_VACUNACION_DEPURADA.DB_VACUNACION_CONSOLIDADA_DEPURADA_COVID dvcdc
+        WHERE dvcdc.FECHA_APLICACION > TO_DATE('${startDay}', 'YYYY-MM-DD') AND dvcdc.FECHA_APLICACION  < TO_DATE('${endDay}', 'YYYY-MM-DD') and dvcdc.UNICODIGO IS NOT NULL
+        GROUP BY 
+          dvcdc.FECHA_APLICACION,
+          dvcdc.UNICODIGO,
+          dvcdc.SEXO,
+          dvcdc.NOMBRE_VACUNA
+        ORDER BY dvcdc.FECHA_APLICACION DESC
+      `;
+      console.log(query);
 
-      // TRANSFORM, mutación de datos/ transformación de datos
-      const vacunasAgregadas = this.procesarVacunaNominalToVacunaAgregada(
-        vacunas,
-        dia,
-      );
-
+      const vacunas = await this.vacunacionRepository.query(query);
+      //
+      this.logger.log(`Encontradas ${vacunas.length} vacunas aplicadas para el día ${startDay}`);
       // LOAD, ALMACENAMIENTO DE LOS DATOS
-      await this.vacunometroService.createMany(
-        vacunasAgregadas as Vacunometro[],
-      );
+      await this.vacunometroService.createMany(vacunas);
 
       // SYNC, registro de proceso de sincronización
       const syncProcess: ISync = {
@@ -88,65 +86,6 @@ export class VacunacionNominalService {
     }
   }
 
-  private procesarVacunaNominalToVacunaAgregada(
-    vacunados: VacunacionNominal[],
-    fecha: Date,
-  ): IVacunometro[] {
-    try {
-      // Utilizar lodash para agrupar y procesar los datos
-      const gruposVacunas = _.groupBy(vacunados, (vacuna) => {
-        return `${vacuna.fecha_aplicacion}_${vacuna.unicodigo}_${vacuna.uni_nombre}_${vacuna.nombre_vacuna}_${vacuna.sexo}_${vacuna.lote_vacuna}`;
-      });
-
-      const vacunasAgregadas: IVacunometro[] = [];
-
-      // Procesar cada grupo y contar
-      _.forEach(gruposVacunas, (grupo) => {
-        const primerElemento = grupo[0]; // Tomar el primer elemento como referencia
-        const cantidad = grupo.length; // Contar elementos en el grupo
-
-        const auditInfo: IBaseEntity = {
-          enabled: true,
-          state: true,
-          action: CRUD.C,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          actionBy: 'SCHEDULE',
-        };
-
-        const vacunaAgregada: IVacunometro = {
-          id: '', // Se generará automáticamente
-          unicode: primerElemento.unicodigo || '',
-          nombreVacuna: primerElemento.nombre_vacuna || '',
-          dosisAplicada: primerElemento.dosis_aplicada || 1,
-          diaAplicacion: fecha.getDate(),
-          mesAplicacion: fecha.getMonth() + 1,
-          anioAplicacion: fecha.getFullYear(),
-          fechaAplicacion: fecha,
-          sexo: primerElemento.sexo || '',
-          total: cantidad,
-          ...auditInfo,
-        };
-
-        vacunasAgregadas.push(vacunaAgregada);
-      });
-
-      // TODO: AGREGAR A LA TABLA DE SINCRONIZACIÓN
-
-      this.logger.log(
-        `Procesadas ${
-          vacunasAgregadas.length
-        } agrupaciones de vacunas para la fecha ${
-          fecha.toISOString().split('T')[0]
-        }`,
-      );
-      return vacunasAgregadas;
-    } catch (error) {
-      this.logger.error('Error procesando vacunas agregadas:', error);
-      return [];
-    }
-  }
-
   /**
    *
    * @param desde
@@ -155,19 +94,11 @@ export class VacunacionNominalService {
   async procesarVacunasAgregadasFull(desde: Date, hasta: Date): Promise<void> {
     try {
       // recorremo el rango de fechas
-      for (
-        let fecha = desde;
-        fecha <= hasta;
-        fecha.setDate(fecha.getDate() + 1)
-      ) {
+      for (let fecha = desde; fecha <= hasta; fecha.setDate(fecha.getDate() + 1)) {
         await this.procesarVacunasAgregadas(fecha);
       }
     } catch (error) {
       this.logger.error(error);
     }
-  }
-
-  async getVacunadosCount(): Promise<number> {
-    return this.vacunacionRepository.count();
   }
 }

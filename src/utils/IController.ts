@@ -24,10 +24,9 @@ export interface IGetManyParams {
 }
 
 /**
- * 
+ *
  */
-export interface IController<C, R, U>
-  extends Omit<BasesCRUD<C, R, U>, 'getMany'> {
+export interface IController<C, R, U> extends Omit<BasesCRUD<C, R, U>, 'getMany'> {
   getMany(params: IGetManyParams): Promise<R[]>;
   delete(id: Identificator, auditData: any): Promise<void>;
 }

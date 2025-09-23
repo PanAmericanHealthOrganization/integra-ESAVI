@@ -6,7 +6,7 @@ import { VacunacionNominalService } from '../service/vacunacion-nominal.service'
  * Controlador para sincronización de datos de vacunación desde Oracle
  */
 @ApiTags('Vacunacion Nominal Sync')
-@Controller({ path: 'vacunacion-nominal-sync' })
+@Controller({ path: 'integrator/vacunacion-nominal-sync' })
 export class VacunacionNominalSyncController {
   constructor(private readonly vacunacionService: VacunacionNominalService) {}
 
@@ -15,7 +15,6 @@ export class VacunacionNominalSyncController {
    * @param fecha - Fecha en formato YYYY-MM-DD
    * @returns Promesa que se resuelve cuando el procesamiento termina
    */
-  // TODO: implemntar cache interceptor para evitar llamadas repetidas en un corto periodo de tiempo
   @Get('/sync')
   async sync(@Query('fecha') fecha: string): Promise<{ message: string }> {
     this.vacunacionService.procesarVacunasAgregadas(new Date(fecha));
@@ -29,20 +28,7 @@ export class VacunacionNominalSyncController {
    * @returns Promesa que se resuelve cuando el procesamiento termina
    */
   @Get('/sync-range')
-  async syncRange(
-    @Query('desde') desde: string,
-    @Query('hasta') hasta: string,
-  ): Promise<void> {
-    console.log(`Syncing from ${desde} to ${hasta}`);
-    return this.vacunacionService.procesarVacunasAgregadasFull(
-      new Date(desde),
-      new Date(hasta),
-    );
-  }
-
-  @Get('/count')
-  async getCount(): Promise<{ count: number }> {
-    const count = await this.vacunacionService.getVacunadosCount();
-    return { count };
+  async syncRange(@Query('desde') desde: string, @Query('hasta') hasta: string): Promise<void> {
+    return this.vacunacionService.procesarVacunasAgregadasFull(new Date(desde), new Date(hasta));
   }
 }

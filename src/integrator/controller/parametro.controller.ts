@@ -10,12 +10,12 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { ParametroService } from '../service/parametro.service';
+import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { CreateParametroDto } from '../dto/create-parametro.dto';
 import { UpdateParametroDto } from '../dto/update-parametro.dto';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AuthGuard } from '@nestjs/passport';
+import { ParametroService } from '../service/parametro.service';
 
 @ApiTags('Integrador')
 @Controller('integrator/parametros')
@@ -73,10 +73,7 @@ export class ParametroController {
     status: 400,
     description: 'The record has not been successfully updated.',
   })
-  update(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdateParametroDto,
-  ) {
+  update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdateParametroDto) {
     return this.parametroService.update(uuid, body);
   }
 }

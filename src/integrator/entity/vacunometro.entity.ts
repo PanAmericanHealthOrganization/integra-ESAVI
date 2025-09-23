@@ -1,3 +1,4 @@
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -46,7 +47,7 @@ export class Vacunometro extends CustomBaseEntity implements IVacunometro {
     nullable: true,
     comment: 'Dosis aplicada',
   })
-  dosisAplicada: number;
+  dosisAplicada: string;
   /**
    *
    */
@@ -107,7 +108,7 @@ export interface IVacunometro {
   id: string;
   unicode: string;
   nombreVacuna: string;
-  dosisAplicada: number;
+  dosisAplicada: string;
   diaAplicacion: number;
   mesAplicacion: number;
   anioAplicacion: number;
@@ -115,3 +116,32 @@ export interface IVacunometro {
   sexo: string;
   total: number;
 }
+
+export class VacunometroDto implements IVacunometro {
+  @ApiProperty()
+  id: string;
+  @ApiProperty()
+  unicode: string;
+  @ApiProperty()
+  nombreVacuna: string;
+  @ApiProperty()
+  dosisAplicada: string;
+  @ApiProperty()
+  diaAplicacion: number;
+  @ApiProperty()
+  mesAplicacion: number;
+  @ApiProperty()
+  anioAplicacion: number;
+  @ApiProperty()
+  fechaAplicacion: Date;
+  @ApiProperty()
+  sexo: string;
+  @ApiProperty()
+  total: number;
+}
+
+/**
+ *
+ */
+
+export class VacunometroCreateDto extends OmitType(VacunometroDto, ['id']) {}

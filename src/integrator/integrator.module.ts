@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AntecedenteEmbarazoController } from './controller/antecedente-embarazo.controller';
 import { AntecedenteEventoController } from './controller/antecedente-evento.controller';
@@ -6,6 +7,7 @@ import { AntecedenteMedicoController } from './controller/antecedente-medico.con
 import { AntecedentePreexistenciaController } from './controller/antecedente-preexistencia.controller';
 import { DatoEsaviController } from './controller/dato-esavi.controller';
 import { DesenlaceEsaviController } from './controller/desenlace-esavi.controller';
+import { GrupoEtarioController } from './controller/grupo-etario.controller';
 import { IntegradorController } from './controller/integrador.controller';
 import { NotificacionController } from './controller/notificacion.controller';
 import { PacienteDhis2Controller } from './controller/paciente-dhis2.controller';
@@ -13,6 +15,36 @@ import { PacienteEmbarazadaController } from './controller/paciente-embarazada.c
 import { PacienteVigiflowController } from './controller/paciente-vigiflow.controller';
 import { ReporteController } from './controller/reporte.controller';
 import { SeedController } from './controller/seed.controller';
+import { VacunometroController } from './controller/vacunometro.controller';
+import {
+  AntecedenteEmbarazo,
+  AntecedenteEvento,
+  AntecedenteMedico,
+  AntecedentePreexistencia,
+  Catalogo,
+  CausalidadEsavi,
+  DatoEsavi,
+  DatoVacuna,
+  DatoVacunacion,
+  DesenlaceEsavi,
+  EmbarazoEsavi,
+  GravedadEsavi,
+  GrupoEtario,
+  Medicamento,
+  Notificacion,
+  NotificacionDhis2,
+  NotificacionVigiflow,
+  Paciente,
+  PacienteDhis2,
+  PacienteEmbarazada,
+  PacienteVigiflow,
+  Parametro,
+  SyncProcess,
+  TipoCatalogo,
+  Vacunacion,
+  Vacunometro,
+} from './entity';
+import { IntegradorService } from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
   AntecedenteEventoService,
@@ -28,8 +60,8 @@ import {
   GravedadEsaviService,
   GrupoEtarioService,
   MedicamentoService,
-  NotificacionService,
   NotificacionDhis2Service,
+  NotificacionService,
   NotificacionVigiflowService,
   PacienteDhis2Service,
   PacienteEmbarazadaServive,
@@ -38,40 +70,8 @@ import {
   ReporteService,
   SeedService,
 } from './service';
-import { VacunometroService } from './service/vacunometro.service';
-import { IntegradorService } from './facade/integrador.service';
-import {
-  AntecedenteEmbarazo,
-  DatoVacuna,
-  DatoVacunacion,
-  DesenlaceEsavi,
-  EmbarazoEsavi,
-  GravedadEsavi,
-  GrupoEtario,
-  Medicamento,
-  Notificacion,
-  NotificacionVigiflow,
-  NotificacionDhis2,
-  Paciente,
-  PacienteVigiflow,
-  PacienteDhis2,
-  PacienteEmbarazada,
-  Parametro,
-  TipoCatalogo,
-  Vacunacion,
-  Vacunometro,
-  AntecedenteEvento,
-  AntecedenteMedico,
-  AntecedentePreexistencia,
-  Catalogo,
-  CausalidadEsavi,
-  DatoEsavi,
-  SyncProcess,
-} from './entity';
 import { SyncService } from './service/sync.service';
-import { VacunometroController } from './controller/vacunometro.controller';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { GrupoEtarioController } from './controller/grupo-etario.controller';
+import { VacunometroService } from './service/vacunometro.service';
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
   imports: [
