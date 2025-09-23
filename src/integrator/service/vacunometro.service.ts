@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
+import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { In, Repository } from 'typeorm';
@@ -9,7 +9,7 @@ import { Vacunometro } from '../entity/vacunometro.entity';
 
 @Injectable()
 export class VacunometroService
-  implements IController<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto>
+  implements IService<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto>
 {
   /**
    *
@@ -19,6 +19,10 @@ export class VacunometroService
     @InjectRepository(Vacunometro, 'POSTGRES_INTEGRATOR_DS')
     private readonly vacunometroRepository: Repository<Vacunometro>,
   ) {}
+
+  exist(id: number | string): Promise<boolean> {
+    return this.vacunometroRepository.exist({ where: { id: id as string } });
+  }
 
   private readonly logger = new Logger(VacunometroService.name);
 
@@ -95,12 +99,13 @@ export class VacunometroService
    *
    * @returns
    */
-  public async delete(id: Identificator, auditoria: IBaseEntity): Promise<void> {
+  public async delete(id: Identificator, auditoria: IBaseEntity): Promise<VacunometroDto> {
     await this.vacunometroRepository.update(id, {
       state: false,
       enabled: false,
       ...auditoria,
     });
+    return this.vacunometroRepository.findOne({ where: { id: id as string } });
   }
 
   /**

@@ -15,6 +15,7 @@ import { PacienteEmbarazadaController } from './controller/paciente-embarazada.c
 import { PacienteVigiflowController } from './controller/paciente-vigiflow.controller';
 import { ReporteController } from './controller/reporte.controller';
 import { SeedController } from './controller/seed.controller';
+import { SyncController } from './controller/sync.controller';
 import { VacunometroController } from './controller/vacunometro.controller';
 import {
   AntecedenteEmbarazo,
@@ -169,6 +170,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SeedController,
     VacunometroController,
     GrupoEtarioController,
+    SyncController,
   ],
   providers: [
     SyncService,

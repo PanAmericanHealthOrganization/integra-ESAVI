@@ -52,6 +52,4 @@ export class SyncDto {
 
 export class CreateSyncDto extends OmitType(SyncDto, ['id'] as const) {}
 
-export class UpdateSyncDto extends PartialType(
-  OmitType(SyncDto, ['id'] as const),
-) {}
+export class UpdateSyncDto extends PartialType(OmitType(SyncDto, ['id'] as const)) {}

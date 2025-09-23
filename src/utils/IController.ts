@@ -12,7 +12,7 @@ export interface BasesCRUD<C, R, U> {
   getPaginated(params: GetListParams): Promise<{ data: R[]; total: number }>;
   create(data: C): Promise<R>;
   update(id: Identificator, data: U): Promise<R>;
-  delete(id: Identificator, auditData: any): Promise<void>;
+  delete(id: Identificator, auditData: any): Promise<R>;
 }
 /**
  * Interfaz básica para operaciones CRUD
@@ -28,7 +28,7 @@ export interface IGetManyParams {
  */
 export interface IController<C, R, U> extends Omit<BasesCRUD<C, R, U>, 'getMany'> {
   getMany(params: IGetManyParams): Promise<R[]>;
-  delete(id: Identificator, auditData: any): Promise<void>;
+  delete(id: Identificator, auditData: any): Promise<R>;
 }
 
 /**

@@ -62,7 +62,7 @@ export class VacunometroController
    *
    */
   @Delete('delete/:id')
-  public delete(id: Identificator, auditData: any): Promise<void> {
+  public delete(id: Identificator, auditData: any): Promise<VacunometroDto> {
     return this.vacunometroService.delete(id, auditData);
   }
 }

@@ -1,12 +1,11 @@
+import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { ISync } from '../dto/sync.dto';
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 
 @Entity({
   schema: 'dhi_esavi',
   name: 'TR_SYNC_PROCESS',
-  comment:
-    'Registra los procesos de sincronización con las diferentes fuentes de datos',
+  comment: 'Registra los procesos de sincronización con las diferentes fuentes de datos',
 })
 export class SyncProcess extends CustomBaseEntity implements ISync {
   /**
@@ -29,8 +28,7 @@ export class SyncProcess extends CustomBaseEntity implements ISync {
    */
   @Column({
     name: 'STATUS',
-    comment:
-      'Estado actual del proceso (pendiente, en progreso, completado, error)',
+    comment: 'Estado actual del proceso (pendiente, en progreso, completado, error)',
   })
   status: string;
 
