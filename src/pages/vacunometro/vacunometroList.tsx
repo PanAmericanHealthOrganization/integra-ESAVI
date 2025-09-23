@@ -1,15 +1,11 @@
+import { endOfMonth, startOfDay } from "date-fns"
 import { useState } from "react"
-import {
-  CreateButton,
-  Datagrid,
-  FilterButton,
-  List,
-  TextField,
-  TextInput,
-  TopToolbar,
-} from "react-admin"
+import { Datagrid, List, TextField, TextInput, TopToolbar } from "react-admin"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
-
+const defaultValues = {
+  desde: startOfDay(new Date()),
+  hasta: endOfMonth(new Date()),
+}
 export const VacunometroFilters = [
   <TextInput label="Unicode" source="unicode" />,
   <TextInput label="Nombre Vacuna" source="nombreVacuna" />,
@@ -22,25 +18,27 @@ const VacunometroList = () => {
   const ListActions = () => (
     <TopToolbar>
       <SyncVacunometroDialog open={open} setOpen={setOpen} />
-      <FilterButton />
-      <CreateButton />
     </TopToolbar>
   )
   return (
-    <List filters={VacunometroFilters} actions={<ListActions />} empty={false}>
-      <Datagrid rowClick="edit" bulkActionButtons={false} optimized>
-        <TextField source="id" />
-        <TextField source="unicode" />
-        <TextField source="nombreVacuna" />
-        <TextField source="dosisAplicada" />
-        <TextField source="diaAplicacion" />
-        <TextField source="mesAplicacion" />
-        <TextField source="anioAplicacion" />
-        <TextField source="fechaAplicacion" />
-        <TextField source="sexo" />
-        <TextField source="cantidad" />
-      </Datagrid>
-    </List>
+    <>
+      <List
+        filters={VacunometroFilters}
+        actions={<ListActions />}
+        empty={false}>
+        <Datagrid rowClick="edit" bulkActionButtons={false} optimized>
+          <TextField source="unicode" />
+          <TextField source="nombreVacuna" />
+          <TextField source="dosisAplicada" />
+          <TextField source="diaAplicacion" />
+          <TextField source="mesAplicacion" />
+          <TextField source="anioAplicacion" />
+          <TextField source="fechaAplicacion" />
+          <TextField source="sexo" />
+          <TextField source="cantidad" />
+        </Datagrid>
+      </List>
+    </>
   )
 }
 

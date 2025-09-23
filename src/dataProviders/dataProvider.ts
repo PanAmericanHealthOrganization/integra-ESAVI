@@ -3,6 +3,7 @@ import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { reporteDataProvider } from "./reportes.dataprovider"
 import { syncsDataProvider } from "./syncs.dataprovider"
+import { vacunasDataProvider } from "./vacunas.dataprovider"
 import { vacunometroDataProvider } from "./vacunometro.dataprovider"
 
 export const dataProvider = combineDataProviders((resource) => {
@@ -17,6 +18,8 @@ export const dataProvider = combineDataProviders((resource) => {
       return syncsDataProvider
     case "vacunometro":
       return vacunometroDataProvider
+    case "vacunacion-nominal-sync":
+      return vacunasDataProvider
     default:
       throw new Error(`Unknown resource: ${resource}`)
   }

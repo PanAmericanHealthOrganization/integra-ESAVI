@@ -27,84 +27,30 @@ export interface IVacunometroDataProvider extends DataProvider {
   syncVacunometro(resource: string, params: any): Promise<any>
 }
 
-export const vacunometroDataProvider: IVacunometroDataProvider = {
+export const vacunasDataProvider: IVacunometroDataProvider = {
   getList: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
-    try {
-      console.log("params", params)
-      const response = await intESAVIClient.post(
-        `integrator/${resource}/getPaginated`,
-        {
-          ...params,
-        }
-      )
-      return {
-        data: response.data.data,
-        total: response.data.total,
-        pageInfo: {
-          hasNextPage: response.data.hasNextPage,
-          hasPreviousPage: response.data.hasPreviousPage,
-        },
-      }
-    } catch (error) {
-      throw new Error("Error al obtener la lista de vacunometro")
-    }
+    throw new Error("Function not implemented.")
   },
   getOne: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetOneParams<RecordType>
   ): Promise<GetOneResult<RecordType>> {
-    try {
-      const response = await intESAVIClient.get(
-        `/integrator/vacunometro/findOne`,
-        {
-          params,
-        }
-      )
-      return {
-        data: response.data.data,
-      }
-    } catch (error) {
-      throw new Error("Error al obtener la lista de vacunometro")
-    }
+    throw new Error("Function not implemented.")
   },
   getMany: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyParams
   ): Promise<GetManyResult<RecordType>> {
-    try {
-      const response = await intESAVIClient.get(
-        `/integrator/vacunometro/findAll`,
-        {
-          params,
-        }
-      )
-      return {
-        data: response.data.data,
-      }
-    } catch (error) {
-      throw new Error("Error al obtener la lista de vacunometro")
-    }
+    throw new Error("Function not implemented.")
   },
   getManyReference: async function <RecordType extends RaRecord = any>(
     resource: string,
     params: GetManyReferenceParams
   ): Promise<GetManyReferenceResult<RecordType>> {
-    try {
-      const response = await intESAVIClient.get(
-        `/integrator/vacunometro/findAll`,
-        {
-          params,
-        }
-      )
-      return {
-        data: response.data.data,
-      }
-    } catch (error) {
-      throw new Error("Error al obtener la lista de vacunometro")
-    }
+    throw new Error("Function not implemented.")
   },
   update: async function <RecordType extends RaRecord = any>(
     resource: string,
@@ -141,11 +87,9 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
   },
   syncVacunometro: async function (resource: string, params: any) {
     try {
-      const response = await intESAVIClient.post(
-        `integrator/${resource}/syncVacunometro`,
-        {
-          ...params,
-        }
+      const { desde, hasta } = params
+      const response = await intESAVIClient.get(
+        `integrator/${resource}/sync-range?desde=${desde}&hasta=${hasta}`
       )
       return {
         data: response.data,
