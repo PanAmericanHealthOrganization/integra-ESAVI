@@ -4,6 +4,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 // Entidades
+import { CRUD } from 'src/utils/interfaces/baseEntity';
+import { ISync } from '../dto/sync.dto';
+import { SyncProcess } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
@@ -16,9 +19,6 @@ import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
 import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
-import { SyncProcess } from '../entity';
-import { CRUD } from 'src/utils/interfaces/baseEntity';
-import { ISync } from '../dto/sync.dto';
 
 @Injectable()
 export class SeedService {
@@ -67,7 +67,6 @@ export class SeedService {
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
       //----fin catalogos---------------------------------------------------------------------------------------------------------
-      /*
       // 4. Crear pacientes
       await this.seedPacientes();
 
@@ -93,7 +92,7 @@ export class SeedService {
       await this.seedDatosVacunas();
 
       // 12. Crear datos de vacunación
-      await this.seedDatosVacunacion();*/
+      await this.seedDatosVacunacion();
 
       await this.createSyncProcess();
       // Finalizar
@@ -109,8 +108,7 @@ export class SeedService {
 
     try {
       // Obtener el query runner para ejecutar SQL directo
-      const queryRunner =
-        this.datoVacunacionRepository.manager.connection.createQueryRunner();
+      const queryRunner = this.datoVacunacionRepository.manager.connection.createQueryRunner();
 
       // Deshabilitar temporalmente las restricciones de clave foránea
       await queryRunner.query('SET session_replication_role = replica;');
@@ -122,27 +120,13 @@ export class SeedService {
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;',
       );*/
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDAD_ESAVI" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDAD_ESAVI" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_MEDICAMENTO" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;',
-      );
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDAD_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDAD_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_MEDICAMENTO" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;');
       /*await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
       );*/
@@ -203,8 +187,7 @@ export class SeedService {
         status: 'COMPLETED',
         startTime: new Date(),
         endTime: new Date(),
-        errorMessage:
-          'Proceso de carga de datos de ejemplo completado exitosamente.',
+        errorMessage: 'Proceso de carga de datos de ejemplo completado exitosamente.',
         errorStack: null,
         errorTrace: null,
         id: undefined, // or null, depending on your entity definition
@@ -246,33 +229,25 @@ export class SeedService {
         vigiflow: 'Mestizo',
         dhis2: 'Mestizo',
         homologada: 'Mestizo',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Autoidentificación Étnica',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
       },
       {
         vigiflow: 'MESTIZO/A',
         dhis2: 'MESTIZO/A',
         homologada: 'Mestizo',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Autoidentificación Étnica',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
       },
       {
         vigiflow: 'Indígena',
         dhis2: 'Indigenous',
         homologada: 'Indígena',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Autoidentificación Étnica',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
       },
       {
         vigiflow: 'Afroecuatoriano',
         dhis2: 'Afro-Ecuadorian',
         homologada: 'Afroecuatoriano',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Autoidentificación Étnica',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
       },
 
       // Provincias
@@ -300,17 +275,13 @@ export class SeedService {
         vigiflow: 'Activo',
         dhis2: 'Active',
         homologada: 'Activo',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Estado Registro',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
       },
       {
         vigiflow: 'Inactivo',
         dhis2: 'Inactive',
         homologada: 'Inactivo',
-        tipoCatalogo: tiposCatalogo.find(
-          (t) => t.descripcion === 'Estado Registro',
-        ),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
       },
     ];
 
@@ -363,14 +334,14 @@ export class SeedService {
     });
 
     const pacientes = [];
+    const origenes = ['VIGIFLOW', 'DHIS2', 'HOMOLOGADA'];
 
     for (let i = 0; i < 1000; i++) {
       const paciente = new Paciente();
       paciente.nombre = faker.person.fullName();
       paciente.identificacion = faker.string.numeric(10);
       paciente.sexo = faker.helpers.arrayElement(sexos);
-      paciente.autoIdentificacion =
-        faker.helpers.arrayElement(autoIdentificaciones);
+      paciente.autoIdentificacion = faker.helpers.arrayElement(autoIdentificaciones);
       paciente.registroSincronizado = faker.datatype.boolean();
 
       pacientes.push(paciente);
@@ -430,10 +401,7 @@ export class SeedService {
     for (let i = 0; i < 1500; i++) {
       const datoEsavi = new DatoEsavi();
       datoEsavi.notificacion = faker.helpers.arrayElement(notificaciones);
-      datoEsavi.sistemaCodififacion = faker.helpers.arrayElement([
-        'MedDRA',
-        'CIE-10',
-      ]);
+      datoEsavi.sistemaCodififacion = faker.helpers.arrayElement(['MedDRA', 'CIE-10']);
       datoEsavi.nombre = faker.helpers.arrayElement([
         'Fiebre',
         'Dolor de cabeza',
@@ -508,10 +476,7 @@ export class SeedService {
         'Interaccion',
       ]);
       medicamento.codigoATC = faker.string.alphanumeric(7);
-      medicamento.sistemaCodificacion = faker.helpers.arrayElement([
-        'ATC',
-        'WHO Drug',
-      ]);
+      medicamento.sistemaCodificacion = faker.helpers.arrayElement(['ATC', 'WHO Drug']);
       medicamento.codigo = faker.string.alphanumeric(8);
       medicamento.nombreNormalizado = medicamento.nombre;
       medicamento.codigoFormaFarmaceutica = faker.string.alphanumeric(4);
@@ -540,7 +505,6 @@ export class SeedService {
 
     const notificaciones = await this.notificacionRepository.find();
     const datosEsavi = await this.datoEsaviRepository.find();
-    const datosVacunas = await this.datoVacunaRepository.find();
 
     const causalidades = [];
 
@@ -625,9 +589,7 @@ export class SeedService {
     for (let i = 0; i < 400; i++) {
       const desenlace = new DesenlaceEsavi();
       desenlace.codigo = faker.string.alphanumeric(8);
-      desenlace.fechaMuerte = faker.datatype.boolean()
-        ? faker.date.recent()
-        : null;
+      desenlace.fechaMuerte = faker.datatype.boolean() ? faker.date.recent() : null;
       desenlace.autopsia = faker.number.int({ min: 0, max: 1 });
       desenlace.fechaNotificacionMuerte = faker.date.recent();
       desenlace.autopsiaFetal = faker.number.int({ min: 0, max: 1 });
@@ -655,14 +617,8 @@ export class SeedService {
     for (let i = 0; i < 800; i++) {
       const datoVacuna = new DatoVacuna();
       datoVacuna.codigoAtc = faker.string.alphanumeric(7);
-      datoVacuna.rolVacuna = faker.helpers.arrayElement([
-        'Sospechosa',
-        'Concomitante',
-      ]);
-      datoVacuna.sistemaDeCodificacion = faker.helpers.arrayElement([
-        'WHUDRUG',
-        'ATC',
-      ]);
+      datoVacuna.rolVacuna = faker.helpers.arrayElement(['Sospechosa', 'Concomitante']);
+      datoVacuna.sistemaDeCodificacion = faker.helpers.arrayElement(['WHUDRUG', 'ATC']);
       datoVacuna.nombreVacuna = faker.helpers.arrayElement([
         'BCG',
         'Pentavalente',
@@ -684,16 +640,8 @@ export class SeedService {
       datoVacuna.nombreFabricanteWhoDrug = datoVacuna.nombreFabricante;
       datoVacuna.codigoFabricanteWhoDrug = faker.string.alphanumeric(6);
       datoVacuna.numeroDosisVacuna = faker.number.int({ min: 1, max: 5 });
-      datoVacuna.dosis = faker.helpers.arrayElement([
-        '1ra dosis',
-        '2da dosis',
-        '3ra dosis',
-      ]);
-      datoVacuna.dosis1 = faker.helpers.arrayElement([
-        '0.5ml',
-        '1ml',
-        '0.25ml',
-      ]);
+      datoVacuna.dosis = faker.helpers.arrayElement(['1ra dosis', '2da dosis', '3ra dosis']);
+      datoVacuna.dosis1 = faker.helpers.arrayElement(['0.5ml', '1ml', '0.25ml']);
       datoVacuna.intervaloDosificacion = faker.helpers.arrayElement([
         '4 semanas',
         '8 semanas',
@@ -704,28 +652,16 @@ export class SeedService {
       datoVacuna.nombreDiluyenteVacuna = faker.lorem.words(2);
       datoVacuna.fechaVencimientoDiluyente = faker.date.future();
       datoVacuna.paisAutorizacion = faker.location.country();
-      datoVacuna.concentracion = faker.helpers.arrayElement([
-        '0.5ml',
-        '1ml',
-        '0.25ml',
-      ]);
+      datoVacuna.concentracion = faker.helpers.arrayElement(['0.5ml', '1ml', '0.25ml']);
       datoVacuna.ingredienteSospechoso = faker.lorem.words(2);
       datoVacuna.accionTomada = faker.lorem.sentence();
       datoVacuna.informacionAdicionalMedicamento = faker.lorem.paragraph();
       datoVacuna.indicacionMeddra = faker.lorem.sentence();
       datoVacuna.indicacionNotificadorPrimario = faker.lorem.sentence();
-      datoVacuna.duracion = faker.helpers.arrayElement([
-        '1 día',
-        '3 días',
-        '7 días',
-      ]);
+      datoVacuna.duracion = faker.helpers.arrayElement(['1 día', '3 días', '7 días']);
       datoVacuna.inicioAdministracion = faker.date.recent();
       datoVacuna.finAdministracion = faker.date.future();
-      datoVacuna.formaFarmaceutica = faker.helpers.arrayElement([
-        'Inyección',
-        'Oral',
-        'Nasal',
-      ]);
+      datoVacuna.formaFarmaceutica = faker.helpers.arrayElement(['Inyección', 'Oral', 'Nasal']);
       datoVacuna.formaFarmaceuticaEDQM = datoVacuna.formaFarmaceutica;
       datoVacuna.viaAdministracion = faker.helpers.arrayElement([
         'Intramuscular',
