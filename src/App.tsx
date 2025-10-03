@@ -10,8 +10,9 @@ import analisis from "./pages/analisis"
 import dashboard from "./pages/dashboard"
 import esavis from "./pages/esavis"
 import reportes from "./pages/reportes"
-import vacunometro from "./pages/vacunometro"
 import syncs from "./pages/syncs"
+import vacunometro from "./pages/vacunometro"
+import { theme } from "./theme"
 
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
@@ -21,7 +22,8 @@ const App = () => {
       dataProvider={dataProvider}
       authProvider={myAuthKeyCloakProvider(keycloak, { updateInformationUser })}
       layout={CustomLayout}
-      loginPage={CustomLoginPage}>
+      loginPage={CustomLoginPage}
+      theme={theme}>
       <Resource name="dashboard" list={dashboard.list} />
       <Resource name="esavis" list={esavis.list} />
       <Resource name="reportes" list={reportes.list} />

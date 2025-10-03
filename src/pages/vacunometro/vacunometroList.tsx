@@ -29,12 +29,17 @@ const VacunometroList = () => {
   )
   return (
     <>
-      <List actions={<ListActions />} perPage={25} empty={false}>
+      <List actions={<ListActions />}>
         <Datagrid rowClick="edit" bulkActionButtons={false}>
+          <DateField
+            locales={"sv-SE"}
+            source="fechaAplicacion"
+            options={{ year: "numeric", month: "2-digit", day: "2-digit" }}
+            label="Fecha de Aplicación"
+          />
           <TextField source="unicode" />
-          <TextField source="nombreVacuna" />
-          <DateField source="fechaAplicacion" />
           <TextField source="sexo" />
+          <TextField source="nombreVacuna" />
           <TextField source="total" />
         </Datagrid>
       </List>
