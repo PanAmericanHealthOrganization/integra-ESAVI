@@ -37,10 +37,10 @@ const VacunometroList = () => {
             options={{ year: "numeric", month: "2-digit", day: "2-digit" }}
             label="Fecha de Aplicación"
           />
-          <TextField source="unicode" />
-          <TextField source="sexo" />
-          <TextField source="nombreVacuna" />
-          <TextField source="total" />
+          <TextField source="unicode" label="Establecimiento" />
+          <TextField source="sexo" label="Sexo" />
+          <TextField source="nombreVacuna" label="Nombre de Vacuna" />
+          <TextField source="total" label="Total" />
         </Datagrid>
       </List>
     </>
