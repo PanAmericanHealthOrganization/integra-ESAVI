@@ -1,3 +1,4 @@
+//Este servicio es para la integración, no confundir con el servicio del semillero que crea los grupos etarios en la base de datos.
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
