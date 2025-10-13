@@ -20,7 +20,7 @@ import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-i
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    VacunacionIntegratorModule,
+    //VacunacionIntegratorModule, // Descomentar para habilitar el módulo de vacunación con base de datos oracle.
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,

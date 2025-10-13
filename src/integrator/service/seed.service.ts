@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 // Entidades
 import { CRUD } from 'src/utils/interfaces/baseEntity';
 import { ISync } from '../dto/sync.dto';
-import { SyncProcess } from '../entity';
+import { Auditoria, SyncProcess } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
@@ -14,7 +14,7 @@ import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
 import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
 import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
-import { GrupoEtario } from '../entity/grupo-etario.entity';
+import { CreateGrupoEtarioDto, GrupoEtario, IGrupoEtario } from '../entity/grupo-etario.entity';
 import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
@@ -124,9 +124,9 @@ export class SeedService {
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;');
-      /*await queryRunner.query(
+      await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
-      );*/
+      );
       /**
        * 
       await queryRunner.query(
@@ -299,13 +299,32 @@ export class SeedService {
   private async seedGruposEtarios() {
     console.log('👥 Creando grupos etarios...');
 
-    const gruposEtarios = [
+    /*const gruposEtarios = [
       { inicio: 0, fin: 2, descripcion: 'Lactantes (0-2 años)' },
       { inicio: 3, fin: 5, descripcion: 'Preescolares (3-5 años)' },
       { inicio: 6, fin: 11, descripcion: 'Escolares (6-11 años)' },
       { inicio: 12, fin: 17, descripcion: 'Adolescentes (12-17 años)' },
       { inicio: 18, fin: 64, descripcion: 'Adultos (18-64 años)' },
       { inicio: 65, fin: 120, descripcion: 'Adultos mayores (65+ años)' },
+    ];*/
+    const auditoriaDto: Auditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: '',
+      deletedAt: undefined,
+      deletedBy: '',
+      isEnabled: true,
+      isActive: true
+    };
+    const gruposEtarios: CreateGrupoEtarioDto [] = [
+      { inicioEdad: 0, finEdad: 11, descripcion: 'Menor 1 año' }, // contiene edades en meses
+      { inicioEdad: 1, finEdad: 4, descripcion: '1 A 4 Años' },
+      { inicioEdad: 5, finEdad: 9, descripcion: '5 A 9 Año' },
+      { inicioEdad: 10, finEdad: 14, descripcion: '10 A 14' },
+      { inicioEdad: 15, finEdad: 19, descripcion: '15 A 19' },
+      { inicioEdad: 20, finEdad: 64, descripcion: '20 A 64' },
+      { inicioEdad: 65, finEdad: 120, descripcion: '65 Año y más' },
     ];
 
     for (const grupo of gruposEtarios) {
@@ -314,7 +333,7 @@ export class SeedService {
       });
 
       if (!existing) {
-        await this.grupoEtarioRepository.save(grupo);
+        await this.grupoEtarioRepository.save({ ...grupo, ...auditoriaDto } as GrupoEtario);
       }
     }
   }
