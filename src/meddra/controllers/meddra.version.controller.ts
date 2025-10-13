@@ -23,20 +23,26 @@ export class MeddraVersionController {
   @Post('process')
   async processVersionFiles(@Body() processsVersionReqDto: ProcessVersionReqDTO): Promise<any[]> {
     const { version, lang } = processsVersionReqDto;
-    
+
     try {
-      return this.meddraProcessFilesService.processVersionFiles(version, lang, 'ActualizaciÓN SIN DESCRIPCION');
+      return this.meddraProcessFilesService.processVersionFiles(
+        version,
+        lang,
+        'ActualizaciÓN SIN DESCRIPCION',
+      );
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
 
   @Post('upload')
   uploadFile(
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new MaxFileSizeValidator({ maxSize: 1000 }), new FileTypeValidator({ fileType: 'image/jpeg' })],
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 1000 }),
+          new FileTypeValidator({ fileType: 'image/jpeg' }),
+        ],
       }),
     )
     file: Express.Multer.File,

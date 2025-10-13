@@ -2,6 +2,12 @@
 /dist
 /node_modules
 /postgres_data
+/postgres_sdata
+/data
+/oracle_data
+/postgis_data
+/mssql_data
+/mysql_data
 # Logs
 logs
 *.log
@@ -10,6 +16,8 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+integra-esavi-calidad
+
 
 # OS
 .DS_Store

@@ -7,7 +7,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
-  Matches,
   ValidateNested,
 } from 'class-validator';
 
@@ -196,9 +195,10 @@ export interface IProcessVersion {
 }
 
 export class ProcessVersionReqDTO implements IProcessVersion {
-  @IsNotEmpty({ message: 'El Campo "version", es requerido' })
   //@Matches('^(0[1-9]|[1-9][0-9])_(1|2)$', "No es una versión válida, ejemplo: '22_1,22_2,23_1,23_2'")
+  @IsNotEmpty({ message: 'El Campo "version", es requerido' })
   version: string;
+
   @IsNotEmpty({ message: 'El Campo "lang", del lenguaje es requerido' })
   lang: string;
 }

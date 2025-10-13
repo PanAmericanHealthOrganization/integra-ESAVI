@@ -13,10 +13,7 @@ import {
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import {
-  IMeddraResponse,
-  MeddraQueryRequestDto,
-} from '../models/dto/meddra.query';
+import { IMeddraResponse, MeddraQueryRequestDto } from '../models/dto/meddra.query';
 import { MeddraClientService } from '../services/meddra-client.service';
 import { MeddraStandarService } from '../services/meddra-standar.service';
 /**
@@ -39,13 +36,10 @@ export class MeddraController {
   @Post('/')
   @ApiOperation({
     summary: 'Consuta a servicios de MedDRA, realiza una consulta inteligente',
-    description:
-      'Consulta de datos a meddra, la consulta puede ser de base de datos o por api',
+    description: 'Consulta de datos a meddra, la consulta puede ser de base de datos o por api',
   })
   @UseInterceptors(CacheInterceptor)
-  public gerMeddra(
-    @Body() query: MeddraQueryRequestDto,
-  ): Promise<IMeddraResponse> {
+  public gerMeddra(@Body() query: MeddraQueryRequestDto): Promise<IMeddraResponse> {
     try {
       return this.meddraClientService.getQuery(query);
     } catch (e) {
@@ -59,8 +53,7 @@ export class MeddraController {
    */
   @ApiOperation({
     summary: 'Descarga de historial de consultas de datos MedDRA',
-    description:
-      'Descarga de datos a meddra, la consulta puede ser de base de datos o por api',
+    description: 'Descarga de datos a meddra, la consulta puede ser de base de datos o por api',
   })
   @Get('/history:ext')
   public async getMeddraHistory(@Param('ext') ext: string) {
@@ -89,8 +82,7 @@ export class MeddraController {
    *
    */
   @ApiOperation({
-    summary:
-      'Consulta de datos del MedDra, coincidencia por lltCode en base de datos',
+    summary: 'Consulta de datos del MedDra, coincidencia por lltCode en base de datos',
     description: 'Obtiene los datos de referencia de MedDra',
   })
   @Get('')

@@ -1,14 +1,14 @@
 import { DataSource, In, InsertResult, Repository } from 'typeorm';
 import { LLT } from '../models/standar/llt.entity';
 
+import { Logger } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as readline from 'readline';
-import { SOC } from '../models/standar/soc.entity';
 import { MeddraSync } from '../models/standar/meddraSync.entity';
 import { PT } from '../models/standar/pt.entity';
-import { Logger } from '@nestjs/common';
+import { SOC } from '../models/standar/soc.entity';
 /**
  * Permite procesar los archivos de meddra
  */
@@ -39,7 +39,7 @@ export class MeddraProcessFilesService {
    * @param version
    */
   async processVersionFiles(version: string, lang: string, description: string): Promise<any> {
-    console.log("version ::::" , version , lang , description);
+    console.log('version ::::', version, lang, description);
 
     // leer el archjivo del repositio upload_files/meddra*/27/es
     const exist = await this.validarVersion(version, lang);
@@ -48,8 +48,8 @@ export class MeddraProcessFilesService {
     }
     // validar que exista el directorio
     const path = join(process.cwd(), 'upload_files', 'meddra', version, lang);
-    console.log("Patth::: " , path);
-    
+    console.log('Patth::: ', path);
+
     if (!directoryExists(path)) {
       throw new Error('El directorio no existe');
     }
@@ -61,7 +61,9 @@ export class MeddraProcessFilesService {
     let ptDB = [];
     let llDB = [];
     try {
-      const versionEntity = await this.meddraSuncRepository.save(new MeddraSync(version, lang, description));
+      const versionEntity = await this.meddraSuncRepository.save(
+        new MeddraSync(version, lang, description),
+      );
 
       // const llt = await readFileContent(version, lang, 'llt.asc');
 
@@ -175,12 +177,18 @@ export class MeddraProcessFilesService {
   }
 
   async validarVersion(meddraVersion: string, lang: string): Promise<boolean> {
-    const versionExist = await this.meddraSuncRepository.findOne({ where: { meddraVersion, lang, enabled: true } });
+    const versionExist = await this.meddraSuncRepository.findOne({
+      where: { meddraVersion, lang, enabled: true },
+    });
     return versionExist ? true : false;
   }
 }
 
-const readFileContent = async (version: string, lang: string, file: string): Promise<string[][]> => {
+const readFileContent = async (
+  version: string,
+  lang: string,
+  file: string,
+): Promise<string[][]> => {
   const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, file);
   // leer el archivo asc
   const fileStream = fs.createReadStream(filePath, { encoding: 'ascii' });

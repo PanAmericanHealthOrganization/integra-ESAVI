@@ -114,12 +114,9 @@ export class SeedService {
       await queryRunner.query('SET session_replication_role = replica;');
 
       // Limpiar todas las tablas usando TRUNCATE (más rápido que DELETE)
-      /*await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNACION" CASCADE;',
-      );
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;',
-      );*/
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNACION" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;');
+
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDAD_ESAVI" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDAD_ESAVI" CASCADE;');
@@ -334,7 +331,6 @@ export class SeedService {
     });
 
     const pacientes = [];
-    const origenes = ['VIGIFLOW', 'DHIS2', 'HOMOLOGADA'];
 
     for (let i = 0; i < 1000; i++) {
       const paciente = new Paciente();
@@ -343,6 +339,7 @@ export class SeedService {
       paciente.sexo = faker.helpers.arrayElement(sexos);
       paciente.autoIdentificacion = faker.helpers.arrayElement(autoIdentificaciones);
       paciente.registroSincronizado = faker.datatype.boolean();
+      paciente.fechaNacimiento = faker.date.birthdate();
 
       pacientes.push(paciente);
     }
@@ -401,7 +398,6 @@ export class SeedService {
     for (let i = 0; i < 1500; i++) {
       const datoEsavi = new DatoEsavi();
       datoEsavi.notificacion = faker.helpers.arrayElement(notificaciones);
-      datoEsavi.sistemaCodififacion = faker.helpers.arrayElement(['MedDRA', 'CIE-10']);
       datoEsavi.nombre = faker.helpers.arrayElement([
         'Fiebre',
         'Dolor de cabeza',
@@ -419,16 +415,6 @@ export class SeedService {
       datoEsavi.descripcion = faker.lorem.sentence();
       datoEsavi.nombreReportado = datoEsavi.nombre;
       datoEsavi.codigoLLT = faker.string.alphanumeric(8);
-      datoEsavi.nameLLT = datoEsavi.nombre;
-      datoEsavi.codigoPT = faker.string.alphanumeric(8);
-      datoEsavi.namePT = datoEsavi.nombre;
-      datoEsavi.codigoHLT = faker.string.alphanumeric(8);
-      datoEsavi.nameHLT = faker.lorem.words(2);
-      datoEsavi.codigoHLGT = faker.string.alphanumeric(8);
-      datoEsavi.nameHLGT = faker.lorem.words(3);
-      datoEsavi.codigoSOC = faker.string.alphanumeric(8);
-      datoEsavi.nameSOC = faker.lorem.words(2);
-      datoEsavi.codigoEsaviCie10 = faker.string.alphanumeric(6);
       datoEsavi.fechaEsavi = faker.date.recent();
       datoEsavi.fechaFinalizacion = faker.date.future();
       datoEsavi.duracion = faker.helpers.arrayElement([
@@ -632,8 +618,6 @@ export class SeedService {
       ]);
       datoVacuna.nombreVacunaPatenteWhoDrug = datoVacuna.nombreVacuna;
       datoVacuna.drugCode = faker.string.alphanumeric(8);
-      datoVacuna.nombreVacunaNormalizada = datoVacuna.nombreVacuna;
-      datoVacuna.principioActivoWhoDrug = faker.lorem.words(2);
       datoVacuna.codigoOtro = faker.string.alphanumeric(8);
       datoVacuna.identificadorVacuna = faker.string.alphanumeric(10);
       datoVacuna.nombreFabricante = faker.company.name();

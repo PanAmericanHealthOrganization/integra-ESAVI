@@ -1,11 +1,11 @@
-import { IntegrationGroup, Parametro } from '../entity/parametro.entity';
-import { CreateParametroDto } from '../dto/create-parametro.dto';
-import { UpdateParametroDto } from '../dto/update-parametro.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CreateParametroDto } from '../dto/create-parametro.dto';
+import { UpdateParametroDto } from '../dto/update-parametro.dto';
+import { Parametro } from '../entity/parametro.entity';
 
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ParametroService {
@@ -48,10 +48,7 @@ export class ParametroService {
     throw Error('');
   }
 
-  async update(
-    uuid: string,
-    updateParametroDto: UpdateParametroDto,
-  ): Promise<Parametro> {
+  async update(uuid: string, updateParametroDto: UpdateParametroDto): Promise<Parametro> {
     const parametro = await this.findOne(uuid);
     if (parametro) {
       this.parametroRepository.merge(parametro, updateParametroDto);

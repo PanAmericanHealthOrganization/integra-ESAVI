@@ -1,16 +1,13 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryColumn,
-} from 'typeorm';
-import { Notificacion } from './notificacion.entity';
-import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { Notificacion } from './notificacion.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ESAVI_DURANTE_EMBARAZO', comment: 'Tabla de ESAVI durante el embarazo' })
+@Entity({
+  schema: 'dhi_esavi',
+  name: 'TR_ESAVI_DURANTE_EMBARAZO',
+  comment: 'Tabla de ESAVI durante el embarazo',
+})
 export class EmbarazoEsavi extends Auditoria {
   @PrimaryColumn({
     name: 'NOTIFICACION_ID',

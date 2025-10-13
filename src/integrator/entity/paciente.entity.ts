@@ -1,3 +1,4 @@
+import * as moment from 'moment/moment';
 import {
   BeforeInsert,
   Column,
@@ -7,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   TableInheritance,
 } from 'typeorm';
-import * as moment from 'moment/moment';
 import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
 
@@ -60,6 +60,14 @@ export class Paciente extends Auditoria {
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_AUTO_IDENTIFICACION_ETNICA_ID' })
   autoIdentificacion: Catalogo;
+
+  @Column({
+    name: 'FECHA_NACIMIENTO',
+    type: 'date',
+    nullable: true,
+    comment: 'Fecha de nacimiento del paciente',
+  })
+  fechaNacimiento: Date;
 
   /** */
   @Column({
