@@ -32,6 +32,7 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
+import { UpdateDatoEsaviDto } from 'src/integrator/dto/update-dato-esavi.dto';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -531,7 +532,9 @@ export class VigiflowIntegradorService {
         const datoEsavi = new CreateDatoEsaviDto();
 
         datoEsavi.nombre = reg['D'] && reg['D'].toUpperCase();
-        datoEsavi.nombreReportado = reg['C'] && reg['C'].toUpperCase();
+        //datoEsavi.nombreReportado = reg['C'] && reg['C'].toUpperCase();
+        const nombreEsaviReportadoMayusculas = reg['C'] && reg['C'].toUpperCase();
+        datoEsavi.nombreReportado = reg['C'] && this.eliminarSaltoLinea(nombreEsaviReportadoMayusculas);
         datoEsavi.fechaEsavi = this.formatoFecha(
           reg['I'] ? reg['I'].toString() : reg['I'],
         );
@@ -579,6 +582,10 @@ export class VigiflowIntegradorService {
       }
     }
     // );
+  }
+  eliminarSaltoLinea(nombreEsaviReportadoMayusculas: string): string {
+    //throw new Error('Method not implemented.');
+    return nombreEsaviReportadoMayusculas.replace(/[\r\n]+/g, "");
   }
 
   formatoFecha(valor: string) {
