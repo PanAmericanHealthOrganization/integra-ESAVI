@@ -283,6 +283,149 @@ export class SeedService {
         homologada: 'Inactivo',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
       },
+
+      //Profesión notificador
+      /**
+       * const profesiones = [
+  'AUXILIAR',
+  'ENFERMERA',
+  'ESTUDIANTE',
+  'FARMACEUTICO',
+  'INTERNO',
+  'MEDICO',
+  'CONSUMIDOR U OTRO PROFESIONAL',
+  'OTRO PROFESIONAL DE LA SALUD',
+];
+       */
+      {
+        vigiflow: 'AUXILIAR',
+        dhis2: 'AUXILIAR',
+        homologada: 'AUXILIAR',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'ENFERMERA',
+        dhis2: 'ENFERMERA',
+        homologada: 'ENFERMERA',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'ESTUDIANTE',
+        dhis2: 'ESTUDIANTE',
+        homologada: 'ESTUDIANTE',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'ESTUDIANTES',
+        dhis2: 'ESTUDIANTES',
+        homologada: 'ESTUDIANTE',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'FARMACEUTICO',
+        dhis2: 'Pharmacist',
+        homologada: 'FARMACEUTICO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'INTERNO',
+        dhis2: 'INTERNO',
+        homologada: 'INTERNO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'MEDICO',
+        dhis2: 'MEDICO',
+        homologada: 'MEDICO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'MÉDICO',
+        dhis2: 'MÉDICO',
+        homologada: 'MEDICO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'CONSUMIDOR U OTRO PROFESIONAL',
+        dhis2: 'Other professional',
+        homologada: 'CONSUMIDOR U OTRO PROFESIONAL',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'OTRO PROFESIONAL DE LA SALUD',
+        dhis2: 'Other health professional',
+        homologada: 'OTRO PROFESIONAL DE LA SALUD',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+
+      //Unidad de Edad, o Tipo de edades
+      /**
+       * const unidadesEdad = [
+       * 'AÑOS',
+       * 'MESES',
+       * 'DÍAS',
+       * 'DIAS', //por si acaso alguien lo escribe sin tilde, para la homologación.
+       * 'AÑO',
+       * 'MES',
+       * 'SEMANA',
+       * 'DIA',
+       * 'HORA',
+       * ];
+       */
+      {
+        vigiflow: 'AÑOS',
+        dhis2: 'AÑOS',
+        homologada: 'AÑOS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'MESES',
+        dhis2: 'MESES',
+        homologada: 'MESES',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'DÍAS',
+        dhis2: 'DÍAS',
+        homologada: 'DÍAS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'DIAS',
+        dhis2: 'DIAS',
+        homologada: 'DÍAS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'AÑO',
+        dhis2: 'AÑO',
+        homologada: 'AÑOS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'MES',
+        dhis2: 'MES',
+        homologada: 'MESES',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'SEMANA',
+        dhis2: 'SEMANA',
+        homologada: 'SEMANAS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'DIA',
+        dhis2: 'DIA',
+        homologada: 'DÍAS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'HORA',
+        dhis2: 'HORA',
+        homologada: 'HORAS',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
     ];
 
     for (const catalogo of catalogos) {
@@ -404,6 +547,7 @@ export class SeedService {
       notificacion.fechaAtencion = faker.date.recent();
       notificacion.codigoUnidadSalud = faker.string.alphanumeric(8);
 
+//(notificacion as any).TIPO_NOTIFICACION = 'ficticia'; // Asignación manual, con esto se evita crear una clase hija de "Notificacion", es decir, "NotificacionFicticia" o crear un campo opcional "tipoNotificacion" en la entidad padre "Notificacion".
       notificaciones.push(notificacion);
     }
 

@@ -198,7 +198,7 @@ export class VigiflowIntegradorService {
         notificacion.fechaReporteNacional = fechaReporte;
       }
 
-      notificacion.unidadEdadPaciente = reg['I'];
+      notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
       notificacion.organizacion = reg['AF'];
       notificacion.codigoVigiflow = reg['B'];
       notificacion.nombreNotificador = reg['AB'];
