@@ -2,6 +2,8 @@ import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Entidades
 import { CRUD } from 'src/utils/interfaces/baseEntity';
@@ -63,6 +65,9 @@ export class SeedService {
 
       // 2. Crear catálogos
       await this.seedCatalogos();
+
+      // 2.1. Cargar provincias desde CSV
+      await this.loadProvinciasFromCSV();
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
@@ -883,4 +888,58 @@ export class SeedService {
     await this.datoVacunacionRepository.save(datosVacunacion);
   } //---fin del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
   */ 
+
+  private async loadProvinciasFromCSV() {
+    console.log('🗺️ Cargando provincias desde CSV...');
+
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
+      const csvContent = fs.readFileSync(csvPath, 'utf-8');
+      const lines = csvContent.split('\n').filter(line => line.trim());
+      
+      const tipoProvincia = await this.tipoCatalogoRepository.findOne({
+        where: { descripcion: 'Provincia' }
+      });
+
+      if (!tipoProvincia) {
+        console.error('Tipo de catálogo "Provincia" no encontrado');
+        return;
+      }
+
+      const auditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true
+      };
+
+      for (let i = 1; i < lines.length; i++) { // Skip header
+        const [vigiflow, dhis2, homologada] = lines[i].split(',').map(col => col.trim().replace(/"/g, ''));
+        
+        if (vigiflow && dhis2 && homologada) {
+          const existing = await this.catalogoRepository.findOne({
+            where: { vigiflow, tipoCatalogo: tipoProvincia }
+          });
+
+          if (!existing) {
+            await this.catalogoRepository.save({
+              vigiflow,
+              dhis2,
+              homologada,
+              tipoCatalogo: tipoProvincia,
+              ...auditoria
+            } as Catalogo);
+          }
+        }
+      }
+
+      console.log('✅ Provincias cargadas desde CSV');
+    } catch (error) {
+      console.error('❌ Error al cargar provincias desde CSV:', error);
+    }
+  }
 }
