@@ -66,9 +66,9 @@ export class SeedService {
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
-      //----fin catalogos---------------------------------------------------------------------------------------------------------
+      //----fin catalogos / registros para homologación---------------------------------------------------------------------------------------------------------
       // 4. Crear pacientes
-      await this.seedPacientes();
+      /*await this.seedPacientes();
 
       // 5. Crear notificaciones
       await this.seedNotificaciones();
@@ -93,6 +93,7 @@ export class SeedService {
 
       // 12. Crear datos de vacunación
       await this.seedDatosVacunacion();
+*/
 
       await this.createSyncProcess();
       // Finalizar
@@ -428,6 +429,17 @@ export class SeedService {
       },
     ];
 
+    const auditoriaCatalogoHomologacionDto: Auditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: '',
+      deletedAt: undefined,
+      deletedBy: '',
+      isEnabled: true,
+      isActive: true
+    };
+
     for (const catalogo of catalogos) {
       const existing = await this.catalogoRepository.findOne({
         where: {
@@ -437,7 +449,7 @@ export class SeedService {
       });
 
       if (!existing) {
-        await this.catalogoRepository.save(catalogo);
+        await this.catalogoRepository.save({ ...catalogo, ...auditoriaCatalogoHomologacionDto } as Catalogo);
       }
     }
   }
@@ -484,6 +496,7 @@ export class SeedService {
     }
   }
 
+   /* //---inicio del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
   private async seedPacientes() {
     console.log('👤 Creando pacientes...');
 
@@ -868,5 +881,6 @@ export class SeedService {
     }
 
     await this.datoVacunacionRepository.save(datosVacunacion);
-  }
+  } //---fin del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
+  */ 
 }

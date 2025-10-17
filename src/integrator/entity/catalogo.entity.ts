@@ -6,13 +6,15 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { TipoCatalogo } from './tipo-catalogo.entity';
+import { Auditoria } from './auditoria.entity';
+import { OmitType } from '@nestjs/swagger';
 
 @Entity({
   schema: 'dhi_esavi',
   name: 'TC_CATALOGO',
   comment: 'Catálogo de valores de homologaciones de Vigiflow a DHIS2',
 })
-export class Catalogo {
+export class Catalogo extends Auditoria implements ICatalogo {
   /**
    *
    */
@@ -76,3 +78,40 @@ export class Catalogo {
   })
   tipoCatalogo: TipoCatalogo;
 }
+
+export interface ICatalogo extends Auditoria {
+  id: string;
+  padre: Catalogo;
+  vigiflow: string;
+  dhis2: string;
+  homologada: string;
+  tipoCatalogo: TipoCatalogo;
+}
+
+export class CatalogoDto extends Auditoria implements ICatalogo {
+  id: string;
+  padre: Catalogo;
+  vigiflow: string;
+  dhis2: string;
+  homologada: string;
+  tipoCatalogo: TipoCatalogo;
+}
+
+export class CreateCatalogoDto extends OmitType( CatalogoDto, 
+  [
+    'id', 
+    'createdAt', 
+    'createdBy',
+    'deletedAt',
+    'deletedBy',
+    'isActive',
+    'isEnabled',
+    'updatedAt',
+    'updatedBy',
+  ]  as const ) {}
+
+  export class UpdateCatalogoDto extends OmitType( CatalogoDto, [
+    'dhis2',
+    'vigiflow',
+    'tipoCatalogo',
+  ] as const ) {}
