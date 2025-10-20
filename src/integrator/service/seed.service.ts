@@ -69,6 +69,12 @@ export class SeedService {
       // 2.1. Cargar provincias desde CSV
       await this.loadProvinciasFromCSV();
 
+      // 2.2. Cargar cantones desde CSV
+      //await this.loadCantonesFromCSV();
+
+      // 2.3. Cargar parroquias desde CSV
+      await this.loadParroquiasFromCSV();
+
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
       //----fin catalogos / registros para homologación---------------------------------------------------------------------------------------------------------
@@ -136,16 +142,16 @@ export class SeedService {
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
       );
-      /**
-       * 
+      /*
+      * 
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_CATALOGO" CASCADE;',
       );
       await queryRunner.query(
         'TRUNCATE TABLE "dhi_esavi"."TC_TIPOCATALOGO" CASCADE;',
       );
-      
       */
+      
       // Restaurar las restricciones de clave foránea
       await queryRunner.query('SET session_replication_role = DEFAULT;');
 
@@ -888,7 +894,7 @@ export class SeedService {
     await this.datoVacunacionRepository.save(datosVacunacion);
   } //---fin del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
   */ 
-
+  //--inicio carga de provincias desde CSV------------------------------------------------------------------------------------------------------
   private async loadProvinciasFromCSV() {
     console.log('🗺️ Cargando provincias desde CSV...');
 
@@ -942,4 +948,137 @@ export class SeedService {
       console.error('❌ Error al cargar provincias desde CSV:', error);
     }
   }
+  //--fin carga de provincias desde CSV------------------------------------------------------------------------------------------------------
+  
+  //--inicio carga de cantones desde CSV------------------------------------------------------------------------------------------------------
+  /* private async loadCantonesFromCSV() {
+    console.log('🗺️ Cargando cantones desde CSV...');
+
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_ecuador.csv');
+      const csvContent = fs.readFileSync(csvPath, 'utf-8');
+      const lines = csvContent.split('\n').filter(line => line.trim());
+
+      const tipoCanton = await this.tipoCatalogoRepository.findOne({
+        where: { descripcion: 'Canton' }
+      });
+
+      if (!tipoCanton) {
+        console.error('Tipo de catálogo "Canton" no encontrado');
+        return;
+      }
+
+      const auditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true
+      };
+
+      for (let i = 1; i < lines.length; i++) { // Skip header
+        const [vigiflow, dhis2, homologada] = lines[i].split(', ').map(col => col.trim().replace(/"/g, ''));
+
+        if (vigiflow && dhis2 && homologada) {
+          const existing = await this.catalogoRepository.findOne({
+            where: { vigiflow, tipoCatalogo: tipoCanton }
+          });
+
+          if (!existing) {
+            await this.catalogoRepository.save({
+              vigiflow,
+              dhis2,
+              homologada,
+              tipoCatalogo: tipoCanton,
+              ...auditoria
+            } as Catalogo);
+          }
+        }
+      }
+
+      console.log('✅ Cantones cargados desde CSV');
+    } catch (error) {
+      console.error('❌ Error al cargar cantones desde CSV:', error);
+    }
+  } */
+  //--fin carga de cantones desde CSV------------------------------------------------------------------------------------------------------
+    
+  //--inicio carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
+  private async loadParroquiasFromCSV() {
+    console.log('🗺️ Cargando parroquias desde CSV...');
+
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
+      const csvContent = fs.readFileSync(csvPath, 'utf-8');
+      
+      // split() separa las líneas de "csvContent", para esto usa el salto de línea '\n', y
+      // el resultado es retornado como un arreglo de líneas. Luego, 
+      // filter() transforma y devuelve un nuevo arreglo según la condición devuelta por
+      // la función de devolución de llamada (callback). Esta función flecha, mediante trim()
+      // elimina los espacios en blanco al inicio y al final de cada línea, 
+      // y verifica si la línea no está vacía. Si está vacía, retorna una cadena vacía '', es decir,
+      // false (falsy en JavaScript), y filter() la excluye del arreglo final.
+      const lines = csvContent.split('\n')
+                              .filter(line => line.trim());
+
+      const tipoParroquia = await this.tipoCatalogoRepository.findOne({
+        where: { descripcion: 'Parroquia' }
+      });
+
+      if (!tipoParroquia) {
+        console.error('Tipo de catálogo "Parroquia" no encontrado');
+        return;
+      }
+
+      const auditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true
+      };
+
+      for (let i = 1; i < lines.length; i++) { // Skip header "i=0"
+        /**
+         * .split(', ') separa cada línea en columnas, usando la coma seguida de un espacio como delimitador.
+         * .map(col => col.trim().replace(/"/g, '')) elimina las comillas dobles de cada columna y
+         * luego elimina los espacios en blanco alrededor de cada columna. La iteración por las columnas
+         * se realiza mediante la función de devolución de llamada (callback) de map(), por lo que no se
+         * requiere un lazo for adicional.
+         * Recordar que: map() llama a una función de devolución de llamada, para cada elemento 
+         * de una matriz y devuelve una matriz que contiene los resultados.
+         */
+        const [vigiflow, dhis2, homologada] = lines[i].split(',')
+                                                      .map(col => col.trim().replace(/"/g, ''));
+
+        if (vigiflow && dhis2 && homologada) {
+          const existing = await this.catalogoRepository.findOne({
+            where: { vigiflow, tipoCatalogo: tipoParroquia }
+          });
+
+          if (!existing) {
+            await this.catalogoRepository.save({
+              vigiflow,
+              dhis2,
+              homologada,
+              tipoCatalogo: tipoParroquia,
+              ...auditoria
+            } as Catalogo);
+          }
+        }
+      }
+
+      console.log('✅ Parroquias-DHIS2 cargadas desde CSV');
+    } catch (error) {
+      console.error('❌ Error al cargar parroquias-DHIS2 desde CSV:', error);
+    }
+  }
+  //--fin carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
+
 }
