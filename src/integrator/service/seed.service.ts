@@ -70,7 +70,7 @@ export class SeedService {
       await this.loadProvinciasFromCSV();
 
       // 2.2. Cargar cantones desde CSV
-      //await this.loadCantonesFromCSV();
+      await this.loadCantonesFromCSV();
 
       // 2.3. Cargar parroquias desde CSV
       await this.loadParroquiasFromCSV();
@@ -951,16 +951,16 @@ export class SeedService {
   //--fin carga de provincias desde CSV------------------------------------------------------------------------------------------------------
   
   //--inicio carga de cantones desde CSV------------------------------------------------------------------------------------------------------
-  /* private async loadCantonesFromCSV() {
+  private async loadCantonesFromCSV() {
     console.log('🗺️ Cargando cantones desde CSV...');
 
     try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_ecuador.csv');
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
       const lines = csvContent.split('\n').filter(line => line.trim());
 
       const tipoCanton = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Canton' }
+        where: { descripcion: 'Cantón' } // observar que debe ser con tilde.
       });
 
       if (!tipoCanton) {
@@ -980,7 +980,7 @@ export class SeedService {
       };
 
       for (let i = 1; i < lines.length; i++) { // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i].split(', ').map(col => col.trim().replace(/"/g, ''));
+        const [vigiflow, dhis2, homologada] = lines[i].split(',').map(col => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
@@ -1003,7 +1003,7 @@ export class SeedService {
     } catch (error) {
       console.error('❌ Error al cargar cantones desde CSV:', error);
     }
-  } */
+  } 
   //--fin carga de cantones desde CSV------------------------------------------------------------------------------------------------------
     
   //--inicio carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
