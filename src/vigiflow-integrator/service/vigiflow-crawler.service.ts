@@ -1,11 +1,11 @@
-import { HttpException, Injectable, Logger } from '@nestjs/common';
-import * as puppeteer from 'puppeteer';
-import { ConfigService } from '@nestjs/config';
-import { catchError, firstValueFrom } from 'rxjs';
-import { AxiosError } from 'axios';
-import { read } from 'xlsx';
-import * as moment from 'moment/moment';
 import { HttpService } from '@nestjs/axios';
+import { HttpException, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { AxiosError } from 'axios';
+import * as moment from 'moment/moment';
+import * as puppeteer from 'puppeteer';
+import { catchError, firstValueFrom } from 'rxjs';
+import { read } from 'xlsx';
 
 @Injectable()
 export class VigiflowCrawlerService {
@@ -22,13 +22,14 @@ export class VigiflowCrawlerService {
     const base = this.configService.get<string>('VIGIFLOW_URL');
     const username = this.configService.get<string>('VIGIFLOW_USERNAME');
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
+    const puppeteerPath = this.configService.get<string>('DIR_CHROME_PUPPETEER');
 
     //const browser = await puppeteer.launch({ headless: false });
     const browser = await puppeteer.launch({
-      headless: false,
-      executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', // Ruta al ejecutable de Chrome
+      headless: true,
+      executablePath: puppeteerPath, // Ruta al ejecutable de Chrome
     });
-    
+
     const page = await browser.newPage();
     await page.setRequestInterception(true);
     //Avoid loading the images
@@ -61,9 +62,7 @@ export class VigiflowCrawlerService {
       //console.timeLog('START');
       await page.on('response', async (response) => {
         //console.log(response.request().url());
-        if (
-          response.request().url() === 'https://vigiflow.who-umc.org/query/user'
-        ) {
+        if (response.request().url() === 'https://vigiflow.who-umc.org/query/user') {
           const bearer = response.request().headers().authorization;
           this._jwtToken = bearer.substring(7);
           await browser.close();
@@ -82,11 +81,7 @@ export class VigiflowCrawlerService {
     return obj;
   }
 
-  async retrieveExcelReport(
-    fechaInicio: string,
-    fechaFin: string,
-    codigoATC: string,
-  ) {
+  async retrieveExcelReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
     try {
       console.log('fechaInicio:::. ', fechaInicio);
       console.log('fechaFin:::. ', fechaFin);
@@ -98,9 +93,7 @@ export class VigiflowCrawlerService {
       // TOKEN::  { jwt: '' }
       console.log('TOKEN:: ', token);
 
-      const url = this.configService.get<string>(
-        'VIGIFLOW_RENDER_AEFI_EXCEL_URL',
-      );
+      const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_EXCEL_URL');
       console.log('url:::: ', url);
 
       const payload = this.getPayload(
@@ -137,22 +130,13 @@ export class VigiflowCrawlerService {
     }
   }
 
-  async retrieveJsonReport(
-    fechaInicio: string,
-    fechaFin: string,
-    codigoATC: string,
-  ) {
+  async retrieveJsonReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
     const token = await this.retrieveJWT();
 
     const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_JSON_URL');
 
     console.log('url2:: ', url);
-    const payload = this.getPayload(
-      'rendericsrlistingexcel',
-      fechaInicio,
-      fechaFin,
-      codigoATC,
-    );
+    const payload = this.getPayload('rendericsrlistingexcel', fechaInicio, fechaFin, codigoATC);
     console.log('payload2:: ', payload);
 
     const { data } = await firstValueFrom(
@@ -175,12 +159,7 @@ export class VigiflowCrawlerService {
     return excel;
   }
 
-  private getPayload(
-    queryName: string,
-    fechaInicio: string,
-    fechaFin: string,
-    codigoATC: string,
-  ) {
+  private getPayload(queryName: string, fechaInicio: string, fechaFin: string, codigoATC: string) {
     return JSON.stringify({
       queryName: queryName,
       booleanSearchIcsrsParameters: [],
