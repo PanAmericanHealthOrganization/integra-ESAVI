@@ -60,14 +60,21 @@ export class VigiflowCrawlerService {
       const url = page.url();
       console.log(`This is the current page ${url}`);
       //console.timeLog('START');
-      await page.on('response', async (response) => {
+      /*--await page.on('response', async (response) => {
         //console.log(response.request().url());
         if (response.request().url() === 'https://vigiflow.who-umc.org/query/user') {
           const bearer = response.request().headers().authorization;
           this._jwtToken = bearer.substring(7);
           await browser.close();
         }
-      });
+      });*/
+      const responses = await page.waitForResponse(
+        (response) => response.url() === 'https://vigiflow.who-umc.org/query/user'
+        && response.request().method() === 'POST',
+        { timeout: 15000 },
+      );
+      const bearer = responses.request().headers().authorization;
+      this._jwtToken = bearer?.substring(7) ?? '';
     } catch (e) {
       console.log('error al obtener el tokeb', e);
       console.log('error al obtener el tokeb', e.message);
@@ -75,7 +82,7 @@ export class VigiflowCrawlerService {
     }
     //Workaround solution
 
-    await this.sleep(15000);
+    /*--await this.sleep(15000);*/
     const obj = { jwt: this._jwtToken };
     console.log('obj TOKEN:::: ', obj);
     return obj;
