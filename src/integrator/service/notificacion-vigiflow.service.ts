@@ -40,31 +40,31 @@ export class NotificacionVigiflowService {
         const notificacion = plainToClass(NotificacionVigiflow, createDto);
         notificacion.paciente = pacienteUUID;
         console.log(notificacion);
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.provincia)) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.provincia)) {
           try {
             notificacion.provinciaResidencia =
               await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residencia.provincia,
+                createDto.residenciaPaciente.provincia,
               );
           } catch (error) {
             console.log('Provincia no encontrada');
           }
         }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.canton)) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.canton)) {
           try {
             notificacion.cantonResidencia =
               await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residencia.canton,
+                createDto.residenciaPaciente.canton,
               );
           } catch (error) {
             console.log('Canton no encontrada');
           }
         }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residencia.parroquia)) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.parroquia)) {
           try {
             notificacion.parroquiaResidencia =
               await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residencia.parroquia,
+                createDto.residenciaPaciente.parroquia,
               );
           } catch (error) {
             console.log('Parroquia no encontrada');

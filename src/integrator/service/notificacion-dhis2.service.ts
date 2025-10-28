@@ -142,33 +142,33 @@ export class NotificacionDhis2Service {
           }
         }
 
-        if (createDto.residencia.provincia) {
+        if (createDto.residenciaPaciente.provincia) {
           try {
             notificacion.provinciaResidencia =
               await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residencia.provincia,
+                createDto.residenciaPaciente.provincia,
               );
           } catch (error) {
             console.error(`Error al buscar provincia: ${error.message}`);
           }
         }
 
-        if (createDto.residencia.canton) {
+        if (createDto.residenciaPaciente.canton) {
           try {
             notificacion.cantonResidencia =
               await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residencia.canton,
+                createDto.residenciaPaciente.canton,
               );
           } catch (error) {
             console.error(`Error al buscar canton: ${error.message}`);
           }
         }
 
-        if (createDto.residencia.parroquia) {
+        if (createDto.residenciaPaciente.parroquia) {
           try {
             notificacion.parroquiaResidencia =
               await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residencia.parroquia,
+                createDto.residenciaPaciente.parroquia,
               );
           } catch (error) {
             console.error(`Error al buscar parroquia: ${error.message}`);
@@ -360,33 +360,33 @@ export class NotificacionDhis2Service {
       }
     }
 
-    if (createDto.residencia.provincia) {
+    if (createDto.residenciaPaciente.provincia) {
       try {
         notificacionExistente.provinciaResidencia =
           await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residencia.provincia,
+            createDto.residenciaPaciente.provincia,
           );
       } catch (error) {
         console.error(`Error al buscar provincia: ${error.message}`);
       }
     }
 
-    if (createDto.residencia.canton) {
+    if (createDto.residenciaPaciente.canton) {
       try {
         notificacionExistente.cantonResidencia =
           await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residencia.canton,
+            createDto.residenciaPaciente.canton,
           );
       } catch (error) {
         console.error(`Error al buscar canton: ${error.message}`);
       }
     }
 
-    if (createDto.residencia.parroquia) {
+    if (createDto.residenciaPaciente.parroquia) {
       try {
         notificacionExistente.parroquiaResidencia =
           await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residencia.parroquia,
+            createDto.residenciaPaciente.parroquia,
           );
       } catch (error) {
         console.error(`Error al buscar parroquia: ${error.message}`);

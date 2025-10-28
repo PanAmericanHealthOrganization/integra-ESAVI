@@ -154,6 +154,9 @@ export class VigiflowIntegradorService {
     console.log('Fin Proceso..................');
   }
 
+  //Extracción de los datos de la hoja [0], del libro 
+  //de Excel 'VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx'.
+  //AEFI: Adverse Events Following Immunization (Eventos Adversos Después de la Vacunación).
   private async extractedFromExcelToPersist(workBook: WorkBook) {
     //Convert file to json
     const ws = await workBook.Sheets[workBook.SheetNames[0]];
@@ -206,7 +209,7 @@ export class VigiflowIntegradorService {
       const ubicacionResidenciaPaciente = new UbicacionDto();
       ubicacionResidenciaPaciente.provincia =
         reg['D'] && reg['D'].toUpperCase();
-      notificacion.residencia = ubicacionResidenciaPaciente;
+      notificacion.residenciaPaciente = ubicacionResidenciaPaciente;
       // Unidad residencia Notificador
       const ubicacionResidenciaNotificador = new UbicacionDto();
       ubicacionResidenciaNotificador.provincia =
@@ -288,6 +291,10 @@ export class VigiflowIntegradorService {
     });
   }
 
+  //Extracción de los datos de la hoja [1] de nombre 'Reportes', del libro
+  //de Excel 'VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx'. Recordar que la hoja [0], no
+  //contiene información. Estos nuevos campos permiten completar la tabla
+  //de NOTIFICACON, mediante un proceso de actualización.
   async extractedFromJsonReportToUpdate(workbook2: WorkBook) {
     //Convert file to json
     const ws2 = await workbook2.Sheets[workbook2.SheetNames[1]];
@@ -422,6 +429,9 @@ export class VigiflowIntegradorService {
   //   });
   // }
 
+
+  //Extracción de los datos de la hoja [2] de nombre 'Medicamentos', del libro
+  //de Excel 'VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx'.
   async extractedFromJsonReportToCreateMedicamento(workbook2: WorkBook) {
     // Convertir archivo a JSON
     const country = 'ECU';
@@ -507,6 +517,8 @@ export class VigiflowIntegradorService {
     }
   }
 
+  //Extracción de los datos de la hoja [3] de nombre 'Reacciones', del libro
+  //de Excel 'VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx'.
   async extractedFromJsonReportToCreateReaccion(workbook2: WorkBook) {
     //Convert file to json
     const ws3 = await workbook2.Sheets[workbook2.SheetNames[3]];
