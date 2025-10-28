@@ -3,7 +3,7 @@ import { Catalogo } from '../entity/catalogo.entity';
 import { UbicacionDto } from './ubicacion.dto';
 
 export class CreateNotificacionDto {
-  residencia: UbicacionDto;
+  residenciaPaciente: UbicacionDto;
   peso: number;
   altura: number;
   fechaNacimiento: Date;
@@ -42,6 +42,6 @@ export class CreateNotificacionDto {
   monitorioEstablecimientoSalud : number;
   constructor() {
     this.residenciaNotificador = new UbicacionDto();
-    this.residencia = new UbicacionDto();
+    this.residenciaPaciente = new UbicacionDto();
   }
 }

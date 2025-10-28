@@ -469,7 +469,7 @@ export class Dhis2IntegratorService {
             header.column === 'DNVE ESAVI TRK - Parroquia residencia',
         )
       ];
-    notificacion.residencia = ubicacionResidencia;
+    notificacion.residenciaPaciente = ubicacionResidencia;
 
     // Profesion quien notifica
     notificacion.profesionNotificadorParam =
@@ -924,7 +924,7 @@ export class Dhis2IntegratorService {
               header.column === 'DNVE ESAVI TRK - Parroquia residencia',
           )
         ];
-      notificacion.residencia = ubicacionResidencia;
+      notificacion.residenciaPaciente = ubicacionResidencia;
       // Profesion quien notifica
       notificacion.profesionNotificadorParam =
         row[
