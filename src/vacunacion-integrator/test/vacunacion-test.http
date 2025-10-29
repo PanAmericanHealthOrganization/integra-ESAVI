@@ -217,7 +217,7 @@ Content-Type: {{contentType}}
 # 6. Para testing, usar períodos cortos para evitar timeouts
 # 7. Para producción, considerar el volumen de datos al seleccionar rangos
 
-GET http://localhost:8081/integrator/vacunacion-nominal-sync/sync-range?desde=2025-02-01&hasta=2025-02-20
+GET http://localhost:8081/integrator/vacunacion-nominal-sync/sync-range?desde=2021-02-01&hasta=2025-02-20
 Accept: application/json
 Content-Type: application/json
 
