@@ -45,8 +45,6 @@ export const esaviDataProvider: DataProvider = {
   ): Promise<GetListResult<RecordType>> {
     console.log("params", params)
     const { filter = {}, pagination } = params
-    const { page = 1, perPage = 10 } = pagination
-
     try {
       const response = await intESAVIClient.post(ENDPOINTS.FIND_ALL, {
         filter,

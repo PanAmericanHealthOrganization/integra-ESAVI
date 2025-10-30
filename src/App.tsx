@@ -8,6 +8,7 @@ import { CustomLoginPage } from "./layout/CustomLogin"
 import { myAuthKeyCloakProvider } from "./myAuthKeyCloakProvider"
 import analisis from "./pages/analisis"
 import calidad from "./pages/calidad"
+import catalogos from "./pages/catalogos"
 import dashboard from "./pages/dashboard"
 import esavis from "./pages/esavis"
 import reportes from "./pages/reportes"
@@ -32,6 +33,7 @@ const App = () => {
       <Resource name="vacunometro" {...vacunometro} />
       <Resource name="calidad" {...calidad} />
       <Resource name="syncs" {...syncs} />
+      <Resource name="catalogos" {...catalogos} />
     </Admin>
   )
 }

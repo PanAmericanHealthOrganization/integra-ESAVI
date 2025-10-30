@@ -1,8 +1,8 @@
-import { endOfMonth, startOfDay } from "date-fns"
 import { useState } from "react"
 import {
   Datagrid,
   DateField,
+  FilterButton,
   List,
   SearchInput,
   TextField,
@@ -10,17 +10,11 @@ import {
 } from "react-admin"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
 
-/**
- *
- */
-const defaultValues = {
-  desde: startOfDay(new Date()),
-  hasta: endOfMonth(new Date()),
-}
 const VacunometroFilters = [
-  <SearchInput source="unicode" alwaysOn />,
-  <SearchInput source="nombreVacuna" />,
-  <SearchInput source="sexo" />,
+  <SearchInput source="unicode" alwaysOn placeholder="Unicodigo" />,
+  <SearchInput source="fechaAplicacion" placeholder="Fecha de Aplicación" />,
+  <SearchInput source="nombreVacuna" placeholder="Nombre de Vacuna" />,
+  <SearchInput source="sexo" placeholder="Sexo" />,
 ]
 
 const VacunometroList = () => {
@@ -28,6 +22,7 @@ const VacunometroList = () => {
 
   const ListActions = () => (
     <TopToolbar>
+      <FilterButton />
       <SyncVacunometroDialog open={open} setOpen={setOpen} />
     </TopToolbar>
   )
@@ -44,6 +39,7 @@ const VacunometroList = () => {
           <TextField source="unicode" label="Establecimiento" />
           <TextField source="sexo" label="Sexo" />
           <TextField source="nombreVacuna" label="Nombre de Vacuna" />
+          <TextField source="dosis" label="Dosis" />
           <TextField source="total" label="Total" />
         </Datagrid>
       </List>
