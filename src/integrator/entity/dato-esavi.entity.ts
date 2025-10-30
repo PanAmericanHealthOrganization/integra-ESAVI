@@ -164,12 +164,14 @@ export class DatoEsavi extends Auditoria {
   })
   nameSOC: string;
   ////////////////////////////////////////////
+
   @Column({
     name: 'CODIGO_ESAVI_CIE10',
     nullable: true,
     comment: 'Código del ESAVI según clasificación CIE-10',
   })
   codigoEsaviCie10: string;
+  
   @Column({
     name: 'FECHA_ESAVI',
     nullable: true,
@@ -202,6 +204,21 @@ export class DatoEsavi extends Auditoria {
     comment: 'Código único del caso reportado',
   })
   codigoCaso: string;
+
+  //-------------nuevas columnas----------------
+  @Column({
+    name: 'CODIGO_DXINICIAL_CIE10',
+    nullable: true,
+    comment: 'Código CIE-10 del diagnóstico inicial. Etapa de notificación DHIS2.',
+  })
+  codigoDxInicialCie10: string; //Etapa de notificación DHIS2
+
+  @Column({
+    name: 'CODIGO_DXINICIAL_MEDDRA_LLT',
+    nullable: true,
+    comment: 'Código LLT MedDRA del diagnóstico inicial',
+  })
+  codigoDxInicialMeddraLlt: string; //Etapa de notificación DHIS2
 
   @BeforeInsert()
   beforeInsert() {

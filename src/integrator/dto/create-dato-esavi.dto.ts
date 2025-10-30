@@ -28,4 +28,7 @@ export class CreateDatoEsaviDto {
   resultado: string;
   //////////
   codigoCaso: string;
+  //nuevas propiedades
+  codigoDxInicialCie10: string; //Etapa de notificación DHIS2
+  codigoDxInicialMeddraLlt: string; //Etapa de notificación DHIS2
 }
