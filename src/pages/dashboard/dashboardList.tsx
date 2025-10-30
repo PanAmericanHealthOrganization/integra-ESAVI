@@ -1,19 +1,17 @@
-import { useEffect, useState } from "react"
 import { Box, Grid } from "@mui/material"
-import { Bar, Pie } from "react-chartjs-2"
-import { dashboardDataProvider } from "../../dataProviders/dashboard.dataprovider"
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
+  ArcElement,
   BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
   Title,
   Tooltip,
-  Legend,
-  ArcElement,
-  ChartOptions,
 } from "chart.js"
-import { size } from "lodash"
+import { useEffect, useState } from "react"
+import { Bar, Pie } from "react-chartjs-2"
+import { dashboardDataProvider } from "../../dataProviders/dashboard.dataprovider"
 
 ChartJS.register(
   CategoryScale,

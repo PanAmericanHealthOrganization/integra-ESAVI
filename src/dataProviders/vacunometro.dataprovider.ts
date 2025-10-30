@@ -33,7 +33,6 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
     try {
-      console.log("params", params)
       const response = await intESAVIClient.post(
         `integrator/${resource}/getPaginated`,
         {

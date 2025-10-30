@@ -9,11 +9,15 @@ import {
   TopToolbar,
 } from "react-admin"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
+
+/**
+ *
+ */
 const defaultValues = {
   desde: startOfDay(new Date()),
   hasta: endOfMonth(new Date()),
 }
-export const VacunometroFilters = [
+const VacunometroFilters = [
   <SearchInput source="unicode" alwaysOn />,
   <SearchInput source="nombreVacuna" />,
   <SearchInput source="sexo" />,
@@ -29,8 +33,8 @@ const VacunometroList = () => {
   )
   return (
     <>
-      <List actions={<ListActions />}>
-        <Datagrid rowClick="edit" bulkActionButtons={false}>
+      <List actions={<ListActions />} filters={VacunometroFilters} perPage={25}>
+        <Datagrid rowClick="show" bulkActionButtons={false}>
           <DateField
             locales={"sv-SE"}
             source="fechaAplicacion"

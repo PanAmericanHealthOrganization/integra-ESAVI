@@ -3,11 +3,9 @@ import { Button, Card } from "@mui/material"
 import { useState } from "react"
 import {
   Datagrid,
-  DateField,
   ExportButton,
   FunctionField,
   List,
-  TextField,
   TextInput,
   TopToolbar,
 } from "react-admin"
@@ -61,18 +59,10 @@ export const ESAVISList = () => {
   const handleMouseLeave = () => {
     setIsHover(false)
   }
-  const boxStyle = {
-    width: "10px",
-    pading: "5px 0px 0px 0px",
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    maxWidth: "10%",
-    cursor: isHover ? "copy" : "pointer",
-    fontweight: !isHover ? "bold" : "normal",
-  }
+
   return (
     <Card variant="outlined" style={{ padding: 10 }}>
-      <List actions={<ListActions />} filters={postFilters}>
+      <List actions={<ListActions />} empty={false}>
         <Datagrid bulkActionButtons={false}>
           <FunctionField
             label="Id"
@@ -96,7 +86,6 @@ export const ESAVISList = () => {
                       </td>
                       <td>
                         <label
-                          style={boxStyle}
                           title={`${record.id}`}
                           onMouseEnter={handleMouseEnter}
                           onMouseLeave={handleMouseLeave}>

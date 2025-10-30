@@ -1,3 +1,4 @@
+import FlakyIcon from "@mui/icons-material/Flaky"
 import PieChartIcon from "@mui/icons-material/PieChart"
 import SettingsIcon from "@mui/icons-material/Settings"
 import SickIcon from "@mui/icons-material/Sick"
@@ -23,6 +24,11 @@ export const CustomMenu = () => (
         leftIcon={<PieChartIcon />}
       />
     </Authorize>
+    <Menu.Item
+      to="/dashboard"
+      primaryText="Dashboard"
+      leftIcon={<PieChartIcon />}
+    />
 
     <Authorize
       allowedRoles={["Administrador", "Analista de Información"]}
@@ -36,6 +42,11 @@ export const CustomMenu = () => (
       to="/reportes"
       primaryText="Reportes"
       leftIcon={<TableChartIcon />}
+    />
+    <Menu.Item
+      to="/calidad"
+      primaryText="Calidad de Datos"
+      leftIcon={<FlakyIcon />}
     />
 
     <Menu.Item
@@ -53,8 +64,6 @@ export const CustomMenu = () => (
       primaryText="Procesos de sincronización"
       leftIcon={<SyncIcon />}
     />
-
-    {/* Puedes agregar más elementos al menú aquí siguiendo el mismo patrón */}
   </Menu>
 
   // <Menu>
