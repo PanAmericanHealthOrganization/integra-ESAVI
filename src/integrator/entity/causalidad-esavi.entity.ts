@@ -82,6 +82,20 @@ export class CausalidadEsavi extends Auditoria {
   })
   clasificacionCausalidadNaranjo: string;
 
+  //Campos nuevos: CODIGO_DXFINAL_CIE10, CODIGO_DXFINAL_MEDDRA_LLT
+  @Column({
+    name: 'CODIGO_DXFINAL_CIE10',
+    nullable: true,
+    comment: 'Código CIE-10 del diagnóstico final.',
+  })
+  codigoDxFinalCie10: string;
+  @Column({
+    name: 'CODIGO_DXFINAL_MEDDRA_LLT',
+    nullable: true,
+    comment: 'Código LLT MedDRA del diagnóstico final.',
+  })
+  codigoDxFinalMeddraLlt: string;
+  
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;

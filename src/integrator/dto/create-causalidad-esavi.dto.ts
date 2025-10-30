@@ -9,4 +9,7 @@ export class CreateCausalidadEsaviDto {
   clasificacionCausalidadWHOUMC: string;
   referenciaIdentificadorVacuna: string;
   clasificacionCausalidadNaranjo: string;
+  //propiedades nuevas
+  codigoDxFinalCie10: string;
+  codigoDxFinalMeddraLlt: string;
 }
