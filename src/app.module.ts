@@ -6,11 +6,9 @@ import { Dhis2IntegratorModule } from './dhis2-integrator/dhis2-integrator.modul
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { HttpExceptionFilter } from './providers/http-exception.filter';
-import { HeaderApiKeyStrategy } from './strategy/header-api-key.strategy';
 //import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
-import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 
 @Module({
   imports: [
@@ -20,13 +18,12 @@ import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-i
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    VacunacionIntegratorModule, // Descomentar para habilitar el módulo de vacunación con base de datos oracle.
+    //VacunacionIntegratorModule, // Descomentar para habilitar el módulo de vacunación con base de datos oracle.
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,
   ],
   providers: [
-    HeaderApiKeyStrategy,
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
