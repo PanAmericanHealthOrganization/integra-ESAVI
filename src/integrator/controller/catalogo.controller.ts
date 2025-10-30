@@ -10,16 +10,16 @@ import {
   UseFilters,
   UseGuards,
 } from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { CatalogoService } from '../service/catalogo.service';
 import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
 import { UpdateCatalogoDto } from '../dto/update-catalogo.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { CatalogoService } from '../service/catalogo.service';
 
-@ApiTags('Integrador')
+@ApiTags(' Catálogos ')
 @Controller('integrator/catalogo')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
+//@ApiSecurity('X-API-KEY', ['X-API-KEY'])
 @UseGuards(AuthGuard('api-key'))
 @UseFilters(new HttpExceptionFilter())
 @ApiResponse({ status: 401, description: 'Unauthorized.' })
@@ -73,10 +73,7 @@ export class ParametroController {
     status: 400,
     description: 'The record has not been successfully updated.',
   })
-  update(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdateCatalogoDto,
-  ) {
+  update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdateCatalogoDto) {
     return this.parametroService.update(uuid, body);
   }
 }

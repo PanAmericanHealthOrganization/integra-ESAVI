@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -31,10 +31,7 @@ async function bootstrap() {
   SwaggerModule.setup(String(process.env.NAME_PROYECT), app, document);
   await app.listen(process.env.PORT_DEFAULT);
 
-  console.log(
-    'HOST_SWAGGER',
-    `${process.env.HOST_SWAGGER}/${String(process.env.NAME_PROYECT)}`,
-  );
+  console.log('HOST_SWAGGER', `${process.env.HOST_SWAGGER}/${String(process.env.NAME_PROYECT)}`);
   console.log('PORT:', process.env.PORT_DEFAULT);
 }
 

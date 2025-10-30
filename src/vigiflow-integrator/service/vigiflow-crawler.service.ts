@@ -18,11 +18,15 @@ export class VigiflowCrawlerService {
     this._jwtToken = '';
   }
 
+  /**
+   *
+   * @returns
+   */
   async retrieveJWT(): Promise<any> {
     const base = this.configService.get<string>('VIGIFLOW_URL');
     const username = this.configService.get<string>('VIGIFLOW_USERNAME');
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
-    const puppeteerPath = this.configService.get<string>('DIR_CHROME_PUPPETEER');
+    const puppeteerPath = this.configService.get<string>('PATH_BROWSER_PUPPETEER');
 
     //const browser = await puppeteer.launch({ headless: false });
     const browser = await puppeteer.launch({
@@ -43,73 +47,48 @@ export class VigiflowCrawlerService {
     page.setDefaultTimeout(0);
     await page.goto(base, { waitUntil: 'networkidle0' });
     try {
-      // Navigate to the login page
-      //page.goto(base, { waitUntil: 'networkidle0' });
-      // Fill in the login form
-      console.log('Setting up parameters to login');
       await page.type('input[id=email]', username);
       await page.type('input[id=password]', password);
-      // Submit the form
-      console.log('Making click on submit button');
-      // Submit the form
       await Promise.all([
         page.waitForNavigation({ waitUntil: 'networkidle2' }),
         page.click('button[type="submit"]'),
       ]);
-      // Current page
-      const url = page.url();
-      console.log(`This is the current page ${url}`);
-      //console.timeLog('START');
-      /*--await page.on('response', async (response) => {
-        //console.log(response.request().url());
-        if (response.request().url() === 'https://vigiflow.who-umc.org/query/user') {
-          const bearer = response.request().headers().authorization;
-          this._jwtToken = bearer.substring(7);
-          await browser.close();
-        }
-      });*/
+
       const responses = await page.waitForResponse(
-        (response) => response.url() === 'https://vigiflow.who-umc.org/query/user'
-        && response.request().method() === 'POST',
+        (response) =>
+          response.url() === 'https://vigiflow.who-umc.org/query/user' &&
+          response.request().method() === 'POST',
         { timeout: 15000 },
       );
       const bearer = responses.request().headers().authorization;
       this._jwtToken = bearer?.substring(7) ?? '';
     } catch (e) {
-      console.log('error al obtener el tokeb', e);
-      console.log('error al obtener el tokeb', e.message);
+      this.logger.log('Error al obtener el token JWT:', e);
+    } finally {
       await browser.close();
     }
-    //Workaround solution
-
-    /*--await this.sleep(15000);*/
     const obj = { jwt: this._jwtToken };
-    console.log('obj TOKEN:::: ', obj);
     return obj;
   }
 
+  /**
+   * Descaga el reporte en formato Excel
+   * @param fechaInicio
+   * @param fechaFin
+   * @param codigoATC
+   * @returns
+   */
   async retrieveExcelReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
     try {
-      console.log('fechaInicio:::. ', fechaInicio);
-      console.log('fechaFin:::. ', fechaFin);
-      console.log('codigoATC:::. ', codigoATC);
-
-      // Obtener el token JWT
+      this.logger.log('Iniciando la generación del reporte de Excel...');
       const token = await this.retrieveJWT();
-
-      // TOKEN::  { jwt: '' }
-      console.log('TOKEN:: ', token);
-
       const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_EXCEL_URL');
-      console.log('url:::: ', url);
-
       const payload = this.getPayload(
         'renderaefiicsrlinelistingexcel',
         fechaInicio,
         fechaFin,
         codigoATC,
       );
-      console.log('payload::: ', payload);
 
       // Realizar la petición HTTP para obtener el documento
       const { data } = await firstValueFrom(
@@ -122,29 +101,29 @@ export class VigiflowCrawlerService {
           })
           .pipe(
             catchError((e: AxiosError) => {
-              this.logger.error(e);
+              this.logger.error(JSON.stringify(e));
               throw new HttpException(e.response.data, e.response.status);
             }),
           ),
       );
-
-      // Leer el archivo recibido y devolverlo
       return read(data.renderedDocument);
     } catch (error) {
-      // Manejo de errores
       this.logger.error('Error al generar el reporte de Excel:', error);
       throw new Error('Hubo un problema al generar el reporte de Excel');
     }
   }
 
+  /**
+   * genera el reporte en formato JSON
+   * @param fechaInicio
+   * @param fechaFin
+   * @param codigoATC
+   * @returns
+   */
   async retrieveJsonReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
     const token = await this.retrieveJWT();
-
     const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_JSON_URL');
-
-    console.log('url2:: ', url);
     const payload = this.getPayload('rendericsrlistingexcel', fechaInicio, fechaFin, codigoATC);
-    console.log('payload2:: ', payload);
 
     const { data } = await firstValueFrom(
       this.httpService
@@ -162,10 +141,17 @@ export class VigiflowCrawlerService {
         ),
     );
     const excel = read(data.renderedDocument);
-    const sheetsNames = excel.SheetNames;
     return excel;
   }
 
+  /**
+   * Genera el payload para realizar la consulta
+   * @param queryName
+   * @param fechaInicio
+   * @param fechaFin
+   * @param codigoATC
+   * @returns
+   */
   private getPayload(queryName: string, fechaInicio: string, fechaFin: string, codigoATC: string) {
     return JSON.stringify({
       queryName: queryName,
@@ -204,6 +190,11 @@ export class VigiflowCrawlerService {
     });
   }
 
+  /**ç
+   * Pausa la ejecución por un tiempo determinado
+   * @param milliseconds
+   * @returns
+   */
   sleep(milliseconds: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
