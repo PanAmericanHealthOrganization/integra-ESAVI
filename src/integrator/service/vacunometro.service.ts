@@ -12,6 +12,11 @@ export class VacunometroService
   implements IService<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto>
 {
   /**
+   * Logger  of vacunometro service
+   */
+  private readonly logger = new Logger(VacunometroService.name);
+
+  /**
    *
    * @param vacunometroRepository
    */
@@ -20,11 +25,14 @@ export class VacunometroService
     private readonly vacunometroRepository: Repository<Vacunometro>,
   ) {}
 
+  /**
+   *
+   * @param id
+   * @returns
+   */
   exist(id: number | string): Promise<boolean> {
     return this.vacunometroRepository.exist({ where: { id: id as string } });
   }
-
-  private readonly logger = new Logger(VacunometroService.name);
 
   /**
    *
@@ -53,7 +61,6 @@ export class VacunometroService
    */
   public async getPaginated(paginated: GetListParams): Promise<IPaginationResponse<Vacunometro>> {
     const { pagination, sort, filter } = paginated;
-    console.log({ filter });
 
     let buildFilter = {};
 

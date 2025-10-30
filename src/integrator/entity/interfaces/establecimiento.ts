@@ -7,82 +7,82 @@ export interface IEstablecimiento {
   /**
    *
    */
-  uni_codigo: string;
+  uniCodigo: string;
 
   /**
    *
    */
-  uni_nombre: string;
+  uniNombre: string;
 
   /**
    *
    */
-  prv_codigo: string;
+  provinciaCodigo: string;
 
   /**
    *
    */
-  prv_descripcion: string;
+  provinciaDescripcion: string;
 
   /**
    *
    */
-  can_codigo: string;
+  cantonCodigo: string;
 
   /**
    *
    */
-  can_descripcion: string;
+  cantonDescripcion: string;
 
   /**
    *
    */
-  par_codigo: string;
+  parroquiaCodigo: string;
 
   /**
    *
    */
-  par_descripcion: string;
+  parroquiaDescripcion: string;
 
   /**
    *
    */
-  zon_codigo: string;
+  zonaCodigo: string;
 
   /**
    *
    */
-  zon_descripcion: string;
+  zonaDescripcion: string;
 
   /**
    *
    */
-  dis_codigo: string;
+  distritoCodigo: string;
 
   /**
    *
    */
-  dis_descripcion: string;
+  distritoDescripcion: string;
 
   /**
    *
    */
-  cir_codigo: string;
+  circuitoCodigo: string;
 
   /**
    *
    */
-  tipo_entidad: string;
+  tipoEntidad: string;
 
   /**
    *
    */
-  longps: string;
+  longitudGps: number;
 
   /**
    *
    */
-  latgps: string;
+  latitudGps: number;
 
   /**
    *

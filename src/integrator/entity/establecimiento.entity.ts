@@ -26,7 +26,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 10,
     unique: true,
   })
-  uni_codigo: string;
+  uniCodigo: string;
 
   /**
    * Unique code of the establishment
@@ -38,7 +38,7 @@ export class Establecimiento implements IEstablecimiento {
     type: 'varchar',
     length: 100,
   })
-  uni_nombre: string;
+  uniNombre: string;
 
   /**
    * Unique code of the establishment
@@ -50,7 +50,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 10,
     comment: 'Código del la provincia en la que está ubicado el establecimiento',
   })
-  prv_codigo: string;
+  provinciaCodigo: string;
 
   /**
    * Unique code of the establishment
@@ -62,7 +62,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 100,
     comment: 'Descripción de la provincia en la que está ubicado el establecimiento',
   })
-  prv_descripcion: string;
+  provinciaDescripcion: string;
 
   /**
    * Unique code of the establishment
@@ -72,7 +72,7 @@ export class Establecimiento implements IEstablecimiento {
     name: 'CAN_CODIGO',
     comment: 'Código de la canton en la que está ubicado el establecimiento',
   })
-  can_codigo: string;
+  cantonCodigo: string;
 
   /**
    * Unique code of the establishment
@@ -82,7 +82,7 @@ export class Establecimiento implements IEstablecimiento {
     name: 'CAN_DESCRIPCION',
     comment: 'Descripción de la canton en la que está ubicado el establecimiento',
   })
-  can_descripcion: string;
+  cantonDescripcion: string;
 
   /**
    * Unique code of the establishment
@@ -94,7 +94,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 12,
     comment: 'Código de la parroquia en la que está ubicado el establecimiento',
   })
-  par_codigo: string;
+  parroquiaCodigo: string;
 
   /**
    *
@@ -106,7 +106,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 100,
     comment: 'Descripción de la parroquia en la que está ubicado el establecimiento',
   })
-  par_descripcion: string;
+  parroquiaDescripcion: string;
 
   /**
    *
@@ -118,7 +118,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 10,
     comment: 'Código de la zona en la que está ubicado el establecimiento',
   })
-  zon_codigo: string;
+  zonaCodigo: string;
 
   /**
    *  Unique code of the establishment
@@ -129,7 +129,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 100,
     comment: 'Descripción de la zona en la que está ubicado el establecimiento',
   })
-  zon_descripcion: string;
+  zonaDescripcion: string;
 
   /**
    *
@@ -141,7 +141,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 10,
     comment: 'Código del distrito en la que está ubicado el establecimiento',
   })
-  dis_codigo: string;
+  distritoCodigo: string;
 
   /**
    *
@@ -153,7 +153,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 100,
     comment: 'Descripción del distrito en la que está ubicado el establecimiento',
   })
-  dis_descripcion: string;
+  distritoDescripcion: string;
 
   /**
    *
@@ -165,7 +165,7 @@ export class Establecimiento implements IEstablecimiento {
     length: 10,
     comment: 'Código de la circunscripción en la que está ubicado el establecimiento',
   })
-  cir_codigo: string;
+  circuitoCodigo: string;
 
   /**
    *
@@ -177,21 +177,21 @@ export class Establecimiento implements IEstablecimiento {
     type: 'varchar',
     length: 50,
   })
-  tipo_entidad: string;
+  tipoEntidad: string;
 
   /**
    *
   Unique code of the establishment
     */
-  @Column({ name: 'LONGPS', comment: 'Longitud del establecimiento', type: 'varchar', length: 20 })
-  longps: string;
+  @Column({ name: 'LONGPS', comment: 'Longitud del establecimiento', type: 'float' })
+  longitudGps: number;
 
   /**
    *
   Unique code of the establishment
     */
-  @Column({ name: 'LATGPS', comment: 'Latitud del establecimiento', type: 'varchar', length: 20 })
-  latgps: string;
+  @Column({ name: 'LATGPS', comment: 'Latitud del establecimiento', type: 'float' })
+  latitudGps: number;
 
   /**
    *

@@ -45,6 +45,7 @@ import {
   Vacunacion,
   Vacunometro,
 } from './entity';
+import { Establecimiento } from './entity/establecimiento.entity';
 import { IntegradorService } from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
@@ -71,6 +72,7 @@ import {
   ReporteService,
   SeedService,
 } from './service';
+import { EstablecimientosService } from './service/establecimientos.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
@@ -126,6 +128,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         AntecedenteEvento,
         AntecedenteMedico,
         AntecedentePreexistencia,
+        Establecimiento,
         Catalogo,
         CausalidadEsavi,
         DatoEsavi,
@@ -178,6 +181,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEventoService,
     AntecedenteMedicoService,
     AntecedentePreexistenciaService,
+    EstablecimientosService,
     CatalogoService,
     CausalidadEsaviService,
     DatoEsaviService,

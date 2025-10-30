@@ -2,32 +2,32 @@ import { IEstablecimiento } from '../entity/interfaces/establecimiento';
 
 export class EstablecimientoDto implements IEstablecimiento {
   id: string;
-  uni_codigo: string;
-  uni_nombre: string;
-  prv_codigo: string;
-  prv_descripcion: string;
-  can_codigo: string;
-  can_descripcion: string;
-  par_codigo: string;
-  par_descripcion: string;
-  zon_codigo: string;
-  zon_descripcion: string;
-  dis_codigo: string;
-  dis_descripcion: string;
-  cir_codigo: string;
-  tipo_entidad: string;
-  longps: string;
-  latgps: string;
+  uniCodigo: string;
+  uniNombre: string;
+  provinciaCodigo: string;
+  provinciaDescripcion: string;
+  cantonCodigo: string;
+  cantonDescripcion: string;
+  parroquiaCodigo: string;
+  parroquiaDescripcion: string;
+  zonaCodigo: string;
+  zonaDescripcion: string;
+  distritoCodigo: string;
+  distritoDescripcion: string;
+  circuitoCodigo: string;
+  tipoEntidad: string;
+  longitudGps: number;
+  latitudGps: number;
   mail: string;
 }
 
 export class EstablecimientoCreateDto implements Partial<IEstablecimiento> {
   id: string;
-  uni_codigo: string;
-  uni_nombre: string;
-  prv_codigo: string;
+  uniCodigo: string;
+  uniNombre: string;
+  provinciaCodigo: string;
 }
 
 export class EstablecimientoUpdateDto implements Partial<IEstablecimiento> {
-  uni_codigo: string;
+  uniCodigo: string;
 }

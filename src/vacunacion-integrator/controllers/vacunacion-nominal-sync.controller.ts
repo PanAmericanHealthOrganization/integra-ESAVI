@@ -6,7 +6,7 @@ import { VacunacionNominalService } from '../service/vacunacion-nominal.service'
  * Controlador para sincronización de datos de vacunación desde Oracle
  */
 @ApiTags('Vacunacion Nominal Sync')
-@Controller({ path: 'integrator/vacunacion-nominal-sync' })
+@Controller({ path: 'integrator/vacunacion-nominal-sync', version: '1' })
 export class VacunacionNominalSyncController {
   constructor(private readonly vacunacionService: VacunacionNominalService) {}
 
@@ -29,6 +29,7 @@ export class VacunacionNominalSyncController {
    */
   @Get('/sync-range')
   async syncRange(@Query('desde') desde: string, @Query('hasta') hasta: string): Promise<void> {
+    console.log(`Iniciando sincronización de vacunas desde ${desde} hasta ${hasta}`);
     return this.vacunacionService.procesarVacunasAgregadasFull(new Date(desde), new Date(hasta));
   }
 }
