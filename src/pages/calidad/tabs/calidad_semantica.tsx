@@ -17,18 +17,6 @@ import {
   Typography,
 } from "@mui/material"
 import React, { useEffect, useState } from "react"
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
 
 interface SemanticRule {
   id: string
@@ -313,75 +301,6 @@ const CalidadSemantica: React.FC = () => {
             </Card>
           </Grid>
         ))}
-      </Grid>
-
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* Gráfico de violaciones por regla */}
-        <Grid item xs={12} lg={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Violaciones por Regla Semántica
-              </Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={semanticRules}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      angle={-45}
-                      textAnchor="end"
-                      height={100}
-                    />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar
-                      dataKey="violations"
-                      fill="#f59e0b"
-                      name="Violaciones"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Gráfico de consistencia */}
-        <Grid item xs={12} lg={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Consistencia por Campos
-              </Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={consistencyChecks}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="field_pair"
-                      angle={-45}
-                      textAnchor="end"
-                      height={60}
-                    />
-                    <YAxis domain={[90, 100]} />
-                    <Tooltip
-                      formatter={(value) => [`${value}%`, "Consistencia"]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="consistency_rate"
-                      stroke="#10b981"
-                      fill="#10b981"
-                      fillOpacity={0.6}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
 
       {/* Tabla de reglas semánticas */}

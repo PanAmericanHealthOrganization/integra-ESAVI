@@ -42,12 +42,6 @@ const mockData: QualityMetric[] = [
     trend: "down",
     percentage: "-15%",
   },
-  {
-    title: "Tiempo Resolución",
-    value: "2.4h",
-    trend: "stable",
-    percentage: "0%",
-  },
 ]
 
 // Datos para los gráficos
@@ -151,7 +145,8 @@ export const CalidadGeneral = () => {
                   variant="h6"
                   component="h2"
                   sx={{ mb: 2, fontWeight: "semibold" }}>
-                  Tendencia de Calidad
+                  Tendencia de Calidad **** puede el porcentaje de calidad en
+                  función del timpo, pero me iria por completitud
                 </Typography>
                 <Box sx={{ height: 250 }}>
                   <ResponsiveContainer width="100%" height="100%">
@@ -181,7 +176,8 @@ export const CalidadGeneral = () => {
                   variant="h6"
                   component="h2"
                   sx={{ mb: 2, fontWeight: "semibold" }}>
-                  Distribución por Categoría
+                  De las columnas principales el que menor error maneja un top
+                  10, quizá otro tipo de gráfico
                 </Typography>
                 <Box sx={{ height: 250 }}>
                   <ResponsiveContainer width="100%" height="100%">

@@ -58,32 +58,46 @@ const CalidadSintactica: React.FC = () => {
       // Datos simulados - reemplazar con llamada real a la API
       const errorsData: SyntaxError[] = [
         {
-          field: "email",
+          field: "Nombres",
           error_type: "Formato inválido",
           error_count: 145,
           severity: "high",
-          examples: ["usuario@", "email.com", "test@.com"],
+          examples: ["p.p", "2do Mancheno", "060545"],
         },
         {
-          field: "telefono",
+          field: "fecha nacimiento",
+          error_type: "Fuera de fecha válida",
+          error_count: 145,
+          severity: "high",
+          examples: ["1900-01-01"],
+        },
+        {
+          field: "teléfono",
           error_type: "Caracteres no numéricos",
           error_count: 89,
           severity: "medium",
           examples: ["123-abc-456", "(555) xyz", "12345678901234"],
         },
         {
-          field: "fecha_nacimiento",
+          field: "fecha Nacimiento",
           error_type: "Formato de fecha",
           error_count: 67,
           severity: "high",
           examples: ["32/13/2023", "2023-13-45", "abc-def-ghij"],
         },
         {
-          field: "codigo_postal",
-          error_type: "Longitud incorrecta",
-          error_count: 34,
-          severity: "low",
-          examples: ["123", "1234567890", "ABC123"],
+          field: "Sin diagnostico",
+          error_type: "Registro con vacios",
+          error_count: 15,
+          severity: "high",
+          examples: [""],
+        },
+        {
+          field: "Sin gravedad",
+          error_type: "Registros que no tienen gravedad",
+          error_count: 250,
+          severity: "high",
+          examples: ["0603542"],
         },
       ]
 

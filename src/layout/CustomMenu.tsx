@@ -50,6 +50,11 @@ export const CustomMenu = () => (
         primaryText="Calidad de Datos"
         leftIcon={<FlakyIcon />}
       />
+      <Menu.Item
+        to="/esavis-dashboard"
+        primaryText="ESAVIS Dashboard"
+        leftIcon={<FlakyIcon />}
+      />
 
       <Menu.Item
         to="/configuraciones"

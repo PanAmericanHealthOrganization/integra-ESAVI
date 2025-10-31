@@ -10,6 +10,7 @@ import analisis from "./pages/analisis"
 import calidad from "./pages/calidad"
 import catalogos from "./pages/catalogos"
 import dashboard from "./pages/dashboard"
+import { EsaviDashboardList } from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
 import reportes from "./pages/reportes"
 import syncs from "./pages/syncs"
@@ -34,6 +35,7 @@ const App = () => {
       <Resource name="calidad" {...calidad} />
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
+      <Resource name="esavis-dashboard" list={EsaviDashboardList} />
     </Admin>
   )
 }

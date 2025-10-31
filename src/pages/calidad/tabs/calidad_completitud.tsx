@@ -32,17 +32,49 @@ const CalidadCompletitud: React.FC = () => {
     try {
       // Simulated data - replace with actual API call
       const data: CompletenessData[] = [
-        { column: "id", vacunacion: 98, persona: 99, notificacion: 97 },
-        { column: "fecha", vacunacion: 85, persona: 90, notificacion: 88 },
-        { column: "tipo", vacunacion: 92, persona: 95, notificacion: 89 },
-        { column: "estado", vacunacion: 78, persona: 82, notificacion: 75 },
+        // Campos específicos de Vacunación
         {
-          column: "observaciones",
-          vacunacion: 45,
-          persona: 60,
-          notificacion: 52,
+          column: "fecha_vacunacion",
+          vacunacion: 98,
+          persona: 0,
+          notificacion: 0,
         },
-        { column: "ubicacion", vacunacion: 88, persona: 91, notificacion: 85 },
+        { column: "vacuna", vacunacion: 95, persona: 0, notificacion: 0 },
+        { column: "dosis", vacunacion: 92, persona: 0, notificacion: 0 },
+        { column: "lote", vacunacion: 87, persona: 0, notificacion: 0 },
+        { column: "unicodigo", vacunacion: 85, persona: 0, notificacion: 0 },
+
+        // Campos específicos de Persona
+        {
+          column: "fecha_nacimiento",
+          vacunacion: 0,
+          persona: 94,
+          notificacion: 0,
+        },
+        {
+          column: "identificacion",
+          vacunacion: 0,
+          persona: 98,
+          notificacion: 0,
+        },
+        {
+          column: "tipo_identificacion",
+          vacunacion: 0,
+          persona: 96,
+          notificacion: 0,
+        },
+        { column: "nombres", vacunacion: 0, persona: 92, notificacion: 0 },
+        { column: "apellidos", vacunacion: 0, persona: 89, notificacion: 0 },
+        { column: "sexo", vacunacion: 0, persona: 87, notificacion: 0 },
+
+        // Campos específicos de Notificación
+        {
+          column: "fecha_notificacion",
+          vacunacion: 0,
+          persona: 0,
+          notificacion: 88,
+        },
+        { column: "fecha_evento", vacunacion: 0, persona: 0, notificacion: 85 },
       ]
 
       setCompletenessData(data)
