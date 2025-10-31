@@ -1,27 +1,10 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AntecedenteEventoService } from '../service/antecedente-evento.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateAntecedenteEventoDto } from '../dto/update-antecedente-evento.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AntecedenteEventoService } from '../service/antecedente-evento.service';
 
 @ApiTags('Antecedente Evento')
-@Controller('integrator/antecedente-evento')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/antecedente-evento', version: '1' })
 export class AntecedenteEventoController {
   constructor(private antecedenteEventoService: AntecedenteEventoService) {}
 
@@ -32,7 +15,7 @@ export class AntecedenteEventoController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.antecedenteEventoService.findAll();
   }
 

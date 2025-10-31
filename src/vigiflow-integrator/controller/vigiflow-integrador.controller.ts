@@ -1,21 +1,11 @@
-import {
-  Controller,
-  Get,
-  Logger,
-  Query,
-  Req,
-  Res,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Logger, Query, Res, UseFilters } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
+import { AefiQuery } from '../query/aefi-query';
 import { VigiflowCrawlerService } from '../service/vigiflow-crawler.service';
 import { VigiflowIntegradorService } from '../service/vigiflow-integrador.service';
-import { Response } from 'express';
-import { AefiQuery } from '../query/aefi-query';
-import { MaholderService } from 'src/whodrugs/services/maholder.service';
 
 @ApiTags('Vigiflow')
 @Controller('integrator/vigiflow')
@@ -37,7 +27,7 @@ export class VigiflowIntegradorController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  async retrieveJwt(@Req() req) {
+  async retrieveJwt() {
     return await this.vigiflowCrawlerService.retrieveJWT();
   }
 
@@ -49,8 +39,7 @@ export class VigiflowIntegradorController {
       query.codigoATC,
     );
     res.set({
-      'Content-Type':
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename=myfile.xlsx',
     });
     res.send(excelBuffer);
@@ -86,11 +75,7 @@ export class VigiflowIntegradorController {
     );
 
     try {
-      await this.vigiflowIntegradorService.createInBulk(
-        fechaInicio,
-        fechaFin,
-        aefiQuery.codigoATC,
-      );
+      await this.vigiflowIntegradorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);
     } catch (error) {
       this.logger.error(error);
       return {

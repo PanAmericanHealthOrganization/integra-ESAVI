@@ -25,7 +25,6 @@ export class WhodrugsSyncController {
   })
   public async sync(): Promise<any> {
     await this.whoDrugsSincService.sync();
-    
   }
 
   /**
@@ -40,10 +39,8 @@ export class WhodrugsSyncController {
     @Query('country') country: string,
     @Query('atcCode') atcCode: string,
     @Query('optionSetName')
-    optionSetName: string = 'Ponga aqui el nombre del OptionSet',
-  )
-  // : Promise<any> 
-  {
+    optionSetName = 'Ponga aqui el nombre del OptionSet',
+  ) {
     if (['', undefined, null].includes(country)) {
       throw new Error('country is required');
     }
@@ -52,6 +49,5 @@ export class WhodrugsSyncController {
       atcCode,
       optionSetName,
     });
-    
   }
 }

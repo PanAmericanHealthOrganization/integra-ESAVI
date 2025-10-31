@@ -1,27 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { CreateGrupoEtarioDto } from '../dto/create-grupo-etario.dto';
 import { UpdateGrupoEtarioDto } from '../dto/update-grupo-etario.dto';
 import { GrupoEtarioService } from '../service/grupo-etario.service';
 
 @ApiTags('Integrador')
-@Controller('integrator/grupo-etario')
-// @ApiSecurity('X-API-KEY', ['X-API-KEY'])
-// @UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/grupo-etario', version: '1' })
 export class GrupoEtarioController {
   constructor(private grupoEtarioService: GrupoEtarioService) {}
 
@@ -32,7 +16,7 @@ export class GrupoEtarioController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.grupoEtarioService.findAll();
   }
 
@@ -71,10 +55,7 @@ export class GrupoEtarioController {
     status: 400,
     description: 'The record has not been successfully updated.',
   })
-  update(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdateGrupoEtarioDto,
-  ) {
+  update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdateGrupoEtarioDto) {
     return this.grupoEtarioService.update(uuid, body);
   }
 }

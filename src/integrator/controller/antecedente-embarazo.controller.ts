@@ -1,13 +1,11 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateAntecedenteEmbarazoDto } from '../dto/create-antecedente-embarazo.dto';
 import { UpdateAntecedenteEmbarazoDto } from '../dto/update-antecedente-embarazo.dto';
 import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
 
 @ApiTags('Antecedente Embarazo')
-@Controller('integrator/antecedente-embarazo')
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/antecedente-embarazo', version: '1' })
 export class AntecedenteEmbarazoController {
   constructor(private antecedenteEmbarazoService: AntecedenteEmbarazoService) {}
 
@@ -18,7 +16,7 @@ export class AntecedenteEmbarazoController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.antecedenteEmbarazoService.findAll();
   }
 

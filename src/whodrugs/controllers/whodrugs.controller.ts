@@ -1,9 +1,9 @@
 import { Body, Controller, HttpException, HttpStatus, Param, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { DrugService } from '../services/drugs.service';
-import { Drug } from '../models/drug.entity';
 import { IPaginationRequest, IPaginationResponse } from 'src/utils/interfaces/pagination';
- 
+import { Drug } from '../models/drug.entity';
+import { DrugService } from '../services/drugs.service';
+
 /**
  *
  *
@@ -54,21 +54,24 @@ export class WhodrugsController {
     @Query('country') country: string,
     @Query('atcCode') atcCode: string,
     @Body() query: Drug | any,
-  )
-  : Promise<IPaginationResponse<Drug[]>>
-   {
+  ): Promise<IPaginationResponse<Drug[]>> {
     const pagingAndFilet: IPaginationRequest<Drug> = {
       page,
       size,
       query,
     };
-    
+
     if (!country) {
       throw new HttpException("Es necesario el query param 'country'", HttpStatus.BAD_REQUEST);
     }
 
-    return await this.drugService.getDrugsPaginated(pagingAndFilet, drugName, drugCode, country, atcCode);
-
+    return await this.drugService.getDrugsPaginated(
+      pagingAndFilet,
+      drugName,
+      drugCode,
+      country,
+      atcCode,
+    );
   }
 
   public async getDrugsHistory(@Body() query: any, @Param('ext') ext: string) {

@@ -1,15 +1,9 @@
-import { Controller, Get, Query, Req, UseFilters } from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ReporteService } from '../service/reporte.service';
 
 @ApiTags('Reports')
-@Controller('integrator/reports')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-// @UseGuards(AuthGuard('api-key'))  // Si des comento esta debo tener un token
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/reports', version: '1' })
 export class ReporteController {
   constructor(private reporteService: ReporteService) {}
 
@@ -27,7 +21,7 @@ export class ReporteController {
     status: 400,
     description: 'The record has not been successfully retrieved.',
   })
-  async createPdf(@Req() req) {
+  async createPdf() {
     const resp = await this.reporteService.createPdf();
     return {
       msg: 'OK',
@@ -41,15 +35,7 @@ export class ReporteController {
    * @returns
    */
   @Get('/retrivePdf')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'The records have been successfully retrieved.',
-  // })
-  // @ApiResponse({
-  //   status: 400,
-  //   description: 'The record has not been successfully retrieved.',
-  // })
-  async retrivePdf(@Query() aefiQuery: any, @Req() req) {
+  async retrivePdf(@Query() aefiQuery: any) {
     const { startDate, endDate } = aefiQuery;
 
     if (!startDate || !endDate) {
@@ -60,8 +46,7 @@ export class ReporteController {
     }
 
     // Validar que las fechas tengan el formato correcto (YYYY-MM-DD)
-    const isValidDateFormat = (date: string) =>
-      /^\d{4}-\d{2}-\d{2}$/.test(date);
+    const isValidDateFormat = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date);
 
     if (!isValidDateFormat(startDate) || !isValidDateFormat(endDate)) {
       return {
@@ -89,10 +74,7 @@ export class ReporteController {
       };
     }
 
-    const resp = await this.reporteService.retrivePdf(
-      fechaInicioDate,
-      fechaFinDate,
-    );
+    const resp = await this.reporteService.retrivePdf(fechaInicioDate, fechaFinDate);
 
     return {
       msg: 'OK',
@@ -114,7 +96,7 @@ export class ReporteController {
   //   status: 400,
   //   description: 'The record has not been successfully retrieved.',
   // })
-  async casosEsaviPorSexoGrave(@Req() req) {
+  async casosEsaviPorSexoGrave() {
     const resp = await this.reporteService.casosEsaviPorSexoGrave();
     return {
       msg: 'OK',
@@ -136,7 +118,7 @@ export class ReporteController {
     status: 400,
     description: 'The record has not been successfully retrieved.',
   })
-  async casosEsaviPorSexoNoGrave(@Req() req) {
+  async casosEsaviPorSexoNoGrave() {
     const resp = await this.reporteService.casosEsaviPorSexoNoGrave();
     return {
       msg: 'OK',
@@ -158,7 +140,7 @@ export class ReporteController {
     status: 400,
     description: 'The record has not been successfully retrieved.',
   })
-  async casosEsaviPorMes(@Req() req) {
+  async casosEsaviPorMes() {
     const resp = await this.reporteService.casosEsaviPorMes();
     return {
       msg: 'OK',
@@ -180,7 +162,7 @@ export class ReporteController {
   //   status: 400,
   //   description: 'The record has not been successfully retrieved.',
   // })
-  async casosCruzadosMeddra(@Req() req) {
+  async casosCruzadosMeddra() {
     const resp = await this.reporteService.casosCruzadosMeddra();
     return {
       msg: 'OK',
@@ -202,7 +184,7 @@ export class ReporteController {
   //   status: 400,
   //   description: 'The record has not been successfully retrieved.',
   // })
-  async casosNoCruzadosMeddra(@Req() req) {
+  async casosNoCruzadosMeddra() {
     const resp = await this.reporteService.casosNoCruzadosMeddra();
     return {
       msg: 'OK',
@@ -224,7 +206,7 @@ export class ReporteController {
   //   status: 400,
   //   description: 'The record has not been successfully retrieved.',
   // })
-  async casosCruzadosWhodrug(@Req() req) {
+  async casosCruzadosWhodrug() {
     const resp = await this.reporteService.casosCruzadosWhodrug();
     return {
       msg: 'OK',

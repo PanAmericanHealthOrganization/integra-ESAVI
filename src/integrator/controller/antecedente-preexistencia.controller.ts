@@ -1,32 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AntecedentePreexistenciaService } from '../service/antecedente-preexistencia.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateAntecedentePreexistenciaDto } from '../dto/update-antecedente-preexistencia.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AntecedentePreexistenciaService } from '../service/antecedente-preexistencia.service';
 
 @ApiTags('Antecedente Pre-existencia')
-@Controller('integrator/antecedente-preexistencia')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/antecedente-preexistencia', version: '1' })
 export class AntecedentePreexistenciaController {
-  constructor(
-    private antecedentePreexistenciaService: AntecedentePreexistenciaService,
-  ) {}
+  constructor(private antecedentePreexistenciaService: AntecedentePreexistenciaService) {}
 
   /************CRUD PARA MICROSERVICIOS************/
   //BUSCAR TODOS LOS ITEMS
@@ -35,7 +15,7 @@ export class AntecedentePreexistenciaController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.antecedentePreexistenciaService.findAll();
   }
 

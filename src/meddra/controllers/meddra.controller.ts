@@ -10,17 +10,17 @@ import {
   StreamableFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { IMeddraResponse, MeddraQueryRequestDto } from '../models/dto/meddra.query';
 import { MeddraClientService } from '../services/meddra-client.service';
 import { MeddraStandarService } from '../services/meddra-standar.service';
+
 /**
  *
  */
 @ApiTags('Meddra', 'Meddra Standar')
-@ApiBearerAuth()
 @Controller({ path: 'meddra', version: '1' })
 export class MeddraController {
   //
@@ -30,6 +30,7 @@ export class MeddraController {
   ) {}
 
   private readonly logger = new Logger(MeddraController.name);
+
   /**
    *
    */
@@ -46,6 +47,7 @@ export class MeddraController {
       this.logger.error(e);
     }
   }
+
   /**
    *
    * @param ext
@@ -62,6 +64,7 @@ export class MeddraController {
     console.log(file);
     return new StreamableFile(file);
   }
+
   /**
    *
    * @param ext

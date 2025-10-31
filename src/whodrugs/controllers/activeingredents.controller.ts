@@ -1,7 +1,7 @@
 import { Controller, Get, HttpException, HttpStatus, Param } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { ActiveIngredientsService } from '../services/activeIngredients.service';
 import { ActiveIngredient } from '../models/activeIngredient.entity';
+import { ActiveIngredientsService } from '../services/activeIngredients.service';
 /**
  *
  */
@@ -25,7 +25,7 @@ export class ActiveIngredientController {
     if (!drugId) {
       throw new HttpException("drugId can't be empty", HttpStatus.BAD_REQUEST);
     }
-    
+
     return await this.activeIngredentService.getActiveIngredentsOfDrug(drugId);
   }
 }

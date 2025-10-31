@@ -1,17 +1,16 @@
-import { Controller, Get, Logger, Query, UseFilters, Post, Body, Param } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Body, Controller, Get, Logger, Param, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AefiQuery } from 'src/vigiflow-integrator/query/aefi-query';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
+import {
+  DuplicateConfirmationDto,
+  DuplicateHandlingConfigDto,
+} from '../dto/duplicate-handling.dto';
+import { Dhis2DuplicateHandlerService } from '../services/dhis2-duplicate-handler.service';
 import { Dhis2IntegratorService } from '../services/dhis2-integrator.service';
 import { Dhis2ProcessingLogService } from '../services/dhis2-processing-log.service';
-import { Dhis2DuplicateHandlerService } from '../services/dhis2-duplicate-handler.service';
-import { DuplicateConfirmationDto, DuplicateHandlingConfigDto } from '../dto/duplicate-handling.dto';
 
 @ApiTags('Dhis2')
-@Controller('integrator/dhis2')
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/dhis2', version: '1' })
 export class Dhis2IntegradorController {
   private readonly logger = new Logger(Dhis2IntegradorController.name);
 
@@ -48,11 +47,7 @@ export class Dhis2IntegradorController {
     );
 
     try {
-      await this.dhis2IntegratorService.createInBulk(
-        fechaInicio,
-        fechaFin,
-        aefiQuery.codigoATC,
-      );
+      await this.dhis2IntegratorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);
     } catch (error) {
       this.logger.error(error);
       return {
@@ -70,7 +65,7 @@ export class Dhis2IntegradorController {
   @ApiOperation({ summary: 'Importación masiva con manejo de duplicados' })
   async createInBulkWithDuplicateHandling(
     @Query() aefiQuery: AefiQuery,
-    @Body() duplicateConfig?: DuplicateHandlingConfigDto
+    @Body() duplicateConfig?: DuplicateHandlingConfigDto,
   ) {
     const fechaInicio: Date = new Date(
       `${aefiQuery.fechaInicio.slice(0, 4)}-${aefiQuery.fechaInicio.slice(
@@ -90,7 +85,7 @@ export class Dhis2IntegradorController {
         fechaInicio,
         fechaFin,
         aefiQuery.codigoATC,
-        duplicateConfig
+        duplicateConfig,
       );
     } catch (error) {
       this.logger.error(error);
@@ -127,18 +122,18 @@ export class Dhis2IntegradorController {
       const result = await this.duplicateHandlerService.processConfirmation(
         confirmation,
         null, // En implementación real, esto debería ser el DTO completo
-        'MANUAL_CONFIRMATION'
+        'MANUAL_CONFIRMATION',
       );
       return {
         status: 'OK',
-        result
+        result,
       };
     } catch (error) {
       this.logger.error(error);
       return {
         status: 'ERROR',
         msg: 'Error procesando confirmación de duplicado',
-        error: error.message
+        error: error.message,
       };
     }
   }

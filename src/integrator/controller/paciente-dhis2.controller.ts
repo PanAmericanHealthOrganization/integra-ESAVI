@@ -1,29 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreatePacienteDhis2Dto } from '../dto/create-paciente-dhis2.dto';
 import { UpdatePacienteDto } from '../dto/update-paciente.dto';
 import { PacienteDhis2Service } from '../service/paciente-dhis2.service';
-import { CreatePacienteDhis2Dto } from '../dto/create-paciente-dhis2.dto';
 
 @ApiTags('Paciente')
-@Controller('integrator/paciente/dhis2')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/paciente/dhis2', version: '1' })
 export class PacienteDhis2Controller {
   constructor(private pacienteDhis2Service: PacienteDhis2Service) {}
 
@@ -34,7 +16,7 @@ export class PacienteDhis2Controller {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.pacienteDhis2Service.findAll();
   }
 
@@ -73,10 +55,7 @@ export class PacienteDhis2Controller {
     status: 400,
     description: 'The record has not been successfully updated.',
   })
-  update(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdatePacienteDto,
-  ) {
+  update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdatePacienteDto) {
     return this.pacienteDhis2Service.update(uuid, body);
   }
 }

@@ -6,10 +6,7 @@ import { IActiveIngredient } from './dtos/drug.dto';
  *
  */
 @Entity({ schema: 'who_drug', name: 'active_ingredients' })
-export class ActiveIngredient
-  extends CustomBaseEntity
-  implements IActiveIngredient
-{
+export class ActiveIngredient extends CustomBaseEntity implements IActiveIngredient {
   constructor() {
     super();
   }

@@ -7,19 +7,13 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
-  Req,
-  UseFilters,
 } from '@nestjs/common';
 import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { NotificacionService } from '../service/notificacion.service';
 import { GetListParams } from 'src/utils/interfaces/pagination';
+import { NotificacionService } from '../service/notificacion.service';
 
 @ApiTags('Notificacion')
-@Controller('integrator/notificacion')
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/notificacion', version: '1' })
 export class NotificacionController {
   constructor(private notificacionService: NotificacionService) {}
 
@@ -30,7 +24,7 @@ export class NotificacionController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.notificacionService.findAll();
   }
 
@@ -52,17 +46,12 @@ export class NotificacionController {
     description: 'The record has been successfully retrieved.',
   })
   @ApiResponse({ status: 404, description: 'The record has not been found.' })
-  findOne(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Query('r') relation?: string,
-  ) {
+  findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Query('r') relation?: string) {
     if (relation) {
       const allowedRelations: string[] = ['paciente', 'r2', 'r3']; // Define the allowed relations here
       const requestedRelations: string[] = relation.split(',');
 
-      const invalidRelations = requestedRelations.filter(
-        (rel) => !allowedRelations.includes(rel),
-      );
+      const invalidRelations = requestedRelations.filter((rel) => !allowedRelations.includes(rel));
       if (invalidRelations.length > 0) {
         throw new BadRequestException(
           `Invalid relation(s) provided: ${invalidRelations.join(', ')}`,
@@ -73,9 +62,7 @@ export class NotificacionController {
   }
 
   @Get(':uuid/medicina')
-  findMedicinaByNotificacionUUID(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-  ) {
+  findMedicinaByNotificacionUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.notificacionService.findMedicinaByNotificacionUUID(uuid);
   }
 
@@ -91,30 +78,18 @@ export class NotificacionController {
   }
 
   @Get(':uuid/antecedente-embarazo')
-  searchAntecedenteEmbarazoByUUID(
-    @Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string,
-  ) {
-    return this.notificacionService.findAntecedenteEmbarazoByNotificacionUUID(
-      uuidNotificacion,
-    );
+  searchAntecedenteEmbarazoByUUID(@Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string) {
+    return this.notificacionService.findAntecedenteEmbarazoByNotificacionUUID(uuidNotificacion);
   }
 
   @Get(':uuid/antecedente-evento')
-  searchAntecedenteEventoByUUID(
-    @Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string,
-  ) {
-    return this.notificacionService.findAntecedenteEventoByNotificacionUUID(
-      uuidNotificacion,
-    );
+  searchAntecedenteEventoByUUID(@Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string) {
+    return this.notificacionService.findAntecedenteEventoByNotificacionUUID(uuidNotificacion);
   }
 
   @Get(':uuid/antecedente-medico')
-  searchAntecedenteMedicoByUUID(
-    @Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string,
-  ) {
-    return this.notificacionService.findAntecedenteMedicoByNotificacionUUID(
-      uuidNotificacion,
-    );
+  searchAntecedenteMedicoByUUID(@Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string) {
+    return this.notificacionService.findAntecedenteMedicoByNotificacionUUID(uuidNotificacion);
   }
 
   @Get(':uuid/antecedente-preexistencia')

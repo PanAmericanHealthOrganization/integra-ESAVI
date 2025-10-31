@@ -20,10 +20,7 @@ describe('VigiflowIntegradorController', () => {
       const fechaFin = '20241231';
 
       const convertedFechaInicio = new Date(
-        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(
-          4,
-          6,
-        )}-${fechaInicio.slice(6)}`,
+        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(4, 6)}-${fechaInicio.slice(6)}`,
       );
       const convertedFechaFin = new Date(
         `${fechaFin.slice(0, 4)}-${fechaFin.slice(4, 6)}-${fechaFin.slice(6)}`,
@@ -38,10 +35,7 @@ describe('VigiflowIntegradorController', () => {
       const fechaFin = '20240301';
 
       const convertedFechaInicio = new Date(
-        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(
-          4,
-          6,
-        )}-${fechaInicio.slice(6)}`,
+        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(4, 6)}-${fechaInicio.slice(6)}`,
       );
       const convertedFechaFin = new Date(
         `${fechaFin.slice(0, 4)}-${fechaFin.slice(4, 6)}-${fechaFin.slice(6)}`,
@@ -56,10 +50,7 @@ describe('VigiflowIntegradorController', () => {
       const fechaFin = '20241231';
 
       const convertedFechaInicio = new Date(
-        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(
-          4,
-          6,
-        )}-${fechaInicio.slice(6)}`,
+        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(4, 6)}-${fechaInicio.slice(6)}`,
       );
       const convertedFechaFin = new Date(
         `${fechaFin.slice(0, 4)}-${fechaFin.slice(4, 6)}-${fechaFin.slice(6)}`,
@@ -74,10 +65,7 @@ describe('VigiflowIntegradorController', () => {
       const fechaFin = '20241231';
 
       const convertedFechaInicio = new Date(
-        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(
-          4,
-          6,
-        )}-${fechaInicio.slice(6)}`,
+        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(4, 6)}-${fechaInicio.slice(6)}`,
       );
       const convertedFechaFin = new Date(
         `${fechaFin.slice(0, 4)}-${fechaFin.slice(4, 6)}-${fechaFin.slice(6)}`,
@@ -92,10 +80,7 @@ describe('VigiflowIntegradorController', () => {
       const fechaFin = '20240229'; // Leap year February
 
       const convertedFechaInicio = new Date(
-        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(
-          4,
-          6,
-        )}-${fechaInicio.slice(6)}`,
+        `${fechaInicio.slice(0, 4)}-${fechaInicio.slice(4, 6)}-${fechaInicio.slice(6)}`,
       );
       const convertedFechaFin = new Date(
         `${fechaFin.slice(0, 4)}-${fechaFin.slice(4, 6)}-${fechaFin.slice(6)}`,
@@ -152,9 +137,7 @@ describe('VigiflowIntegradorController', () => {
       };
 
       expect(errorResponse.status).toBe('ERROR');
-      expect(errorResponse.msg).toBe(
-        'Error al importar datos del sistema Vigiflow',
-      );
+      expect(errorResponse.msg).toBe('Error al importar datos del sistema Vigiflow');
       expect(Object.keys(errorResponse)).toHaveLength(2);
     });
   });

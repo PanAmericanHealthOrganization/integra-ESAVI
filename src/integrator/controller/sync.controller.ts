@@ -8,7 +8,7 @@ import { SyncService } from '../service';
  *
  */
 @ApiTags('Procesos de sincronización Sync')
-@Controller({ path: 'integrator/syncs' })
+@Controller({ path: 'integrator/syncs', version: '1' })
 export class SyncController implements IController<CreateSyncDto, SyncDto, UpdateSyncDto> {
   constructor(private readonly syncService: SyncService) {}
   private readonly logger = new Logger(SyncController.name);

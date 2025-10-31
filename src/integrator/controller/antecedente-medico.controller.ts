@@ -1,29 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseFilters } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AntecedenteMedicoService } from '../service/antecedente-medico.service';
-import { CreateAntecedenteMedicoDto } from '../dto/create-antecedente-medico.dto';
 import { UpdateAntecedenteMedicoDto } from '../dto/update-antecedente-medico.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AntecedenteMedicoService } from '../service/antecedente-medico.service';
 
 @ApiTags('Antecedente Medico')
-@Controller('integrator/antecedente-medico')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
+@Controller({ path: 'integrator/antecedente-medico', version: '1' })
 @UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
 export class AntecedenteMedicoController {
   constructor(private antecedenteMedicoService: AntecedenteMedicoService) {}
 
@@ -34,7 +17,7 @@ export class AntecedenteMedicoController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.antecedenteMedicoService.findAll();
   }
 

@@ -1,31 +1,12 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AuthGuard } from '@nestjs/passport';
-import { DatoEsaviService } from '../service/dato-esavi.service';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdateDatoEsaviDto } from '../dto/update-dato-esavi.dto';
+import { DatoEsaviService } from '../service/dato-esavi.service';
 
 @ApiTags('Esavi')
-@Controller('integrator/esavi/dato')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
-@ApiResponse({ status: 401, description: 'Unauthorized.' })
-@ApiResponse({ status: 403, description: 'Forbidden.' })
+@Controller({ path: 'integrator/esavi/dato', version: '1' })
 export class DatoEsaviController {
-  constructor(
-    private datoEsaviService: DatoEsaviService,
-  ) {}
+  constructor(private datoEsaviService: DatoEsaviService) {}
 
   /************CRUD PARA MICROSERVICIOS************/
   //BUSCAR TODOS LOS ITEMS
@@ -34,7 +15,7 @@ export class DatoEsaviController {
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.datoEsaviService.findAll();
   }
 
@@ -59,10 +40,7 @@ export class DatoEsaviController {
     status: 400,
     description: 'The record has not been successfully updated.',
   })
-  update(
-    @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdateDatoEsaviDto,
-  ) {
+  update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdateDatoEsaviDto) {
     return this.datoEsaviService.update(uuid, body);
   }
 }
