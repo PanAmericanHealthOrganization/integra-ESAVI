@@ -22,7 +22,7 @@ async function bootstrap() {
         type: 'apiKey',
         name: 'X-API-KEY',
         in: 'header',
-        description: 'Ingresa tu API key entregada por el personal de OPS/MSP',
+        description: 'Ingresa tu API key entregada por essl personal de OPS/MSP',
       },
       'X-API-KEY',
     )
@@ -31,7 +31,7 @@ async function bootstrap() {
   // Enable API versioning
   app.enableVersioning({
     type: VersioningType.URI,
-    prefix: 'V',
+    prefix: 'v',
   });
   const document = SwaggerModule.createDocument(app, config);
 
