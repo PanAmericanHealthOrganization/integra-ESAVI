@@ -1,6 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Dhis2ProcessingLogDto, LogType, ProcessingStatus, ProcessingSummaryDto } from '../dto/dhis2-processing-log.dto';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  Dhis2ProcessingLogDto,
+  LogType,
+  ProcessingStatus,
+  ProcessingSummaryDto,
+} from '../dto/dhis2-processing-log.dto';
 
 @Injectable()
 export class Dhis2ProcessingLogService {
@@ -23,7 +28,7 @@ export class Dhis2ProcessingLogService {
       usuario?: string;
       loteId?: string;
       error?: string;
-    }
+    },
   ): Dhis2ProcessingLogDto {
     const log: Dhis2ProcessingLogDto = {
       id: uuidv4(),
@@ -37,7 +42,7 @@ export class Dhis2ProcessingLogService {
       timestamp: new Date().toISOString(),
       usuario: metadata?.usuario || 'SYSTEM',
       loteId: metadata?.loteId,
-      error: metadata?.error
+      error: metadata?.error,
     };
 
     // Almacenar en memoria (en producción esto debería ir a una base de datos)
@@ -62,7 +67,7 @@ export class Dhis2ProcessingLogService {
     fechaFin: Date,
     codigoATC: string,
     totalRegistros: number,
-    usuario?: string
+    usuario?: string,
   ): Dhis2ProcessingLogDto {
     return this.createLog(
       LogType.IMPORT_START,
@@ -75,9 +80,9 @@ export class Dhis2ProcessingLogService {
           fechaInicio: fechaInicio.toISOString(),
           fechaFin: fechaFin.toISOString(),
           codigoATC,
-          totalRegistros
-        }
-      }
+          totalRegistros,
+        },
+      },
     );
   }
 
@@ -87,7 +92,7 @@ export class Dhis2ProcessingLogService {
   logImportEnd(
     loteId: string,
     summary: ProcessingSummaryDto,
-    usuario?: string
+    usuario?: string,
   ): Dhis2ProcessingLogDto {
     return this.createLog(
       LogType.IMPORT_END,
@@ -96,8 +101,8 @@ export class Dhis2ProcessingLogService {
       {
         loteId,
         usuario,
-        metadata: summary
-      }
+        metadata: summary,
+      },
     );
   }
 
@@ -111,20 +116,15 @@ export class Dhis2ProcessingLogService {
     status: ProcessingStatus,
     mensaje: string,
     detalles?: string,
-    error?: string
+    error?: string,
   ): Dhis2ProcessingLogDto {
-    return this.createLog(
-      LogType.RECORD_PROCESSING,
-      status,
-      mensaje,
-      {
-        loteId,
-        codigoDhis2Evento,
-        identificacionPaciente,
-        detalles,
-        error
-      }
-    );
+    return this.createLog(LogType.RECORD_PROCESSING, status, mensaje, {
+      loteId,
+      codigoDhis2Evento,
+      identificacionPaciente,
+      detalles,
+      error,
+    });
   }
 
   /**
@@ -136,7 +136,7 @@ export class Dhis2ProcessingLogService {
     identificacionPaciente: string,
     motivoDuplicado: string,
     datosExistentes?: any,
-    datosNuevos?: any
+    datosNuevos?: any,
   ): Dhis2ProcessingLogDto {
     return this.createLog(
       LogType.DUPLICATE_DETECTED,
@@ -149,9 +149,9 @@ export class Dhis2ProcessingLogService {
         detalles: motivoDuplicado,
         metadata: {
           datosExistentes,
-          datosNuevos
-        }
-      }
+          datosNuevos,
+        },
+      },
     );
   }
 
@@ -162,7 +162,7 @@ export class Dhis2ProcessingLogService {
     loteId: string,
     codigoDhis2Evento: string,
     accion: string,
-    resultado: string
+    resultado: string,
   ): Dhis2ProcessingLogDto {
     return this.createLog(
       LogType.DUPLICATE_RESOLVED,
@@ -171,8 +171,8 @@ export class Dhis2ProcessingLogService {
       {
         loteId,
         codigoDhis2Evento,
-        detalles: resultado
-      }
+        detalles: resultado,
+      },
     );
   }
 
@@ -184,19 +184,14 @@ export class Dhis2ProcessingLogService {
     mensaje: string,
     error: string,
     codigoDhis2Evento?: string,
-    identificacionPaciente?: string
+    identificacionPaciente?: string,
   ): Dhis2ProcessingLogDto {
-    return this.createLog(
-      LogType.ERROR_OCCURRED,
-      ProcessingStatus.ERROR,
-      mensaje,
-      {
-        loteId,
-        codigoDhis2Evento,
-        identificacionPaciente,
-        error
-      }
-    );
+    return this.createLog(LogType.ERROR_OCCURRED, ProcessingStatus.ERROR, mensaje, {
+      loteId,
+      codigoDhis2Evento,
+      identificacionPaciente,
+      error,
+    });
   }
 
   /**
@@ -211,10 +206,12 @@ export class Dhis2ProcessingLogService {
    */
   getAllLogs(): Dhis2ProcessingLogDto[] {
     const allLogs: Dhis2ProcessingLogDto[] = [];
-    this.processingLogs.forEach(logs => {
+    this.processingLogs.forEach((logs) => {
       allLogs.push(...logs);
     });
-    return allLogs.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    return allLogs.sort(
+      (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
   }
 
   /**
@@ -225,7 +222,7 @@ export class Dhis2ProcessingLogService {
     fechaInicio: Date,
     fechaFin: Date,
     codigoATC: string,
-    totalRegistros: number
+    totalRegistros: number,
   ): ProcessingSummaryDto {
     const summary: ProcessingSummaryDto = {
       loteId,
@@ -238,7 +235,7 @@ export class Dhis2ProcessingLogService {
       registrosActualizados: 0,
       registrosOmitidos: 0,
       registrosConError: 0,
-      estadisticas: {}
+      estadisticas: {},
     };
 
     this.processingSummaries.set(loteId, summary);
@@ -300,11 +297,8 @@ export class Dhis2ProcessingLogService {
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
     this.processingLogs.forEach((logs, loteId) => {
-      const filteredLogs = logs.filter(log => 
-        new Date(log.timestamp) > cutoffDate
-      );
+      const filteredLogs = logs.filter((log) => new Date(log.timestamp) > cutoffDate);
       this.processingLogs.set(loteId, filteredLogs);
     });
   }
 }
-

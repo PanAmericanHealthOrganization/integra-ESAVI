@@ -1,27 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { ApiResponse, ApiSecurity, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
-import { UpdateAntecedenteEmbarazoDto } from '../dto/update-antecedente-embarazo.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, Req } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateAntecedenteEmbarazoDto } from '../dto/create-antecedente-embarazo.dto';
+import { UpdateAntecedenteEmbarazoDto } from '../dto/update-antecedente-embarazo.dto';
+import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
 
 @ApiTags('Antecedente Embarazo')
 @Controller('integrator/antecedente-embarazo')
-@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
 @ApiResponse({ status: 401, description: 'Unauthorized.' })
 @ApiResponse({ status: 403, description: 'Forbidden.' })
 export class AntecedenteEmbarazoController {

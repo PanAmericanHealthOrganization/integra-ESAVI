@@ -1,21 +1,21 @@
-import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
+import { Module } from '@nestjs/common';
 import { IntegratorModule } from '../integrator/integrator.module';
-import { Dhis2IntegratorService } from './services/dhis2-integrator.service';
 import { Dhis2IntegradorController } from './controllers/dhis2-integrador.controller';
+import { Dhis2AnalyticsService } from './services/dhis2-analytics.service';
 import { Dhis2DataElementService } from './services/dhis2-data-element.service';
+import { Dhis2DuplicateHandlerService } from './services/dhis2-duplicate-handler.service';
+import { Dhis2EventsService } from './services/dhis2-events.service';
+import { Dhis2IntegratorService } from './services/dhis2-integrator.service';
 import { Dhis2OptionsService } from './services/dhis2-options.service';
+import { Dhis2ProcessingLogService } from './services/dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './services/dhis2-program-stage.service';
 import { Dhis2ProgramService } from './services/dhis2-program.service';
-import { Dhis2EventsService } from './services/dhis2-events.service';
-import { Dhis2AnalyticsService } from './services/dhis2-analytics.service';
-import { Dhis2ProcessingLogService } from './services/dhis2-processing-log.service';
-import { Dhis2DuplicateHandlerService } from './services/dhis2-duplicate-handler.service';
 
 @Module({
   imports: [
     HttpModule.register({
-      timeout: 15000,
+      timeout: 150000000,
       maxRedirects: 5,
     }),
     IntegratorModule,
@@ -33,4 +33,4 @@ import { Dhis2DuplicateHandlerService } from './services/dhis2-duplicate-handler
   ],
   controllers: [Dhis2IntegradorController],
 })
-export class Dhis2IntegratorModule { }
+export class Dhis2IntegratorModule {}

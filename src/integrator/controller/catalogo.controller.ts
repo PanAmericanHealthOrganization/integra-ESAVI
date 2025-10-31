@@ -1,40 +1,22 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Put,
-  Req,
-  UseFilters,
-  UseGuards,
-} from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
 import { UpdateCatalogoDto } from '../dto/update-catalogo.dto';
 import { CatalogoService } from '../service/catalogo.service';
 
 @ApiTags(' Catálogos ')
-@Controller('integrator/catalogo')
-//@ApiSecurity('X-API-KEY', ['X-API-KEY'])
-@UseGuards(AuthGuard('api-key'))
-@UseFilters(new HttpExceptionFilter())
+@Controller({ path: 'catalogo', version: '1' })
 @ApiResponse({ status: 401, description: 'Unauthorized.' })
 @ApiResponse({ status: 403, description: 'Forbidden.' })
 export class ParametroController {
   constructor(private parametroService: CatalogoService) {}
 
-  /************CRUD PARA MICROSERVICIOS************/
-  //BUSCAR TODOS LOS ITEMS
   @Get('/findAll')
   @ApiResponse({
     status: 200,
     description: 'The records have been successfully retrieved.',
   })
-  findAll(@Req() req) {
+  findAll() {
     return this.parametroService.findAll();
   }
 
