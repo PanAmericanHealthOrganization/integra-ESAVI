@@ -28,15 +28,10 @@ export class NotificacionService {
     private readonly antecedentePreexistenciaService: AntecedentePreexistenciaService,
   ) {}
 
-  async create(
-    createDto: CreateNotificacionDto,
-    paciente: Paciente,
-  ): Promise<Notificacion> {
+  async create(createDto: CreateNotificacionDto, paciente: Paciente): Promise<Notificacion> {
     const notificacion = plainToClass(Notificacion, createDto);
     notificacion.paciente = paciente;
-    this.logger.log(
-      `Notification has been created: ${JSON.stringify(createDto)}`,
-    );
+    this.logger.log(`Notification has been created: ${JSON.stringify(createDto)}`);
     return this.notificacionRepository.save(notificacion);
   }
 
@@ -73,20 +68,12 @@ export class NotificacionService {
     return this.medicamentoService.findMedicinaByNotificacionUUID(uuid);
   }
 
-  async findMedicinaByUUIDBelongingToNotificacion(
-    uuidNotificacion: string,
-    uuidMedicina: string,
-  ) {
-    return this.medicamentoService.findOneBelongingToNotificacion(
-      uuidNotificacion,
-      uuidMedicina,
-    );
+  async findMedicinaByUUIDBelongingToNotificacion(uuidNotificacion: string, uuidMedicina: string) {
+    return this.medicamentoService.findOneBelongingToNotificacion(uuidNotificacion, uuidMedicina);
   }
 
   async findAntecedenteEmbarazoByNotificacionUUID(uuidNotificacion: string) {
-    return this.antecedenteMedicoService.findAntecedenteMedicoByNotificacionUUID(
-      uuidNotificacion,
-    );
+    return this.antecedenteMedicoService.findAntecedenteMedicoByNotificacionUUID(uuidNotificacion);
   }
 
   async findAntecedenteMedicoByNotificacionUUID(uuidNotificacion: string) {
@@ -96,14 +83,10 @@ export class NotificacionService {
   }
 
   async findAntecedenteEventoByNotificacionUUID(uuidNotificacion: string) {
-    return this.antecedenteEventoService.findAntecedenteEventoByNotificacionUUID(
-      uuidNotificacion,
-    );
+    return this.antecedenteEventoService.findAntecedenteEventoByNotificacionUUID(uuidNotificacion);
   }
 
-  async findAntecedentePreexistenciaByNotificacionUUID(
-    uuidNotificacion: string,
-  ) {
+  async findAntecedentePreexistenciaByNotificacionUUID(uuidNotificacion: string) {
     return this.antecedentePreexistenciaService.findAntecedentePreexistenciaByNotificacionUUID(
       uuidNotificacion,
     );
@@ -115,22 +98,15 @@ export class NotificacionService {
    * @returns
    */
   async findAllPaginated(params: GetListParams) {
-    const page = params.pagination.page
-      ? parseInt(params.pagination.page as any, 10)
-      : 1;
-    const limit = params.pagination.perPage
-      ? parseInt(params.pagination.perPage as any, 10)
-      : 10;
+    const page = params.pagination.page ? parseInt(params.pagination.page as any, 10) : 1;
+    const limit = params.pagination.perPage ? parseInt(params.pagination.perPage as any, 10) : 10;
     const skip = (page - 1) * limit;
 
-    const query =
-      this.notificacionRepository.createQueryBuilder('notificacion');
+    const query = this.notificacionRepository.createQueryBuilder('notificacion');
 
     // Selección de campos específicos si se solicita
     if (params.meta && Array.isArray(params.meta) && params.meta.length > 0) {
-      const selectFields = params.meta?.fields?.map(
-        (field) => `notificacion.${field}`,
-      );
+      const selectFields = params.meta?.fields?.map((field) => `notificacion.${field}`);
       query.select(selectFields);
     }
 

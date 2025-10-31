@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
-import { CreateCompleteDto } from '../dto/create-complete.dto';
 import { NotificacionDhis2 } from '../entity/notificacion-dhis2.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { PacienteDhis2 } from '../entity/paciente-dhis2.entity';
@@ -107,18 +106,12 @@ export class NotificacionDhis2Service {
 
     try {
       // Verificamos si ya existe una notificación con el mismo códigoDhis2Evento
-      const notificacionExistente = await this.findByCodeDhis2(
-        createDto.codigoDhis2Evento,
-      );
+      const notificacionExistente = await this.findByCodeDhis2(createDto.codigoDhis2Evento);
       console.log('ExistePacienteNotificacion::', notificacionExistente);
 
       if (notificacionExistente) {
         try {
-          return await this.update(
-            notificacionExistente,
-            createDto,
-            pacienteUUID,
-          );
+          return await this.update(notificacionExistente, createDto, pacienteUUID);
         } catch (error) {
           console.log('Error en actualización');
         }
@@ -131,23 +124,19 @@ export class NotificacionDhis2Service {
         // Asignamos las propiedades de la notificación
         if (createDto.unidadEdadPaciente) {
           try {
-            notificacion.unidadEdad =
-              await this.catalogoService.findByDescriptionToDhis2(
-                createDto.unidadEdadPaciente,
-              );
-          } catch (error) {
-            console.error(
-              `Error al buscar unidadEdadPaciente: ${error.message}`,
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(
+              createDto.unidadEdadPaciente,
             );
+          } catch (error) {
+            console.error(`Error al buscar unidadEdadPaciente: ${error.message}`);
           }
         }
 
         if (createDto.residenciaPaciente.provincia) {
           try {
-            notificacion.provinciaResidencia =
-              await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residenciaPaciente.provincia,
-              );
+            notificacion.provinciaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+              createDto.residenciaPaciente.provincia,
+            );
           } catch (error) {
             console.error(`Error al buscar provincia: ${error.message}`);
           }
@@ -155,10 +144,9 @@ export class NotificacionDhis2Service {
 
         if (createDto.residenciaPaciente.canton) {
           try {
-            notificacion.cantonResidencia =
-              await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residenciaPaciente.canton,
-              );
+            notificacion.cantonResidencia = await this.catalogoService.findByDescriptionToDhis2(
+              createDto.residenciaPaciente.canton,
+            );
           } catch (error) {
             console.error(`Error al buscar canton: ${error.message}`);
           }
@@ -166,10 +154,9 @@ export class NotificacionDhis2Service {
 
         if (createDto.residenciaPaciente.parroquia) {
           try {
-            notificacion.parroquiaResidencia =
-              await this.catalogoService.findByDescriptionToDhis2(
-                createDto.residenciaPaciente.parroquia,
-              );
+            notificacion.parroquiaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+              createDto.residenciaPaciente.parroquia,
+            );
           } catch (error) {
             console.error(`Error al buscar parroquia: ${error.message}`);
           }
@@ -187,13 +174,11 @@ export class NotificacionDhis2Service {
 
         if (createDto.edad && createDto.unidadEdadPaciente) {
           try {
-            let edadFinal = this.calcularGrupoEtario(
-              createDto.edad,
-              createDto.unidadEdadPaciente,
-            );
+            let edadFinal = this.calcularGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente =
-              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
+              edadFinal,
+            );
             notificacion.grupoEtario = grupoEtarioPaciente;
             console.log('GrupoetarioExis::', grupoEtarioPaciente);
           } catch (error) {
@@ -213,8 +198,7 @@ export class NotificacionDhis2Service {
                 createDto.fechaNotificacion,
                 createDto.fechaNacimiento,
               );
-              const grupoEtarioPaciente =
-                await this.grupoEtarioService.findGrupoEtarioByAge(edad);
+              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad);
               notificacion.grupoEtario = grupoEtarioPaciente;
             }
           } catch (error) {
@@ -224,14 +208,11 @@ export class NotificacionDhis2Service {
 
         if (createDto.profesionNotificadorParam) {
           try {
-            notificacion.profesionNotificador =
-              await this.catalogoService.findByDescriptionToDhis2(
-                createDto.profesionNotificadorParam,
-              );
-          } catch (error) {
-            console.error(
-              `Error al buscar profesionNotificadorParam: ${error.message}`,
+            notificacion.profesionNotificador = await this.catalogoService.findByDescriptionToDhis2(
+              createDto.profesionNotificadorParam,
             );
+          } catch (error) {
+            console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
           }
         }
 
@@ -239,19 +220,14 @@ export class NotificacionDhis2Service {
         notificacion.paciente = pacienteUUID;
         notificacion.createdBy = 'system';
 
-        this.logger.log(
-          `NotificaciónDHIS2 ha sido creada: ${JSON.stringify(createDto)}`,
-        );
+        this.logger.log(`NotificaciónDHIS2 ha sido creada: ${JSON.stringify(createDto)}`);
 
         // Guardamos la nueva notificación
         return this.notificacionRepository.save(notificacion);
       }
     } catch (error) {
       // Si ocurre un error, lo registramos
-      console.error(
-        'Error en la creación o actualización de la notificación:',
-        error,
-      );
+      console.error('Error en la creación o actualización de la notificación:', error);
       throw new Error('Hubo un problema al crear o actualizar la notificación');
     }
   }
@@ -292,7 +268,7 @@ export class NotificacionDhis2Service {
   async findByIdentificacionAndDateRange(
     identificacion: string,
     fechaInicio: Date,
-    fechaFin: Date
+    fechaFin: Date,
   ) {
     return this.notificacionRepository
       .createQueryBuilder('notificacion')
@@ -327,7 +303,7 @@ export class NotificacionDhis2Service {
    */
   async updateByCodigoDhis2Evento(codigoDhis2Evento: string, updateData: any) {
     const notificacionExistente = await this.findByCodeDhis2(codigoDhis2Evento);
-    
+
     if (!notificacionExistente) {
       throw new Error(`Notificación con código DHIS2 ${codigoDhis2Evento} no encontrada`);
     }
@@ -351,10 +327,9 @@ export class NotificacionDhis2Service {
     // Actualizamos los campos relevantes
     if (createDto.unidadEdadPaciente) {
       try {
-        notificacionExistente.unidadEdad =
-          await this.catalogoService.findByDescriptionToDhis2(
-            createDto.unidadEdadPaciente,
-          );
+        notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(
+          createDto.unidadEdadPaciente,
+        );
       } catch (error) {
         console.error(`Error al buscar unidadEdadPaciente: ${error.message}`);
       }
@@ -374,9 +349,7 @@ export class NotificacionDhis2Service {
     if (createDto.residenciaPaciente.canton) {
       try {
         notificacionExistente.cantonResidencia =
-          await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residenciaPaciente.canton,
-          );
+          await this.catalogoService.findByDescriptionToDhis2(createDto.residenciaPaciente.canton);
       } catch (error) {
         console.error(`Error al buscar canton: ${error.message}`);
       }
@@ -404,13 +377,9 @@ export class NotificacionDhis2Service {
     // }
     if (createDto.edad && createDto.unidadEdadPaciente) {
       try {
-        let edadFinal = this.calcularGrupoEtario(
-          createDto.edad,
-          createDto.unidadEdadPaciente,
-        );
+        let edadFinal = this.calcularGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
         // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-        const grupoEtarioPaciente =
-          await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+        const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
         notificacionExistente.grupoEtario = grupoEtarioPaciente;
       } catch (error) {
         console.error(
@@ -429,8 +398,7 @@ export class NotificacionDhis2Service {
             createDto.fechaNotificacion,
             createDto.fechaNacimiento,
           );
-          const grupoEtarioPaciente =
-            await this.grupoEtarioService.findGrupoEtarioByAge(edad);
+          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad);
           notificacionExistente.grupoEtario = grupoEtarioPaciente;
         }
       } catch (error) {
@@ -441,13 +409,9 @@ export class NotificacionDhis2Service {
     if (createDto.profesionNotificadorParam) {
       try {
         notificacionExistente.profesionNotificador =
-          await this.catalogoService.findByDescriptionToDhis2(
-            createDto.profesionNotificadorParam,
-          );
+          await this.catalogoService.findByDescriptionToDhis2(createDto.profesionNotificadorParam);
       } catch (error) {
-        console.error(
-          `Error al buscar profesionNotificadorParam: ${error.message}`,
-        );
+        console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
       }
     }
 
@@ -455,8 +419,7 @@ export class NotificacionDhis2Service {
     notificacionExistente.paciente = pacienteUUID;
     notificacionExistente.createdBy = 'system';
     notificacionExistente.antecedenteVacunal = createDto.antecedenteVacunal;
-    notificacionExistente.antecedenteEventoPrevio =
-      createDto.antecedenteEventoPrevio;
+    notificacionExistente.antecedenteEventoPrevio = createDto.antecedenteEventoPrevio;
     notificacionExistente.fechaAtencion = createDto.fechaAtencion;
     notificacionExistente.fechaNotificacion = createDto.fechaNotificacion;
     notificacionExistente.fechaNacimiento = createDto.fechaNacimiento;
@@ -467,9 +430,7 @@ export class NotificacionDhis2Service {
     notificacionExistente.beforeUpdate();
 
     // Guardamos la notificación actualizada
-    this.logger.log(
-      `NotificaciónDHIS2 ha sido actualizada: ${JSON.stringify(createDto)}`,
-    );
+    this.logger.log(`NotificaciónDHIS2 ha sido actualizada: ${JSON.stringify(createDto)}`);
     // await this.notificacionRepository.update(notificacionExistente.id, notificacionExistente);
     // return notificacionExistente
     return this.notificacionRepository.save(notificacionExistente);

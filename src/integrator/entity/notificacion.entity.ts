@@ -40,8 +40,7 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'OTRAPARROQUIARESIDENCIA',
     nullable: true,
-    comment:
-      'Otra parroquia de residencia del paciente no contemplada en catálogo',
+    comment: 'Otra parroquia de residencia del paciente no contemplada en catálogo',
   })
   otraParroquiaResidencia: string;
   ////////////////////////////////////////////////////////////////////

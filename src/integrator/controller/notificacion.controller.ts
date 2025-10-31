@@ -108,15 +108,6 @@ export class NotificacionController {
    */
   @Post('findAllPaginated')
   async findAllPaginated(@Body() body: GetListParams) {
-    // Los parámetros de paginación, filtros, campos y ordenamiento vienen en el body
-    // Ejemplo de body esperado:
-    // {
-    //   "page": 1,
-    //   "rowsPerPage": 10,
-    //   "filters": { "estado": "ACTIVO" },
-    //   "fields": ["id", "fecha", "estado"],
-    //   "sorterFields": [{ "field": "fecha", "order": "DESC" }]
-    // }
     return await this.notificacionService.findAllPaginated(body);
   }
 }
