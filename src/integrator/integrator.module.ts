@@ -46,6 +46,7 @@ import {
   Vacunometro,
 } from './entity';
 import { Establecimiento } from './entity/establecimiento.entity';
+import { Investigacion } from './entity/investigacion.entity';
 import { IntegradorService } from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
@@ -75,6 +76,7 @@ import {
 import { EstablecimientosService } from './service/establecimientos.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
+//import { InvestigacionService } from './entity/investigacion.service';
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
   imports: [
@@ -102,6 +104,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
           EmbarazoEsavi,
           GravedadEsavi,
           GrupoEtario,
+          Investigacion,
           Medicamento,
           Notificacion,
           NotificacionVigiflow,
@@ -138,6 +141,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         EmbarazoEsavi,
         GravedadEsavi,
         GrupoEtario,
+        Investigacion,
         Medicamento,
         Notificacion,
         NotificacionVigiflow,
