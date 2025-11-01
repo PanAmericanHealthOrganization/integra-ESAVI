@@ -2,6 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
+import * as fs from 'fs/promises';
 import * as moment from 'moment/moment';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
@@ -14,7 +15,7 @@ import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
 import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
-import { utils, WorkBook } from 'xlsx';
+import { read, utils, WorkBook } from 'xlsx';
 import { CreateCompleteDto } from '../../integrator/dto/create-complete.dto';
 import { CreateDatoEsaviDto } from '../../integrator/dto/create-dato-esavi.dto';
 import { CreateDatoVacunaDto } from '../../integrator/dto/create-dato-vacuna.dto';
@@ -32,7 +33,6 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
-import { UpdateDatoEsaviDto } from 'src/integrator/dto/update-dato-esavi.dto';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -80,7 +80,7 @@ export class VigiflowIntegradorService {
   // 0 23 L * * -- Ejecución fin de mes
   // 0 23 1 * * -- Ejecucion inicio de mes
   @Cron('0 23 1 * *')
-  async handleCron() {
+  private async handleCron() {
     const now = new Date();
 
     // Procesar mientras fechaInicio sea menor que la fecha actual
@@ -92,15 +92,11 @@ export class VigiflowIntegradorService {
 
       // Avanzar fechaInicio al primer día del siguiente mes
       this.logger.log(
-        `Procesado desde ${moment
-          .utc(this.fechaInicio)
-          .toISOString()} hasta ${moment.utc(fechaFin).toISOString()}`,
+        `Procesado desde ${moment.utc(this.fechaInicio).toISOString()} hasta ${moment
+          .utc(fechaFin)
+          .toISOString()}`,
       );
-      this.fechaInicio = moment
-        .utc(this.fechaInicio)
-        .add(1, 'month')
-        .startOf('month')
-        .toDate();
+      this.fechaInicio = moment.utc(this.fechaInicio).add(1, 'month').startOf('month').toDate();
     }
 
     // Si hemos alcanzado la fecha actual, reiniciar fechaInicio
@@ -154,7 +150,33 @@ export class VigiflowIntegradorService {
     console.log('Fin Proceso..................');
   }
 
-  //Extracción de los datos de la hoja [0], del libro 
+  public async createInBulkFromFile() {
+    // Leer los archivos desde files_meddra
+    const reportOne = read(
+      await fs.readFile(
+        './upload_files/files_meddra/borrar.fuente-VigiFlow_AEFILinelisting_20082025_092447.xlsx',
+      ),
+    );
+    const reportTwo = read(
+      await fs.readFile('./upload_files/files_meddra/borrar.VigiFlow_Excel_22082025_111315.xlsx'),
+    );
+
+    console.log('extractedFromExcelToPersist..................');
+    await this.extractedFromExcelToPersist(reportOne);
+    await this.sleep(8000);
+    console.log('extractedFromJsonReportToUpdate..................');
+    await this.extractedFromJsonReportToUpdate(reportTwo);
+    await this.sleep(8000);
+    console.log('extractedFromJsonReportToCreateMedicamento..................');
+    await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
+    await this.sleep(8000);
+    console.log('extractedFromJsonReportToCreateReaccion..................');
+    await this.extractedFromJsonReportToCreateReaccion(reportTwo);
+    await this.sleep(3000);
+    console.log('Fin Proceso..................');
+  }
+
+  //Extracción de los datos de la hoja [0], del libro
   //de Excel 'VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx'.
   //AEFI: Adverse Events Following Immunization (Eventos Adversos Después de la Vacunación).
   private async extractedFromExcelToPersist(workBook: WorkBook) {
@@ -178,9 +200,7 @@ export class VigiflowIntegradorService {
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
-      const fecha = this.formatoFecha(
-        reg['G'] ? reg['G'].toString() : reg['G'],
-      );
+      const fecha = this.formatoFecha(reg['G'] ? reg['G'].toString() : reg['G']);
       if (fecha) {
         notificacion.fechaNacimiento = fecha;
       }
@@ -188,15 +208,11 @@ export class VigiflowIntegradorService {
       if (edad > 0) {
         notificacion.edad = edad;
       }
-      const fechaNotificacion = this.formatoFecha(
-        reg['AD'] ? reg['AD'].toString() : reg['AD'],
-      );
+      const fechaNotificacion = this.formatoFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
         notificacion.fechaNotificacion = fechaNotificacion;
       }
-      const fechaReporte = this.formatoFecha(
-        reg['AE'] ? reg['AE'].toString() : reg['AE'],
-      );
+      const fechaReporte = this.formatoFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
       if (fechaReporte) {
         notificacion.fechaReporteNacional = fechaReporte;
       }
@@ -207,13 +223,11 @@ export class VigiflowIntegradorService {
       notificacion.nombreNotificador = reg['AB'];
       // Ubicacion residencia Paciente
       const ubicacionResidenciaPaciente = new UbicacionDto();
-      ubicacionResidenciaPaciente.provincia =
-        reg['D'] && reg['D'].toUpperCase();
+      ubicacionResidenciaPaciente.provincia = reg['D'] && reg['D'].toUpperCase();
       notificacion.residenciaPaciente = ubicacionResidenciaPaciente;
       // Unidad residencia Notificador
       const ubicacionResidenciaNotificador = new UbicacionDto();
-      ubicacionResidenciaNotificador.provincia =
-        reg['AC'] && reg['AC'].toUpperCase();
+      ubicacionResidenciaNotificador.provincia = reg['AC'] && reg['AC'].toUpperCase();
       notificacion.residenciaNotificador = ubicacionResidenciaNotificador;
 
       // Create AntecedenteEnfermedadesPrevias
@@ -233,14 +247,10 @@ export class VigiflowIntegradorService {
         eventosImportantes && eventosImportantes.toLowerCase(),
       );
       grave.muerte = cadenaNormalizada && cadenaNormalizada.includes('muerte');
-      grave.riesgoVida =
-        cadenaNormalizada && cadenaNormalizada.includes('amenaza');
-      grave.discapacidad =
-        cadenaNormalizada && cadenaNormalizada.includes('discapacidad');
-      grave.hospitalizacion =
-        cadenaNormalizada && cadenaNormalizada.includes('hospitalizacion');
-      grave.anomaliaCongenita =
-        cadenaNormalizada && cadenaNormalizada.includes('anomalia');
+      grave.riesgoVida = cadenaNormalizada && cadenaNormalizada.includes('amenaza');
+      grave.discapacidad = cadenaNormalizada && cadenaNormalizada.includes('discapacidad');
+      grave.hospitalizacion = cadenaNormalizada && cadenaNormalizada.includes('hospitalizacion');
+      grave.anomaliaCongenita = cadenaNormalizada && cadenaNormalizada.includes('anomalia');
 
       // Create Desenlace Esavi
       const desenlaceEsaviDto = new CreateDesenlaceEsaviDto();
@@ -251,11 +261,8 @@ export class VigiflowIntegradorService {
           : autopsia && this.eliminarTildes(autopsia).includes('no')
           ? 2
           : 3;
-      desenlaceEsaviDto.comentarios =
-        reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
-      const fechaInvestigacion = this.formatoFecha(
-        reg['AM'] ? reg['AM'].toString() : reg['AM'],
-      );
+      desenlaceEsaviDto.comentarios = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
+      const fechaInvestigacion = this.formatoFecha(reg['AM'] ? reg['AM'].toString() : reg['AM']);
       if (fechaInvestigacion) {
         desenlaceEsaviDto.fechaInicioInvestigacion = fechaInvestigacion;
       }
@@ -306,17 +313,14 @@ export class VigiflowIntegradorService {
     });
 
     toUpdate.map(async (reg) => {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(
-        reg['G'],
-      );
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['G']);
 
       if (paciente && paciente.id) {
         console.log('ExistePaciente');
 
-        const notificacionList =
-          await this.notificacionVigiflowService.findByPacienteUUID(
-            paciente.id,
-          );
+        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(
+          paciente.id,
+        );
 
         const notificacion = notificacionList.at(0);
 
@@ -330,10 +334,11 @@ export class VigiflowIntegradorService {
           updateNotificacion.casoNarrativo = reg['AC'];
           updateNotificacion.comentario = reg['AD'];
           // updateNotificacion.profesionNotificadorParam = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);;
-          const profesionNotificador =
-            reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
-          updateNotificacion.profesionNotificadorParam =
-            this.encontrarCoincidencia(profesionNotificador, profesiones);
+          const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
+          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(
+            profesionNotificador,
+            profesiones,
+          );
           updateNotificacion.tipoReporte = reg['N'];
           updateNotificacion.organizacionEmisor = reg['D'];
           updateNotificacion.identificacionNotificador = reg['R'];
@@ -348,18 +353,12 @@ export class VigiflowIntegradorService {
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
 
-          await this.notificacionVigiflowService.update(
-            notificacion,
-            updateNotificacion,
-          );
+          await this.notificacionVigiflowService.update(notificacion, updateNotificacion);
 
           const antecedenteEmbarazo = new UpdateAntecedenteEmbarazoDto();
           antecedenteEmbarazo.edadGestacional = reg['V'] && Number(reg['V']);
           if (antecedenteEmbarazo.edadGestacional) {
-            await this.antecedenteEmbarazo.update(
-              notificacion.id,
-              antecedenteEmbarazo,
-            );
+            await this.antecedenteEmbarazo.update(notificacion.id, antecedenteEmbarazo);
           }
         }
       }
@@ -429,7 +428,6 @@ export class VigiflowIntegradorService {
   //   });
   // }
 
-
   //Extracción de los datos de la hoja [2] de nombre 'Medicamentos', del libro
   //de Excel 'VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx'.
   async extractedFromJsonReportToCreateMedicamento(workbook2: WorkBook) {
@@ -446,14 +444,11 @@ export class VigiflowIntegradorService {
 
     // Iterar con for...of para esperar las respuestas
     for (const reg of toUpdate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(
-        reg['B'],
-      );
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['B']);
       if (paciente) {
-        const notificacionList =
-          await this.notificacionVigiflowService.findByPacienteUUID(
-            paciente.id,
-          );
+        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(
+          paciente.id,
+        );
         const notificacion = notificacionList.at(0);
         const medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
@@ -473,9 +468,7 @@ export class VigiflowIntegradorService {
         datoVacuna.inicioAdministracion = this.formatoFecha(
           reg['W'] ? reg['W'].toString() : reg['W'],
         );
-        datoVacuna.finAdministracion = this.formatoFecha(
-          reg['X'] ? reg['X'].toString() : reg['X'],
-        );
+        datoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
         datoVacuna.formaFarmaceutica = reg['Y'];
         datoVacuna.formaFarmaceuticaEDQM = reg['Z'];
         datoVacuna.viaAdministracion = reg['AA'];
@@ -487,24 +480,17 @@ export class VigiflowIntegradorService {
         datoVacuna.codigoAtc = reg['G'];
 
         const drugName = datoVacuna.nombreVacunaPatenteWhoDrug;
-        const whodrug: any[] = await this.drugService.getDrugsOnly(
-          drugName,
-          country,
-        );
+        const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
         if (whodrug.length > 0) {
           datoVacuna.drugCode = whodrug[0]?.drugCode;
-          const mah = await this.maholderService.getMaholderOfDrug(
-            whodrug[0]?.id,
-            country,
-          );
+          const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
           datoVacuna.mahholdersJson = mah.map((item) => ({
             name: item.name,
             medicinalProductID: item.medicinalProductID,
           }));
-          const ingredentActive =
-            await this.activeIngredentService.getActiveIngredentsOfDrug(
-              whodrug[0]?.id,
-            );
+          const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(
+            whodrug[0]?.id,
+          );
           datoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
             ingredent: item.ingredient,
           }));
@@ -530,15 +516,12 @@ export class VigiflowIntegradorService {
     });
     // toCreate.map(async (reg) => {
     for (const reg of toCreate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(
-        reg['A'],
-      );
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['A']);
 
       if (paciente) {
-        const notificacionList =
-          await this.notificacionVigiflowService.findByPacienteUUID(
-            paciente.id,
-          );
+        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(
+          paciente.id,
+        );
         const notificacion = notificacionList.at(0);
 
         const datoEsavi = new CreateDatoEsaviDto();
@@ -546,24 +529,18 @@ export class VigiflowIntegradorService {
         datoEsavi.nombre = reg['D'] && reg['D'].toUpperCase();
         //datoEsavi.nombreReportado = reg['C'] && reg['C'].toUpperCase();
         const nombreEsaviReportadoMayusculas = reg['C'] && reg['C'].toUpperCase();
-        datoEsavi.nombreReportado = reg['C'] && this.eliminarSaltoLinea(nombreEsaviReportadoMayusculas);
-        datoEsavi.fechaEsavi = this.formatoFecha(
-          reg['I'] ? reg['I'].toString() : reg['I'],
-        );
-        datoEsavi.fechaFinalizacion = this.formatoFecha(
-          reg['J'] ? reg['J'].toString() : reg['J'],
-        );
+        datoEsavi.nombreReportado =
+          reg['C'] && this.eliminarSaltoLinea(nombreEsaviReportadoMayusculas);
+        datoEsavi.fechaEsavi = this.formatoFecha(reg['I'] ? reg['I'].toString() : reg['I']);
+        datoEsavi.fechaFinalizacion = this.formatoFecha(reg['J'] ? reg['J'].toString() : reg['J']);
         datoEsavi.duracion = reg['K'];
         datoEsavi.resultado = reg['N'];
         //TODO: Crear la interfaz para meddra LLT - PT - SOC
-        const meddraLlt: any =
-          reg['D'] && (await this.meddraLltService.searchLLT(reg['D']));
-        const meddraPT: any =
-          reg['E'] && (await this.meddraPtService.searchPT(reg['E']));
+        const meddraLlt: any = reg['D'] && (await this.meddraLltService.searchLLT(reg['D']));
+        const meddraPT: any = reg['E'] && (await this.meddraPtService.searchPT(reg['E']));
         // const meddraHLT : any = reg['F'] && await this.meddra.searchPT(reg['F']);
         // const meddraHLGT : any = reg['G'] && await this.meddra.searchPT(reg['G']);
-        const meddraSOC: any =
-          reg['H'] && (await this.meddraSocService.searchSOC(reg['H']));
+        const meddraSOC: any = reg['H'] && (await this.meddraSocService.searchSOC(reg['H']));
 
         datoEsavi.nameLLT = reg['D'] && reg['D'].toUpperCase();
         datoEsavi.namePT = reg['E'] && reg['E'].toUpperCase();
@@ -571,23 +548,17 @@ export class VigiflowIntegradorService {
         datoEsavi.nameHLGT = reg['G'] && reg['G'].toUpperCase();
         datoEsavi.nameSOC = reg['H'] && reg['H'].toUpperCase();
 
-        datoEsavi.CTLLTMEDDRA_ID =
-          meddraLlt && meddraLlt?.length > 0 ? meddraLlt[0].id : null;
-        datoEsavi.CTPTMEDDRA_ID =
-          meddraPT && meddraPT?.length > 0 ? meddraPT[0].id : null;
+        datoEsavi.CTLLTMEDDRA_ID = meddraLlt && meddraLlt?.length > 0 ? meddraLlt[0].id : null;
+        datoEsavi.CTPTMEDDRA_ID = meddraPT && meddraPT?.length > 0 ? meddraPT[0].id : null;
         // datoEsavi.CTHLTMEDDRA_ID = meddraHLT && meddraHLT?.length > 0  ? meddraHLT[0].id : null ;
         // datoEsavi.CTHLGTMEDDRA_ID = meddraHLGT && meddraHLGT?.length > 0  ? meddraHLGT[0].id : null ;
-        datoEsavi.CTSOCMEDDRA_ID =
-          meddraSOC && meddraSOC?.length > 0 ? meddraSOC[0].id : null;
+        datoEsavi.CTSOCMEDDRA_ID = meddraSOC && meddraSOC?.length > 0 ? meddraSOC[0].id : null;
 
-        datoEsavi.codigoLLT =
-          meddraLlt && meddraLlt?.length > 0 ? meddraLlt[0].code : null;
-        datoEsavi.codigoPT =
-          meddraPT && meddraPT?.length > 0 ? meddraPT[0].code : null;
+        datoEsavi.codigoLLT = meddraLlt && meddraLlt?.length > 0 ? meddraLlt[0].code : null;
+        datoEsavi.codigoPT = meddraPT && meddraPT?.length > 0 ? meddraPT[0].code : null;
         // datoEsavi.codigoHLT = meddraHLT && meddraHLT?.length > 0 ? meddraHLT[0].code : null ;
         // datoEsavi.codigoHLGT = meddraHLGT && meddraHLGT?.length > 0 ? meddraHLGT[0].code : null ;
-        datoEsavi.codigoSOC =
-          meddraSOC && meddraSOC?.length > 0 ? meddraSOC[0].code : null;
+        datoEsavi.codigoSOC = meddraSOC && meddraSOC?.length > 0 ? meddraSOC[0].code : null;
 
         datoEsavi.codigoCaso = notificacion.codigoVigiflow;
         await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
@@ -597,7 +568,7 @@ export class VigiflowIntegradorService {
   }
   eliminarSaltoLinea(nombreEsaviReportadoMayusculas: string): string {
     //throw new Error('Method not implemented.');
-    return nombreEsaviReportadoMayusculas.replace(/[\r\n]+/g, "");
+    return nombreEsaviReportadoMayusculas.replace(/[\r\n]+/g, '');
   }
 
   formatoFecha(valor: string) {
@@ -655,9 +626,7 @@ export class VigiflowIntegradorService {
 
   encontrarCoincidencia(entrada, lista) {
     const entradaNormalizada = this.normalizarTexto(entrada);
-    return lista.find((item) =>
-      this.normalizarTexto(item).includes(entradaNormalizada),
-    );
+    return lista.find((item) => this.normalizarTexto(item).includes(entradaNormalizada));
   }
 
   esAfirmativo(valor) {

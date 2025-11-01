@@ -63,17 +63,6 @@ export class VigiflowIntegradorController {
         6,
       )}-${aefiQuery.fechaFin.slice(6)}`,
     );
-    console.log(
-      '***** fechaInicio:',
-      aefiQuery.fechaInicio,
-      fechaInicio,
-      'fechaFin:',
-      aefiQuery.fechaFin,
-      fechaFin,
-      'codigoATC:',
-      aefiQuery.codigoATC,
-    );
-
     try {
       await this.vigiflowIntegradorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);
     } catch (error) {
@@ -87,5 +76,25 @@ export class VigiflowIntegradorController {
       status: 'OK',
       msg: 'Éxito',
     };
+  }
+
+  /**
+   *
+   */
+  @Get('/bulk-from-file')
+  async bulkFromFile(): Promise<{ status: string; msg: string }> {
+    try {
+      await this.vigiflowIntegradorService.createInBulkFromFile();
+      return {
+        status: 'OK',
+        msg: 'Datos importados exitosamente desde archivo',
+      };
+    } catch (error) {
+      this.logger.error('Error en bulk-from-file:', error);
+      return {
+        status: 'ERROR',
+        msg: 'Error al importar datos desde archivo',
+      };
+    }
   }
 }
