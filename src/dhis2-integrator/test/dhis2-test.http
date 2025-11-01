@@ -1,5 +1,6 @@
 ### Variables de configuración
 @baseUrl = http://localhost:8081
+@version = /v1
 @apiPath = /integrator/dhis2
 
 ### Headers comunes
@@ -166,7 +167,7 @@ Accept: {{accept}}
 Content-Type: {{contentType}}
 
 ### Test con código ATC específico para vacunas COVID-19
-GET {{baseUrl}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20241231&codigoATC=J07
+GET {{baseUrl}}{{version}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20241231&codigoATC=J07
 Accept: {{accept}}
 Content-Type: {{contentType}}
 
@@ -312,3 +313,9 @@ Content-Type: {{contentType}}
 GET {{baseUrl}}{{apiPath}}/summary/DHIS2_1703123456789_J07
 Accept: {{accept}}
 Content-Type: {{contentType}}
+
+### URL para consumir el servicio dhis2-integrator.service.ts - método createInBulk
+GET {{baseUrl}}{{version}}{{apiPath}}/bulk?fechaInicio=20240101&fechaFin=20240131&codigoATC=J07
+Accept: {{accept}}
+Content-Type: {{contentType}}
+
