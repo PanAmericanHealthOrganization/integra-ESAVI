@@ -77,6 +77,8 @@ import { EstablecimientosService } from './service/establecimientos.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
 //import { InvestigacionService } from './entity/investigacion.service';
+import { InvestigacionService } from './service/investigacion.service';
+import { InvestigacionController } from './controller/investigacion.controller';
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
   imports: [
@@ -178,6 +180,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     VacunometroController,
     GrupoEtarioController,
     SyncController,
+    InvestigacionController,
   ],
   providers: [
     SyncService,
@@ -209,6 +212,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEmbarazoService,
     SeedService,
     VacunometroService,
+    InvestigacionService,
   ],
   exports: [
     SyncService,
