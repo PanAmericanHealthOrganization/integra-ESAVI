@@ -1,6 +1,6 @@
+import { OmitType } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
-import { OmitType } from '@nestjs/swagger';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -61,11 +61,19 @@ export class GrupoEtarioDto extends Auditoria implements IGrupoEtario {
   descripcion: string;
 }
 
-export class CreateGrupoEtarioDto  extends OmitType(GrupoEtarioDto, [
-  'id', 'createdAt', 'createdBy', 'deletedAt','deletedBy', 'isActive', 'isEnabled', 'updatedAt', 'updatedBy'] as const) {  
+export class CreateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
+  'id',
+  'createdAt',
+  'createdBy',
+  'deletedAt',
+  'deletedBy',
+  'isActive',
+  'isEnabled',
+  'updatedAt',
+  'updatedBy',
+] as const) {}
 
-}
-
-export class UpdateGrupoEtarioDto extends OmitType(GrupoEtarioDto, ['inicioEdad', 'finEdad'] as const) {
-
-}
+export class UpdateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
+  'inicioEdad',
+  'finEdad',
+] as const) {}

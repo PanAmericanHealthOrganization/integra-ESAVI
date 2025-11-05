@@ -5,10 +5,7 @@ import { Paciente } from '../entity/paciente.entity';
 
 const { exec } = require('child_process');
 const fs = require('fs');
-const pdf = require('pdf-parse');
-const pdf2base64 = require('pdf-to-base64');
 
-// TODO: esto se debe hacer como servicio
 @Injectable()
 export class ReporteService {
   private readonly logger = new Logger(ReporteService.name);
@@ -20,11 +17,7 @@ export class ReporteService {
 
   pdfFilePath = `${process.env.DIR_PDF}/GACETA_ESAVI_EC_2024.pdf`; // <-- Agregada la coma
   // Función para eliminar el archivo PDF de forma forzada
-  private async forceDeleteFile(
-    filePath: string,
-    retries = 5,
-    delay = 1000,
-  ): Promise<void> {
+  private async forceDeleteFile(filePath: string, retries = 5, delay = 1000): Promise<void> {
     let attempts = 0;
     return new Promise<void>((resolve, reject) => {
       const tryDelete = () => {
@@ -35,9 +28,7 @@ export class ReporteService {
             console.log(`Archivo ${filePath} eliminado con éxito.`);
             resolve(); // Resolvemos cuando el archivo es eliminado
           } else {
-            console.log(
-              `El archivo ${filePath} no existe, no es necesario eliminarlo.`,
-            );
+            console.log(`El archivo ${filePath} no existe, no es necesario eliminarlo.`);
             resolve(); // El archivo no existe, no hay nada que eliminar
           }
         } catch (error) {

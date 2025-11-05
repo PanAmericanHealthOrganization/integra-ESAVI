@@ -1,9 +1,8 @@
-import { faker } from '@faker-js/faker';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Repository } from 'typeorm';
 
 // Entidades
 import { CRUD } from 'src/utils/interfaces/baseEntity';
@@ -16,7 +15,7 @@ import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
 import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
 import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
-import { CreateGrupoEtarioDto, GrupoEtario, IGrupoEtario } from '../entity/grupo-etario.entity';
+import { CreateGrupoEtarioDto, GrupoEtario } from '../entity/grupo-etario.entity';
 import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
@@ -136,9 +135,7 @@ export class SeedService {
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;');
-      await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;',
-      );
+      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;');
       /*
       * 
       await queryRunner.query(
@@ -148,7 +145,7 @@ export class SeedService {
         'TRUNCATE TABLE "dhi_esavi"."TC_TIPOCATALOGO" CASCADE;',
       );
       */
-      
+
       // Restaurar las restricciones de clave foránea
       await queryRunner.query('SET session_replication_role = DEFAULT;');
 
@@ -196,7 +193,8 @@ export class SeedService {
         status: 'COMPLETED',
         startTime: new Date(),
         endTime: new Date(),
-        errorMessage: 'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
+        errorMessage:
+          'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
         errorStack: null,
         errorTrace: null,
         id: undefined, // or null, depending on your entity definition
@@ -445,7 +443,7 @@ export class SeedService {
       deletedAt: undefined,
       deletedBy: '',
       isEnabled: true,
-      isActive: true
+      isActive: true,
     };
 
     for (const catalogo of catalogos) {
@@ -457,7 +455,10 @@ export class SeedService {
       });
 
       if (!existing) {
-        await this.catalogoRepository.save({ ...catalogo, ...auditoriaCatalogoHomologacionDto } as Catalogo);
+        await this.catalogoRepository.save({
+          ...catalogo,
+          ...auditoriaCatalogoHomologacionDto,
+        } as Catalogo);
       }
     }
   }
@@ -481,9 +482,9 @@ export class SeedService {
       deletedAt: undefined,
       deletedBy: '',
       isEnabled: true,
-      isActive: true
+      isActive: true,
     };
-    const gruposEtarios: CreateGrupoEtarioDto [] = [
+    const gruposEtarios: CreateGrupoEtarioDto[] = [
       { inicioEdad: 0, finEdad: 11, descripcion: 'Menor 1 año' }, // contiene edades en meses
       { inicioEdad: 1, finEdad: 4, descripcion: '1 A 4 Años' },
       { inicioEdad: 5, finEdad: 9, descripcion: '5 A 9 Año' },
@@ -504,7 +505,7 @@ export class SeedService {
     }
   }
 
-   /* //---inicio del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
+  /* //---inicio del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
   private async seedPacientes() {
     console.log('👤 Creando pacientes...');
 
@@ -877,18 +878,23 @@ export class SeedService {
 
     await this.datoVacunacionRepository.save(datosVacunacion);
   } //---fin del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
-  */ 
+  */
   //--inicio carga de provincias desde CSV------------------------------------------------------------------------------------------------------
   private async loadProvinciasFromCSV() {
     console.log('🗺️ Cargando provincias desde CSV...');
 
     try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
+      const csvPath = path.join(
+        process.cwd(),
+        'upload_files',
+        'catalogos-csv',
+        'provincias_ecuador.csv',
+      );
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
-      const lines = csvContent.split('\n').filter(line => line.trim());
-      
+      const lines = csvContent.split('\n').filter((line) => line.trim());
+
       const tipoProvincia = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Provincia' }
+        where: { descripcion: 'Provincia' },
       });
 
       if (!tipoProvincia) {
@@ -904,15 +910,18 @@ export class SeedService {
         deletedAt: undefined,
         deletedBy: '',
         isEnabled: true,
-        isActive: true
+        isActive: true,
       };
 
-      for (let i = 1; i < lines.length; i++) { // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i].split(',').map(col => col.trim().replace(/"/g, ''));
-        
+      for (let i = 1; i < lines.length; i++) {
+        // Skip header
+        const [vigiflow, dhis2, homologada] = lines[i]
+          .split(',')
+          .map((col) => col.trim().replace(/"/g, ''));
+
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoProvincia }
+            where: { vigiflow, tipoCatalogo: tipoProvincia },
           });
 
           if (!existing) {
@@ -921,7 +930,7 @@ export class SeedService {
               dhis2,
               homologada,
               tipoCatalogo: tipoProvincia,
-              ...auditoria
+              ...auditoria,
             } as Catalogo);
           }
         }
@@ -933,18 +942,23 @@ export class SeedService {
     }
   }
   //--fin carga de provincias desde CSV------------------------------------------------------------------------------------------------------
-  
+
   //--inicio carga de cantones desde CSV------------------------------------------------------------------------------------------------------
   private async loadCantonesFromCSV() {
     console.log('🗺️ Cargando cantones desde CSV...');
 
     try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
+      const csvPath = path.join(
+        process.cwd(),
+        'upload_files',
+        'catalogos-csv',
+        'cantones_dhis2_ecuador.csv',
+      );
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
-      const lines = csvContent.split('\n').filter(line => line.trim());
+      const lines = csvContent.split('\n').filter((line) => line.trim());
 
       const tipoCanton = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Cantón' } // observar que debe ser con tilde.
+        where: { descripcion: 'Cantón' }, // observar que debe ser con tilde.
       });
 
       if (!tipoCanton) {
@@ -960,15 +974,18 @@ export class SeedService {
         deletedAt: undefined,
         deletedBy: '',
         isEnabled: true,
-        isActive: true
+        isActive: true,
       };
 
-      for (let i = 1; i < lines.length; i++) { // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i].split(',').map(col => col.trim().replace(/"/g, ''));
+      for (let i = 1; i < lines.length; i++) {
+        // Skip header
+        const [vigiflow, dhis2, homologada] = lines[i]
+          .split(',')
+          .map((col) => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoCanton }
+            where: { vigiflow, tipoCatalogo: tipoCanton },
           });
 
           if (!existing) {
@@ -977,7 +994,7 @@ export class SeedService {
               dhis2,
               homologada,
               tipoCatalogo: tipoCanton,
-              ...auditoria
+              ...auditoria,
             } as Catalogo);
           }
         }
@@ -987,29 +1004,33 @@ export class SeedService {
     } catch (error) {
       console.error('❌ Error al cargar cantones desde CSV:', error);
     }
-  } 
+  }
   //--fin carga de cantones desde CSV------------------------------------------------------------------------------------------------------
-    
+
   //--inicio carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
   private async loadParroquiasFromCSV() {
     console.log('🗺️ Cargando parroquias desde CSV...');
 
     try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
+      const csvPath = path.join(
+        process.cwd(),
+        'upload_files',
+        'catalogos-csv',
+        'parroquias_dhis2_ecuador.csv',
+      );
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
-      
+
       // split() separa las líneas de "csvContent", para esto usa el salto de línea '\n', y
-      // el resultado es retornado como un arreglo de líneas. Luego, 
+      // el resultado es retornado como un arreglo de líneas. Luego,
       // filter() transforma y devuelve un nuevo arreglo según la condición devuelta por
       // la función de devolución de llamada (callback). Esta función flecha, mediante trim()
-      // elimina los espacios en blanco al inicio y al final de cada línea, 
+      // elimina los espacios en blanco al inicio y al final de cada línea,
       // y verifica si la línea no está vacía. Si está vacía, retorna una cadena vacía '', es decir,
       // false (falsy en JavaScript), y filter() la excluye del arreglo final.
-      const lines = csvContent.split('\n')
-                              .filter(line => line.trim());
+      const lines = csvContent.split('\n').filter((line) => line.trim());
 
       const tipoParroquia = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Parroquia' }
+        where: { descripcion: 'Parroquia' },
       });
 
       if (!tipoParroquia) {
@@ -1025,25 +1046,27 @@ export class SeedService {
         deletedAt: undefined,
         deletedBy: '',
         isEnabled: true,
-        isActive: true
+        isActive: true,
       };
 
-      for (let i = 1; i < lines.length; i++) { // Skip header "i=0"
+      for (let i = 1; i < lines.length; i++) {
+        // Skip header "i=0"
         /**
          * .split(', ') separa cada línea en columnas, usando la coma seguida de un espacio como delimitador.
          * .map(col => col.trim().replace(/"/g, '')) elimina las comillas dobles de cada columna y
          * luego elimina los espacios en blanco alrededor de cada columna. La iteración por las columnas
          * se realiza mediante la función de devolución de llamada (callback) de map(), por lo que no se
          * requiere un lazo for adicional.
-         * Recordar que: map() llama a una función de devolución de llamada, para cada elemento 
+         * Recordar que: map() llama a una función de devolución de llamada, para cada elemento
          * de una matriz y devuelve una matriz que contiene los resultados.
          */
-        const [vigiflow, dhis2, homologada] = lines[i].split(',')
-                                                      .map(col => col.trim().replace(/"/g, ''));
+        const [vigiflow, dhis2, homologada] = lines[i]
+          .split(',')
+          .map((col) => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoParroquia }
+            where: { vigiflow, tipoCatalogo: tipoParroquia },
           });
 
           if (!existing) {
@@ -1052,7 +1075,7 @@ export class SeedService {
               dhis2,
               homologada,
               tipoCatalogo: tipoParroquia,
-              ...auditoria
+              ...auditoria,
             } as Catalogo);
           }
         }
@@ -1064,5 +1087,4 @@ export class SeedService {
     }
   }
   //--fin carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
-
 }
