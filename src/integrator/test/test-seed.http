@@ -1,5 +1,5 @@
 ### Ejemplo: Cargar datos de ejemplo (POST /seed)
-POST http://localhost:8081/seed
+POST http://localhost:8081/v1/seed
 Content-Type: application/json
 X-API-KEY: TU_API_KEY_AQUI
 

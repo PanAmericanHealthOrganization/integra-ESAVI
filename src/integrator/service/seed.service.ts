@@ -54,8 +54,8 @@ export class SeedService {
   ) {}
 
   async seedData() {
-    console.log('🌱 Iniciando carga de datos de ejemplo...');
-
+    //console.log('🌱 Iniciando carga de datos de ejemplo...'); // Cuando se cargaban datos fake para pruebas.
+    console.log('🌱 Iniciando carga de valores en catálogo de homolgación...');
     try {
       // 0. Limpiar datos existentes (opcional)
       await this.cleanData();
@@ -108,9 +108,9 @@ export class SeedService {
 
       await this.createSyncProcess();
       // Finalizar
-      console.log('✅ Datos de ejemplo cargados exitosamente');
+      console.log('✅ Valores cargados en catálogo de homologación exitosamente');
     } catch (error) {
-      console.error('❌ Error al cargar datos de ejemplo:', error);
+      console.error('❌ Error al cargar valores en catálogo de homologación:', error);
       throw error;
     }
   }
@@ -196,7 +196,7 @@ export class SeedService {
         status: 'COMPLETED',
         startTime: new Date(),
         endTime: new Date(),
-        errorMessage: 'Proceso de carga de datos de ejemplo completado exitosamente.',
+        errorMessage: 'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
         errorStack: null,
         errorTrace: null,
         id: undefined, // or null, depending on your entity definition

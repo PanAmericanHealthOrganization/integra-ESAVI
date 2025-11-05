@@ -23,12 +23,30 @@ export class PacienteService {
     throw new Error('No soportado');
   }
 
-  findAll(): Promise<Paciente[]> {
+  /*findAll(): Promise<Paciente[]> {
     return this.pacientRepository.find({
       where: {
         isActive: true,
       },
     });
+  }*/
+
+  async findAll(): Promise<Paciente[]> {
+    const pacientes = await this.pacientRepository.createQueryBuilder('paciente')
+      /*.leftJoinAndSelect('paciente.sexo', 'sexo') // con esto se obtiene el objeto completo, en donde está el valor y no solo el id.
+      //.leftJoinAndSelect('paciente.autoIdentificacion', 'autoIdentificacion')
+      .addSelect('paciente.codigoVigiflow')  // Incluye el campo 'codigoVigiflow' si es de la subclase 'PacienteVigiFlow'
+      .addSelect('paciente.codigoDhis2')    // Incluye el campo 'codigoDhis2' si es de la subclase 'PacienteDhis2'
+      .addSelect('paciente."ORIGEN"', 'origen')*/
+      .where('paciente.isActive = :isActive', { isActive: true })
+      .getRawMany();
+
+  // Se puede acceder al campo como paciente.origen gracias al getter
+  pacientes.forEach(p => {
+    this.logger.debug(`Paciente completo: ${JSON.stringify(p)}`);
+  });
+  
+    return pacientes;
   }
 
   async findOne(uuid: string): Promise<Paciente> {
