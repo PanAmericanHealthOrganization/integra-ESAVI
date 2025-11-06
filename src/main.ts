@@ -1,3 +1,4 @@
+import 'reflect-metadata'; //primera línea necesaria para el modo depuración.
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
