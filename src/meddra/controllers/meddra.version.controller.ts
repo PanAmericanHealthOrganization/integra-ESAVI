@@ -9,7 +9,7 @@ import {
   Post,
   UploadedFile,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ProcessVersionReqDTO } from '../models/dto/meddra.query';
 import { MeddraProcessFilesService } from '../services/meddra-process.service';
 /**
@@ -20,10 +20,13 @@ import { MeddraProcessFilesService } from '../services/meddra-process.service';
 export class MeddraVersionController {
   constructor(private readonly meddraProcessFilesService: MeddraProcessFilesService) {}
 
+  @ApiOperation({
+    summary: 'Procesar archivos de versión de MedDRA',
+    description: 'Procesa los archivos de versión de MedDRA',
+  })
   @Post('process')
   async processVersionFiles(@Body() processsVersionReqDto: ProcessVersionReqDTO): Promise<any[]> {
     const { version, lang } = processsVersionReqDto;
-
     try {
       return this.meddraProcessFilesService.processVersionFiles(
         version,
@@ -36,7 +39,7 @@ export class MeddraVersionController {
   }
 
   @Post('upload')
-  uploadFile(
+  async uploadFile(
     @UploadedFile(
       new ParseFilePipe({
         validators: [

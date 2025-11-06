@@ -36,9 +36,8 @@ export class VacunometroController
   /**
    *
    */
-  @Post('getPaginated')
+  @Post('paginated')
   public getPaginated(@Body() params: GetListParams): Promise<{ data: any[]; total: number }> {
-    console.log(params);
     return this.vacunometroService.getPaginated(params);
   }
 
