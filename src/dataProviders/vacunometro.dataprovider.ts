@@ -34,7 +34,7 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
   ): Promise<GetListResult<RecordType>> {
     try {
       const response = await intESAVIClient.post(
-        `integrator/${resource}/getPaginated`,
+        `integrator/${resource}/paginated`,
         {
           ...params,
         }

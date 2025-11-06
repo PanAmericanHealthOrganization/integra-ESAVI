@@ -99,9 +99,12 @@ export const ESAVISList = () => {
             )}
           />
           <FunctionField
-            label="Origen"
-            sortBy="origen"
-            render={(record: any) => `${record.tipo}`}
+            label="Código Origen"
+            render={(record: any) => {
+              return record.codigoVigiflow && record.codigoVigiflow !== ""
+                ? "VIGIFLOW"
+                : "DHIS2"
+            }}
           />
           <FunctionField
             label="Código Origen"
