@@ -15,7 +15,7 @@ export class SeedController {
   async seedData() {
     await this.seedService.seedData();
     return {
-      message: 'Datos de ejemplo cargados exitosamente',
+      message: 'Controlador del semillero: Valores cargados exitosamente en el catálogo de homologación.',
       timestamp: new Date().toISOString(),
     };
   }

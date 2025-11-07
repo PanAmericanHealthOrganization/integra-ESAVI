@@ -591,7 +591,14 @@ export class Dhis2IntegratorService {
             'DNVE ESAVI TRK - Criterio de notificación - hospitalización',
         )
       ],
-    );
+    ); //---después de esto va la CORRECCIÓN:
+    grave.condicionEgreso =
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Condición de egreso',
+          )
+        ];
 
     // Define Desenlace esavi
     const desenlaceEsavi = new CreateDesenlaceEsaviDto();
