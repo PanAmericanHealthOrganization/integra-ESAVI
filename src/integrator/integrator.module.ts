@@ -29,6 +29,7 @@ import {
   DatoVacunacion,
   DesenlaceEsavi,
   EmbarazoEsavi,
+  Gaceta,
   GravedadEsavi,
   GrupoEtario,
   Medicamento,
@@ -60,6 +61,7 @@ import {
   DatoVacunacionService,
   DesenlaceEsaviService,
   EmbarazoEsaviService,
+  GacetaService,
   GravedadEsaviService,
   GrupoEtarioService,
   MedicamentoService,
@@ -77,9 +79,10 @@ import { EstablecimientosService } from './service/establecimientos.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
 //import { InvestigacionService } from './entity/investigacion.service';
-import { InvestigacionService } from './service/investigacion.service';
+import { GacetaController } from './controller';
 import { InvestigacionController } from './controller/investigacion.controller';
 import { PacienteController } from './controller/paciente.controller';
+import { InvestigacionService } from './service/investigacion.service';
 import { PacienteService } from './service/paciente.service';
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
@@ -122,6 +125,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
           Vacunacion,
           Vacunometro,
           SyncProcess,
+          Gaceta,
         ],
         synchronize: true,
         poolSize: 5,
@@ -159,6 +163,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Vacunacion,
         Vacunometro,
         SyncProcess,
+        Gaceta,
       ],
       POSTGRES_INTEGRATOR_DS,
     ),
@@ -184,6 +189,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SyncController,
     InvestigacionController,
     PacienteController,
+    GacetaController,
   ],
   providers: [
     SyncService,
@@ -217,6 +223,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SeedService,
     VacunometroService,
     InvestigacionService,
+    GacetaService,
   ],
   exports: [
     SyncService,

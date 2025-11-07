@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IEstablecimiento } from './interfaces/establecimiento';
+import { IEstablecimiento } from './interfaces/establecimiento.interface';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
   schema: 'dhi_esavi',

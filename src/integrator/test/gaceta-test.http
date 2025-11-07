@@ -1,0 +1,37 @@
+### Crear una nueva gaceta
+POST http://localhost:8081/v1/integrator/gaceta/create
+Content-Type: application/json
+
+{
+    "fechaPublicacion": "2024-11-06",
+    "numeroGaceta": 1,
+    "volumen": 2024,
+    "anio": 2024,
+    "mes": 12,
+    "urlGaceta": "https://www.salud.gob.ec/gaceta/2024/11/gaceta-001.pdf",
+    "estado": "PENDIENTE",
+    "autor": "Dr. Juan Pérez",
+    "cargo": "Director de Farmacovigilancia",
+    "autorSecundario": "Dra. María González",
+    "cargoSecundario": "Subdirectora de Vigilancia Epidemiológica",
+    "analisisGravedad": "<h3>Análisis de Gravedad</h3><p>Durante el período analizado se registraron 245 eventos adversos, de los cuales el 15% fueron clasificados como graves según los criterios internacionales.</p>",
+    "analisisSexoEdad": "<h3>Distribución por Sexo y Edad</h3><ul><li>Mujeres: 60% (147 casos)</li><li>Hombres: 40% (98 casos)</li><li>Grupo etario más afectado: 25-64 años (70%)</li></ul>",
+    "analisisTipoEvento": "<h3>Tipos de Eventos</h3><p>Los eventos más frecuentes fueron reacciones cutáneas (35%), seguidos de trastornos gastrointestinales (25%) y neurológicos (20%).</p>",
+    "analisisGeografico": "<h3>Distribución Geográfica</h3><p>Las provincias con mayor incidencia fueron Pichincha (30%), Guayas (25%) y Azuay (15%), correlacionándose con la densidad poblacional.</p>",
+    "resumenContenido": "<h2>Resumen Ejecutivo</h2><p>Este informe presenta el análisis de farmacovigilancia correspondiente al mes de octubre 2024, incluyendo la evaluación de 245 reportes de eventos adversos.</p>",
+    "conclusiones": "<h3>Conclusiones</h3><ol><li>El perfil de seguridad de los medicamentos analizados se mantiene dentro de los parámetros esperados</li><li>Se identificaron 3 nuevas señales de seguridad que requieren seguimiento</li></ol>",
+    "recomendaciones": "<h3>Recomendaciones</h3><p>Se recomienda continuar el monitoreo intensivo de las nuevas señales identificadas y fortalecer la capacitación en farmacovigilancia a nivel regional.</p>"
+}
+
+### Obtener una gaceta por ID (UUID válido)
+GET http://localhost:8081/v1/integrator/gaceta/getOne/123e4567-e89b-12d3-a456-426614174000
+Content-Type: application/json
+
+### Ejemplo de error: UUID inválido (demasiados caracteres)
+# GET http://localhost:8081/v1/integrator/gaceta/getOne/1b24ecbee-9f32-4242-a31d-bd139c323387
+# Content-Type: application/json
+# Este UUID es inválido porque tiene 9 caracteres en el primer segmento en lugar de 8
+
+### Obtener una gaceta por ID (crear una gaceta primero para probar)
+GET http://localhost:8081/v1/integrator/gaceta/getOne/1b24ecbe-9f32-4242-a31d-bd139c323387
+Content-Type: application/json

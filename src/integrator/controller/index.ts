@@ -5,6 +5,7 @@ export * from './antecedente-preexistencia.controller';
 export * from './catalogo.controller';
 export * from './dato-esavi.controller';
 export * from './desenlace-esavi.controller';
+export * from './gaceta.controller';
 export * from './integrador.controller';
 export * from './notificacion.controller';
 export * from './paciente-dhis2.controller';
