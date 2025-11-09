@@ -1,3 +1,4 @@
+import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import PieChartIcon from "@mui/icons-material/PieChart"
 import SegmentIcon from "@mui/icons-material/Segment"
@@ -44,6 +45,11 @@ export const CustomMenu = () => (
         to="/reportes"
         primaryText="Reportes"
         leftIcon={<TableChartIcon />}
+      />
+      <Menu.Item
+        to="/gaceta"
+        primaryText="Gaceta"
+        leftIcon={<AutoStoriesIcon />}
       />
       <Menu.Item
         to="/calidad"
