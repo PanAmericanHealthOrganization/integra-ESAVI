@@ -1,5 +1,9 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { readFileSync } from 'fs';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
@@ -20,10 +24,12 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
   /**
    *
    * @param gacetaRepository
+   * @param configService
    */
   constructor(
     @InjectRepository(Gaceta, 'POSTGRES_INTEGRATOR_DS')
     private readonly gacetaRepository: Repository<Gaceta>,
+    private readonly configService: ConfigService,
   ) {}
 
   /**
@@ -77,12 +83,21 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
    * @param id
    * @returns
    */
-  public getOne(id: Identificator): Promise<GacetaDto> {
+  public async getOne(id: Identificator): Promise<GacetaDto> {
     const cleanId = this.validateAndCleanId(id);
+    const t = (await this.gacetaRepository.findOne({ where: { id: cleanId } })) as GacetaDto;
+    // completar con las imagenes
+    // ontener como blob la imagenes de un directorio
     this.logger.log(`Buscando gaceta con ID: ${cleanId}`);
-    return this.gacetaRepository.findOne({ where: { id: cleanId } });
+    return t;
   }
 
+  private getGraficoBlob(id: string): Promise<Blob> {
+    // Lógica para obtener el Blob desde el sistema de archivos o almacenamiento
+    const fileBasePath = '/path/to/gaceta/graphics/';
+    const filePath = `${fileBasePath}${id}-grafico-analisis-gravedad.png`;
+    return null;
+  }
   /**
    *
    * @param params
@@ -284,25 +299,18 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
     }
 
     // Si se está actualizando el número, año o mes, verificar unicidad
-    if (updateGacetaDto.numeroGaceta || updateGacetaDto.anio || updateGacetaDto.mes) {
-      const numeroGaceta = updateGacetaDto.numeroGaceta || exist.numeroGaceta;
-      const anio = updateGacetaDto.anio || exist.anio;
-      const mes = updateGacetaDto.mes || exist.mes;
 
-      const existingGaceta = await this.gacetaRepository.findOne({
-        where: {
-          numeroGaceta: numeroGaceta,
-          anio: anio,
-          mes: mes,
-        },
-      });
+    const existingGaceta = await this.gacetaRepository.findOne({
+      where: {
+        id: id as string,
+      },
+    });
 
-      if (existingGaceta && existingGaceta.id !== cleanId) {
-        throw new Error(`Ya existe una gaceta con el número ${numeroGaceta} para ${mes}/${anio}`);
-      }
+    if (existingGaceta && existingGaceta.id !== cleanId) {
+      throw new Error(`Ya existe una gaceta con el número`);
     }
-
-    await this.gacetaRepository.update(cleanId, updateGacetaDto);
+    const u = await this.gacetaRepository.update(cleanId, { ...updateGacetaDto });
+    console.log('Resultado de la actualización:', u);
     return this.getOne(cleanId);
   }
 
@@ -360,5 +368,49 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
         fechaPublicacion: 'DESC',
       },
     });
+  }
+
+  /**
+   * Obtiene un archivo PDF de informe basado en año y mes
+   * @param ano - Año del informe (ej: 2025)
+   * @param mes - Mes del informe en formato de 2 dígitos (ej: 01, 02, ..., 12)
+   * @returns Buffer con el contenido del archivo PDF
+   * @throws NotFoundException si el archivo no existe
+   * @throws BadRequestException si los parámetros son inválidos
+   */
+  public async getPdfInforme(ano: number, mes: number): Promise<Buffer> {
+    try {
+      // Formatear el mes a 2 dígitos
+      const mesFormateado = mes.toString().padStart(2, '0');
+
+      // Obtener el path base desde variables de entorno usando ConfigService
+      const pdfBasePath = this.configService.get<string>('PATH_GACETA_ESAVI') || '/app/reports/pdf';
+
+      // Construir el nombre del archivo: informe_2025_01.pdf
+      const nombreArchivo = `informe_esavi_${ano}${mesFormateado}.pdf`;
+
+      // Construir la ruta completa del archivo
+      const rutaCompleta = path.join(pdfBasePath, ano.toString(), mesFormateado, nombreArchivo);
+
+      // Verificar si el archivo existe
+      try {
+        await fs.access(rutaCompleta);
+      } catch (error) {
+        this.logger.error(`Archivo no encontrado: ${rutaCompleta}`);
+        throw new NotFoundException(`Informe no encontrado para ${ano}/${mesFormateado}`);
+      }
+
+      // Leer el archivo y retornar como Buffer
+      const archivoBuffer = readFileSync(rutaCompleta);
+
+      return archivoBuffer;
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+
+      this.logger.error(`Error al obtener archivo PDF: ${error.message}`, error.stack);
+      throw new BadRequestException(`Error al procesar solicitud de PDF: ${error.message}`);
+    }
   }
 }

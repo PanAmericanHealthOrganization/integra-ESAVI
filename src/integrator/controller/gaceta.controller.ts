@@ -1,5 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { CreateGacetaDto } from '../dto/create-gaceta.dto';
@@ -15,6 +27,42 @@ import { GacetaService } from '../service/gaceta.service';
 @Controller({ path: 'integrator/gaceta', version: '1' })
 export class GacetaController implements IController<CreateGacetaDto, GacetaDto, UpdateGacetaDto> {
   constructor(private readonly gacetaService: GacetaService) {}
+
+  /**
+   * Descargar archivo PDF de la gaceta
+   */
+  @Get('pdf')
+  @ApiOperation({ summary: 'Descargar archivo PDF de la gaceta' })
+  @ApiParam({
+    name: 'filename',
+    description: 'Nombre del archivo PDF',
+    example: 'asdf_202501.pdf',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo PDF descargado exitosamente',
+    content: {
+      'application/pdf': {
+        schema: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  public async getPdfInforme(
+    @Query('anio') anio: number,
+    @Query('mes') mes: number,
+    @Res() res: Response,
+  ): Promise<void> {
+    if (!anio || !mes) {
+      throw new BadRequestException('Parámetros "anio" y "mes" son obligatorios');
+    }
+    const file = await this.gacetaService.getPdfInforme(anio, mes);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="gaceta_${anio}_${mes}.pdf"`);
+    res.send(file);
+  }
 
   /**
    * Obtener una gaceta por ID

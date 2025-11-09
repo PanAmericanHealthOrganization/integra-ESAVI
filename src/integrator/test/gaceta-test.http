@@ -5,9 +5,9 @@ Content-Type: application/json
 {
     "fechaPublicacion": "2024-11-06",
     "numeroGaceta": 1,
-    "volumen": 2024,
-    "anio": 2024,
-    "mes": 12,
+    "volumen": 2025,
+    "anio": 2025,
+    "mes": 11,
     "urlGaceta": "https://www.salud.gob.ec/gaceta/2024/11/gaceta-001.pdf",
     "estado": "PENDIENTE",
     "autor": "Dr. Juan Pérez",
@@ -35,3 +35,30 @@ Content-Type: application/json
 ### Obtener una gaceta por ID (crear una gaceta primero para probar)
 GET http://localhost:8081/v1/integrator/gaceta/getOne/1b24ecbe-9f32-4242-a31d-bd139c323387
 Content-Type: application/json
+
+### Descargar archivo PDF de informe - Enero 2025
+GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=2025&mes=11
+Accept: application/pdf
+
+### Descargar archivo PDF de informe - Febrero 2025
+GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=2025&mes=2
+Accept: application/pdf
+
+### Descargar archivo PDF de informe - Noviembre 2024
+GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=2024&mes=11
+Accept: application/pdf
+
+### Ejemplo de error: Parámetros faltantes (sin año)
+# GET http://localhost:8081/v1/integrator/gaceta/pdf?mes=1
+# Accept: application/pdf
+# Este ejemplo debería retornar un BadRequestException
+
+### Ejemplo de error: Parámetros faltantes (sin mes)
+# GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=2025
+# Accept: application/pdf
+# Este ejemplo debería retornar un BadRequestException
+
+### Ejemplo de error: Archivo no encontrado
+# GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=1999&mes=1
+# Accept: application/pdf
+# Este ejemplo debería retornar un NotFoundException si el archivo no existe

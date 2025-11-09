@@ -15,6 +15,7 @@ export interface IGaceta {
   estado: ESTADO_GACETA;
   autor: string;
   cargo: string;
+  titulo: string;
   autorSecundario: string;
   cargoSecundario: string;
   analisisGravedad: string;

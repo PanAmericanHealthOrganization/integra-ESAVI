@@ -77,10 +77,23 @@ export class GacetaDto implements IGaceta {
   cargoSecundario: string;
 
   @ApiProperty({
+    description: 'Título de la gaceta',
+    example: 'Análisis de Eventos Adversos en el Mes de Octubre 2024',
+  })
+  titulo: string;
+
+  @ApiProperty({
     description: 'Análisis de gravedad (HTML/texto enriquecido)',
     example: '<h3>Análisis de Gravedad</h3><p>Durante el período analizado...</p>',
   })
   analisisGravedad: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis de gravedad (archivo binario)',
+    type: 'string',
+    format: 'binary',
+  })
+  graficoAnalisisGravedad?: Blob;
 
   @ApiProperty({
     description: 'Análisis de sexo y edad (HTML/texto enriquecido)',

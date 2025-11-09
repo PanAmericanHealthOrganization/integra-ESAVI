@@ -92,6 +92,17 @@ export class Gaceta implements IGaceta {
   cargoSecundario: string;
 
   /**
+   * Column  of gaceta
+   */
+  @Column({
+    name: 'TITULO',
+    comment: 'Título de la gaceta',
+    nullable: false,
+    default: 'Gaceta',
+  })
+  titulo: string;
+
+  /**
    * Análisis de gravedad con soporte para texto enriquecido/HTML
    */
   @Column({
