@@ -1,6 +1,14 @@
 import { Divider, Grid } from "@mui/material"
 import { RichTextInput } from "ra-input-rich-text"
-import { DateInput, Edit, ImageField, SimpleForm, TextInput } from "react-admin"
+import {
+  DateInput,
+  Edit,
+  ImageField,
+  SelectInput,
+  SimpleForm,
+  TextInput,
+} from "react-admin"
+import { ESTADO_GACETA } from "../../dataProviders/enums/estado_gaceta.enum"
 
 export const GacetaEdit = () => {
   return (
@@ -14,7 +22,16 @@ export const GacetaEdit = () => {
             <DateInput source="fechaPublicacion" label="Fecha de Publicación" />
           </Grid>
           <Grid item xs={12} sm={3}>
-            <TextInput source="estado" label="Estado" />
+            <SelectInput
+              source="estado"
+              label="Estado"
+              choices={[
+                { id: ESTADO_GACETA.BORRADOR, name: "Borrador" },
+                { id: ESTADO_GACETA.PENDIENTE, name: "Pendiente" },
+                { id: ESTADO_GACETA.PUBLICADO, name: "Publicado" },
+                { id: ESTADO_GACETA.CANCELADO, name: "Cancelado" },
+              ]}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextInput source="titulo" label="Título" />
@@ -60,7 +77,7 @@ export const GacetaEdit = () => {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <h3>Analisis Graficos</h3>
+            <h3>Análisis Gráficos</h3>
           </Grid>
           <Grid item xs={12} sm={3}>
             <ImageField
@@ -99,7 +116,7 @@ export const GacetaEdit = () => {
           <Grid item xs={12} sm={12}>
             <RichTextInput source="recomendaciones" label="Recomendaciones" />
           </Grid>
-        </Grid>
+        </Grid>{" "}
       </SimpleForm>
     </Edit>
   )

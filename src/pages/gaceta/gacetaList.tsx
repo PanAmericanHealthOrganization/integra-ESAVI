@@ -31,7 +31,7 @@ const DownloadFileButton = ({ record }: { record: any }) => {
       // Crear un enlace temporal para descargar el archivo
       const link = document.createElement("a")
       link.href = url
-      link.download = `gaceta_${record.anio}_${String(record.mes).padStart(2, "0")}.pdf`
+      link.download = `gaceta_esavi_${record.anio}_${String(record.mes).padStart(2, "0")}.pdf`
       document.body.appendChild(link)
       link.click()
 
