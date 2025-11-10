@@ -19,6 +19,7 @@ import { CreateDesenlaceEsaviDto } from '../../integrator/dto/create-desenlace-e
 import { CreateGravedadEsaviDto } from '../../integrator/dto/create-gravedad-esavi.dto';
 import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
 import { CreatePacienteDhis2Dto } from '../../integrator/dto/create-paciente-dhis2.dto';
+import { InvestigacionCreateDto } from 'src/integrator/dto/investigacion.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { ProgramStage } from '../dto/interfaceprogramStages';
@@ -179,6 +180,15 @@ export class Dhis2IntegratorService {
     );
 
     return { headers, rows };
+  }
+
+  revisarValorNulo(profesion: any): string {
+    // Si el valor es nulo, indefinido o una cadena vacía, devolver 'DESCONOCIDO'
+    if (profesion === null || profesion === undefined || profesion === '') {
+      return 'DESCONOCIDO';
+    } else {
+      return profesion;
+    }
   }
 
   obtenerValorNumerico(valor: string): number {
@@ -479,14 +489,16 @@ export class Dhis2IntegratorService {
       ];
     notificacion.residenciaPaciente = ubicacionResidencia;
 
-    // Profesion quien notifica
-    notificacion.profesionNotificadorParam =
+    // Profesion quien notifica. Si es nulo, asignar 'DESCONOCIDO'
+
+    notificacion.profesionNotificadorParam = this.revisarValorNulo(
       row[
         headers.findIndex(
           (header) =>
             header.column === 'DNVE ESAVI TRK - Profesión de quien notifica',
         )
-      ];
+      ],);
+
 
     // Presenta eventos adversos
     const antecedenteEventoPrevio = this.obtenerValorNumerico(
@@ -855,6 +867,15 @@ export class Dhis2IntegratorService {
       }
     }
 
+    //-------TR_INVESTIGACION
+    const investigacion = new InvestigacionCreateDto();
+    investigacion.fechaInvestigacion =
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Fecha en que se termina la investigación',
+        )
+      ];
+
     // Complete the dto
     const create = new CreateCompleteDto();
     create.source = SourceEnum.DHIS2;
@@ -878,6 +899,7 @@ export class Dhis2IntegratorService {
 
     return create;
   }
+  
 
   /**
    * Calcula la duración del procesamiento
@@ -1564,7 +1586,14 @@ export class Dhis2IntegratorService {
           datoVacunas.push(datoVacuna);
         }
       }
-
+      //-------TR_INVESTIGACION
+    const investigacion = new InvestigacionCreateDto();
+    investigacion.fechaInvestigacion = this.formatoFecha(
+      row[
+        data.headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Fecha en que se termina la investigación',
+        )
+      ],);
       // Antecedente evento adverso
 
       //Complete the dto

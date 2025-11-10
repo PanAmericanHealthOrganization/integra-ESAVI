@@ -364,6 +364,18 @@ export class SeedService {
         homologada: 'OTRO PROFESIONAL DE LA SALUD',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
       },
+      {
+        vigiflow: 'OTRO',
+        dhis2: 'OTRO',
+        homologada: 'OTRO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
+      {
+        vigiflow: 'DESCONOCIDO',
+        dhis2: 'DESCONOCIDO',
+        homologada: 'DESCONOCIDO',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+      },
 
       //Unidad de Edad, o Tipo de edades
       /**
