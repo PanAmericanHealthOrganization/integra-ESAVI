@@ -1,8 +1,6 @@
 import { HttpModule } from '@nestjs/axios';
-import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsModule } from 'src/settings/settings.module';
 import { AutoEncryptSubscriber } from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
@@ -31,7 +29,6 @@ import { MeddraLltController } from './controllers/meddra.llt.controller';
 export const MEDDRA_DS = 'meddra';
 @Module({
   imports: [
-    CacheModule.register(),
     SettingsModule,
     TypeOrmModule.forRootAsync({
       name: MEDDRA_DS,
@@ -57,17 +54,7 @@ export const MEDDRA_DS = 'meddra';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature(
-      [
-        MeddraQuery,
-        LLT,
-        PT,
-        SOC,
-        MappingDefinition,
-        Mappings,
-        cie10Meddra,
-        CIE10ES,
-        MeddraSync,
-      ],
+      [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
       MEDDRA_DS,
     ),
     HttpModule,
@@ -80,10 +67,6 @@ export const MEDDRA_DS = 'meddra';
     MeddraSocService,
     MeddraPtService,
     MeddraLLTService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CacheInterceptor,
-    },
   ],
   controllers: [
     MeddraController,

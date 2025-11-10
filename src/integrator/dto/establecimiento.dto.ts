@@ -1,4 +1,4 @@
-import { IEstablecimiento } from '../entity/interfaces/establecimiento';
+import { IEstablecimiento } from '../entity/interfaces/establecimiento.interface';
 
 export class EstablecimientoDto implements IEstablecimiento {
   id: string;

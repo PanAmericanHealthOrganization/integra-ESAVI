@@ -1,15 +1,4 @@
-import { CacheInterceptor } from '@nestjs/cache-manager';
-import {
-  Body,
-  Controller,
-  Get,
-  Logger,
-  Param,
-  Post,
-  Query,
-  StreamableFile,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post, Query, StreamableFile } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -39,7 +28,6 @@ export class MeddraController {
     summary: 'Consuta a servicios de MedDRA, realiza una consulta inteligente',
     description: 'Consulta de datos a meddra, la consulta puede ser de base de datos o por api',
   })
-  @UseInterceptors(CacheInterceptor)
   public gerMeddra(@Body() query: MeddraQueryRequestDto): Promise<IMeddraResponse> {
     try {
       return this.meddraClientService.getQuery(query);
