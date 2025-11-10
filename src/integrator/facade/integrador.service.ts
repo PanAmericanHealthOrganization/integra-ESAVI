@@ -20,6 +20,8 @@ import { NotificacionVigiflowService } from '../service/notificacion-vigiflow.se
 import { PacienteDhis2Service } from '../service/paciente-dhis2.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { PacienteVigiflowService } from '../service/paciente-vigiflow.service';
+//import { Investigacion, InvestigacionCreateDto } from '../entity/investigacion.entity';
+import { InvestigacionService } from '../service/investigacion.service';
 
 @Injectable()
 export class IntegradorService {
@@ -43,6 +45,7 @@ export class IntegradorService {
     private readonly datoVacunacionService: DatoVacunacionService,
     private readonly datoEsaviService: DatoEsaviService,
     private readonly catalogoService: CatalogoService,
+    private readonly investigacionService: InvestigacionService,
   ) {}
 
   async create(createDto: CreateCompleteDto) {
@@ -155,6 +158,14 @@ export class IntegradorService {
       if (createDto.datoEsavi) {
         await this.datoEsaviService.create(notificacion, createDto.datoEsavi);
       }
+
+      // Investigacion: TR_INVESTIGACION
+      /*if (createDto.investigacion) {
+        await this.investigacionService.create(
+          //notificacion, esavi,
+          createDto.investigacion,
+        );
+      }*/
     }
     return;
   }

@@ -17,6 +17,8 @@ import { CreatePacienteVigiflowDto } from './create-paciente-vigiflow.dto';
 import { CreatePacienteDhis2Dto } from './create-paciente-dhis2.dto';
 import { CreatePacienteEmbarazadaDto } from './create-paciente-embarazada.dto';
 import { CreateDatoEsaviDto } from './create-dato-esavi.dto';
+//import { InvestigacionCreateDto } from './investigacion.dto';
+import { InvestigacionCreateDto } from '../entity/investigacion.entity';
 
 export class CreateCompleteDto {
   @ApiProperty({
@@ -47,4 +49,8 @@ export class CreateCompleteDto {
 
   datoVacunacion: CreateDatoVacunacionDto ;
   createdBy: string;
+
+  //--> TR_INVESTIGACION
+  investigacion: InvestigacionCreateDto;
+
 }
