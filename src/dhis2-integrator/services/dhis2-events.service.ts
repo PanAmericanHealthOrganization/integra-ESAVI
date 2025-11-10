@@ -22,7 +22,7 @@ export const getDHIS2EventsURL = (params: ParamsEsavi): string => {
   const DHIS2_PAGING = `&paging=${paging.paging}&page=${paging.page}&pageSize=${paging.pageSize}`;
   const DHIS2_EVENTS_FIELDS =
     '&fields=orgUnit,program,event,trackedEntityInstance,status,orgUnitName,eventDate,lastUpdated,dataValues[dataElement,value]';
-  const DHIS2_EVENTS_FILTER_PROGRAM = `&program=${params.program}`;
+  const DHIS2_EVENTS_FILTER_PROGRAM = `&program=${params.program}`;// PENDIENTE: Agregar fechas de inicio y fin ---> const DHIS2_EVENTS_FILTER_PROGRAM = `&program=${params.program}&startDate=2024-01-01&endDate=2024-12-31`;
   return `/api/events.json?${DHIS2_EVENTS_FILTER_PROGRAM}&${DHIS2_PAGING}&status=COMPLETED${DHIS2_EVENTS_FIELDS}`;
 };
 

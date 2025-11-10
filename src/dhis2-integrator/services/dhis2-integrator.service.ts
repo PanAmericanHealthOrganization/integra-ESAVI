@@ -592,6 +592,60 @@ export class Dhis2IntegratorService {
         )
       ],
     ); //---después de esto va la CORRECCIÓN:
+    grave.anomaliaCongenita = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de notificación - anomalía congénita',
+        )
+      ],
+    );
+    grave.aborto = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de notificación - aborto',
+        )
+      ],
+    );
+    grave.muerteFetal = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de notificación - muerte fetal',
+        )
+      ],
+    );
+    grave.muerte = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de notificación - muerte',
+        )
+      ],
+    );
+    grave.parteEventosPreocupacion = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de investigación - parte de eventos preocupación',
+        )
+      ],
+    );
+    grave.nuevoEventos = this.esValorAfirmativo(
+      row[
+        headers.findIndex(
+          (header) =>
+            header.column ===
+            'DNVE ESAVI TRK - Criterio de investigación - nuevos eventos',
+        )
+      ],
+    );
     grave.condicionEgreso =
         row[
           headers.findIndex(

@@ -19,7 +19,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    VacunacionIntegratorModule, // Descomentar para habilitar el módulo de vacunación con base de datos oracle.
+    //VacunacionIntegratorModule, // Descomentar para habilitar el módulo de vacunación con base de datos oracle.
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,
