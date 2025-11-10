@@ -199,6 +199,14 @@ export class Dhis2IntegratorService {
     }
   }
 
+  /*obtenerValorBooleano(valor: string): boolean {
+    const normalizedValue = valor ? valor.toLowerCase().trim() : '';
+    return normalizedValue === 'si';
+  }*/ //antecedenteDiagnosticoCovid19 No puede ser booleano porque en el origen hay 3 valores: SI, NO, SIN DATO
+  
+  //Este método se utiliza para separar el código de CIE-10 y la descripción
+  // Ejemplo: "A00 Cólera" => { codigo: "A00", descripcion: "Cólera" }
+  // El valor en el elemento de datos es una cadena de texto que contiene un código seguido de una descripción.
   separarCodigoYDescripcion(texto: string | null | undefined): {
     codigo: string;
     descripcion: string;
@@ -527,7 +535,7 @@ export class Dhis2IntegratorService {
         )
       ];
 
-    // Create Antecedente Medico
+    // Create Antecedente Medico: TR_ANTECEDENTES_MEDICO
     const antecedenteMedico = new CreateAntecedenteMedicoDto();
     const comorbilidadPrincipal = this.separarCodigoYDescripcion(
       row[
@@ -542,6 +550,39 @@ export class Dhis2IntegratorService {
       comorbilidadPrincipal.codigo;
     antecedenteMedico.descripcionPrincipal =
       comorbilidadPrincipal.descripcion;
+      const comorbilidadDos = this.separarCodigoYDescripcion(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Especificar la comorbilidad 2',
+          )
+        ],
+      );
+      antecedenteMedico.comorbilidadDosCIE10 = comorbilidadDos.codigo;
+      antecedenteMedico.descripcionDos = comorbilidadDos.descripcion;
+      const comorbilidadTres = this.separarCodigoYDescripcion(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Especificar la comorbilidad 3',
+          )
+        ],
+      );
+      antecedenteMedico.comorbilidadTresCIE10 = comorbilidadTres.codigo;
+      antecedenteMedico.descripcionTres = comorbilidadTres.descripcion;
+      //DNVE ESAVI TRK - ¿Tiene antecedentes de diagnóstico de infección por SARS-CoV-2 antes de la vacunación?
+      const tieneAntecedenteDxInfeccSarsCov2AntesVacuna = 
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - ¿Tiene antecedentes de diagnóstico de infección por SARS-CoV-2 antes de la vacunación?',
+          )
+        ]
+      ;
+      antecedenteMedico.antecedenteDiagnosticoCovid19 = tieneAntecedenteDxInfeccSarsCov2AntesVacuna;
 
     // Create Antecedente evento adverso
     const antecedenteEventoAdverso = new CreateAntecedenteEventoDto();
