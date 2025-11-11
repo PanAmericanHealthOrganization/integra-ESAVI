@@ -160,12 +160,13 @@ export class IntegradorService {
       }
 
       // Investigacion: TR_INVESTIGACION
-      /*if (createDto.investigacion) {
+      if (createDto.investigacion) {
         await this.investigacionService.create(
           //notificacion, esavi,
+          //createDto.datoEsavi //Para aceptar otro argumento se debe editar el servicio "investigacionService"
           createDto.investigacion,
         );
-      }*/
+      }
     }
     return;
   }

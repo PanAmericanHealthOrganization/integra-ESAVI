@@ -4,7 +4,7 @@ import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { ILike, In, Raw, Repository } from 'typeorm';
-import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../dto/investigacion.dto';
+import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';
 import { Investigacion } from '../entity/investigacion.entity';
 
 
@@ -167,8 +167,11 @@ export class InvestigacionService
          * @param investigacion //esta es la data
          * @returns
          */
-        async create(investigacion: Investigacion): Promise<InvestigacionDto> {          
+        /*async create(investigacion: Investigacion): Promise<InvestigacionDto> {          
           return this.investigacionRepository.save(investigacion);
+        }*/ //ESTE DTO SERÍA MÁS APLICABLE A UN DTO DE RESPUESTA O SALIDA.
+        async create(investigacionCreateDto: InvestigacionCreateDto): Promise<InvestigacionDto> {
+          return this.investigacionRepository.save(investigacionCreateDto);
         }
 
         /**

@@ -115,7 +115,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
     }*/
 }
 
-export interface IInvestigacion {
+export interface IInvestigacion extends CustomBaseEntity {
   id: string;
   fechaInvestigacion: Date;
   vacunatorioCalidad: boolean;
@@ -126,9 +126,12 @@ export interface IInvestigacion {
   muestraLaboratorio: boolean;
 }
 
-export class InvestigacionDto implements IInvestigacion {
+export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion {
   @ApiProperty()
   id: string;
+
+  @ApiProperty()
+  datoEsavi: DatoEsavi;
 
   @ApiProperty()
   fechaInvestigacion: Date;
@@ -156,4 +159,29 @@ export class InvestigacionDto implements IInvestigacion {
  *
  *
  * */
-export class InvestigacionCreateDto extends OmitType(InvestigacionDto, ['id']) {}
+export class InvestigacionCreateDto extends OmitType(InvestigacionDto, [
+  'id',
+  //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
+  'enabled',
+  'state',
+  'action',
+  'createdAt',  
+  'updatedAt',
+  'actionBy',
+  
+] as const) {}
+/**
+ *
+ *
+ */
+export class InvestigacionUpdateDto extends OmitType(InvestigacionDto, [
+  'id',
+  //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al actualizar
+  'enabled',
+  'state',
+  'action',
+  'createdAt',
+  'updatedAt',
+  'actionBy',
+] as const) {}
+
