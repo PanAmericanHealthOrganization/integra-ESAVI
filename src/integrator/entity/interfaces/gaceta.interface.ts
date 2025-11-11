@@ -9,8 +9,8 @@ export interface IGaceta {
   fechaPublicacion: Date;
   numeroGaceta: number;
   volumen: number;
-  anio: number;
-  mes: number;
+  desde: Date;
+  hasta: Date;
   urlGaceta: string;
   estado: ESTADO_GACETA;
   autor: string;

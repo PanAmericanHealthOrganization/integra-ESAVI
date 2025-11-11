@@ -3,11 +3,11 @@ POST http://localhost:8081/v1/integrator/gaceta/create
 Content-Type: application/json
 
 {
-    "fechaPublicacion": "2024-11-06",
-    "numeroGaceta": 1,
+    "fechaPublicacion": "2025-01-28T00:00:00Z",
+    "numeroGaceta": 2,
     "volumen": 2025,
-    "anio": 2025,
-    "mes": 11,
+    "desde": "2025-02-01",
+    "hasta": "2025-02-28",
     "urlGaceta": "https://www.salud.gob.ec/gaceta/2024/11/gaceta-001.pdf",
     "estado": "PENDIENTE",
     "autor": "Dr. Juan Pérez",
@@ -62,3 +62,79 @@ Accept: application/pdf
 # GET http://localhost:8081/v1/integrator/gaceta/pdf?anio=1999&mes=1
 # Accept: application/pdf
 # Este ejemplo debería retornar un NotFoundException si el archivo no existe
+
+### Obtener gacetas paginadas - Filtrar por año 2025
+POST http://localhost:8081/v1/integrator/gaceta/paginated
+Content-Type: application/json
+
+{
+  "pagination": {
+    "page": 1,
+    "perPage": 10
+  },
+  "sort": {
+    "field": "fechaPublicacion",
+    "order": "DESC"
+  },
+  "filter": {
+    "anio": 2025
+  }
+}
+
+### Obtener gacetas paginadas - Filtrar por año 2025 y mes 11
+POST http://localhost:8081/v1/integrator/gaceta/paginated
+Content-Type: application/json
+
+{
+  "pagination": {
+    "page": 1,
+    "perPage": 10
+  },
+  "sort": {
+    "field": "numeroGaceta",
+    "order": "ASC"
+  },
+  "filter": {
+    "anio": 2025,
+    "mes": 11
+  }
+}
+
+### Obtener gacetas paginadas - Filtrar solo por mes (cualquier año)
+POST http://localhost:8081/v1/integrator/gaceta/paginated
+Content-Type: application/json
+
+{
+  "pagination": {
+    "page": 1,
+    "perPage": 5
+  },
+  "sort": {
+    "field": "desde",
+    "order": "DESC"
+  },
+  "filter": {
+    "mes": 11
+  }
+}
+
+### Obtener gacetas paginadas - Filtros combinados
+POST http://localhost:8081/v1/integrator/gaceta/paginated
+Content-Type: application/json
+
+{
+  "pagination": {
+    "page": 1,
+    "perPage": 10
+  },
+  "sort": {
+    "field": "fechaPublicacion",
+    "order": "DESC"
+  },
+  "filter": {
+    "anio": 2025,
+    "mes": 11,
+    "estado": "PUBLICADO",
+    "autor": "Dr."
+  }
+}

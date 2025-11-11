@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { format } from 'date-fns';
 import { readFileSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -126,12 +127,37 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       buildFilter = { ...buildFilter, numeroGaceta: filter.numeroGaceta };
     }
 
+    // Filtro por año - busca en la fecha 'desde' de la gaceta
     if (filter?.anio && typeof filter.anio === 'number') {
-      buildFilter = { ...buildFilter, anio: filter.anio };
+      buildFilter = {
+        ...buildFilter,
+        desde: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = :year`, {
+          year: filter.anio,
+        }),
+      };
     }
 
+    // Filtro por mes - busca en la fecha 'desde' de la gaceta
     if (filter?.mes && typeof filter.mes === 'number') {
-      buildFilter = { ...buildFilter, mes: filter.mes };
+      // Si ya hay un filtro de año, combinarlo con el mes
+      if (filter?.anio && typeof filter.anio === 'number') {
+        buildFilter = {
+          ...buildFilter,
+          desde: Raw(
+            (alias) =>
+              `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
+            { year: filter.anio, month: filter.mes },
+          ),
+        };
+      } else {
+        // Solo filtro por mes sin año específico
+        buildFilter = {
+          ...buildFilter,
+          desde: Raw((alias) => `EXTRACT(MONTH FROM ${alias}) = :month`, {
+            month: filter.mes,
+          }),
+        };
+      }
     }
 
     if (filter?.estado && typeof filter.estado === 'string') {
@@ -220,11 +246,14 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       'fechaPublicacion',
       'numeroGaceta',
       'volumen',
-      'anio',
-      'mes',
+      'desde',
+      'hasta',
       'estado',
       'autor',
       'autorSecundario',
+      'urlGaceta',
+      'cargo',
+      'cargoSecundario',
     ];
 
     const finalSortField = validSortFields.includes(sortField) ? sortField : 'fechaPublicacion';
@@ -260,23 +289,47 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
    */
   public async create(createGacetaDto: CreateGacetaDto): Promise<GacetaDto> {
     try {
-      // Verificar si ya existe una gaceta con el mismo número, año y mes
+      // Extraer año y mes de la fecha desde para la validación
+      const fechaDesde = new Date(createGacetaDto.desde);
+      const anio = fechaDesde.getFullYear();
+      const mes = fechaDesde.getMonth() + 1; // getMonth() retorna 0-11
+
+      // Verificar si ya existe una gaceta con el mismo número en el mismo año y mes
       const existingGaceta = await this.gacetaRepository.findOne({
         where: {
           numeroGaceta: createGacetaDto.numeroGaceta,
-          anio: createGacetaDto.anio,
-          mes: createGacetaDto.mes,
+          desde: Raw(
+            (alias) =>
+              `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
+            { year: anio, month: mes },
+          ),
         },
       });
 
       if (existingGaceta) {
         throw new Error(
-          `Ya existe una gaceta con el número ${createGacetaDto.numeroGaceta} para ${createGacetaDto.mes}/${createGacetaDto.anio}`,
+          `Ya existe una gaceta con el número ${
+            createGacetaDto.numeroGaceta
+          } para el período ${anio}/${mes.toString().padStart(2, '0')}`,
         );
       }
 
       const gaceta = this.gacetaRepository.create(createGacetaDto);
-      return await this.gacetaRepository.save(gaceta);
+
+      const t = await this.gacetaRepository.save(gaceta);
+      // ejecutar de forma sincrona el script de renderizado
+      this.ejecutarRenderScript(createGacetaDto.desde, createGacetaDto.hasta)
+        .then(() => {
+          this.logger.log(
+            `Renderizado ejecutado tras actualización de gaceta, ${createGacetaDto.desde}/${createGacetaDto.hasta}`,
+          );
+        })
+        .catch((error) => {
+          this.logger.error(
+            `Error al ejecutar renderizado tras actualización de gaceta, ${createGacetaDto.desde}/${createGacetaDto.hasta} - Error: ${error.message}`,
+          );
+        });
+      return t;
     } catch (error) {
       this.logger.error(`Error al crear gaceta: ${error.message}`);
       throw error;
@@ -311,6 +364,26 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
     }
     const u = await this.gacetaRepository.update(cleanId, { ...updateGacetaDto });
     console.log('Resultado de la actualización:', u);
+
+    // ejecutar de forma sincrona el script de renderizado
+    this.ejecutarRenderScript(exist.desde, exist.hasta)
+      .then(() => {
+        this.logger.log(
+          `Renderizado ejecutado tras actualización de gaceta ID: ${cleanId} - ${format(
+            exist.desde,
+            'yyyy-MM-dd',
+          )}/${format(exist.hasta, 'yyyy-MM-dd')}`,
+        );
+      })
+      .catch((error) => {
+        this.logger.error(
+          `Error al ejecutar renderizado tras actualización de gaceta ID: ${cleanId} - ${format(
+            exist.desde,
+            'yyyy-MM-dd',
+          )}/${format(exist.hasta, 'yyyy-MM-dd')} - Error: ${error.message}`,
+        );
+      });
+
     return this.getOne(cleanId);
   }
 
@@ -384,13 +457,19 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       const mesFormateado = mes.toString().padStart(2, '0');
 
       // Obtener el path base desde variables de entorno usando ConfigService
-      const pdfBasePath = this.configService.get<string>('PATH_GACETA_ESAVI') || '/app/reports/pdf';
+      const pdfBasePath = this.configService.get<string>('PATH_GACETA_ESAVI_PROJECT');
 
       // Construir el nombre del archivo: informe_2025_01.pdf
       const nombreArchivo = `informe_esavi_${ano}${mesFormateado}.pdf`;
 
       // Construir la ruta completa del archivo
-      const rutaCompleta = path.join(pdfBasePath, ano.toString(), mesFormateado, nombreArchivo);
+      const rutaCompleta = path.join(
+        pdfBasePath,
+        'output',
+        ano.toString(),
+        mesFormateado,
+        nombreArchivo,
+      );
 
       // Verificar si el archivo existe
       try {
@@ -411,6 +490,62 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
 
       this.logger.error(`Error al obtener archivo PDF: ${error.message}`, error.stack);
       throw new BadRequestException(`Error al procesar solicitud de PDF: ${error.message}`);
+    }
+  }
+
+  /**
+   * Ejecuta el script render_simple.sh para generar reportes en un rango de fechas
+   * @param fechaInicio - Fecha de inicio en formato YYYY-MM-DD (ej: 2025-05-01)
+   * @param fechaFin - Fecha de fin en formato YYYY-MM-DD (ej: 2025-08-30)
+   * @returns Promise<string> con la salida del comando
+   * @throws BadRequestException si los parámetros son inválidos o hay error en la ejecución
+   */
+  public async ejecutarRenderScript(fechaInicio: Date, fechaFin: Date): Promise<string> {
+    try {
+      // Ruta del directorio donde se encuentra el script usando ConfigService
+      const scriptPath = this.configService.get<string>('PATH_GACETA_ESAVI_PROJECT');
+
+      // dar forma a las fechas yyyy-mm-dd
+      const fechaInicioFormateada = format(fechaInicio, 'yyyy-MM-dd');
+      const fechaFinFormateada = format(fechaFin, 'yyyy-MM-dd');
+
+      // Comando a ejecutar
+      const comando = `cd "${scriptPath}" && ./render_simple.sh all ${fechaInicioFormateada} ${fechaFinFormateada}`;
+      console.log('Comando a ejecutar:', comando);
+      // Importar exec de manera dinámica
+      const { exec } = await import('child_process');
+      const { promisify } = await import('util');
+      const execAsync = promisify(exec);
+
+      // Ejecutar el comando
+      const resultado = await execAsync(comando, {
+        cwd: scriptPath,
+        timeout: 300000, // 5 minutos de timeout
+        maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+      });
+
+      this.logger.log(`Script ejecutado exitosamente. Stdout: ${resultado.stdout}`);
+
+      if (resultado.stderr && resultado.stderr.trim() !== '') {
+        this.logger.warn(`Advertencias del script: ${resultado.stderr}`);
+      }
+
+      return resultado.stdout;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      this.logger.error(`Error al ejecutar script render_simple.sh: ${error.message}`, error.stack);
+
+      // Si es un error de ejecución del comando, proporcionar más detalles
+      if (error.code) {
+        throw new BadRequestException(
+          `Error en la ejecución del script (código ${error.code}): ${error.message}`,
+        );
+      }
+
+      throw new BadRequestException(`Error al ejecutar script de renderizado: ${error.message}`);
     }
   }
 }

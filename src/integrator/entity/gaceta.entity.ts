@@ -38,16 +38,16 @@ export class Gaceta implements IGaceta {
   volumen: number;
 
   /**
-   *
+   * Column  of gaceta
    */
-  @Column({ name: 'ANIO', type: 'int', comment: 'Año de la gaceta' })
-  anio: number;
+  @Column({ name: 'DESDE', type: 'date', comment: 'Fecha desde de la gaceta' })
+  desde: Date;
 
   /**
-   *
+   * Column  of gaceta
    */
-  @Column({ name: 'MES', type: 'int', comment: 'Mes de la gaceta' })
-  mes: number;
+  @Column({ name: 'HASTA', type: 'date', comment: 'Fecha hasta de la gaceta' })
+  hasta: Date;
 
   /**
    *

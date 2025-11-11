@@ -28,16 +28,16 @@ export class GacetaDto implements IGaceta {
   volumen: number;
 
   @ApiProperty({
-    description: 'Año de la gaceta',
-    example: 2024,
+    description: 'Fecha desde de la gaceta',
+    example: '2024-11-01T00:00:00.000Z',
   })
-  anio: number;
+  desde: Date;
 
   @ApiProperty({
-    description: 'Mes de la gaceta',
-    example: 11,
+    description: 'Fecha hasta de la gaceta',
+    example: '2024-11-30T00:00:00.000Z',
   })
-  mes: number;
+  hasta: Date;
 
   @ApiProperty({
     description: 'URL de la gaceta',

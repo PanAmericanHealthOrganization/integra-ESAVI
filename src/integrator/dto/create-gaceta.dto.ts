@@ -1,5 +1,5 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, IsNumber, IsString, IsUrl, Max, Min } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber, IsString, IsUrl, Min } from 'class-validator';
 import { ESTADO_GACETA, IGaceta } from '../entity/interfaces/gaceta.interface';
 
 export type GacetaEstado = 'PUBLICADO' | 'PENDIENTE' | 'CANCELADO';
@@ -10,8 +10,8 @@ class GacetaBase implements IGaceta {
   fechaPublicacion: Date;
   numeroGaceta: number;
   volumen: number;
-  anio: number;
-  mes: number;
+  desde: Date;
+  hasta: Date;
   urlGaceta: string;
   estado: ESTADO_GACETA;
   autor: string;
@@ -73,31 +73,27 @@ export class CreateGacetaDto extends PartialType(GacetaBase) {
    *
    */
   @ApiProperty({
-    description: 'Año de la gaceta',
-    example: 2024,
-    minimum: 2020,
-    maximum: 2050,
+    description: 'Fecha desde de la gaceta',
+    example: '2024-11-01',
+    type: 'string',
+    format: 'date',
   })
-  @IsNumber()
+  @IsDateString()
   @IsNotEmpty()
-  @Min(2020)
-  @Max(2050)
-  declare anio: number;
+  declare desde: Date;
 
   /**
-   *
+   * Api property of create gaceta dto
    */
   @ApiProperty({
-    description: 'Mes de la gaceta',
-    example: 11,
-    minimum: 1,
-    maximum: 12,
+    description: 'Fecha hasta de la gaceta',
+    example: '2024-11-30',
+    type: 'string',
+    format: 'date',
   })
-  @IsNumber()
+  @IsDateString()
   @IsNotEmpty()
-  @Min(1)
-  @Max(12)
-  declare mes: number;
+  declare hasta: Date;
 
   /**
    *
