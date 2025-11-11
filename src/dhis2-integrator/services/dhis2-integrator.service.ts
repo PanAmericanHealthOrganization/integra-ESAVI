@@ -885,6 +885,7 @@ export class Dhis2IntegratorService {
     create.datoVacuna = datoVacunas;
     create.gravedadEsavi = grave;
     create.desenlaceEsavi = desenlaceEsavi;
+    create.investigacion = investigacion;
 
     if (antecedenteMedico.descripcionPrincipal &&
         antecedenteMedico.descripcionPrincipal.length > 0) {

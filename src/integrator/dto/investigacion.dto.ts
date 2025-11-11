@@ -1,12 +1,18 @@
 import{ ApiProperty, OmitType } from'@nestjs/swagger';
 import{ IInvestigacion } from '../entity/investigacion.entity';
-export class InvestigacionDto implements IInvestigacion{
+import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { DatoEsavi } from '../entity/dato-esavi.entity';
+export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion{
     /**
      * Identificador único de la investigación
      * */
     @ApiProperty()
     id: string;
-
+    /**
+     * Datos del ESAVI asociado a la investigación
+    */
+    @ApiProperty()
+    datoEsavi: DatoEsavi;
     /**
      * Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2
      * */
