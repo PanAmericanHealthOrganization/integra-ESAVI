@@ -17,7 +17,7 @@ export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion
      * Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2
      * */
     @ApiProperty()
-    fechaInvestigacion: Date;
+    fechaInvestigacion: Date | null;
 
     /**
      * El vacunatorio cumple con los estándares de calidad
@@ -41,13 +41,13 @@ export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion
      * Número de casos con sintomatología que recibieron vacuna
      * */
     @ApiProperty()
-    busquedaCasosSintomatologiaConVacuna: number;
+    busquedaCasosSintomatologiaConVacuna: boolean;
 
     /**
      * Número de casos con sintomatología sin antecedente de vacuna
      * */
     @ApiProperty()
-    busquedaCasosSintomatologiaSinVacuna: number;
+    busquedaCasosSintomatologiaSinVacuna: boolean;
 
     /**
      * Muestra de Laboratorio

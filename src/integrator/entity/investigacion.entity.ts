@@ -47,7 +47,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
     comment:
       'Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2',
   })
-  fechaInvestigacion: Date;
+  fechaInvestigacion: Date | null;
 
   /**
    *
@@ -87,7 +87,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',
   })
-  busquedaCasosSintomatologiaConVacuna: number;
+  busquedaCasosSintomatologiaConVacuna: boolean;
 
   /**
    *
@@ -97,7 +97,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',
   })
-  busquedaCasosSintomatologiaSinVacuna: number;
+  busquedaCasosSintomatologiaSinVacuna: boolean;
 
   /**
    *
@@ -117,12 +117,12 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
 
 export interface IInvestigacion extends CustomBaseEntity {
   id: string;
-  fechaInvestigacion: Date;
+  fechaInvestigacion: Date | null;
   vacunatorioCalidad: boolean;
   personalCapacitado: boolean;
   problemaBiologico: boolean;
-  busquedaCasosSintomatologiaConVacuna: number;
-  busquedaCasosSintomatologiaSinVacuna: number;
+  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: boolean;
   muestraLaboratorio: boolean;
 }
 
@@ -134,7 +134,7 @@ export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion
   datoEsavi: DatoEsavi;
 
   @ApiProperty()
-  fechaInvestigacion: Date;
+  fechaInvestigacion: Date | null;
 
   @ApiProperty()
   vacunatorioCalidad: boolean;
@@ -146,10 +146,10 @@ export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion
   problemaBiologico: boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaConVacuna: number;
+  busquedaCasosSintomatologiaConVacuna: boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaSinVacuna: number;
+  busquedaCasosSintomatologiaSinVacuna: boolean;
 
   @ApiProperty()
   muestraLaboratorio: boolean;

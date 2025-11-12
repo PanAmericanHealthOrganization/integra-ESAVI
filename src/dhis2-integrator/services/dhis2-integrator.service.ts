@@ -869,12 +869,72 @@ export class Dhis2IntegratorService {
 
     //-------TR_INVESTIGACION
     const investigacion = new InvestigacionCreateDto();
-    investigacion.fechaInvestigacion =
+    investigacion.fechaInvestigacion = this.formatoFecha(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Fecha en que se termina la investigación',
         )
-      ];
+      ],);
+      //column: DNVE ESAVI TRK - El vacunatorio cumple con los estándares de calidad. Utilizar el método this.esAfirmativo
+      investigacion.vacunatorioCalidad = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - El vacunatorio cumple con los estándares de calidad',
+          )
+        ],
+      );
+      //column: DNVE ESAVI TRK - El personal de salud está capacitado en inmunizaciones. Utilizar el método this.esAfirmativo
+      investigacion.personalCapacitado = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - El personal de salud está capacitado en inmunizaciones',
+          )
+        ],
+      );
+      //column: DNVE ESAVI TRK - Evidenció algún problema en el biológico. Utilizar el método this.esAfirmativo
+      investigacion.problemaBiologico = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Evidenció algún problema en el biológico',
+          )
+        ],
+      );
+      //column: DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna. Utilizar el método this.esAfirmativo
+      investigacion.busquedaCasosSintomatologiaConVacuna = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',
+          )
+        ],
+      );
+      //column: DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna. Utilizar el método this.esAfirmativo
+      investigacion.busquedaCasosSintomatologiaSinVacuna = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',
+          )
+        ],
+      );
+      //column: DNVE ESAVI TRK - Muestra de Laboratorio. Utilizar el método this.esAfirmativo
+      investigacion.muestraLaboratorio = this.esValorAfirmativo(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Muestra de Laboratorio',
+          )
+        ],
+      );
 
     // Complete the dto
     const create = new CreateCompleteDto();
