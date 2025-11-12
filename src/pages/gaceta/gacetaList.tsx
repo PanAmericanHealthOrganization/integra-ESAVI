@@ -11,7 +11,7 @@ import {
 } from "react-admin"
 
 import DownloadIcon from "@mui/icons-material/Download"
-import { IconButton } from "@mui/material"
+import { Box, IconButton, Typography } from "@mui/material"
 
 const DownloadFileButton = ({ record }: { record: any }) => {
   const dataProvider = useDataProvider()
@@ -19,9 +19,14 @@ const DownloadFileButton = ({ record }: { record: any }) => {
 
   const handleDownload = async () => {
     try {
+      // Extraer año y mes del campo 'hasta' que es de tipo date
+      const fechaHasta = new Date(record.hasta)
+      const anio = fechaHasta.getFullYear()
+      const mes = fechaHasta.getMonth() + 1 // getMonth() devuelve 0-11, necesitamos 1-12
+
       const response = await dataProvider.getGacetaFile("gaceta", {
-        anio: record.anio,
-        mes: record.mes,
+        anio: anio,
+        mes: mes,
       })
 
       // La respuesta debería ser un blob
@@ -31,7 +36,7 @@ const DownloadFileButton = ({ record }: { record: any }) => {
       // Crear un enlace temporal para descargar el archivo
       const link = document.createElement("a")
       link.href = url
-      link.download = `gaceta_esavi_${record.anio}_${String(record.mes).padStart(2, "0")}.pdf`
+      link.download = `gaceta_esavi_${anio}_${String(mes).padStart(2, "0")}.pdf`
       document.body.appendChild(link)
       link.click()
 
@@ -88,6 +93,21 @@ const GacetaFilter = (props: any) => {
   )
 }
 
+const EmptyGacetaList = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 200,
+      flexDirection: "column",
+    }}>
+    <Typography variant="h6" color="textSecondary">
+      Sin gacetas disponibles para los filtros agregados
+    </Typography>
+  </Box>
+)
+
 export const GacetaList = () => {
   const currentYear = new Date().getFullYear()
 
@@ -95,12 +115,39 @@ export const GacetaList = () => {
     <List
       title="Gacetas ESAVI Oficiales"
       filters={<GacetaFilter />}
-      filterDefaultValues={{ anio: currentYear }}>
+      filterDefaultValues={{ anio: currentYear }}
+      empty={<EmptyGacetaList />}>
       <Datagrid bulkActionButtons={false} rowClick={false}>
         <TextField source="fechaPublicacion" label="Fecha de Publicación" />
         <TextField source="titulo" label="Título" />
-        <TextField source="anio" label="Año" />
-        <TextField source="mes" label="Mes" />
+        <FunctionField
+          label="Año"
+          render={(record) =>
+            record.hasta ? new Date(record.hasta).getFullYear() : ""
+          }
+        />
+        <FunctionField
+          label="Mes"
+          render={(record) => {
+            if (!record.hasta) return ""
+            const month = new Date(record.hasta).getMonth() + 1
+            const monthNames = [
+              "Enero",
+              "Febrero",
+              "Marzo",
+              "Abril",
+              "Mayo",
+              "Junio",
+              "Julio",
+              "Agosto",
+              "Septiembre",
+              "Octubre",
+              "Noviembre",
+              "Diciembre",
+            ]
+            return monthNames[month - 1]
+          }}
+        />
         <TextField source="estado" label="Estado" />
         <FunctionField
           label="Archivo"

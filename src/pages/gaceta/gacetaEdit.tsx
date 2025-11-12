@@ -43,10 +43,10 @@ export const GacetaEdit = () => {
             <TextInput source="volumen" label="Volumen" />
           </Grid>
           <Grid item xs={12} sm={2}>
-            <TextInput source="anio" label="Año" />
+            <DateInput source="desde" label="desde" />
           </Grid>
           <Grid item xs={12} sm={2}>
-            <TextInput source="mes" label="Mes" />
+            <TextInput source="hasta" label="hasta" />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextInput source="urlGaceta" label="URL de Gaceta" readOnly />
