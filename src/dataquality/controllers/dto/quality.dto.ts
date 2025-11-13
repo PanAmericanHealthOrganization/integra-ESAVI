@@ -26,21 +26,22 @@ export class CompletenessQualityTableDto {
 }
 
 export class SintacticQualityDto {
-  tableName: string;
-  columnName: string;
-  columnDescription: string;
-  validRecords: number;
-  invalidRecords: number;
-  percentageValidRecords: number;
+  regla: string;
+  condicion: string;
+  descripcionRegla: string;
+  totalRegistros: number;
+  totalRegistrosValidos: number;
+  porcentajeRegistrosValidos: number;
 }
 
 export class SemanticQualityTableDto {
-  tableName: string;
-  columnName: string;
-  columnDescription: string;
-  validRecords: number;
-  invalidRecords: number;
+  ruleName: string;
+  ruleDescription: string;
+  totalRecords: number;
+  totalValidRecords: number;
+  totalInvalidRecords: number;
   percentageValidRecords: number;
+  percentageInvalidRecords: number;
 }
 
 export class TemporalQualityTableDto {

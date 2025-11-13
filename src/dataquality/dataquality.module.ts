@@ -5,6 +5,8 @@ import { DataqualityController } from './controllers/dataquality.controller';
 import { DataqualityDimensions } from './entities/dataquality.entity';
 import { GeneralService } from './services/general.service';
 import { CompletenessService } from './services/complees.service';
+import { SintacticService } from './services/sintactic.service';
+import { SemanticService } from './services/semantic.service';
 
 const DATAQUALITY_DS = 'DATAQUALITY_DS';
 
@@ -21,9 +23,9 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
         username: configService.get('USER_DATABASE'),
         password: configService.get('PASS_DATABASE'),
         database: configService.get('NAME_DATABASE'),
-        schema: 'dataquality',
+        schema: 'dhi_esavi',
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: true,
         poolSize: 5,
       }),
       inject: [ConfigService],
@@ -31,7 +33,7 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
     TypeOrmModule.forFeature([DataqualityDimensions], DATAQUALITY_DS),
   ],
   controllers: [DataqualityController],
-  providers: [GeneralService, CompletenessService],
-  exports: [GeneralService, CompletenessService],
+  providers: [GeneralService, CompletenessService, SintacticService, SemanticService],
+  exports: [GeneralService, CompletenessService, SintacticService, SemanticService],
 })
 export class DataqualityModule {}
