@@ -7,6 +7,7 @@ import { MeddraModule } from './meddra/meddra.module';
 //import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
+import { DataqualityModule } from './dataquality/dataquality.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,
+    DataqualityModule,
   ],
   providers: [],
 })
