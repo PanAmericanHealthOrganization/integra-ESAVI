@@ -3,4 +3,5 @@ export class CreatePacienteDto {
   identificacion: string;
   sexoPaciente: string;
   autoIdentificacionPaciente: string;
+  fechaNacimiento: Date;
 }
