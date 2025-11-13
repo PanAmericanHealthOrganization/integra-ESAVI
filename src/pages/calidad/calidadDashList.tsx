@@ -3,10 +3,23 @@ import {
   CheckCircle,
   Code,
   Psychology,
+  Refresh,
   Schedule,
 } from "@mui/icons-material"
-import { Box, Container, Paper, Tab, Tabs } from "@mui/material"
-import React, { useState } from "react"
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+} from "@mui/material"
+import React, { useMemo, useState } from "react"
 
 // Importar componentes de tabs
 import CalidadCompletitud from "./tabs/calidad_completitud"
@@ -14,6 +27,10 @@ import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
 import CalidadSintactica from "./tabs/calidad_sintactica"
 import CalidadTemporal from "./tabs/calidad_temporal"
+import {
+  CalidadDataQualityProvider,
+  useCalidadDataQuality,
+} from "./calidadDataQualityContext"
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -43,44 +60,99 @@ function a11yProps(index: number) {
   }
 }
 
-export const CalidadDashList: React.FC = () => {
+const CalidadDashListContent: React.FC = () => {
   const [currentTab, setCurrentTab] = useState(0)
+  const { error, loading, refresh, selectedDate, setSelectedDate } =
+    useCalidadDataQuality()
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue)
   }
 
-  const tabs = [
-    {
-      label: "General",
-      icon: <Assessment />,
-      component: <CalidadGeneral />,
-    },
-    {
-      label: "Completitud",
-      icon: <CheckCircle />,
-      component: <CalidadCompletitud />,
-    },
-    {
-      label: "Sintáctica",
-      icon: <Code />,
-      component: <CalidadSintactica />,
-    },
-    {
-      label: "Semántica",
-      icon: <Psychology />,
-      component: <CalidadSemantica />,
-    },
-    {
-      label: "Temporal",
-      icon: <Schedule />,
-      component: <CalidadTemporal />,
-    },
-  ]
+  const tabs = useMemo(
+    () => [
+      {
+        label: "General",
+        icon: <Assessment />,
+        component: <CalidadGeneral />,
+      },
+      {
+        label: "Completitud",
+        icon: <CheckCircle />,
+        component: <CalidadCompletitud />,
+      },
+      {
+        label: "Sintáctica",
+        icon: <Code />,
+        component: <CalidadSintactica />,
+      },
+      {
+        label: "Semántica",
+        icon: <Psychology />,
+        component: <CalidadSemantica />,
+      },
+      {
+        label: "Temporal",
+        icon: <Schedule />,
+        component: <CalidadTemporal />,
+      },
+    ],
+    []
+  )
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Paper elevation={2} sx={{ width: "100%" }}>
+      <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            px: 3,
+            py: 3,
+          }}>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Monitoreo de Calidad de Datos
+          </Typography>
+
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", md: "center" }}>
+            <TextField
+              label="Fecha de referencia"
+              type="date"
+              size="small"
+              InputLabelProps={{ shrink: true }}
+              value={selectedDate}
+              onChange={(event) => setSelectedDate(event.target.value)}
+              sx={{ maxWidth: 220 }}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<Refresh />}
+              onClick={refresh}
+              disabled={loading}>
+              Actualizar
+            </Button>
+            {loading && (
+              <Stack direction="row" spacing={1} alignItems="center">
+                <CircularProgress size={20} />
+                <Typography variant="body2" color="text.secondary">
+                  Cargando información…
+                </Typography>
+              </Stack>
+            )}
+          </Stack>
+
+          {error && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+        </Box>
+
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <Tabs
             value={currentTab}
@@ -95,6 +167,7 @@ export const CalidadDashList: React.FC = () => {
                 fontSize: "1rem",
                 fontWeight: 500,
               },
+              px: 3,
             }}>
             {tabs.map((tab, index) => (
               <Tab
@@ -118,4 +191,12 @@ export const CalidadDashList: React.FC = () => {
   )
 }
 
+export const CalidadDashList: React.FC = () => (
+  <CalidadDataQualityProvider>
+    <CalidadDashListContent />
+  </CalidadDataQualityProvider>
+)
+
 export default CalidadDashList
+
+export { CalidadDashListContent }

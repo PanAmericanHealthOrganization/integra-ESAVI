@@ -1,13 +1,11 @@
-import { TrendingDown, TrendingFlat, TrendingUp } from "@mui/icons-material"
-import { Box, Card, CardContent, Chip, Grid, Typography } from "@mui/material"
+import { Box, Card, CardContent, Grid, Typography } from "@mui/material"
+import { useMemo } from "react"
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
   Legend,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -16,220 +14,333 @@ import {
   YAxis,
 } from "recharts"
 
-interface QualityMetric {
-  title: string
-  value: string
-  trend: "up" | "down" | "stable"
-  percentage: string
-}
+import { useCalidadDataQuality } from "../calidadDataQualityContext"
 
-const mockData: QualityMetric[] = [
-  {
-    title: "Casos Procesados",
-    value: "2,847",
-    trend: "up",
-    percentage: "+12%",
-  },
-  {
-    title: "Calidad Promedio",
-    value: "94.2%",
-    trend: "up",
-    percentage: "+2.1%",
-  },
-  {
-    title: "Errores Detectados",
-    value: "23",
-    trend: "down",
-    percentage: "-15%",
-  },
+const numberFormatter = new Intl.NumberFormat("es-ES")
+
+const completenessBuckets = [
+  { id: "full", label: "100% completitud", color: "#16a34a", match: (v: number) => v === 100 },
+  { id: "high", label: "75% - 99%", color: "#22c55e", match: (v: number) => v >= 75 && v < 100 },
+  { id: "medium", label: "50% - 74%", color: "#f97316", match: (v: number) => v >= 50 && v < 75 },
+  { id: "low", label: "1% - 49%", color: "#ef4444", match: (v: number) => v > 0 && v < 50 },
+  { id: "empty", label: "0%", color: "#991b1b", match: (v: number) => v === 0 },
 ]
 
-// Datos para los gráficos
-const tendenciaData = [
-  { mes: "Ene", calidad: 87.5 },
-  { mes: "Feb", calidad: 89.2 },
-  { mes: "Mar", calidad: 91.8 },
-  { mes: "Abr", calidad: 90.5 },
-  { mes: "May", calidad: 92.3 },
-  { mes: "Jun", calidad: 94.2 },
-]
+const LoadingState = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 300,
+    }}>
+    <Typography variant="h6">Cargando resumen general…</Typography>
+  </Box>
+)
 
-const categoriaData = [
-  { name: "Eventos Adversos", value: 85, color: "#3b82f6" },
-  { name: "Vacunación", value: 92, color: "#10b981" },
-  { name: "Seguimiento", value: 78, color: "#f59e0b" },
-]
+const EmptyState = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 300,
+    }}>
+    <Typography variant="h6">
+      No hay datos de calidad disponibles para la fecha seleccionada.
+    </Typography>
+  </Box>
+)
 
-const erroresData = [
-  { month: "Ene", errors: 45 },
-  { month: "Feb", errors: 38 },
-  { month: "Mar", errors: 32 },
-  { month: "Abr", errors: 28 },
-  { month: "May", errors: 25 },
-  { month: "Jun", errors: 23 },
-]
+type ChartEmptyStateProps = { message: string }
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"]
+const ChartEmptyState = ({ message }: ChartEmptyStateProps) => (
+  <Box
+    sx={{
+      height: "100%",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      px: 2,
+      textAlign: "center",
+    }}>
+    <Typography variant="body1" color="text.secondary">
+      {message}
+    </Typography>
+  </Box>
+)
 
-export const CalidadGeneral = () => {
-  const getTrendIcon = (trend: "up" | "down" | "stable") => {
-    switch (trend) {
-      case "up":
-        return <TrendingUp sx={{ color: "success.main" }} />
-      case "down":
-        return <TrendingDown sx={{ color: "error.main" }} />
-      case "stable":
-        return <TrendingFlat sx={{ color: "grey.500" }} />
+export const CalidadGeneral: React.FC = () => {
+  const { data, loading } = useCalidadDataQuality()
+
+  const resumen = useMemo(() => {
+    if (!data) return null
+
+    const totalCampos = data.completenessQualityTable.length
+
+    const promedioCompletitud =
+      totalCampos > 0
+        ? data.completenessQualityTable.reduce(
+            (acc, item) => acc + item.completenessPercentage,
+            0
+          ) / totalCampos
+        : 0
+
+    const camposCompletos = data.completenessQualityTable.filter(
+      (item) => item.completenessPercentage === 100
+    ).length
+
+    const camposCriticos = data.completenessQualityTable.filter(
+      (item) => item.completenessPercentage < 50
+    ).length
+
+    return {
+      totalRegistros: data.totalRegistros,
+      totalErrores: data.totalErrores,
+      promedioCompletitud,
+      totalCampos,
+      camposCompletos,
+      camposCriticos,
     }
+  }, [data])
+
+  const topCamposIncompletos = useMemo(() => {
+    if (!data) return []
+
+    return [...data.completenessQualityTable]
+      .sort(
+        (a, b) =>
+          a.completenessPercentage - b.completenessPercentage ||
+          b.totalRecords - a.totalRecords
+      )
+      .slice(0, 10)
+      .map((item) => ({
+        nombre: `${item.tableName}.${item.columnName}`,
+        completitud: Number(item.completenessPercentage.toFixed(2)),
+        faltante: Number((100 - item.completenessPercentage).toFixed(2)),
+      }))
+  }, [data])
+
+  const distribucionCompletitud = useMemo(() => {
+    if (!data)
+      return completenessBuckets.map((bucket) => ({ ...bucket, count: 0 }))
+
+    return completenessBuckets
+      .map((bucket) => ({
+        ...bucket,
+        count: data.completenessQualityTable.filter((row) =>
+          bucket.match(row.completenessPercentage)
+        ).length,
+      }))
+      .filter((bucket) => bucket.count > 0)
+  }, [data])
+
+  const columnasConMasNulos = useMemo(() => {
+    if (!data) return []
+
+    return data.completenessQualityTable
+      .filter((row) => row.totalNulls > 0)
+      .sort((a, b) => b.totalNulls - a.totalNulls)
+      .slice(0, 8)
+      .map((row) => ({
+        columna: `${row.tableName}.${row.columnName}`,
+        nulos: row.totalNulls,
+        noNulos: row.totalNonNulls,
+      }))
+  }, [data])
+
+  if (loading) {
+    return <LoadingState />
   }
 
-  const getTrendColor = (trend: "up" | "down" | "stable") => {
-    switch (trend) {
-      case "up":
-        return "success"
-      case "down":
-        return "error"
-      case "stable":
-        return "default"
-    }
+  if (!data || !resumen) {
+    return <EmptyState />
   }
 
   return (
-    <Box sx={{ p: 3, bgcolor: "grey.50", minHeight: "100vh" }}>
-      <Box sx={{ maxWidth: "1200px", mx: "auto" }}>
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          {mockData.map((metric, index) => (
-            <Grid item xs={12} sm={6} md={3} lg={3} xl={3} key={index}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    gutterBottom>
-                    {metric.title}
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      mt: 2,
-                    }}>
-                    <Typography
-                      variant="h4"
-                      component="div"
-                      sx={{ fontWeight: "bold" }}>
-                      {metric.value}
-                    </Typography>
-                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      {getTrendIcon(metric.trend)}
-                      <Chip
-                        label={metric.percentage}
-                        color={getTrendColor(metric.trend)}
-                        size="small"
-                        variant="outlined"
+    <Box sx={{ p: 3, bgcolor: "grey.50" }}>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Registros evaluados
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {numberFormatter.format(resumen.totalRegistros)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Registros considerados en la evaluación
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Errores detectados
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {numberFormatter.format(resumen.totalErrores)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Registros con problemas de calidad
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio de completitud
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {resumen.promedioCompletitud.toFixed(2)}%
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Promedio global de campos completos
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Columnas críticas
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {numberFormatter.format(resumen.camposCriticos)}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Columnas con menos de 50% de completitud
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={8}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Top 10 columnas con menor completitud
+              </Typography>
+              <Box sx={{ height: 320 }}>
+                {topCamposIncompletos.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={topCamposIncompletos} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis
+                        type="number"
+                        domain={[0, 100]}
+                        tickFormatter={(value) => `${value}%`}
                       />
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
+                      <YAxis type="category" dataKey="nombre" width={240} />
+                      <Tooltip formatter={(value) => [`${value}%`, "Completitud"]} />
+                      <Legend />
+                      <Bar
+                        dataKey="completitud"
+                        name="Completitud"
+                        fill="#3b82f6"
+                        radius={[0, 4, 4, 0]}
+                      />
+                      <Bar
+                        dataKey="faltante"
+                        name="Dato faltante"
+                        fill="#ef4444"
+                        radius={[0, 4, 4, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="Todas las columnas presentan 100% de completitud." />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
 
-        <Grid container spacing={3} sx={{ mb: 4 }}>
-          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  component="h2"
-                  sx={{ mb: 2, fontWeight: "semibold" }}>
-                  Tendencia de Calidad **** puede el porcentaje de calidad en
-                  función del timpo, pero me iria por completitud
-                </Typography>
-                <Box sx={{ height: 250 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={tendenciaData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="mes" />
-                      <YAxis domain={[80, 100]} />
-                      <Tooltip />
-                      <Line
-                        type="monotone"
-                        dataKey="calidad"
-                        stroke="#3b82f6"
-                        strokeWidth={2}
-                        dot={{ fill: "#3b82f6", strokeWidth: 2 }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
-            <Card sx={{ height: "100%" }}>
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  component="h2"
-                  sx={{ mb: 2, fontWeight: "semibold" }}>
-                  De las columnas principales el que menor error maneja un top
-                  10, quizá otro tipo de gráfico
-                </Typography>
-                <Box sx={{ height: 250 }}>
+        <Grid item xs={12} md={4}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Distribución de completitud
+              </Typography>
+              <Box sx={{ height: 280 }}>
+                {distribucionCompletitud.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={categoriaData}
+                        data={distribucionCompletitud}
+                        dataKey="count"
+                        nameKey="label"
                         cx="50%"
                         cy="50%"
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, value }) => `${name}: ${value}%`}>
-                        {categoriaData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        outerRadius={90}
+                        label={({ label, count }) => `${label}: ${count}`}>
+                        {distribucionCompletitud.map((entry) => (
+                          <Cell key={entry.id} fill={entry.color} />
                         ))}
                       </Pie>
                       <Tooltip />
                     </PieChart>
                   </ResponsiveContainer>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                ) : (
+                  <ChartEmptyState message="No se registraron columnas evaluadas para calcular la distribución." />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
+      </Grid>
 
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
-            <Card>
-              <CardContent>
-                <Typography
-                  variant="h6"
-                  component="h2"
-                  sx={{ mb: 2, fontWeight: "semibold" }}>
-                  Evolución de Errores Detectados
-                </Typography>
-                <Box sx={{ height: 300 }}>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
+                Columnas con mayor número de valores nulos
+              </Typography>
+              <Box sx={{ height: 360 }}>
+                {columnasConMasNulos.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={erroresData}>
+                    <BarChart data={columnasConMasNulos} layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
-                      <YAxis />
-                      <Tooltip />
+                      <XAxis type="number" />
+                      <YAxis type="category" dataKey="columna" width={260} />
+                      <Tooltip
+                        formatter={(value) => [
+                          numberFormatter.format(value as number),
+                          "",
+                        ]}
+                      />
                       <Legend />
-                      <Bar dataKey="errors" fill="#ef4444" name="Errores" />
+                      <Bar
+                        dataKey="nulos"
+                        name="Valores nulos"
+                        fill="#ef4444"
+                        radius={[0, 4, 4, 0]}
+                      />
+                      <Bar
+                        dataKey="noNulos"
+                        name="Valores completos"
+                        fill="#10b981"
+                        radius={[0, 4, 4, 0]}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
+                ) : (
+                  <ChartEmptyState message="No se encontraron columnas con valores nulos para la fecha seleccionada." />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
         </Grid>
-      </Box>
+      </Grid>
     </Box>
   )
 }

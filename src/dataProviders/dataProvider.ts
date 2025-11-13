@@ -1,5 +1,6 @@
 import { combineDataProviders } from "react-admin"
 import { dashboardDataProvider } from "./dashboard.dataprovider"
+import { calidadDataProvider } from "./calidad.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { gacetaDataProvider } from "./gaceta.dataprovider"
 import { reporteDataProvider } from "./reportes.dataprovider"
@@ -23,6 +24,8 @@ export const dataProvider = combineDataProviders((resource) => {
       return vacunasDataProvider
     case "gaceta":
       return gacetaDataProvider
+    case "dataquality":
+      return calidadDataProvider
     default:
       throw new Error(`Unknown resource: ${resource}`)
   }

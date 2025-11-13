@@ -16,451 +16,343 @@ import {
   TableRow,
   Typography,
 } from "@mui/material"
-import React, { useEffect, useState } from "react"
+import { useMemo } from "react"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts"
 
-interface SemanticRule {
-  id: string
-  name: string
-  description: string
-  violations: number
-  severity: "critical" | "high" | "medium" | "low"
-  field: string
-  rule_type:
-    | "referential_integrity"
-    | "business_logic"
-    | "consistency"
-    | "domain_validation"
+import { useCalidadDataQuality } from "../calidadDataQualityContext"
+
+const numberFormatter = new Intl.NumberFormat("es-ES")
+
+const getStatusColor = (percentage: number) => {
+  if (percentage >= 95) return "success"
+  if (percentage >= 85) return "warning"
+  return "error"
 }
 
-interface SemanticMetric {
-  title: string
-  value: number
-  total: number
-  percentage: number
-  trend: "up" | "down" | "stable"
-  status: "success" | "warning" | "error"
+const getStatusLabel = (percentage: number) => {
+  if (percentage >= 95) return "Excelente"
+  if (percentage >= 85) return "Aceptable"
+  return "Crítico"
 }
 
-interface ConsistencyCheck {
-  field_pair: string
-  consistent_records: number
-  inconsistent_records: number
-  consistency_rate: number
-}
+const LoadingState = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 400,
+    }}>
+    <Typography variant="h6">
+      Cargando datos de validación semántica…
+    </Typography>
+  </Box>
+)
+
+const EmptyState = () => (
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      height: 400,
+    }}>
+    <Typography variant="h6">
+      No existen resultados de reglas semánticas para la fecha seleccionada.
+    </Typography>
+  </Box>
+)
 
 const CalidadSemantica: React.FC = () => {
-  const [semanticRules, setSemanticRules] = useState<SemanticRule[]>([])
-  const [metrics, setMetrics] = useState<SemanticMetric[]>([])
-  const [consistencyChecks, setConsistencyChecks] = useState<
-    ConsistencyCheck[]
-  >([])
-  const [loading, setLoading] = useState(true)
+  const { data, loading } = useCalidadDataQuality()
+  const reglas = data?.semanticQuality ?? []
 
-  useEffect(() => {
-    fetchSemanticData()
-  }, [])
+  const resumen = useMemo(() => {
+    if (reglas.length === 0) return null
 
-  const fetchSemanticData = async () => {
-    try {
-      // Datos simulados - reemplazar con llamada real a la API
-      const rulesData: SemanticRule[] = [
-        {
-          id: "R001",
-          name: "Edad vs Fecha Nacimiento",
-          description:
-            "La edad calculada debe coincidir con la fecha de nacimiento",
-          violations: 23,
-          severity: "high",
-          field: "edad, fecha_nacimiento",
-          rule_type: "consistency",
-        },
-        {
-          id: "R002",
-          name: "Código Vacuna Válido",
-          description:
-            "El código de vacuna debe existir en el catálogo oficial",
-          violations: 8,
-          severity: "critical",
-          field: "codigo_vacuna",
-          rule_type: "referential_integrity",
-        },
-        {
-          id: "R003",
-          name: "Dosis vs Esquema",
-          description:
-            "El número de dosis debe ser válido para el esquema de vacunación",
-          violations: 45,
-          severity: "medium",
-          field: "numero_dosis, esquema_vacunacion",
-          rule_type: "business_logic",
-        },
-        {
-          id: "R004",
-          name: "Edad Mínima Vacuna",
-          description: "La edad debe ser compatible con la vacuna administrada",
-          violations: 12,
-          severity: "high",
-          field: "edad, tipo_vacuna",
-          rule_type: "business_logic",
-        },
-        {
-          id: "R005",
-          name: "Ubicación Geográfica",
-          description:
-            "El código de ubicación debe existir en el catálogo geográfico",
-          violations: 67,
-          severity: "medium",
-          field: "codigo_ubicacion",
-          rule_type: "referential_integrity",
-        },
-      ]
+    const totalReglas = reglas.length
+    const totalRegistros = reglas.reduce(
+      (acc, regla) => acc + regla.totalRecords,
+      0
+    )
+    const totalValidos = reglas.reduce(
+      (acc, regla) => acc + regla.totalValidRecords,
+      0
+    )
+    const totalInvalidos = reglas.reduce(
+      (acc, regla) => acc + regla.totalInvalidRecords,
+      0
+    )
+    const promedioValidez =
+      reglas.reduce(
+        (acc, regla) => acc + regla.percentageValidRecords,
+        0
+      ) / totalReglas
+    const reglasCriticas = reglas.filter(
+      (regla) => regla.percentageValidRecords < 85
+    ).length
 
-      const metricsData: SemanticMetric[] = [
-        {
-          title: "Integridad Referencial",
-          value: 9823,
-          total: 10000,
-          percentage: 98.23,
-          trend: "up",
-          status: "success",
-        },
-        {
-          title: "Reglas de Negocio",
-          value: 9543,
-          total: 10000,
-          percentage: 95.43,
-          trend: "stable",
-          status: "success",
-        },
-        {
-          title: "Consistencia Interna",
-          value: 9177,
-          total: 10000,
-          percentage: 91.77,
-          trend: "down",
-          status: "warning",
-        },
-        {
-          title: "Validación de Dominio",
-          value: 9633,
-          total: 10000,
-          percentage: 96.33,
-          trend: "up",
-          status: "success",
-        },
-      ]
-
-      const consistencyData: ConsistencyCheck[] = [
-        {
-          field_pair: "edad - fecha_nacimiento",
-          consistent_records: 9777,
-          inconsistent_records: 223,
-          consistency_rate: 97.77,
-        },
-        {
-          field_pair: "dosis - esquema_vacunacion",
-          consistent_records: 9555,
-          inconsistent_records: 445,
-          consistency_rate: 95.55,
-        },
-        {
-          field_pair: "vacuna - edad_minima",
-          consistent_records: 9888,
-          inconsistent_records: 112,
-          consistency_rate: 98.88,
-        },
-        {
-          field_pair: "ubicacion - codigo_postal",
-          consistent_records: 9333,
-          inconsistent_records: 667,
-          consistency_rate: 93.33,
-        },
-      ]
-
-      setSemanticRules(rulesData)
-      setMetrics(metricsData)
-      setConsistencyChecks(consistencyData)
-      setLoading(false)
-    } catch (error) {
-      console.error("Error fetching semantic data:", error)
-      setLoading(false)
+    return {
+      totalReglas,
+      totalRegistros,
+      totalValidos,
+      totalInvalidos,
+      promedioValidez,
+      reglasCriticas,
     }
-  }
+  }, [reglas])
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case "critical":
-        return "error"
-      case "high":
-        return "error"
-      case "medium":
-        return "warning"
-      case "low":
-        return "info"
-      default:
-        return "default"
-    }
-  }
+  const topReglasConIncumplimientos = useMemo(() => {
+    return reglas
+      .slice()
+      .sort((a, b) => b.totalInvalidRecords - a.totalInvalidRecords)
+      .slice(0, 10)
+      .map((regla) => ({
+        regla: regla.ruleName,
+        invalidos: regla.totalInvalidRecords,
+        porcentajeInvalido: Number(
+          regla.percentageInvalidRecords.toFixed(2)
+        ),
+        validos: regla.totalValidRecords,
+      }))
+  }, [reglas])
 
-  const getRuleTypeLabel = (type: string) => {
-    switch (type) {
-      case "referential_integrity":
-        return "Integridad Referencial"
-      case "business_logic":
-        return "Lógica de Negocio"
-      case "consistency":
-        return "Consistencia"
-      case "domain_validation":
-        return "Validación de Dominio"
-      default:
-        return type
-    }
-  }
-
-  const getTrendIcon = (trend: string) => {
-    switch (trend) {
-      case "up":
-        return "↗️"
-      case "down":
-        return "↘️"
-      case "stable":
-        return "→"
-      default:
-        return "→"
-    }
-  }
+  const tablaReglas = useMemo(
+    () =>
+      reglas.slice().sort(
+        (a, b) => a.percentageValidRecords - b.percentageValidRecords
+      ),
+    [reglas]
+  )
 
   if (loading) {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: 400,
-        }}>
-        <Typography variant="h6">
-          Cargando datos de validación semántica...
-        </Typography>
-      </Box>
-    )
+    return <LoadingState />
+  }
+
+  if (!resumen) {
+    return <EmptyState />
   }
 
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
-        Calidad Semántica de Datos
+        Calidad semántica de datos
       </Typography>
 
-      {/* Métricas principales */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {metrics.map((metric, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                  <Psychology color="primary" sx={{ mr: 1 }} />
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Reglas evaluadas
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {resumen.totalReglas}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio de cumplimiento
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {resumen.promedioValidez.toFixed(2)}%
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={resumen.promedioValidez}
+                sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                color={getStatusColor(resumen.promedioValidez) as any}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Registros válidos
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {numberFormatter.format(resumen.totalValidos)}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Reglas críticas
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                {resumen.reglasCriticas}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Menos del 85% de registros válidos
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={7}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Reglas con mayores incumplimientos
+              </Typography>
+              <Box sx={{ height: 360 }}>
+                {topReglasConIncumplimientos.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={topReglasConIncumplimientos} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis type="category" dataKey="regla" width={260} />
+                      <Tooltip
+                        formatter={(value) => [
+                          numberFormatter.format(value as number),
+                          "Registros inválidos",
+                        ]}
+                      />
+                      <Bar
+                        dataKey="invalidos"
+                        name="Registros inválidos"
+                        fill="#ef4444"
+                        radius={[0, 4, 4, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyState />
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={5}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Resumen global
+              </Typography>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+                <Box>
                   <Typography variant="body2" color="text.secondary">
-                    {metric.title}
+                    Total de registros evaluados
+                  </Typography>
+                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    {numberFormatter.format(resumen.totalRegistros)}
                   </Typography>
                 </Box>
-                <Typography
-                  variant="h4"
-                  component="div"
-                  sx={{ fontWeight: "bold", mb: 1 }}>
-                  {metric.percentage}%
-                </Typography>
-                <Box
-                  sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                  <Typography variant="body2">
-                    {getTrendIcon(metric.trend)}
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Registros inválidos
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: "bold", color: "error.main" }}>
+                    {numberFormatter.format(resumen.totalInvalidos)}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="body2" color="text.secondary">
+                    Cumplimiento promedio
                   </Typography>
                   <Chip
-                    label={
-                      metric.status === "success"
-                        ? "Excelente"
-                        : metric.status === "warning"
-                          ? "Aceptable"
-                          : "Crítico"
-                    }
-                    color={metric.status as any}
+                    label={getStatusLabel(resumen.promedioValidez)}
+                    color={getStatusColor(resumen.promedioValidez) as any}
                     size="small"
                   />
                 </Box>
-                <LinearProgress
-                  variant="determinate"
-                  value={metric.percentage}
-                  sx={{ mb: 1, height: 6, borderRadius: 3 }}
-                  color={metric.status as any}
-                />
-                <Typography variant="body2" color="text.secondary">
-                  {metric.value.toLocaleString()} /{" "}
-                  {metric.total.toLocaleString()}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Tabla de reglas semánticas */}
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Detalle de Reglas Semánticas
-              </Typography>
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>ID</TableCell>
-                      <TableCell>Regla</TableCell>
-                      <TableCell>Tipo</TableCell>
-                      <TableCell>Campo(s)</TableCell>
-                      <TableCell>Violaciones</TableCell>
-                      <TableCell>Severidad</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {semanticRules.map((rule) => (
-                      <TableRow key={rule.id} hover>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}>
-                            {rule.id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: "bold" }}>
-                            {rule.name}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            {rule.description}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={getRuleTypeLabel(rule.rule_type)}
-                            size="small"
-                            variant="outlined"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}>
-                            {rule.field}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            color="error"
-                            sx={{ fontWeight: "bold" }}>
-                            {rule.violations}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={rule.severity}
-                            color={getSeverityColor(rule.severity) as any}
-                            size="small"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Tabla de consistencia */}
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Análisis de Consistencia
-              </Typography>
-              <TableContainer component={Paper} elevation={0}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Campos Relacionados</TableCell>
-                      <TableCell>Registros Consistentes</TableCell>
-                      <TableCell>Registros Inconsistentes</TableCell>
-                      <TableCell>Tasa de Consistencia</TableCell>
-                      <TableCell>Estado</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {consistencyChecks.map((check, index) => (
-                      <TableRow key={index} hover>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: "monospace" }}>
-                            {check.field_pair}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="success.main">
-                            {check.consistent_records.toLocaleString()}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography variant="body2" color="error.main">
-                            {check.inconsistent_records.toLocaleString()}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontWeight: "bold" }}>
-                            {check.consistency_rate}%
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Chip
-                            label={
-                              check.consistency_rate >= 95
-                                ? "Excelente"
-                                : check.consistency_rate >= 90
-                                  ? "Bueno"
-                                  : "Mejorable"
-                            }
-                            color={
-                              check.consistency_rate >= 95
-                                ? "success"
-                                : check.consistency_rate >= 90
-                                  ? "warning"
-                                  : "error"
-                            }
-                            size="small"
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              </Box>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
+
+      <Card>
+        <CardContent>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+            Detalle de reglas semánticas
+          </Typography>
+          <TableContainer component={Paper} elevation={0}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Regla</TableCell>
+                  <TableCell>Descripción</TableCell>
+                  <TableCell>Registros válidos</TableCell>
+                  <TableCell>Registros inválidos</TableCell>
+                  <TableCell>% válido</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {tablaReglas.map((regla) => (
+                  <TableRow key={regla.ruleCode} hover>
+                    <TableCell sx={{ maxWidth: 220 }}>
+                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                        <Psychology color="primary" fontSize="small" />
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {regla.ruleName}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontFamily: "monospace" }}>
+                        {regla.ruleCode}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 360 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {regla.ruleDescription}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="success.main">
+                        {numberFormatter.format(regla.totalValidRecords)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="body2" color="error.main">
+                        {numberFormatter.format(regla.totalInvalidRecords)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Chip
+                        label={`${regla.percentageValidRecords.toFixed(2)}%`}
+                        color={
+                          getStatusColor(regla.percentageValidRecords) as any
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </CardContent>
+      </Card>
 
       <Alert severity="info" sx={{ mt: 3 }}>
         <Typography variant="body2">
-          La validación semántica verifica que los datos tengan sentido en el
-          contexto del dominio de negocio. Incluye reglas de integridad
-          referencial, lógica de negocio y consistencia entre campos
-          relacionados.
+          La calidad semántica garantiza que los datos tengan sentido en el
+          contexto del negocio. Revise las reglas críticas para priorizar acciones
+          de mejora y coordinar ajustes con los equipos de origen.
         </Typography>
       </Alert>
     </Box>
