@@ -35,6 +35,7 @@ export class SintacticQualityDto {
 }
 
 export class SemanticQualityTableDto {
+  ruleCode: string;
   ruleName: string;
   ruleDescription: string;
   totalRecords: number;

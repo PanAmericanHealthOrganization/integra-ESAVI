@@ -24,6 +24,7 @@ export class SemanticService {
       this.validateMinAge(),
       this.validateMaxAge(),
       this.validateBirthDateNotAfterNotification(),
+      this.validateReferentialIntegrity(),
     ]);
   }
 
@@ -51,6 +52,7 @@ export class SemanticService {
     const valid = Math.max(total - invalid, 0);
 
     return this.toSemanticDto({
+      ruleCode: 'edadNoNegativa',
       ruleName: 'edadNoNegativa',
       ruleDescription: `La edad registrada en ${this.notificationTableName}.${this.ageColumn} no debe ser negativa`,
       totalRecords: total,
@@ -83,6 +85,7 @@ export class SemanticService {
     const valid = Math.max(total - invalid, 0);
 
     return this.toSemanticDto({
+      ruleCode: 'edadNoMayorA100',
       ruleName: 'edadNoMayorA100',
       ruleDescription: `La edad registrada en ${this.notificationTableName}.${this.ageColumn} no debe superar los 100 años`,
       totalRecords: total,
@@ -132,8 +135,52 @@ export class SemanticService {
     const valid = Math.max(total - invalid, 0);
 
     return this.toSemanticDto({
+      ruleCode: 'fechaNacimientoAntesDeNotificacion',
       ruleName: 'fechaNacimientoAntesDeNotificacion',
       ruleDescription: `La fecha de nacimiento del paciente (${this.patientTableName}.${this.birthDateColumn}) no puede ser posterior a la fecha de notificación (${this.notificationTableName}.${this.notificationDateColumn})`,
+      totalRecords: total,
+      valid,
+      invalid,
+    });
+  }
+
+  private async validateReferentialIntegrity(): Promise<SemanticQualityTableDto> {
+    const notificationTable = this.qualifiedTable(this.notificationTableName, 'n');
+    const patientTable = this.qualifiedTable(this.patientTableName, 'p');
+    const joinClause = `
+      LEFT JOIN ${patientTable}
+        ON ${this.columnReference('n', this.patientIdColumn)} = ${this.columnReference(
+      'p',
+      this.patientIdColumn,
+    )}
+    `;
+
+    const total = await this.fetchCount(
+      `
+      SELECT COUNT(*)::BIGINT AS total
+      FROM ${notificationTable}
+      ${joinClause};
+    `,
+      'total',
+    );
+
+    const invalid = await this.fetchCount(
+      `
+      SELECT COUNT(*)::BIGINT AS invalid
+      FROM ${notificationTable}
+      ${joinClause}
+      WHERE ${this.columnReference('n', this.patientIdColumn)} IS NOT NULL
+        AND ${this.columnReference('p', this.patientIdColumn)} IS NULL;
+    `,
+      'invalid',
+    );
+
+    const valid = Math.max(total - invalid, 0);
+
+    return this.toSemanticDto({
+      ruleCode: 'integridadReferencialPaciente',
+      ruleName: 'integridadReferencialPaciente',
+      ruleDescription: `Cada registro en ${this.notificationTableName}.${this.patientIdColumn} debe tener un paciente asociado en ${this.patientTableName}.${this.patientIdColumn}`,
       totalRecords: total,
       valid,
       invalid,
@@ -146,12 +193,14 @@ export class SemanticService {
   }
 
   private toSemanticDto({
+    ruleCode,
     ruleName,
     ruleDescription,
     totalRecords,
     valid,
     invalid,
   }: {
+    ruleCode: string;
     ruleName: string;
     ruleDescription: string;
     totalRecords: number;
@@ -163,6 +212,7 @@ export class SemanticService {
     const percentageInvalidRecords =
       totalRecords === 0 ? 0 : Number(((invalid / totalRecords) * 100).toFixed(2));
     return {
+      ruleCode,
       ruleName,
       ruleDescription,
       totalRecords,

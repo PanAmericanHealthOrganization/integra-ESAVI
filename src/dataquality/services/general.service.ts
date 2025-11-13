@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {
-  CompletenessQualityTableDto,
-  QualityDto,
-  SemanticQualityTableDto,
-  SintacticQualityDto,
-} from '../controllers/dto/quality.dto';
+import { Cron } from '@nestjs/schedule';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { QualityDto } from '../controllers/dto/quality.dto';
 import { DataqualityDimensions } from '../entities/dataquality.entity';
 import { CompletenessService } from './complees.service';
-import { SintacticService } from './sintactic.service';
 import { SemanticService } from './semantic.service';
+import { SintacticService } from './sintactic.service';
 /**
  *
  */
@@ -19,6 +15,8 @@ export class GeneralService {
   private readonly schemaName = 'dhi_esavi';
 
   constructor(
+    @InjectDataSource('DATAQUALITY_DS')
+    private readonly dataSource: DataSource,
     @InjectRepository(DataqualityDimensions, 'DATAQUALITY_DS')
     private dataqualityDimensionsRepository: Repository<DataqualityDimensions>,
     private completenessService: CompletenessService,
@@ -26,16 +24,35 @@ export class GeneralService {
     private semanticService: SemanticService,
   ) {}
 
-  async processQuality() {
-    const g = await this.generalQuality();
+  async getGeneralQuality(date: Date): Promise<QualityDto> {
+    const dataqualityDimension = await this.dataqualityDimensionsRepository.findOne({
+      where: {
+        fecha: date,
+        dimension: this.schemaName,
+      },
+    });
+    if (dataqualityDimension) {
+      return JSON.parse(dataqualityDimension.jsonQuality);
+    }
+    return await this.processQualityDay(date);
+  }
+
+  private async processQualityDay(day: Date): Promise<QualityDto> {
+    const g = await this.generalQuality(day);
     await this.dataqualityDimensionsRepository.save({
       fecha: g.fecha,
       dimension: g.dimension,
       jsonQuality: JSON.stringify(g.jsonQuality),
     });
+    return g;
   }
 
-  async generalQuality(): Promise<QualityDto> {
+  @Cron('0 0 3 * * *')
+  async processQualityCron() {
+    await this.processQualityDay(new Date());
+  }
+
+  async generalQuality(day: Date): Promise<QualityDto> {
     const [completenessQualityTable, sintacticQuality, semanticQuality] = await Promise.all([
       this.completenessService.obtenerCompletitudDeEsquema(this.schemaName),
       this.sintacticService.sintacticQuality(),
@@ -43,12 +60,12 @@ export class GeneralService {
     ]);
 
     return {
-      fecha: new Date(),
+      fecha: day,
       dimension: this.schemaName,
       jsonQuality: {
-        totalRegistros: this.calculateTotalRecords(completenessQualityTable),
-        totalErrores: 0,
-        totalPorcentaje: 0,
+        totalRegistros: (await this.calculateTotalRecords('TR_NOTIFICACION')) ?? 0,
+        totalErrores: -100,
+        totalPorcentaje: -100,
         completenessQualityTable,
         sintacticQuality,
         semanticQuality,
@@ -57,13 +74,13 @@ export class GeneralService {
     };
   }
 
-  private calculateTotalRecords(tables: CompletenessQualityTableDto[]): number {
-    const totalsByTable = new Map<string, number>();
-    tables.forEach((item) => {
-      if (!totalsByTable.has(item.tableName)) {
-        totalsByTable.set(item.tableName, item.totalRecords);
-      }
-    });
-    return Array.from(totalsByTable.values()).reduce((acc, current) => acc + current, 0);
+  private async calculateTotalRecords(tableName: string): Promise<number> {
+    const query = `
+      SELECT COUNT(*)::BIGINT AS total
+      FROM dhi_esavi."${tableName}";
+    `;
+
+    const [result] = await this.dataSource.query(query);
+    return Number(result?.[0]?.total ?? 0);
   }
 }
