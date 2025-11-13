@@ -408,6 +408,10 @@ export class Dhis2IntegratorService {
         )
       ],
     );
+    // Para no repetir la extracción de fechaNacimiento, solo se asigna el valor de notificacion a paciente.
+    paciente.fechaNacimiento = notificacion.fechaNacimiento;
+    
+    // La edad ya es otra variable independiente en la extracción.
     notificacion.edad = this.formatoInteger(
       row[
         headers.findIndex(

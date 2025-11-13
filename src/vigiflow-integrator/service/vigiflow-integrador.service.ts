@@ -203,6 +203,8 @@ export class VigiflowIntegradorService {
       const fecha = this.formatoFecha(reg['G'] ? reg['G'].toString() : reg['G']);
       if (fecha) {
         notificacion.fechaNacimiento = fecha;
+        //Para no repetir la extracción, simplemente se asigna la fecha de nacimiento al paciente desde la notificación.
+        paciente.fechaNacimiento = fecha;
       }
       const edad = this.formatoInteger(reg['H']);
       if (edad > 0) {
