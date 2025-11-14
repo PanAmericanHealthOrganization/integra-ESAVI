@@ -1,7 +1,7 @@
 import {
   Assessment,
   CheckCircle,
-  Code,
+  FactCheck,
   Psychology,
   Refresh,
   Schedule,
@@ -77,19 +77,19 @@ const CalidadDashListContent: React.FC = () => {
         component: <CalidadGeneral />,
       },
       {
-        label: "Completitud",
+        label: "Exactitud",
         icon: <CheckCircle />,
-        component: <CalidadCompletitud />,
-      },
-      {
-        label: "Sintáctica",
-        icon: <Code />,
         component: <CalidadSintactica />,
       },
       {
-        label: "Semántica",
+        label: "Consistencia",
         icon: <Psychology />,
         component: <CalidadSemantica />,
+      },
+      {
+        label: "Completitud",
+        icon: <FactCheck />,
+        component: <CalidadCompletitud />,
       },
       {
         label: "Temporal",
@@ -111,40 +111,55 @@ const CalidadDashListContent: React.FC = () => {
             px: 3,
             py: 3,
           }}>
-          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-            Monitoreo de Calidad de Datos
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", md: "center" },
+              gap: 2,
+            }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              Monitoreo de Calidad de Datos
+            </Typography>
 
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={2}
-            alignItems={{ xs: "stretch", md: "center" }}>
-            <TextField
-              label="Fecha de referencia"
-              type="date"
-              size="small"
-              InputLabelProps={{ shrink: true }}
-              value={selectedDate}
-              onChange={(event) => setSelectedDate(event.target.value)}
-              sx={{ maxWidth: 220 }}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<Refresh />}
-              onClick={refresh}
-              disabled={loading}>
-              Actualizar
-            </Button>
-            {loading && (
-              <Stack direction="row" spacing={1} alignItems="center">
-                <CircularProgress size={20} />
-                <Typography variant="body2" color="text.secondary">
-                  Cargando información…
-                </Typography>
-              </Stack>
-            )}
-          </Stack>
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              justifyContent="flex-end"
+              sx={{
+                flexWrap: "wrap",
+                width: { xs: "100%", md: "auto" },
+                ml: { xs: 0, md: "auto" },
+              }}>
+              <TextField
+                label="Fecha de referencia"
+                type="date"
+                size="small"
+                InputLabelProps={{ shrink: true }}
+                value={selectedDate}
+                onChange={(event) => setSelectedDate(event.target.value)}
+                sx={{ maxWidth: 220 }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Refresh />}
+                onClick={refresh}
+                disabled={loading}>
+                Actualizar
+              </Button>
+              {loading && (
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <CircularProgress size={20} />
+                  <Typography variant="body2" color="text.secondary">
+                    Cargando información…
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
+          </Box>
 
           {error && (
             <Alert severity="warning" sx={{ mb: 2 }}>

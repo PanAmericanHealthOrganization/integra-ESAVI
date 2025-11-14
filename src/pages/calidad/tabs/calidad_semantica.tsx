@@ -92,10 +92,8 @@ const CalidadSemantica: React.FC = () => {
       0
     )
     const promedioValidez =
-      reglas.reduce(
-        (acc, regla) => acc + regla.percentageValidRecords,
-        0
-      ) / totalReglas
+      reglas.reduce((acc, regla) => acc + regla.percentageValidRecords, 0) /
+      totalReglas
     const reglasCriticas = reglas.filter(
       (regla) => regla.percentageValidRecords < 85
     ).length
@@ -114,22 +112,20 @@ const CalidadSemantica: React.FC = () => {
     return reglas
       .slice()
       .sort((a, b) => b.totalInvalidRecords - a.totalInvalidRecords)
-      .slice(0, 10)
+      .slice(0, 5)
       .map((regla) => ({
         regla: regla.ruleName,
         invalidos: regla.totalInvalidRecords,
-        porcentajeInvalido: Number(
-          regla.percentageInvalidRecords.toFixed(2)
-        ),
+        porcentajeInvalido: Number(regla.percentageInvalidRecords.toFixed(2)),
         validos: regla.totalValidRecords,
       }))
   }, [reglas])
 
   const tablaReglas = useMemo(
     () =>
-      reglas.slice().sort(
-        (a, b) => a.percentageValidRecords - b.percentageValidRecords
-      ),
+      reglas
+        .slice()
+        .sort((a, b) => a.percentageValidRecords - b.percentageValidRecords),
     [reglas]
   )
 
@@ -144,7 +140,7 @@ const CalidadSemantica: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
-        Calidad semántica de datos
+        Consistencia de datos
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -164,7 +160,7 @@ const CalidadSemantica: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Promedio de cumplimiento
+                Promedio de consistencia
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
                 {resumen.promedioValidez.toFixed(2)}%
@@ -200,7 +196,7 @@ const CalidadSemantica: React.FC = () => {
                 {resumen.reglasCriticas}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Menos del 85% de registros válidos
+                Menos del 85% de registros coherentes
               </Typography>
             </CardContent>
           </Card>
@@ -212,24 +208,26 @@ const CalidadSemantica: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Reglas con mayores incumplimientos
+                Ranking de inconsistencias (Top 5)
               </Typography>
               <Box sx={{ height: 360 }}>
                 {topReglasConIncumplimientos.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={topReglasConIncumplimientos} layout="vertical">
+                    <BarChart
+                      data={topReglasConIncumplimientos}
+                      layout="vertical">
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis type="number" />
                       <YAxis type="category" dataKey="regla" width={260} />
                       <Tooltip
                         formatter={(value) => [
                           numberFormatter.format(value as number),
-                          "Registros inválidos",
+                          "Inconsistencias",
                         ]}
                       />
                       <Bar
                         dataKey="invalidos"
-                        name="Registros inválidos"
+                        name="Registros inconsistentes"
                         fill="#ef4444"
                         radius={[0, 4, 4, 0]}
                       />
@@ -246,7 +244,7 @@ const CalidadSemantica: React.FC = () => {
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Resumen global
+                Resumen de consistencia
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
                 <Box>
@@ -259,7 +257,7 @@ const CalidadSemantica: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Registros inválidos
+                    Registros inconsistentes
                   </Typography>
                   <Typography
                     variant="h5"
@@ -269,7 +267,7 @@ const CalidadSemantica: React.FC = () => {
                 </Box>
                 <Box>
                   <Typography variant="body2" color="text.secondary">
-                    Cumplimiento promedio
+                    Consistencia promedio
                   </Typography>
                   <Chip
                     label={getStatusLabel(resumen.promedioValidez)}
@@ -286,7 +284,7 @@ const CalidadSemantica: React.FC = () => {
       <Card>
         <CardContent>
           <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-            Detalle de reglas semánticas
+            Detalle de reglas de consistencia
           </Typography>
           <TableContainer component={Paper} elevation={0}>
             <Table size="small">
@@ -303,7 +301,8 @@ const CalidadSemantica: React.FC = () => {
                 {tablaReglas.map((regla) => (
                   <TableRow key={regla.ruleCode} hover>
                     <TableCell sx={{ maxWidth: 220 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Psychology color="primary" fontSize="small" />
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
                           {regla.ruleName}
@@ -350,9 +349,9 @@ const CalidadSemantica: React.FC = () => {
 
       <Alert severity="info" sx={{ mt: 3 }}>
         <Typography variant="body2">
-          La calidad semántica garantiza que los datos tengan sentido en el
-          contexto del negocio. Revise las reglas críticas para priorizar acciones
-          de mejora y coordinar ajustes con los equipos de origen.
+          La dimensión de consistencia verifica la coherencia entre variables
+          relacionadas. Priorice las reglas críticas para alinear los datos
+          entre sistemas y detectar discrepancias recurrentes.
         </Typography>
       </Alert>
     </Box>

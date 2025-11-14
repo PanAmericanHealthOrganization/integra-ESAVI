@@ -18,10 +18,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -110,33 +107,22 @@ const CalidadSintactica: React.FC = () => {
     }
   }, [reglas])
 
-  const graficoReglas = useMemo(
+  const rankingExactitud = useMemo(
     () =>
-      reglas.map((regla) => ({
-        nombre: regla.regla,
-        porcentaje: Number(regla.porcentajeRegistrosValidos.toFixed(2)),
-        validos: regla.totalRegistrosValidos,
-        registros: regla.totalRegistros,
-      })),
+      reglas
+        .slice()
+        .sort(
+          (a, b) => a.porcentajeRegistrosValidos - b.porcentajeRegistrosValidos
+        )
+        .slice(0, 5)
+        .map((regla) => ({
+          nombre: regla.regla,
+          porcentaje: Number(regla.porcentajeRegistrosValidos.toFixed(2)),
+          validos: regla.totalRegistrosValidos,
+          registros: regla.totalRegistros,
+        })),
     [reglas]
   )
-
-  const distribucionValidacion = useMemo(() => {
-    if (!resumen) return []
-
-    return [
-      {
-        nombre: "Registros válidos",
-        valor: resumen.totalValidos,
-        color: "#16a34a",
-      },
-      {
-        nombre: "Registros inválidos",
-        valor: resumen.totalInvalidos,
-        color: "#ef4444",
-      },
-    ].filter((item) => item.valor > 0)
-  }, [resumen])
 
   const getSeverityIcon = (percentage: number) => {
     if (percentage >= 95) return <CheckCircle color="success" />
@@ -155,7 +141,7 @@ const CalidadSintactica: React.FC = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
-        Calidad sintáctica de datos
+        Exactitud de datos
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -175,7 +161,7 @@ const CalidadSintactica: React.FC = () => {
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Promedio de validez
+                Promedio de exactitud
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
                 {resumen.promedioValidez.toFixed(2)}%
@@ -211,7 +197,7 @@ const CalidadSintactica: React.FC = () => {
                 {resumen.reglasCriticas}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                Menos del 80% de registros válidos
+                Menos del 80% de registros correctos
               </Typography>
             </CardContent>
           </Card>
@@ -219,15 +205,15 @@ const CalidadSintactica: React.FC = () => {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
+        <Grid item xs={12} lg={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                Porcentaje de registros válidos por regla
+                Ranking de exactitud por regla (Top 5)
               </Typography>
               <Box sx={{ height: 400 }}>
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={graficoReglas} layout="vertical">
+                  <BarChart data={rankingExactitud} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       type="number"
@@ -235,11 +221,11 @@ const CalidadSintactica: React.FC = () => {
                       tickFormatter={(value) => `${value}%`}
                     />
                     <YAxis type="category" dataKey="nombre" width={260} />
-                    <Tooltip formatter={(value) => [`${value}%`, "Validez"]} />
+                    <Tooltip formatter={(value) => [`${value}%`, "Exactitud"]} />
                     <Legend />
                     <Bar
                       dataKey="porcentaje"
-                      name="% registros válidos"
+                      name="% registros correctos"
                       fill="#3b82f6"
                       radius={[0, 4, 4, 0]}
                     />
@@ -250,51 +236,11 @@ const CalidadSintactica: React.FC = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} lg={4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                Distribución global
-              </Typography>
-              <Box sx={{ height: 320 }}>
-                {distribucionValidacion.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={distribucionValidacion}
-                        dataKey="valor"
-                        nameKey="nombre"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={90}
-                        label={({ nombre, valor }) =>
-                          `${nombre}: ${valor.toLocaleString()}`
-                        }>
-                        {distribucionValidacion.map((entry) => (
-                          <Cell key={entry.nombre} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        formatter={(value) => [
-                          (value as number).toLocaleString(),
-                          "Registros",
-                        ]}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <EmptyState />
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
         <Grid item xs={12}>
           <Card>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                Detalle de reglas sintácticas
+                Detalle de reglas de exactitud (validaciones sintácticas)
               </Typography>
               <List>
                 {reglas
@@ -365,9 +311,9 @@ const CalidadSintactica: React.FC = () => {
 
       <Alert severity="info" sx={{ mt: 3 }}>
         <Typography variant="body2">
-          La validación sintáctica comprueba que cada campo cumpla con el formato
-          esperado (longitud, caracteres admitidos y estructura). Prioriza la
-          revisión de las reglas marcadas como críticas.
+          La dimensión de exactitud verifica que cada campo cumpla con el
+          formato esperado (longitud, caracteres y estructura). Priorice las
+          reglas críticas para elevar el porcentaje global.
         </Typography>
       </Alert>
     </Box>

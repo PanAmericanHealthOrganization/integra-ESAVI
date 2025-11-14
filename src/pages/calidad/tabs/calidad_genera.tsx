@@ -1,13 +1,23 @@
-import { Box, Card, CardContent, Grid, Typography } from "@mui/material"
+import {
+  Box,
+  Card,
+  CardContent,
+  Chip,
+  Grid,
+  Stack,
+  Typography,
+} from "@mui/material"
 import { useMemo } from "react"
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Legend,
-  Pie,
-  PieChart,
+  Line,
+  LineChart,
+  PolarAngleAxis,
+  RadialBar,
+  RadialBarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -18,13 +28,34 @@ import { useCalidadDataQuality } from "../calidadDataQualityContext"
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
-const completenessBuckets = [
-  { id: "full", label: "100% completitud", color: "#16a34a", match: (v: number) => v === 100 },
-  { id: "high", label: "75% - 99%", color: "#22c55e", match: (v: number) => v >= 75 && v < 100 },
-  { id: "medium", label: "50% - 74%", color: "#f97316", match: (v: number) => v >= 50 && v < 75 },
-  { id: "low", label: "1% - 49%", color: "#ef4444", match: (v: number) => v > 0 && v < 50 },
-  { id: "empty", label: "0%", color: "#991b1b", match: (v: number) => v === 0 },
-]
+type ScoreStatus = {
+  label: string
+  chipColor: "default" | "success" | "warning" | "error"
+  gaugeColor: string
+}
+
+const getScoreStatus = (value: number | null): ScoreStatus => {
+  if (value === null) {
+    return { label: "Sin datos", chipColor: "default", gaugeColor: "#cbd5f5" }
+  }
+
+  if (value >= 95) {
+    return { label: "Óptimo", chipColor: "success", gaugeColor: "#16a34a" }
+  }
+
+  if (value >= 85) {
+    return {
+      label: "En seguimiento",
+      chipColor: "warning",
+      gaugeColor: "#f59e0b",
+    }
+  }
+
+  return { label: "Crítico", chipColor: "error", gaugeColor: "#dc2626" }
+}
+
+const formatPercentage = (value: number | null) =>
+  value === null ? "Sin datos" : `${value.toFixed(2)}%`
 
 const LoadingState = () => (
   <Box
@@ -71,20 +102,78 @@ const ChartEmptyState = ({ message }: ChartEmptyStateProps) => (
 )
 
 export const CalidadGeneral: React.FC = () => {
-  const { data, loading } = useCalidadDataQuality()
+  const { data, loading, selectedDate } = useCalidadDataQuality()
 
-  const resumen = useMemo(() => {
+  const resumenGlobal = useMemo(() => {
     if (!data) return null
 
-    const totalCampos = data.completenessQualityTable.length
+    const exactitudGlobal =
+      data.sintacticQuality.length > 0
+        ? data.sintacticQuality.reduce(
+            (acc, item) => acc + item.porcentajeRegistrosValidos,
+            0
+          ) / data.sintacticQuality.length
+        : null
+
+    const consistenciaGlobal =
+      data.semanticQuality.length > 0
+        ? data.semanticQuality.reduce(
+            (acc, item) => acc + item.percentageValidRecords,
+            0
+          ) / data.semanticQuality.length
+        : null
+
+    const indicadoresDisponibles = [exactitudGlobal, consistenciaGlobal].filter(
+      (value): value is number => value !== null
+    )
+
+    const indicadorCalidadGlobal =
+      indicadoresDisponibles.length > 0
+        ? indicadoresDisponibles.reduce((acc, value) => acc + value, 0) /
+          indicadoresDisponibles.length
+        : null
+
+    const registrosSinErrores = Math.max(
+      data.totalRegistros - data.totalErrores,
+      0
+    )
+
+    const porcentajeRegistrosSinErrores =
+      data.totalRegistros > 0
+        ? (registrosSinErrores / data.totalRegistros) * 100
+        : null
 
     const promedioCompletitud =
-      totalCampos > 0
+      data.completenessQualityTable.length > 0
         ? data.completenessQualityTable.reduce(
             (acc, item) => acc + item.completenessPercentage,
             0
-          ) / totalCampos
-        : 0
+          ) / data.completenessQualityTable.length
+        : null
+
+    return {
+      indicadorCalidadGlobal,
+      exactitudGlobal,
+      consistenciaGlobal,
+      porcentajeRegistrosSinErrores,
+      registrosSinErrores,
+      totalRegistros: data.totalRegistros,
+      totalErrores: data.totalErrores,
+      totalReglasExactitud: data.sintacticQuality.length,
+      totalReglasConsistencia: data.semanticQuality.length,
+      promedioCompletitud,
+    }
+  }, [data])
+
+  const resumenCompletitud = useMemo(() => {
+    if (!data || data.completenessQualityTable.length === 0) return null
+
+    const totalCampos = data.completenessQualityTable.length
+    const promedioCompletitud =
+      data.completenessQualityTable.reduce(
+        (acc, item) => acc + item.completenessPercentage,
+        0
+      ) / totalCampos
 
     const camposCompletos = data.completenessQualityTable.filter(
       (item) => item.completenessPercentage === 100
@@ -94,13 +183,16 @@ export const CalidadGeneral: React.FC = () => {
       (item) => item.completenessPercentage < 50
     ).length
 
+    const columnasCeroRegistros = data.completenessQualityTable.filter(
+      (item) => item.totalRecords === 0
+    ).length
+
     return {
-      totalRegistros: data.totalRegistros,
-      totalErrores: data.totalErrores,
-      promedioCompletitud,
       totalCampos,
+      promedioCompletitud,
       camposCompletos,
       camposCriticos,
+      columnasCeroRegistros,
     }
   }, [data])
 
@@ -121,18 +213,62 @@ export const CalidadGeneral: React.FC = () => {
       }))
   }, [data])
 
-  const distribucionCompletitud = useMemo(() => {
-    if (!data)
-      return completenessBuckets.map((bucket) => ({ ...bucket, count: 0 }))
+  const tendenciaTemporal = useMemo(() => {
+    if (!data || data.temporalQuality.length === 0) return []
 
-    return completenessBuckets
-      .map((bucket) => ({
-        ...bucket,
-        count: data.completenessQualityTable.filter((row) =>
-          bucket.match(row.completenessPercentage)
-        ).length,
-      }))
-      .filter((bucket) => bucket.count > 0)
+    return data.temporalQuality
+      .map((item) => {
+        const registro = item as Record<string, unknown>
+
+        const periodo =
+          (typeof registro.period === "string" && registro.period) ||
+          (typeof registro.periodo === "string" && registro.periodo) ||
+          (typeof registro.fecha === "string" && registro.fecha) ||
+          (typeof registro.month === "string" && registro.month) ||
+          (typeof registro.fechaCorte === "string" && registro.fechaCorte) ||
+          null
+
+        const indicador =
+          (typeof registro.indicadorCalidadGlobal === "number" &&
+            registro.indicadorCalidadGlobal) ||
+          (typeof registro.qualityScore === "number" &&
+            registro.qualityScore) ||
+          (typeof registro.totalScore === "number" && registro.totalScore) ||
+          (typeof registro.calidadGlobal === "number" &&
+            registro.calidadGlobal) ||
+          null
+
+        const exactitud =
+          (typeof registro.exactitudGlobal === "number" &&
+            registro.exactitudGlobal) ||
+          (typeof registro.accuracy === "number" && registro.accuracy) ||
+          null
+
+        const consistencia =
+          (typeof registro.consistenciaGlobal === "number" &&
+            registro.consistenciaGlobal) ||
+          (typeof registro.consistency === "number" && registro.consistency) ||
+          null
+
+        if (!periodo || indicador === null) return null
+
+        return {
+          periodo,
+          indicador: indicador as number,
+          exactitud: exactitud as number | null,
+          consistencia: consistencia as number | null,
+        }
+      })
+      .filter(
+        (
+          item
+        ): item is {
+          periodo: string
+          indicador: number
+          exactitud: number | null
+          consistencia: number | null
+        } => item !== null
+      )
   }, [data])
 
   const columnasConMasNulos = useMemo(() => {
@@ -149,73 +285,266 @@ export const CalidadGeneral: React.FC = () => {
       }))
   }, [data])
 
+  const ultimaActualizacion = useMemo(() => {
+    if (!selectedDate) return "No disponible"
+    const parsedDate = new Date(`${selectedDate}T00:00:00`)
+    if (Number.isNaN(parsedDate.getTime())) return selectedDate
+    return parsedDate.toLocaleDateString("es-SV", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+    })
+  }, [selectedDate])
+
+  const summaryCards = useMemo(() => {
+    if (!resumenGlobal) return []
+
+    return [
+      {
+        title: "Indicador de calidad global",
+        value: resumenGlobal.indicadorCalidadGlobal,
+        helper: `Actualizado al ${ultimaActualizacion}`,
+        status: getScoreStatus(resumenGlobal.indicadorCalidadGlobal),
+      },
+      {
+        title: "Exactitud global",
+        value: resumenGlobal.exactitudGlobal,
+        helper: `Basado en ${resumenGlobal.totalReglasExactitud} reglas de exactitud`,
+        status: getScoreStatus(resumenGlobal.exactitudGlobal),
+      },
+      {
+        title: "Consistencia global",
+        value: resumenGlobal.consistenciaGlobal,
+        helper: `Basado en ${resumenGlobal.totalReglasConsistencia} reglas de consistencia`,
+        status: getScoreStatus(resumenGlobal.consistenciaGlobal),
+      },
+      {
+        title: "% de registros sin errores",
+        value: resumenGlobal.porcentajeRegistrosSinErrores,
+        helper: `${numberFormatter.format(
+          resumenGlobal.registrosSinErrores
+        )} de ${numberFormatter.format(
+          resumenGlobal.totalRegistros
+        )} registros`,
+        status: getScoreStatus(resumenGlobal.porcentajeRegistrosSinErrores),
+      },
+    ]
+  }, [resumenGlobal, ultimaActualizacion])
+
+  const GaugeCard = ({
+    title,
+    value,
+    helperText,
+  }: {
+    title: string
+    value: number | null
+    helperText?: string
+  }) => {
+    const status = getScoreStatus(value)
+
+    if (value === null) {
+      return (
+        <Card sx={{ height: "100%" }}>
+          <CardContent>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              {title}
+            </Typography>
+            <ChartEmptyState message="No se recibieron datos para calcular esta métrica." />
+          </CardContent>
+        </Card>
+      )
+    }
+
+    const clampedValue = Math.max(0, Math.min(100, value))
+
+    return (
+      <Card sx={{ height: "100%" }}>
+        <CardContent sx={{ height: "100%" }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+            {title}
+          </Typography>
+          <Box sx={{ position: "relative", height: 220, mb: 2 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <RadialBarChart
+                data={[{ name: title, value: clampedValue }]}
+                innerRadius="65%"
+                outerRadius="100%"
+                startAngle={180}
+                endAngle={0}>
+                <PolarAngleAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tick={false}
+                  angleAxisId={0}
+                />
+                <RadialBar
+                  dataKey="value"
+                  fill={status.gaugeColor}
+                  cornerRadius={16}
+                  background={{ fill: "#e5e7eb" }}
+                />
+              </RadialBarChart>
+            </ResponsiveContainer>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -10%)",
+                textAlign: "center",
+              }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                {clampedValue.toFixed(1)}%
+              </Typography>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}>
+                {status.label}
+              </Typography>
+            </Box>
+          </Box>
+          <Chip
+            label={status.label}
+            color={status.chipColor}
+            size="small"
+            sx={{ mb: helperText ? 2 : 0 }}
+          />
+          {helperText && (
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block">
+              {helperText}
+            </Typography>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (loading) {
     return <LoadingState />
   }
 
-  if (!data || !resumen) {
+  if (!data || !resumenGlobal) {
     return <EmptyState />
   }
 
   return (
     <Box sx={{ p: 3, bgcolor: "grey.50" }}>
+      <Stack spacing={1.5} sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          Vista general de la calidad de datos
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Resumen ejecutivo enfocado en las dimensiones de exactitud y
+          consistencia. Última actualización: {ultimaActualizacion}.
+        </Typography>
+      </Stack>
+
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Registros evaluados
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {numberFormatter.format(resumen.totalRegistros)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Registros considerados en la evaluación
-              </Typography>
-            </CardContent>
-          </Card>
+        {summaryCards.map((metric) => (
+          <Grid item xs={12} sm={6} md={3} key={metric.title}>
+            <Card>
+              <CardContent>
+                <Typography variant="body2" color="text.secondary">
+                  {metric.title}
+                </Typography>
+                <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                  {formatPercentage(metric.value)}
+                </Typography>
+                <Chip
+                  label={metric.status.label}
+                  color={metric.status.chipColor}
+                  size="small"
+                  sx={{ mt: 1 }}
+                />
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  display="block"
+                  sx={{ mt: 1 }}>
+                  {metric.helper}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={6}>
+          <GaugeCard
+            title="Semáforo de calidad global"
+            value={resumenGlobal.indicadorCalidadGlobal}
+            helperText="Objetivo recomendado: ≥ 95% (verde); seguimiento entre 85% y 94% (amarillo)."
+          />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Errores detectados
+        <Grid item xs={12} md={6}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent sx={{ height: "100%" }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Tendencia temporal de calidad
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {numberFormatter.format(resumen.totalErrores)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Registros con problemas de calidad
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Promedio de completitud
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {resumen.promedioCompletitud.toFixed(2)}%
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Promedio global de campos completos
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Columnas críticas
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {numberFormatter.format(resumen.camposCriticos)}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Columnas con menos de 50% de completitud
+              <Box sx={{ height: 240 }}>
+                {tendenciaTemporal.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={tendenciaTemporal}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="periodo" />
+                      <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                      <Tooltip
+                        formatter={(value: number) => `${value.toFixed(2)}%`}
+                        labelFormatter={(label) => `Período: ${label}`}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="indicador"
+                        name="Indicador global"
+                        stroke="#2563eb"
+                        strokeWidth={2}
+                        dot
+                        activeDot={{ r: 6 }}
+                      />
+                      {tendenciaTemporal.some(
+                        (item) => item.exactitud !== null
+                      ) && (
+                        <Line
+                          type="monotone"
+                          dataKey="exactitud"
+                          name="Exactitud"
+                          stroke="#16a34a"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      )}
+                      {tendenciaTemporal.some(
+                        (item) => item.consistencia !== null
+                      ) && (
+                        <Line
+                          type="monotone"
+                          dataKey="consistencia"
+                          name="Consistencia"
+                          stroke="#f97316"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      )}
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <ChartEmptyState message="El servicio aún no entrega una serie temporal para mostrar la evolución mensual de los indicadores. Solicite al backend los valores históricos para habilitar esta vista." />
+                )}
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 2 }}>
+                Los valores se calculan a partir de los resultados históricos
+                provistos por el servicio de calidad de datos.
               </Typography>
             </CardContent>
           </Card>
@@ -240,7 +569,9 @@ export const CalidadGeneral: React.FC = () => {
                         tickFormatter={(value) => `${value}%`}
                       />
                       <YAxis type="category" dataKey="nombre" width={240} />
-                      <Tooltip formatter={(value) => [`${value}%`, "Completitud"]} />
+                      <Tooltip
+                        formatter={(value) => [`${value}%`, "Completitud"]}
+                      />
                       <Legend />
                       <Bar
                         dataKey="completitud"
@@ -268,31 +599,60 @@ export const CalidadGeneral: React.FC = () => {
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Distribución de completitud
+                Resumen de completitud
               </Typography>
-              <Box sx={{ height: 280 }}>
-                {distribucionCompletitud.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={distribucionCompletitud}
-                        dataKey="count"
-                        nameKey="label"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={90}
-                        label={({ label, count }) => `${label}: ${count}`}>
-                        {distribucionCompletitud.map((entry) => (
-                          <Cell key={entry.id} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ChartEmptyState message="No se registraron columnas evaluadas para calcular la distribución." />
-                )}
-              </Box>
+              {resumenCompletitud ? (
+                <Stack spacing={2}>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Promedio global
+                    </Typography>
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                      {resumenCompletitud.promedioCompletitud.toFixed(2)}%
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body2" color="text.secondary">
+                      Columnas evaluadas
+                    </Typography>
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                      {numberFormatter.format(resumenCompletitud.totalCampos)}
+                    </Typography>
+                  </Box>
+                  <Stack direction="row" spacing={3}>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Columnas completas
+                      </Typography>
+                      <Typography variant="h6" color="success.main">
+                        {numberFormatter.format(
+                          resumenCompletitud.camposCompletos
+                        )}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Columnas críticas
+                      </Typography>
+                      <Typography variant="h6" color="error.main">
+                        {numberFormatter.format(
+                          resumenCompletitud.camposCriticos
+                        )}
+                      </Typography>
+                    </Box>
+                  </Stack>
+                  {resumenCompletitud.columnasCeroRegistros > 0 && (
+                    <Typography variant="caption" color="text.secondary">
+                      {numberFormatter.format(
+                        resumenCompletitud.columnasCeroRegistros
+                      )}{" "}
+                      columnas no reportaron registros durante el período.
+                    </Typography>
+                  )}
+                </Stack>
+              ) : (
+                <ChartEmptyState message="No se encontraron columnas evaluadas para calcular el resumen de completitud." />
+              )}
             </CardContent>
           </Card>
         </Grid>

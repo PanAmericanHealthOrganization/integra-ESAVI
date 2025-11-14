@@ -1,25 +1,33 @@
-import { Divider, Grid } from "@mui/material"
+import { Divider, Grid, Typography } from "@mui/material"
 import { RichTextInput } from "ra-input-rich-text"
 import {
   DateInput,
   Edit,
-  ImageField,
   SelectInput,
   SimpleForm,
   TextInput,
 } from "react-admin"
 import { ESTADO_GACETA } from "../../dataProviders/enums/estado_gaceta.enum"
+import { ImageFieldWithZoom } from "../../components/ImageFieldWithZoom"
 
 export const GacetaEdit = () => {
   return (
-    <Edit mutationMode="undoable" redirect={false} resource="gaceta">
+    <Edit
+      mutationMode="undoable"
+      redirect={false}
+      resource="gaceta"
+      delete={false}>
       <SimpleForm>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12}>
             <h3>Datos generales:</h3>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <DateInput source="fechaPublicacion" label="Fecha de Publicación" />
+            <DateInput
+              source="fechaPublicacion"
+              label="Fecha de Publicación"
+              readOnly
+            />
           </Grid>
           <Grid item xs={12} sm={3}>
             <SelectInput
@@ -43,15 +51,17 @@ export const GacetaEdit = () => {
             <TextInput source="volumen" label="Volumen" />
           </Grid>
           <Grid item xs={12} sm={2}>
-            <DateInput source="desde" label="desde" />
+            <DateInput source="desde" label="desde" readOnly />
           </Grid>
           <Grid item xs={12} sm={2}>
-            <TextInput source="hasta" label="hasta" />
+            <DateInput source="hasta" label="hasta" readOnly />
           </Grid>
           <Grid item xs={12} sm={4}>
             <TextInput source="urlGaceta" label="URL de Gaceta" readOnly />
           </Grid>
-
+          <Grid item xs={12} sm={12}>
+            <h3>Autores:</h3>
+          </Grid>
           <Grid item xs={12} sm={3}>
             <TextInput source="autor" label="Autor" />
           </Grid>
@@ -70,6 +80,11 @@ export const GacetaEdit = () => {
           </Grid>
 
           <Grid item xs={12} sm={12}>
+            <Typography variant="h4" sx={{ textDecoration: "underline" }}>
+              Introducción
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={12}>
             <h3>Resumen Ejecutivo</h3>
           </Grid>
           <Grid item xs={12} sm={12}>
@@ -77,38 +92,38 @@ export const GacetaEdit = () => {
           </Grid>
 
           <Grid item xs={12} sm={12}>
-            <h3>Análisis Gráficos</h3>
+            <Typography variant="h4" sx={{ textDecoration: "underline" }}>
+              Resultados
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <h3>Distribución por Edad y Sexo Gráficos</h3>
           </Grid>
           <Grid item xs={12} sm={3}>
-            <ImageField
-              source="graficoAnalisisGravedad"
-              title="Análisis Gráfico"
+            <ImageFieldWithZoom
+              source="piramideEdadSexo"
+              title="Piramide de Edad y Sexo"
             />
           </Grid>
           <Grid item xs={12} sm={8}>
-            <RichTextInput
-              source="analisisGravedad"
-              label="Análisis de Gravedad"
-            />
-          </Grid>
-          <Grid item xs={12} sm={12}>
             <RichTextInput
               source="analisisSexoEdad"
               label="Análisis de Sexo y Edad"
             />
           </Grid>
           <Grid item xs={12} sm={12}>
-            <RichTextInput
-              source="analisisTipoEvento"
-              label="Análisis de Tipo de Evento"
-            />
+            <h3>Distribución Geográfica</h3>
           </Grid>
-
           <Grid item xs={12} sm={12}>
-            <RichTextInput
-              source="analisisGeografico"
-              label="Análisis Geográfico"
-            />
+            <h3>Caracterización por Tipo de Vacuna</h3>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <h3>Análisis Temporal</h3>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <Typography variant="h4" sx={{ textDecoration: "underline" }}>
+              Conclusiones y Recomendaciones
+            </Typography>
           </Grid>
           <Grid item xs={12} sm={12}>
             <RichTextInput source="conclusiones" label="Conclusiones" />
