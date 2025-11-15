@@ -221,13 +221,13 @@ export class SeedService {
       {
         vigiflow: 'Masculino',
         dhis2: 'Hombre',
-        homologada: 'Masculino',
+        homologada: 'Hombre',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },
       {
         vigiflow: 'Femenino',
         dhis2: 'Mujer',
-        homologada: 'Femenino',
+        homologada: 'Mujer',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },
 
@@ -237,13 +237,7 @@ export class SeedService {
         dhis2: 'Mestizo',
         homologada: 'Mestizo',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'MESTIZO/A',
-        dhis2: 'MESTIZO/A',
-        homologada: 'Mestizo',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
+      },      
       {
         vigiflow: 'Indígena',
         dhis2: 'Indigenous',
@@ -253,7 +247,55 @@ export class SeedService {
       {
         vigiflow: 'Afroecuatoriano',
         dhis2: 'Afro-Ecuadorian',
-        homologada: 'Afroecuatoriano',
+        homologada: 'Afrodescendiente',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'INDÍGENA',
+        dhis2: 'INDÍGENA',
+        homologada: 'Indígena',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'AFROECUATORIANO/A AFRODESCENDIENTE',
+        dhis2: 'AFROECUATORIANO/A AFRODESCENDIENTE',
+        homologada: 'Afrodescendiente',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'NEGRO/A',
+        dhis2: 'NEGRO/A',
+        homologada: 'Negro',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },      
+      {
+        vigiflow: 'MULATO/A',
+        dhis2: 'MULATO/A',
+        homologada: 'Mulato',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },      
+      {
+        vigiflow: 'MONTUBIO/A',
+        dhis2: 'MONTUBIO/A',
+        homologada: 'Montubio',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'MESTIZO/A',
+        dhis2: 'MESTIZO/A',
+        homologada: 'Mestizo',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'BLANCO/A',
+        dhis2: 'BLANCO/A',
+        homologada: 'Blanco',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+      },
+      {
+        vigiflow: 'OTROS',
+        dhis2: 'OTROS',
+        homologada: 'Otros',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
       },
 

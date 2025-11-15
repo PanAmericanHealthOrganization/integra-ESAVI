@@ -609,7 +609,7 @@ export class Dhis2IntegratorService {
             header.column === 'DNVE ESAVI TRK - Evento adverso anterior',
         )
       ],
-    );
+    );// En notificacion ya está este campo como antecedenteEventoPrevio. Pero, se conserva hasta pedir confirmación.
     antecedenteEventoAdverso.alergiaMedicamento = this.esValorAfirmativo(
       row[
         headers.findIndex(
@@ -1547,7 +1547,7 @@ export class Dhis2IntegratorService {
         antecedenteEmbarazada.fechaUltimaMenstruacion = this.ajustarFecha(
           notificacion.fechaAtencion,
           -antecedenteEmbarazada.edadGestacional * 7,
-        );
+        );// La constante 7 es número de días en una semana.
         antecedenteEmbarazada.fechaParto = this.ajustarFecha(
           antecedenteEmbarazada.fechaUltimaMenstruacion,
           semanasEmbarazo * 7,
