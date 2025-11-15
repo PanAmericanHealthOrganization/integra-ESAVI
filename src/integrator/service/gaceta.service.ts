@@ -2,7 +2,6 @@ import { BadRequestException, Injectable, Logger, NotFoundException } from '@nes
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'date-fns';
-import { readFileSync } from 'fs';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
@@ -89,27 +88,47 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
     const t = (await this.gacetaRepository.findOne({ where: { id: cleanId } })) as GacetaDto;
     // completar con las imagenes
     // ontener como blob la imagenes de un directorio
-    this.logger.log(`Buscando gaceta con ID: ${cleanId}`);
+    t.graficoAnalisisPorGravedad = await this.getGraficoBlob('gravedad-desenlace-1', t.hasta);
+    t.graficoAnalisisPoblacion = await this.getGraficoBlob('piramide-edad-1', t.hasta);
+    t.graficoAnalisisDistribucionGeografica = await this.getGraficoBlob(
+      'mapa-incidencia-1',
+      t.hasta,
+    );
     return t;
   }
 
-  private getGraficoBlob(id: string): Promise<Blob> {
+  private async getGraficoBlob(name: string, hasta: Date): Promise<string> {
     // Lógica para obtener el Blob desde el sistema de archivos o almacenamiento
-    const fileBasePath = '/path/to/gaceta/graphics/';
-    const filePath = `${fileBasePath}${id}-grafico-analisis-gravedad.png`;
-    return null;
+    const fileBasePath = this.configService.get<string>('PATH_GACETA_ESAVI_PROJECT');
+    const filePath = path.join(
+      fileBasePath,
+      'output',
+      format(hasta, 'yyyy'),
+      format(hasta, 'MM'),
+      'figuras',
+      `${format(hasta, 'yyyyMM')}_${name}.png`,
+    );
+
+    try {
+      const fileBuffer = await fs.readFile(filePath);
+      return `data:image/png;base64,${fileBuffer.toString('base64')}`;
+    } catch (error) {
+      this.logger.error(`Error al leer el archivo gráfico en ${filePath}: ${error.message}`);
+      throw new NotFoundException(
+        `El gráfico ${name} para la fecha ${format(hasta, 'yyyy-MM')} no fue encontrado.`,
+      );
+    }
   }
   /**
    *
    * @param params
    * @returns
    */
-  public getMany(params: IGetManyParams): Promise<Gaceta[]> {
+  public async getMany(params: IGetManyParams): Promise<GacetaDto[]> {
     // Validar todos los IDs en el array
     const cleanIds = (params.ids as string[]).map((id) => this.validateAndCleanId(id));
-    return this.gacetaRepository.find({
-      where: { id: In(cleanIds) },
-    });
+    const gacetas = await this.gacetaRepository.find({ where: { id: In(cleanIds) } });
+    return gacetas;
   }
 
   /**
@@ -480,7 +499,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       }
 
       // Leer el archivo y retornar como Buffer
-      const archivoBuffer = readFileSync(rutaCompleta);
+      const archivoBuffer = await fs.readFile(rutaCompleta);
 
       return archivoBuffer;
     } catch (error) {

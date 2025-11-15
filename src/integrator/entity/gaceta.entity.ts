@@ -103,47 +103,81 @@ export class Gaceta implements IGaceta {
   titulo: string;
 
   /**
-   * Análisis de gravedad con soporte para texto enriquecido/HTML
+   *
    */
   @Column({
-    name: 'ANALISIS_GRAVEDAD',
+    name: 'ANALISIS_POBLACION',
     type: 'text',
-    comment: 'Análisis de gravedad de la gaceta (soporta HTML/texto enriquecido)',
+    comment: 'Análisis de población',
+    nullable: false,
+    default: '',
   })
-  analisisGravedad: string;
+  analisisPoblacion: string;
 
   /**
-   * Análisis de sexo y edad con soporte para texto enriquecido/HTML
+   *
    */
   @Column({
-    name: 'ANALISIS_SEXO_EDAD',
+    name: 'ANALISIS_DISTRIBUCION_GEOGRAFICA',
     type: 'text',
-    comment: 'Análisis de sexo y edad de la gaceta (soporta HTML/texto enriquecido)',
+    comment: 'Análisis de distribución geográfica',
+    nullable: false,
+    default: '',
   })
-  analisisSexoEdad: string;
+  analisisDistribucionGeografica: string;
 
   /**
-   * Análisis de tipo de evento con soporte para texto enriquecido/HTML
+   *
    */
   @Column({
-    name: 'ANALISIS_TIPO_EVENTO',
+    name: 'ANALISIS_DISTRIBUCION_TIPO_EVENTO',
     type: 'text',
-    comment: 'Análisis de tipo de evento de la gaceta (soporta HTML/texto enriquecido)',
+    comment: 'Análisis de distribución de tipo de evento',
+    nullable: false,
+    default: '',
   })
-  analisisTipoEvento: string;
+  analisisDistribucionTipoEvento: string;
 
   /**
-   * Análisis geográfico con soporte para texto enriquecido/HTML
+   *
    */
   @Column({
-    name: 'ANALISIS_GEOGRAFICO',
+    name: 'ANALISIS_DISTRIBUCION_VACUNAS',
     type: 'text',
-    comment: 'Análisis geográfico de la gaceta (soporta HTML/texto enriquecido)',
+    comment: 'Análisis de distribución de vacunas',
+    nullable: false,
+    default: '',
   })
-  analisisGeografico: string;
+  analisisDistribucionVacunas: string;
 
+  /**
+   *
+   */
+  @Column({
+    name: 'ANALISIS_POR_GRAVEDAD',
+    type: 'text',
+    comment: 'Análisis por gravedad',
+    nullable: false,
+    default: '',
+  })
+  analisisPorGravedad: string;
+
+  /**
+   *
+   */
+  @Column({
+    name: 'ANALISIS_TEMPORAL',
+    type: 'text',
+    comment: 'Análisis temporal',
+    nullable: false,
+    default: '',
+  })
+  analisisTemporal: string;
   /**
    * Resumen del contenido con soporte para texto enriquecido/HTML
+   */
+  /**
+   *
    */
   @Column({
     name: 'RESUMEN_CONTENIDO',
@@ -154,6 +188,9 @@ export class Gaceta implements IGaceta {
 
   /**
    * Conclusiones con soporte para texto enriquecido/HTML
+   */
+  /**
+   *
    */
   @Column({
     name: 'CONCLUSIONES',

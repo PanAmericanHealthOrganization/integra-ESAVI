@@ -1,7 +1,0 @@
-"0","#| eval: false
-esavi_sexo<- ""select to_char(tn.\""FECHAREPORTENACIONAL\"", 'yyyy') Año, to_char(tn.\""FECHAREPORTENACIONAL\"", 'TMMonth') Mes, tc.\""DESCRIPCIONHOMOLOGADA\"", count(*) 
-"
-"2","Error: unexpected symbol in:
-""#| eval: false
-esavi_sexo<- ""select""
-"

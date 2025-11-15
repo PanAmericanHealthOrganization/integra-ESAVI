@@ -83,41 +83,94 @@ export class GacetaDto implements IGaceta {
   titulo: string;
 
   @ApiProperty({
-    description: 'Análisis de gravedad (HTML/texto enriquecido)',
-    example: '<h3>Análisis de Gravedad</h3><p>Durante el período analizado...</p>',
-  })
-  analisisGravedad: string;
-
-  @ApiProperty({
-    description: 'Gráfico de análisis de gravedad (archivo binario)',
-    type: 'string',
-    format: 'binary',
-  })
-  graficoAnalisisGravedad?: Blob;
-
-  @ApiProperty({
-    description: 'Análisis de sexo y edad (HTML/texto enriquecido)',
-    example: '<h3>Distribución por Sexo y Edad</h3>',
-  })
-  analisisSexoEdad: string;
-
-  @ApiProperty({
-    description: 'Análisis de tipo de evento (HTML/texto enriquecido)',
-    example: '<h3>Tipos de Eventos</h3>',
-  })
-  analisisTipoEvento: string;
-
-  @ApiProperty({
-    description: 'Análisis geográfico (HTML/texto enriquecido)',
-    example: '<h3>Distribución Geográfica</h3>',
-  })
-  analisisGeografico: string;
-
-  @ApiProperty({
     description: 'Resumen del contenido (HTML/texto enriquecido)',
     example: '<h2>Resumen Ejecutivo</h2>',
   })
   resumenContenido: string;
+
+  @ApiProperty({
+    description: 'Análisis de población (HTML/texto enriquecido)',
+    example: '<h3>Análisis de población</h3>',
+  })
+  analisisPoblacion: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis de población (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisPoblacion?: string;
+
+  @ApiProperty({
+    description: 'Análisis de distribución geográfica (HTML/texto enriquecido)',
+    example: '<h3>Análisis de distribución geográfica</h3>',
+  })
+  analisisDistribucionGeografica: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis de distribución geográfica (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisDistribucionGeografica?: string;
+
+  @ApiProperty({
+    description: 'Análisis de distribución de tipo de evento (HTML/texto enriquecido)',
+    example: '<h3>Análisis de distribución de tipo de evento</h3>',
+  })
+  analisisDistribucionTipoEvento: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis de distribución de tipo de evento (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisDistribucionTipoEvento?: string;
+
+  @ApiProperty({
+    description: 'Análisis de distribución de vacunas (HTML/texto enriquecido)',
+    example: '<h3>Análisis de distribución de vacunas</h3>',
+  })
+  analisisDistribucionVacunas: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis de distribución de vacunas (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisDistribucionVacunas?: string;
+
+  @ApiProperty({
+    description: 'Análisis por gravedad (HTML/texto enriquecido)',
+    example: '<h3>Análisis por gravedad</h3>',
+  })
+  analisisPorGravedad: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis por gravedad (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisPorGravedad?: string;
+
+  @ApiProperty({
+    description: 'Análisis temporal (HTML/texto enriquecido)',
+    example: '<h3>Análisis temporal</h3>',
+  })
+  analisisTemporal: string;
+
+  @ApiProperty({
+    description: 'Gráfico de análisis temporal (Base64)',
+    type: 'string',
+    example:
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  })
+  graficoAnalisisTemporal?: string;
 
   @ApiProperty({
     description: 'Conclusiones (HTML/texto enriquecido)',

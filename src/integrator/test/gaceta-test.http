@@ -14,13 +14,15 @@ Content-Type: application/json
     "cargo": "Director de Farmacovigilancia",
     "autorSecundario": "Dra. María González",
     "cargoSecundario": "Subdirectora de Vigilancia Epidemiológica",
-    "analisisGravedad": "<h3>Análisis de Gravedad</h3><p>Durante el período analizado se registraron 245 eventos adversos, de los cuales el 15% fueron clasificados como graves según los criterios internacionales.</p>",
-    "analisisSexoEdad": "<h3>Distribución por Sexo y Edad</h3><ul><li>Mujeres: 60% (147 casos)</li><li>Hombres: 40% (98 casos)</li><li>Grupo etario más afectado: 25-64 años (70%)</li></ul>",
-    "analisisTipoEvento": "<h3>Tipos de Eventos</h3><p>Los eventos más frecuentes fueron reacciones cutáneas (35%), seguidos de trastornos gastrointestinales (25%) y neurológicos (20%).</p>",
-    "analisisGeografico": "<h3>Distribución Geográfica</h3><p>Las provincias con mayor incidencia fueron Pichincha (30%), Guayas (25%) y Azuay (15%), correlacionándose con la densidad poblacional.</p>",
     "resumenContenido": "<h2>Resumen Ejecutivo</h2><p>Este informe presenta el análisis de farmacovigilancia correspondiente al mes de octubre 2024, incluyendo la evaluación de 245 reportes de eventos adversos.</p>",
     "conclusiones": "<h3>Conclusiones</h3><ol><li>El perfil de seguridad de los medicamentos analizados se mantiene dentro de los parámetros esperados</li><li>Se identificaron 3 nuevas señales de seguridad que requieren seguimiento</li></ol>",
-    "recomendaciones": "<h3>Recomendaciones</h3><p>Se recomienda continuar el monitoreo intensivo de las nuevas señales identificadas y fortalecer la capacitación en farmacovigilancia a nivel regional.</p>"
+    "recomendaciones": "<h3>Recomendaciones</h3><p>Se recomienda continuar el monitoreo intensivo de las nuevas señales identificadas y fortalecer la capacitación en farmacovigilancia a nivel regional.</p>",
+    "analisisPoblacion": "<h3>Análisis de Población</h3><p>Durante el período analizado se registraron 245 eventos adversos, de los cuales el 15% fueron clasificados como graves según los criterios internacionales.</p>",
+    "analisisDistribucionGeografica": "<h3>Análisis de Distribución Geográfica</h3><p>Las provincias con mayor incidencia fueron Pichincha (30%), Guayas (25%) y Azuay (15%), correlacionándose con la densidad poblacional.</p>",
+    "analisisDistribucionTipoEvento": "<h3>Análisis de Distribución de Tipo de Evento</h3><p>Los eventos más frecuentes fueron reacciones cutáneas (35%), seguidos de trastornos gastrointestinales (25%) y neurológicos (20%).</p>",
+    "analisisDistribucionVacunas": "<h3>Análisis de Distribución de Vacunas</h3><p>Las vacunas más frecuentes fueron la vacuna contra la gripe (35%), seguida de la vacuna contra la hepatitis A (25%) y la vacuna contra la hepatitis B (20%).</p>",
+    "analisisPorGravedad": "<h3>Análisis por Gravedad</h3><p>Durante el período analizado se registraron 245 eventos adversos, de los cuales el 15% fueron clasificados como graves según los criterios internacionales.</p>",
+    "analisisTemporal": "<h3>Análisis Temporal</h3><p>Durante el período analizado se registraron 245 eventos adversos, de los cuales el 15% fueron clasificados como graves según los criterios internacionales.</p>"
 }
 
 ### Obtener una gaceta por ID (UUID válido)

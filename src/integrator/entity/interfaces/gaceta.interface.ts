@@ -18,11 +18,15 @@ export interface IGaceta {
   titulo: string;
   autorSecundario: string;
   cargoSecundario: string;
-  analisisGravedad: string;
-  analisisSexoEdad: string;
-  analisisTipoEvento: string;
-  analisisGeografico: string;
+  resumenContenido: string;
+
+  analisisPoblacion: string;
+  analisisDistribucionGeografica: string;
+  analisisDistribucionTipoEvento: string;
+  analisisDistribucionVacunas: string;
+  analisisPorGravedad: string;
+  analisisTemporal: string;
+
   conclusiones: string;
   recomendaciones: string;
-  resumenContenido: string;
 }

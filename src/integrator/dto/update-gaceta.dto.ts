@@ -1,9 +1,14 @@
-import { OmitType } from '@nestjs/swagger';
-import { CreateGacetaDto } from './create-gaceta.dto';
+import { OmitType, PartialType } from '@nestjs/swagger';
+import { GacetaDto } from './gaceta.dto';
 
-export class UpdateGacetaDto extends OmitType(CreateGacetaDto, [
-  'id',
+export class UpdateGacetaDto extends OmitType(PartialType(GacetaDto), [
   'fechaPublicacion',
+  'graficoAnalisisPoblacion',
+  'graficoAnalisisDistribucionGeografica',
+  'graficoAnalisisDistribucionTipoEvento',
+  'graficoAnalisisDistribucionVacunas',
+  'graficoAnalisisPorGravedad',
+  'graficoAnalisisTemporal',
   'desde',
   'hasta',
-]) {}
+] as const) {}

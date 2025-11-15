@@ -1,6 +1,0 @@
-"0","con <- dbConnect(drv, url=""jdbc:postgresql://10.64.102.29:5432/dhis2"", user=""usr_dhis2esavi"", password=""aaaDHIS2"")
-"
-"2","Error in dbConnect(drv, url = ""jdbc:postgresql://10.64.102.29:5432/dhis2"",  : 
-  Unable to connect JDBC to jdbc:postgresql://10.64.102.29:5432/dhis2
-  JDBC ERROR: El intento de conexión falló.
-"
