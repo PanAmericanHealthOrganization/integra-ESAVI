@@ -101,18 +101,28 @@ export const GacetaEdit = () => {
           </Grid>
           <Grid item xs={12} sm={3}>
             <ImageFieldWithZoom
-              source="piramideEdadSexo"
+              source="graficoAnalisisPorGravedad"
               title="Piramide de Edad y Sexo"
             />
           </Grid>
           <Grid item xs={12} sm={8}>
-            <RichTextInput
-              source="analisisSexoEdad"
-              label="Análisis de Sexo y Edad"
-            />
+            <RichTextInput source="analisisSexoEdad" label={false} fullWidth />
           </Grid>
           <Grid item xs={12} sm={12}>
             <h3>Distribución Geográfica</h3>
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <ImageFieldWithZoom
+              source="graficoAnalisisPoblacion"
+              title="Distribución Geográfica"
+            />
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <RichTextInput
+              source="analisisGeografico"
+              label={false}
+              fullWidth
+            />
           </Grid>
           <Grid item xs={12} sm={12}>
             <h3>Caracterización por Tipo de Vacuna</h3>
@@ -126,10 +136,16 @@ export const GacetaEdit = () => {
             </Typography>
           </Grid>
           <Grid item xs={12} sm={12}>
-            <RichTextInput source="conclusiones" label="Conclusiones" />
+            <h3>Conclusiones</h3>
           </Grid>
           <Grid item xs={12} sm={12}>
-            <RichTextInput source="recomendaciones" label="Recomendaciones" />
+            <RichTextInput source="conclusiones" label={false} />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <h3>Recomendaciones</h3>
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <RichTextInput source="recomendaciones" label={false} />
           </Grid>
         </Grid>{" "}
       </SimpleForm>
