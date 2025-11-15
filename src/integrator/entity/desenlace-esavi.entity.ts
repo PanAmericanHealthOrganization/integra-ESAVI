@@ -47,7 +47,7 @@ export class DesenlaceEsavi extends Auditoria {
   @Column({
     name: 'AUTOPSIA',
     nullable: true,
-    comment: 'Indica si se realizó autopsia (0=No, 1=Sí)',
+    comment: 'Indica si se realizó autopsia (si=1, no=2, [no sabe | ignorado | desconoce] = 3, "configuración por defecto para otras opciones no contempladas" = 3)',
   })
   autopsia: number;
 
