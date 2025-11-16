@@ -1,12 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { InvestigacionDto } from '../dto/investigacion.dto';
 import { Investigacion, InvestigacionUpdateDto } from '../entity/investigacion.entity';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { In, Raw, Repository } from 'typeorm';
-import { InvestigacionCreateDto } from '../entity/investigacion.entity';
+import { ILike, In, Raw, Repository } from 'typeorm';
+import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';
+import { Investigacion } from '../entity/investigacion.entity';
+
 
 //Se recomienda usar las interfaces icontroller y la iservice,
 //que se encuentran en src/utils/IController.ts
@@ -20,14 +22,14 @@ export class InvestigacionService
    */
   private readonly logger = new Logger(InvestigacionService.name);
 
-  /**
-   * Constructor de la clase InvestigacionService
-   * @param investigacionRepository Repositorio de la entidad Investigacion
-   */
-  constructor(
-    @InjectRepository(Investigacion, 'POSTGRES_INTEGRATOR_DS')
-    private readonly investigacionRepository: Repository<Investigacion>,
-  ) {}
+        /**
+         * Constructor de la clase InvestigacionService
+         * @param investigacionRepository Repositorio de la entidad Investigacion
+         */
+        constructor(
+          @InjectRepository(Investigacion, 'POSTGRES_INTEGRATOR_DS')
+          private readonly investigacionRepository: Repository<Investigacion>,
+        ) {}
 
   /**
    *
@@ -166,17 +168,17 @@ export class InvestigacionService
     return { data, total };
   }
 
-  /**
-   *
-   * @param investigacion //esta es la data
-   * @returns
-   */
-  /*async create(investigacion: Investigacion): Promise<InvestigacionDto> {          
+        /**
+         *
+         * @param investigacion //esta es la data
+         * @returns
+         */
+        /*async create(investigacion: Investigacion): Promise<InvestigacionDto> {          
           return this.investigacionRepository.save(investigacion);
         }*/ //ESTE DTO SERÍA MÁS APLICABLE A UN DTO DE RESPUESTA O SALIDA.
-  async create(investigacionCreateDto: InvestigacionCreateDto): Promise<InvestigacionDto> {
-    return this.investigacionRepository.save(investigacionCreateDto);
-  }
+        async create(investigacionCreateDto: InvestigacionCreateDto): Promise<InvestigacionDto> {
+          return this.investigacionRepository.save(investigacionCreateDto);
+        }
 
   /**
    *

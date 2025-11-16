@@ -804,6 +804,16 @@ export class Dhis2IntegratorService {
     antecedenteEmbarazada.edadGestacional = semanaGestacion
       ? Number(semanaGestacion)
       : null;
+    if (antecedenteEmbarazada.edadGestacional && notificacion.fechaAtencion) {
+      antecedenteEmbarazada.fechaUltimaMenstruacion = this.ajustarFecha(
+        notificacion.fechaAtencion,
+        -antecedenteEmbarazada.edadGestacional * 7,
+      );// La constante 7 es número de días en una semana.
+      antecedenteEmbarazada.fechaParto = this.ajustarFecha(
+        antecedenteEmbarazada.fechaUltimaMenstruacion,
+        semanasEmbarazo * 7,
+      );
+    }
 
     // Dato Vacuna
     const numeroVacunas = 5;
@@ -949,6 +959,7 @@ export class Dhis2IntegratorService {
     create.datoVacuna = datoVacunas;
     create.gravedadEsavi = grave;
     create.desenlaceEsavi = desenlaceEsavi;
+    //investigacion.datoEsaviId= datoEsavis.id;
     create.investigacion = investigacion;
 
     if (antecedenteMedico.descripcionPrincipal &&
