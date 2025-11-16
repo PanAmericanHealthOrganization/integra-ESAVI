@@ -36,11 +36,11 @@ export const calidadDataProvider: ICalidadDataProvider = {
     resource: string,
     params: GetListParams & QueryFunctionContext
   ): Promise<any> {
-    // http://localhost:8081/v1/dataquality/general
     const { date } = params.filter
-    const response = await intESAVIClient.get(`/${resource}/general`, {
-      params: { date: date.toString() },
-    })
+    console.log("date", date)
+    const response = await intESAVIClient.get(
+      `/${resource}/general?date=${date}`
+    )
     return response.data
   },
   getList: function <RecordType extends RaRecord = any>(
