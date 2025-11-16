@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
@@ -6,6 +6,9 @@ import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/paginat
 import { ILike, In, Raw, Repository } from 'typeorm';
 import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';
 import { Investigacion } from '../entity/investigacion.entity';
+import { plainToInstance } from 'class-transformer';
+import { DatoEsavi } from '../entity/dato-esavi.entity';
+import { DatoEsaviService } from './dato-esavi.service';
 
 
 //Se recomienda usar las interfaces icontroller y la iservice,
@@ -30,6 +33,8 @@ export class InvestigacionService
         constructor(
           @InjectRepository(Investigacion, 'POSTGRES_INTEGRATOR_DS')
           private readonly investigacionRepository: Repository<Investigacion>,
+          // Inyectamos el servicio, no el repo
+          private readonly datoEsaviService: DatoEsaviService,
         ) {}
 
         /**
@@ -164,15 +169,41 @@ export class InvestigacionService
 
         /**
          *
-         * @param investigacion //esta es la data
+         * @param investigacionCreateDto //esta es la data
          * @returns
          */
         /*async create(investigacion: Investigacion): Promise<InvestigacionDto> {          
           return this.investigacionRepository.save(investigacion);
         }*/ //ESTE DTO SERÍA MÁS APLICABLE A UN DTO DE RESPUESTA O SALIDA.
-        async create(investigacionCreateDto: InvestigacionCreateDto): Promise<InvestigacionDto> {
+        
+        //--TODO FK
+        async create(
+          //datoEsaviId: DatoEsavi,
+          investigacionCreateDto: InvestigacionCreateDto
+        ): Promise<InvestigacionDto> {
           return this.investigacionRepository.save(investigacionCreateDto);
         }
+          
+
+        /*async create(data: InvestigacionCreateDto): Promise<InvestigacionDto> {
+          const { datoEsaviId, ...rest } = data;
+          // Buscar la entidad relacionada
+          const datoEsavi = await this.datoEsaviRepository.findOneBy({
+            id: data.datoEsaviId,  // para no causar confusión se podría cambiar a "datoEsaviId"
+          });
+          if (!datoEsavi) throw new Error('DatoEsavi no encontrado');
+        
+          // Crear la entidad usando spread operator
+          const investigacion = this.investigacionRepository.create({
+            ...rest,       // copia todas las propiedades del DTO
+            datoEsavi,     // asigna la relación explícitamente
+          });
+        
+          return await this.investigacionRepository.save(investigacion);
+          
+                      
+        }*/
+          
 
         /**
          *

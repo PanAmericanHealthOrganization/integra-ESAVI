@@ -32,7 +32,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
   /**
-   *
+   *@OneToOne(() => DatoEsavi, { nullable: false })
    */
   @OneToOne(() => DatoEsavi)
   @JoinColumn({ name: 'DATOS_ESAVI_ID' })
