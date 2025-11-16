@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataqualityController } from './controllers/dataquality.controller';
-import { DataqualityDimensions } from './entities/dataquality.entity';
-import { GeneralService } from './services/general.service';
 import { CompletenessService } from './services/complees.service';
-import { SintacticService } from './services/sintactic.service';
+import { GeneralService } from './services/general.service';
 import { SemanticService } from './services/semantic.service';
+import { SintacticService } from './services/sintactic.service';
+import { DataQualityDimensions } from './entities/dataQualityDimensions.entity';
 
 const DATAQUALITY_DS = 'DATAQUALITY_DS';
 
@@ -30,7 +30,7 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([DataqualityDimensions], DATAQUALITY_DS),
+    TypeOrmModule.forFeature([DataQualityDimensions], DATAQUALITY_DS),
   ],
   controllers: [DataqualityController],
   providers: [GeneralService, CompletenessService, SintacticService, SemanticService],

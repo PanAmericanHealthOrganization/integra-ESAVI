@@ -3,7 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { QualityDto } from '../controllers/dto/quality.dto';
-import { DataqualityDimensions } from '../entities/dataquality.entity';
+import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { CompletenessService } from './complees.service';
 import { SemanticService } from './semantic.service';
 import { SintacticService } from './sintactic.service';
@@ -17,29 +17,29 @@ export class GeneralService {
   constructor(
     @InjectDataSource('DATAQUALITY_DS')
     private readonly dataSource: DataSource,
-    @InjectRepository(DataqualityDimensions, 'DATAQUALITY_DS')
-    private dataqualityDimensionsRepository: Repository<DataqualityDimensions>,
+    @InjectRepository(DataQualityDimensions, 'DATAQUALITY_DS')
+    private dataQualityDimensionsRepository: Repository<DataQualityDimensions>,
     private completenessService: CompletenessService,
     private sintacticService: SintacticService,
     private semanticService: SemanticService,
   ) {}
 
   async getGeneralQuality(date: Date): Promise<QualityDto> {
-    const dataqualityDimension = await this.dataqualityDimensionsRepository.findOne({
+    const dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
         fecha: date,
         dimension: this.schemaName,
       },
     });
-    if (dataqualityDimension) {
-      return JSON.parse(dataqualityDimension.jsonQuality);
+    if (dataQualityDimension) {
+      return JSON.parse(dataQualityDimension.jsonQuality);
     }
     return await this.processQualityDay(date);
   }
 
   private async processQualityDay(day: Date): Promise<QualityDto> {
     const g = await this.generalQuality(day);
-    await this.dataqualityDimensionsRepository.save({
+    await this.dataQualityDimensionsRepository.save({
       fecha: g.fecha,
       dimension: g.dimension,
       jsonQuality: JSON.stringify(g.jsonQuality),
