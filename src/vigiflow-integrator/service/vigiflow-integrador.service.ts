@@ -28,6 +28,7 @@ import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-
 import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
+import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
@@ -191,6 +192,17 @@ export class VigiflowIntegradorService {
     // console.log('reports::: ', reports);
     console.log('reports.length::: ', reports.length);
     reports.map(async (reg) => {
+      const auditoria: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: 'System',
+        deletedAt: undefined,
+        deletedBy: 'System',
+        isEnabled: true,
+        isActive: true,
+      };
+
       // Create Paciente Vigiflow
       const paciente = new CreatePacienteVigiflowDto();
       paciente.identificacion = reg['E'];
@@ -282,7 +294,7 @@ export class VigiflowIntegradorService {
         reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si');
 
       //Complete the dto
-      const create = new CreateCompleteDto();
+      let create = new CreateCompleteDto();
       create.source = SourceEnum.VIGIFLOW;
       create.pacienteVigiflow = paciente;
       create.notificacion = notificacion;
@@ -292,6 +304,7 @@ export class VigiflowIntegradorService {
       if (embarazada.momentoEsavi) {
         create.pacienteEmbarazada = embarazada;
       }
+      create = { ...create, ...auditoria };
 
       await this.integradorService.create(create);
       console.log('Notificacion enviar::::', notificacion);
@@ -444,6 +457,17 @@ export class VigiflowIntegradorService {
       header: headers2,
     });
 
+    const auditoria: Auditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: 'System',
+      deletedAt: undefined,
+      deletedBy: 'System',
+      isEnabled: true,
+      isActive: true,
+    };
+
     // Iterar con for...of para esperar las respuestas
     for (const reg of toUpdate) {
       const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['B']);
@@ -452,15 +476,16 @@ export class VigiflowIntegradorService {
           paciente.id,
         );
         const notificacion = notificacionList.at(0);
-        const medicamento = new CreateMedicamentoDto();
+        let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
         medicamento.nombre = reg['D'];
         medicamento.codigoATC = reg['G'];
+        medicamento = { ...medicamento, ...auditoria };
 
         // Comentado el método de creación de medicamento para no ejecutarlo
         await this.medicamentoService.createOneToOne(notificacion, medicamento);
 
-        const datoVacuna = new CreateDatoVacunaDto();
+        let datoVacuna = new CreateDatoVacunaDto();
         datoVacuna.nombreVacuna = reg['D'];
         datoVacuna.accionTomada = reg['M'];
         datoVacuna.dosis = reg['S'];
@@ -497,6 +522,7 @@ export class VigiflowIntegradorService {
             ingredent: item.ingredient,
           }));
         }
+        datoVacuna = { ...datoVacuna, ...auditoria };
 
         await this.datoVacunaService.createVigiflow(notificacion, datoVacuna);
       } else {
@@ -516,6 +542,18 @@ export class VigiflowIntegradorService {
       range: importRange2,
       header: headers2,
     });
+
+    const auditoria: Auditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: 'System',
+      deletedAt: undefined,
+      deletedBy: 'System',
+      isEnabled: true,
+      isActive: true,
+    };
+
     // toCreate.map(async (reg) => {
     for (const reg of toCreate) {
       const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['A']);
@@ -526,7 +564,8 @@ export class VigiflowIntegradorService {
         );
         const notificacion = notificacionList.at(0);
 
-        const datoEsavi = new CreateDatoEsaviDto();
+        let datoEsavi = new CreateDatoEsaviDto();
+        datoEsavi = { ...datoEsavi, ...auditoria };
 
         datoEsavi.nombre = reg['D'] && reg['D'].toUpperCase();
         //datoEsavi.nombreReportado = reg['C'] && reg['C'].toUpperCase();

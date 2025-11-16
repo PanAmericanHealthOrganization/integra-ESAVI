@@ -24,7 +24,7 @@ export class SemanticService {
       `
       SELECT COUNT(*)::BIGINT AS total
       FROM dhi_esavi."TR_NOTIFICACION" n
-      WHERE n."AUD_FECHA_CREACION" < $1;
+      WHERE n."EDAD" IS NULL OR n."EDAD" >= 0 AND n."AUD_FECHA_CREACION" <= $1;
     `,
       'total',
       day,
@@ -34,7 +34,7 @@ export class SemanticService {
       ` 
       SELECT COUNT(*)::BIGINT AS invalid
       FROM dhi_esavi."TR_NOTIFICACION" n
-      WHERE n."EDAD" IS NULL OR n."EDAD" < 0 AND n."AUD_FECHA_CREACION" < $1;
+      WHERE n."EDAD" < 0 AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
       day,
@@ -67,7 +67,7 @@ export class SemanticService {
       `
       SELECT COUNT(*)::BIGINT AS invalid
       FROM dhi_esavi."TR_NOTIFICACION" n
-      WHERE n."EDAD" IS NULL OR n."EDAD" > 100 AND n."AUD_FECHA_CREACION" < $1;
+      WHERE n."EDAD" > 120 AND n."AUD_FECHA_CREACION" <= $1;
     `,
       'invalid',
       day,
@@ -90,7 +90,8 @@ export class SemanticService {
       `
       SELECT COUNT(*)::BIGINT AS total
       FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
-      WHERE p."FECHA_NACIMIENTO" > n."FECHA_NOTIFICACION" AND n."AUD_FECHA_CREACION" < $1;
+      WHERE p."FECHA_NACIMIENTO" IS not NULL and n."FECHA_NOTIFICACION" IS NOT NULL 
+      AND n."AUD_FECHA_CREACION" < $1;
     `,
       'total',
       day,
@@ -100,7 +101,7 @@ export class SemanticService {
       `
       SELECT COUNT(*)::BIGINT AS invalid
       FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
-      WHERE p."FECHA_NACIMIENTO" < n."FECHA_NACIMIENTO" AND n."AUD_FECHA_CREACION" < $1;
+      WHERE p."FECHA_NACIMIENTO" > n."FECHA_NOTIFICACION" AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
       day,

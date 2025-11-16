@@ -68,8 +68,7 @@ export class DatoVacunacion extends Auditoria {
     name: 'OTRAPARROQUIANOTIFICADOR',
     length: 128,
     nullable: true,
-    comment:
-      'Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio',
+    comment: 'Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio',
   })
   otraParroquia: string;
   /**

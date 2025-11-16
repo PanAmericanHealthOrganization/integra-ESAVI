@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 
 // Entidades
 import { ISync } from '../dto/sync.dto';
-import { Auditoria, SyncProcess } from '../entity';
+import { Auditoria, IAuditoria, SyncProcess } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
@@ -172,13 +172,24 @@ export class SeedService {
       { codigo: 'EST', descripcion: 'Estado Registro' },
     ];
 
+    const auditoriaDto: Auditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: '',
+      deletedAt: undefined,
+      deletedBy: '',
+      isEnabled: true,
+      isActive: true,
+    };
+
     for (const tipo of tiposCatalogo) {
       const existing = await this.tipoCatalogoRepository.findOne({
         where: { descripcion: tipo.descripcion },
       });
 
       if (!existing) {
-        await this.tipoCatalogoRepository.save(tipo);
+        await this.tipoCatalogoRepository.save({ ...tipo, ...auditoriaDto } as TipoCatalogo);
       }
     }
   }
@@ -197,14 +208,14 @@ export class SeedService {
         errorStack: null,
         errorTrace: null,
         id: undefined,
-        createdAt: undefined,
-        createdBy: '',
+        createdAt: new Date(),
+        createdBy: 'System',
         updatedAt: undefined,
         updatedBy: '',
         deletedAt: undefined,
         deletedBy: '',
-        isEnabled: false,
-        isActive: false,
+        isEnabled: true,
+        isActive: true,
       };
       l.push(syncProcess);
     }
@@ -1091,13 +1102,13 @@ export class SeedService {
         return;
       }
 
-      const auditoria = {
+      const auditoria: IAuditoria = {
         createdAt: new Date(),
         createdBy: 'System',
         updatedAt: undefined,
-        updatedBy: '',
+        updatedBy: 'System',
         deletedAt: undefined,
-        deletedBy: '',
+        deletedBy: 'System',
         isEnabled: true,
         isActive: true,
       };

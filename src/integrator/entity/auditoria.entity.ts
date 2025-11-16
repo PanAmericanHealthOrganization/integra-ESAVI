@@ -10,7 +10,7 @@ export abstract class Auditoria implements IAuditoria {
   @Column({
     name: 'AUD_FECHA_CREACION',
     type: 'timestamptz',
-    nullable: true,
+    nullable: false,
     comment: 'Fecha de creación',
   })
   createdAt: Date;
@@ -21,7 +21,7 @@ export abstract class Auditoria implements IAuditoria {
   @Column({
     name: 'AUD_USUARIO_CREACION',
     length: 60,
-    nullable: true,
+    nullable: false,
     comment: 'Usuario que creó el registro',
   })
   createdBy: string;
@@ -33,6 +33,7 @@ export abstract class Auditoria implements IAuditoria {
     name: 'AUD_FECHA_ACTUALIZACION',
     type: 'timestamptz',
     nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
     comment: 'Fecha de actualización',
   })
   updatedAt: Date;
@@ -43,6 +44,7 @@ export abstract class Auditoria implements IAuditoria {
   @Column({
     name: 'AUD_USUARIO_ACTUALIZACION',
     nullable: true,
+    default: 'SYSTEM',
     length: 60,
     comment: 'Usuario que actualizó el registro',
   })
@@ -77,6 +79,7 @@ export abstract class Auditoria implements IAuditoria {
     name: 'AUD_HABILITADO',
     type: 'boolean',
     default: true,
+    nullable: false,
     comment: 'Indica si el registro está habilitado',
   })
   isEnabled: boolean;
@@ -88,6 +91,7 @@ export abstract class Auditoria implements IAuditoria {
     name: 'AUD_ESTADO',
     type: 'boolean',
     default: true,
+    nullable: false,
     comment: 'Indica si el registro está activo',
   })
   isActive: boolean;
