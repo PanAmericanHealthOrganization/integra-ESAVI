@@ -1,4 +1,4 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Drug } from './drug.entity';
 
@@ -9,7 +9,7 @@ import { Drug } from './drug.entity';
   schema: 'who_drug',
   name: 'atomic_therapeutic_chemicals',
 })
-export class AnatomicalTherapeuticChemical extends CustomBaseEntity {
+export class AnatomicalTherapeuticChemical extends Auditoria {
   /**
    *
    */
@@ -74,9 +74,7 @@ export class AnatomicalTherapeuticChemicalBuilder {
     return this;
   }
 
-  public withOfficialFlag(
-    officialFlag: string,
-  ): AnatomicalTherapeuticChemicalBuilder {
+  public withOfficialFlag(officialFlag: string): AnatomicalTherapeuticChemicalBuilder {
     this.anatomicalTherapeuticChemical.officialFlag = officialFlag;
     return this;
   }

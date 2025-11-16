@@ -1,11 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
 
 @Entity({
   schema: 'dhi_esavi',
   name: 'TC_TIPO_CATALOGO',
   comment: 'Tabla de tipos de catálogo',
 })
-export class TipoCatalogo {
+export class TipoCatalogo extends Auditoria {
   @PrimaryGeneratedColumn('uuid', {
     name: 'ID',
     comment: 'ID del tipo de catálogo',

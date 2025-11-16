@@ -1,10 +1,10 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
-import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { IAuditoria } from '../entity';
 
 /**
  *
  */
-export interface ISync extends IBaseEntity {
+export interface ISync extends IAuditoria {
   /**
    * Identificador único del proceso de sincronización
    */

@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { IVacunometro } from '../entity';
+import { Auditoria, IVacunometro } from '../entity';
 
-export class VacunometroDto implements IVacunometro {
+export class VacunometroDto extends Auditoria implements IVacunometro {
   /**
    * Identificador único del vacunómetro
    *

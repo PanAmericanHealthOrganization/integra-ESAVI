@@ -5,48 +5,39 @@ import { SemanticQualityTableDto } from '../controllers/dto/quality.dto';
 
 @Injectable()
 export class SemanticService {
-  private readonly schemaName = 'dhi_esavi';
-  private readonly notificationTableName = 'TR_NOTIFICACION';
-  private readonly patientTableName = 'TR_PACIENTE';
-
-  private readonly ageColumn = 'EDAD';
-  private readonly birthDateColumn = 'FECHA_NACIMIENTO';
-  private readonly notificationDateColumn = 'FECHA_NOTIFICACION';
-  private readonly patientIdColumn = 'PACIENTE_ID';
-
   constructor(
     @InjectDataSource('DATAQUALITY_DS')
     private readonly dataSource: DataSource,
   ) {}
 
-  async semanticQuality(): Promise<SemanticQualityTableDto[]> {
+  async semanticQuality(day: Date): Promise<SemanticQualityTableDto[]> {
     return Promise.all([
-      this.validateMinAge(),
-      this.validateMaxAge(),
-      this.validateBirthDateNotAfterNotification(),
-      this.validateReferentialIntegrity(),
+      this.validateMinAge(day),
+      this.validateMaxAge(day),
+      this.validateBirthDateNotAfterNotification(day),
+      this.validateReferentialIntegrity(day),
     ]);
   }
 
-  private async validateMinAge(): Promise<SemanticQualityTableDto> {
-    const notificationTable = this.qualifiedTable(this.notificationTableName, 'n');
-    const ageColumn = this.columnReference('n', this.ageColumn);
-
+  private async validateMinAge(day: Date): Promise<SemanticQualityTableDto> {
     const total = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${this.qualifiedTable(this.notificationTableName)};
+      FROM dhi_esavi."TR_NOTIFICACION" n
+      WHERE n."AUD_FECHA_CREACION" < $1;
     `,
       'total',
+      day,
     );
 
     const invalid = await this.fetchCount(
-      `
+      ` 
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${notificationTable}
-      WHERE ${ageColumn} IS NULL OR ${ageColumn} < 0;
+      FROM dhi_esavi."TR_NOTIFICACION" n
+      WHERE n."EDAD" IS NULL OR n."EDAD" < 0 AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
+      day,
     );
 
     const valid = Math.max(total - invalid, 0);
@@ -54,32 +45,32 @@ export class SemanticService {
     return this.toSemanticDto({
       ruleCode: 'edadNoNegativa',
       ruleName: 'edadNoNegativa',
-      ruleDescription: `La edad registrada en ${this.notificationTableName}.${this.ageColumn} no debe ser negativa`,
+      ruleDescription: `La edad registrada en dhi_esavi."TR_NOTIFICACION".EDAD no debe ser negativa`,
       totalRecords: total,
       valid,
       invalid,
     });
   }
 
-  private async validateMaxAge(): Promise<SemanticQualityTableDto> {
-    const notificationTable = this.qualifiedTable(this.notificationTableName, 'n');
-    const ageColumn = this.columnReference('n', this.ageColumn);
-
+  private async validateMaxAge(day: Date): Promise<SemanticQualityTableDto> {
     const total = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${this.qualifiedTable(this.notificationTableName)};
+      FROM dhi_esavi."TR_NOTIFICACION" n
+      WHERE n."AUD_FECHA_CREACION" < $1;
     `,
       'total',
+      day,
     );
 
     const invalid = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${notificationTable}
-      WHERE ${ageColumn} IS NULL OR ${ageColumn} > 100;
+      FROM dhi_esavi."TR_NOTIFICACION" n
+      WHERE n."EDAD" IS NULL OR n."EDAD" > 100 AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
+      day,
     );
 
     const valid = Math.max(total - invalid, 0);
@@ -87,49 +78,32 @@ export class SemanticService {
     return this.toSemanticDto({
       ruleCode: 'edadNoMayorA100',
       ruleName: 'edadNoMayorA100',
-      ruleDescription: `La edad registrada en ${this.notificationTableName}.${this.ageColumn} no debe superar los 100 años`,
+      ruleDescription: `La edad registrada en dhi_esavi."TR_NOTIFICACION".EDAD no debe superar los 100 años`,
       totalRecords: total,
       valid,
       invalid,
     });
   }
 
-  private async validateBirthDateNotAfterNotification(): Promise<SemanticQualityTableDto> {
-    const notificationTable = this.qualifiedTable(this.notificationTableName, 'n');
-    const patientTable = this.qualifiedTable(this.patientTableName, 'p');
-    const joinClause = `
-      INNER JOIN ${patientTable}
-        ON ${this.columnReference('n', this.patientIdColumn)} = ${this.columnReference(
-      'p',
-      this.patientIdColumn,
-    )}
-    `;
-
+  private async validateBirthDateNotAfterNotification(day: Date): Promise<SemanticQualityTableDto> {
     const total = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${notificationTable}
-      ${joinClause};
+      FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
+      WHERE p."FECHA_NACIMIENTO" > n."FECHA_NOTIFICACION" AND n."AUD_FECHA_CREACION" < $1;
     `,
       'total',
+      day,
     );
-
-    const birthDate = this.columnReference('p', this.birthDateColumn);
-    const notificationDate = this.columnReference('n', this.notificationDateColumn);
-    const invalidCondition = [
-      `${birthDate} IS NULL`,
-      `${notificationDate} IS NULL`,
-      `${birthDate} > ${notificationDate}`,
-    ].join(' OR ');
 
     const invalid = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${notificationTable}
-      ${joinClause}
-      WHERE ${invalidCondition};
+      FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
+      WHERE p."FECHA_NACIMIENTO" < n."FECHA_NACIMIENTO" AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
+      day,
     );
 
     const valid = Math.max(total - invalid, 0);
@@ -137,42 +111,32 @@ export class SemanticService {
     return this.toSemanticDto({
       ruleCode: 'fechaNacimientoAntesDeNotificacion',
       ruleName: 'fechaNacimientoAntesDeNotificacion',
-      ruleDescription: `La fecha de nacimiento del paciente (${this.patientTableName}.${this.birthDateColumn}) no puede ser posterior a la fecha de notificación (${this.notificationTableName}.${this.notificationDateColumn})`,
+      ruleDescription: `La fecha de nacimiento del paciente dhi_esavi."TR_PACIENTE".FECHA_NACIMIENTO no puede ser posterior a la fecha de notificación dhi_esavi."TR_NOTIFICACION".FECHA_NOTIFICACION`,
       totalRecords: total,
       valid,
       invalid,
     });
   }
 
-  private async validateReferentialIntegrity(): Promise<SemanticQualityTableDto> {
-    const notificationTable = this.qualifiedTable(this.notificationTableName, 'n');
-    const patientTable = this.qualifiedTable(this.patientTableName, 'p');
-    const joinClause = `
-      LEFT JOIN ${patientTable}
-        ON ${this.columnReference('n', this.patientIdColumn)} = ${this.columnReference(
-      'p',
-      this.patientIdColumn,
-    )}
-    `;
-
+  private async validateReferentialIntegrity(day: Date): Promise<SemanticQualityTableDto> {
     const total = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${notificationTable}
-      ${joinClause};
+      FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
+      WHERE n."AUD_FECHA_CREACION" < $1;
     `,
       'total',
+      day,
     );
 
     const invalid = await this.fetchCount(
       `
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${notificationTable}
-      ${joinClause}
-      WHERE ${this.columnReference('n', this.patientIdColumn)} IS NOT NULL
-        AND ${this.columnReference('p', this.patientIdColumn)} IS NULL;
+      FROM dhi_esavi."TR_NOTIFICACION" n inner join dhi_esavi."TR_PACIENTE" p on n."PACIENTE_ID" = p."PACIENTE_ID"
+      WHERE n."PACIENTE_ID" IS NOT NULL AND p."PACIENTE_ID" IS NULL AND n."AUD_FECHA_CREACION" < $1;
     `,
       'invalid',
+      day,
     );
 
     const valid = Math.max(total - invalid, 0);
@@ -180,15 +144,15 @@ export class SemanticService {
     return this.toSemanticDto({
       ruleCode: 'integridadReferencialPaciente',
       ruleName: 'integridadReferencialPaciente',
-      ruleDescription: `Cada registro en ${this.notificationTableName}.${this.patientIdColumn} debe tener un paciente asociado en ${this.patientTableName}.${this.patientIdColumn}`,
+      ruleDescription: `Cada registro en dhi_esavi."TR_NOTIFICACION".PACIENTE_ID debe tener un paciente asociado en dhi_esavi."TR_PACIENTE".PACIENTE_ID`,
       totalRecords: total,
       valid,
       invalid,
     });
   }
 
-  private async fetchCount(query: string, alias: string): Promise<number> {
-    const [result] = await this.dataSource.query(query);
+  private async fetchCount(query: string, alias: string, day: Date): Promise<number> {
+    const [result] = await this.dataSource.query(query, [day]);
     return Number(result?.[alias] ?? 0);
   }
 
@@ -221,16 +185,5 @@ export class SemanticService {
       percentageValidRecords,
       percentageInvalidRecords,
     };
-  }
-
-  private qualifiedTable(table: string, alias?: string): string {
-    const schema = `"${this.schemaName}"`;
-    const tableName = `"${table}"`;
-    const aliasClause = alias ? ` ${alias}` : '';
-    return `${schema}.${tableName}${aliasClause}`;
-  }
-
-  private columnReference(alias: string, column: string): string {
-    return `${alias}."${column}"`;
   }
 }

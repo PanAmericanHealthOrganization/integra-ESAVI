@@ -1,11 +1,14 @@
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { MeddraSync } from './meddraSync.entity';
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 
 @Entity({ name: 'med_soc', schema: 'meddra' })
-export class SOC extends CustomBaseEntity {
+export class SOC extends Auditoria {
   // PK
-  @PrimaryGeneratedColumn({ name: 'id', comment: 'Identificador único del registro en base de datos ' })
+  @PrimaryGeneratedColumn({
+    name: 'id',
+    comment: 'Identificador único del registro en base de datos ',
+  })
   id: number;
 
   /**

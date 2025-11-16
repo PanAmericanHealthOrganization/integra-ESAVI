@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { log } from 'console';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
-import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { In, Repository } from 'typeorm';
 import {
@@ -11,6 +10,7 @@ import {
   EstablecimientoUpdateDto,
 } from '../dto/establecimiento.dto';
 import { Establecimiento } from '../entity/establecimiento.entity';
+import { Auditoria } from '../entity';
 
 @Injectable()
 export class EstablecimientosService
@@ -74,7 +74,7 @@ export class EstablecimientosService
     return this.getOne(id);
   }
 
-  public async delete(id: Identificator, auditoria: IBaseEntity): Promise<EstablecimientoDto> {
+  public async delete(id: Identificator, auditoria: Auditoria): Promise<EstablecimientoDto> {
     await this.establecimientoRepository.update(id, {});
     log('Deleted establecimiento with id:', id);
     return this.establecimientoRepository.findOne({ where: { id: id as string } });

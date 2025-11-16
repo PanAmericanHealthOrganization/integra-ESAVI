@@ -20,6 +20,7 @@ export class CompletenessService {
 
   async obtenerCompletitudDeColumna(
     descriptor: ColumnCompletenessDescriptor,
+    day: Date,
   ): Promise<CompletenessQualityTableDto> {
     const schema = descriptor.tableSchema ?? 'public';
     const quotedSchema = this.quoteIdentifier(schema, 'schema');
@@ -31,25 +32,29 @@ export class CompletenessService {
       SELECT
         COUNT(*)::BIGINT AS total_records,
         COUNT(*) FILTER (WHERE ${quotedColumn} IS NULL)::BIGINT AS total_nulls
-      FROM ${tableReference} ;
+      FROM ${tableReference} t WHERE t."AUD_FECHA_CREACION" <= $1;
     `;
+    try {
+      const [result] = await this.dataSource.query(query, [day]);
+      const totalRecords = Number(result?.total_records ?? 0);
+      const totalNulls = Number(result?.total_nulls ?? 0);
+      const totalNonNulls = totalRecords - totalNulls;
+      const completenessPercentage =
+        totalRecords === 0 ? 0 : Number(((totalNonNulls / totalRecords) * 100).toFixed(2));
 
-    const [result] = await this.dataSource.query(query);
-    const totalRecords = Number(result?.total_records ?? 0);
-    const totalNulls = Number(result?.total_nulls ?? 0);
-    const totalNonNulls = totalRecords - totalNulls;
-    const completenessPercentage =
-      totalRecords === 0 ? 0 : Number(((totalNonNulls / totalRecords) * 100).toFixed(2));
-
-    return {
-      tableName: descriptor.tableName,
-      columnName: descriptor.columnName,
-      columnDescription: descriptor.columnDescription ?? descriptor.columnName,
-      totalRecords,
-      totalNulls,
-      totalNonNulls,
-      completenessPercentage,
-    };
+      return {
+        tableName: descriptor.tableName,
+        columnName: descriptor.columnName,
+        columnDescription: descriptor.columnDescription ?? descriptor.columnName,
+        totalRecords,
+        totalNulls,
+        totalNonNulls,
+        completenessPercentage,
+      };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 
   async obtenerTablasYColumnasDeEsquema(esquema: string): Promise<ColumnCompletenessDescriptor[]> {
@@ -79,14 +84,17 @@ export class CompletenessService {
     }));
   }
 
-  async obtenerCompletitudDeEsquema(esquema: string): Promise<CompletenessQualityTableDto[]> {
+  async obtenerCompletitudDeEsquema(
+    esquema: string,
+    date: Date,
+  ): Promise<CompletenessQualityTableDto[]> {
     const tablasYColumnas = await this.obtenerTablasYColumnasDeEsquema(esquema);
     const columnasValidas = tablasYColumnas.filter(
       (columna) => !columna.columnName.toUpperCase().startsWith('AUD'),
     );
     return Promise.all(
       columnasValidas.map(async (tablaYColumna) => {
-        return this.obtenerCompletitudDeColumna(tablaYColumna);
+        return this.obtenerCompletitudDeColumna(tablaYColumna, date);
       }),
     );
   }

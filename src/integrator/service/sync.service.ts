@@ -107,7 +107,7 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
     try {
       console.log('Fetching sync processes with params:', params);
       const [data] = await this.syncProcessRepository.findAndCount({
-        where: { enabled: true, state: true },
+        where: { isEnabled: true, isActive: true },
         order: { createdAt: 'DESC' },
       });
       return data;
@@ -144,7 +144,7 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
    */
   public async getList(): Promise<SyncProcess[]> {
     return this.syncProcessRepository.find({
-      where: { enabled: true, state: true },
+      where: { isEnabled: true, isActive: true },
     });
   }
 }

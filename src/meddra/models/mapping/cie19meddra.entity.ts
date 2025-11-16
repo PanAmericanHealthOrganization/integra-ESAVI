@@ -1,11 +1,11 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 /**
  *
- */ 
+ */
 //comment: 'Tabla de homologación CIE10-MEDDRA'
-@Entity({ name: 'med_cie10_to_med', })
-export class cie10Meddra extends CustomBaseEntity {
+@Entity({ name: 'med_cie10_to_med' })
+export class cie10Meddra extends Auditoria {
   /**
    *
    */

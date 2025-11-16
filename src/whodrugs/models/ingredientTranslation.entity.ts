@@ -1,4 +1,4 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { ActiveIngredient } from './activeIngredient.entity';
 import { IIngredientTranslation } from './dtos/drug.dto';
@@ -10,7 +10,7 @@ import { IIngredientTranslation } from './dtos/drug.dto';
   schema: 'who_drug',
   name: 'ingredient_translation',
 })
-export class IngredientTranslation extends CustomBaseEntity implements IIngredientTranslation {
+export class IngredientTranslation extends Auditoria implements IIngredientTranslation {
   /**
    *
    */

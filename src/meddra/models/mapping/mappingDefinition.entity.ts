@@ -1,13 +1,12 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
-
 
 //comment: 'Definición y descripción del Mapeo',
 
 @Entity({
   name: 'mapping_definition',
 })
-export class MappingDefinition extends CustomBaseEntity {
+export class MappingDefinition extends Auditoria {
   /**
    *
    */

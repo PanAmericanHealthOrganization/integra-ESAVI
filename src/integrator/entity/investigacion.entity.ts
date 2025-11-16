@@ -13,9 +13,9 @@ Nombre: MUESTRA_LABORATORIO; Comentario: Muestra de Laboratorio; Nullable: true;
 
 */
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { DatoEsavi } from './dato-esavi.entity';
+import { Auditoria, IAuditoria } from './auditoria.entity';
 
 /**
  *
@@ -25,7 +25,7 @@ import { DatoEsavi } from './dato-esavi.entity';
   name: 'TR_INVESTIGACION',
   comment: 'Tabla que registr la investigación de los casos de ESAVI',
 })
-export class Investigacion extends CustomBaseEntity implements IInvestigacion {
+export class Investigacion extends Auditoria implements IInvestigacion {
   /**
    * Primary generated column of investigacion
    */
@@ -115,7 +115,7 @@ export class Investigacion extends CustomBaseEntity implements IInvestigacion {
     }*/
 }
 
-export interface IInvestigacion extends CustomBaseEntity {
+export interface IInvestigacion extends IAuditoria {
   id: string;
   fechaInvestigacion: Date | null;
   vacunatorioCalidad: boolean;
@@ -126,7 +126,7 @@ export interface IInvestigacion extends CustomBaseEntity {
   muestraLaboratorio: boolean;
 }
 
-export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion {
+export class InvestigacionDto extends Auditoria implements IInvestigacion {
   @ApiProperty()
   id: string;
 
@@ -162,13 +162,14 @@ export class InvestigacionDto extends CustomBaseEntity implements IInvestigacion
 export class InvestigacionCreateDto extends OmitType(InvestigacionDto, [
   'id',
   //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
-  'enabled',
-  'state',
-  'action',
-  'createdAt',  
+  'isEnabled',
+  'isActive',
+  'createdAt',
   'updatedAt',
-  'actionBy',
-  
+  'createdBy',
+  'updatedBy',
+  'deletedAt',
+  'deletedBy',
 ] as const) {}
 /**
  *
@@ -177,11 +178,10 @@ export class InvestigacionCreateDto extends OmitType(InvestigacionDto, [
 export class InvestigacionUpdateDto extends OmitType(InvestigacionDto, [
   'id',
   //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al actualizar
-  'enabled',
-  'state',
-  'action',
+  'isEnabled',
+  'isActive',
+  'createdBy',
   'createdAt',
   'updatedAt',
-  'actionBy',
+  'updatedBy',
 ] as const) {}
-

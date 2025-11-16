@@ -1,6 +1,7 @@
+import { AuditoriaDto } from '../entity/auditoria.entity';
 import { IEstablecimiento } from '../entity/interfaces/establecimiento.interface';
 
-export class EstablecimientoDto implements IEstablecimiento {
+export class EstablecimientoDto extends AuditoriaDto implements IEstablecimiento {
   id: string;
   uniCodigo: string;
   uniNombre: string;

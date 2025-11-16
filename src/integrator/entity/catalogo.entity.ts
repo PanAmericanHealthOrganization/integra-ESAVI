@@ -1,10 +1,4 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { TipoCatalogo } from './tipo-catalogo.entity';
 import { Auditoria } from './auditoria.entity';
 import { OmitType } from '@nestjs/swagger';
@@ -97,21 +91,20 @@ export class CatalogoDto extends Auditoria implements ICatalogo {
   tipoCatalogo: TipoCatalogo;
 }
 
-export class CreateCatalogoDto extends OmitType( CatalogoDto, 
-  [
-    'id', 
-    'createdAt', 
-    'createdBy',
-    'deletedAt',
-    'deletedBy',
-    'isActive',
-    'isEnabled',
-    'updatedAt',
-    'updatedBy',
-  ]  as const ) {}
+export class CreateCatalogoDto extends OmitType(CatalogoDto, [
+  'id',
+  'createdAt',
+  'createdBy',
+  'deletedAt',
+  'deletedBy',
+  'isActive',
+  'isEnabled',
+  'updatedAt',
+  'updatedBy',
+] as const) {}
 
-  export class UpdateCatalogoDto extends OmitType( CatalogoDto, [
-    'dhis2',
-    'vigiflow',
-    'tipoCatalogo',
-  ] as const ) {}
+export class UpdateCatalogoDto extends OmitType(CatalogoDto, [
+  'dhis2',
+  'vigiflow',
+  'tipoCatalogo',
+] as const) {}

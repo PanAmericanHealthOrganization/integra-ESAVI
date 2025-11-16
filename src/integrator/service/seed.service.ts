@@ -5,7 +5,6 @@ import * as path from 'path';
 import { Repository } from 'typeorm';
 
 // Entidades
-import { CRUD } from 'src/utils/interfaces/baseEntity';
 import { ISync } from '../dto/sync.dto';
 import { Auditoria, SyncProcess } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
@@ -197,15 +196,15 @@ export class SeedService {
           'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
         errorStack: null,
         errorTrace: null,
-        id: undefined, // or null, depending on your entity definition
-
-        // Add required properties with default or mock values
-        enabled: true,
-        state: true,
-        action: CRUD.C,
-        actionBy: 'system', // or any appropriate user identifier
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        id: undefined,
+        createdAt: undefined,
+        createdBy: '',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: false,
+        isActive: false,
       };
       l.push(syncProcess);
     }
@@ -237,7 +236,7 @@ export class SeedService {
         dhis2: 'Mestizo',
         homologada: 'Mestizo',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },      
+      },
       {
         vigiflow: 'Indígena',
         dhis2: 'Indigenous',
@@ -267,13 +266,13 @@ export class SeedService {
         dhis2: 'NEGRO/A',
         homologada: 'Negro',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },      
+      },
       {
         vigiflow: 'MULATO/A',
         dhis2: 'MULATO/A',
         homologada: 'Mulato',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },      
+      },
       {
         vigiflow: 'MONTUBIO/A',
         dhis2: 'MONTUBIO/A',

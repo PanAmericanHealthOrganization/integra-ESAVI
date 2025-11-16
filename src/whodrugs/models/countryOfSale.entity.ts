@@ -1,10 +1,10 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Drug } from './drug.entity';
 import { Maholder } from './maholder.entity';
 
 @Entity({ name: 'country_sales', schema: 'who_drug' })
-export class CountryOfSale extends CustomBaseEntity {
+export class CountryOfSale extends Auditoria {
   constructor() {
     super();
   }

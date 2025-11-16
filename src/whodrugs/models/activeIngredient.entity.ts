@@ -1,4 +1,4 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Drug } from './drug.entity';
 import { IActiveIngredient } from './dtos/drug.dto';
@@ -6,7 +6,7 @@ import { IActiveIngredient } from './dtos/drug.dto';
  *
  */
 @Entity({ schema: 'who_drug', name: 'active_ingredients' })
-export class ActiveIngredient extends CustomBaseEntity implements IActiveIngredient {
+export class ActiveIngredient extends Auditoria implements IActiveIngredient {
   constructor() {
     super();
   }

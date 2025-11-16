@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { GeneralService } from '../services/general.service';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
@@ -10,7 +10,9 @@ export class DataqualityController implements IController<QualityDto, QualityDto
   constructor(private readonly generalService: GeneralService) {}
 
   @Get('general')
-  public async getGeneralQuality(@Param('date') date: Date): Promise<QualityDto> {
+  public async getGeneralQuality(@Query('date') dateString: string): Promise<QualityDto> {
+    console.log('date', dateString);
+    const date = new Date(dateString);
     return await this.generalService.getGeneralQuality(date);
   }
   getMany(params: IGetManyParams): Promise<QualityDto[]> {

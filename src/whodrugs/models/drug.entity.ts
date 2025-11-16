@@ -1,17 +1,16 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { encriptionTransformer } from '../utils/whodrug.encript';
+import { AnatomicalTherapeuticChemical } from './atomicTerapeutalChemical.entity';
 import { CountryOfSale } from './countryOfSale.entity';
 import { DrugSync } from './drugSync.entity';
 import { IDrug } from './dtos/drug.dto';
-import { AnatomicalTherapeuticChemical } from './atomicTerapeutalChemical.entity';
-
 
 /**
  *
  */
 @Entity({ name: 'drug', schema: 'who_drug' })
-export class Drug extends CustomBaseEntity implements IDrug {
+export class Drug extends Auditoria implements IDrug {
   /**
    *
    */

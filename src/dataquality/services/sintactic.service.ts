@@ -14,17 +14,18 @@ export class SintacticService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async sintacticQuality(): Promise<SintacticQualityDto[]> {
+  async sintacticQuality(day: Date): Promise<SintacticQualityDto[]> {
     return Promise.all([
-      this.nombresNoDebeTenerCaracteresEspeciales(),
-      this.nombresDebeSerMayorA4caracteres(),
-      this.formatoFechaValido(),
+      this.nombresNoDebeTenerCaracteresEspeciales(day),
+      this.nombresDebeSerMayorA4caracteres(day),
+      this.formatoFechaValido(day),
     ]);
   }
 
-  private async nombresNoDebeTenerCaracteresEspeciales(): Promise<SintacticQualityDto> {
+  private async nombresNoDebeTenerCaracteresEspeciales(day: Date): Promise<SintacticQualityDto> {
     const { total, valid } = await this.evaluateRule(
       `${this.columnReference()} ~ '[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\\s]'`,
+      day,
     );
 
     return {
@@ -37,8 +38,8 @@ export class SintacticService {
     };
   }
 
-  private async nombresDebeSerMayorA4caracteres(): Promise<SintacticQualityDto> {
-    const { total, valid } = await this.evaluateRule(`LENGTH(${this.columnReference()}) > 4`);
+  private async nombresDebeSerMayorA4caracteres(day: Date): Promise<SintacticQualityDto> {
+    const { total, valid } = await this.evaluateRule(`LENGTH(${this.columnReference()}) > 4`, day);
 
     return {
       regla: 'nombresDebeSerMayorA4caracteres',
@@ -50,12 +51,13 @@ export class SintacticService {
     };
   }
 
-  private async formatoFechaValido(): Promise<SintacticQualityDto> {
+  private async formatoFechaValido(day: Date): Promise<SintacticQualityDto> {
     return this.buildDateFormatResult(
       'formatoFechaValido',
       'La fecha debe estar en formato YYYY-MM-DD',
       'Verifica que la fecha esté en formato YYYY-MM-DD',
       this.columnReference(),
+      day,
     );
   }
 
@@ -64,24 +66,24 @@ export class SintacticService {
     condition: string,
     description: string,
     column: string,
+    day: Date,
   ): Promise<SintacticQualityDto> {
     const tableReference = `${this.schemaReference()}.${this.tableReference()}`;
 
     const totalQuery = `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${tableReference};
+      FROM ${tableReference} t WHERE t."AUD_FECHA_CREACION" <= $1;
     `;
 
     const invalidQuery = `
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${tableReference}
+      FROM ${tableReference} t
       WHERE ${column} IS NULL
         OR ${column} !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
-        OR TO_DATE(${column}, 'YYYY-MM-DD') IS NULL;
+        OR TO_DATE(${column}, 'YYYY-MM-DD') IS NULL AND t."AUD_FECHA_CREACION" <= $1;
     `;
-
-    const [totalResult] = await this.dataSource.query(totalQuery);
-    const [invalidResult] = await this.dataSource.query(invalidQuery);
+    const [totalResult] = await this.dataSource.query(totalQuery, [day]);
+    const [invalidResult] = await this.dataSource.query(invalidQuery, [day]);
 
     const total = Number(totalResult?.total ?? 0);
     const invalid = Number(invalidResult?.invalid ?? 0);
@@ -97,20 +99,23 @@ export class SintacticService {
     };
   }
 
-  private async evaluateRule(condition: string): Promise<{ total: number; valid: number }> {
+  private async evaluateRule(
+    condition: string,
+    day: Date,
+  ): Promise<{ total: number; valid: number }> {
     const tableReference = `${this.schemaReference()}.${this.tableReference()}`;
     const totalQuery = `
       SELECT COUNT(*)::BIGINT AS total
-      FROM ${tableReference};
+      FROM ${tableReference} t WHERE t."AUD_FECHA_CREACION" <= $1;
     `;
     const invalidQuery = `
       SELECT COUNT(*)::BIGINT AS invalid
-      FROM ${tableReference}
-      WHERE ${condition} OR ${this.columnReference()} IS NULL;
+      FROM ${tableReference} t
+      WHERE ${condition} OR ${this.columnReference()} IS NULL AND t."AUD_FECHA_CREACION" <=  $1;
     `;
 
-    const [totalResult] = await this.dataSource.query(totalQuery);
-    const [invalidResult] = await this.dataSource.query(invalidQuery);
+    const [totalResult] = await this.dataSource.query(totalQuery, [day]);
+    const [invalidResult] = await this.dataSource.query(invalidQuery, [day]);
 
     const total = Number(totalResult?.total ?? 0);
     const invalid = Number(invalidResult?.invalid ?? 0);

@@ -1,12 +1,6 @@
-export interface IEstablecimiento {
-  /**
-   *
-   */
-  id: string;
+import { IAuditoria } from '../auditoria.entity';
 
-  /**
-   *
-   */
+export interface IEstablecimiento extends IAuditoria {
   uniCodigo: string;
 
   /**

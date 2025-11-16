@@ -1,10 +1,10 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity } from 'typeorm';
 import { SyncStateEnum } from '../utils/sycnstate.enum';
 import { IDrugSync } from './dtos/drugSync.dto';
 
 @Entity({ name: 'drug_sync', schema: 'who_drug' })
-export class DrugSync extends CustomBaseEntity implements IDrugSync {
+export class DrugSync extends Auditoria implements IDrugSync {
   /**
    *
    * Description:
@@ -95,12 +95,12 @@ export class DrugSyncBuilder {
   }
 
   public setEnabled(enabled: boolean): DrugSyncBuilder {
-    this.drugSync.enabled = enabled;
+    this.drugSync.isEnabled = enabled;
     return this;
   }
 
   public setState(state: boolean): DrugSyncBuilder {
-    this.drugSync.state = state;
+    this.drugSync.isActive = state;
     return this;
   }
   public setSha256(state: string): DrugSyncBuilder {

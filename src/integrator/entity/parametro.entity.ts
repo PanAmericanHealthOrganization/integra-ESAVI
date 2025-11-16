@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
 
 export enum IntegrationGroup {
   DHIS2 = 'DHIS2',
@@ -11,7 +12,7 @@ export enum IntegrationGroup {
   name: 'TC_PARAMETRO',
   comment: 'Tabla de parámetros de configuración',
 })
-export class Parametro {
+export class Parametro extends Auditoria {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
   @Column({

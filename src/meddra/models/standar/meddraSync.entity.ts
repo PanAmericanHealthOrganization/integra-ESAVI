@@ -1,7 +1,6 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { SyncStateEnum } from '../enums/sycnstate.enum';
-
+import { Auditoria } from 'src/integrator/entity';
 
 //comment: 'Tabla para la gestión de meddra',
 
@@ -9,7 +8,7 @@ import { SyncStateEnum } from '../enums/sycnstate.enum';
   name: 'med_sync',
   schema: 'meddra',
 })
-export class MeddraSync extends CustomBaseEntity {
+export class MeddraSync extends Auditoria {
   constructor(meddraVersion: string, lang: string = 'ES', description: string) {
     super();
     this.meddraVersion = meddraVersion;

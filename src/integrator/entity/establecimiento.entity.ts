@@ -1,11 +1,12 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { IEstablecimiento } from './interfaces/establecimiento.interface';
+import { Auditoria } from './auditoria.entity';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
   schema: 'dhi_esavi',
   comment: 'Tabla de establecimientos de salud gestionados por el ministerio de salud publica',
 })
-export class Establecimiento implements IEstablecimiento {
+export class Establecimiento extends Auditoria implements IEstablecimiento {
   /**
    * Primary generated column of establecimiento
    */

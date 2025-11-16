@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria, IAuditoria } from './auditoria.entity';
 
 /**
  *
@@ -10,7 +10,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
   name: 'TR_VACUNOMETRO',
   comment: 'Conteo de vacunas para el analisis de los datos',
 })
-export class Vacunometro extends CustomBaseEntity implements IVacunometro {
+export class Vacunometro extends Auditoria implements IVacunometro {
   /**
    *
    */
@@ -104,7 +104,7 @@ export class Vacunometro extends CustomBaseEntity implements IVacunometro {
   total: number;
 }
 
-export interface IVacunometro {
+export interface IVacunometro extends IAuditoria {
   id: string;
   unicode: string;
   nombreVacuna: string;
@@ -117,7 +117,7 @@ export interface IVacunometro {
   total: number;
 }
 
-export class VacunometroDto implements IVacunometro {
+export class VacunometroDto extends Auditoria implements IVacunometro {
   @ApiProperty()
   id: string;
   @ApiProperty()

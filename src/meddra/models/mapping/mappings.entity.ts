@@ -1,10 +1,10 @@
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 /**
  *
  */
 @Entity({ name: 'mappings' })
-export class Mappings extends CustomBaseEntity {
+export class Mappings extends Auditoria {
   /**
    *
    */

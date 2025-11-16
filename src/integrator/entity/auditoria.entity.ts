@@ -3,7 +3,7 @@ import { Column } from 'typeorm';
 /**
  *
  */
-export abstract class Auditoria {
+export abstract class Auditoria implements IAuditoria {
   /**
    *
    */
@@ -90,5 +90,27 @@ export abstract class Auditoria {
     default: true,
     comment: 'Indica si el registro está activo',
   })
+  isActive: boolean;
+}
+
+export class IAuditoria {
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+  deletedAt: Date;
+  deletedBy: string;
+  isEnabled: boolean;
+  isActive: boolean;
+}
+
+export class AuditoriaDto implements IAuditoria {
+  createdAt: Date;
+  createdBy: string;
+  updatedAt: Date;
+  updatedBy: string;
+  deletedAt: Date;
+  deletedBy: string;
+  isEnabled: boolean;
   isActive: boolean;
 }

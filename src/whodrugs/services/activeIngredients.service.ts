@@ -25,10 +25,10 @@ export class ActiveIngredientsService {
       .createQueryBuilder()
       .update()
       .set({
-        state: false,
-        enabled: false,
+        isActive: false,
+        isEnabled: false,
       })
-      .where('state = :state', { state: true })
+      .where('isActive = :isActive', { isActive: true })
       .execute();
     // create new
   }
@@ -52,7 +52,9 @@ export class ActiveIngredientsService {
         let activeIngredientEntity = new ActiveIngredient();
         activeIngredientEntity.ingredient = activeIngredient.ingredient || '';
         activeIngredientEntity.drug = drugSaved;
-        activeIngredientEntity = await this.activeIngredientsRepository.save(activeIngredientEntity);
+        activeIngredientEntity = await this.activeIngredientsRepository.save(
+          activeIngredientEntity,
+        );
         await this.ingredientTranslationService.syncIngredientTraslations(
           activeIngredient.ingredientTranslations || [],
           activeIngredientEntity,
@@ -61,12 +63,11 @@ export class ActiveIngredientsService {
     }
   }
 
-
   public async getActiveIngredentsOfDrug(drugId: string): Promise<ActiveIngredient[]> {
     const r = await this.activeIngredientsRepository.find({
-      select: { id: true, ingredient : true  },
+      select: { id: true, ingredient: true },
       where: {
-        drug: { id: drugId },  // Compara el id de la entidad relacionada 'drug'
+        drug: { id: drugId }, // Compara el id de la entidad relacionada 'drug'
       },
     });
     console.log(r);

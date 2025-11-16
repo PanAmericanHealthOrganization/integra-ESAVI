@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  IPaginationRequest,
-  IPaginationResponse,
-} from 'src/utils/interfaces/pagination';
+import { IPaginationRequest, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
 import { Drug } from '../models/drug.entity';
 
@@ -37,10 +34,8 @@ export class DrugService {
       },
       where: [
         {
-          enabled: true,
-          state: true,
-          // anatomicalTherapeuticChemical: { code: atcCode },
-          // countriesOfSale: { iso3Code: country },
+          isEnabled: true,
+          isActive: true,
         },
       ],
     });
@@ -53,14 +48,8 @@ export class DrugService {
       .filter(
         (drug) =>
           (!drugName && !drugCode) ||
-          (drugName &&
-            `${drug.drugName}`
-              .toUpperCase()
-              .includes(`${drugName}`.toUpperCase())) ||
-          (drugCode &&
-            `${drug.drugCode}`
-              .toUpperCase()
-              .includes(`${drugCode}`.toUpperCase())),
+          (drugName && `${drug.drugName}`.toUpperCase().includes(`${drugName}`.toUpperCase())) ||
+          (drugCode && `${drug.drugCode}`.toUpperCase().includes(`${drugCode}`.toUpperCase())),
       )
       .slice(request.page * request.size, request.size);
 
@@ -70,11 +59,7 @@ export class DrugService {
     };
   }
 
-  public async getDrugsOnly(
-    drugName: string,
-    country: string,
-    atcCode?: string,
-  ): Promise<any[]> {
+  public async getDrugsOnly(drugName: string, country: string, atcCode?: string): Promise<any[]> {
     const drugPartial = await this.drugRepository.find({
       select: {
         id: true,
@@ -91,8 +76,8 @@ export class DrugService {
       },
       where: [
         {
-          enabled: true,
-          state: true,
+          isActive: true,
+          isEnabled: true,
         },
       ],
     });
@@ -105,8 +90,7 @@ export class DrugService {
       .filter(
         (drug) =>
           !drugName ||
-          (drugName &&
-            `${drug.drugName}`.toUpperCase() === `${drugName}`.toUpperCase()), // Comparación exacta
+          (drugName && `${drug.drugName}`.toUpperCase() === `${drugName}`.toUpperCase()), // Comparación exacta
       );
 
     return final;
@@ -119,7 +103,7 @@ export class DrugService {
         drugName: true,
         drugCode: true,
       },
-      where: [{ enabled: true, state: true }],
+      where: [{ isActive: true }],
       skip,
       take,
     });

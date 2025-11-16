@@ -178,7 +178,7 @@ export class MeddraProcessFilesService {
 
   async validarVersion(meddraVersion: string, lang: string): Promise<boolean> {
     const versionExist = await this.meddraSuncRepository.findOne({
-      where: { meddraVersion, lang, enabled: true },
+      where: { meddraVersion, lang, isEnabled: true },
     });
     return versionExist ? true : false;
   }

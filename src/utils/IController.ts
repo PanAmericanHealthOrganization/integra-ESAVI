@@ -1,4 +1,4 @@
-import { IBaseEntity } from './interfaces/baseEntity';
+import { Auditoria } from '../integrator/entity/auditoria.entity';
 import { GetListParams } from './interfaces/pagination';
 
 export type Identificator = number | string;
@@ -20,7 +20,7 @@ export interface BasesCRUD<C, R, U> {
 
 export interface IGetManyParams {
   ids: Identificator[];
-  audit: IBaseEntity;
+  audit: Auditoria;
 }
 
 /**

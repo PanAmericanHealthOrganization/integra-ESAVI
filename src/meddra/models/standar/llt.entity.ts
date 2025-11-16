@@ -1,12 +1,12 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PT } from './pt.entity';
-import { CustomBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity';
 
 /**
  *
  */
 @Entity({ name: 'med_llt', schema: 'meddra' })
-export class LLT extends CustomBaseEntity {
+export class LLT extends Auditoria {
   /**
    *
    */

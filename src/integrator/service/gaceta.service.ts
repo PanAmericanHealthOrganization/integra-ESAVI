@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
-import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { Between, ILike, In, Raw, Repository } from 'typeorm';
 import { CreateGacetaDto } from '../dto/create-gaceta.dto';
@@ -412,7 +412,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
    * @param auditoria
    * @returns
    */
-  public async delete(id: Identificator, auditoria: IBaseEntity): Promise<GacetaDto> {
+  public async delete(id: Identificator, auditoria: Auditoria): Promise<GacetaDto> {
     const cleanId = this.validateAndCleanId(id);
     const exist = await this.getOne(cleanId);
     if (!exist) {

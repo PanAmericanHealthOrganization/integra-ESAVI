@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
-import { IBaseEntity } from 'src/utils/interfaces/baseEntity';
+import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { ILike, In, Raw, Repository } from 'typeorm';
 import { VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto } from '../dto/vacunometro.dto';
@@ -201,10 +201,10 @@ export class VacunometroService
    *
    * @returns
    */
-  public async delete(id: Identificator, auditoria: IBaseEntity): Promise<VacunometroDto> {
+  public async delete(id: Identificator, auditoria: Auditoria): Promise<VacunometroDto> {
     await this.vacunometroRepository.update(id, {
-      state: false,
-      enabled: false,
+      isActive: false,
+      isEnabled: false,
       ...auditoria,
     });
     return this.vacunometroRepository.findOne({ where: { id: id as string } });

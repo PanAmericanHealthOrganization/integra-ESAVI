@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { add, endOfDay, format, startOfDay } from 'date-fns';
 import { ISync } from 'src/integrator/dto/sync.dto';
 import { SyncService, VacunometroService } from 'src/integrator/service';
-import { CRUD } from 'src/utils/interfaces/baseEntity';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
 @Injectable()
@@ -72,12 +71,14 @@ export class VacunacionNominalService {
         errorMessage: '',
         errorStack: '',
         errorTrace: '',
-        enabled: true, // or the appropriate default value
-        state: true, // set appropriate value
-        action: CRUD.C, // set appropriate value
-        createdAt: new Date(),
-        updatedAt: new Date(), // add any other required fields with default values
-        actionBy: 'SCHEDULE', // or set to the appropriate user identifier
+        createdAt: undefined,
+        createdBy: '',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: false,
+        isActive: false,
       };
       await this.syncProcessService.createSyncProcess(syncProcess);
       return;

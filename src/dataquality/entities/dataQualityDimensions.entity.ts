@@ -1,3 +1,4 @@
+import { Auditoria } from 'src/integrator/entity';
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 
 @Entity({
@@ -5,7 +6,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeor
   name: 'DQ_DIMENSION',
   comment: 'Tabla de dimensiones de calidad de los datos',
 })
-export class DataQualityDimensions {
+export class DataQualityDimensions extends Auditoria {
   /**
    * Identificador único de la dimensión de calidad
    */
