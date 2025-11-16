@@ -97,7 +97,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         password: configService.get('PASS_DATABASE'),
         database: configService.get('NAME_DATABASE'),
         autoLoadEntities: true,
-        synchronize: false, // Deshabilitado para evitar problemas de límite de columnas
+        synchronize: true, // Deshabilitado para evitar problemas de límite de columnas
         poolSize: 5,
       }),
       imports: [ConfigModule],
