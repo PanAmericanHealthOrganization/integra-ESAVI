@@ -78,9 +78,9 @@ export class SintacticService {
     const invalidQuery = `
       SELECT COUNT(*)::BIGINT AS invalid
       FROM ${tableReference} t
-      WHERE ${column} IS NULL
+      WHERE (${column} IS NULL
         OR ${column} !~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
-        OR TO_DATE(${column}, 'YYYY-MM-DD') IS NULL AND t."AUD_FECHA_CREACION" <= $1;
+        OR TO_DATE(${column}, 'YYYY-MM-DD') IS NULL ) AND t."AUD_FECHA_CREACION" <= $1;
     `;
     const [totalResult] = await this.dataSource.query(totalQuery, [day]);
     const [invalidResult] = await this.dataSource.query(invalidQuery, [day]);
