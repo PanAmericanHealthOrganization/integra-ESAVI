@@ -7,6 +7,8 @@ import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity'
 import { CompletenessService } from './complees.service';
 import { SemanticService } from './semantic.service';
 import { SintacticService } from './sintactic.service';
+import { IAuditoria } from 'src/integrator/entity';
+
 /**
  *
  */
@@ -40,7 +42,16 @@ export class GeneralService {
 
   private async processQualityDay(day: Date): Promise<DataQualityDimensions> {
     const g = await this.generalQuality(day);
-
+    const auditoria: IAuditoria = {
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: 'System',
+      deletedAt: undefined,
+      deletedBy: 'System',
+      isEnabled: true,
+      isActive: true,
+    };
     let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
         fecha: Equal(day),
@@ -50,12 +61,23 @@ export class GeneralService {
 
     if (dataQualityDimension) {
       dataQualityDimension.jsonQuality = JSON.stringify(g.jsonQuality);
+      dataQualityDimension.updatedAt = new Date();
+      dataQualityDimension.updatedBy = 'System';
       return this.dataQualityDimensionsRepository.save(dataQualityDimension);
     } else {
+      // Si no existe, crear uno nuevo con la información de auditoría
       return this.dataQualityDimensionsRepository.save({
         fecha: day,
         dimension: g.dimension,
         jsonQuality: JSON.stringify(g.jsonQuality),
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: undefined,
+        deletedAt: undefined,
+        deletedBy: undefined,
+        isEnabled: true,
+        isActive: true,
       });
     }
   }
