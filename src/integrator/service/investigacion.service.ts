@@ -1,8 +1,8 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
-import { InvestigacionDto } from '../dto/investigacion.dto';
-import { Investigacion, InvestigacionUpdateDto } from '../entity/investigacion.entity';
+//import { InvestigacionDto } from '../dto/investigacion.dto';
+//import { Investigacion, InvestigacionUpdateDto } from '../entity/investigacion.entity';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { ILike, In, Raw, Repository } from 'typeorm';
