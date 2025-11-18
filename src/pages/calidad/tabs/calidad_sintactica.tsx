@@ -1,4 +1,4 @@
-import { CheckCircle, Code, Error, Warning } from "@mui/icons-material"
+import { CheckCircle, Error, Warning } from "@mui/icons-material"
 import {
   Alert,
   Box,
@@ -87,12 +87,16 @@ const CalidadSintactica: React.FC = () => {
       (acc, item) => acc + item.totalRegistrosValidos,
       0
     )
-    const totalInvalidos = totalRegistros - totalValidos
+    const totalInvalidos = reglas.reduce(
+      (acc, item) => acc + item.totalRegistrosInvalidos,
+      0
+    )
     const promedioValidez =
-      reglas.reduce(
-        (acc, item) => acc + item.porcentajeRegistrosValidos,
-        0
-      ) / totalReglas
+      reglas.reduce((acc, item) => acc + item.porcentajeRegistrosValidos, 0) /
+      totalReglas
+    const promedioInvalidez =
+      reglas.reduce((acc, item) => acc + item.porcentajeRegistrosInvalidos, 0) /
+      totalReglas
     const reglasCriticas = reglas.filter(
       (item) => item.porcentajeRegistrosValidos < 80
     ).length
@@ -103,6 +107,7 @@ const CalidadSintactica: React.FC = () => {
       totalValidos,
       totalInvalidos,
       promedioValidez,
+      promedioInvalidez,
       reglasCriticas,
     }
   }, [reglas])
@@ -140,12 +145,8 @@ const CalidadSintactica: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
-        Exactitud de datos
-      </Typography>
-
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -157,7 +158,7 @@ const CalidadSintactica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -175,7 +176,27 @@ const CalidadSintactica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio de inexactitud
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                {resumen.promedioInvalidez.toFixed(2)}%
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={resumen.promedioInvalidez}
+                sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                color="error"
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -187,17 +208,16 @@ const CalidadSintactica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Reglas críticas
+                Registros inválidos
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {resumen.reglasCriticas}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Menos del 80% de registros correctos
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                {resumen.totalInvalidos.toLocaleString()}
               </Typography>
             </CardContent>
           </Card>
@@ -221,7 +241,9 @@ const CalidadSintactica: React.FC = () => {
                       tickFormatter={(value) => `${value}%`}
                     />
                     <YAxis type="category" dataKey="nombre" width={260} />
-                    <Tooltip formatter={(value) => [`${value}%`, "Exactitud"]} />
+                    <Tooltip
+                      formatter={(value) => [`${value}%`, "Exactitud"]}
+                    />
                     <Legend />
                     <Bar
                       dataKey="porcentaje"
@@ -278,11 +300,13 @@ const CalidadSintactica: React.FC = () => {
                               }
                               size="small"
                             />
+                            <Chip
+                              label={`${regla.porcentajeRegistrosInvalidos.toFixed(2)}% inválidos`}
+                              color="error"
+                              size="small"
+                            />
                             <Typography variant="body2" color="error">
-                              {(
-                                regla.totalRegistros -
-                                regla.totalRegistrosValidos
-                              ).toLocaleString()}{" "}
+                              {regla.totalRegistrosInvalidos.toLocaleString()}{" "}
                               registros inválidos
                             </Typography>
                           </Box>
@@ -295,7 +319,9 @@ const CalidadSintactica: React.FC = () => {
                               gutterBottom>
                               {regla.condicion}
                             </Typography>
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography
+                              variant="caption"
+                              color="text.secondary">
                               {regla.descripcionRegla}
                             </Typography>
                           </Box>

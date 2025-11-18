@@ -1,3 +1,4 @@
+import { useDataProvider, useNotify } from "ra-core"
 import React, {
   PropsWithChildren,
   createContext,
@@ -7,7 +8,6 @@ import React, {
   useMemo,
   useState,
 } from "react"
-import { useDataProvider, useNotify } from "ra-core"
 
 import { ICalidadDataProvider } from "../../dataProviders/calidad.dataprovider"
 
@@ -27,7 +27,9 @@ export interface SyntacticQualityRow {
   descripcionRegla: string
   totalRegistros: number
   totalRegistrosValidos: number
+  totalRegistrosInvalidos: number
   porcentajeRegistrosValidos: number
+  porcentajeRegistrosInvalidos: number
 }
 
 export interface SemanticQualityRow {
@@ -35,10 +37,10 @@ export interface SemanticQualityRow {
   ruleName: string
   ruleDescription: string
   totalRecords: number
-  totalValidRecords: number
-  totalInvalidRecords: number
-  percentageValidRecords: number
-  percentageInvalidRecords: number
+  totalRegistrosValidos: number
+  totalRegistrosInvalidos: number
+  porcentajeRegistrosValidos: number
+  porcentajeRegistrosInvalidos: number
 }
 
 export interface TemporalQualityRow {

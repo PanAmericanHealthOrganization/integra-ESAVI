@@ -22,15 +22,15 @@ import {
 import React, { useMemo, useState } from "react"
 
 // Importar componentes de tabs
+import {
+  CalidadDataQualityProvider,
+  useCalidadDataQuality,
+} from "./calidadDataQualityContext"
 import CalidadCompletitud from "./tabs/calidad_completitud"
 import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
 import CalidadSintactica from "./tabs/calidad_sintactica"
 import CalidadTemporal from "./tabs/calidad_temporal"
-import {
-  CalidadDataQualityProvider,
-  useCalidadDataQuality,
-} from "./calidadDataQualityContext"
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -77,7 +77,7 @@ const CalidadDashListContent: React.FC = () => {
         component: <CalidadGeneral />,
       },
       {
-        label: "Exactitud",
+        label: "Sintáctica",
         icon: <CheckCircle />,
         component: <CalidadSintactica />,
       },
@@ -107,32 +107,28 @@ const CalidadDashListContent: React.FC = () => {
           sx={{
             display: "flex",
             flexDirection: "column",
-            gap: 2,
-            px: 3,
-            py: 3,
+            gap: 1,
+            px: 1,
+            py: 1,
           }}>
           <Box
             sx={{
               display: "flex",
-              flexDirection: { xs: "column", md: "row" },
+              flexDirection: "row",
               justifyContent: "space-between",
-              alignItems: { xs: "flex-start", md: "center" },
+              alignItems: "center",
               gap: 2,
+              flexWrap: "wrap",
             }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", flexShrink: 0 }}>
               Monitoreo de Calidad de Datos
             </Typography>
 
             <Stack
               direction="row"
-              spacing={2}
+              spacing={1}
               alignItems="center"
-              justifyContent="flex-end"
-              sx={{
-                flexWrap: "wrap",
-                width: { xs: "100%", md: "auto" },
-                ml: { xs: 0, md: "auto" },
-              }}>
+              sx={{ flexShrink: 1 }}>
               <TextField
                 label="Fecha de referencia"
                 type="date"
@@ -140,7 +136,7 @@ const CalidadDashListContent: React.FC = () => {
                 InputLabelProps={{ shrink: true }}
                 value={selectedDate}
                 onChange={(event) => setSelectedDate(event.target.value)}
-                sx={{ maxWidth: 220 }}
+                sx={{ minWidth: 180 }}
               />
               <Button
                 variant="contained"

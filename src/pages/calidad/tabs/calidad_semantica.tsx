@@ -84,18 +84,23 @@ const CalidadSemantica: React.FC = () => {
       0
     )
     const totalValidos = reglas.reduce(
-      (acc, regla) => acc + regla.totalValidRecords,
+      (acc, regla) => acc + regla.totalRegistrosValidos,
       0
     )
     const totalInvalidos = reglas.reduce(
-      (acc, regla) => acc + regla.totalInvalidRecords,
+      (acc, regla) => acc + regla.totalRegistrosInvalidos,
       0
     )
     const promedioValidez =
-      reglas.reduce((acc, regla) => acc + regla.percentageValidRecords, 0) /
+      reglas.reduce((acc, regla) => acc + regla.porcentajeRegistrosValidos, 0) /
       totalReglas
+    const promedioInvalidez =
+      reglas.reduce(
+        (acc, regla) => acc + regla.porcentajeRegistrosInvalidos,
+        0
+      ) / totalReglas
     const reglasCriticas = reglas.filter(
-      (regla) => regla.percentageValidRecords < 85
+      (regla) => regla.porcentajeRegistrosValidos < 85
     ).length
 
     return {
@@ -104,6 +109,7 @@ const CalidadSemantica: React.FC = () => {
       totalValidos,
       totalInvalidos,
       promedioValidez,
+      promedioInvalidez,
       reglasCriticas,
     }
   }, [reglas])
@@ -111,13 +117,15 @@ const CalidadSemantica: React.FC = () => {
   const topReglasConIncumplimientos = useMemo(() => {
     return reglas
       .slice()
-      .sort((a, b) => b.totalInvalidRecords - a.totalInvalidRecords)
+      .sort((a, b) => b.totalRegistrosInvalidos - a.totalRegistrosInvalidos)
       .slice(0, 5)
       .map((regla) => ({
         regla: regla.ruleName,
-        invalidos: regla.totalInvalidRecords,
-        porcentajeInvalido: Number(regla.percentageInvalidRecords.toFixed(2)),
-        validos: regla.totalValidRecords,
+        invalidos: regla.totalRegistrosInvalidos,
+        porcentajeInvalido: Number(
+          regla.porcentajeRegistrosInvalidos.toFixed(2)
+        ),
+        validos: regla.totalRegistrosValidos,
       }))
   }, [reglas])
 
@@ -125,7 +133,9 @@ const CalidadSemantica: React.FC = () => {
     () =>
       reglas
         .slice()
-        .sort((a, b) => a.percentageValidRecords - b.percentageValidRecords),
+        .sort(
+          (a, b) => a.porcentajeRegistrosValidos - b.porcentajeRegistrosValidos
+        ),
     [reglas]
   )
 
@@ -144,7 +154,7 @@ const CalidadSemantica: React.FC = () => {
       </Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -156,7 +166,7 @@ const CalidadSemantica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -174,7 +184,27 @@ const CalidadSemantica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <Card>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio de inconsistencia
+              </Typography>
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                {resumen.promedioInvalidez.toFixed(2)}%
+              </Typography>
+              <LinearProgress
+                variant="determinate"
+                value={resumen.promedioInvalidez}
+                sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                color="error"
+              />
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -186,17 +216,16 @@ const CalidadSemantica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Reglas críticas
+                Registros inválidos
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {resumen.reglasCriticas}
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Menos del 85% de registros coherentes
+              <Typography
+                variant="h4"
+                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                {numberFormatter.format(resumen.totalInvalidos)}
               </Typography>
             </CardContent>
           </Card>
@@ -294,7 +323,7 @@ const CalidadSemantica: React.FC = () => {
                   <TableCell>Descripción</TableCell>
                   <TableCell>Registros válidos</TableCell>
                   <TableCell>Registros inválidos</TableCell>
-                  <TableCell>% válido</TableCell>
+                  <TableCell>Porcentajes</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -322,22 +351,36 @@ const CalidadSemantica: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="success.main">
-                        {numberFormatter.format(regla.totalValidRecords)}
+                        {numberFormatter.format(regla.totalRegistrosValidos)}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" color="error.main">
-                        {numberFormatter.format(regla.totalInvalidRecords)}
+                        {numberFormatter.format(regla.totalRegistrosInvalidos)}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Chip
-                        label={`${regla.percentageValidRecords.toFixed(2)}%`}
-                        color={
-                          getStatusColor(regla.percentageValidRecords) as any
-                        }
-                        size="small"
-                      />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          gap: 1,
+                          flexDirection: "column",
+                        }}>
+                        <Chip
+                          label={`${regla.porcentajeRegistrosValidos.toFixed(2)}% válidos`}
+                          color={
+                            getStatusColor(
+                              regla.porcentajeRegistrosValidos
+                            ) as any
+                          }
+                          size="small"
+                        />
+                        <Chip
+                          label={`${regla.porcentajeRegistrosInvalidos.toFixed(2)}% inválidos`}
+                          color="error"
+                          size="small"
+                        />
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}

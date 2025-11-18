@@ -118,7 +118,7 @@ export const CalidadGeneral: React.FC = () => {
     const consistenciaGlobal =
       data.semanticQuality.length > 0
         ? data.semanticQuality.reduce(
-            (acc, item) => acc + item.percentageValidRecords,
+            (acc, item) => acc + item.porcentajeRegistrosValidos,
             0
           ) / data.semanticQuality.length
         : null
