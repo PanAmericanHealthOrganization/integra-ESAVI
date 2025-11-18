@@ -23,7 +23,7 @@ export class SintacticService {
   }
 
   private async nombresNoDebeTenerCaracteresEspeciales(day: Date): Promise<SintacticQualityDto> {
-    const { total, valid } = await this.evaluateRule(
+    const { total, valid, invalid } = await this.evaluateRule(
       `${this.columnReference()} ~ '[^A-Za-z0-9ÁÉÍÓÚáéíóúÑñ\\s]'`,
       day,
     );
@@ -34,12 +34,17 @@ export class SintacticService {
       descripcionRegla: 'Detecta nombres con caracteres diferentes a letras, números o espacios',
       totalRegistros: total,
       totalRegistrosValidos: valid,
+      totalRegistrosInvalidos: invalid,
       porcentajeRegistrosValidos: this.calculatePercentage(valid, total),
+      porcentajeRegistrosInvalidos: this.calculatePercentage(invalid, total),
     };
   }
 
   private async nombresDebeSerMayorA4caracteres(day: Date): Promise<SintacticQualityDto> {
-    const { total, valid } = await this.evaluateRule(`LENGTH(${this.columnReference()}) > 4`, day);
+    const { total, valid, invalid } = await this.evaluateRule(
+      `LENGTH(${this.columnReference()}) > 4`,
+      day,
+    );
 
     return {
       regla: 'nombresDebeSerMayorA4caracteres',
@@ -47,7 +52,9 @@ export class SintacticService {
       descripcionRegla: 'Verifica la longitud mínima permitida para el campo nombre',
       totalRegistros: total,
       totalRegistrosValidos: valid,
+      totalRegistrosInvalidos: invalid,
       porcentajeRegistrosValidos: this.calculatePercentage(valid, total),
+      porcentajeRegistrosInvalidos: this.calculatePercentage(invalid, total),
     };
   }
 
@@ -95,14 +102,16 @@ export class SintacticService {
       descripcionRegla: description,
       totalRegistros: total,
       totalRegistrosValidos: valid,
+      totalRegistrosInvalidos: invalid,
       porcentajeRegistrosValidos: this.calculatePercentage(valid, total),
+      porcentajeRegistrosInvalidos: this.calculatePercentage(invalid, total),
     };
   }
 
   private async evaluateRule(
     condition: string,
     day: Date,
-  ): Promise<{ total: number; valid: number }> {
+  ): Promise<{ total: number; valid: number; invalid: number }> {
     const tableReference = `${this.schemaReference()}.${this.tableReference()}`;
     const totalQuery = `
       SELECT COUNT(*)::BIGINT AS total
@@ -121,7 +130,7 @@ export class SintacticService {
     const invalid = Number(invalidResult?.invalid ?? 0);
     const valid = total - invalid < 0 ? 0 : total - invalid;
 
-    return { total, valid };
+    return { total, valid, invalid };
   }
 
   private calculatePercentage(valid: number, total: number): number {

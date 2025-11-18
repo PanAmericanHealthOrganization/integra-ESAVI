@@ -31,7 +31,9 @@ export class SintacticQualityDto {
   descripcionRegla: string;
   totalRegistros: number;
   totalRegistrosValidos: number;
+  totalRegistrosInvalidos: number;
   porcentajeRegistrosValidos: number;
+  porcentajeRegistrosInvalidos: number;
 }
 
 export class SemanticQualityTableDto {
@@ -39,17 +41,19 @@ export class SemanticQualityTableDto {
   ruleName: string;
   ruleDescription: string;
   totalRecords: number;
-  totalValidRecords: number;
-  totalInvalidRecords: number;
-  percentageValidRecords: number;
-  percentageInvalidRecords: number;
+  totalRegistrosValidos: number;
+  totalRegistrosInvalidos: number;
+  porcentajeRegistrosValidos: number;
+  porcentajeRegistrosInvalidos: number;
 }
 
 export class TemporalQualityTableDto {
-  tableName: string;
-  columnName: string;
-  columnDescription: string;
-  validRecords: number;
-  invalidRecords: number;
-  percentageValidRecords: number;
+  ruleCode: string;
+  ruleName: string;
+  ruleDescription: string;
+  totalRecords: number;
+  totalRegistrosValidos: number;
+  totalRegistrosInvalidos: number;
+  porcentajeRegistrosValidos: number;
+  porcentajeRegistrosInvalidos: number;
 }

@@ -181,10 +181,10 @@ export class SemanticService {
       ruleName,
       ruleDescription,
       totalRecords,
-      totalValidRecords: valid,
-      totalInvalidRecords: invalid,
-      percentageValidRecords,
-      percentageInvalidRecords,
+      totalRegistrosValidos: valid,
+      totalRegistrosInvalidos: invalid,
+      porcentajeRegistrosValidos: percentageValidRecords,
+      porcentajeRegistrosInvalidos: percentageInvalidRecords,
     };
   }
 }

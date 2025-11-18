@@ -7,6 +7,9 @@ import { GeneralService } from './services/general.service';
 import { SemanticService } from './services/semantic.service';
 import { SintacticService } from './services/sintactic.service';
 import { DataQualityDimensions } from './entities/dataQualityDimensions.entity';
+import { TemporalQualityService } from './services/temporal-quality.service';
+import { DataqualityMaintenanceService } from './services/maintenance.service';
+import { DataqualityMaintenanceController } from './controllers/dataquality-maintenance.controller';
 
 const DATAQUALITY_DS = 'DATAQUALITY_DS';
 
@@ -32,8 +35,22 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
     }),
     TypeOrmModule.forFeature([DataQualityDimensions], DATAQUALITY_DS),
   ],
-  controllers: [DataqualityController],
-  providers: [GeneralService, CompletenessService, SintacticService, SemanticService],
-  exports: [GeneralService, CompletenessService, SintacticService, SemanticService],
+  controllers: [DataqualityController, DataqualityMaintenanceController],
+  providers: [
+    GeneralService,
+    CompletenessService,
+    SintacticService,
+    SemanticService,
+    TemporalQualityService,
+    DataqualityMaintenanceService,
+  ],
+  exports: [
+    GeneralService,
+    CompletenessService,
+    SintacticService,
+    SemanticService,
+    TemporalQualityService,
+    DataqualityMaintenanceService,
+  ],
 })
 export class DataqualityModule {}

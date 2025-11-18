@@ -8,6 +8,7 @@ import { CompletenessService } from './complees.service';
 import { SemanticService } from './semantic.service';
 import { SintacticService } from './sintactic.service';
 import { IAuditoria } from 'src/integrator/entity';
+import { TemporalQualityService } from './temporal-quality.service';
 
 /**
  *
@@ -24,6 +25,7 @@ export class GeneralService {
     private completenessService: CompletenessService,
     private sintacticService: SintacticService,
     private semanticService: SemanticService,
+    private temporalQualityService: TemporalQualityService,
   ) {}
 
   async getGeneralQuality(date: Date): Promise<QualityDto> {
@@ -40,7 +42,7 @@ export class GeneralService {
     return JSON.parse(result.jsonQuality);
   }
 
-  private async processQualityDay(day: Date): Promise<DataQualityDimensions> {
+  async processQualityDay(day: Date): Promise<DataQualityDimensions> {
     const g = await this.generalQuality(day);
     const auditoria: IAuditoria = {
       createdAt: new Date(),
@@ -88,23 +90,31 @@ export class GeneralService {
   }
 
   async generalQuality(day: Date): Promise<QualityDto> {
-    const [completenessQualityTable, sintacticQuality, semanticQuality] = await Promise.all([
-      this.completenessService.obtenerCompletitudDeEsquema(this.schemaName, day),
-      this.sintacticService.sintacticQuality(day),
-      this.semanticService.semanticQuality(day),
-    ]);
+    const [completenessQualityTable, sintacticQuality, semanticQuality, temporalQuality] =
+      await Promise.all([
+        this.completenessService.obtenerCompletitudDeEsquema(this.schemaName, day),
+        this.sintacticService.sintacticQuality(day),
+        this.semanticService.semanticQuality(day),
+        this.temporalQualityService.temporalQuality(day),
+      ]);
 
     return {
       fecha: day,
       dimension: this.schemaName,
       jsonQuality: {
         totalRegistros: (await this.calculateTotalRecords('TR_NOTIFICACION', day)) ?? 0,
-        totalErrores: -100,
-        totalPorcentaje: -100,
+        totalErrores:
+          sintacticQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0) +
+          semanticQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0) +
+          temporalQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0),
+        totalPorcentaje:
+          sintacticQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0) +
+          semanticQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0) +
+          temporalQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0),
         completenessQualityTable,
         sintacticQuality,
         semanticQuality,
-        temporalQuality: [],
+        temporalQuality,
       },
     };
   }
