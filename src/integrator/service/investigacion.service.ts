@@ -6,8 +6,13 @@ import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { ILike, In, Raw, Repository } from 'typeorm';
-import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';
+import {
+  InvestigacionCreateDto,
+  InvestigacionDto,
+  InvestigacionUpdateDto,
+} from '../entity/investigacion.entity';
 import { Investigacion } from '../entity/investigacion.entity';
+import { withAuditOnCreate, withAuditOnUpdate } from 'src/common/utils/audit.util';
 
 
 //Se recomienda usar las interfaces icontroller y la iservice,
@@ -177,7 +182,7 @@ export class InvestigacionService
           return this.investigacionRepository.save(investigacion);
         }*/ //ESTE DTO SERÍA MÁS APLICABLE A UN DTO DE RESPUESTA O SALIDA.
         async create(investigacionCreateDto: InvestigacionCreateDto): Promise<InvestigacionDto> {
-          return this.investigacionRepository.save(investigacionCreateDto);
+          return this.investigacionRepository.save(withAuditOnCreate(investigacionCreateDto));
         }
 
   /**
@@ -191,6 +196,7 @@ export class InvestigacionService
     if (!exist) {
       throw new Error(`El registro de Investigacion con ${id} no existe.`);
     }
+    withAuditOnUpdate(investigacion);
     await this.investigacionRepository.update(id as string, investigacion);
     return this.getOne(id);
   }

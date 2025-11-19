@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UpdatePacienteDto } from '../dto/update-paciente.dto';
 import { PacienteVigiflow } from '../entity/paciente-vigiflow.entity';
@@ -20,12 +20,16 @@ export class PacienteVigiflowService {
   async create(
     createDto: CreatePacienteVigiflowDto,
   ): Promise<PacienteVigiflow> {
-    if (createDto.codigoVigiflow) {
-      const paciente = await this.findByVigiflowCode(createDto.codigoVigiflow);
+    const codigo = createDto.codigoVigiflow?.trim();
+    if (codigo) {
+      const paciente = await this.findByVigiflowCode(codigo);
       if (paciente) {
         return paciente;
       } else {
-        const paciente = plainToClass(PacienteVigiflow, createDto);
+        const paciente = plainToClass(PacienteVigiflow, {
+          ...createDto,
+          codigoVigiflow: codigo,
+        });
         if (createDto.sexoPaciente) {
           paciente.sexo =
             await this.catalogoService.findByDescriptionToVigiflow(
@@ -39,7 +43,24 @@ export class PacienteVigiflowService {
             );
         }
         paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-        return this.pacienteVigiflowRepository.save(paciente);
+        try {
+          return await this.pacienteVigiflowRepository.save(paciente);
+        } catch (error) {
+          if (
+            error instanceof QueryFailedError &&
+            (error.driverError?.code === '23505' ||
+              error.driverError?.constraint === 'UQ_4ff577c8ff2c90720f455400a92')
+          ) {
+            this.logger.warn(
+              `Registro duplicado para CODIGO_VIGIFLOW ${codigo}, reutilizando paciente existente`,
+            );
+            const existing = await this.findByVigiflowCode(codigo);
+            if (existing) {
+              return existing;
+            }
+          }
+          throw error;
+        }
       }
     }
     throw new Error('Vigiflow code is a mandatory field');
@@ -73,7 +94,7 @@ export class PacienteVigiflowService {
   async findByVigiflowCode(code: string) {
     const paciente = await this.pacienteVigiflowRepository.findOne({
       where: {
-        codigoVigiflow: code,
+        codigoVigiflow: code?.trim(),
       },
     });
     if (paciente) {
