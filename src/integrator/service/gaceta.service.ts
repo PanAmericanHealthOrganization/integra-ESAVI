@@ -333,7 +333,14 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
         );
       }
 
-      const gaceta = this.gacetaRepository.create(createGacetaDto);
+      const gaceta = this.gacetaRepository.create({
+        ...createGacetaDto,
+        estado: ESTADO_GACETA.PENDIENTE,
+        createdBy: process.env.USUARIO_INSERTA_REGISTRO,
+        updatedBy: process.env.USUARIO_INSERTA_REGISTRO,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
 
       const t = await this.gacetaRepository.save(gaceta);
       // ejecutar de forma sincrona el script de renderizado
