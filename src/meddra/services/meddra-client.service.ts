@@ -4,7 +4,11 @@ import { lastValueFrom } from 'rxjs';
 
 import { ConfigService } from '@nestjs/config';
 import { MeddraHistoryService } from './meddra-history.service';
-import { IMeddraJWTResponse, IMeddraQueryRequest, IMeddraResponse } from '../models/dto/meddra.query';
+import {
+  IMeddraJWTResponse,
+  IMeddraQueryRequest,
+  IMeddraResponse,
+} from '../models/dto/meddra.query';
 import { MeddraQuery } from '../models/meddraquerys.entity';
 
 @Injectable()
@@ -76,9 +80,13 @@ export class MeddraClientService {
     // add headers
     const headers = { Authorization: `Bearer ${token}` };
     // build request
-    const request = this.httpService.post<IMeddraResponse>('https://mapisbx.meddra.org/api/search/', query, {
-      headers,
-    });
+    const request = this.httpService.post<IMeddraResponse>(
+      'https://mapisbx.meddra.org/api/search/',
+      query,
+      {
+        headers,
+      },
+    );
 
     try {
       const { data } = await lastValueFrom(request);

@@ -39,7 +39,11 @@ export class MeddraProcessFilesService {
    * Permite procesar los archivos que están en  una versión de meddra
    * @param version
    */
-  async processVersionFiles(version: string | number, lang: string | number, description: string): Promise<any> {
+  async processVersionFiles(
+    version: string | number,
+    lang: string | number,
+    description: string,
+  ): Promise<any> {
     const versionStr = String(version ?? '').trim();
     const langStr = String(lang ?? '').trim();
     console.log('version ::::', versionStr, langStr, description);
