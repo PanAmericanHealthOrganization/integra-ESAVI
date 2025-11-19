@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { IngredientTranslation } from '../models/ingredientTranslation.entity';
 import { IIngredientTranslation } from '../models/dtos/drug.dto';
 import { ActiveIngredient } from '../models/activeIngredient.entity';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 
 @Injectable()
 export class IngredientTranslationService {
@@ -24,7 +25,7 @@ export class IngredientTranslationService {
         ingredientEntity.languageCode = ingredient.languageCode;
         ingredientEntity.activeIngredient = activeIngredient;
         //
-        await this.ingredientTranslationRepository.save(ingredientEntity);
+        await this.ingredientTranslationRepository.save(withAuditOnCreate(ingredientEntity));
       }
     }
   }

@@ -16,6 +16,8 @@ import { uuidGenerator } from '../utils/utils';
 import { WhoDrugsClientService } from './whodrugs-client.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { formatDate } from 'date-fns';
+import { Auditoria } from 'src/integrator/entity';
+import { withAuditOnCreate, withAuditOnUpdate } from 'src/common/utils/audit.util';
 
 const cliProgress = require('cli-progress');
 
@@ -88,7 +90,10 @@ export class WhoDrugsSyncService {
   @Cron(CronExpression.EVERY_DAY_AT_1AM, { name: 'askExistNewVersion' })
   async existNewVersion(): Promise<boolean> {
     this.logger.log(
-      `Consultando si existe una nueva versión de whodrugs ${formatDate(new Date(), 'yyyy-MM-dd HH:mm:ss')}`,
+      `Consultando si existe una nueva versión de whodrugs ${formatDate(
+        new Date(),
+        'yyyy-MM-dd HH:mm:ss',
+      )}`,
     );
     const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
     const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
@@ -131,7 +136,8 @@ export class WhoDrugsSyncService {
       //1
       activeIngredientsEntities = activeIngredientsEntities.concat(activeIngredients);
 
-      ingredientTranslationsEntities = ingredientTranslationsEntities.concat(ingredientTranslations);
+      ingredientTranslationsEntities =
+        ingredientTranslationsEntities.concat(ingredientTranslations);
       //2
       countryOfSalesEntities = countryOfSalesEntities.concat(countryOfSales);
       maholdersEntities = maholdersEntities.concat(maholders);
@@ -155,7 +161,11 @@ export class WhoDrugsSyncService {
       countryOfSalesEntities,
       CountryOfSale.name,
     );
-    await this.saveEntitiesGeneric<Maholder>(this.maholderRepository, maholdersEntities, Maholder.name);
+    await this.saveEntitiesGeneric<Maholder>(
+      this.maholderRepository,
+      maholdersEntities,
+      Maholder.name,
+    );
     await this.saveEntitiesGeneric<AnatomicalTherapeuticChemical>(
       this.anatomicalTherapeuticChemicalRepository,
       atcsEntities,
@@ -179,7 +189,7 @@ export class WhoDrugsSyncService {
         .setSha256(sha256)
         .setSyncStatus(SyncStateEnum.STARTED)
         .build();
-      return await this.drugSyncRepository.save(drugSync);
+      return await this.drugSyncRepository.save(withAuditOnCreate(drugSync));
     } catch (e) {
       this.logger.error(e);
       throw e;
@@ -195,6 +205,7 @@ export class WhoDrugsSyncService {
     try {
       drugSync.endSyncDate = new Date();
       drugSync.syncStatus = SyncStateEnum.FINISHED;
+      withAuditOnUpdate(drugSync);
       return await this.drugSyncRepository.save(drugSync);
     } catch (e) {
       this.logger.error(e);
@@ -214,25 +225,31 @@ export class WhoDrugsSyncService {
   //     where: { sha256: sha256 },
   //   });
   // }
-private async getDrugSyncBySHA(sha256: string): Promise<boolean> {
+  private async getDrugSyncBySHA(sha256: string): Promise<boolean> {
     const count = await this.drugSyncRepository.count({
-        where: { sha256: sha256 },
+      where: { sha256: sha256 },
     });
     return count > 0; // Devuelve true si hay al menos un registro
-}
+  }
 
   /**
    *
    * @param entities
    * @returns
    */
-  public async saveEntitiesGeneric<T>(repositorySaver: Repository<T>, entities: T[], entityName: string): Promise<T[]> {
+  public async saveEntitiesGeneric<T extends Auditoria>(
+    repositorySaver: Repository<T>,
+    entities: T[],
+    entityName: string,
+  ): Promise<T[]> {
     let page = 0;
     const size = 5000;
     const fullEntitiesSaved: T[] = [];
     this.logger.log(`Total: ${entities.length} entidades de ${entityName}`);
     do {
-      const entitiesToSave = entities.slice(page * size, (page + 1) * size);
+      const entitiesToSave = entities
+        .slice(page * size, (page + 1) * size)
+        .map((entity) => withAuditOnCreate(entity));
       this.logger.log(`|---- Guardado  de ${page * size} a ${(page + 1) * size}`);
       let entitiesSaved = [];
       entitiesSaved = await repositorySaver.save(entitiesToSave);
@@ -249,8 +266,14 @@ private async getDrugSyncBySHA(sha256: string): Promise<boolean> {
     this.logger.log('Actualizando estados');
     this.updateEntitiesStates<DrugSync>(this.drugSyncRepository, DrugSync.name);
     this.updateEntitiesStates<Drug>(this.drugRepository, Drug.name);
-    this.updateEntitiesStates<ActiveIngredient>(this.activeIngredientsRepository, ActiveIngredient.name);
-    this.updateEntitiesStates<IngredientTranslation>(this.ingredientTranslationRepository, IngredientTranslation.name);
+    this.updateEntitiesStates<ActiveIngredient>(
+      this.activeIngredientsRepository,
+      ActiveIngredient.name,
+    );
+    this.updateEntitiesStates<IngredientTranslation>(
+      this.ingredientTranslationRepository,
+      IngredientTranslation.name,
+    );
     this.updateEntitiesStates<CountryOfSale>(this.countrySaleRepository, CountryOfSale.name);
     this.updateEntitiesStates<Maholder>(this.maholderRepository, Maholder.name);
 

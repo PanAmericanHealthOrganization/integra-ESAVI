@@ -4,6 +4,7 @@ import { AnatomicalTherapeuticChemical } from '../models/atomicTerapeutalChemica
 import { Repository } from 'typeorm';
 import { IATC } from '../models/dtos/drug.dto';
 import { Drug } from '../models/drug.entity';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 
 @Injectable()
 export class AnatomicalTherapeuticChemicalService {
@@ -20,7 +21,7 @@ export class AnatomicalTherapeuticChemicalService {
         actEntity.text = act.text;
         actEntity.officialFlag = act.officialFlag;
         actEntity.drug = drug;
-        await this.drugRepository.save(actEntity);
+        await this.drugRepository.save(withAuditOnCreate(actEntity));
       }
     }
   }

@@ -5,6 +5,7 @@ import { CountryOfSale } from '../models/countryOfSale.entity';
 import { Drug } from '../models/drug.entity';
 import { ICountryOfSale } from '../models/dtos/drug.dto';
 import { MaholderService } from './maholder.service';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 
 @Injectable()
 export class CountryOfSaleService {
@@ -21,7 +22,7 @@ export class CountryOfSaleService {
         countrySaleEntity.iso3Code = countryOfSale.iso3Code;
         countrySaleEntity.medicinalProductID = countryOfSale.medicinalProductID;
         countrySaleEntity.drug = drugSaved;
-        countrySaleEntity = await this.countrySale.save(countrySaleEntity);
+        countrySaleEntity = await this.countrySale.save(withAuditOnCreate(countrySaleEntity));
 
         await this.maholderService.syncMaholder(countryOfSale.maHolders || [], countrySaleEntity);
       }

@@ -4,6 +4,7 @@ import { Maholder } from '../models/maholder.entity';
 import { Repository } from 'typeorm';
 import { IMaHolder } from '../models/dtos/drug.dto';
 import { CountryOfSale } from '../models/countryOfSale.entity';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 
 @Injectable()
 export class MaholderService {
@@ -18,7 +19,7 @@ export class MaholderService {
         const maholderEntity = new Maholder();
         maholderEntity.name = maholder.name;
         maholderEntity.countrySale = countrySale;
-        await this.maholder.save(maholderEntity);
+        await this.maholder.save(withAuditOnCreate(maholderEntity));
       }
     }
   }

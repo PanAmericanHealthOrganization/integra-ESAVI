@@ -9,6 +9,7 @@ import * as readline from 'readline';
 import { MeddraSync } from '../models/standar/meddraSync.entity';
 import { PT } from '../models/standar/pt.entity';
 import { SOC } from '../models/standar/soc.entity';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 /**
  * Permite procesar los archivos de meddra
  */
@@ -38,16 +39,21 @@ export class MeddraProcessFilesService {
    * Permite procesar los archivos que están en  una versión de meddra
    * @param version
    */
-  async processVersionFiles(version: string, lang: string, description: string): Promise<any> {
-    console.log('version ::::', version, lang, description);
+  async processVersionFiles(version: string | number, lang: string | number, description: string): Promise<any> {
+    const versionStr = String(version ?? '').trim();
+    const langStr = String(lang ?? '').trim();
+    console.log('version ::::', versionStr, langStr, description);
+    if (!versionStr || !langStr) {
+      throw new Error('Los parámetros de versión e idioma son obligatorios');
+    }
 
     // leer el archjivo del repositio upload_files/meddra*/27/es
-    const exist = await this.validarVersion(version, lang);
+    const exist = await this.validarVersion(versionStr, langStr);
     if (exist) {
       throw new Error('La versión ya existe en la base de datos');
     }
     // validar que exista el directorio
-    const path = join(process.cwd(), 'upload_files', 'meddra', version, lang);
+    const path = join(process.cwd(), 'upload_files', 'meddra', versionStr, langStr);
     console.log('Patth::: ', path);
 
     if (!directoryExists(path)) {
@@ -62,18 +68,18 @@ export class MeddraProcessFilesService {
     let llDB = [];
     try {
       const versionEntity = await this.meddraSuncRepository.save(
-        new MeddraSync(version, lang, description),
+        withAuditOnCreate(new MeddraSync(versionStr, langStr, description)),
       );
 
       // const llt = await readFileContent(version, lang, 'llt.asc');
 
-      const soc = await readFileContent(version, lang, 'soc.asc');
+      const soc = await readFileContent(versionStr, langStr, 'soc.asc');
       socDB = await this.processSOC(soc, versionEntity);
 
-      const ptDataFile = await readFileContent(version, lang, 'pt.asc');
+      const ptDataFile = await readFileContent(versionStr, langStr, 'pt.asc');
       ptDB = await this.processPT(ptDataFile, socDB);
 
-      const lltDataFile = await readFileContent(version, lang, 'llt.asc');
+      const lltDataFile = await readFileContent(versionStr, langStr, 'llt.asc');
       llDB = await this.processLLT(lltDataFile, ptDB);
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -97,7 +103,7 @@ export class MeddraProcessFilesService {
   private async processSOC(soc: string[][], meddraSync: MeddraSync): Promise<SOC[]> {
     const lltList = [];
     soc.forEach((line) => {
-      const soc = new SOC();
+      const soc = withAuditOnCreate(new SOC());
       soc.code = line[0];
       soc.name = line[1];
       soc.abbrev = line[2];
@@ -118,7 +124,7 @@ export class MeddraProcessFilesService {
   private async processPT(pt: string[][], socs: SOC[]): Promise<PT[]> {
     const ptList = [];
     pt.forEach((line) => {
-      const pt = new PT();
+      const pt = withAuditOnCreate(new PT());
       pt.code = line[0];
       pt.name = line[1];
       pt.socCode = line[3];
@@ -149,7 +155,7 @@ export class MeddraProcessFilesService {
   private async processLLT(socs: string[][], pts: PT[]): Promise<InsertResult[]> {
     const lltList = [];
     socs.forEach((line) => {
-      const socs = new LLT();
+      const socs = withAuditOnCreate(new LLT());
       socs.code = line[0];
       socs.name = line[1];
       socs.ptCode = line[3];
