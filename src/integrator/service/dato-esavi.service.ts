@@ -1,13 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Notificacion } from '../entity/notificacion.entity';
-import { DatoVacuna } from '../entity/dato-vacuna.entity';
-import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { DatoEsavi } from '../entity/dato-esavi.entity';
+import { Repository } from 'typeorm';
 import { CreateDatoEsaviDto } from '../dto/create-dato-esavi.dto';
 import { UpdateDatoEsaviDto } from '../dto/update-dato-esavi.dto';
+import { DatoEsavi } from '../entity/dato-esavi.entity';
+import { DatoVacuna } from '../entity/dato-vacuna.entity';
+import { Notificacion } from '../entity/notificacion.entity';
+import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
 @Injectable()
 export class DatoEsaviService {
@@ -54,9 +54,7 @@ export class DatoEsaviService {
 
       // Si existe, lo actualizamos
       if (existingDatoEsavi) {
-        this.logger.log(
-          'DatoEsavi existe, se actualizará con los nuevos datos.',
-        );
+        this.logger.log('DatoEsavi existe, se actualizará con los nuevos datos.');
 
         // Actualizamos el registro con los nuevos datos
         Object.assign(existingDatoEsavi, createDto); // Actualizamos las propiedades del registro
@@ -78,9 +76,7 @@ export class DatoEsaviService {
       this.logger.error(`Error al procesar datos esavi: ${e.message}`);
       throw new Error('Hubo un problema al crear o actualizar datos esavi');
     } finally {
-      this.logger.log(
-        `DatoEsavi ha sido procesado: ${JSON.stringify(createDto)}`,
-      );
+      this.logger.log(`DatoEsavi ha sido procesado: ${JSON.stringify(createDto)}`);
     }
   }
 
@@ -147,9 +143,6 @@ export class DatoEsaviService {
     notificacion: Notificacion,
     createDto: CreateDatoEsaviDto | CreateDatoEsaviDto[], // Puede ser un objeto o un arreglo de objetos
   ): Promise<DatoEsavi | DatoEsavi[]> {
-    // Aseguramos que createDto sea siempre un arreglo, incluso si es un solo objeto
-    console.log('datollegacreateverificar:::', createDto);
-
     const createDtos = Array.isArray(createDto) ? createDto : [createDto];
 
     try {
@@ -157,15 +150,19 @@ export class DatoEsaviService {
 
       // Procesar cada objeto en el arreglo (o el único objeto si es un solo elemento)
       for (const dto of createDtos) {
-        const datoEsavi = plainToClass(DatoEsavi, dto);
+        const datoEsavi = plainToClass(DatoEsavi, {
+          createdBy: 'System',
+          createdAt: new Date(),
+          updatedBy: 'System',
+          updatedAt: new Date(),
+          ...dto,
+        });
         datoEsavi.notificacion = notificacion;
 
-        const notificacionInstancia = new Notificacion();
-        notificacionInstancia.id = notificacion.id;
         // Buscar si ya existe un DatoEsavi con la misma notificación, fechaEsavi y nombre
         const existingDatoEsavi = await this.datoEsaviRepository.findOne({
           where: {
-            notificacion: notificacionInstancia,
+            notificacion: { id: notificacion.id },
             fechaEsavi: dto.fechaEsavi,
             nombre: dto.nombre,
             descripcion: dto.descripcion,
@@ -173,16 +170,10 @@ export class DatoEsaviService {
         });
 
         if (existingDatoEsavi) {
-          // Si existe, actualizamos el objeto
-          console.log('VerQuellegadto::', dto);
-
           Object.assign(existingDatoEsavi, dto);
           await this.datoEsaviRepository.save(existingDatoEsavi); // Guardamos la actualización
           datoEsaviArray.push(existingDatoEsavi); // Añadimos al arreglo
         } else {
-          // Si no existe, creamos un nuevo DatoEsavi
-          console.log('Dtoesaaviiiiiillega::', datoEsavi);
-
           await this.datoEsaviRepository.save(datoEsavi);
           datoEsaviArray.push(datoEsavi); // Añadimos al arreglo
         }
@@ -196,9 +187,7 @@ export class DatoEsaviService {
       throw new Error('Hubo un problema al crear o actualizar los datos ESAVI');
     } finally {
       // Registro de la operación
-      this.logger.log(
-        `DatoEsavi(s) procesado(s): ${JSON.stringify(createDtos)}`,
-      );
+      this.logger.log(`DatoEsavi(s) procesado(s): ${JSON.stringify(createDtos)}`);
     }
   }
 
@@ -227,10 +216,7 @@ export class DatoEsaviService {
     throw new EntityNotFoundException('DatoEsavi', uuid);
   }
 
-  async update(
-    uuid: string,
-    updateDatoEsaviDto: UpdateDatoEsaviDto,
-  ): Promise<DatoEsavi> {
+  async update(uuid: string, updateDatoEsaviDto: UpdateDatoEsaviDto): Promise<DatoEsavi> {
     const datoVacuna = await this.findOne(uuid);
     this.datoEsaviRepository.merge(datoVacuna, updateDatoEsaviDto);
     return this.datoEsaviRepository.save(datoVacuna);

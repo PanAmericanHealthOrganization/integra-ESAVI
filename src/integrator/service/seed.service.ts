@@ -1151,4 +1151,61 @@ export class SeedService {
     }
   }
   //--fin carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
+
+  /**
+   * Método para limpiar el contenido de todas las tablas que inician con "TR"
+   */
+  async cleanTRTables() {
+    console.log('🧹 Iniciando limpieza de todas las tablas que inician con "TR"...');
+
+    try {
+      // Obtener el query runner para ejecutar SQL directo
+      const queryRunner = this.datoVacunacionRepository.manager.connection.createQueryRunner();
+
+      // Obtener todas las tablas del esquema que inician con "TR"
+      const tablesResult = await queryRunner.query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'dhi_esavi' 
+        AND table_name LIKE 'TR_%'
+        ORDER BY table_name;
+      `);
+
+      console.log(`📋 Se encontraron ${tablesResult.length} tablas que inician con "TR"`);
+
+      if (tablesResult.length === 0) {
+        console.log('ℹ️ No se encontraron tablas que inician con "TR"');
+        await queryRunner.release();
+        return;
+      }
+
+      // Deshabilitar temporalmente las restricciones de clave foránea
+      await queryRunner.query('SET session_replication_role = replica;');
+
+      // Limpiar el contenido de cada tabla encontrada
+      for (const table of tablesResult) {
+        const tableName = table.table_name;
+        console.log(`🧹 Limpiando contenido de tabla: ${tableName}`);
+
+        try {
+          await queryRunner.query(`TRUNCATE TABLE "dhi_esavi"."${tableName}" CASCADE;`);
+          console.log(`✅ Tabla ${tableName} limpiada exitosamente`);
+        } catch (tableError) {
+          console.error(`❌ Error al limpiar tabla ${tableName}:`, tableError);
+          // Continuamos con las demás tablas aunque falle una
+        }
+      }
+
+      // Restaurar las restricciones de clave foránea
+      await queryRunner.query('SET session_replication_role = DEFAULT;');
+
+      // Liberar el query runner
+      await queryRunner.release();
+
+      console.log('✅ Proceso de limpieza de tablas "TR" completado exitosamente');
+    } catch (error) {
+      console.error('❌ Error al limpiar tablas que inician con "TR":', error);
+      throw error;
+    }
+  }
 }
