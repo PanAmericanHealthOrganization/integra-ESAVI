@@ -12,6 +12,7 @@ export abstract class Auditoria implements IAuditoria {
     name: 'AUD_FECHA_CREACION',
     type: 'timestamptz',
     nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
     comment: 'Fecha de creación',
   })
   createdAt: Date;
