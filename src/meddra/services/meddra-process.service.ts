@@ -6,10 +6,12 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { join } from 'path';
 import * as readline from 'readline';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import * as XLSX from 'xlsx';
+import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
 import { MeddraSync } from '../models/standar/meddraSync.entity';
 import { PT } from '../models/standar/pt.entity';
 import { SOC } from '../models/standar/soc.entity';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
 /**
  * Permite procesar los archivos de meddra
  */
@@ -27,6 +29,9 @@ export class MeddraProcessFilesService {
 
     @InjectRepository(MeddraSync, 'meddra')
     private readonly meddraSuncRepository: Repository<MeddraSync>,
+
+    @InjectRepository(cie10Meddra, 'meddra')
+    private readonly cie10MeddraRepository: Repository<cie10Meddra>,
 
     @InjectDataSource('meddra')
     private dataSource: DataSource,
@@ -183,7 +188,59 @@ export class MeddraProcessFilesService {
    */
   async processCIE10Meddra(version: string, lang: string): Promise<boolean> {
     console.log(`Procesando CIE10Meddra${version}${lang}`);
-    return false;
+    const fileName = `ICD_10_TO_MEDDRA_${lang}_${version}.xlsx`;
+    const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, fileName);
+
+    if (!fs.existsSync(filePath)) {
+      this.logger.error(`El archivo ${filePath} no existe`);
+      throw new Error(`El archivo ${filePath} no existe`);
+    }
+
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const data: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 2 }); // Skip first 2 rows
+
+    const cie10List: cie10Meddra[] = [];
+    
+    for (const row of data) {
+      if (row.length === 0) continue;
+      
+      const entity = new cie10Meddra();
+      // Mapping based on column index from inspection
+      // 0: ICD-10 Chapter Number
+      // 1: ICD-10 Chapter
+      // 2: ICD-10 Code
+      // 3: ICD-10 Term
+      // 4: Mapped MedDRA LLT
+      // 5: Mapped MedDRA LLT Code
+      // 6: Map Attribute
+      // 7: MedDRA PT
+      // 8: MedDRA PT Code
+      
+      entity.icd10_charper_number = String(row[0] || '');
+      entity.icd10_charper = String(row[1] || '');
+      entity.icd10_code = String(row[2] || '');
+      entity.icd10_term = String(row[3] || '');
+      entity.meddra_llt_name = String(row[4] || '');
+      entity.meddra_llt_code = String(row[5] || '');
+      entity.equivalence = String(row[6] || '');
+      entity.meddra_pt_name = String(row[7] || '');
+      entity.meddra_pt_code = String(row[8] || '');
+      
+      withAuditOnCreate(entity);
+      cie10List.push(entity);
+    }
+
+    const chunkSize = 5000;
+    for (let i = 0; i < cie10List.length; i += chunkSize) {
+      const chunk = cie10List.slice(i, i + chunkSize);
+      await this.cie10MeddraRepository.save(chunk);
+      this.logger.log(`Insertados CIE10-MedDRA ${Math.min(i + chunkSize, cie10List.length)} de ${cie10List.length}`);
+    }
+
+    this.logger.log('Proceso de archivos de CIE10-MedDRA finalizado');
+    return true;
   }
 
   async validarVersion(meddraVersion: string, lang: string): Promise<boolean> {

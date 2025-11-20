@@ -1,7 +1,4 @@
 import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
-import { EncryptionTransformer } from 'typeorm-encrypted';
-
-
 
 @Entity({ schema: 'meddra', name: 'med_request_history' })
 @Index(['searchterm'])
@@ -11,8 +8,7 @@ export class MeddraQuery extends BaseEntity {
 
   @Column({ name: 'searchterms', unique: true })
   searchterm: string;
-  
-  
+
   @Column({
     name: 'response',
     // transformer: new EncryptionTransformer({
