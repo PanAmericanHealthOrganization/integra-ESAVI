@@ -3,6 +3,7 @@ import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
 import { CompletenessQualityTableDto } from '../controllers/dto/quality.dto';
+import * as moment from 'moment';
 
 export interface ColumnCompletenessDescriptor {
   tableName: string;
@@ -35,7 +36,9 @@ export class CompletenessService {
       FROM ${tableReference} t WHERE t."AUD_FECHA_CREACION" <= $1;
     `;
     try {
-      const [result] = await this.dataSource.query(query, [day]);
+      const [result] = await this.dataSource.query(query, [
+        moment(day).add(1, 'day').endOf('day').toISOString(),
+      ]);
       const totalRecords = Number(result?.total_records ?? 0);
       const totalNulls = Number(result?.total_nulls ?? 0);
       const totalNonNulls = totalRecords - totalNulls;
