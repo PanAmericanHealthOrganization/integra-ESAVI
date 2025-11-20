@@ -1,12 +1,12 @@
-import {Injectable} from '@nestjs/common';
-import {InjectRepository} from '@nestjs/typeorm';
-import {ILike,Repository} from 'typeorm';
-import {MeddraStandarDto} from '../models/dto/meddraStandar.dto';
-import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
-import {CIE10ES} from '../models/standar/cie_10_meddra.entity';
-import {LLT} from '../models/standar/llt.entity';
-import {PT} from '../models/standar/pt.entity';
-import {SOC} from '../models/standar/soc.entity';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ILike, Repository } from 'typeorm';
+import { MeddraStandarDto } from '../models/dto/meddraStandar.dto';
+import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
+import { CIE10ES } from '../models/standar/cie_10_meddra.entity';
+import { LLT } from '../models/standar/llt.entity';
+import { PT } from '../models/standar/pt.entity';
+import { SOC } from '../models/standar/soc.entity';
 
 @Injectable()
 export class MeddraStandarService {
@@ -41,7 +41,7 @@ export class MeddraStandarService {
     });
 
     const cie10Meddraespaniol = await this.CIE10ESRepository.findOne({
-      where: { code: ILike(cie10Meddra?.icd10_code) },
+      where: { icd10Code: ILike(cie10Meddra?.icd10_code) },
     });
 
     const meddraStandar = new MeddraStandarDto();

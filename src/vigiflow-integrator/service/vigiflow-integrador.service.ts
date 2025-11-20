@@ -7,6 +7,7 @@ import * as moment from 'moment/moment';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
 import { UpdateAntecedenteEmbarazoDto } from 'src/integrator/dto/update-antecedente-embarazo.dto';
+import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { AntecedenteEmbarazoService } from 'src/integrator/service/antecedente-embarazo.service';
 import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt-service';
@@ -28,7 +29,6 @@ import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-
 import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
-import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';

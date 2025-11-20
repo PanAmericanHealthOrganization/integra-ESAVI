@@ -1,24 +1,10 @@
-import { BeforeInsert, BeforeUpdate, Column } from 'typeorm';
+import { Column, Entity } from 'typeorm';
 
 /**
  *
  */
+@Entity()
 export abstract class Auditoria implements IAuditoria {
-  /**
-   *
-   */
-  @BeforeInsert()
-  setCreationDate() {
-    this.createdAt = new Date();
-  }
-
-  /**
-   *
-   */
-  @BeforeUpdate()
-  setUpdateDate() {
-    this.updatedAt = new Date();
-  }
   /**
    *
    */

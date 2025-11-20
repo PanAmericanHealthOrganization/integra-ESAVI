@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 
 // Entidades
 import { ISync } from '../dto/sync.dto';
-import { Auditoria, IAuditoria, SyncProcess } from '../entity';
+import { IAuditoria, SyncProcess } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
@@ -172,7 +172,7 @@ export class SeedService {
       { codigo: 'EST', descripcion: 'Estado Registro' },
     ];
 
-    const auditoriaDto: Auditoria = {
+    const auditoriaDto: IAuditoria = {
       createdAt: new Date(),
       createdBy: 'System',
       updatedAt: undefined,
@@ -499,7 +499,7 @@ export class SeedService {
       },
     ];
 
-    const auditoriaCatalogoHomologacionDto: Auditoria = {
+    const auditoriaCatalogoHomologacionDto: IAuditoria = {
       createdAt: new Date(),
       createdBy: 'System',
       updatedAt: undefined,
@@ -538,7 +538,7 @@ export class SeedService {
       { inicio: 18, fin: 64, descripcion: 'Adultos (18-64 años)' },
       { inicio: 65, fin: 120, descripcion: 'Adultos mayores (65+ años)' },
     ];*/
-    const auditoriaDto: Auditoria = {
+    const auditoriaDto: IAuditoria = {
       createdAt: new Date(),
       createdBy: 'System',
       updatedAt: undefined,
@@ -549,13 +549,13 @@ export class SeedService {
       isActive: true,
     };
     const gruposEtarios: CreateGrupoEtarioDto[] = [
-      { inicioEdad: 0, finEdad: 11, descripcion: 'Menor 1 año' }, // contiene edades en meses
-      { inicioEdad: 1, finEdad: 4, descripcion: '1 A 4 Años' },
-      { inicioEdad: 5, finEdad: 9, descripcion: '5 A 9 Año' },
-      { inicioEdad: 10, finEdad: 14, descripcion: '10 A 14' },
-      { inicioEdad: 15, finEdad: 19, descripcion: '15 A 19' },
-      { inicioEdad: 20, finEdad: 64, descripcion: '20 A 64' },
-      { inicioEdad: 65, finEdad: 120, descripcion: '65 Año y más' },
+      { inicioEdad: 0, finEdad: 11, descripcion: 'Menor 1 año', ...auditoriaDto },
+      { inicioEdad: 1, finEdad: 4, descripcion: '1 A 4 Años', ...auditoriaDto },
+      { inicioEdad: 5, finEdad: 9, descripcion: '5 A 9 Año', ...auditoriaDto },
+      { inicioEdad: 10, finEdad: 14, descripcion: '10 A 14', ...auditoriaDto },
+      { inicioEdad: 15, finEdad: 19, descripcion: '15 A 19', ...auditoriaDto },
+      { inicioEdad: 20, finEdad: 64, descripcion: '20 A 64', ...auditoriaDto },
+      { inicioEdad: 65, finEdad: 120, descripcion: '65 Año y más', ...auditoriaDto },
     ];
 
     for (const grupo of gruposEtarios) {
