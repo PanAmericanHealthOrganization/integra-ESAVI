@@ -35,16 +35,6 @@ export class Dhis2IntegradorController {
         6,
       )}-${aefiQuery.fechaFin.slice(6)}`,
     );
-    console.log(
-      '***** fechaInicioDhis2:',
-      aefiQuery.fechaInicio,
-      fechaInicio,
-      'fechaFin:',
-      aefiQuery.fechaFin,
-      fechaFin,
-      'codigoATC:',
-      aefiQuery.codigoATC,
-    );
 
     try {
       await this.dhis2IntegratorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);

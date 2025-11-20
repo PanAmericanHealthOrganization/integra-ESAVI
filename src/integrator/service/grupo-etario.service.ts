@@ -2,11 +2,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { GrupoEtario } from '../entity/grupo-etario.entity';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { CreateGrupoEtarioDto } from '../dto/create-grupo-etario.dto';
 import { UpdateGrupoEtarioDto } from '../dto/update-grupo-etario.dto';
+import { GrupoEtario } from '../entity/grupo-etario.entity';
 
 @Injectable()
 export class GrupoEtarioService {
@@ -47,16 +47,10 @@ export class GrupoEtarioService {
     throw Error('');
   }
 
-  async update(
-    uuid: string,
-    updateGrupoEtarioDto: UpdateGrupoEtarioDto,
-  ): Promise<GrupoEtario> {
+  async update(uuid: string, updateGrupoEtarioDto: UpdateGrupoEtarioDto): Promise<GrupoEtario> {
     const grupoEtario = await this.findOne(uuid);
     if (grupoEtario) {
-      this.grupoEtarioServiceRepository.merge(
-        grupoEtario,
-        updateGrupoEtarioDto,
-      );
+      this.grupoEtarioServiceRepository.merge(grupoEtario, updateGrupoEtarioDto);
       return this.grupoEtarioServiceRepository.save(grupoEtario);
     }
   }
@@ -72,8 +66,6 @@ export class GrupoEtarioService {
     });
 
     if (grupoEtario) {
-      console.log('GrupooEta:::', grupoEtario);
-
       return grupoEtario;
     }
 

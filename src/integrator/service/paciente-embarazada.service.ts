@@ -1,11 +1,10 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { PacienteEmbarazada } from "../entity/paciente-embarazada.entity";
-import { Repository } from "typeorm";
-import { CreatePacienteEmbarazadaDto } from "../dto/create-paciente-embarazada.dto";
-import { Notificacion } from "../entity/notificacion.entity";
-import { plainToClass } from "class-transformer";
-
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
+import { CreatePacienteEmbarazadaDto } from '../dto/create-paciente-embarazada.dto';
+import { Notificacion } from '../entity/notificacion.entity';
+import { PacienteEmbarazada } from '../entity/paciente-embarazada.entity';
 
 @Injectable()
 export class PacienteEmbarazadaServive {
@@ -40,13 +39,10 @@ export class PacienteEmbarazadaServive {
   ): Promise<PacienteEmbarazada> {
     try {
       // Llamamos a la nueva función para buscar si ya existe un registro para la notificación
-      const pacienteEmbarazadaExistente = await this.findByNotificacionId(
-        notificacion.id,
-      );
+      const pacienteEmbarazadaExistente = await this.findByNotificacionId(notificacion.id);
 
       if (pacienteEmbarazadaExistente) {
         // Si existe, actualizamos el registro
-        console.log('PacienteEmbarazada existe, actualizando...');
 
         // Actualizamos los campos solo si vienen en el DTO
         Object.keys(createDto).forEach((key) => {
@@ -61,13 +57,8 @@ export class PacienteEmbarazadaServive {
           pacienteEmbarazadaExistente.createdBy || 'AUTOMATICO';
 
         // Guardamos el registro actualizado
-        return this.pacienteEmbarazadaRepository.save(
-          pacienteEmbarazadaExistente,
-        );
+        return this.pacienteEmbarazadaRepository.save(pacienteEmbarazadaExistente);
       } else {
-        // Si no existe, creamos un nuevo registro
-        console.log('PacienteEmbarazada no existe, creando nuevo...');
-
         const pacienteEmbarazada = plainToClass(PacienteEmbarazada, createDto);
         pacienteEmbarazada.notificacion = notificacion;
         pacienteEmbarazada.createdBy = 'AUTOMATICO';
@@ -77,19 +68,13 @@ export class PacienteEmbarazadaServive {
       }
     } catch (e) {
       this.logger.error(`Error al procesar PacienteEmbarazada: ${e.message}`);
-      throw new Error(
-        'Hubo un problema al crear o actualizar el registro de PacienteEmbarazada',
-      );
+      throw new Error('Hubo un problema al crear o actualizar el registro de PacienteEmbarazada');
     } finally {
-      this.logger.log(
-        `PacienteEmbarazada ha sido procesado: ${JSON.stringify(createDto)}`,
-      );
+      this.logger.log(`PacienteEmbarazada ha sido procesado: ${JSON.stringify(createDto)}`);
     }
   }
 
-  async findByNotificacionId(
-    notificacionId: string,
-  ): Promise<PacienteEmbarazada | null> {
+  async findByNotificacionId(notificacionId: string): Promise<PacienteEmbarazada | null> {
     try {
       // Realizamos la búsqueda en la base de datos por el ID de notificación
       const datoVacuna = await this.pacienteEmbarazadaRepository.findOne({
@@ -97,10 +82,7 @@ export class PacienteEmbarazadaServive {
       });
       return datoVacuna || null; // Devolver el dato o null si no se encuentra
     } catch (error) {
-      console.error(
-        'Error al buscar DatoVacuna por ID de notificación:',
-        error,
-      );
+      console.error('Error al buscar DatoVacuna por ID de notificación:', error);
       return null; // Si ocurre un error, devolvemos null
     }
   }

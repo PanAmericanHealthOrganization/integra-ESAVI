@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AntecedenteMedico } from '../entity/antecedente-medico.entity';
-import { UpdateAntecedenteMedicoDto } from '../dto/update-antecedente-medico.dto';
-import { CreateAntecedenteMedicoDto } from '../dto/create-antecedente-medico.dto';
 import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
+import { CreateAntecedenteMedicoDto } from '../dto/create-antecedente-medico.dto';
+import { UpdateAntecedenteMedicoDto } from '../dto/update-antecedente-medico.dto';
+import { AntecedenteMedico } from '../entity/antecedente-medico.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
@@ -21,8 +21,6 @@ export class AntecedenteMedicoService {
     notificacion: Notificacion,
     createDto: CreateAntecedenteMedicoDto,
   ): Promise<AntecedenteMedico> {
-    console.log('AntecedenteMedicoBooo:::', createDto);
-
     try {
       const antecedenteMedico = plainToClass(AntecedenteMedico, createDto);
       antecedenteMedico.notificacion = notificacion;
@@ -31,9 +29,7 @@ export class AntecedenteMedicoService {
     } catch (e) {
       throw e;
     } finally {
-      this.logger.log(
-        `AntecedenteMedico has been created: ${JSON.stringify(createDto)}`,
-      );
+      this.logger.log(`AntecedenteMedico has been created: ${JSON.stringify(createDto)}`);
     }
   }
 

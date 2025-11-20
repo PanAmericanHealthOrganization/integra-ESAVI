@@ -50,13 +50,9 @@ export class IntegradorService {
 
   async create(createDto: CreateCompleteDto) {
     let notificacion: Notificacion;
-    console.log('Validar :::', SourceEnum.DHIS2);
-    console.log('Validar2 :::', createDto.source);
 
     if (SourceEnum.DHIS2 == createDto.source) {
-      const pacienteDhis2 = await this.pacienteDhis2Service.create(
-        createDto.pacienteDhis2,
-      );
+      const pacienteDhis2 = await this.pacienteDhis2Service.create(createDto.pacienteDhis2);
 
       if (pacienteDhis2) {
         notificacion = await this.notificacionDhis2Service.create(
@@ -74,32 +70,18 @@ export class IntegradorService {
       );
     }
     if (notificacion) {
-      console.log('HayNotificaciooooon');
-
       if (createDto.medicamento && createDto.medicamento.length > 0) {
-        await this.medicamentoService.createOneToMany(
-          notificacion,
-          createDto.medicamento,
-        );
+        await this.medicamentoService.createOneToMany(notificacion, createDto.medicamento);
       }
       // Antecedentes
       if (createDto.antecedenteEmbarazo) {
-        await this.antecedenteEmbarazoService.create(
-          notificacion,
-          createDto.antecedenteEmbarazo,
-        );
+        await this.antecedenteEmbarazoService.create(notificacion, createDto.antecedenteEmbarazo);
       }
       if (createDto.antecedenteEvento) {
-        await this.antecedenteEventoService.create(
-          notificacion,
-          createDto.antecedenteEvento,
-        );
+        await this.antecedenteEventoService.create(notificacion, createDto.antecedenteEvento);
       }
       if (createDto.antecedenteMedico) {
-        await this.antecedenteMedicoService.create(
-          notificacion,
-          createDto.antecedenteMedico,
-        );
+        await this.antecedenteMedicoService.create(notificacion, createDto.antecedenteMedico);
       }
       if (createDto.antecedentePreexistencia) {
         await this.antecedentePreexistenciaService.create(
@@ -109,38 +91,23 @@ export class IntegradorService {
       }
       //ESAVI
       if (createDto.causalidadEsavi) {
-        await this.causalidadEsaviService.create(
-          notificacion,
-          createDto.causalidadEsavi,
-        );
+        await this.causalidadEsaviService.create(notificacion, createDto.causalidadEsavi);
       }
       if (createDto.desenlaceEsavi) {
-        await this.desenlaceEsaviService.create(
-          notificacion,
-          createDto.desenlaceEsavi,
-        );
+        await this.desenlaceEsaviService.create(notificacion, createDto.desenlaceEsavi);
       }
 
       //Paciente Embarazada
       if (createDto.pacienteEmbarazada) {
-        await this.pacienteEmbarazadaService.create(
-          notificacion,
-          createDto.pacienteEmbarazada,
-        );
+        await this.pacienteEmbarazadaService.create(notificacion, createDto.pacienteEmbarazada);
       }
 
       if (createDto.embarazoEsavi) {
-        await this.embarazoEsaviService.create(
-          notificacion,
-          createDto.embarazoEsavi,
-        );
+        await this.embarazoEsaviService.create(notificacion, createDto.embarazoEsavi);
       }
 
       if (createDto.gravedadEsavi) {
-        await this.gravedadEsaviService.create(
-          notificacion,
-          createDto.gravedadEsavi,
-        );
+        await this.gravedadEsaviService.create(notificacion, createDto.gravedadEsavi);
       }
 
       // Datos Vacunacion
@@ -149,10 +116,7 @@ export class IntegradorService {
       }
 
       if (createDto.datoVacunacion) {
-        await this.datoVacunacionService.create(
-          notificacion,
-          createDto.datoVacunacion,
-        );
+        await this.datoVacunacionService.create(notificacion, createDto.datoVacunacion);
       }
 
       if (createDto.datoEsavi) {
@@ -184,12 +148,12 @@ export class IntegradorService {
   async findByIdentificacionAndDateRange(
     identificacion: string,
     fechaInicio: Date,
-    fechaFin: Date
+    fechaFin: Date,
   ) {
     return this.notificacionDhis2Service.findByIdentificacionAndDateRange(
       identificacion,
       fechaInicio,
-      fechaFin
+      fechaFin,
     );
   }
 
@@ -197,19 +161,13 @@ export class IntegradorService {
    * Busca registros similares para actualización masiva
    */
   async findSimilarRecords(identificacion: string, fechaNotificacion: string) {
-    return this.notificacionDhis2Service.findSimilarRecords(
-      identificacion,
-      fechaNotificacion
-    );
+    return this.notificacionDhis2Service.findSimilarRecords(identificacion, fechaNotificacion);
   }
 
   /**
    * Actualiza una notificación por código DHIS2
    */
   async updateByCodigoDhis2Evento(codigoDhis2Evento: string, updateData: CreateCompleteDto) {
-    return this.notificacionDhis2Service.updateByCodigoDhis2Evento(
-      codigoDhis2Evento,
-      updateData
-    );
+    return this.notificacionDhis2Service.updateByCodigoDhis2Evento(codigoDhis2Evento, updateData);
   }
 }

@@ -101,13 +101,9 @@ export class NotificacionDhis2Service {
     createDto: CreateNotificacionDto,
     pacienteUUID: PacienteDhis2,
   ): Promise<NotificacionDhis2> {
-    console.log('NotificacionDatos:::', createDto);
-    console.log('NotificacionDatosPaciente:::', pacienteUUID);
-
     try {
       // Verificamos si ya existe una notificación con el mismo códigoDhis2Evento
       const notificacionExistente = await this.findByCodeDhis2(createDto.codigoDhis2Evento);
-      console.log('ExistePacienteNotificacion::', notificacionExistente);
 
       if (notificacionExistente) {
         try {
@@ -117,8 +113,6 @@ export class NotificacionDhis2Service {
         }
       } else {
         // Si no existe, creamos una nueva notificación
-        console.log('Notificación no existe, creando nueva...');
-
         const notificacion = plainToClass(NotificacionDhis2, createDto);
 
         // Asignamos las propiedades de la notificación
@@ -180,7 +174,6 @@ export class NotificacionDhis2Service {
               edadFinal,
             );
             notificacion.grupoEtario = grupoEtarioPaciente;
-            console.log('GrupoetarioExis::', grupoEtarioPaciente);
           } catch (error) {
             console.error(
               `Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`,
@@ -189,12 +182,7 @@ export class NotificacionDhis2Service {
         } else {
           try {
             if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
-              console.log(
-                'EdadPacientesss::::',
-                createDto.fechaNotificacion,
-                createDto.fechaNacimiento,
-              );
-              const edad = await this.calcularEdad(
+              const edad = this.calcularEdad(
                 createDto.fechaNotificacion,
                 createDto.fechaNacimiento,
               );
@@ -389,15 +377,7 @@ export class NotificacionDhis2Service {
     } else {
       try {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
-          console.log(
-            'EdadPacientesss::::',
-            createDto.fechaNotificacion,
-            createDto.fechaNacimiento,
-          );
-          const edad = await this.calcularEdad(
-            createDto.fechaNotificacion,
-            createDto.fechaNacimiento,
-          );
+          const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
           const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad);
           notificacionExistente.grupoEtario = grupoEtarioPaciente;
         }
@@ -437,8 +417,6 @@ export class NotificacionDhis2Service {
   }
 
   calcularGrupoEtario = (edad, unidadEdad) => {
-    console.log('GrupoEtarioCalcular:::', edad, unidadEdad);
-
     // Aseguramos que la unidad de edad esté en mayúsculas
     let edadFinal = edad;
 

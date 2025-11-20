@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
+import { Repository } from 'typeorm';
 import { CreateGravedadEsaviDto } from '../dto/create-gravedad-esavi.dto';
 import { UpdateGravedadEsaviDto } from '../dto/update-gravedad-esavi.dto';
+import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
@@ -58,9 +58,7 @@ export class GravedadEsaviService {
     createDto: CreateGravedadEsaviDto,
   ): Promise<GravedadEsavi> {
     if (!notificacion) {
-      throw new Error(
-        'El campo notificacion es obligatorio para GravedadEsavi',
-      );
+      throw new Error('El campo notificacion es obligatorio para GravedadEsavi');
     }
 
     try {
@@ -79,23 +77,15 @@ export class GravedadEsaviService {
         });
 
         // Actualizamos el registro de GravedadEsavi
-        this.logger.log(
-          `GravedadEsavi ha sido actualizada: ${JSON.stringify(createDto)}`,
-        );
+        this.logger.log(`GravedadEsavi ha sido actualizada: ${JSON.stringify(createDto)}`);
         return this.gravedadEsaviRepository.save(gravedadEsavi); // Utilizamos save() para actualizar el registro
       } else {
-        // Si no existe, creamos un nuevo registro de GravedadEsavi
-        console.log('GravedadEsavi no existe, creando nueva...');
-
-        // Creamos una nueva instancia de GravedadEsavi y asignamos los valores del DTO
         const nuevaGravedadEsavi = plainToClass(GravedadEsavi, createDto);
         nuevaGravedadEsavi.notificacion = notificacion; // Asociamos la notificación
         nuevaGravedadEsavi.createdBy = process.env.USUARIO_INSERTA_REGISTRO; // Guardamos quien inserta el registro
 
         // Guardamos la nueva GravedadEsavi
-        this.logger.log(
-          `GravedadEsavi ha sido creada: ${JSON.stringify(createDto)}`,
-        );
+        this.logger.log(`GravedadEsavi ha sido creada: ${JSON.stringify(createDto)}`);
         return this.gravedadEsaviRepository.save(nuevaGravedadEsavi); // Utilizamos save() para crear el registro
       }
     } catch (error) {
@@ -124,9 +114,7 @@ export class GravedadEsaviService {
     throw new EntityNotFoundException(`GravedadEsavi`, uuid);
   }
 
-  async findByNotificacionId(
-    uuidNotificacion: string,
-  ): Promise<GravedadEsavi | null> {
+  async findByNotificacionId(uuidNotificacion: string): Promise<GravedadEsavi | null> {
     try {
       const gravedadEsavi = await this.gravedadEsaviRepository.findOne({
         where: {
@@ -135,10 +123,7 @@ export class GravedadEsaviService {
       });
       return gravedadEsavi || null; // Devolver null si no se encuentra
     } catch (error) {
-      console.error(
-        'Error al buscar GravedadEsavi por ID de Notificacion:',
-        error,
-      );
+      console.error('Error al buscar GravedadEsavi por ID de Notificacion:', error);
       return null;
     }
   }

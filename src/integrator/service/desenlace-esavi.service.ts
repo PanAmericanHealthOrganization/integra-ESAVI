@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Notificacion } from '../entity/notificacion.entity';
-import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
+import { Repository } from 'typeorm';
 import { CreateDesenlaceEsaviDto } from '../dto/create-desenlace-esavi.dto';
 import { UpdateDesenlaceEsaviDto } from '../dto/update-desenlace-esavi.dto';
+import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
+import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
 @Injectable()
@@ -68,15 +68,10 @@ export class DesenlaceEsaviService {
           });
 
           // Actualizamos la entidad en la base de datos
-          this.logger.log(
-            `DesenlaceEsavi ha sido actualizada: ${JSON.stringify(createDto)}`,
-          );
+          this.logger.log(`DesenlaceEsavi ha sido actualizada: ${JSON.stringify(createDto)}`);
 
           return this.desenlaceEsaviRepository.save(desenlaceEsavi); // Utilizamos save() para actualizar el registro
         } else {
-          // Si no existe, creamos un nuevo registro de DesenlaceEsavi
-          console.log('DesenlaceEsavi no existe, creando nueva...');
-
           const nuevoDesenlaceEsavi = plainToClass(DesenlaceEsavi, createDto);
 
           // Asignamos los valores de createDto a la nueva instancia de DesenlaceEsavi
@@ -91,9 +86,7 @@ export class DesenlaceEsaviService {
           nuevoDesenlaceEsavi.createdBy = 'AUTOMATICO'; // Guardamos quien inserta el registro
 
           // Guardamos el nuevo DesenlaceEsavi
-          this.logger.log(
-            `DesenlaceEsavi ha sido creada: ${JSON.stringify(createDto)}`,
-          );
+          this.logger.log(`DesenlaceEsavi ha sido creada: ${JSON.stringify(createDto)}`);
 
           return this.desenlaceEsaviRepository.save(nuevoDesenlaceEsavi); // Utilizamos save() para crear el registro
         }
@@ -101,18 +94,12 @@ export class DesenlaceEsaviService {
         this.logger.error(
           `Error al procesar la creación o actualización de DesenlaceEsavi: ${e.message}`,
         );
-        throw new Error(
-          'Hubo un problema al crear o actualizar DesenlaceEsavi',
-        );
+        throw new Error('Hubo un problema al crear o actualizar DesenlaceEsavi');
       } finally {
-        this.logger.log(
-          `DesenlaceEsavi ha sido procesado: ${JSON.stringify(createDto)}`,
-        );
+        this.logger.log(`DesenlaceEsavi ha sido procesado: ${JSON.stringify(createDto)}`);
       }
     } else {
-      throw new Error(
-        'El campo notificacion es obligatorio para DesenlaceEsavi',
-      );
+      throw new Error('El campo notificacion es obligatorio para DesenlaceEsavi');
     }
   }
 
@@ -134,9 +121,7 @@ export class DesenlaceEsaviService {
     throw new EntityNotFoundException('DesenlaceEsavi', uuid);
   }
 
-  async findByNotificacionId(
-    uuidNotificacion: string,
-  ): Promise<DesenlaceEsavi | null> {
+  async findByNotificacionId(uuidNotificacion: string): Promise<DesenlaceEsavi | null> {
     try {
       const desenlaceEsavi = await this.desenlaceEsaviRepository.findOne({
         where: {
@@ -145,10 +130,7 @@ export class DesenlaceEsaviService {
       });
       return desenlaceEsavi || null; // Devolver null si no se encuentra
     } catch (error) {
-      console.error(
-        'Error al buscar desenlaceEsavi por ID de Notificacion:',
-        error,
-      );
+      console.error('Error al buscar desenlaceEsavi por ID de Notificacion:', error);
       return null;
     }
   }
@@ -159,10 +141,7 @@ export class DesenlaceEsaviService {
   ): Promise<DesenlaceEsavi> {
     const desenlaceEsavi = await this.findOne(uuid);
     if (desenlaceEsavi) {
-      this.desenlaceEsaviRepository.merge(
-        desenlaceEsavi,
-        updateGravedadEsaviDto,
-      );
+      this.desenlaceEsaviRepository.merge(desenlaceEsavi, updateGravedadEsaviDto);
       return this.desenlaceEsaviRepository.save(desenlaceEsavi);
     }
   }

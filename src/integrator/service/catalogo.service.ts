@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Catalogo } from '../entity/catalogo.entity';
+import { ILike, Repository } from 'typeorm';
 import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
 import { UpdateCatalogoDto } from '../dto/update-catalogo.dto';
+import { Catalogo } from '../entity/catalogo.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
 @Injectable()
@@ -54,8 +54,6 @@ export class CatalogoService {
       },
     });
     if (catalogo) {
-      console.log('CatalogoEncontrado ::', catalogo);
-
       return catalogo;
     }
     throw new EntityNotFoundException(`Catalogo ${name} not found`);
@@ -73,10 +71,7 @@ export class CatalogoService {
     throw new EntityNotFoundException(`Catalogo`, name);
   }
 
-  async update(
-    uuid: string,
-    updateCatalogoDto: UpdateCatalogoDto,
-  ): Promise<Catalogo> {
+  async update(uuid: string, updateCatalogoDto: UpdateCatalogoDto): Promise<Catalogo> {
     const catalogo = await this.findOne(uuid);
     if (catalogo) {
       this.catalogoRepository.merge(catalogo, updateCatalogoDto);
