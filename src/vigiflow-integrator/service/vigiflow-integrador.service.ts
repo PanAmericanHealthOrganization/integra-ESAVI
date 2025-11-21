@@ -34,6 +34,7 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
+import { throwError } from 'rxjs';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -218,9 +219,15 @@ export class VigiflowIntegradorService {
         //Para no repetir la extracción, simplemente se asigna la fecha de nacimiento al paciente desde la notificación.
         paciente.fechaNacimiento = fecha;
       }
-      const edad = this.formatoInteger(reg['H']);
-      if (edad > 0) {
+      const edad = this.formatoInteger(reg['H'] && reg['H']);
+      const unidadEdad = reg['I'] && reg['I'].toUpperCase();
+      if ( (edad > 0 && edad < 121) && unidadEdad) {
         notificacion.edad = edad;
+        notificacion.unidadEdadPaciente = unidadEdad
+      }else{// Si la edad no es válida, se asigna null. TODO: edad = fechaNotificacion - fechaNacimiento [AÑOS], similar a dhis2
+        notificacion.edad = null;
+        notificacion.unidadEdadPaciente = null;
+        throwError(`Edad o unidad de edad, no válida para el paciente con código Vigiflow: ${paciente.codigoVigiflow}`);
       }
       const fechaNotificacion = this.formatoFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
@@ -231,7 +238,7 @@ export class VigiflowIntegradorService {
         notificacion.fechaReporteNacional = fechaReporte;
       }
 
-      notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
+      //notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
       notificacion.organizacion = reg['AF'];
       notificacion.codigoVigiflow = reg['B'];
       notificacion.nombreNotificador = reg['AB'];

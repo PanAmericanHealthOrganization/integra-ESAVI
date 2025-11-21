@@ -55,11 +55,12 @@ export class GrupoEtarioService {
     }
   }
 
-  async findGrupoEtarioByAge(age: number) {
+  async findGrupoEtarioByAge(age: number, unidad: string) {
     const grupoEtario = await this.grupoEtarioServiceRepository.findOne({
       where: {
         inicioEdad: LessThanOrEqual(age),
         finEdad: MoreThanOrEqual(age),
+        unidadEdad: unidad,
         isActive: true,
         isEnabled: true,
       },

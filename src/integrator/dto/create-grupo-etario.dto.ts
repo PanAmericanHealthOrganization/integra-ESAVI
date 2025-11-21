@@ -6,5 +6,7 @@ export class CreateGrupoEtarioDto {
   @IsNumber()
   fin: number;
   @IsString()
+  unidadEdad: string;
+  @IsString()
   descripcion: string;
 }

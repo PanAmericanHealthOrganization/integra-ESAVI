@@ -142,7 +142,11 @@ export class NotificacionVigiflowService {
         //   }
         // }
 
-        if (createDto.edad && createDto.unidadEdadPaciente) {
+        /**Este proceso es exclusivamente para el cálculo del grupo etario.
+         * La edad y la unidad de edad son asignadas sin mayores transformaciones,
+         * en la clase vigiflow-integrator.service.ts
+         */
+        if (createDto.edad && createDto.unidadEdadPaciente) { // se comprueba que no sean nulos
           try {
             // Aseguramos que la unidad de edad esté en mayúsculas
             let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
@@ -153,24 +157,43 @@ export class NotificacionVigiflowService {
               if (unidadEdad === 'DÉCADA') {
                 // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
                 edadFinal = ~~(createDto.edad * 10);
+                unidadEdad = 'AÑOS'; // Actualizamos la unidad a "AÑOS" después de la conversión
               } else if (unidadEdad === 'SEMANA') {
-                // Convertimos semanas a años (1 semana = 1/52 años)
-                edadFinal = ~~(createDto.edad / 52);
+                if(  createDto.edad >=0 && createDto.edad <= 52 ){
+                  edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
+                  unidadEdad = 'MESES';
+                }else{
+                  // Convertimos semanas a años (1 semana = 1/52 años)
+                  edadFinal = ~~(createDto.edad / 52.1429);
+                  unidadEdad = 'AÑOS';
+                }                
               } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
                 // Convertimos días a años (1 día = 1/365 años)
                 edadFinal = ~~(createDto.edad / 365);
+                unidadEdad = 'AÑOS';
               } else if (unidadEdad === 'HORA') {
                 // Convertimos horas a años (1 hora = 1/8760 años)
                 edadFinal = ~~(createDto.edad / 8760);
-              } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
-                // Convertimos meses a años (1 mes = 1/12 años)
-                edadFinal = ~~(createDto.edad / 12);
+                unidadEdad = 'AÑOS';
+              } else if ( unidadEdad === 'MES' || unidadEdad === 'MESES' ) {                              
+                if (createDto.edad >= 0 && createDto.edad <= 11) {
+                  // Si la edad en meses es menor a 12, la dejamos como meses
+                  edadFinal = createDto.edad;
+                  unidadEdad = 'MESES';
+                } else {
+                   // Convertimos meses a años (1 mes = 1/12 años) 
+                  edadFinal = ~~(createDto.edad / 12);
+                  unidadEdad = 'AÑOS';
+                }
+                
               }
+            }else{
+              unidadEdad = 'AÑOS';
             }
 
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
             const grupoEtarioPaciente =
-              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
             notificacion.grupoEtario = grupoEtarioPaciente;
           } catch (error) {
             console.error(
