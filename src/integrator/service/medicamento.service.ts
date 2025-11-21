@@ -1,10 +1,10 @@
-import { Injectable, Logger, UseFilters } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
+import { Repository } from 'typeorm';
 import { CreateMedicamentoDto } from '../dto/create-medicamento.dto';
-import { Medicamento } from '../entity/medicamento.entity';
 import { UpdateMedicamentoDto } from '../dto/update-medicamento.dto';
+import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
@@ -37,9 +37,7 @@ export class MedicamentoService {
       throw e;
     } finally {
       this.logger.log(
-        `Medicamento has been created(createOneToMany): ${JSON.stringify(
-          createDto,
-        )}`,
+        `Medicamento has been created(createOneToMany): ${JSON.stringify(createDto)}`,
       );
     }
   }
@@ -63,7 +61,7 @@ export class MedicamentoService {
   //     );
   //   }
   // }
-
+  // TODO: este método debe ser mejorado para evitar duplicados, ademas de hacer multiples llamadas innecesarias a la base de datos, not tiene sentido consultar por cada medicamenteo si ya existe, se debe optimizar
   async createOneToOne(
     notificacion: Notificacion,
     createDto: CreateMedicamentoDto,
@@ -82,9 +80,7 @@ export class MedicamentoService {
 
       // Si existe, lo actualizamos
       if (existingMedicamento) {
-        this.logger.log(
-          'Medicamento existe, se actualizará con los nuevos datos.',
-        );
+        this.logger.log('Medicamento existe, se actualizará con los nuevos datos.');
 
         // Actualizamos el registro con los nuevos datos
         Object.assign(existingMedicamento, createDto); // Actualizamos las propiedades del registro
@@ -110,11 +106,7 @@ export class MedicamentoService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(
-        `Medicamento ha sido procesado (createOneToOne): ${JSON.stringify(
-          createDto,
-        )}`,
-      );
+      this.logger.log(`Medicamento ha sido procesado (createOneToOne)`);
     }
   }
 
@@ -142,10 +134,7 @@ export class MedicamentoService {
     throw new EntityNotFoundException(`Medicamento`, uuid);
   }
 
-  async findOneBelongingToNotificacion(
-    uuidNotificacion: string,
-    uuidMedicamento: string,
-  ) {
+  async findOneBelongingToNotificacion(uuidNotificacion: string, uuidMedicamento: string) {
     const medicamento = await this.medicamentoRepository.findOne({
       where: {
         id: uuidMedicamento,
@@ -160,10 +149,7 @@ export class MedicamentoService {
     throw new EntityNotFoundException(`Medicamento`, uuidMedicamento);
   }
 
-  async update(
-    uuid: string,
-    medicamentoDto: UpdateMedicamentoDto,
-  ): Promise<Medicamento> {
+  async update(uuid: string, medicamentoDto: UpdateMedicamentoDto): Promise<Medicamento> {
     const medicamento = await this.findOne(uuid);
     this.medicamentoRepository.merge(medicamento, medicamentoDto);
     return this.medicamentoRepository.save(medicamento);

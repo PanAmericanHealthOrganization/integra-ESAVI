@@ -110,7 +110,6 @@ export class VigiflowIntegradorService {
     if (fechaFin <= fechaInicio) {
       throw new BadRequestException();
     }
-    console.log('fechaInicio:', fechaInicio, 'fechaFin:', fechaFin, codigoATC);
     //Date params should be sent with this format: 20230113
     const fechaInicioFmrt = moment.utc(fechaInicio).format('YYYYMMDD');
     const fechaFinFmrt = moment.utc(fechaFin).format('YYYYMMDD');
@@ -307,7 +306,6 @@ export class VigiflowIntegradorService {
       create = { ...create, ...auditoria };
 
       await this.integradorService.create(create);
-      console.log('Notificacion enviar::::', notificacion);
 
       return;
     });

@@ -27,13 +27,8 @@ export class NotificacionVigiflowService {
     createDto: CreateNotificacionDto,
     pacienteUUID: PacienteVigiflow,
   ): Promise<NotificacionVigiflow> {
-    console.log('DatosVerificarNotificacion', createDto);
-    console.log('DatosVerificarNotificacionPaciente', pacienteUUID);
-
     if (pacienteUUID) {
-      const notificacion = await this.findByVigiflowCode(
-        createDto.codigoVigiflow,
-      );
+      const notificacion = await this.findByVigiflowCode(createDto.codigoVigiflow);
       if (notificacion) {
         return notificacion;
       } else {
@@ -52,10 +47,9 @@ export class NotificacionVigiflowService {
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.canton)) {
           try {
-            notificacion.cantonResidencia =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaPaciente.canton,
-              );
+            notificacion.cantonResidencia = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaPaciente.canton,
+            );
           } catch (error) {
             console.log('Canton no encontrada');
           }
@@ -70,11 +64,7 @@ export class NotificacionVigiflowService {
             console.log('Parroquia no encontrada');
           }
         }
-        if (
-          !this.isNullOrUndefinedOrEmpty(
-            createDto.residenciaNotificador.provincia,
-          )
-        ) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.provincia)) {
           try {
             notificacion.provinciaNotificador =
               await this.catalogoService.findByDescriptionToVigiflow(
@@ -84,23 +74,16 @@ export class NotificacionVigiflowService {
             console.log('Provincia notificador no encontrada');
           }
         }
-        if (
-          !this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)
-        ) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)) {
           try {
-            notificacion.cantonNotificador =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaNotificador.canton,
-              );
+            notificacion.cantonNotificador = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaNotificador.canton,
+            );
           } catch (error) {
             console.log('Canton notificador no encontrado');
           }
         }
-        if (
-          !this.isNullOrUndefinedOrEmpty(
-            createDto.residenciaNotificador.parroquia,
-          )
-        ) {
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.parroquia)) {
           try {
             notificacion.parroquiaNotificador =
               await this.catalogoService.findByDescriptionToVigiflow(
@@ -113,10 +96,9 @@ export class NotificacionVigiflowService {
 
         if (!this.isNullOrUndefinedOrEmpty(createDto.unidadEdadPaciente)) {
           try {
-            notificacion.unidadEdad =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.unidadEdadPaciente,
-              );
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.unidadEdadPaciente,
+            );
           } catch (error) {
             console.log('Unidad Edad paciente no encontrada');
           }
@@ -169,8 +151,9 @@ export class NotificacionVigiflowService {
             }
 
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente =
-              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
+              edadFinal,
+            );
             notificacion.grupoEtario = grupoEtarioPaciente;
           } catch (error) {
             console.error(
@@ -181,29 +164,21 @@ export class NotificacionVigiflowService {
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
         const not = await this.notificacionRepository.save(notificacion);
-        this.logger.log(
-          `NotificationVigiflow has been created: ${JSON.stringify(not)}`,
-        );
+        this.logger.log(`NotificationVigiflow has been created: ${JSON.stringify(not)}`);
         return not;
       }
     } else {
-      throw new Error(
-        'pacienteUUID is a mandatory field to notification-vigiflow',
-      );
+      throw new Error('pacienteUUID is a mandatory field to notification-vigiflow');
     }
   }
 
-  async update(
-    notificacion: NotificacionVigiflow,
-    updateNotificacion: UpdateNotificacionDto,
-  ) {
+  async update(notificacion: NotificacionVigiflow, updateNotificacion: UpdateNotificacionDto) {
     try {
       if (updateNotificacion.profesionNotificadorParam) {
         try {
-          const profesionNotificador =
-            await this.catalogoService.findByDescriptionToVigiflow(
-              updateNotificacion.profesionNotificadorParam,
-            );
+          const profesionNotificador = await this.catalogoService.findByDescriptionToVigiflow(
+            updateNotificacion.profesionNotificadorParam,
+          );
           notificacion.profesionNotificador = profesionNotificador;
         } catch (error) {
           console.log('Profesion no encontrada');
@@ -213,12 +188,9 @@ export class NotificacionVigiflowService {
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
       notificacion.comentario = updateNotificacion.comentario;
       notificacion.tipoReporte = updateNotificacion.tipoReporte;
-      notificacion.identificacionNotificador =
-        updateNotificacion.identificacionNotificador;
-      notificacion.delegadoOrganizacion =
-        updateNotificacion.delegadoOrganizacion;
-      notificacion.ultimaEdicionRegistrada =
-        updateNotificacion.ultimaEdicionRegistrada;
+      notificacion.identificacionNotificador = updateNotificacion.identificacionNotificador;
+      notificacion.delegadoOrganizacion = updateNotificacion.delegadoOrganizacion;
+      notificacion.ultimaEdicionRegistrada = updateNotificacion.ultimaEdicionRegistrada;
       notificacion.lactando = updateNotificacion.lactando;
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
 
