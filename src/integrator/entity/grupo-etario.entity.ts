@@ -35,7 +35,17 @@ export class GrupoEtario extends Auditoria implements IGrupoEtario {
     comment: 'Edad de fin del grupo etario en años',
   })
   finEdad: number;
-
+  /*
+    *
+    */
+  @Column({
+    type: 'varchar',
+    length: 10,
+    name: 'UNIDAD_EDAD',
+    nullable: false,
+    comment: 'Unidad de medida de la edad (Años, Meses)',//, Días)
+  })
+  unidadEdad: string;
   /**
    *
    */
@@ -52,12 +62,14 @@ export interface IGrupoEtario extends Auditoria {
   id: string;
   inicioEdad: number;
   finEdad: number;
+  unidadEdad: string;
   descripcion: string;
 }
 export class GrupoEtarioDto extends Auditoria implements IGrupoEtario {
   id: string;
   inicioEdad: number;
   finEdad: number;
+  unidadEdad: string;
   descripcion: string;
 }
 
@@ -76,4 +88,5 @@ export class CreateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
 export class UpdateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
   'inicioEdad',
   'finEdad',
+  'unidadEdad'
 ] as const) {}

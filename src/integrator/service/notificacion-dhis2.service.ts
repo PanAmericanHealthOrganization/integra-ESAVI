@@ -172,6 +172,7 @@ export class NotificacionDhis2Service {
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
             const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
               edadFinal,
+              createDto.unidadEdadPaciente,
             );
             notificacion.grupoEtario = grupoEtarioPaciente;
           } catch (error) {
@@ -186,7 +187,9 @@ export class NotificacionDhis2Service {
                 createDto.fechaNotificacion,
                 createDto.fechaNacimiento,
               );
-              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad);
+              const unidad = 'AÑOS';//createDto.unidadEdadPaciente;
+              const grupoEtarioPaciente = await this.grupoEtarioService
+              .findGrupoEtarioByAge(edad, unidad);
               notificacion.grupoEtario = grupoEtarioPaciente;
             }
           } catch (error) {
@@ -367,7 +370,8 @@ export class NotificacionDhis2Service {
       try {
         let edadFinal = this.calcularGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
         // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-        const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal);
+        const grupoEtarioPaciente = await this.grupoEtarioService
+        .findGrupoEtarioByAge(edadFinal, createDto.unidadEdadPaciente);
         notificacionExistente.grupoEtario = grupoEtarioPaciente;
       } catch (error) {
         console.error(
@@ -378,7 +382,8 @@ export class NotificacionDhis2Service {
       try {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
           const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad);
+          const unidad = 'AÑOS';//createDto.unidadEdadPaciente;S
+          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
           notificacionExistente.grupoEtario = grupoEtarioPaciente;
         }
       } catch (error) {
