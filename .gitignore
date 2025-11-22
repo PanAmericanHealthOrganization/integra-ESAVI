@@ -21,7 +21,9 @@ integra-esavi-calidad
 
 # OS
 .DS_Store
-
+.pnpm-store
+.vscode
+.vscode/*
 # Tests
 /coverage
 /.nyc_output
@@ -49,5 +51,8 @@ integra-esavi-calidad
 .env
 
 borrar*
+
+pnpm-lock.yaml
+pnpm-workspace.yaml
 
 integra-esavi.code-workspace
