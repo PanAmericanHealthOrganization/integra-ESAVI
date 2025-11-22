@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs/promises';
 import * as moment from 'moment/moment';
+import { throwError } from 'rxjs';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
 import { UpdateAntecedenteEmbarazoDto } from 'src/integrator/dto/update-antecedente-embarazo.dto';
@@ -34,7 +35,6 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
-import { throwError } from 'rxjs';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -130,9 +130,7 @@ export class VigiflowIntegradorService {
     );
 
     // *** ARCHIVOS LOCALES
-    // const reportOne = read(archivoAefi2);
     // const reportTwo = read(archivo2);
-    console.log('extractedFromExcelToPersist..................');
     // Procesamos el primer reporte
     await this.extractedFromExcelToPersist(reportOne);
     await this.sleep(8000);
@@ -162,19 +160,19 @@ export class VigiflowIntegradorService {
       await fs.readFile('./upload_files/files_meddra/borrar.VigiFlow_Excel_22082025_111315.xlsx'),
     );
 
-    console.log('extractedFromExcelToPersist..................');
+    this.logger.log('extractedFromExcelToPersist..................');
     await this.extractedFromExcelToPersist(reportOne);
     await this.sleep(8000);
-    console.log('extractedFromJsonReportToUpdate..................');
+    this.logger.log('extractedFromJsonReportToUpdate..................');
     await this.extractedFromJsonReportToUpdate(reportTwo);
     await this.sleep(8000);
-    console.log('extractedFromJsonReportToCreateMedicamento..................');
+    this.logger.log('extractedFromJsonReportToCreateMedicamento..................');
     await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
     await this.sleep(8000);
-    console.log('extractedFromJsonReportToCreateReaccion..................');
+    this.logger.log('extractedFromJsonReportToCreateReaccion..................');
     await this.extractedFromJsonReportToCreateReaccion(reportTwo);
     await this.sleep(3000);
-    console.log('Fin Proceso..................');
+    this.logger.log('Fin Proceso..................');
   }
 
   //Extracción de los datos de la hoja [0], del libro
@@ -220,13 +218,16 @@ export class VigiflowIntegradorService {
       }
       const edad = this.formatoInteger(reg['H'] && reg['H']);
       const unidadEdad = reg['I'] && reg['I'].toUpperCase();
-      if ( (edad > 0 && edad < 121) && unidadEdad) {
+      if (edad > 0 && edad < 121 && unidadEdad) {
         notificacion.edad = edad;
-        notificacion.unidadEdadPaciente = unidadEdad
-      }else{// Si la edad no es válida, se asigna null. TODO: edad = fechaNotificacion - fechaNacimiento [AÑOS], similar a dhis2
+        notificacion.unidadEdadPaciente = unidadEdad;
+      } else {
+        // Si la edad no es válida, se asigna null. TODO: edad = fechaNotificacion - fechaNacimiento [AÑOS], similar a dhis2
         notificacion.edad = null;
         notificacion.unidadEdadPaciente = null;
-        throwError(`Edad o unidad de edad, no válida para el paciente con código Vigiflow: ${paciente.codigoVigiflow}`);
+        throwError(
+          `Edad o unidad de edad, no válida para el paciente con código Vigiflow: ${paciente.codigoVigiflow}`,
+        );
       }
       const fechaNotificacion = this.formatoFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {

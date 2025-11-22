@@ -28,9 +28,8 @@ export class VigiflowCrawlerService {
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
     const puppeteerPath = this.configService.get<string>('PATH_BROWSER_PUPPETEER');
 
-    //const browser = await puppeteer.launch({ headless: false });
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: 'new',
       executablePath: puppeteerPath, // Ruta al ejecutable de Chrome
     });
 
