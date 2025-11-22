@@ -392,11 +392,20 @@ export class Dhis2IntegratorService {
     paciente.fechaNacimiento = notificacion.fechaNacimiento;
 
     // La edad ya es otra variable independiente en la extracción.
-    notificacion.edad = this.formatoInteger(
+    const edad = this.formatoInteger(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Edad')],
     );
-    notificacion.unidadEdadPaciente =
+    const unidadEdad =
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Tipo edad')];
+
+    if( (edad > 0 && edad < 121) && (edad && unidadEdad) ){
+      notificacion.edad= edad;
+      notificacion.unidadEdadPaciente= unidadEdad;
+    } else { // si ocurre esto, se intenta calcular en base a la fecha de nacimiento y la fecha de notificación, pero, en "notificacion-dhis2.service.ts"
+      notificacion.edad = null;
+      notificacion.unidadEdadPaciente = null;
+    }
+
     notificacion.organizacion =
       row[headers.findIndex((header) => header.column === 'Organisation unit name')];
     notificacion.organizacionUnitCode =

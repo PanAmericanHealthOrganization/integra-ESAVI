@@ -10,6 +10,7 @@ import { EntityNotFoundException } from '../exception/enntity-not-found.exceptio
 import { CatalogoService } from './catalogo.service';
 import { GrupoEtarioService } from './grupo-etario.service';
 import { PacienteDhis2Service } from './paciente-dhis2.service';
+import e from 'express';
 
 @Injectable()
 export class NotificacionDhis2Service {
@@ -168,11 +169,11 @@ export class NotificacionDhis2Service {
 
         if (createDto.edad && createDto.unidadEdadPaciente) {
           try {
-            let edadFinal = this.calcularGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
+            let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
             const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
-              edadFinal,
-              createDto.unidadEdadPaciente,
+              resultadoUnidadEdad.edadCalculada,
+              resultadoUnidadEdad.unidadEdadCalculada,
             );
             notificacion.grupoEtario = grupoEtarioPaciente;
           } catch (error) {
@@ -188,7 +189,9 @@ export class NotificacionDhis2Service {
                 createDto.fechaNacimiento,
               );
               const unidad = 'AÑOS';//createDto.unidadEdadPaciente;
-              const grupoEtarioPaciente = await this.grupoEtarioService
+              notificacion.edad = edad;
+              notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
+              const grupoEtarioPaciente = await this.grupoEtarioService              
               .findGrupoEtarioByAge(edad, unidad);
               notificacion.grupoEtario = grupoEtarioPaciente;
             }
@@ -368,10 +371,10 @@ export class NotificacionDhis2Service {
     // }
     if (createDto.edad && createDto.unidadEdadPaciente) {
       try {
-        let edadFinal = this.calcularGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
+        let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
         // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
         const grupoEtarioPaciente = await this.grupoEtarioService
-        .findGrupoEtarioByAge(edadFinal, createDto.unidadEdadPaciente);
+        .findGrupoEtarioByAge(resultadoUnidadEdad.edadCalculada, resultadoUnidadEdad.unidadEdadCalculada);
         notificacionExistente.grupoEtario = grupoEtarioPaciente;
       } catch (error) {
         console.error(
@@ -383,6 +386,8 @@ export class NotificacionDhis2Service {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
           const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
           const unidad = 'AÑOS';//createDto.unidadEdadPaciente;S
+          notificacionExistente.edad = edad;
+          notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
           const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
           notificacionExistente.grupoEtario = grupoEtarioPaciente;
         }
@@ -421,32 +426,58 @@ export class NotificacionDhis2Service {
     return this.notificacionRepository.save(notificacionExistente);
   }
 
-  calcularGrupoEtario = (edad, unidadEdad) => {
-    // Aseguramos que la unidad de edad esté en mayúsculas
-    let edadFinal = edad;
+  calcularEdadUnidadParaGrupoEtario = (edad, unidadEdad) : {edadCalculada: number, unidadEdadCalculada: string} => {
+    // Estos cálculos son únicamente para determinar el grupo etario correcto. NO SE ASIGNAN en edad y unidad de edad de la notificación.
+    //let edadFinal = edad;
+    let edadCalculada: number= edad;
+    let unidadEdadCalculada: string= unidadEdad.toUpperCase();// Aseguramos que la unidad de edad esté en mayúsculas
 
-    // Si la unidad no es "AÑO" o "AÑOS", realizar la conversión
-    if (unidadEdad !== 'AÑO' && unidadEdad !== 'AÑOS') {
-      if (unidadEdad === 'DÉCADA') {
+    // Si la unidad no es "AÑO", ni  "AÑOS", realizar la conversión
+    if ( unidadEdadCalculada !== 'AÑO' && unidadEdadCalculada !== 'AÑOS' ) {
+      if ( unidadEdadCalculada === 'DÉCADA' ) {
         // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
-        edadFinal = Math.floor(edad * 10);
-      } else if (unidadEdad === 'SEMANA') {
-        // Convertimos semanas a años (1 semana = 1/52 años)
-        edadFinal = Math.floor(edad / 52);
+        edadCalculada = Math.floor(edad * 10);
+        unidadEdadCalculada = 'AÑOS';
+      } else if (unidadEdad === 'SEMANA') { //Tomar en cuenta que el grupo etario del Ministerio, solo tiene unidades de MESES y AÑOS.
+        if(edadCalculada>=0 && edadCalculada <=52){
+          edadCalculada = Math.floor(edad / 4.3452); // Convertimos semanas a meses (1 semana = 1/4.345 meses)
+          unidadEdadCalculada = 'MESES';
+        } else {
+          // Convertimos semanas a años (1 semana = 1/52 años)
+          edadCalculada = Math.floor(edad / 52.1429);
+          unidadEdadCalculada = 'AÑOS';
+        }
       } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
-        // Convertimos días a años (1 día = 1/365 años)
-        edadFinal = Math.floor(edad / 365);
+        if(edad>=0 && edad <=365){
+          edadCalculada = Math.floor(edad / 30.4167); // Convertimos días a meses (1 mes = 1/30.4167 días)
+          unidadEdadCalculada = 'MESES';
+        }else{
+          // Convertimos días a años (1 día = 1/365 años)
+          edadCalculada = Math.floor(edad / 365);
+          unidadEdadCalculada = 'AÑOS';
+        }
       } else if (unidadEdad === 'HORA') {
         // Convertimos horas a años (1 hora = 1/8760 años)
-        edadFinal = Math.floor(edad / 8760);
+        edadCalculada = Math.floor(edad / 8760);
+        unidadEdadCalculada = 'AÑOS';
       } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
-        // Convertimos meses a años (1 mes = 1/12 años)
-        edadFinal = Math.floor(edad / 12);
+        if(edad>=0 && edad <=11){
+          edadCalculada = edad;
+          unidadEdadCalculada = 'MESES';
+        }else{
+          // Convertimos meses a años (1 mes = 1/12 años)
+          edadCalculada = Math.floor(edad / 12);
+          unidadEdadCalculada = 'AÑOS';
+        }
       }
+    } else {
+      // Si la unidad es "AÑO" o "AÑOS", no hacemos ninguna conversión
+      edadCalculada = edad;
+      unidadEdadCalculada = 'AÑOS';
     }
 
-    // Aseguramos que siempre se retorne la edadFinal
-    return edadFinal;
+    // Aseguramos que siempre se retorne los valores calculados
+    return {edadCalculada, unidadEdadCalculada};
   };
 
   /**
