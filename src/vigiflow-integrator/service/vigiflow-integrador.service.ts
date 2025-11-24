@@ -625,13 +625,13 @@ export class VigiflowIntegradorService {
   
     // a. Eliminar prefijos/sufijos no deseados
     valor = valor.replace(
-      /^(LOT:|LOTE|Reg sa:|R\.S\.|Reg\.San\.No\.:|; RG:|Reg\. San\.:|Registro:|RS:)\s*(.*)\s*$/i,
+      /^(LOT:|LOTE|Reg sa:|R\.S\.|Reg\.San\.No\.:|; RG:|Reg\. San\.:|Registro:|RS:|Lote No. |BOPV lote: |DPT: |OPV: |LOTE:)\s*(.*)\s*$/i,
       "$2"
     );
   
     // b. Reemplazar palabras clave por "Desconocido"
     if (
-      /\b(SE DESCONOCE|DESCONOCE|DESCONOCIDO|N\/R|Ni idea|no aplica|no reporta|NO SE DISPONE|NO DISPONIBLE|NO REGISTRA|Asked But Unknown)\b/i.test(
+      /\b(SE DESCONOCE|DESCONOCE|DESCONOCIDO|N\/R|Ni idea|no aplica|no reporta|NO SE DISPONE|NO DISPONIBLE|NO REGISTRA|Asked But Unknown|NO INDICA|SE DESCONOCE EL LOTE )\b/i.test(
         valor
       )
     ) {

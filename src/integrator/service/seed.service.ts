@@ -551,11 +551,11 @@ export class SeedService {
     const gruposEtarios: CreateGrupoEtarioDto[] = [
       { inicioEdad: 0, finEdad: 11, unidadEdad: 'MESES', descripcion: 'Menor 1 año', ...auditoriaDto },
       { inicioEdad: 1, finEdad: 4, unidadEdad: 'AÑOS', descripcion: '1 A 4 Años', ...auditoriaDto },
-      { inicioEdad: 5, finEdad: 9, unidadEdad: 'AÑOS', descripcion: '5 A 9 Año', ...auditoriaDto },
-      { inicioEdad: 10, finEdad: 14, unidadEdad: 'AÑOS', descripcion: '10 A 14', ...auditoriaDto },
-      { inicioEdad: 15, finEdad: 19, unidadEdad: 'AÑOS', descripcion: '15 A 19', ...auditoriaDto },
-      { inicioEdad: 20, finEdad: 64, unidadEdad: 'AÑOS', descripcion: '20 A 64', ...auditoriaDto },
-      { inicioEdad: 65, finEdad: 120, unidadEdad: 'AÑOS', descripcion: '65 Año y más', ...auditoriaDto },
+      { inicioEdad: 5, finEdad: 9, unidadEdad: 'AÑOS', descripcion: '5 A 9 Años', ...auditoriaDto },
+      { inicioEdad: 10, finEdad: 14, unidadEdad: 'AÑOS', descripcion: '10 A 14 Años', ...auditoriaDto },
+      { inicioEdad: 15, finEdad: 19, unidadEdad: 'AÑOS', descripcion: '15 A 19 Años', ...auditoriaDto },
+      { inicioEdad: 20, finEdad: 64, unidadEdad: 'AÑOS', descripcion: '20 A 64 Años', ...auditoriaDto },
+      { inicioEdad: 65, finEdad: 120, unidadEdad: 'AÑOS', descripcion: '65 Años y más', ...auditoriaDto },
     ];
 
     for (const grupo of gruposEtarios) {
