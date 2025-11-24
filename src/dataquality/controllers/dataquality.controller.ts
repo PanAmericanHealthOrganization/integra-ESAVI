@@ -1,9 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
-import { GeneralService } from '../services/general.service';
+import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
-import { QualityDto } from './dto/quality.dto';
 import { GetListParams } from 'src/utils/interfaces/pagination';
+import { GeneralService } from '../services/general.service';
+import { QualityDto } from './dto/quality.dto';
 
 @Controller({ path: 'dataquality', version: '1' })
 export class DataqualityController implements IController<QualityDto, QualityDto, QualityDto> {
@@ -11,8 +10,25 @@ export class DataqualityController implements IController<QualityDto, QualityDto
 
   @Get('general')
   public async getGeneralQuality(@Query('date') dateString: string): Promise<QualityDto> {
-    console.log('date', dateString);
+    // Si no se proporciona fecha, usar la fecha actual
+    if (!dateString) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return await this.generalService.getGeneralQuality(today);
+    }
+
+    // Validar y parsear la fecha
     const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      throw new BadRequestException(
+        `Fecha inválida: "${dateString}". Use formato ISO (YYYY-MM-DD) o timestamp válido.`,
+      );
+    }
+
+    // Normalizar a medianoche para evitar problemas con horas
+    date.setHours(0, 0, 0, 0);
+
     return await this.generalService.getGeneralQuality(date);
   }
   getMany(params: IGetManyParams): Promise<QualityDto[]> {

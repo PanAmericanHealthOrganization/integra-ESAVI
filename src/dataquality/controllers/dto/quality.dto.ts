@@ -1,59 +1,26 @@
-export class QualityDto {
-  id?: string;
-  fecha: Date;
-  dimension: string;
-  jsonQuality: GeneralQualityDto;
-}
-
-export class GeneralQualityDto {
+export class TotalesCalidDatosDto {
   totalRegistros: number;
-  totalErrores: number;
-  totalPorcentaje: number;
-  completenessQualityTable: CompletenessQualityTableDto[];
-  sintacticQuality: SintacticQualityDto[];
-  semanticQuality: SemanticQualityTableDto[];
-  temporalQuality: TemporalQualityTableDto[];
+  totalRegistrosValidos: number;
+  totalRegistrosInvalidos: number;
+  porcentajeRegistrosValidos: number;
+  porcentajeRegistrosInvalidos: number;
 }
 
-export class CompletenessQualityTableDto {
-  tableName: string;
-  columnName: string;
-  columnDescription: string;
-  totalRecords: number;
-  totalNulls: number;
-  totalNonNulls: number;
-  completenessPercentage: number;
-}
-
-export class SintacticQualityDto {
+export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
+  tipo: string;
   regla: string;
   condicion: string;
   descripcionRegla: string;
-  totalRegistros: number;
-  totalRegistrosValidos: number;
-  totalRegistrosInvalidos: number;
-  porcentajeRegistrosValidos: number;
-  porcentajeRegistrosInvalidos: number;
 }
 
-export class SemanticQualityTableDto {
-  ruleCode: string;
-  ruleName: string;
-  ruleDescription: string;
-  totalRecords: number;
-  totalRegistrosValidos: number;
-  totalRegistrosInvalidos: number;
-  porcentajeRegistrosValidos: number;
-  porcentajeRegistrosInvalidos: number;
+export class DimensionCalidadDatosDto {
+  dimension: string;
+  calidadDimension: number;
+  jsonQuality: CalidadDatosResultadoDto[];
 }
 
-export class TemporalQualityTableDto {
-  ruleCode: string;
-  ruleName: string;
-  ruleDescription: string;
-  totalRecords: number;
-  totalRegistrosValidos: number;
-  totalRegistrosInvalidos: number;
-  porcentajeRegistrosValidos: number;
-  porcentajeRegistrosInvalidos: number;
+export class QualityDto {
+  id?: string;
+  fecha: Date;
+  jsonQuality: DimensionCalidadDatosDto[];
 }

@@ -49,7 +49,7 @@ integra-esavi-calidad
 .des.env
 #Ignorar
 .env
-
+~$*
 borrar*
 
 pnpm-lock.yaml

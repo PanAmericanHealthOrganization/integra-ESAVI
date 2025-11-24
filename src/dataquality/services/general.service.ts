@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { IAuditoria } from 'src/integrator/entity';
 import { DataSource, Equal, Repository } from 'typeorm';
 import { QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
-import { CompletenessService } from './complees.service';
-import { SemanticService } from './semantic.service';
-import { SintacticService } from './sintactic.service';
-import { IAuditoria } from 'src/integrator/entity';
-import { TemporalQualityService } from './temporal-quality.service';
+import { DimConsistenciaService } from './dim-consitencia';
+import { DimExactitudService } from './dim-exactitud.service';
 
 /**
  *
@@ -21,11 +20,10 @@ export class GeneralService {
     @InjectDataSource('DATAQUALITY_DS')
     private readonly dataSource: DataSource,
     @InjectRepository(DataQualityDimensions, 'DATAQUALITY_DS')
-    private dataQualityDimensionsRepository: Repository<DataQualityDimensions>,
-    private completenessService: CompletenessService,
-    private sintacticService: SintacticService,
-    private semanticService: SemanticService,
-    private temporalQualityService: TemporalQualityService,
+    private readonly dataQualityDimensionsRepository: Repository<DataQualityDimensions>,
+    private readonly dimConsistenciaService: DimConsistenciaService,
+    private readonly dimExactitudService: DimExactitudService,
+    private readonly configService: ConfigService,
   ) {}
 
   async getGeneralQuality(date: Date): Promise<QualityDto> {
@@ -43,43 +41,39 @@ export class GeneralService {
   }
 
   async processQualityDay(day: Date): Promise<DataQualityDimensions> {
-    const g = await this.generalQuality(day);
+    // genera el resumen de calidad
+    const g = await this.generateQualitySumary(day);
+
+    //
     const auditoria: IAuditoria = {
       createdAt: new Date(),
-      createdBy: 'System',
+      createdBy: 'bOOOOOORARA',
       updatedAt: undefined,
-      updatedBy: 'System',
+      updatedBy: undefined,
       deletedAt: undefined,
-      deletedBy: 'System',
+      deletedBy: undefined,
       isEnabled: true,
       isActive: true,
     };
     let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
         fecha: Equal(day),
-        dimension: Equal(g.dimension),
+        dimension: Equal(this.schemaName),
       },
     });
 
     if (dataQualityDimension) {
       dataQualityDimension.jsonQuality = JSON.stringify(g.jsonQuality);
       dataQualityDimension.updatedAt = new Date();
-      dataQualityDimension.updatedBy = 'System';
+      dataQualityDimension.updatedBy = this.configService.get('SYSTEM_USER');
       return this.dataQualityDimensionsRepository.save(dataQualityDimension);
     } else {
       // Si no existe, crear uno nuevo con la información de auditoría
       return this.dataQualityDimensionsRepository.save({
         fecha: day,
-        dimension: g.dimension,
+        dimension: this.schemaName,
         jsonQuality: JSON.stringify(g.jsonQuality),
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: undefined,
-        deletedAt: undefined,
-        deletedBy: undefined,
-        isEnabled: true,
-        isActive: true,
+        ...auditoria,
       });
     }
   }
@@ -89,43 +83,15 @@ export class GeneralService {
     await this.processQualityDay(new Date());
   }
 
-  async generalQuality(day: Date): Promise<QualityDto> {
-    const [completenessQualityTable, sintacticQuality, semanticQuality, temporalQuality] =
-      await Promise.all([
-        this.completenessService.obtenerCompletitudDeEsquema(this.schemaName, day),
-        this.sintacticService.sintacticQuality(day),
-        this.semanticService.semanticQuality(day),
-        this.temporalQualityService.temporalQuality(day),
-      ]);
+  async generateQualitySumary(day: Date): Promise<QualityDto> {
+    const [dimExactitud, dimConsistencia] = await Promise.all([
+      this.dimExactitudService.processAll(day),
+      this.dimConsistenciaService.processAll(day),
+    ]);
 
     return {
       fecha: day,
-      dimension: this.schemaName,
-      jsonQuality: {
-        totalRegistros: (await this.calculateTotalRecords('TR_NOTIFICACION', day)) ?? 0,
-        totalErrores:
-          sintacticQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0) +
-          semanticQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0) +
-          temporalQuality.reduce((acc, curr) => acc + curr.totalRegistrosInvalidos, 0),
-        totalPorcentaje:
-          sintacticQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0) +
-          semanticQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0) +
-          temporalQuality.reduce((acc, curr) => acc + curr.porcentajeRegistrosInvalidos, 0),
-        completenessQualityTable,
-        sintacticQuality,
-        semanticQuality,
-        temporalQuality,
-      },
+      jsonQuality: [dimExactitud, dimConsistencia],
     };
-  }
-
-  private async calculateTotalRecords(tableName: string, day: Date): Promise<number> {
-    const query = `
-      SELECT COUNT(*)::BIGINT AS total
-      FROM "dhi_esavi"."${tableName}" t where t."AUD_FECHA_CREACION" <= $1;
-    `;
-
-    const [result] = await this.dataSource.query(query, [day]);
-    return Number(result?.total ?? 0);
   }
 }
