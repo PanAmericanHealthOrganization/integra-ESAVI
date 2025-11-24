@@ -507,7 +507,8 @@ export class VigiflowIntegradorService {
         datoVacuna.viaAdministracion = reg['AA'];
         datoVacuna.viaAdministracionEDQM = reg['AB'];
         datoVacuna.paisAutorizacion = reg['J'];
-        datoVacuna.numeroLote = reg['AE'];
+        //datoVacuna.numeroLote = reg['AE'];
+        datoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
         datoVacuna.indicacionMeddra = reg['Q'];
         datoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
         datoVacuna.codigoAtc = reg['G'];
@@ -617,6 +618,44 @@ export class VigiflowIntegradorService {
     //throw new Error('Method not implemented.');
     return nombreEsaviReportadoMayusculas.replace(/[\r\n]+/g, '');
   }
+  transformarLoteVacuna(input: string): string | null {
+    if (!input) return null;
+  
+    let valor = input.trim();
+  
+    // a. Eliminar prefijos/sufijos no deseados
+    valor = valor.replace(
+      /^(LOT:|LOTE|Reg sa:|R\.S\.|Reg\.San\.No\.:|; RG:|Reg\. San\.:|Registro:|RS:)\s*(.*)\s*$/i,
+      "$2"
+    );
+  
+    // b. Reemplazar palabras clave por "Desconocido"
+    if (
+      /\b(SE DESCONOCE|DESCONOCE|DESCONOCIDO|N\/R|Ni idea|no aplica|no reporta|NO SE DISPONE|NO DISPONIBLE|NO REGISTRA|Asked But Unknown)\b/i.test(
+        valor
+      )
+    ) {
+      return "Desconocido";
+    }
+  
+    // d. Detectar cantidades/unidades de masa/volumen y asignar NULL
+    if (
+      /\d+\s*(mg|ml|g|kg|oz|l|mL|cc)\s*(\/\s*\d+\s*(mg|ml|g|kg|oz|l|mL|cc))?/i.test(
+        valor
+      )
+    ) {
+      return null;
+    }
+  
+    // c. Eliminar espacios dentro del número de lote
+    valor = valor.replace(/\s*(\w+)\s*(\d+)\s*/g, "$1$2");
+  
+    // Normalizar espacios finales/iniciales
+    valor = valor.trim();
+  
+    return valor || null;
+  }
+  
 
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
