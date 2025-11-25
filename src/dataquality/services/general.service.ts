@@ -26,18 +26,27 @@ export class GeneralService {
     private readonly configService: ConfigService,
   ) {}
 
-  async getGeneralQuality(date: Date): Promise<QualityDto> {
-    const dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
+  async getGeneralQuality(date: Date): Promise<any> {
+    let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
         fecha: Equal(date),
         dimension: Equal(this.schemaName),
       },
     });
     if (dataQualityDimension) {
-      return JSON.parse(dataQualityDimension.jsonQuality);
+      const t = JSON.parse(dataQualityDimension.jsonQuality);
+      return { ...dataQualityDimension, jsonQuality: t };
+    } else {
+      await this.processQualityDay(date);
+      dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
+        where: {
+          fecha: Equal(date),
+          dimension: Equal(this.schemaName),
+        },
+      });
+      const t = JSON.parse(dataQualityDimension.jsonQuality);
+      return { ...dataQualityDimension, jsonQuality: t };
     }
-    const result = await this.processQualityDay(date);
-    return JSON.parse(result.jsonQuality);
   }
 
   async processQualityDay(day: Date): Promise<DataQualityDimensions> {
