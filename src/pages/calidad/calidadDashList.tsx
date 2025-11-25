@@ -1,10 +1,8 @@
 import {
   Assessment,
   CheckCircle,
-  FactCheck,
   Psychology,
   Refresh,
-  Schedule,
 } from "@mui/icons-material"
 import {
   Alert,
@@ -26,11 +24,9 @@ import {
   CalidadDataQualityProvider,
   useCalidadDataQuality,
 } from "./calidadDataQualityContext"
-import CalidadCompletitud from "./tabs/calidad_completitud"
 import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
 import CalidadSintactica from "./tabs/calidad_sintactica"
-import CalidadTemporal from "./tabs/calidad_temporal"
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -85,16 +81,6 @@ const CalidadDashListContent: React.FC = () => {
         label: "Consistencia",
         icon: <Psychology />,
         component: <CalidadSemantica />,
-      },
-      {
-        label: "Completitud",
-        icon: <FactCheck />,
-        component: <CalidadCompletitud />,
-      },
-      {
-        label: "Temporal",
-        icon: <Schedule />,
-        component: <CalidadTemporal />,
       },
     ],
     []

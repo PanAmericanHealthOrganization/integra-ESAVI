@@ -9,19 +9,10 @@ import {
 } from "@mui/material"
 import { useMemo } from "react"
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
   PolarAngleAxis,
   RadialBar,
   RadialBarChart,
   ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
 } from "recharts"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
@@ -123,6 +114,14 @@ export const CalidadGeneral: React.FC = () => {
           ) / data.semanticQuality.length
         : null
 
+    // Calcular calidad por dimensión desde la nueva estructura
+    const calidadPorDimension =
+      data.dimensiones?.map((dim) => ({
+        nombre: dim.dimension,
+        calidad: dim.calidadDimension * 100, // Convertir a porcentaje
+        totalReglas: dim.jsonQuality.length,
+      })) ?? []
+
     const indicadoresDisponibles = [exactitudGlobal, consistenciaGlobal].filter(
       (value): value is number => value !== null
     )
@@ -163,126 +162,6 @@ export const CalidadGeneral: React.FC = () => {
       totalReglasConsistencia: data.semanticQuality.length,
       promedioCompletitud,
     }
-  }, [data])
-
-  const resumenCompletitud = useMemo(() => {
-    if (!data || data.completenessQualityTable.length === 0) return null
-
-    const totalCampos = data.completenessQualityTable.length
-    const promedioCompletitud =
-      data.completenessQualityTable.reduce(
-        (acc, item) => acc + item.completenessPercentage,
-        0
-      ) / totalCampos
-
-    const camposCompletos = data.completenessQualityTable.filter(
-      (item) => item.completenessPercentage === 100
-    ).length
-
-    const camposCriticos = data.completenessQualityTable.filter(
-      (item) => item.completenessPercentage < 50
-    ).length
-
-    const columnasCeroRegistros = data.completenessQualityTable.filter(
-      (item) => item.totalRecords === 0
-    ).length
-
-    return {
-      totalCampos,
-      promedioCompletitud,
-      camposCompletos,
-      camposCriticos,
-      columnasCeroRegistros,
-    }
-  }, [data])
-
-  const topCamposIncompletos = useMemo(() => {
-    if (!data) return []
-
-    return [...data.completenessQualityTable]
-      .sort(
-        (a, b) =>
-          a.completenessPercentage - b.completenessPercentage ||
-          b.totalRecords - a.totalRecords
-      )
-      .slice(0, 10)
-      .map((item) => ({
-        nombre: `${item.tableName}.${item.columnName}`,
-        completitud: Number(item.completenessPercentage.toFixed(2)),
-        faltante: Number((100 - item.completenessPercentage).toFixed(2)),
-      }))
-  }, [data])
-
-  const tendenciaTemporal = useMemo(() => {
-    if (!data || data.temporalQuality.length === 0) return []
-
-    return data.temporalQuality
-      .map((item) => {
-        const registro = item as Record<string, unknown>
-
-        const periodo =
-          (typeof registro.period === "string" && registro.period) ||
-          (typeof registro.periodo === "string" && registro.periodo) ||
-          (typeof registro.fecha === "string" && registro.fecha) ||
-          (typeof registro.month === "string" && registro.month) ||
-          (typeof registro.fechaCorte === "string" && registro.fechaCorte) ||
-          null
-
-        const indicador =
-          (typeof registro.indicadorCalidadGlobal === "number" &&
-            registro.indicadorCalidadGlobal) ||
-          (typeof registro.qualityScore === "number" &&
-            registro.qualityScore) ||
-          (typeof registro.totalScore === "number" && registro.totalScore) ||
-          (typeof registro.calidadGlobal === "number" &&
-            registro.calidadGlobal) ||
-          null
-
-        const exactitud =
-          (typeof registro.exactitudGlobal === "number" &&
-            registro.exactitudGlobal) ||
-          (typeof registro.accuracy === "number" && registro.accuracy) ||
-          null
-
-        const consistencia =
-          (typeof registro.consistenciaGlobal === "number" &&
-            registro.consistenciaGlobal) ||
-          (typeof registro.consistency === "number" && registro.consistency) ||
-          null
-
-        if (!periodo || indicador === null) return null
-
-        return {
-          periodo,
-          indicador: indicador as number,
-          exactitud: exactitud as number | null,
-          consistencia: consistencia as number | null,
-        }
-      })
-      .filter(
-        (
-          item
-        ): item is {
-          periodo: string
-          indicador: number
-          exactitud: number | null
-          consistencia: number | null
-        } => item !== null
-      )
-  }, [data])
-
-  const columnasConMasNulos = useMemo(() => {
-    if (!data) return []
-
-    return data.completenessQualityTable
-      .filter((row) => row.totalNulls > 0)
-      .sort((a, b) => b.totalNulls - a.totalNulls)
-      .slice(0, 8)
-      .map((row) => ({
-        columna: `${row.tableName}.${row.columnName}`,
-        nulos: row.totalNulls,
-        noNulos: row.totalNonNulls,
-      }))
   }, [data])
 
   const ultimaActualizacion = useMemo(() => {
@@ -474,231 +353,12 @@ export const CalidadGeneral: React.FC = () => {
       </Grid>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <GaugeCard
             title="Semáforo de calidad global"
             value={resumenGlobal.indicadorCalidadGlobal}
             helperText="Objetivo recomendado: ≥ 95% (verde); seguimiento entre 85% y 94% (amarillo)."
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent sx={{ height: "100%" }}>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-                Tendencia temporal de calidad
-              </Typography>
-              <Box sx={{ height: 240 }}>
-                {tendenciaTemporal.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={tendenciaTemporal}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="periodo" />
-                      <YAxis domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                      <Tooltip
-                        formatter={(value: number) => `${value.toFixed(2)}%`}
-                        labelFormatter={(label) => `Período: ${label}`}
-                      />
-                      <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="indicador"
-                        name="Indicador global"
-                        stroke="#2563eb"
-                        strokeWidth={2}
-                        dot
-                        activeDot={{ r: 6 }}
-                      />
-                      {tendenciaTemporal.some(
-                        (item) => item.exactitud !== null
-                      ) && (
-                        <Line
-                          type="monotone"
-                          dataKey="exactitud"
-                          name="Exactitud"
-                          stroke="#16a34a"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      )}
-                      {tendenciaTemporal.some(
-                        (item) => item.consistencia !== null
-                      ) && (
-                        <Line
-                          type="monotone"
-                          dataKey="consistencia"
-                          name="Consistencia"
-                          stroke="#f97316"
-                          strokeWidth={2}
-                          dot={false}
-                        />
-                      )}
-                    </LineChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ChartEmptyState message="El servicio aún no entrega una serie temporal para mostrar la evolución mensual de los indicadores. Solicite al backend los valores históricos para habilitar esta vista." />
-                )}
-              </Box>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 2 }}>
-                Los valores se calculan a partir de los resultados históricos
-                provistos por el servicio de calidad de datos.
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Top 10 columnas con menor completitud
-              </Typography>
-              <Box sx={{ height: 320 }}>
-                {topCamposIncompletos.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={topCamposIncompletos} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis
-                        type="number"
-                        domain={[0, 100]}
-                        tickFormatter={(value) => `${value}%`}
-                      />
-                      <YAxis type="category" dataKey="nombre" width={240} />
-                      <Tooltip
-                        formatter={(value) => [`${value}%`, "Completitud"]}
-                      />
-                      <Legend />
-                      <Bar
-                        dataKey="completitud"
-                        name="Completitud"
-                        fill="#3b82f6"
-                        radius={[0, 4, 4, 0]}
-                      />
-                      <Bar
-                        dataKey="faltante"
-                        name="Dato faltante"
-                        fill="#ef4444"
-                        radius={[0, 4, 4, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ChartEmptyState message="Todas las columnas presentan 100% de completitud." />
-                )}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Resumen de completitud
-              </Typography>
-              {resumenCompletitud ? (
-                <Stack spacing={2}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Promedio global
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                      {resumenCompletitud.promedioCompletitud.toFixed(2)}%
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Columnas evaluadas
-                    </Typography>
-                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                      {numberFormatter.format(resumenCompletitud.totalCampos)}
-                    </Typography>
-                  </Box>
-                  <Stack direction="row" spacing={3}>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Columnas completas
-                      </Typography>
-                      <Typography variant="h6" color="success.main">
-                        {numberFormatter.format(
-                          resumenCompletitud.camposCompletos
-                        )}
-                      </Typography>
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" color="text.secondary">
-                        Columnas críticas
-                      </Typography>
-                      <Typography variant="h6" color="error.main">
-                        {numberFormatter.format(
-                          resumenCompletitud.camposCriticos
-                        )}
-                      </Typography>
-                    </Box>
-                  </Stack>
-                  {resumenCompletitud.columnasCeroRegistros > 0 && (
-                    <Typography variant="caption" color="text.secondary">
-                      {numberFormatter.format(
-                        resumenCompletitud.columnasCeroRegistros
-                      )}{" "}
-                      columnas no reportaron registros durante el período.
-                    </Typography>
-                  )}
-                </Stack>
-              ) : (
-                <ChartEmptyState message="No se encontraron columnas evaluadas para calcular el resumen de completitud." />
-              )}
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                Columnas con mayor número de valores nulos
-              </Typography>
-              <Box sx={{ height: 360 }}>
-                {columnasConMasNulos.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={columnasConMasNulos} layout="vertical">
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis type="category" dataKey="columna" width={260} />
-                      <Tooltip
-                        formatter={(value) => [
-                          numberFormatter.format(value as number),
-                          "",
-                        ]}
-                      />
-                      <Legend />
-                      <Bar
-                        dataKey="nulos"
-                        name="Valores nulos"
-                        fill="#ef4444"
-                        radius={[0, 4, 4, 0]}
-                      />
-                      <Bar
-                        dataKey="noNulos"
-                        name="Valores completos"
-                        fill="#10b981"
-                        radius={[0, 4, 4, 0]}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <ChartEmptyState message="No se encontraron columnas con valores nulos para la fecha seleccionada." />
-                )}
-              </Box>
-            </CardContent>
-          </Card>
         </Grid>
       </Grid>
     </Box>

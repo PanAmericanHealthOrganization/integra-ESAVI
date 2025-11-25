@@ -120,7 +120,7 @@ const CalidadSemantica: React.FC = () => {
       .sort((a, b) => b.totalRegistrosInvalidos - a.totalRegistrosInvalidos)
       .slice(0, 5)
       .map((regla) => ({
-        regla: regla.ruleName,
+        regla: regla.ruleName || regla.regla,
         invalidos: regla.totalRegistrosInvalidos,
         porcentajeInvalido: Number(
           regla.porcentajeRegistrosInvalidos.toFixed(2)
@@ -327,26 +327,28 @@ const CalidadSemantica: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tablaReglas.map((regla) => (
-                  <TableRow key={regla.ruleCode} hover>
+                {tablaReglas.map((regla, index) => (
+                  <TableRow key={regla.ruleCode || `regla-${index}`} hover>
                     <TableCell sx={{ maxWidth: 220 }}>
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Psychology color="primary" fontSize="small" />
                         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {regla.ruleName}
+                          {regla.ruleName || regla.regla}
                         </Typography>
                       </Box>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontFamily: "monospace" }}>
-                        {regla.ruleCode}
-                      </Typography>
+                      {regla.ruleCode && (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontFamily: "monospace" }}>
+                          {regla.ruleCode}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell sx={{ maxWidth: 360 }}>
                       <Typography variant="body2" color="text.secondary">
-                        {regla.ruleDescription}
+                        {regla.ruleDescription || regla.descripcionRegla}
                       </Typography>
                     </TableCell>
                     <TableCell>

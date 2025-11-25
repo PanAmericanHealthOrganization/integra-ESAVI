@@ -21,6 +21,38 @@ export interface CompletenessQualityRow {
   completenessPercentage: number
 }
 
+// Nueva estructura de reglas de calidad del servicio
+export interface QualityRule {
+  tipo: string
+  regla: string
+  condicion: string
+  descripcionRegla: string
+  totalRegistros: string | number
+  totalRegistrosValidos: string | number
+  porcentajeRegistrosValidos: number | null
+  porcentajeRegistrosInvalidos: number | null
+}
+
+// Nueva estructura de dimensión de calidad del servicio
+export interface DimensionQuality {
+  dimension: string
+  calidadDimension: number
+  jsonQuality: QualityRule[]
+}
+
+// Nueva estructura de respuesta del servicio
+export interface CalidadApiResponse {
+  id: string
+  fecha: string
+  dimension: string
+  jsonQuality: DimensionQuality[]
+  createdAt?: string
+  updatedAt?: string
+  isEnabled?: boolean
+  isActive?: boolean
+}
+
+// Interfaces compatibles con los componentes existentes
 export interface SyntacticQualityRow {
   regla: string
   condicion: string
@@ -33,9 +65,12 @@ export interface SyntacticQualityRow {
 }
 
 export interface SemanticQualityRow {
-  ruleCode: string
-  ruleName: string
-  ruleDescription: string
+  ruleCode?: string
+  ruleName?: string
+  ruleDescription?: string
+  regla: string
+  condicion: string
+  descripcionRegla: string
   totalRecords: number
   totalRegistrosValidos: number
   totalRegistrosInvalidos: number
@@ -55,6 +90,9 @@ export interface DataQualitySummary {
   sintacticQuality: SyntacticQualityRow[]
   semanticQuality: SemanticQualityRow[]
   temporalQuality: TemporalQualityRow[]
+  // Datos adicionales de la nueva estructura
+  dimensiones?: DimensionQuality[]
+  fecha?: string
 }
 
 interface CalidadDataQualityContextValue {
@@ -71,6 +109,114 @@ const CalidadDataQualityContext = createContext<
 >(undefined)
 
 const formatDate = (date: Date) => date.toISOString().slice(0, 10) // YYYY-MM-DD
+
+/**
+ * Transforma la nueva estructura de respuesta del API a la estructura
+ * compatible con los componentes existentes
+ */
+const transformApiResponse = (
+  apiResponse: CalidadApiResponse
+): DataQualitySummary => {
+  const allRules: QualityRule[] = []
+
+  // Extraer todas las reglas de todas las dimensiones
+  apiResponse.jsonQuality.forEach((dimension) => {
+    dimension.jsonQuality.forEach((rule) => {
+      allRules.push(rule)
+    })
+  })
+
+  // Convertir valores string a number
+  const parseNumber = (value: string | number): number => {
+    if (typeof value === "number") return value
+    const parsed = parseInt(value, 10)
+    return isNaN(parsed) ? 0 : parsed
+  }
+
+  // Filtrar reglas sintácticas (tipo "Dominio")
+  const sintacticQuality: SyntacticQualityRow[] = allRules
+    .filter(
+      (rule) =>
+        rule.tipo === "Dominio" || rule.tipo === "Dimensión de Exactitud"
+    )
+    .map((rule) => {
+      const totalRegistros = parseNumber(rule.totalRegistros)
+      const totalRegistrosValidos = parseNumber(rule.totalRegistrosValidos)
+      const totalRegistrosInvalidos = totalRegistros - totalRegistrosValidos
+      const porcentajeRegistrosValidos = rule.porcentajeRegistrosValidos ?? 0
+      const porcentajeRegistrosInvalidos =
+        rule.porcentajeRegistrosInvalidos ?? 100 - porcentajeRegistrosValidos
+
+      return {
+        regla: rule.regla,
+        condicion: rule.condicion,
+        descripcionRegla: rule.descripcionRegla,
+        totalRegistros,
+        totalRegistrosValidos,
+        totalRegistrosInvalidos,
+        porcentajeRegistrosValidos,
+        porcentajeRegistrosInvalidos,
+      }
+    })
+
+  // Filtrar reglas semánticas (tipo "Interrelación" y "Dimensión de Integridad")
+  const semanticQuality: SemanticQualityRow[] = allRules
+    .filter(
+      (rule) =>
+        rule.tipo === "Interrelación" || rule.tipo === "Dimensión de Integridad"
+    )
+    .map((rule) => {
+      const totalRecords = parseNumber(rule.totalRegistros)
+      const totalRegistrosValidos = parseNumber(rule.totalRegistrosValidos)
+      const totalRegistrosInvalidos = totalRecords - totalRegistrosValidos
+      const porcentajeRegistrosValidos = rule.porcentajeRegistrosValidos ?? 0
+      const porcentajeRegistrosInvalidos =
+        rule.porcentajeRegistrosInvalidos ?? 100 - porcentajeRegistrosValidos
+
+      return {
+        regla: rule.regla,
+        condicion: rule.condicion,
+        descripcionRegla: rule.descripcionRegla,
+        totalRecords,
+        totalRegistrosValidos,
+        totalRegistrosInvalidos,
+        porcentajeRegistrosValidos,
+        porcentajeRegistrosInvalidos,
+      }
+    })
+
+  // Calcular totales
+  const totalRegistros = allRules.reduce((acc, rule) => {
+    const total = parseNumber(rule.totalRegistros)
+    return acc > total ? acc : total
+  }, 0)
+
+  const totalErrores = allRules.reduce((acc, rule) => {
+    const total = parseNumber(rule.totalRegistros)
+    const validos = parseNumber(rule.totalRegistrosValidos)
+    return acc + (total - validos)
+  }, 0)
+
+  const totalPorcentaje =
+    allRules.length > 0
+      ? allRules.reduce(
+          (acc, rule) => acc + (rule.porcentajeRegistrosValidos ?? 0),
+          0
+        ) / allRules.length
+      : 0
+
+  return {
+    totalRegistros,
+    totalErrores,
+    totalPorcentaje,
+    completenessQualityTable: [], // No viene en la nueva estructura
+    sintacticQuality,
+    semanticQuality,
+    temporalQuality: [], // No viene en la nueva estructura
+    dimensiones: apiResponse.jsonQuality,
+    fecha: apiResponse.fecha,
+  }
+}
 
 export const CalidadDataQualityProvider: React.FC<PropsWithChildren> = ({
   children,
@@ -100,7 +246,9 @@ export const CalidadDataQualityProvider: React.FC<PropsWithChildren> = ({
         filter: { date: selectedDate },
       } as any)
 
-      setData(response)
+      // Transformar la respuesta del API al formato compatible
+      const transformedData = transformApiResponse(response)
+      setData(transformedData)
     } catch (err) {
       console.error("Error cargando la calidad de datos:", err)
       const message =
