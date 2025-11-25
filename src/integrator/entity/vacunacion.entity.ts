@@ -16,7 +16,7 @@ export class Vacunacion extends Auditoria implements IVacunacion {
   /**
    * Primary generated column of vacunacion
    */
-  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único de la vacunación' })
   id: string;
 
   /**
@@ -62,7 +62,7 @@ export class Vacunacion extends Auditoria implements IVacunacion {
   /**
    * Column  of vacunacion
    */
-  @Column({ nullable: true })
+  @Column({ nullable: true, name: 'DIRECCION_VACUNATORIO', comment: 'Dirección del vacunatorio' })
   direccionVacunatorio: string;
 
   /**

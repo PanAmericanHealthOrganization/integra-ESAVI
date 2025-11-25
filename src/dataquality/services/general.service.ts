@@ -47,7 +47,7 @@ export class GeneralService {
     //
     const auditoria: IAuditoria = {
       createdAt: new Date(),
-      createdBy: 'bOOOOOORARA',
+      createdBy: this.configService.get('USUARIO_INSERTA_REGISTRO'),
       updatedAt: undefined,
       updatedBy: undefined,
       deletedAt: undefined,
@@ -65,7 +65,7 @@ export class GeneralService {
     if (dataQualityDimension) {
       dataQualityDimension.jsonQuality = JSON.stringify(g.jsonQuality);
       dataQualityDimension.updatedAt = new Date();
-      dataQualityDimension.updatedBy = this.configService.get('SYSTEM_USER');
+      dataQualityDimension.updatedBy = this.configService.get('SYSTEUSUARIO_INSERTA_REGISTROM_USER');
       return this.dataQualityDimensionsRepository.save(dataQualityDimension);
     } else {
       // Si no existe, crear uno nuevo con la información de auditoría
