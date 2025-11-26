@@ -44,11 +44,7 @@ export class MeddraProcessFilesService {
    * Permite procesar los archivos que están en  una versión de meddra
    * @param version
    */
-  async processVersionFiles(
-    version: string | number,
-    lang: string | number,
-    description: string,
-  ): Promise<any> {
+  async processVersionFiles(version: string | number, lang: string | number, description: string): Promise<any> {
     const versionStr = String(version ?? '').trim();
     const langStr = String(lang ?? '').trim();
     console.log('version ::::', versionStr, langStr, description);
@@ -202,10 +198,10 @@ export class MeddraProcessFilesService {
     const data: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, range: 2 }); // Skip first 2 rows
 
     const cie10List: cie10Meddra[] = [];
-    
+
     for (const row of data) {
       if (row.length === 0) continue;
-      
+
       const entity = new cie10Meddra();
       // Mapping based on column index from inspection
       // 0: ICD-10 Chapter Number
@@ -217,7 +213,7 @@ export class MeddraProcessFilesService {
       // 6: Map Attribute
       // 7: MedDRA PT
       // 8: MedDRA PT Code
-      
+
       entity.icd10_charper_number = String(row[0] || '');
       entity.icd10_charper = String(row[1] || '');
       entity.icd10_code = String(row[2] || '');
@@ -227,7 +223,7 @@ export class MeddraProcessFilesService {
       entity.equivalence = String(row[6] || '');
       entity.meddra_pt_name = String(row[7] || '');
       entity.meddra_pt_code = String(row[8] || '');
-      
+
       withAuditOnCreate(entity);
       cie10List.push(entity);
     }
@@ -251,14 +247,17 @@ export class MeddraProcessFilesService {
   }
 }
 
-const readFileContent = async (
-  version: string,
-  lang: string,
-  file: string,
-): Promise<string[][]> => {
+/**
+ *
+ * @param version, versión de meddra
+ * @param lang, idioma
+ * @param file, nombre del archivo
+ * @returns
+ */
+const readFileContent = async (version: string, lang: string, file: string): Promise<string[][]> => {
   const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, file);
   // leer el archivo asc
-  const fileStream = fs.createReadStream(filePath, { encoding: 'ascii' });
+  const fileStream = fs.createReadStream(filePath, { encoding: 'latin1' });
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity,

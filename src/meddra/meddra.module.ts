@@ -46,7 +46,7 @@ export const MEDDRA_DS = 'meddra';
           'dist/**/models/standar/*.entity{.ts,.js}',
         ],
         schema: MEDDRA_DS,
-        synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
+        synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
