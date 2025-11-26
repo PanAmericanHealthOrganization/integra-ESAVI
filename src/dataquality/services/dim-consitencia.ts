@@ -159,7 +159,7 @@ export class DimConsistenciaService {
       where
       tn."FECHA_NOTIFICACION" is not null
       and tp."FECHA_NACIMIENTO" is not null
-      and tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      and tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -192,7 +192,7 @@ export class DimConsistenciaService {
       dhi_esavi."TR_NOTIFICACION" tn
       inner join dhi_esavi."TR_PACIENTE" tp on tp."PACIENTE_ID" = tn."PACIENTE_ID"
       where
-      tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -224,7 +224,7 @@ export class DimConsistenciaService {
       where
       tn."FECHA_NOTIFICACION" is not null
       and
-      tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -257,7 +257,7 @@ export class DimConsistenciaService {
       inner join dhi_esavi."TR_DATOS_ESAVI" tde on
       tde."NOTIFICACION_ID" = tn."ID"
       where
-      tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -297,7 +297,7 @@ export class DimConsistenciaService {
       inner join dhi_esavi."TR_DATO_VACUNA" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
       where
-      tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -347,7 +347,7 @@ export class DimConsistenciaService {
         and tp."FECHA_NACIMIENTO" is not null
         and tde."FECHA_ESAVI" is not null
         and tdv."FECHA_VACUNACION" is not null
-        and tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        and tp."FECHA_NACIMIENTO" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -399,7 +399,7 @@ export class DimConsistenciaService {
         and tp."FECHA_NACIMIENTO" is not null
         and tde."FECHA_ESAVI" is not null
         and tdv."FECHA_VACUNACION" is not null
-        and tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        and tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -449,7 +449,7 @@ export class DimConsistenciaService {
         and tp."FECHA_NACIMIENTO" is not null
         and tde."FECHA_ESAVI" is not null
         and tdv."FECHA_VACUNACION" is not null
-        and tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        and tn."FECHA_NOTIFICACION"<= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -500,7 +500,7 @@ export class DimConsistenciaService {
         and tp."FECHA_NACIMIENTO" is not null
         and tde."FECHA_ESAVI" is not null
         and tdv."FECHA_VACUNACION" is not null
-        and tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        and tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -509,9 +509,9 @@ export class DimConsistenciaService {
       tipo: 'Interrelación',
       regla: 'Integridad FECHA_NOTIFICACION\n(solo para casos en los que FECHA_NOTIFICACION es distinto de null)',
       condicion: `1.  FECHA_NOTIFICACION ≥ FECHA_NACIMIENTO
-2. FECHA_NOTIFICACION ≥  FECHA_VACUNACION
-3. FECHA_NOTIFICACION ≥  FECHA_ESAVI
-`,
+                  2. FECHA_NOTIFICACION ≥  FECHA_VACUNACION
+                  3. FECHA_NOTIFICACION ≥  FECHA_ESAVI
+                `,
       descripcionRegla:
         'La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha',
       ...totales,
@@ -527,49 +527,52 @@ export class DimConsistenciaService {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Muerte para el día ${day.toISOString()}`);
     const query = `
       select
-      count(*) as "totalRegistros",
-      count(*) filter (
-        where
-        tde."FECHAMUERTE" >= tp."FECHA_NACIMIENTO" AND
-        tde."FECHAMUERTE" <= tn."FECHA_NOTIFICACION" AND
-        tde."FECHAMUERTE" >= tdv."FECHA_VACUNACION" AND
-        tde."FECHAMUERTE" >= tde2."FECHA_ESAVI"
-      ) as "totalRegistrosValidos",
-      count(*) filter (
-        where
-        tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO" OR
-        tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION" OR
-        tde."FECHAMUERTE" < tdv."FECHA_VACUNACION" OR
-        tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
-      ) as "totalRegistrosNoValidos"
+        count(*) filter (where tge."MUERTE" = true) as "totalRegistros",
+        count(*) filter (
+          where
+            tde."FECHAMUERTE" is not null
+            and tde."FECHAMUERTE" >= tp."FECHA_NACIMIENTO"
+            and tde."FECHAMUERTE" <= tn."FECHA_NOTIFICACION"
+            and tde."FECHAMUERTE" >= tdv."FECHA_VACUNACION"
+            and tde."FECHAMUERTE" >= tde2."FECHA_ESAVI"
+        ) as "totalRegistrosValidos",
+        count(*) filter (
+          where
+            tde."FECHAMUERTE" is null
+            or tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO"
+            or tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION"
+            or tde."FECHAMUERTE" < tdv."FECHA_VACUNACION"
+            or tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
+        ) as "totalRegistrosNoValidos"
       from
-      dhi_esavi."TR_NOTIFICACION" tn
+        dhi_esavi."TR_NOTIFICACION" tn
       inner join dhi_esavi."TR_PACIENTE" tp on
-      tp."PACIENTE_ID" = tn."PACIENTE_ID"
+        tp."PACIENTE_ID" = tn."PACIENTE_ID"
       inner join dhi_esavi."TR_DESENLACE_ESAVI" tde on
-      tde."NOTIFICACION_ID" = tn."ID"
+        tde."NOTIFICACION_ID" = tn."ID"
       inner join dhi_esavi."TR_DATO_VACUNACION" tdv on
-      tdv."NOTIFICACION_ID" = tn."ID"
-      inner join dhi_esavi."TR_DATOS_ESAVI" tde2 on
-      tde2."NOTIFICACION_ID" = tn."ID"
+        tdv."NOTIFICACION_ID" = tn."ID"
+      left join dhi_esavi."TR_DATOS_ESAVI" tde2 on
+        tde2."NOTIFICACION_ID" = tn."ID"
+      inner join dhi_esavi."TR_GRAVEDAD_ESAVI" tge on
+        tge."NOTIFICACION_ID" = tn."ID"
       where
-      tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
-      ;
-    `;
+        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+    ;`;
 
     const result = await this.dataSource.query(query);
-
     const totales = await DataQualityUtils.construirResultado(result);
 
     return {
       tipo: 'Interrelación',
-      regla: 'Integridad fmuerte (Solo para casos con desenlace fatal y en los que fmuerte es distinto de null)',
-      condicion: `
-      1.  FECHA_NOTIFICACION ≥ FECHA_NACIMIENTO
-      2. FECHA_NOTIFICACION ≥  FECHA_VACUNACION
-      3. FECHA_NOTIFICACION ≥  FECHA_ESAVI`,
+      regla: 'Integridad Fecha de Muerte (casos fatales)',
+      condicion: `Si MUERTE = true entonces <b>FECHAMUERTE</b> debe existir y cumplir:
+        - FECHAMUERTE >= FECHA_NACIMIENTO
+        - FECHAMUERTE <= FECHA_NOTIFICACION
+        - FECHAMUERTE >= FECHA_VACUNACION
+        - FECHAMUERTE >= FECHA_ESAVI`,
       descripcionRegla:
-        'La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha',
+        'En casos con desenlace fatal, la fecha de muerte debe ser coherente respecto a las demás fechas relacionadas.',
       ...totales,
     };
   }
@@ -620,7 +623,7 @@ export class DimConsistenciaService {
       inner join dhi_esavi."TR_GRAVEDAD_ESAVI" tde on
       tde."NOTIFICACION_ID" = tn."ID"
       where
-      tn."AUD_FECHA_CREACION" <= '${date.toISOString()}'
+      tn."FECHA_NOTIFICACION" <= '${date.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -678,7 +681,7 @@ export class DimConsistenciaService {
       inner join dhi_esavi."TR_DESENLACE_ESAVI" tde2 on
         tde2."NOTIFICACION_ID" = tn."ID"
       where
-        tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -718,7 +721,7 @@ export class DimConsistenciaService {
       left join dhi_esavi."TC_CATALOGO" tc on
         tc."CATALOGO_ID" = tp."CT_SEXO_ID"
       where
-        tp."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
     ;`;
 
     const result = await this.dataSource.query(query);
