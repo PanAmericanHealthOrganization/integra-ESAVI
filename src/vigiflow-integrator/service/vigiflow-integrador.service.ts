@@ -584,11 +584,11 @@ export class VigiflowIntegradorService {
         datoEsavi.duracion = reg['K'];
         datoEsavi.resultado = reg['N'];
         //TODO: Crear la interfaz para meddra LLT - PT - SOC
-        const meddraLlt: any = reg['D'] && (await this.meddraLltService.searchLLT(reg['D']));
-        const meddraPT: any = reg['E'] && (await this.meddraPtService.searchPT(reg['E']));
+        const meddraLlt: any = reg['D'] && (await this.meddraLltService.searchLLT( this.degradarParaCatalogoRoto(reg['D']) ));
+        const meddraPT: any = reg['E'] && (await this.meddraPtService.searchPT( this.degradarParaCatalogoRoto(reg['E'])) );
         // const meddraHLT : any = reg['F'] && await this.meddra.searchPT(reg['F']);
         // const meddraHLGT : any = reg['G'] && await this.meddra.searchPT(reg['G']);
-        const meddraSOC: any = reg['H'] && (await this.meddraSocService.searchSOC(reg['H']));
+        const meddraSOC: any = reg['H'] && (await this.meddraSocService.searchSOC( this.degradarParaCatalogoRoto(reg['H'])) );
 
         datoEsavi.nameLLT = reg['D'] && reg['D'].toUpperCase();
         datoEsavi.namePT = reg['E'] && reg['E'].toUpperCase();
@@ -655,6 +655,36 @@ export class VigiflowIntegradorService {
   
     return valor || null;
   }
+  
+  /**
+ * Degrada un término español correcto al formato roto del catálogo histórico.
+ * Reglas clave:
+ *   í → m     (Neumonía → Neumonma)
+ *   é → i     (Afonía → Afonma)
+ *   ó → s     (Intoxicación → Intoxicacisn)
+ *   ú → z     (úlcera → zlcera)
+ *   á → a     (sin tilde, ejemplo Fármaco → Farmaco)
+ * Ejemplos:
+ *   "Síndrome"      → "Smndrome"
+ *   "Clínica"       → "Clmnica"
+ *   "Antibiótico"   → "Antibistico"
+ *   "Intoxicación"  → "Intoxicacisn"
+ *   "Vacunación"    → "Vacunacisn"
+ *   "Fármaco"       → "Farmaco"
+ *   "Paciente"      → "Paciente" (sin cambios)
+ */
+degradarParaCatalogoRoto = (texto: string): string =>
+  texto
+    .normalize('NFD')                    // Separa letras de sus acentos
+    .replace(/i\u0301/g, 'm')            // í → m  (Neumonía → Neumonma)
+    .replace(/I\u0301/g, 'M')            // Í → M
+    .replace(/e\u0301/g, 'i')            // é → i  (Afonía → Afonma)
+    .replace(/E\u0301/g, 'I')            // É → I
+    .replace(/o\u0301/g, 's')            // ó → s  (Tóxico → Tsxico)
+    .replace(/O\u0301/g, 'S')            // Ó → S
+    .replace(/u\u0301/g, 'z')            // ú → z  (úlcera → zlcera)
+    .replace(/U\u0301/g, 'Z')            // Ú → Z
+    .replace(/[\u0300-\u036f]/g, '');    // Quita todos los demás acentos (á, ú, etc.)
   
 
   formatoFecha(valor: string) {
