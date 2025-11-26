@@ -15,8 +15,8 @@ export class Vacunometro extends Auditoria implements IVacunometro {
    *
    */
   @PrimaryGeneratedColumn('uuid', {
-    name: 'VACUNOMETRO_ID',
-    comment: 'ID de la vacuna',
+    name: 'ID',
+    comment: 'Identificador único del registro de vacunómetro',
   })
   id: string;
 

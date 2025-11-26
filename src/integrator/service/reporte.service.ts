@@ -34,14 +34,10 @@ export class ReporteService {
         } catch (error) {
           if (attempts < retries) {
             attempts++;
-            console.log(
-              `Intento ${attempts} fallido para eliminar el archivo ${filePath}. Reintentando...`,
-            );
+            console.log(`Intento ${attempts} fallido para eliminar el archivo ${filePath}. Reintentando...`);
             setTimeout(tryDelete, delay); // Reintentar después de un intervalo
           } else {
-            console.error(
-              `No se pudo eliminar el archivo ${filePath} después de ${retries} intentos.`,
-            );
+            console.error(`No se pudo eliminar el archivo ${filePath} después de ${retries} intentos.`);
             reject(new Error(`No se pudo eliminar el archivo ${filePath}.`));
           }
         }
@@ -122,9 +118,9 @@ export class ReporteService {
     const query = `select COALESCE(tc."DESCRIPCIONHOMOLOGADA", 'NO REGISTRA')  AS "sexo",
     count(*) AS "cantidad"
    from dhi_esavi."TR_PACIENTE" tp inner join
-      dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
+      dhi_esavi."TR_NOTIFICACION" tn on tp."ID" = tn."PACIENTE_ID" inner join 
       dhi_esavi."TR_GRAVEDADESAVI" tg on tn."NOTIFICACION_ID" = tg."NOTIFICACION_ID" and tg."TIPOGRAVEDAD" = 'GRAVE' inner join
-      dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."CATALOGO_ID" 	 
+      dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."ID" 	 
    group by tc."DESCRIPCIONHOMOLOGADA"`;
 
     try {
@@ -136,13 +132,20 @@ export class ReporteService {
   }
 
   async casosEsaviPorSexoNoGrave(): Promise<string> {
-    const query = `select COALESCE(tc."DESCRIPCIONHOMOLOGADA", 'NO REGISTRA')  AS "sexo",
-     count(*) AS "cantidad"
-    from dhi_esavi."TR_PACIENTE" tp inner join
-       dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
-       dhi_esavi."TR_GRAVEDADESAVI" tg on tn."NOTIFICACION_ID" = tg."NOTIFICACION_ID" and tg."TIPOGRAVEDAD" <> 'GRAVE' inner join
-       dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."CATALOGO_ID" 	 
-    group by tc."DESCRIPCIONHOMOLOGADA"`;
+    const query = `
+      select
+        COALESCE(tc."DESCRIPCIONHOMOLOGADA", 'NO REGISTRA') AS "sexo",
+        count(*) AS "cantidad"
+      from dhi_esavi."TR_PACIENTE" tp
+      inner join dhi_esavi."TR_NOTIFICACION" tn
+        on tp."ID" = tn."PACIENTE_ID"
+      inner join dhi_esavi."TR_GRAVEDADESAVI" tg
+        on tn."NOTIFICACION_ID" = tg."NOTIFICACION_ID"
+        and tg."TIPOGRAVEDAD" <> 'GRAVE'
+      inner join dhi_esavi."TC_CATALOGO" tc
+        on tp."CTSEXO_ID" = tc."ID"
+      group by tc."DESCRIPCIONHOMOLOGADA"
+    `;
 
     try {
       const results = await this.pacientRepository.query(query);
@@ -161,8 +164,8 @@ export class ReporteService {
     count(tg4."NOTIFICACION_ID") as grave, 
     count(*) - count(tg4."NOTIFICACION_ID") as nograve
 from dhi_esavi."TR_PACIENTE" tp inner join 
-dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID"  inner join 
-dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."CATALOGO_ID" left join  
+dhi_esavi."TR_NOTIFICACION" tn on tp."ID" = tn."PACIENTE_ID"  inner join 
+dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."ID" left join  
 (select tg1."NOTIFICACION_ID" from  dhi_esavi."TR_GRAVEDADESAVI" tg1 where (tg1."TIPOGRAVEDAD" = 'GRAVE')) as tg4 on tg4."NOTIFICACION_ID" = tn."NOTIFICACION_ID"
 where 	 to_char(tn."FECHAREPORTENACIONAL", 'yyyy') = '2021'
 group by to_char(tn."FECHAREPORTENACIONAL", 'yyyymm'),  to_char(tn."FECHAREPORTENACIONAL", 'yyyy'), to_char(tn."FECHAREPORTENACIONAL", 'MM'), to_char(tn."FECHAREPORTENACIONAL", 'TMMonth'), tp."ORIGEN"

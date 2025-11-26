@@ -1,7 +1,7 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { TipoCatalogo } from './tipo-catalogo.entity';
-import { Auditoria } from './auditoria.entity';
 import { OmitType } from '@nestjs/swagger';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { TipoCatalogo } from './tipo-catalogo.entity';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -13,7 +13,7 @@ export class Catalogo extends Auditoria implements ICatalogo {
    *
    */
   @PrimaryGeneratedColumn('uuid', {
-    name: 'CATALOGO_ID',
+    name: 'ID',
     comment: 'Identificador del catálogo',
   })
   id: string;
@@ -103,8 +103,4 @@ export class CreateCatalogoDto extends OmitType(CatalogoDto, [
   'updatedBy',
 ] as const) {}
 
-export class UpdateCatalogoDto extends OmitType(CatalogoDto, [
-  'dhis2',
-  'vigiflow',
-  'tipoCatalogo',
-] as const) {}
+export class UpdateCatalogoDto extends OmitType(CatalogoDto, ['dhis2', 'vigiflow', 'tipoCatalogo'] as const) {}

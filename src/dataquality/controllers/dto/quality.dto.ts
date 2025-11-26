@@ -1,4 +1,4 @@
-import { IsInt, IsString } from 'class-validator';
+import { IsArray, IsInt, IsString } from 'class-validator';
 
 export class TotalesCalidDatosDto {
   /**
@@ -30,9 +30,20 @@ export class TotalesCalidDatosDto {
    */
   @IsInt()
   porcentajeRegistrosInvalidos: number;
+
+  /**
+   * Determines whether array is
+   */
+  @IsArray()
+  idNotificacionesNoValidos: string[];
 }
 
 export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
+  /**
+   * Codigo  of calidad datos resultado dto
+   */
+  codigo: string;
+
   /**
    *
    */

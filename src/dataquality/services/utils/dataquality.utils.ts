@@ -17,9 +17,10 @@ export class DataQualityUtils {
         totalRegistrosInvalidos: 0,
         porcentajeRegistrosValidos: 0,
         porcentajeRegistrosInvalidos: 0,
+        idNotificacionesNoValidos: [],
       };
     }
-    const { totalRegistros, totalRegistrosValidos, totalRegistrosInvalidos } = result[0];
+    const { totalRegistros, totalRegistrosValidos, totalRegistrosInvalidos, idNotificacionesNoValidos } = result[0];
 
     const porcentajeRegistrosValidos = totalRegistros !== 0 ? (totalRegistrosValidos / totalRegistros) * 100 : 0;
     const porcentajeRegistrosInvalidos = totalRegistros !== 0 ? (totalRegistrosInvalidos / totalRegistros) * 100 : 0;
@@ -30,6 +31,7 @@ export class DataQualityUtils {
       totalRegistrosInvalidos,
       porcentajeRegistrosValidos,
       porcentajeRegistrosInvalidos,
+      idNotificacionesNoValidos,
     };
   }
 

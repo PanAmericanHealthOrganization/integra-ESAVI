@@ -1,15 +1,8 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Notificacion } from './notificacion.entity';
+import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
-import * as moment from 'moment/moment';
+import { Notificacion } from './notificacion.entity';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -20,7 +13,7 @@ export class DatoVacunacion extends Auditoria {
   /**
    *
    */
-  @PrimaryGeneratedColumn('uuid', { name: 'DATOVACUNACION_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único PK de la tabla TR_DATO_VACUNACION' })
   id: string;
 
   /**
@@ -51,12 +44,24 @@ export class DatoVacunacion extends Auditoria {
     comment: 'Hora en que se administró la vacuna',
   })
   horaVacunacion: Date;
+
+  /**
+   * Many to one of dato vacunacion
+   */
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_PROVINCIA_VACUNATORIO_ID' })
   provincia: Catalogo;
+
+  /**
+   * Many to one of dato vacunacion
+   */
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_CANTON_NOTIFICADOR_ID' })
   canton: Catalogo;
+
+  /**
+   * Many to one of dato vacunacion
+   */
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_PARROQUIA_NOTIFICADOR_ID' })
   parroquia: Catalogo;
@@ -71,6 +76,7 @@ export class DatoVacunacion extends Auditoria {
     comment: 'Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio',
   })
   otraParroquia: string;
+
   /**
    *
    */
@@ -81,6 +87,7 @@ export class DatoVacunacion extends Auditoria {
     comment: 'Dirección completa del vacunatorio',
   })
   direccion: string;
+
   /**
    *
    */

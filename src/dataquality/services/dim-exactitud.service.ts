@@ -36,10 +36,11 @@ export class DimExactitudService {
         select
         count(tn."EDAD") as "totalRegistros",
         count(tn."EDAD") filter (where tn."EDAD" is not null) "totalRegistrosValidos",
-        count(tn."EDAD") filter (where tn."EDAD" is null) "totalRegistrosNoValidos"
+        count(tn."EDAD") filter (where tn."EDAD" is null) "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT tn."ID") filter (where tn."EDAD" is null), '[]') as "idNotificacionesNoValidos"
         from
           dhi_esavi."TR_NOTIFICACION" tn
-        inner join dhi_esavi."TR_PACIENTE" tp on tn."PACIENTE_ID" = tp."PACIENTE_ID"
+        inner join dhi_esavi."TR_PACIENTE" tp on tn."PACIENTE_ID" = tp."ID"
         where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
         ;
     `;
@@ -47,6 +48,7 @@ export class DimExactitudService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
+      codigo: 'EXA_DOM_001',
       tipo: 'Dimensión de Exactitud',
       regla: 'Edad al inicio del evento',
       condicion: 'La edad registrada  debe ser la edad de la persona al inicio del evento.',
@@ -71,6 +73,9 @@ export class DimExactitudService {
     count(tn."NOMBRE_VACUNA") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})) "totalRegistrosNoValidos"
+    , coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
+      .map((v) => `'${v}'`)
+      .join(', ')})), '[]') as "idNotificacionesNoValidos"
     from
       dhi_esavi."TR_DATO_VACUNA" tn
     where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
@@ -79,6 +84,7 @@ export class DimExactitudService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
+      codigo: 'EXA_DOM_002',
       tipo: 'Dimensión de Exactitud',
       regla: 'Nombre de vacuna según dominio',
       condicion:

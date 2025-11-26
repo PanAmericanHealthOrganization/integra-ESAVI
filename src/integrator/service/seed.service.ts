@@ -203,8 +203,7 @@ export class SeedService {
         status: 'COMPLETED',
         startTime: new Date(),
         endTime: new Date(),
-        errorMessage:
-          'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
+        errorMessage: 'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
         errorStack: null,
         errorTrace: null,
         id: undefined,
@@ -948,12 +947,7 @@ export class SeedService {
     console.log('🗺️ Cargando provincias desde CSV...');
 
     try {
-      const csvPath = path.join(
-        process.cwd(),
-        'upload_files',
-        'catalogos-csv',
-        'provincias_ecuador.csv',
-      );
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
       const lines = csvContent.split('\n').filter((line) => line.trim());
 
@@ -979,9 +973,7 @@ export class SeedService {
 
       for (let i = 1; i < lines.length; i++) {
         // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i]
-          .split(',')
-          .map((col) => col.trim().replace(/"/g, ''));
+        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
@@ -1012,12 +1004,7 @@ export class SeedService {
     console.log('🗺️ Cargando cantones desde CSV...');
 
     try {
-      const csvPath = path.join(
-        process.cwd(),
-        'upload_files',
-        'catalogos-csv',
-        'cantones_dhis2_ecuador.csv',
-      );
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
       const lines = csvContent.split('\n').filter((line) => line.trim());
 
@@ -1043,9 +1030,7 @@ export class SeedService {
 
       for (let i = 1; i < lines.length; i++) {
         // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i]
-          .split(',')
-          .map((col) => col.trim().replace(/"/g, ''));
+        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({
@@ -1076,12 +1061,7 @@ export class SeedService {
     console.log('🗺️ Cargando parroquias desde CSV...');
 
     try {
-      const csvPath = path.join(
-        process.cwd(),
-        'upload_files',
-        'catalogos-csv',
-        'parroquias_dhis2_ecuador.csv',
-      );
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
       const csvContent = fs.readFileSync(csvPath, 'utf-8');
 
       // split() separa las líneas de "csvContent", para esto usa el salto de línea '\n', y
@@ -1124,9 +1104,7 @@ export class SeedService {
          * Recordar que: map() llama a una función de devolución de llamada, para cada elemento
          * de una matriz y devuelve una matriz que contiene los resultados.
          */
-        const [vigiflow, dhis2, homologada] = lines[i]
-          .split(',')
-          .map((col) => col.trim().replace(/"/g, ''));
+        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
         if (vigiflow && dhis2 && homologada) {
           const existing = await this.catalogoRepository.findOne({

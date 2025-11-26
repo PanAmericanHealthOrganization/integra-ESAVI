@@ -1,18 +1,14 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Notificacion } from './notificacion.entity';
-import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { Notificacion } from './notificacion.entity';
 
 @Entity({ schema: 'dhi_esavi', name: 'TR_DATOS_ESAVI', comment: 'Tabla de datos del ESAVI' })
 export class DatoEsavi extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'DATOS_ESAVI_ID' })
+  /**
+   *
+   */
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador PK de la tabla TR_DATOS_ESAVI' })
   id: string;
   /**
    *
@@ -26,15 +22,16 @@ export class DatoEsavi extends Auditoria {
   @Column({
     name: 'SISTEMA_DE_CODIFICACION',
     nullable: true,
-    comment:
-      'Sistema de codificación utilizado para el ESAVI (ej: MedDRA, CIE-10)',
+    comment: 'Sistema de codificación utilizado para el ESAVI (ej: MedDRA, CIE-10)',
   })
   sistemaCodififacion: string;
+  /**
+   *
+   */
   @Column({
     name: 'NOMBRE_ESAVI',
     nullable: true,
-    comment:
-      'Nombre del evento supuestamente atribuido a la vacunación o inmunización',
+    comment: 'Nombre del evento supuestamente atribuido a la vacunación o inmunización',
   })
   nombre: string;
   /**
@@ -171,12 +168,11 @@ export class DatoEsavi extends Auditoria {
     comment: 'Código del ESAVI según clasificación CIE-10',
   })
   codigoEsaviCie10: string;
-  
+
   @Column({
     name: 'FECHA_ESAVI',
     nullable: true,
-    comment:
-      'Fecha de inicio del evento supuestamente atribuido a la vacunación',
+    comment: 'Fecha de inicio del evento supuestamente atribuido a la vacunación',
   })
   fechaEsavi: Date;
   @Column({

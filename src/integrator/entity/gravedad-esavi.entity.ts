@@ -1,19 +1,19 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Notificacion } from './notificacion.entity';
-import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { Notificacion } from './notificacion.entity';
 
+/**
+ *
+ */
 @Entity({ schema: 'dhi_esavi', name: 'TR_GRAVEDAD_ESAVI', comment: 'Tabla de gravedad del ESAVI' })
 export class GravedadEsavi extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
+  /**
+   * Primary generated column of gravedad esavi
+   */
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único PK de la tabla TR_GRAVEDAD_ESAVI' })
   id: string;
+
   /**
    *
    */
@@ -23,6 +23,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Tipo de gravedad del ESAVI',
   })
   tipo: string;
+
   /**
    *
    */
@@ -32,6 +33,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI resultó en muerte',
   })
   muerte: boolean;
+
   /**
    *
    */
@@ -41,6 +43,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI puso en riesgo la vida del paciente',
   })
   riesgoVida: boolean;
+
   /**
    *
    */
@@ -50,6 +53,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI resultó en discapacidad',
   })
   discapacidad: boolean;
+
   /**
    *
    */
@@ -59,6 +63,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI requirió hospitalización',
   })
   hospitalizacion: boolean;
+
   /**
    *
    */
@@ -68,6 +73,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI causó anomalía congénita',
   })
   anomaliaCongenita: boolean;
+
   /**
    *
    */
@@ -77,6 +83,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI resultó en aborto',
   })
   aborto: boolean;
+
   /**
    *
    */
@@ -86,6 +93,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si el ESAVI resultó en muerte fetal',
   })
   muerteFetal: boolean;
+
   /**
    *
    */
@@ -95,6 +103,7 @@ export class GravedadEsavi extends Auditoria {
     comment: 'Indica si hubo otros eventos importantes',
   })
   eventoImportante: boolean;
+
   /**
    *
    */

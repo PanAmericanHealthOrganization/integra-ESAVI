@@ -5,6 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsModule } from 'src/settings/settings.module';
 import { AutoEncryptSubscriber } from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
 import { MeddraController } from './controllers/meddra.controller';
+import { MeddraLltController } from './controllers/meddra.llt.controller';
+import { MeddraPtController } from './controllers/meddra.pt.controller';
+import { MeddraSocController } from './controllers/meddra.soc.controller';
 import { MeddraVersionController } from './controllers/meddra.version.controller';
 import { cie10Meddra } from './models/mapping/cie19meddra.entity';
 import { MappingDefinition } from './models/mapping/mappingDefinition.entity';
@@ -17,14 +20,11 @@ import { PT } from './models/standar/pt.entity';
 import { SOC } from './models/standar/soc.entity';
 import { MeddraClientService } from './services/meddra-client.service';
 import { MeddraHistoryService } from './services/meddra-history.service';
-import { MeddraProcessFilesService } from './services/meddra-process.service';
-import { MeddraStandarService } from './services/meddra-standar.service';
-import { MeddraSocService } from './services/meddra-soc.service';
-import { MeddraSocController } from './controllers/meddra.soc.controller';
-import { MeddraPtService } from './services/meddra-pt-service';
-import { MeddraPtController } from './controllers/meddra.pt.controller';
 import { MeddraLLTService } from './services/meddra-lt-service';
-import { MeddraLltController } from './controllers/meddra.llt.controller';
+import { MeddraProcessFilesService } from './services/meddra-process.service';
+import { MeddraPtService } from './services/meddra-pt-service';
+import { MeddraSocService } from './services/meddra-soc.service';
+import { MeddraStandarService } from './services/meddra-standar.service';
 
 export const MEDDRA_DS = 'meddra';
 @Module({
@@ -46,7 +46,7 @@ export const MEDDRA_DS = 'meddra';
           'dist/**/models/standar/*.entity{.ts,.js}',
         ],
         schema: MEDDRA_DS,
-        synchronize: configService.get('ENV') === 'DEV',
+        synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),

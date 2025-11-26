@@ -1,14 +1,7 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Notificacion } from './notificacion.entity';
-import { Auditoria } from './auditoria.entity';
 import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
+import { Notificacion } from './notificacion.entity';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -16,7 +9,10 @@ import * as moment from 'moment/moment';
   comment: 'Tabla de datos de vacuna aplicada',
 })
 export class DatoVacuna extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'DATOVACUNA_ID' })
+  /**
+   * Primary generated column of dato vacuna
+   */
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador PK de la tabla TR_DATO_VACUNA' })
   id: string;
 
   /**

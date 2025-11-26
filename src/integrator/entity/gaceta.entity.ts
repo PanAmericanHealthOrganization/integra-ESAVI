@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ESTADO_GACETA, IGaceta } from './interfaces/gaceta.interface';
 import { Auditoria } from './auditoria.entity';
+import { ESTADO_GACETA, IGaceta } from './interfaces/gaceta.interface';
 
 /**
  *
@@ -15,7 +15,7 @@ export class Gaceta extends Auditoria implements IGaceta {
    * Primary generated column of gaceta
    */
   @PrimaryGeneratedColumn('uuid', {
-    name: 'GACETA_ID',
+    name: 'ID',
     comment: 'Identificador único de la gaceta',
   })
   id: string;

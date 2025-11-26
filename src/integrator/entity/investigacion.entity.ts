@@ -14,8 +14,8 @@ Nombre: MUESTRA_LABORATORIO; Comentario: Muestra de Laboratorio; Nullable: true;
 */
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { DatoEsavi } from './dato-esavi.entity';
 import { Auditoria, IAuditoria } from './auditoria.entity';
+import { DatoEsavi } from './dato-esavi.entity';
 
 /**
  *
@@ -31,6 +31,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
    */
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
+
   /**
    *@OneToOne(() => DatoEsavi, { nullable: false })
    */
@@ -44,8 +45,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
   @Column({
     name: 'FECHA_INVESTIGACION',
     nullable: true,
-    comment:
-      'Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2',
+    comment: 'Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2',
   })
   fechaInvestigacion: Date | null;
 

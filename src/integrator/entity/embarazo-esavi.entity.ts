@@ -10,8 +10,8 @@ import { Notificacion } from './notificacion.entity';
 })
 export class EmbarazoEsavi extends Auditoria {
   @PrimaryColumn({
-    name: 'NOTIFICACION_ID',
-    comment: 'Identificador de la notificación asociada',
+    name: 'ID',
+    comment: 'Identificador único PK de la tabla TR_ESAVI_DURANTE_EMBARAZO',
   })
   id: string;
 

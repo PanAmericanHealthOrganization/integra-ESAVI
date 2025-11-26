@@ -44,7 +44,7 @@ export const WHODRUGS_DS = 'who_drug';
         database: configService.get('WHD_DB_NAME'),
         schema: WHODRUGS_DS, // a
         entities: ['dist/**/models/*.entity{.ts,.js}'],
-        synchronize: configService.get('ENV') === 'DEV',
+        synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
@@ -52,15 +52,7 @@ export const WHODRUGS_DS = 'who_drug';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature(
-      [
-        DrugSync,
-        Drug,
-        ActiveIngredient,
-        IngredientTranslation,
-        AnatomicalTherapeuticChemical,
-        CountryOfSale,
-        Maholder,
-      ],
+      [DrugSync, Drug, ActiveIngredient, IngredientTranslation, AnatomicalTherapeuticChemical, CountryOfSale, Maholder],
       WHODRUGS_DS,
     ),
     HttpModule.registerAsync({
@@ -91,12 +83,7 @@ export const WHODRUGS_DS = 'who_drug';
     WhoDrugsSyncService,
     WhoDrugsAsAnyService,
   ],
-  controllers: [
-    WhodrugsController,
-    WhodrugsSyncController,
-    MaholderController,
-    ActiveIngredientController,
-  ],
+  controllers: [WhodrugsController, WhodrugsSyncController, MaholderController, ActiveIngredientController],
   exports: [ActiveIngredientsService, MaholderService, DrugService],
 })
 export class WhodrugsModule {}

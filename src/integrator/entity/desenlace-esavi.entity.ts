@@ -1,15 +1,8 @@
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { Notificacion } from './notificacion.entity';
 import * as moment from 'moment/moment';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
+import { Notificacion } from './notificacion.entity';
 
 @Entity({
   schema: 'dhi_esavi',
@@ -17,7 +10,10 @@ import { Catalogo } from './catalogo.entity';
   comment: 'Tabla de desenlace del ESAVI',
 })
 export class DesenlaceEsavi extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'DESENLACE_ESAVI_ID' })
+  /**
+   *
+   */
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
 
   /**
@@ -47,7 +43,8 @@ export class DesenlaceEsavi extends Auditoria {
   @Column({
     name: 'AUTOPSIA',
     nullable: true,
-    comment: 'Indica si se realizó autopsia (si=1, no=2, [no sabe | ignorado | desconoce] = 3, "configuración por defecto para otras opciones no contempladas" = 3)',
+    comment:
+      'Indica si se realizó autopsia (si=1, no=2, [no sabe | ignorado | desconoce] = 3, "configuración por defecto para otras opciones no contempladas" = 3)',
   })
   autopsia: number;
 

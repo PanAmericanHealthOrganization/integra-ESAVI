@@ -1,13 +1,5 @@
 import * as moment from 'moment/moment';
-import {
-  BeforeInsert,
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  TableInheritance,
-} from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, TableInheritance } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
 
@@ -24,7 +16,7 @@ export class Paciente extends Auditoria {
   /**
    *
    */
-  @PrimaryGeneratedColumn('uuid', { name: 'PACIENTE_ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único PK de la tabla TR_PACIENTE' })
   id: string;
 
   /**

@@ -7,14 +7,24 @@ export enum IntegrationGroup {
   HL7FIRE = 'HL7FIRE',
 }
 
+/**
+ *
+ */
 @Entity({
   schema: 'dhi_esavi',
   name: 'TC_PARAMETRO',
   comment: 'Tabla de parámetros de configuración',
 })
 export class Parametro extends Auditoria {
-  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
+  /**
+   * Primary generated column of parametro
+   */
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único PK de la tabla TC_PARAMETRO' })
   id: string;
+
+  /**
+   * Column  of parametro
+   */
   @Column({
     name: 'CLAVE',
     nullable: false,
@@ -23,6 +33,10 @@ export class Parametro extends Auditoria {
     comment: 'Clave única del parámetro de configuración',
   })
   clave: string;
+
+  /**
+   * Column  of parametro
+   */
   @Column({
     name: 'VALOR',
     type: 'text',
@@ -30,6 +44,10 @@ export class Parametro extends Auditoria {
     comment: 'Valor asociado al parámetro de configuración',
   })
   valor: string;
+
+  /**
+   * Column  of parametro
+   */
   @Column({
     name: 'DESCRIPCION',
     nullable: true,

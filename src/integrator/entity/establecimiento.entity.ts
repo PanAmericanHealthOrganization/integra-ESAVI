@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IEstablecimiento } from './interfaces/establecimiento.interface';
 import { Auditoria } from './auditoria.entity';
+import { IEstablecimiento } from './interfaces/establecimiento.interface';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
   schema: 'dhi_esavi',
@@ -11,7 +11,7 @@ export class Establecimiento extends Auditoria implements IEstablecimiento {
    * Primary generated column of establecimiento
    */
   @PrimaryGeneratedColumn('uuid', {
-    name: 'ESTABLECIMIENTO_ID',
+    name: 'ID',
     comment: 'Identificador único del establecimiento',
   })
   id: string;

@@ -2,6 +2,9 @@ import { OmitType } from '@nestjs/swagger';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 
+/**
+ *
+ */
 @Entity({
   schema: 'dhi_esavi',
   name: 'TC_GRUPO_ETARIO',
@@ -11,7 +14,7 @@ export class GrupoEtario extends Auditoria implements IGrupoEtario {
   /**
    *
    */
-  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
+  @PrimaryGeneratedColumn('uuid', { name: 'ID', comment: 'Identificador único pk de la tabla TC_GRUPO_ETARIO' })
   id: string;
 
   /**
@@ -36,16 +39,17 @@ export class GrupoEtario extends Auditoria implements IGrupoEtario {
   })
   finEdad: number;
   /*
-    *
-    */
+   *
+   */
   @Column({
     type: 'varchar',
     length: 10,
     name: 'UNIDAD_EDAD',
     nullable: false,
-    comment: 'Unidad de medida de la edad (Años, Meses)',//, Días)
+    comment: 'Unidad de medida de la edad (Años, Meses)', //, Días)
   })
   unidadEdad: string;
+
   /**
    *
    */
@@ -85,8 +89,4 @@ export class CreateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
   'updatedBy',
 ] as const) {}
 
-export class UpdateGrupoEtarioDto extends OmitType(GrupoEtarioDto, [
-  'inicioEdad',
-  'finEdad',
-  'unidadEdad'
-] as const) {}
+export class UpdateGrupoEtarioDto extends OmitType(GrupoEtarioDto, ['inicioEdad', 'finEdad', 'unidadEdad'] as const) {}
