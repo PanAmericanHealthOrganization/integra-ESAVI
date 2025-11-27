@@ -257,7 +257,9 @@ export class MeddraProcessFilesService {
 const readFileContent = async (version: string, lang: string, file: string): Promise<string[][]> => {
   const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, file);
   // leer el archivo asc
-  const fileStream = fs.createReadStream(filePath, { encoding: 'latin1' });
+  const buffer = fs.readFileSync(filePath);
+  const encodingString: string = detectEncoding(buffer);
+  const fileStream = fs.createReadStream(filePath, { encoding: encodingString as BufferEncoding });//{ encoding: 'latin1' }
   const rl = readline.createInterface({
     input: fileStream,
     crlfDelay: Infinity,
@@ -272,4 +274,21 @@ const readFileContent = async (version: string, lang: string, file: string): Pro
 
 export const directoryExists = (path: string): boolean => {
   return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
+};
+
+export function detectEncoding(buffer: Buffer): string {
+  // Detectar BOM
+  if (buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
+    return 'utf8';
+  }
+  if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
+    return 'utf16le';
+  }
+  if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
+    return 'utf16be';
+  }
+
+  // Heurística simple: ¿hay bytes > 127?
+  const hasHighBytes = buffer.some(b => b > 0x7F);
+  return hasHighBytes ? 'latin1' : 'ascii';
 };
