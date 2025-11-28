@@ -10,7 +10,6 @@ import { EntityNotFoundException } from '../exception/enntity-not-found.exceptio
 import { CatalogoService } from './catalogo.service';
 import { GrupoEtarioService } from './grupo-etario.service';
 import { PacienteDhis2Service } from './paciente-dhis2.service';
-import e from 'express';
 
 @Injectable()
 export class NotificacionDhis2Service {
@@ -98,10 +97,7 @@ export class NotificacionDhis2Service {
   //   throw new Error('pacienteUUID is a mandatory field to notification-dhis2');
   // }
 
-  async create(
-    createDto: CreateNotificacionDto,
-    pacienteUUID: PacienteDhis2,
-  ): Promise<NotificacionDhis2> {
+  async create(createDto: CreateNotificacionDto, pacienteUUID: PacienteDhis2): Promise<NotificacionDhis2> {
     try {
       // Verificamos si ya existe una notificación con el mismo códigoDhis2Evento
       const notificacionExistente = await this.findByCodeDhis2(createDto.codigoDhis2Evento);
@@ -119,9 +115,7 @@ export class NotificacionDhis2Service {
         // Asignamos las propiedades de la notificación
         if (createDto.unidadEdadPaciente) {
           try {
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(
-              createDto.unidadEdadPaciente,
-            );
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(createDto.unidadEdadPaciente);
           } catch (error) {
             console.error(`Error al buscar unidadEdadPaciente: ${error.message}`);
           }
@@ -169,7 +163,10 @@ export class NotificacionDhis2Service {
 
         if (createDto.edad && createDto.unidadEdadPaciente) {
           try {
-            let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
+            let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(
+              createDto.edad,
+              createDto.unidadEdadPaciente,
+            );
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
             const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
               resultadoUnidadEdad.edadCalculada,
@@ -184,15 +181,11 @@ export class NotificacionDhis2Service {
         } else {
           try {
             if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
-              const edad = this.calcularEdad(
-                createDto.fechaNotificacion,
-                createDto.fechaNacimiento,
-              );
-              const unidad = 'AÑOS';//createDto.unidadEdadPaciente;
+              const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
+              const unidad = 'AÑOS'; //createDto.unidadEdadPaciente;
               notificacion.edad = edad;
               notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
-              const grupoEtarioPaciente = await this.grupoEtarioService              
-              .findGrupoEtarioByAge(edad, unidad);
+              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
               notificacion.grupoEtario = grupoEtarioPaciente;
             }
           } catch (error) {
@@ -214,7 +207,7 @@ export class NotificacionDhis2Service {
         notificacion.paciente = pacienteUUID;
         notificacion.createdBy = 'system';
 
-        this.logger.log(`NotificaciónDHIS2 ha sido creada: ${JSON.stringify(createDto)}`);
+        this.logger.log(`NotificaciónDHIS2 ha sido creada`);
 
         // Guardamos la nueva notificación
         return this.notificacionRepository.save(notificacion);
@@ -259,11 +252,7 @@ export class NotificacionDhis2Service {
   /**
    * Busca notificaciones por identificación de paciente y rango de fechas
    */
-  async findByIdentificacionAndDateRange(
-    identificacion: string,
-    fechaInicio: Date,
-    fechaFin: Date,
-  ) {
+  async findByIdentificacionAndDateRange(identificacion: string, fechaInicio: Date, fechaFin: Date) {
     return this.notificacionRepository
       .createQueryBuilder('notificacion')
       .leftJoinAndSelect('notificacion.paciente', 'paciente')
@@ -310,11 +299,7 @@ export class NotificacionDhis2Service {
     return this.notificacionRepository.save(notificacionExistente);
   }
 
-  async update(
-    notificacionExistente: Notificacion,
-    createDto: CreateNotificacionDto,
-    pacienteUUID: PacienteDhis2,
-  ) {
+  async update(notificacionExistente: Notificacion, createDto: CreateNotificacionDto, pacienteUUID: PacienteDhis2) {
     // Si la notificación existe, la actualizamos con los nuevos datos
     console.log('Notificación ya existe, actualizando...');
 
@@ -331,10 +316,9 @@ export class NotificacionDhis2Service {
 
     if (createDto.residenciaPaciente.provincia) {
       try {
-        notificacionExistente.provinciaResidencia =
-          await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residenciaPaciente.provincia,
-          );
+        notificacionExistente.provinciaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+          createDto.residenciaPaciente.provincia,
+        );
       } catch (error) {
         console.error(`Error al buscar provincia: ${error.message}`);
       }
@@ -342,8 +326,9 @@ export class NotificacionDhis2Service {
 
     if (createDto.residenciaPaciente.canton) {
       try {
-        notificacionExistente.cantonResidencia =
-          await this.catalogoService.findByDescriptionToDhis2(createDto.residenciaPaciente.canton);
+        notificacionExistente.cantonResidencia = await this.catalogoService.findByDescriptionToDhis2(
+          createDto.residenciaPaciente.canton,
+        );
       } catch (error) {
         console.error(`Error al buscar canton: ${error.message}`);
       }
@@ -351,10 +336,9 @@ export class NotificacionDhis2Service {
 
     if (createDto.residenciaPaciente.parroquia) {
       try {
-        notificacionExistente.parroquiaResidencia =
-          await this.catalogoService.findByDescriptionToDhis2(
-            createDto.residenciaPaciente.parroquia,
-          );
+        notificacionExistente.parroquiaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+          createDto.residenciaPaciente.parroquia,
+        );
       } catch (error) {
         console.error(`Error al buscar parroquia: ${error.message}`);
       }
@@ -373,8 +357,10 @@ export class NotificacionDhis2Service {
       try {
         let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
         // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-        const grupoEtarioPaciente = await this.grupoEtarioService
-        .findGrupoEtarioByAge(resultadoUnidadEdad.edadCalculada, resultadoUnidadEdad.unidadEdadCalculada);
+        const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
+          resultadoUnidadEdad.edadCalculada,
+          resultadoUnidadEdad.unidadEdadCalculada,
+        );
         notificacionExistente.grupoEtario = grupoEtarioPaciente;
       } catch (error) {
         console.error(
@@ -385,7 +371,7 @@ export class NotificacionDhis2Service {
       try {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
           const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-          const unidad = 'AÑOS';//createDto.unidadEdadPaciente;S
+          const unidad = 'AÑOS'; //createDto.unidadEdadPaciente;S
           notificacionExistente.edad = edad;
           notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
           const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
@@ -398,8 +384,9 @@ export class NotificacionDhis2Service {
 
     if (createDto.profesionNotificadorParam) {
       try {
-        notificacionExistente.profesionNotificador =
-          await this.catalogoService.findByDescriptionToDhis2(createDto.profesionNotificadorParam);
+        notificacionExistente.profesionNotificador = await this.catalogoService.findByDescriptionToDhis2(
+          createDto.profesionNotificadorParam,
+        );
       } catch (error) {
         console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
       }
@@ -426,20 +413,21 @@ export class NotificacionDhis2Service {
     return this.notificacionRepository.save(notificacionExistente);
   }
 
-  calcularEdadUnidadParaGrupoEtario = (edad, unidadEdad) : {edadCalculada: number, unidadEdadCalculada: string} => {
+  calcularEdadUnidadParaGrupoEtario = (edad, unidadEdad): { edadCalculada: number; unidadEdadCalculada: string } => {
     // Estos cálculos son únicamente para determinar el grupo etario correcto. NO SE ASIGNAN en edad y unidad de edad de la notificación.
     //let edadFinal = edad;
-    let edadCalculada: number= edad;
-    let unidadEdadCalculada: string= unidadEdad.toUpperCase();// Aseguramos que la unidad de edad esté en mayúsculas
+    let edadCalculada: number = edad;
+    let unidadEdadCalculada: string = unidadEdad.toUpperCase(); // Aseguramos que la unidad de edad esté en mayúsculas
 
     // Si la unidad no es "AÑO", ni  "AÑOS", realizar la conversión
-    if ( unidadEdadCalculada !== 'AÑO' && unidadEdadCalculada !== 'AÑOS' ) {
-      if ( unidadEdadCalculada === 'DÉCADA' ) {
+    if (unidadEdadCalculada !== 'AÑO' && unidadEdadCalculada !== 'AÑOS') {
+      if (unidadEdadCalculada === 'DÉCADA') {
         // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
         edadCalculada = Math.floor(edad * 10);
         unidadEdadCalculada = 'AÑOS';
-      } else if (unidadEdad === 'SEMANA') { //Tomar en cuenta que el grupo etario del Ministerio, solo tiene unidades de MESES y AÑOS.
-        if(edadCalculada>=0 && edadCalculada <=52){
+      } else if (unidadEdad === 'SEMANA') {
+        //Tomar en cuenta que el grupo etario del Ministerio, solo tiene unidades de MESES y AÑOS.
+        if (edadCalculada >= 0 && edadCalculada <= 52) {
           edadCalculada = Math.floor(edad / 4.3452); // Convertimos semanas a meses (1 semana = 1/4.345 meses)
           unidadEdadCalculada = 'MESES';
         } else {
@@ -448,10 +436,10 @@ export class NotificacionDhis2Service {
           unidadEdadCalculada = 'AÑOS';
         }
       } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
-        if(edad>=0 && edad <=365){
+        if (edad >= 0 && edad <= 365) {
           edadCalculada = Math.floor(edad / 30.4167); // Convertimos días a meses (1 mes = 1/30.4167 días)
           unidadEdadCalculada = 'MESES';
-        }else{
+        } else {
           // Convertimos días a años (1 día = 1/365 años)
           edadCalculada = Math.floor(edad / 365);
           unidadEdadCalculada = 'AÑOS';
@@ -461,10 +449,10 @@ export class NotificacionDhis2Service {
         edadCalculada = Math.floor(edad / 8760);
         unidadEdadCalculada = 'AÑOS';
       } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
-        if(edad>=0 && edad <=11){
+        if (edad >= 0 && edad <= 11) {
           edadCalculada = edad;
           unidadEdadCalculada = 'MESES';
-        }else{
+        } else {
           // Convertimos meses a años (1 mes = 1/12 años)
           edadCalculada = Math.floor(edad / 12);
           unidadEdadCalculada = 'AÑOS';
@@ -477,7 +465,7 @@ export class NotificacionDhis2Service {
     }
 
     // Aseguramos que siempre se retorne los valores calculados
-    return {edadCalculada, unidadEdadCalculada};
+    return { edadCalculada, unidadEdadCalculada };
   };
 
   /**
@@ -497,11 +485,7 @@ export class NotificacionDhis2Service {
     // Ajustar si el cumpleaños no ha pasado aún este año
     if (
       fechaNotificacion <
-      new Date(
-        fechaNotificacion.getFullYear(),
-        fechaNacimiento.getMonth(),
-        fechaNacimiento.getDate(),
-      )
+      new Date(fechaNotificacion.getFullYear(), fechaNacimiento.getMonth(), fechaNacimiento.getDate())
     ) {
       edad--;
     }

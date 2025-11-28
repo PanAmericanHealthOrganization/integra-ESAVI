@@ -42,13 +42,14 @@ export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
   /**
    * Codigo  of calidad datos resultado dto
    */
+  @IsString()
   codigo: string;
 
   /**
    *
    */
   @IsString()
-  tipo: string;
+  subDimension: string;
 
   /**
    *
@@ -69,14 +70,28 @@ export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
   descripcionRegla: string;
 }
 
-export class DimensionCalidadDatosDto {
-  dimension: string;
-  calidadDimension: number;
-  jsonQuality: CalidadDatosResultadoDto[];
-}
-
 export class QualityDto {
   id?: string;
   fecha: Date;
   jsonQuality: DimensionCalidadDatosDto[];
+}
+
+export enum DIMENSION_CALIDAD {
+  EXACTITUD = 'Dimensión de Exactitud',
+  CONSISTENCIA = 'Dimensión de Consistencia',
+}
+
+export enum SUB_DIMENSION_CALIDAD {
+  EXAC_SINTACTICA = 'Dimensión de Exactitud Sintáctica',
+  EXAC_SEMANTICA = 'Dimensión de Exactitud Semántica',
+  CONS_DOMINIO = 'Dimensión de Consistencia de Dominio',
+  CONS_INTRARELACION = 'Dimensión de Consistencia de Formato',
+  CONS_INTERRELACION = 'Dimensión de Consistencia de Interrelación',
+}
+
+export class DimensionCalidadDatosDto {
+  dimension: DIMENSION_CALIDAD;
+  calidadTotal: number;
+  deltaCalidadTotal: number;
+  jsonDimensionQuality: CalidadDatosResultadoDto[];
 }

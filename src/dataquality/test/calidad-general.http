@@ -1,0 +1,81 @@
+### Variables comunes
+@baseUrl = http://localhost:8081/v1/dataquality
+@fechaHoy = {{$datetime iso8601}}
+@fechaManual = 2025-01-15
+
+### ============================================
+### CALIDAD GENERAL
+### ============================================
+
+### Calidad General - Obtener datos del día de hoy
+GET {{baseUrl}}/calidad-general?fecha={{fechaHoy}}
+Content-Type: application/json
+
+###
+
+### Calidad General - Datos de fecha específica
+GET {{baseUrl}}/calidad-general?fecha={{fechaManual}}
+Content-Type: application/json
+
+###
+
+### Calidad General - Rango de fechas
+GET {{baseUrl}}/calidad-general?fechaInicio=2025-01-01&fechaFin=2025-01-31
+Content-Type: application/json
+
+###
+
+### Calidad General - POST datos del día
+POST {{baseUrl}}/calidad-general
+Content-Type: application/json
+
+{
+    "fecha": "{{fechaHoy}}"
+}
+
+###
+
+### ============================================
+### VALIDACIONES
+### ============================================
+
+### Validar datos - Por ID
+GET {{baseUrl}}/dataquality/validar/12345
+Content-Type: application/json
+
+###
+
+### Validar lote de datos
+POST {{baseUrl}}/dataquality/validar
+Content-Type: application/json
+
+{
+    "registros": [
+        {"id": "001", "campo1": "valor1"},
+        {"id": "002", "campo1": "valor2"}
+    ]
+}
+
+###
+
+### ============================================
+### REPORTES
+### ============================================
+
+### Obtener reporte de calidad
+GET {{baseUrl}}/dataquality/reporte?fecha={{fechaManual}}
+Content-Type: application/json
+
+###
+
+### Obtener métricas de calidad
+GET {{baseUrl}}/dataquality/metricas?periodo=mensual
+Content-Type: application/json
+
+###
+
+### Exportar reporte
+GET {{baseUrl}}/dataquality/exportar?formato=excel&fecha={{fechaManual}}
+Content-Type: application/json
+
+###

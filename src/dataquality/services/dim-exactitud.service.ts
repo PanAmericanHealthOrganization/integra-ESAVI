@@ -1,6 +1,11 @@
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CalidadDatosResultadoDto, DimensionCalidadDatosDto } from '../controllers/dto/quality.dto';
+import {
+  CalidadDatosResultadoDto,
+  DIMENSION_CALIDAD,
+  DimensionCalidadDatosDto,
+  SUB_DIMENSION_CALIDAD,
+} from '../controllers/dto/quality.dto';
 import { DataQualityUtils } from './utils/dataquality.utils';
 
 export class DimExactitudService {
@@ -20,9 +25,10 @@ export class DimExactitudService {
       this._nombreVacunaDominio(day),
     ]);
     return {
-      dimension: 'Dimensión de Exactitud',
-      calidadDimension: DataQualityUtils.calcularCalidadDimension([edadInicioEvaento, nombreVacunaDominio]),
-      jsonQuality: [edadInicioEvaento, nombreVacunaDominio],
+      dimension: DIMENSION_CALIDAD.EXACTITUD,
+      calidadTotal: DataQualityUtils.calcularCalidadDimension([edadInicioEvaento, nombreVacunaDominio]),
+      deltaCalidadTotal: -10000,
+      jsonDimensionQuality: [edadInicioEvaento, nombreVacunaDominio],
     };
   }
 
@@ -41,18 +47,18 @@ export class DimExactitudService {
         from
           dhi_esavi."TR_NOTIFICACION" tn
         inner join dhi_esavi."TR_PACIENTE" tp on tn."PACIENTE_ID" = tp."ID"
-        where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
         ;
     `;
     const result = await this.dataSource.query(query);
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'EXA_DOM_001',
-      tipo: 'Dimensión de Exactitud',
+      codigo: 'EXA_SEM_001',
+      subDimension: SUB_DIMENSION_CALIDAD.EXAC_SEMANTICA,
       regla: 'Edad al inicio del evento',
-      condicion: 'La edad registrada  debe ser la edad de la persona al inicio del evento.',
-      descripcionRegla: 'El valor es correcto cuando la edad calculada es igual a  EDAD registrada en la notificación.',
+      condicion: 'FECHA_ESAVI - FECHA_NACIMIENTO - =Edad al inicio del evento',
+      descripcionRegla: 'La edad registrada  debe ser la edad de la persona al inicio del evento.',
       ...totales,
     };
   }
@@ -73,7 +79,7 @@ export class DimExactitudService {
     count(tn."NOMBRE_VACUNA") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})) "totalRegistrosNoValidos"
-    , coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
+    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})), '[]') as "idNotificacionesNoValidos"
     from
@@ -84,11 +90,11 @@ export class DimExactitudService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'EXA_DOM_002',
-      tipo: 'Dimensión de Exactitud',
-      regla: 'Nombre de vacuna según dominio',
+      codigo: 'EXA_SEM_002',
+      subDimension: SUB_DIMENSION_CALIDAD.EXAC_SEMANTICA,
+      regla: 'Nombre vacuna',
       condicion:
-        'Comparar cada valor único de vacuna registrado en NOMBRE_VACUNA con catalogo de referencia nacional de vacunas',
+        'Comparar cada valor único de vacuna registrado en NOMBRE_VACUNA con catalogo de referencia nacional de vacunas. ',
       descripcionRegla:
         'El nombre de la vacuna registrado debe corresponder a una vacuna dentro del catalogo nacional de referencia',
       ...totales,

@@ -93,11 +93,19 @@ export class GeneralService {
     }
   }
 
-  @Cron('0 0 3 * * *')
+  /**
+   * Cron job to process data quality every day at 3 AM
+   */
+  @Cron('0 0 3 1 * *')
   async processQualityCron() {
     await this.processQualityDay(new Date());
   }
 
+  /**
+   *
+   * @param day
+   * @returns
+   */
   async generateQualitySumary(day: Date): Promise<QualityDto> {
     const [dimExactitud, dimConsistencia] = await Promise.all([
       this.dimExactitudService.processAll(day),

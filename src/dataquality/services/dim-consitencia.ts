@@ -1,7 +1,12 @@
 import { Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { CalidadDatosResultadoDto, DimensionCalidadDatosDto } from '../controllers/dto/quality.dto';
+import {
+  CalidadDatosResultadoDto,
+  DIMENSION_CALIDAD,
+  DimensionCalidadDatosDto,
+  SUB_DIMENSION_CALIDAD,
+} from '../controllers/dto/quality.dto';
 import { DataQualityUtils } from './utils/dataquality.utils';
 
 /**
@@ -27,7 +32,7 @@ export class DimConsistenciaService {
   async processAll(day: Date): Promise<DimensionCalidadDatosDto> {
     this.logger.log(`Iniciando procesamiento de Dimensión de Consistencia para el día ${day.toISOString()}`);
     const [
-      edadInicioEvento,
+      noFechasFuturas,
       fechaNacimientoMinima,
       edadMinimaPosible,
       notificacionEnviada,
@@ -58,9 +63,9 @@ export class DimConsistenciaService {
       this._integridadGestante(day),
     ]);
     return {
-      dimension: 'Dimensión de Exactitud',
-      calidadDimension: DataQualityUtils.calcularCalidadDimension([
-        ...edadInicioEvento,
+      dimension: DIMENSION_CALIDAD.CONSISTENCIA,
+      calidadTotal: DataQualityUtils.calcularCalidadDimension([
+        ...noFechasFuturas,
         fechaNacimientoMinima,
         edadMinimaPosible,
         notificacionEnviada,
@@ -75,8 +80,9 @@ export class DimConsistenciaService {
         integridadCasosFatales,
         integridadGestante,
       ]),
-      jsonQuality: [
-        ...edadInicioEvento,
+      deltaCalidadTotal: -10000,
+      jsonDimensionQuality: [
+        ...noFechasFuturas,
         fechaNacimientoMinima,
         edadMinimaPosible,
         notificacionEnviada,
@@ -143,8 +149,8 @@ export class DimConsistenciaService {
         //
         const totales = await DataQualityUtils.construirResultado(result);
         resultados.push({
-          codigo: 'CON_DOM_001',
-          tipo: 'Dominio',
+          codigo: `CON_DOM_001_${(columna || '').toUpperCase()}`,
+          subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
           regla: `No fechas futuras en ${evalItem.tabla}.${columna}`,
           condicion: `La columna ${columna} en la tabla ${evalItem.tabla} no debe contener fechas posteriores a la fecha de evaluación.`,
           descripcionRegla: `El valor es correcto cuando la fecha registrada en ${columna} es anterior o igual a la fecha de evaluación.`,
@@ -190,7 +196,7 @@ export class DimConsistenciaService {
     const totales = await DataQualityUtils.construirResultado(result);
     return {
       codigo: 'CON_DOM_02',
-      tipo: 'Dominio',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
       regla: 'Fecha de nacimiento mínima posible',
       condicion:
         'La fecha de nacimiento registrada no debe ser anterior a 120 años desde la fecha de creación del registro.',
@@ -225,7 +231,7 @@ export class DimConsistenciaService {
     const totales = await DataQualityUtils.construirResultado(result);
     return {
       codigo: 'CON_DOM_03',
-      tipo: 'Dominio',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
       regla: 'Edad mínima posible',
       condicion: 'La edad registrada no debe ser un valor negativo.',
       descripcionRegla: 'El valor es correcto cuando la edad es mayor o igual a cero.',
@@ -259,8 +265,8 @@ export class DimConsistenciaService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_04',
-      tipo: 'Dominio',
+      codigo: 'CON_INTRA_OO1',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTRARELACION,
       regla: 'Notificación enviada',
       condicion: 'La fecha de notificación debe estar registrada.',
       descripcionRegla: 'El valor es correcto cuando la fecha de notificación no es nula.',
@@ -269,7 +275,6 @@ export class DimConsistenciaService {
   }
 
   /**
-   *
    * @param day
    * @returns
    */
@@ -293,54 +298,30 @@ export class DimConsistenciaService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_05',
-      tipo: 'Dimensión de Integridad',
-      regla: 'Integridad Esavi - Nombre LLT',
-      condicion: 'Si ID tiene un registro válido, entonces NAME_LLT debe contener al menos un valor registrado.',
-      descripcionRegla: 'El valor es correcto cuando se cumple la fórmula',
+      codigo: 'CON_INTRA_OO2',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTRARELACION,
+      regla: 'Integridad ESAVI',
+      condicion:
+        'Si ID tiene un registro válido, entonces NAME_LLT debe contener al menos un término  MedDRA,El valor es correcto cuando se cumple la fórmula',
+      descripcionRegla:
+        'Si la notificación fue enviada debe existir al menos un signo, síntoma o hallazgo anormal de laboratorio reportado como ESAVI',
       ...totales,
     };
   }
 
-  /**
-   *
-   * @param day
-   * @returns
-   */
-  private async _integridadVacunaAndFechaVacunacion(day: Date): Promise<CalidadDatosResultadoDto> {
-    this.logger.log(`Iniciando evaluación de integridad Vacuna y Fecha de Vacunación para el día ${day.toISOString()}`);
-    const query = `
-      select
-        count(*) as "totalRegistros",
-        count(*) filter (
-        where
-        tdvn."FECHA_VACUNACION" is not null
-        and tdv."NOMBRE_VACUNA" is not null) as "totalRegistrosValidos",
-        count(*) filter (
-        where
-        tdvn."FECHA_VACUNACION" is null
-        or tdv."NOMBRE_VACUNA" is null) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."NOMBRE_VACUNA" is null), '[]') as "idNotificacionesNoValidos"
-      from
-        dhi_esavi."TR_NOTIFICACION" tn
-      inner join dhi_esavi."TR_DATO_VACUNACION" tdvn on
-        tdvn."NOTIFICACION_ID" = tn."ID"
-      inner join dhi_esavi."TR_DATO_VACUNA" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
-      where
-      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
-      ;
-    `;
+  private async _integridadLoteVacuna(day: Date): Promise<CalidadDatosResultadoDto> {
+    this.logger.log(`Iniciando evaluación de integridad Lote Vacuna para el día ${day.toISOString()}`);
+    const query = ``;
     const result = await this.dataSource.query(query);
-    const totale = await DataQualityUtils.construirResultado(result);
+    const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_06',
-      tipo: 'Interrelación',
-      regla: 'El registro de una vacuna debe ir asociado al registro de la fecha de administración de la vacuna',
-      condicion:
-        'Si ID tiene un registro válido, entonces FECHA_VACUNACION debe contener al menos un valor registrado.',
-      descripcionRegla: 'El valor es correcto cuando se cumple la fórmula',
-      ...totale,
+      codigo: 'CON_INTRA_OO3',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTRARELACION,
+      regla: 'Integridad vacuna-lote',
+      condicion: 'La información del lote de la vacuna debe estar completa y asociada correctamente a la vacuna.',
+      descripcionRegla:
+        'Si se registra una vacuna administrada, debe existir un lote asociado con información completa.',
+      ...totales,
     };
   }
 
@@ -388,13 +369,55 @@ export class DimConsistenciaService {
     //
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_002',
-      tipo: 'Dimensión de Integridad',
+      codigo: 'CON_DOM_001',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
       regla: 'Integridad FECHA_NACIMIENTO (solo para casos en los que FECHA_NACIMIENTO es distinto de null)',
       condicion:
         'El valor es correcto si las 3 formulas se cumplen y no se encuentran valores en los que FECHA_NACIMIENTO sea > a una o más de las otras fechas.',
       descripcionRegla: 'La fecha de nacimiento se debe relacionar en forma logica con otras variables de tipo fecha',
       ...totales,
+    };
+  }
+
+  /**
+   *
+   * @param day
+   * @returns
+   */
+  private async _integridadVacunaAndFechaVacunacion(day: Date): Promise<CalidadDatosResultadoDto> {
+    this.logger.log(`Iniciando evaluación de integridad Vacuna y Fecha de Vacunación para el día ${day.toISOString()}`);
+    const query = `
+      select
+        count(*) as "totalRegistros",
+        count(*) filter (
+        where
+        tdvn."FECHA_VACUNACION" is not null
+        and tdv."NOMBRE_VACUNA" is not null) as "totalRegistrosValidos",
+        count(*) filter (
+        where
+        tdvn."FECHA_VACUNACION" is null
+        or tdv."NOMBRE_VACUNA" is null) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."NOMBRE_VACUNA" is null), '[]') as "idNotificacionesNoValidos"
+      from
+        dhi_esavi."TR_NOTIFICACION" tn
+      inner join dhi_esavi."TR_DATO_VACUNACION" tdvn on
+        tdvn."NOTIFICACION_ID" = tn."ID"
+      inner join dhi_esavi."TR_DATO_VACUNA" tdv on
+        tdv."NOTIFICACION_ID" = tn."ID"
+      where
+      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+      ;
+    `;
+    const result = await this.dataSource.query(query);
+    const totale = await DataQualityUtils.construirResultado(result);
+    return {
+      codigo: 'CON_DOM_02',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
+      regla: 'El registro de una vacuna debe ir asociado al registro de la fecha de administración de la vacuna',
+      condicion:
+        'Si ID tiene un registro válido, entonces FECHA_VACUNACION debe contener al menos un valor registrado.',
+      descripcionRegla: 'El valor es correcto cuando se cumple la fórmula',
+      ...totale,
     };
   }
 
@@ -441,7 +464,7 @@ export class DimConsistenciaService {
     const totales = await DataQualityUtils.construirResultado(result);
     return {
       codigo: 'CON_DOM_002',
-      tipo: 'Interrelación',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
       regla: 'Integridad FECHA_VACUNACION (solo para casos en los que FECHA_VACUNACION es distinto de null)',
       condicion:
         'El valor es correcto si las 3 formulas se cumplen y no se encuentran valores en los que FECHA_VACUNACION sea > a una o más de las otras fechas.',
@@ -492,8 +515,8 @@ export class DimConsistenciaService {
     const result = await this.dataSource.query(query);
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_002',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_003',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_DOMINIO,
       regla: 'Integridad FECHA_ESAVI (solo para casos en los que FECHA_ESAVI es distinto de null)',
       condicion: `1. FECHA_ESAVI  es ≥  FECHA_NACIMIENTO 
          2. FECHA_ESAVI  es ≥  FECHA_VACUNACION
@@ -552,8 +575,8 @@ export class DimConsistenciaService {
     const result = await this.dataSource.query(query);
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_002',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_004',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'Integridad FECHA_NOTIFICACION\n(solo para casos en los que FECHA_NOTIFICACION es distinto de null)',
       condicion: `1.  FECHA_NOTIFICACION ≥ FECHA_NACIMIENTO
                   2. FECHA_NOTIFICACION ≥  FECHA_VACUNACION
@@ -619,8 +642,8 @@ export class DimConsistenciaService {
     const totales = await DataQualityUtils.construirResultado(result);
 
     return {
-      codigo: 'CON_DOM_002',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_005',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'Integridad Fecha de Muerte (casos fatales)',
       condicion: `Si MUERTE = true entonces <b>FECHAMUERTE</b> debe existir y cumplir:
         - FECHAMUERTE >= FECHA_NACIMIENTO
@@ -701,8 +724,8 @@ export class DimConsistenciaService {
     const totales = await DataQualityUtils.construirResultado(result);
 
     return {
-      codigo: 'CON_DOM_002',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_006',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'Los ESAVI graves deben tener al menos un motivo de gravedad registrado',
       condicion: `
         1. Si TIPO_GRAVEDAD= GRAVE  entonces al menos una de las siguientes variables debe ser = true
@@ -767,8 +790,8 @@ export class DimConsistenciaService {
 
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_003',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_007',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'Integridad Casos Fatales',
       condicion: `1. Si FECHAMUERTE es distinto de null entonces: TIPO_GRAVEDAD debe ser = GRAVE
       MUERTE debe ser = true`,
@@ -813,8 +836,8 @@ export class DimConsistenciaService {
 
     const totales = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_004',
-      tipo: 'Interrelación',
+      codigo: 'CON_DOM_008',
+      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'Integridad Gestante',
       condicion: `1. Si "EMBARAZADA_MOMENTO_VACUNA" = true  y/o EMBARAZADA_MOMENTO_ESAVI= true entonces "CT_SEXO_ID" mujer`,
       descripcionRegla: 'Los ESAVI en gestantes deben tener una relación lógica con la variable sexo ',
