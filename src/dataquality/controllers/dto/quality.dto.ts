@@ -79,6 +79,7 @@ export class QualityDto {
 export enum DIMENSION_CALIDAD {
   EXACTITUD = 'Dimensión de Exactitud',
   CONSISTENCIA = 'Dimensión de Consistencia',
+  COMPLETITUD = 'Dimensión de Completitud',
 }
 
 export enum SUB_DIMENSION_CALIDAD {
@@ -87,6 +88,7 @@ export enum SUB_DIMENSION_CALIDAD {
   CONS_DOMINIO = 'Dimensión de Consistencia de Dominio',
   CONS_INTRARELACION = 'Dimensión de Consistencia de Formato',
   CONS_INTERRELACION = 'Dimensión de Consistencia de Interrelación',
+  COMP_NO_NULL = 'Dimensión de Completitud No Nulo',
 }
 
 export class DimensionCalidadDatosDto {

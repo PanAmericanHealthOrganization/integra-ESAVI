@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataqualityMaintenanceController } from './controllers/dataquality-maintenance.controller';
 import { DataqualityController } from './controllers/dataquality.controller';
 import { DataQualityDimensions } from './entities/dataQualityDimensions.entity';
+import { DimCompletitudService } from './services/dim-completitud';
 import { DimConsistenciaService } from './services/dim-consitencia';
 import { DimExactitudService } from './services/dim-exactitud.service';
 import { GeneralService } from './services/general.service';
@@ -34,6 +35,12 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
     TypeOrmModule.forFeature([DataQualityDimensions], DATAQUALITY_DS),
   ],
   controllers: [DataqualityController, DataqualityMaintenanceController],
-  providers: [GeneralService, DimExactitudService, DimConsistenciaService, DataqualityMaintenanceService],
+  providers: [
+    GeneralService,
+    DimExactitudService,
+    DimConsistenciaService,
+    DataqualityMaintenanceService,
+    DimCompletitudService,
+  ],
 })
 export class DataqualityModule {}

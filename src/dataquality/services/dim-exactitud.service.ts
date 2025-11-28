@@ -27,7 +27,7 @@ export class DimExactitudService {
     return {
       dimension: DIMENSION_CALIDAD.EXACTITUD,
       calidadTotal: DataQualityUtils.calcularCalidadDimension([edadInicioEvaento, nombreVacunaDominio]),
-      deltaCalidadTotal: -10000,
+      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad([edadInicioEvaento, nombreVacunaDominio], []),
       jsonDimensionQuality: [edadInicioEvaento, nombreVacunaDominio],
     };
   }

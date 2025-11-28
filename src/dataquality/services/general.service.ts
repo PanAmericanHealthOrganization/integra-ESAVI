@@ -6,6 +6,7 @@ import { IAuditoria } from 'src/integrator/entity';
 import { DataSource, Equal, Repository } from 'typeorm';
 import { QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
+import { DimCompletitudService } from './dim-completitud';
 import { DimConsistenciaService } from './dim-consitencia';
 import { DimExactitudService } from './dim-exactitud.service';
 
@@ -24,6 +25,7 @@ export class GeneralService {
     private readonly dimConsistenciaService: DimConsistenciaService,
     private readonly dimExactitudService: DimExactitudService,
     private readonly configService: ConfigService,
+    private readonly dimCompletitudService: DimCompletitudService,
   ) {}
 
   /**

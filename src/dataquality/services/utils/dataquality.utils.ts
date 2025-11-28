@@ -35,6 +35,20 @@ export class DataQualityUtils {
     };
   }
 
+  static calcularDeltaCalidad(
+    resultados: CalidadDatosResultadoDto[],
+    resultadosPrevios: CalidadDatosResultadoDto[],
+  ): number {
+    if (!resultados || resultados.length === 0) {
+      return 0;
+    }
+
+    const calidadActual = DataQualityUtils.calcularCalidadDimension(resultados);
+    const calidadPrevio = DataQualityUtils.calcularCalidadDimension(resultadosPrevios);
+
+    return calidadActual - calidadPrevio;
+  }
+
   static calcularCalidadDimension(resultados: CalidadDatosResultadoDto[]): number {
     if (!resultados || resultados.length === 0) {
       return 0;

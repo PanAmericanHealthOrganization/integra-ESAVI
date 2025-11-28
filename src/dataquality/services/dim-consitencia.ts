@@ -80,7 +80,7 @@ export class DimConsistenciaService {
         integridadCasosFatales,
         integridadGestante,
       ]),
-      deltaCalidadTotal: -10000,
+      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad([], []),
       jsonDimensionQuality: [
         ...noFechasFuturas,
         fechaNacimientoMinima,
