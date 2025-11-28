@@ -13,7 +13,7 @@ export class MeddraLltController {
 
   // Endpoint para buscar PTs
   @Get('search')
-  async searchLLT(@Query('term') term: string): Promise<LLT[]> {
+  async searchLLT(@Query('term') term: string): Promise<LLT> {
     return this.meddraLltService.searchLLT(term);
   }
 }

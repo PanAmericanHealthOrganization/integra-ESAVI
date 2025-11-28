@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Notificacion } from '../entity/notificacion.entity';
-import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
+import { Repository } from 'typeorm';
 import { CreateDatoVacunacionDto } from '../dto/create-dato-vacunacion.dto';
 import { UpdateDatoVacunacionDto } from '../dto/update-dato-vacunacion.dto';
+import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
+import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
 @Injectable()
@@ -15,43 +16,25 @@ export class DatoVacunacionService {
   constructor(
     @InjectRepository(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly datoVacunacionRepository: Repository<DatoVacunacion>,
+    private readonly configService: ConfigService,
   ) {}
 
-  // async create(
-  //   notificacion: Notificacion,
-  //   createDto: CreateDatoVacunacionDto,
-  // ): Promise<DatoVacunacion> {
-  //   try {
-  //     const datoVacuna = plainToClass(DatoVacunacion, createDto);
-  //     datoVacuna.notificacion = notificacion;
-  //     datoVacuna.createdBy = 'AUTOMATICO';
-
-  //     return this.datoVacunacionRepository.save(datoVacuna);
-  //   } catch (e) {
-  //     throw e;
-  //   } finally {
-  //     this.logger.log(
-  //       `DatoVacuna has been created: ${JSON.stringify(createDto)}`,
-  //     );
-  //   }
-  // }
-
-  async create(
-    notificacion: Notificacion,
-    createDto: CreateDatoVacunacionDto,
-  ): Promise<DatoVacunacion> {
+  /**
+   *
+   * @param notificacion
+   * @param createDto
+   * @returns
+   */
+  public async create(notificacion: Notificacion, createDto: CreateDatoVacunacionDto): Promise<DatoVacunacion> {
     try {
       // Verificar si ya existe un DatoVacunacion con la misma notificación
-      const existingDatoVacunacion =
-        await this.datoVacunacionRepository.findOne({
-          where: { notificacion: { id: notificacion.id } }, // Buscamos por el ID de la notificación
-        });
+      const existingDatoVacunacion = await this.datoVacunacionRepository.findOne({
+        where: { notificacion: { id: notificacion.id } }, // Buscamos por el ID de la notificación
+      });
 
       // Si existe, lo actualizamos
       if (existingDatoVacunacion) {
-        this.logger.log(
-          'DatoVacunacion existe, se actualizará con los nuevos datos.',
-        );
+        this.logger.log('DatoVacunacion existe, se actualizará con los nuevos datos.');
 
         // Actualizamos el registro con los nuevos datos
         Object.assign(existingDatoVacunacion, createDto); // Actualizamos las propiedades del registro
@@ -66,7 +49,7 @@ export class DatoVacunacionService {
       // Si no existe, creamos uno nuevo
       const datoVacuna = plainToClass(DatoVacunacion, createDto);
       datoVacuna.notificacion = notificacion;
-      datoVacuna.createdBy = 'AUTOMATICO'; // Asignamos el creador automáticamente
+      datoVacuna.createdBy = this.configService.get('USUARIO_INSERTA_REGISTRO'); // Asignamos el creador automáticamente
 
       // Guardamos el nuevo DatoVacunacion
       return this.datoVacunacionRepository.save(datoVacuna);
@@ -74,11 +57,7 @@ export class DatoVacunacionService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(
-        `DatoVacunacion ha sido procesado (create): ${JSON.stringify(
-          createDto,
-        )}`,
-      );
+      this.logger.log(`DatoVacunacion ha sido procesadoDesenlaceEsavi ha sido creada`);
     }
   }
 
@@ -109,7 +88,5 @@ export class DatoVacunacionService {
 
   async update(uuid: string, vacunaDto: UpdateDatoVacunacionDto) {
     const datoVacuna = await this.findOne(uuid);
-    //this.datoVacunacionRepository.merge(datoVacuna, vacunaDto);
-    //return this.datoVacunacionRepository.save(datoVacuna);
   }
 }

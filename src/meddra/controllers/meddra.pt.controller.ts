@@ -13,7 +13,7 @@ export class MeddraPtController {
 
   // Endpoint para buscar PTs
   @Get('search')
-  async searchPT(@Query('term') term: string): Promise<PT[]> {
+  async searchPT(@Query('term') term: string): Promise<PT> {
     return this.meddraPtService.searchPT(term);
   }
 }

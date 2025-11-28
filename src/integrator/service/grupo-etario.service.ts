@@ -70,6 +70,6 @@ export class GrupoEtarioService {
       return grupoEtario;
     }
 
-    throw new Error('No se encontró un grupo etario para esta edad.');
+    throw new Error(`No se encontró un grupo etario en base de datos para esta edad ${age} y unidad ${unidad}.`);
   }
 }

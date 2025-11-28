@@ -18,28 +18,13 @@ export class DatoEsaviService {
     private readonly datoEsaviRepository: Repository<DatoEsavi>,
   ) {}
 
-  // async create(
-  //   notificacion: Notificacion,
-  //   createDto: CreateDatoEsaviDto,
-  // ): Promise<DatoEsavi> {
-  //   try {
-  //     const datoEsavi = plainToClass(DatoEsavi, createDto);
-  //     datoEsavi.notificacion = notificacion;
-  //     return this.datoEsaviRepository.save(datoEsavi);
-  //   } catch (e) {
-  //     this.logger.error(`Error al procesar datos esavi: ${e.message}`);
-  //     throw new Error('Hubo un problema al crear o eliminar datos esavi');
-  //   } finally {
-  //     this.logger.log(
-  //       `DatoEsavi has been created: ${JSON.stringify(createDto)}`,
-  //     );
-  //   }
-  // }
-
-  async createVigiflow(
-    notificacion: Notificacion,
-    createDto: CreateDatoEsaviDto,
-  ): Promise<DatoEsavi> {
+  /**
+   *
+   * @param notificacion
+   * @param createDto
+   * @returns
+   */
+  public async createVigiflow(notificacion: Notificacion, createDto: CreateDatoEsaviDto): Promise<DatoEsavi> {
     try {
       // Verificar si ya existe un DatoEsavi con los mismos datos
       const notificacionExistente = new Notificacion();
@@ -76,7 +61,7 @@ export class DatoEsaviService {
       this.logger.error(`Error al procesar datos esavi: ${e.message}`);
       throw new Error('Hubo un problema al crear o actualizar datos esavi');
     } finally {
-      this.logger.log(`DatoEsavi ha sido procesado: ${JSON.stringify(createDto)}`);
+      this.logger.log(`DatoEsavi ha sido procesado`);
     }
   }
 

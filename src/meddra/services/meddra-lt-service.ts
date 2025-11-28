@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LLT } from '../models/standar/llt.entity';
@@ -10,22 +10,28 @@ export class MeddraLLTService {
     private readonly lltRepository: Repository<LLT>,
   ) {}
 
-  normalizeString(str: string): string {
-    return str
-      .normalize('NFD') // Eliminar acentos (forma normalizada compuesta)
-      .replace(/[\u0300-\u036f]/g, '') // Eliminar los caracteres diacríticos (acentos)
-      .toLowerCase() // Convertir a minúsculas
-      .trim(); // Eliminar espacios extra al principio y al final
-  }
+  private readonly logger = new Logger(MeddraLLTService.name);
 
-  // Método para buscar SOC por nombre
-  async searchLLT(term: string): Promise<LLT[]> {
-    // Normalizamos el término de búsqueda
-    const normalizedTerm = this.normalizeString(term);
+  /**
+   *
+   * @param term
+   * @returns
+   */
+  async searchLLT(term: string): Promise<LLT> {
+    if (!term || term.trim() === '') {
+      this.logger.warn('Término de búsqueda LLT vacío o nulo');
+      return null;
+    }
 
-    return this.lltRepository
+    term = term.trim();
+    const t = await this.lltRepository
       .createQueryBuilder('llt')
-      .where('LOWER(llt.name) = :term', { term: normalizedTerm }) // Comparar con el nombre normalizado
-      .getMany();
+      .where('LOWER(llt.name) = :term', { term: (term || '').toLowerCase() }) // Comparar con el nombre normalizado
+      .getOne();
+
+    if (!t) {
+      this.logger.warn(`LLT no encontrado para el término: "${term}"`);
+    }
+    return t;
   }
 }

@@ -5,13 +5,13 @@ import { Logger } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import { join } from 'path';
-import * as readline from 'readline';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 import * as XLSX from 'xlsx';
 import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
 import { MeddraSync } from '../models/standar/meddraSync.entity';
 import { PT } from '../models/standar/pt.entity';
 import { SOC } from '../models/standar/soc.entity';
+import { MeddraUtils } from '../utils/meddra.utils';
 /**
  * Permite procesar los archivos de meddra
  */
@@ -61,7 +61,7 @@ export class MeddraProcessFilesService {
     const path = join(process.cwd(), 'upload_files', 'meddra', versionStr, langStr);
     console.log('Patth::: ', path);
 
-    if (!directoryExists(path)) {
+    if (!MeddraUtils.directoryExists(path)) {
       throw new Error('El directorio no existe');
     }
 
@@ -72,19 +72,21 @@ export class MeddraProcessFilesService {
     let ptDB = [];
     let llDB = [];
     try {
+      // Crear la versión
       const versionEntity = await this.meddraSuncRepository.save(
         withAuditOnCreate(new MeddraSync(versionStr, langStr, description)),
       );
 
-      // const llt = await readFileContent(version, lang, 'llt.asc');
-
-      const soc = await readFileContent(versionStr, langStr, 'soc.asc');
+      // Nivel superior
+      const soc = await MeddraUtils.readFileContent(versionStr, langStr, 'soc.asc');
       socDB = await this.processSOC(soc, versionEntity);
 
-      const ptDataFile = await readFileContent(versionStr, langStr, 'pt.asc');
+      // Nivel intermedio, requiere soc por pt
+      const ptDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'pt.asc');
       ptDB = await this.processPT(ptDataFile, socDB);
 
-      const lltDataFile = await readFileContent(versionStr, langStr, 'llt.asc');
+      // Nivel inferior, requiere pt por llt
+      const lltDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'llt.asc');
       llDB = await this.processLLT(lltDataFile, ptDB);
     } catch (e) {
       await queryRunner.rollbackTransaction();
@@ -246,52 +248,3 @@ export class MeddraProcessFilesService {
     return versionExist ? true : false;
   }
 }
-
-/**
- *
- * @param version, versión de meddra
- * @param lang, idioma
- * @param file, nombre del archivo
- * @returns
- */
-const readFileContent = async (version: string, lang: string, file: string): Promise<string[][]> => {
-  const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, file);
-  // leer el archivo asc
-  /*const buffer = fs.readFileSync(filePath);
-  //const encodingString: string = detectEncoding(buffer);
-  const fileStream = fs.createReadStream(filePath, { encoding: encodingString as BufferEncoding });//{ encoding: 'latin1' }
-  */
- //const fileStream = fs.createReadStream(filePath, { encoding: 'latin1' });
-  const fileStream = fs.createReadStream(filePath, { encoding: 'ascii' });
-  const rl = readline.createInterface({
-    input: fileStream,
-    crlfDelay: Infinity,
-  });
-  const lines = [];
-  for await (const line of rl) {
-    const lineContent = line.split('$');
-    lines.push(lineContent);
-  }
-  return lines;
-};
-
-export const directoryExists = (path: string): boolean => {
-  return fs.existsSync(path) && fs.lstatSync(path).isDirectory();
-};
-
-/*export function detectEncoding(buffer: Buffer): string {
-  // Detectar BOM
-  if (buffer[0] === 0xEF && buffer[1] === 0xBB && buffer[2] === 0xBF) {
-    return 'utf8';
-  }
-  if (buffer[0] === 0xFF && buffer[1] === 0xFE) {
-    return 'utf16le';
-  }
-  if (buffer[0] === 0xFE && buffer[1] === 0xFF) {
-    return 'utf16be';
-  }
-
-  // Heurística simple: ¿hay bytes > 127?
-  const hasHighBytes = buffer.some(b => b > 0x7F);
-  return hasHighBytes ? 'latin1' : 'ascii';
-};*/

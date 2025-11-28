@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PT } from '../models/standar/pt.entity';
@@ -10,22 +10,29 @@ export class MeddraPtService {
     private readonly ptRepository: Repository<PT>,
   ) {}
 
-  normalizeString(str: string): string {
-    return str
-      .normalize('NFD') // Eliminar acentos (forma normalizada compuesta)
-      .replace(/[\u0300-\u036f]/g, '') // Eliminar los caracteres diacríticos (acentos)
-      .toLowerCase() // Convertir a minúsculas
-      .trim(); // Eliminar espacios extra al principio y al final
-  }
+  private readonly logger = new Logger(MeddraPtService.name);
 
-  // Método para buscar SOC por nombre
-  async searchPT(term: string): Promise<PT[]> {
-    // Normalizamos el término de búsqueda
-    const normalizedTerm = this.normalizeString(term);
+  /**
+   * Searches for a PT entity by its name, case-insensitively.
+   * @param term
+   * @returns PT entity if found, otherwise undefined.
+   */
+  public async searchPT(term: string): Promise<PT> {
+    if (!term || term.trim() === '') {
+      this.logger.warn('Término de búsqueda PT vacío o nulo');
+      return null;
+    }
 
-    return this.ptRepository // Usamos el repositorio de PT
-      .createQueryBuilder('pt') // Alias de la tabla PT
-      .where('LOWER(pt.name) = :term', { term: normalizedTerm }) // Comparar con el nombre normalizado
-      .getMany(); // Obtener los resultados que coinciden
+    term = term.trim();
+    const pt = await this.ptRepository
+      .createQueryBuilder('pt')
+      .where('LOWER(pt.name) = :term', { term: (term || '').toLowerCase() })
+      .getOne();
+
+    if (!pt) {
+      this.logger.warn(`PT no encontrado para el término: "${term}"`);
+    }
+
+    return pt;
   }
 }

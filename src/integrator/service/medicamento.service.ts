@@ -17,10 +17,7 @@ export class MedicamentoService {
     private readonly medicamentoRepository: Repository<Medicamento>,
   ) {}
 
-  async createOneToMany(
-    notificacion: Notificacion,
-    createDto: CreateMedicamentoDto[],
-  ): Promise<Medicamento[]> {
+  async createOneToMany(notificacion: Notificacion, createDto: CreateMedicamentoDto[]): Promise<Medicamento[]> {
     try {
       const medicinaList = [];
       createDto.forEach((item) => {
@@ -36,9 +33,7 @@ export class MedicamentoService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(
-        `Medicamento has been created(createOneToMany): ${JSON.stringify(createDto)}`,
-      );
+      this.logger.log(`Medicamento has been created(createOneToMany): ${JSON.stringify(createDto)}`);
     }
   }
 
@@ -62,10 +57,7 @@ export class MedicamentoService {
   //   }
   // }
   // TODO: este método debe ser mejorado para evitar duplicados, ademas de hacer multiples llamadas innecesarias a la base de datos, not tiene sentido consultar por cada medicamenteo si ya existe, se debe optimizar
-  async createOneToOne(
-    notificacion: Notificacion,
-    createDto: CreateMedicamentoDto,
-  ): Promise<Medicamento> {
+  async createOneToOne(notificacion: Notificacion, createDto: CreateMedicamentoDto): Promise<Medicamento> {
     try {
       // Verificar si ya existe un medicamento con los mismos datos
       const notificacionExistente = new Notificacion();
@@ -106,7 +98,7 @@ export class MedicamentoService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(`Medicamento ha sido procesado (createOneToOne)`);
+      this.logger.log(`Medicamento ha sido procesado`);
     }
   }
 

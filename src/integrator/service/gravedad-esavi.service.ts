@@ -53,10 +53,7 @@ export class GravedadEsaviService {
 
   //   }
 
-  async create(
-    notificacion: Notificacion,
-    createDto: CreateGravedadEsaviDto,
-  ): Promise<GravedadEsavi> {
+  async create(notificacion: Notificacion, createDto: CreateGravedadEsaviDto): Promise<GravedadEsavi> {
     if (!notificacion) {
       throw new Error('El campo notificacion es obligatorio para GravedadEsavi');
     }
@@ -85,13 +82,11 @@ export class GravedadEsaviService {
         nuevaGravedadEsavi.createdBy = process.env.USUARIO_INSERTA_REGISTRO; // Guardamos quien inserta el registro
 
         // Guardamos la nueva GravedadEsavi
-        this.logger.log(`GravedadEsavi ha sido creada: ${JSON.stringify(createDto)}`);
+        this.logger.log(`GravedadEsavi ha sido creada`);
         return this.gravedadEsaviRepository.save(nuevaGravedadEsavi); // Utilizamos save() para crear el registro
       }
     } catch (error) {
-      this.logger.error(
-        `Error al procesar la creación o actualización de GravedadEsavi: ${error.message}`,
-      );
+      this.logger.error(`Error al procesar la creación o actualización de GravedadEsavi: ${error.message}`);
       throw new Error('Hubo un problema al crear o actualizar GravedadEsavi');
     }
   }
@@ -128,10 +123,7 @@ export class GravedadEsaviService {
     }
   }
 
-  async update(
-    uuid: string,
-    updateGravedadEsaviDto: UpdateGravedadEsaviDto,
-  ): Promise<GravedadEsavi> {
+  async update(uuid: string, updateGravedadEsaviDto: UpdateGravedadEsaviDto): Promise<GravedadEsavi> {
     const gravedadEsavi = await this.findOne(uuid);
     if (gravedadEsavi) {
       this.gravedadEsaviRepository.merge(gravedadEsavi, updateGravedadEsaviDto);

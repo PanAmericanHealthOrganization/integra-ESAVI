@@ -23,10 +23,7 @@ export class NotificacionVigiflowService {
     private readonly grupoEtarioService: GrupoEtarioService,
   ) {}
 
-  async create(
-    createDto: CreateNotificacionDto,
-    pacienteUUID: PacienteVigiflow,
-  ): Promise<NotificacionVigiflow> {
+  async create(createDto: CreateNotificacionDto, pacienteUUID: PacienteVigiflow): Promise<NotificacionVigiflow> {
     if (pacienteUUID) {
       const notificacion = await this.findByVigiflowCode(createDto.codigoVigiflow);
       if (notificacion) {
@@ -34,13 +31,11 @@ export class NotificacionVigiflowService {
       } else {
         const notificacion = plainToClass(NotificacionVigiflow, createDto);
         notificacion.paciente = pacienteUUID;
-        console.log(notificacion);
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.provincia)) {
           try {
-            notificacion.provinciaResidencia =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaPaciente.provincia,
-              );
+            notificacion.provinciaResidencia = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaPaciente.provincia,
+            );
           } catch (error) {
             console.log('Provincia no encontrada');
           }
@@ -56,22 +51,20 @@ export class NotificacionVigiflowService {
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.parroquia)) {
           try {
-            notificacion.parroquiaResidencia =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaPaciente.parroquia,
-              );
+            notificacion.parroquiaResidencia = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaPaciente.parroquia,
+            );
           } catch (error) {
             console.log('Parroquia no encontrada');
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.provincia)) {
           try {
-            notificacion.provinciaNotificador =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaNotificador.provincia,
-              );
+            notificacion.provinciaNotificador = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaNotificador.provincia,
+            );
           } catch (error) {
-            console.log('Provincia notificador no encontrada');
+            console.log(`Provincia "${createDto.residenciaNotificador.provincia}" notificador no encontrada `);
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)) {
@@ -80,17 +73,16 @@ export class NotificacionVigiflowService {
               createDto.residenciaNotificador.canton,
             );
           } catch (error) {
-            console.log('Canton notificador no encontrado');
+            console.log(`Canton "${createDto.residenciaNotificador.canton}" notificador no encontrado`);
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.parroquia)) {
           try {
-            notificacion.parroquiaNotificador =
-              await this.catalogoService.findByDescriptionToVigiflow(
-                createDto.residenciaNotificador.parroquia,
-              );
+            notificacion.parroquiaNotificador = await this.catalogoService.findByDescriptionToVigiflow(
+              createDto.residenciaNotificador.parroquia,
+            );
           } catch (error) {
-            console.log('Parroquia notificador no encontrado');
+            console.log(`Parroquia "${createDto.residenciaNotificador.parroquia}" notificador no encontrado`);
           }
         }
 
@@ -107,9 +99,7 @@ export class NotificacionVigiflowService {
           console.log('EsteGrupoEtario:::', createDto.grupoEtarioPaciente);
 
           try {
-            notificacion.grupoEtario = await this.grupoEtarioService.findOne(
-              createDto.grupoEtarioPaciente,
-            );
+            notificacion.grupoEtario = await this.grupoEtarioService.findOne(createDto.grupoEtarioPaciente);
           } catch (error) {
             console.log('Grupo etario no encontrado');
           }
@@ -128,7 +118,8 @@ export class NotificacionVigiflowService {
          * La edad y la unidad de edad son asignadas sin mayores transformaciones,
          * en la clase vigiflow-integrator.service.ts
          */
-        if (createDto.edad && createDto.unidadEdadPaciente) { // se comprueba que no sean nulos
+        if (createDto.edad && createDto.unidadEdadPaciente) {
+          // se comprueba que no sean nulos
           try {
             // Aseguramos que la unidad de edad esté en mayúsculas
             let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
@@ -141,14 +132,14 @@ export class NotificacionVigiflowService {
                 edadFinal = ~~(createDto.edad * 10);
                 unidadEdad = 'AÑOS'; // Actualizamos la unidad a "AÑOS" después de la conversión
               } else if (unidadEdad === 'SEMANA') {
-                if(  createDto.edad >=0 && createDto.edad <= 52 ){
+                if (createDto.edad >= 0 && createDto.edad <= 52) {
                   edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
                   unidadEdad = 'MESES';
-                }else{
+                } else {
                   // Convertimos semanas a años (1 semana = 1/52 años)
                   edadFinal = ~~(createDto.edad / 52.1429);
                   unidadEdad = 'AÑOS';
-                }                
+                }
               } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
                 // Convertimos días a años (1 día = 1/365 años)
                 edadFinal = ~~(createDto.edad / 365);
@@ -157,36 +148,34 @@ export class NotificacionVigiflowService {
                 // Convertimos horas a años (1 hora = 1/8760 años)
                 edadFinal = ~~(createDto.edad / 8760);
                 unidadEdad = 'AÑOS';
-              } else if ( unidadEdad === 'MES' || unidadEdad === 'MESES' ) {                              
+              } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
                 if (createDto.edad >= 0 && createDto.edad <= 11) {
                   // Si la edad en meses es menor a 12, la dejamos como meses
                   edadFinal = createDto.edad;
                   unidadEdad = 'MESES';
                 } else {
-                   // Convertimos meses a años (1 mes = 1/12 años) 
+                  // Convertimos meses a años (1 mes = 1/12 años)
                   edadFinal = ~~(createDto.edad / 12);
                   unidadEdad = 'AÑOS';
                 }
-                
               }
-            }else{
+            } else {
               unidadEdad = 'AÑOS';
             }
 
             // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente =
-              await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
+            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
             notificacion.grupoEtario = grupoEtarioPaciente;
           } catch (error) {
             console.error(
-              `Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`,
+              `Error al calcular grupo etario para la edad "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
             );
           }
         }
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
         const not = await this.notificacionRepository.save(notificacion);
-        this.logger.log(`NotificationVigiflow has been created: ${JSON.stringify(not)}`);
+        this.logger.log(`Notificación Vigiflow creada con UUID: ${not.id}`);
         return not;
       }
     } else {

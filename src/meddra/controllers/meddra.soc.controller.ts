@@ -17,7 +17,7 @@ export class MeddraSocController {
    * @returns
    */
   @Get('search')
-  async searchSOC(@Query('term') term: string): Promise<SOC[]> {
+  async searchSOC(@Query('term') term: string): Promise<SOC> {
     return this.meddraSocService.searchSOC(term);
   }
 }

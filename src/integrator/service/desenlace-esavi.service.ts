@@ -46,10 +46,7 @@ export class DesenlaceEsaviService {
   // }
   // }
 
-  async create(
-    notificacion: Notificacion,
-    createDto: CreateDesenlaceEsaviDto,
-  ): Promise<DesenlaceEsavi> {
+  async create(notificacion: Notificacion, createDto: CreateDesenlaceEsaviDto): Promise<DesenlaceEsavi> {
     if (notificacion) {
       try {
         // Verificamos si ya existe un registro de DesenlaceEsavi para la notificación
@@ -66,10 +63,6 @@ export class DesenlaceEsaviService {
               desenlaceEsavi[key] = createDto[key];
             }
           });
-
-          // Actualizamos la entidad en la base de datos
-          this.logger.log(`DesenlaceEsavi ha sido actualizada: ${JSON.stringify(createDto)}`);
-
           return this.desenlaceEsaviRepository.save(desenlaceEsavi); // Utilizamos save() para actualizar el registro
         } else {
           const nuevoDesenlaceEsavi = plainToClass(DesenlaceEsavi, createDto);
@@ -86,17 +79,15 @@ export class DesenlaceEsaviService {
           nuevoDesenlaceEsavi.createdBy = 'AUTOMATICO'; // Guardamos quien inserta el registro
 
           // Guardamos el nuevo DesenlaceEsavi
-          this.logger.log(`DesenlaceEsavi ha sido creada: ${JSON.stringify(createDto)}`);
+          this.logger.log(`DesenlaceEsavi ha sido creada`);
 
           return this.desenlaceEsaviRepository.save(nuevoDesenlaceEsavi); // Utilizamos save() para crear el registro
         }
       } catch (e) {
-        this.logger.error(
-          `Error al procesar la creación o actualización de DesenlaceEsavi: ${e.message}`,
-        );
+        this.logger.error(`Error al procesar la creación o actualización de DesenlaceEsavi: ${e.message}`);
         throw new Error('Hubo un problema al crear o actualizar DesenlaceEsavi');
       } finally {
-        this.logger.log(`DesenlaceEsavi ha sido procesado: ${JSON.stringify(createDto)}`);
+        this.logger.log(`DesenlaceEsavi ha sido procesado: ${createDto.codigo}`);
       }
     } else {
       throw new Error('El campo notificacion es obligatorio para DesenlaceEsavi');
@@ -135,10 +126,7 @@ export class DesenlaceEsaviService {
     }
   }
 
-  async update(
-    uuid: string,
-    updateGravedadEsaviDto: UpdateDesenlaceEsaviDto,
-  ): Promise<DesenlaceEsavi> {
+  async update(uuid: string, updateGravedadEsaviDto: UpdateDesenlaceEsaviDto): Promise<DesenlaceEsavi> {
     const desenlaceEsavi = await this.findOne(uuid);
     if (desenlaceEsavi) {
       this.desenlaceEsaviRepository.merge(desenlaceEsavi, updateGravedadEsaviDto);

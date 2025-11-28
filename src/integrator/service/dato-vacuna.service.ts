@@ -53,7 +53,7 @@ export class DatoVacunaService {
       this.logger.error(`Error al procesar los datos de vacuna para Vigiflow: ${e.message}`);
       throw new Error('Hubo un problema al crear o actualizar los datos de vacuna para Vigiflow');
     } finally {
-      this.logger.log(`DatoVacuna para Vigiflow ha sido procesado: ${JSON.stringify(createDto)}`);
+      this.logger.log(`DatoVacuna procesado para Vigiflow`);
     }
   }
 

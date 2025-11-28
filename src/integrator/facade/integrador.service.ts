@@ -55,19 +55,11 @@ export class IntegradorService {
       const pacienteDhis2 = await this.pacienteDhis2Service.create(createDto.pacienteDhis2);
 
       if (pacienteDhis2) {
-        notificacion = await this.notificacionDhis2Service.create(
-          createDto.notificacion,
-          pacienteDhis2,
-        );
+        notificacion = await this.notificacionDhis2Service.create(createDto.notificacion, pacienteDhis2);
       }
     } else {
-      const pacienteVigiflow = await this.pacienteVigiflowService.create(
-        createDto.pacienteVigiflow,
-      );
-      notificacion = await this.notificacionVigiflowService.create(
-        createDto.notificacion,
-        pacienteVigiflow,
-      );
+      const pacienteVigiflow = await this.pacienteVigiflowService.create(createDto.pacienteVigiflow);
+      notificacion = await this.notificacionVigiflowService.create(createDto.notificacion, pacienteVigiflow);
     }
     if (notificacion) {
       if (createDto.medicamento && createDto.medicamento.length > 0) {
@@ -84,10 +76,7 @@ export class IntegradorService {
         await this.antecedenteMedicoService.create(notificacion, createDto.antecedenteMedico);
       }
       if (createDto.antecedentePreexistencia) {
-        await this.antecedentePreexistenciaService.create(
-          notificacion,
-          createDto.antecedentePreexistencia,
-        );
+        await this.antecedentePreexistenciaService.create(notificacion, createDto.antecedentePreexistencia);
       }
       //ESAVI
       if (createDto.causalidadEsavi) {
@@ -145,16 +134,8 @@ export class IntegradorService {
   /**
    * Busca notificaciones por identificación de paciente y rango de fechas
    */
-  async findByIdentificacionAndDateRange(
-    identificacion: string,
-    fechaInicio: Date,
-    fechaFin: Date,
-  ) {
-    return this.notificacionDhis2Service.findByIdentificacionAndDateRange(
-      identificacion,
-      fechaInicio,
-      fechaFin,
-    );
+  async findByIdentificacionAndDateRange(identificacion: string, fechaInicio: Date, fechaFin: Date) {
+    return this.notificacionDhis2Service.findByIdentificacionAndDateRange(identificacion, fechaInicio, fechaFin);
   }
 
   /**

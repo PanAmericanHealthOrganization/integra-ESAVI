@@ -21,7 +21,7 @@ export class MeddraLltController {
    * @returns
    */
   @Get('search')
-  async searchLLT(@Query('term') term: string): Promise<LLT[]> {
+  async searchLLT(@Query('term') term: string): Promise<LLT> {
     return this.meddraLltService.searchLLT(term);
   }
 }
