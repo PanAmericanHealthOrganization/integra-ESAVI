@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PT } from '../models/standar/pt.entity';
-import { MeddraPtService } from '../services/meddra-pt-service';
+import { MeddraPtService } from '../services/meddra-pt.service';
 
 /**
  *

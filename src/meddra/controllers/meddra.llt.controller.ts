@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { LLT } from '../models/standar/llt.entity';
-import { MeddraLLTService } from '../services/meddra-lt-service';
+import { MeddraLLTService } from '../services/meddra-lt.service';
 
 /**
  *

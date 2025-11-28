@@ -1,40 +1,40 @@
-import {HttpService} from '@nestjs/axios';
-import {BadRequestException,Injectable,Logger} from '@nestjs/common';
-import {ConfigService} from '@nestjs/config';
-import {Cron} from '@nestjs/schedule';
+import { HttpService } from '@nestjs/axios';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs/promises';
 import * as moment from 'moment/moment';
-import {throwError} from 'rxjs';
-import {CreatePacienteEmbarazadaDto} from 'src/integrator/dto/create-paciente-embarazada.dto';
-import {UbicacionDto} from 'src/integrator/dto/ubicacion.dto';
-import {UpdateAntecedenteEmbarazoDto} from 'src/integrator/dto/update-antecedente-embarazo.dto';
-import {Auditoria,IAuditoria} from 'src/integrator/entity/auditoria.entity';
-import {AntecedenteEmbarazoService} from 'src/integrator/service/antecedente-embarazo.service';
-import {DatoEsaviService} from 'src/integrator/service/dato-esavi.service';
-import {MeddraLLTService} from 'src/meddra/services/meddra-lt-service';
-import {MeddraPtService} from 'src/meddra/services/meddra-pt-service';
-import {MeddraSocService} from 'src/meddra/services/meddra-soc.service';
-import {ActiveIngredientsService} from 'src/whodrugs/services/activeIngredients.service';
-import {DrugService} from 'src/whodrugs/services/drugs.service';
-import {MaholderService} from 'src/whodrugs/services/maholder.service';
-import {read,utils,WorkBook} from 'xlsx';
-import {CreateCompleteDto} from '../../integrator/dto/create-complete.dto';
-import {CreateDatoEsaviDto} from '../../integrator/dto/create-dato-esavi.dto';
-import {CreateDatoVacunaDto} from '../../integrator/dto/create-dato-vacuna.dto';
-import {CreateDatoVacunacionDto} from '../../integrator/dto/create-dato-vacunacion.dto';
-import {CreateDesenlaceEsaviDto} from '../../integrator/dto/create-desenlace-esavi.dto';
-import {CreateGravedadEsaviDto} from '../../integrator/dto/create-gravedad-esavi.dto';
-import {CreateMedicamentoDto} from '../../integrator/dto/create-medicamento.dto';
-import {CreateNotificacionDto} from '../../integrator/dto/create-notificacion.dto';
-import {CreatePacienteVigiflowDto} from '../../integrator/dto/create-paciente-vigiflow.dto';
-import {UpdateNotificacionDto} from '../../integrator/dto/update-notificacion.dto';
-import {SourceEnum} from '../../integrator/enum/source-enum';
-import {IntegradorService} from '../../integrator/facade/integrador.service';
-import {DatoVacunaService} from '../../integrator/service/dato-vacuna.service';
-import {MedicamentoService} from '../../integrator/service/medicamento.service';
-import {NotificacionVigiflowService} from '../../integrator/service/notificacion-vigiflow.service';
-import {PacienteVigiflowService} from '../../integrator/service/paciente-vigiflow.service';
-import {VigiflowCrawlerService} from './vigiflow-crawler.service';
+import { throwError } from 'rxjs';
+import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
+import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
+import { UpdateAntecedenteEmbarazoDto } from 'src/integrator/dto/update-antecedente-embarazo.dto';
+import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
+import { AntecedenteEmbarazoService } from 'src/integrator/service/antecedente-embarazo.service';
+import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
+import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
+import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
+import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
+import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
+import { DrugService } from 'src/whodrugs/services/drugs.service';
+import { MaholderService } from 'src/whodrugs/services/maholder.service';
+import { read, utils, WorkBook } from 'xlsx';
+import { CreateCompleteDto } from '../../integrator/dto/create-complete.dto';
+import { CreateDatoEsaviDto } from '../../integrator/dto/create-dato-esavi.dto';
+import { CreateDatoVacunaDto } from '../../integrator/dto/create-dato-vacuna.dto';
+import { CreateDatoVacunacionDto } from '../../integrator/dto/create-dato-vacunacion.dto';
+import { CreateDesenlaceEsaviDto } from '../../integrator/dto/create-desenlace-esavi.dto';
+import { CreateGravedadEsaviDto } from '../../integrator/dto/create-gravedad-esavi.dto';
+import { CreateMedicamentoDto } from '../../integrator/dto/create-medicamento.dto';
+import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
+import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-vigiflow.dto';
+import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
+import { SourceEnum } from '../../integrator/enum/source-enum';
+import { IntegradorService } from '../../integrator/facade/integrador.service';
+import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
+import { MedicamentoService } from '../../integrator/service/medicamento.service';
+import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
+import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
+import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -179,7 +179,7 @@ export class VigiflowIntegradorService {
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
     reports.map(async (reg) => {
-      // TODO: colocar auditoria correcta 
+      // TODO: colocar auditoria correcta
       const auditoria: IAuditoria = {
         createdAt: new Date(),
         createdBy: 'System',

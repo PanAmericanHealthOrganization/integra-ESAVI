@@ -20,9 +20,9 @@ import { PT } from './models/standar/pt.entity';
 import { SOC } from './models/standar/soc.entity';
 import { MeddraClientService } from './services/meddra-client.service';
 import { MeddraHistoryService } from './services/meddra-history.service';
-import { MeddraLLTService } from './services/meddra-lt-service';
+import { MeddraLLTService } from './services/meddra-lt.service';
 import { MeddraProcessFilesService } from './services/meddra-process.service';
-import { MeddraPtService } from './services/meddra-pt-service';
+import { MeddraPtService } from './services/meddra-pt.service';
 import { MeddraSocService } from './services/meddra-soc.service';
 import { MeddraStandarService } from './services/meddra-standar.service';
 
