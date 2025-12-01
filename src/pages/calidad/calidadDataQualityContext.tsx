@@ -137,12 +137,11 @@ const transformApiResponse = (
     })
   })
 
-  // Filtrar reglas de exactitud (Dimensión de Exactitud Semántica)
+  // Filtrar reglas de exactitud (subDimensiones: Sintáctica y Semántica)
   const sintacticQuality: SyntacticQualityRow[] = allRules
     .filter(
       (rule) =>
-        rule.subDimension === "Dimensión de Exactitud Semántica" ||
-        rule.subDimension === "Dimensión de Consistencia de Dominio"
+        rule.subDimension === "Sintáctica" || rule.subDimension === "Semántica"
     )
     .map((rule) => ({
       codigo: rule.codigo,
@@ -158,12 +157,13 @@ const transformApiResponse = (
       idNotificacionesNoValidos: rule.idNotificacionesNoValidos,
     }))
 
-  // Filtrar reglas de consistencia (Dimensión de Consistencia de Interrelación y Formato)
+  // Filtrar reglas de consistencia (subDimensiones: Dominio, Intrarelación, Interrelación)
   const semanticQuality: SemanticQualityRow[] = allRules
     .filter(
       (rule) =>
-        rule.subDimension === "Dimensión de Consistencia de Interrelación" ||
-        rule.subDimension === "Dimensión de Consistencia de Formato"
+        rule.subDimension === "Dominio" ||
+        rule.subDimension === "Intrarelación" ||
+        rule.subDimension === "Interrelación"
     )
     .map((rule) => ({
       codigo: rule.codigo,
@@ -178,6 +178,27 @@ const transformApiResponse = (
       porcentajeRegistrosInvalidos: rule.porcentajeRegistrosInvalidos,
       idNotificacionesNoValidos: rule.idNotificacionesNoValidos,
     }))
+
+  // Filtrar reglas de completitud (subDimensión: Completitud)
+  const completenessQuality: CompletenessQualityRow[] = allRules
+    .filter((rule) => rule.subDimension === "Completitud")
+    .map((rule) => {
+      // Extraer nombre de tabla y columna del código de la regla
+      // Formato esperado del código: "CON_DOM_001_NOMBRE_COLUMNA" o similar
+      const partes = rule.codigo.split(".")
+      const tableName = partes.length > 1 ? partes[0] : "TR_NOTIFICACION"
+      const columnName = partes.length > 1 ? partes[1] : rule.regla
+
+      return {
+        tableName,
+        columnName,
+        columnDescription: rule.descripcionRegla,
+        totalRecords: rule.totalRegistros,
+        totalNulls: rule.totalRegistrosInvalidos,
+        totalNonNulls: rule.totalRegistrosValidos,
+        completenessPercentage: rule.porcentajeRegistrosValidos,
+      }
+    })
 
   // Calcular totales
   const totalRegistros = allRules.reduce((acc, rule) => {
@@ -200,7 +221,7 @@ const transformApiResponse = (
     totalRegistros,
     totalErrores,
     totalPorcentaje,
-    completenessQualityTable: [], // No viene en la nueva estructura
+    completenessQualityTable: completenessQuality,
     sintacticQuality,
     semanticQuality,
     temporalQuality: [], // No viene en la nueva estructura

@@ -29,6 +29,18 @@ export interface ICalidadDataProvider extends DataProvider {
     resource: string,
     params: GetListParams & QueryFunctionContext
   ) => Promise<any>
+  getProblems: (
+    resource: string,
+    anio: number,
+    mes: number,
+    codigo: string
+  ) => Promise<any[]>
+  downloadProblemsCSV: (
+    resource: string,
+    anio: number,
+    mes: number,
+    codigo: string
+  ) => Promise<void>
 }
 
 export const calidadDataProvider: ICalidadDataProvider = {
@@ -42,6 +54,73 @@ export const calidadDataProvider: ICalidadDataProvider = {
       `/${resource}/general?date=${date}`
     )
     return response.data
+  },
+  getProblems: async function (
+    resource: string,
+    anio: number,
+    mes: number,
+    codigo: string
+  ): Promise<any[]> {
+    const response = await intESAVIClient.get(
+      `/${resource}/problems?anio=${anio}&mes=${mes}&codigo=${codigo}`
+    )
+    return response.data
+  },
+  downloadProblemsCSV: async function (
+    resource: string,
+    anio: number,
+    mes: number,
+    codigo: string
+  ): Promise<void> {
+    try {
+      const data = await this.getProblems(resource, anio, mes, codigo)
+
+      if (!data || data.length === 0) {
+        alert("No hay datos disponibles para descargar")
+        return
+      }
+
+      // Obtener las claves del primer objeto para crear los headers
+      const headers = Object.keys(data[0])
+
+      // Crear el contenido CSV
+      const csvContent = [
+        headers.join(","), // Headers
+        ...data.map((row) =>
+          headers
+            .map((header) => {
+              const value = row[header]
+              // Escapar valores que contengan comas o comillas
+              if (value === null || value === undefined) return ""
+              const stringValue = String(value)
+              if (stringValue.includes(",") || stringValue.includes('"')) {
+                return `"${stringValue.replace(/"/g, '""')}"`
+              }
+              return stringValue
+            })
+            .join(",")
+        ),
+      ].join("\n")
+
+      // Crear el blob y descargar
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+      const link = document.createElement("a")
+      const url = URL.createObjectURL(blob)
+
+      link.setAttribute("href", url)
+      link.setAttribute(
+        "download",
+        `problemas_calidad_${codigo}_${anio}_${mes}.csv`
+      )
+      link.style.visibility = "hidden"
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    } catch (error) {
+      console.error("Error al descargar CSV:", error)
+      alert("Error al descargar el archivo CSV")
+    }
   },
   getList: function <RecordType extends RaRecord = any>(
     resource: string,

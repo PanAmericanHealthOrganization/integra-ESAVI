@@ -1,4 +1,3 @@
-import { Psychology } from "@mui/icons-material"
 import {
   Alert,
   Box,
@@ -7,13 +6,6 @@ import {
   Chip,
   Grid,
   LinearProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from "@mui/material"
 import { useMemo } from "react"
@@ -28,6 +20,7 @@ import {
 } from "recharts"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
+import { TablaProblemasCalidad } from "../components"
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
@@ -72,8 +65,21 @@ const EmptyState = () => (
 )
 
 const CalidadSemantica: React.FC = () => {
-  const { data, loading } = useCalidadDataQuality()
+  const { data, loading, selectedDate } = useCalidadDataQuality()
   const reglas = data?.semanticQuality ?? []
+  // Extraer año y mes de la fecha seleccionada
+  const anio = selectedDate ? parseInt(selectedDate.split("-")[0]) : undefined
+  const mes = selectedDate ? parseInt(selectedDate.split("-")[1]) : undefined
+
+  // Función de descarga (placeholder)
+  const handleDownload = (codigo: string, anio: number, mes: number) => {
+    console.log("Descargar datos para:", { codigo, anio, mes })
+    // TODO: Implementar lógica de descarga
+  }
+  const dimensionConsistencia = useMemo(() => {
+    if (!data?.dimensiones) return null
+    return data.dimensiones.find((d) => d.dimension === "Consistencia") || null
+  }, [data])
 
   const resumen = useMemo(() => {
     if (reglas.length === 0) return null
@@ -312,109 +318,13 @@ const CalidadSemantica: React.FC = () => {
 
       <Card>
         <CardContent>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
-            Detalle de reglas de consistencia
-          </Typography>
-          <TableContainer component={Paper} elevation={0}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Código / Regla</TableCell>
-                  <TableCell>Subdimensión</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell align="center">Registros válidos</TableCell>
-                  <TableCell align="center">Registros inválidos</TableCell>
-                  <TableCell align="center">Porcentajes</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {tablaReglas.map((regla, index) => (
-                  <TableRow
-                    key={regla.codigo || regla.ruleCode || `regla-${index}`}
-                    hover>
-                    <TableCell sx={{ maxWidth: 220 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: 0.5,
-                        }}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 1,
-                          }}>
-                          <Psychology color="primary" fontSize="small" />
-                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                            {regla.ruleName || regla.regla}
-                          </Typography>
-                        </Box>
-                        {(regla.codigo || regla.ruleCode) && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ fontFamily: "monospace", ml: 3 }}>
-                            {regla.codigo || regla.ruleCode}
-                          </Typography>
-                        )}
-                      </Box>
-                    </TableCell>
-                    <TableCell sx={{ maxWidth: 200 }}>
-                      <Typography variant="caption" color="primary.main">
-                        {regla.subDimension || "—"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell sx={{ maxWidth: 360 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        {regla.ruleDescription || regla.descripcionRegla}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography
-                        variant="body2"
-                        color="success.main"
-                        sx={{ fontWeight: 600 }}>
-                        {numberFormatter.format(regla.totalRegistrosValidos)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Typography
-                        variant="body2"
-                        color="error.main"
-                        sx={{ fontWeight: 600 }}>
-                        {numberFormatter.format(regla.totalRegistrosInvalidos)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Box
-                        sx={{
-                          display: "flex",
-                          gap: 1,
-                          flexDirection: "column",
-                          alignItems: "center",
-                        }}>
-                        <Chip
-                          label={`${regla.porcentajeRegistrosValidos.toFixed(2)}% válidos`}
-                          color={
-                            getStatusColor(
-                              regla.porcentajeRegistrosValidos
-                            ) as any
-                          }
-                          size="small"
-                        />
-                        <Chip
-                          label={`${regla.porcentajeRegistrosInvalidos.toFixed(2)}% inválidos`}
-                          color="error"
-                          size="small"
-                        />
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <TablaProblemasCalidad
+            dimension="Consistencia"
+            data={dimensionConsistencia}
+            onDownload={handleDownload}
+            anio={anio}
+            mes={mes}
+          />
         </CardContent>
       </Card>
 
