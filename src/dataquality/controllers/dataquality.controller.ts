@@ -31,6 +31,23 @@ export class DataqualityController implements IController<QualityDto, QualityDto
 
     return await this.generalService.getGeneralQuality(date);
   }
+
+  /**
+   *
+   * @param anio
+   * @param mes
+   * @param codigo
+   * @returns
+   */
+  @Get('problems')
+  public async qualityProblems(
+    @Query('anio') anio: number,
+    @Query('mes') mes: number,
+    @Query('codigo') codigo: string,
+  ): Promise<any[]> {
+    return await this.generalService.qualityProblems(anio, mes, codigo);
+  }
+
   getMany(params: IGetManyParams): Promise<QualityDto[]> {
     throw new Error('Method not implemented.');
   }

@@ -79,3 +79,37 @@ GET {{baseUrl}}/dataquality/exportar?formato=excel&fecha={{fechaManual}}
 Content-Type: application/json
 
 ###
+
+### ============================================
+### PROBLEMAS DE CALIDAD
+### ============================================
+
+### Obtener problemas de calidad - Ejemplo básico
+GET {{baseUrl}}/problems?anio=2024&mes=12&codigo=CON_DOM_004
+Content-Type: application/json
+
+###
+
+### Obtener problemas de calidad - Sin código
+GET {{baseUrl}}/problems?anio=2025&mes=1
+Content-Type: application/json
+
+###
+
+### Obtener problemas de calidad - Mes actual
+GET {{baseUrl}}/problems?anio=2025&mes=1&codigo=
+Content-Type: application/json
+
+###
+
+### Obtener problemas de calidad - Diferentes códigos
+GET {{baseUrl}}/problems?anio=2024&mes=12&codigo=VAL002
+Content-Type: application/json
+
+###
+
+### Obtener problemas de calidad - Año completo
+GET {{baseUrl}}/problems?anio=2025&mes=0&codigo=ALL
+Content-Type: application/json
+
+###

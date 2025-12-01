@@ -82,7 +82,11 @@ export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
 
 export class QualityDto {
   id?: string;
-  fecha: Date;
+  @IsInt()
+  anio: number;
+  @IsInt()
+  mes: number;
+  @IsArray()
   jsonQuality: DimensionCalidadDatosDto[];
 }
 

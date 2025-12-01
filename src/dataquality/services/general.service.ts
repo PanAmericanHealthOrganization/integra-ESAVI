@@ -5,7 +5,7 @@ import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { getMonth, getYear } from 'date-fns';
 import { IAuditoria } from 'src/integrator/entity';
 import { DataSource, Equal, Repository } from 'typeorm';
-import { IDataQualityDimensions, QualityDto } from '../controllers/dto/quality.dto';
+import { DimensionCalidadDatosDto, IDataQualityDimensions, QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { DimCompletitudService } from './dim-completitud';
 import { DimConsistenciaService } from './dim-consitencia';
@@ -120,8 +120,31 @@ export class GeneralService {
     ]);
 
     return {
-      fecha: day,
+      anio: getYear(day),
+      mes: getMonth(day) + 1,
       jsonQuality: [dimExactitud, dimConsistencia, dimCompletitud],
     };
+  }
+
+  /**
+   *
+   * @param anio
+   * @param mes
+   * @param codigoRegla
+   * @returns
+   */
+  async qualityProblems(anio: number, mes: number, codigoRegla: string): Promise<any> {
+    const t = await this.dataQualityDimensionsRepository
+      .createQueryBuilder('dimension_quality')
+      .where('dimension_quality.anio = :anio AND dimension_quality.mes = :mes', { anio, mes })
+      .getOne();
+
+    const jsonQuality = JSON.parse(t.jsonQuality) as DimensionCalidadDatosDto[];
+    const filteredJsonQuality = jsonQuality
+      .map((dim) => dim.jsonDimensionQuality.filter((r) => r.codigo === codigoRegla))
+      .flat()
+      .find((r) => r);
+
+    return filteredJsonQuality;
   }
 }
