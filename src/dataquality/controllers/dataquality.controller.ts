@@ -9,7 +9,7 @@ export class DataqualityController implements IController<QualityDto, QualityDto
   constructor(private readonly generalService: GeneralService) {}
 
   @Get('general')
-  public async getGeneralQuality(@Query('date') dateString: string): Promise<QualityDto> {
+  public async getGeneralQuality(@Query('date') dateString: Date): Promise<QualityDto> {
     // Si no se proporciona fecha, usar la fecha actual
     if (!dateString) {
       const today = new Date();

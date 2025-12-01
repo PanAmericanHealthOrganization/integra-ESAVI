@@ -19,7 +19,7 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'TIPO_GRAVEDAD',
-    nullable: true,
+    nullable: false,
     comment: 'Tipo de gravedad del ESAVI',
   })
   tipo: string;
@@ -29,7 +29,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'MUERTE',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI resultó en muerte',
   })
   muerte: boolean;
@@ -39,7 +40,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'RIESGO_VIDA',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI puso en riesgo la vida del paciente',
   })
   riesgoVida: boolean;
@@ -49,7 +51,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'DISCAPACIDAD',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI resultó en discapacidad',
   })
   discapacidad: boolean;
@@ -59,7 +62,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'HOSPITALIZACION',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI requirió hospitalización',
   })
   hospitalizacion: boolean;
@@ -69,7 +73,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'ANOMALIA_CONGENITA',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI causó anomalía congénita',
   })
   anomaliaCongenita: boolean;
@@ -79,7 +84,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'ABORTO',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI resultó en aborto',
   })
   aborto: boolean;
@@ -89,7 +95,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'MUERTE_FETAL',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si el ESAVI resultó en muerte fetal',
   })
   muerteFetal: boolean;
@@ -99,7 +106,8 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'OTROS_EVENTOS_IMPORTANTES',
-    nullable: true,
+    nullable: false,
+    default: false,
     comment: 'Indica si hubo otros eventos importantes',
   })
   eventoImportante: boolean;

@@ -2,9 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { getMonth, getYear } from 'date-fns';
 import { IAuditoria } from 'src/integrator/entity';
 import { DataSource, Equal, Repository } from 'typeorm';
-import { QualityDto } from '../controllers/dto/quality.dto';
+import { IDataQualityDimensions, QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { DimCompletitudService } from './dim-completitud';
 import { DimConsistenciaService } from './dim-consitencia';
@@ -34,10 +35,11 @@ export class GeneralService {
    * @returns
    */
   async getGeneralQuality(date: Date): Promise<any> {
+    const [year, month] = [getYear(date), getMonth(date) + 1];
     let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
-        fecha: Equal(date),
-        dimension: Equal(this.schemaName),
+        anio: year,
+        mes: month,
       },
     });
 
@@ -45,8 +47,8 @@ export class GeneralService {
       await this.processQualityDay(date);
       dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
         where: {
-          fecha: Equal(date),
-          dimension: Equal(this.schemaName),
+          anio: year,
+          mes: month,
         },
       });
     }
@@ -58,8 +60,10 @@ export class GeneralService {
   }
 
   async processQualityDay(day: Date): Promise<DataQualityDimensions> {
+    console.log('Procesando calidad de datos para el día:', day);
     // genera el resumen de calidad
     const g = await this.generateQualitySumary(day);
+    const [year, month] = [getYear(day), getMonth(day) + 1];
 
     //
     const auditoria: IAuditoria = {
@@ -74,8 +78,8 @@ export class GeneralService {
     };
     let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
-        fecha: Equal(day),
-        dimension: Equal(this.schemaName),
+        anio: Equal(year),
+        mes: Equal(month),
       },
     });
 
@@ -83,12 +87,12 @@ export class GeneralService {
       dataQualityDimension.jsonQuality = JSON.stringify(g.jsonQuality);
       dataQualityDimension.updatedAt = new Date();
       dataQualityDimension.updatedBy = this.configService.get('SYSTEUSUARIO_INSERTA_REGISTROM_USER');
-      return this.dataQualityDimensionsRepository.save(dataQualityDimension);
+      return this.dataQualityDimensionsRepository.save<IDataQualityDimensions>(dataQualityDimension);
     } else {
       // Si no existe, crear uno nuevo con la información de auditoría
-      return this.dataQualityDimensionsRepository.save({
-        fecha: day,
-        dimension: this.schemaName,
+      return this.dataQualityDimensionsRepository.save<IDataQualityDimensions>({
+        anio: year,
+        mes: month,
         jsonQuality: JSON.stringify(g.jsonQuality),
         ...auditoria,
       });
@@ -109,14 +113,15 @@ export class GeneralService {
    * @returns
    */
   async generateQualitySumary(day: Date): Promise<QualityDto> {
-    const [dimExactitud, dimConsistencia] = await Promise.all([
+    const [dimExactitud, dimConsistencia, dimCompletitud] = await Promise.all([
       this.dimExactitudService.processAll(day),
       this.dimConsistenciaService.processAll(day),
+      this.dimCompletitudService.processAll(day),
     ]);
 
     return {
       fecha: day,
-      jsonQuality: [dimExactitud, dimConsistencia],
+      jsonQuality: [dimExactitud, dimConsistencia, dimCompletitud],
     };
   }
 }

@@ -1,5 +1,15 @@
 import { IsArray, IsInt, IsString } from 'class-validator';
 
+export interface IDataQualityDimensions {
+  id?: number;
+
+  anio: number;
+
+  mes: number;
+
+  jsonQuality: string;
+}
+
 export class TotalesCalidDatosDto {
   /**
    *

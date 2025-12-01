@@ -664,8 +664,8 @@ export class DimConsistenciaService {
   private async _integridadGravedadEsavi(date: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Gravedad ESAVI para el día ${date.toISOString()}`);
     const query = `
-       select
-      count(*) as "totalRegistros",
+      select
+      count(*) filter (where tde."TIPO_GRAVEDAD" = 'GRAVE') as "totalRegistros",
       count(*) filter (
         where
         (tde."TIPO_GRAVEDAD" = 'GRAVE' and 
@@ -679,8 +679,6 @@ export class DimConsistenciaService {
           tde."MUERTE_FETAL" = true OR
           tde."OTROS_EVENTOS_IMPORTANTES" = true
         ))
-        OR
-        (tde."TIPO_GRAVEDAD" != 'GRAVE')
       ) as "totalRegistrosValidos",
       count(*) filter (
         where

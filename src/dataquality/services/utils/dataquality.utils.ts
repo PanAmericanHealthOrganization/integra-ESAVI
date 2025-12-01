@@ -20,7 +20,11 @@ export class DataQualityUtils {
         idNotificacionesNoValidos: [],
       };
     }
-    const { totalRegistros, totalRegistrosValidos, totalRegistrosInvalidos, idNotificacionesNoValidos } = result[0];
+    const row = result[0] || {};
+    const totalRegistros = Math.trunc(Number(row.totalRegistros) || 0);
+    const totalRegistrosValidos = Math.trunc(Number(row.totalRegistrosValidos) || 0);
+    const totalRegistrosInvalidos = Math.trunc(Number(row.totalRegistrosNoValidos) || 0);
+    const idNotificacionesNoValidos = Array.isArray(row.idNotificacionesNoValidos) ? row.idNotificacionesNoValidos : [];
 
     const porcentajeRegistrosValidos = totalRegistros !== 0 ? (totalRegistrosValidos / totalRegistros) * 100 : 0;
     const porcentajeRegistrosInvalidos = totalRegistros !== 0 ? (totalRegistrosInvalidos / totalRegistros) * 100 : 0;

@@ -1,12 +1,13 @@
 import { Auditoria } from 'src/integrator/entity';
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { IDataQualityDimensions } from '../controllers/dto/quality.dto';
 
 @Entity({
   schema: 'dhi_esavi',
   name: 'DQ_DIMENSION',
   comment: 'Tabla de dimensiones de calidad de los datos',
 })
-export class DataQualityDimensions extends Auditoria {
+export class DataQualityDimensions extends Auditoria implements IDataQualityDimensions {
   /**
    * Identificador único de la dimensión de calidad
    */
@@ -17,27 +18,26 @@ export class DataQualityDimensions extends Auditoria {
   id: number;
 
   /**
-   *
-   */
-  @CreateDateColumn({
-    name: 'fecha',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    comment: 'Fecha de evaluación ',
-  })
-  fecha: Date;
-
-  /**
-   *
+   * Column  of data quality dimensions
    */
   @Column({
-    name: 'dimension',
-    type: 'varchar',
-    length: 255,
+    name: 'anio',
+    type: 'int',
     nullable: false,
-    comment: 'Grupo de evaluación',
+    comment: 'Año de evaluación',
   })
-  dimension: string;
+  anio: number;
+
+  /**
+   * Column  of data quality dimensions
+   */
+  @Column({
+    name: 'mes',
+    type: 'int',
+    nullable: false,
+    comment: 'Mes de evaluación',
+  })
+  mes: number;
 
   @Column({
     name: 'json_quali',
