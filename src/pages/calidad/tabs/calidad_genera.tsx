@@ -114,12 +114,13 @@ export const CalidadGeneral: React.FC = () => {
           ) / data.semanticQuality.length
         : null
 
-    // Calcular calidad por dimensión desde la nueva estructura
-    const calidadPorDimension =
+    // Información de dimensiones desde la nueva estructura
+    const dimensionesInfo =
       data.dimensiones?.map((dim) => ({
         nombre: dim.dimension,
-        calidad: dim.calidadDimension * 100, // Convertir a porcentaje
-        totalReglas: dim.jsonQuality.length,
+        calidadTotal: dim.calidadTotal,
+        deltaCalidadTotal: dim.deltaCalidadTotal,
+        totalReglas: dim.jsonDimensionQuality.length,
       })) ?? []
 
     const indicadoresDisponibles = [exactitudGlobal, consistenciaGlobal].filter(
@@ -161,6 +162,7 @@ export const CalidadGeneral: React.FC = () => {
       totalReglasExactitud: data.sintacticQuality.length,
       totalReglasConsistencia: data.semanticQuality.length,
       promedioCompletitud,
+      dimensionesInfo,
     }
   }, [data])
 
@@ -361,6 +363,75 @@ export const CalidadGeneral: React.FC = () => {
           />
         </Grid>
       </Grid>
+
+      {/* Cards de dimensiones */}
+      {resumenGlobal.dimensionesInfo &&
+        resumenGlobal.dimensionesInfo.length > 0 && (
+          <>
+            <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
+              Calidad por Dimensión
+            </Typography>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {resumenGlobal.dimensionesInfo.map((dimension) => {
+                const status = getScoreStatus(dimension.calidadTotal)
+                const deltaPositivo = dimension.deltaCalidadTotal > 0
+                const deltaNegativo = dimension.deltaCalidadTotal < 0
+
+                return (
+                  <Grid item xs={12} sm={6} md={4} key={dimension.nombre}>
+                    <Card>
+                      <CardContent>
+                        <Typography variant="body2" color="text.secondary">
+                          {dimension.nombre}
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "baseline",
+                            gap: 1,
+                            mt: 1,
+                          }}>
+                          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                            {formatPercentage(dimension.calidadTotal)}
+                          </Typography>
+                          {dimension.deltaCalidadTotal !== 0 && (
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: deltaPositivo
+                                  ? "success.main"
+                                  : deltaNegativo
+                                    ? "error.main"
+                                    : "text.secondary",
+                                fontWeight: 600,
+                              }}>
+                              {deltaPositivo ? "↑" : "↓"}{" "}
+                              {Math.abs(dimension.deltaCalidadTotal).toFixed(2)}
+                              %
+                            </Typography>
+                          )}
+                        </Box>
+                        <Chip
+                          label={status.label}
+                          color={status.chipColor}
+                          size="small"
+                          sx={{ mt: 1 }}
+                        />
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          display="block"
+                          sx={{ mt: 1 }}>
+                          {dimension.totalReglas} reglas evaluadas
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                )
+              })}
+            </Grid>
+          </>
+        )}
     </Box>
   )
 }

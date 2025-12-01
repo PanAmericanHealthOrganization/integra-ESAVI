@@ -1,3 +1,4 @@
+import { Assessment } from "@mui/icons-material"
 import {
   Box,
   Button,
@@ -8,20 +9,18 @@ import {
   Grid,
   InputLabel,
   MenuItem,
+  Paper,
   Select,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material"
 import { useEffect, useMemo, useState } from "react"
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
 
@@ -127,17 +126,6 @@ const CalidadCompletitud: React.FC = () => {
       columnasCriticas,
     }
   }, [columnasTabla])
-
-  const chartData = useMemo(
-    () =>
-      columnasTabla.map((column) => ({
-        columna: column.columnName,
-        completitud: Number(column.completenessPercentage.toFixed(2)),
-        nulos: column.totalNulls,
-        noNulos: column.totalNonNulls,
-      })),
-    [columnasTabla]
-  )
 
   if (loading) {
     return <LoadingState />
@@ -251,85 +239,94 @@ const CalidadCompletitud: React.FC = () => {
             </Grid>
           </Grid>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    Completitud por columna
-                  </Typography>
-                  <Box sx={{ height: 400 }}>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis
-                          type="number"
-                          domain={[0, 100]}
-                          tickFormatter={(value) => `${value}%`}
-                        />
-                        <YAxis type="category" dataKey="columna" width={240} />
-                        <Tooltip formatter={(value) => [`${value}%`, "Completitud"]} />
-                        <Bar
-                          dataKey="completitud"
-                          fill="#3b82f6"
-                          radius={[0, 4, 4, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                    Detalle de columnas
-                  </Typography>
-                  <Stack spacing={2} sx={{ maxHeight: 380, overflowY: "auto" }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+                Detalle de completitud por columna
+              </Typography>
+              <TableContainer component={Paper} elevation={0}>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Columna</TableCell>
+                      <TableCell>Descripción</TableCell>
+                      <TableCell align="center">Total registros</TableCell>
+                      <TableCell align="center">Valores con datos</TableCell>
+                      <TableCell align="center">Valores nulos</TableCell>
+                      <TableCell align="center">Completitud</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
                     {columnasTabla
                       .slice()
                       .sort(
                         (a, b) =>
                           a.completenessPercentage - b.completenessPercentage
                       )
-                      .map((column) => (
-                        <Box key={column.columnName}>
-                          <Typography
-                            variant="subtitle2"
-                            sx={{ fontFamily: "monospace" }}>
-                            {column.columnName}
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            color="text.secondary"
-                            gutterBottom>
-                            {column.columnDescription}
-                          </Typography>
-                          <Stack
-                            direction="row"
-                            spacing={1}
-                            alignItems="center">
+                      .map((column, index) => (
+                        <TableRow key={`${column.columnName}-${index}`} hover>
+                          <TableCell sx={{ maxWidth: 220 }}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
+                              }}>
+                              <Assessment color="primary" fontSize="small" />
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: 600,
+                                  fontFamily: "monospace",
+                                }}>
+                                {column.columnName}
+                              </Typography>
+                            </Box>
+                          </TableCell>
+                          <TableCell sx={{ maxWidth: 360 }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {column.columnDescription || "—"}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2">
+                              {numberFormatter.format(column.totalRecords)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography
+                              variant="body2"
+                              color="success.main"
+                              sx={{ fontWeight: 600 }}>
+                              {numberFormatter.format(column.totalNonNulls)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography
+                              variant="body2"
+                              color="error.main"
+                              sx={{ fontWeight: 600 }}>
+                              {numberFormatter.format(column.totalNulls)}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
                             <Chip
                               label={`${column.completenessPercentage.toFixed(2)}%`}
                               color={
-                                getStatusColor(column.completenessPercentage) as any
+                                getStatusColor(
+                                  column.completenessPercentage
+                                ) as any
                               }
                               size="small"
                             />
-                            <Typography variant="caption" color="text.secondary">
-                              {numberFormatter.format(column.totalNonNulls)} /
-                              {` ${numberFormatter.format(column.totalRecords)} registros`}
-                            </Typography>
-                          </Stack>
-                        </Box>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                  </Stack>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </CardContent>
+          </Card>
         </>
       )}
     </Box>

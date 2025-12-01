@@ -1,6 +1,7 @@
 import {
   Assessment,
   CheckCircle,
+  FactCheck,
   Psychology,
   Refresh,
 } from "@mui/icons-material"
@@ -24,6 +25,7 @@ import {
   CalidadDataQualityProvider,
   useCalidadDataQuality,
 } from "./calidadDataQualityContext"
+import CalidadCompletitud from "./tabs/calidad_completitud"
 import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
 import CalidadSintactica from "./tabs/calidad_sintactica"
@@ -61,7 +63,7 @@ const CalidadDashListContent: React.FC = () => {
   const { error, loading, refresh, selectedDate, setSelectedDate } =
     useCalidadDataQuality()
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setCurrentTab(newValue)
   }
 
@@ -81,6 +83,11 @@ const CalidadDashListContent: React.FC = () => {
         label: "Consistencia",
         icon: <Psychology />,
         component: <CalidadSemantica />,
+      },
+      {
+        label: "Completitud",
+        icon: <FactCheck />,
+        component: <CalidadCompletitud />,
       },
     ],
     []
@@ -117,11 +124,22 @@ const CalidadDashListContent: React.FC = () => {
               sx={{ flexShrink: 1 }}>
               <TextField
                 label="Fecha de referencia"
-                type="date"
+                type="month"
                 size="small"
                 InputLabelProps={{ shrink: true }}
                 value={selectedDate}
-                onChange={(event) => setSelectedDate(event.target.value)}
+                onChange={(event) => {
+                  const selectedValue = event.target.value
+                  setSelectedDate(selectedValue)
+                }}
+                inputProps={{
+                  min: (() => {
+                    const date = new Date()
+                    date.setFullYear(date.getFullYear() - 5)
+                    return date.toISOString().slice(0, 7)
+                  })(),
+                  max: new Date().toISOString().slice(0, 7),
+                }}
                 sx={{ minWidth: 180 }}
               />
               <Button

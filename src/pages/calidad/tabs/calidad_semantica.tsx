@@ -319,54 +319,80 @@ const CalidadSemantica: React.FC = () => {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Regla</TableCell>
+                  <TableCell>Código / Regla</TableCell>
+                  <TableCell>Subdimensión</TableCell>
                   <TableCell>Descripción</TableCell>
-                  <TableCell>Registros válidos</TableCell>
-                  <TableCell>Registros inválidos</TableCell>
-                  <TableCell>Porcentajes</TableCell>
+                  <TableCell align="center">Registros válidos</TableCell>
+                  <TableCell align="center">Registros inválidos</TableCell>
+                  <TableCell align="center">Porcentajes</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {tablaReglas.map((regla, index) => (
-                  <TableRow key={regla.ruleCode || `regla-${index}`} hover>
+                  <TableRow
+                    key={regla.codigo || regla.ruleCode || `regla-${index}`}
+                    hover>
                     <TableCell sx={{ maxWidth: 220 }}>
                       <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                        <Psychology color="primary" fontSize="small" />
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {regla.ruleName || regla.regla}
-                        </Typography>
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.5,
+                        }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                          }}>
+                          <Psychology color="primary" fontSize="small" />
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {regla.ruleName || regla.regla}
+                          </Typography>
+                        </Box>
+                        {(regla.codigo || regla.ruleCode) && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontFamily: "monospace", ml: 3 }}>
+                            {regla.codigo || regla.ruleCode}
+                          </Typography>
+                        )}
                       </Box>
-                      {regla.ruleCode && (
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontFamily: "monospace" }}>
-                          {regla.ruleCode}
-                        </Typography>
-                      )}
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Typography variant="caption" color="primary.main">
+                        {regla.subDimension || "—"}
+                      </Typography>
                     </TableCell>
                     <TableCell sx={{ maxWidth: 360 }}>
                       <Typography variant="body2" color="text.secondary">
                         {regla.ruleDescription || regla.descripcionRegla}
                       </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="success.main">
+                    <TableCell align="center">
+                      <Typography
+                        variant="body2"
+                        color="success.main"
+                        sx={{ fontWeight: 600 }}>
                         {numberFormatter.format(regla.totalRegistrosValidos)}
                       </Typography>
                     </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="error.main">
+                    <TableCell align="center">
+                      <Typography
+                        variant="body2"
+                        color="error.main"
+                        sx={{ fontWeight: 600 }}>
                         {numberFormatter.format(regla.totalRegistrosInvalidos)}
                       </Typography>
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="center">
                       <Box
                         sx={{
                           display: "flex",
                           gap: 1,
                           flexDirection: "column",
+                          alignItems: "center",
                         }}>
                         <Chip
                           label={`${regla.porcentajeRegistrosValidos.toFixed(2)}% válidos`}
