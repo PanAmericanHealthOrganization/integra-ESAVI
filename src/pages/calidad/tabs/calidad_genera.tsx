@@ -16,6 +16,7 @@ import {
 } from "recharts"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
+import { GraficoHistoricoCalidad } from "../components/GraficoHistoricoCalidad"
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
@@ -324,47 +325,6 @@ export const CalidadGeneral: React.FC = () => {
         </Typography>
       </Stack>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        {summaryCards.map((metric) => (
-          <Grid item xs={12} sm={6} md={3} key={metric.title}>
-            <Card>
-              <CardContent>
-                <Typography variant="body2" color="text.secondary">
-                  {metric.title}
-                </Typography>
-                <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                  {formatPercentage(metric.value)}
-                </Typography>
-                <Chip
-                  label={metric.status.label}
-                  color={metric.status.chipColor}
-                  size="small"
-                  sx={{ mt: 1 }}
-                />
-                <Typography
-                  variant="caption"
-                  color="text.secondary"
-                  display="block"
-                  sx={{ mt: 1 }}>
-                  {metric.helper}
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12}>
-          <GaugeCard
-            title="Semáforo de calidad global"
-            value={resumenGlobal.indicadorCalidadGlobal}
-            helperText="Objetivo recomendado: ≥ 95% (verde); seguimiento entre 85% y 94% (amarillo)."
-          />
-        </Grid>
-      </Grid>
-
-      {/* Cards de dimensiones */}
       {resumenGlobal.dimensionesInfo &&
         resumenGlobal.dimensionesInfo.length > 0 && (
           <>
@@ -432,6 +392,11 @@ export const CalidadGeneral: React.FC = () => {
             </Grid>
           </>
         )}
+
+      {/* Gráfico Histórico de Calidad */}
+      <Box sx={{ mb: 4 }}>
+        <GraficoHistoricoCalidad />
+      </Box>
     </Box>
   )
 }

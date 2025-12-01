@@ -9,16 +9,6 @@ import {
   Typography,
 } from "@mui/material"
 import { useMemo } from "react"
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
 import { TablaProblemasCalidad } from "../components"
@@ -237,39 +227,6 @@ const CalidadSintactica: React.FC = () => {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-                Ranking de exactitud por regla (Top 5)
-              </Typography>
-              <Box sx={{ height: 400 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={rankingExactitud} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      type="number"
-                      domain={[0, 100]}
-                      tickFormatter={(value) => `${value}%`}
-                    />
-                    <YAxis type="category" dataKey="nombre" width={260} />
-                    <Tooltip
-                      formatter={(value) => [`${value}%`, "Exactitud"]}
-                    />
-                    <Legend />
-                    <Bar
-                      dataKey="porcentaje"
-                      name="% registros correctos"
-                      fill="#3b82f6"
-                      radius={[0, 4, 4, 0]}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
         <Grid item xs={12}>
           <Card>
             <CardContent>

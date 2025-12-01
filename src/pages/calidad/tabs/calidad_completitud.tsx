@@ -1,28 +1,8 @@
-import { Assessment } from "@mui/icons-material"
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material"
+import { Box, Card, CardContent, Chip, Grid, Typography } from "@mui/material"
 import { useEffect, useMemo, useState } from "react"
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
+import { TablaProblemasCalidad } from "../components/TablaProblemasCalidad"
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
@@ -65,8 +45,20 @@ const EmptyState = () => (
 )
 
 const CalidadCompletitud: React.FC = () => {
-  const { data, loading, refresh } = useCalidadDataQuality()
+  const { data, loading, refresh, selectedDate } = useCalidadDataQuality()
   const [selectedTable, setSelectedTable] = useState<string>("")
+  // Función de descarga (placeholder)
+  const handleDownload = (codigo: string, anio: number, mes: number) => {
+    console.log("Descargar datos para:", { codigo, anio, mes })
+    // TODO: Implementar lógica de descarga
+  } // Extraer año y mes de la fecha seleccionada
+  const anio = selectedDate ? parseInt(selectedDate.split("-")[0]) : undefined
+  const mes = selectedDate ? parseInt(selectedDate.split("-")[1]) : undefined
+
+  const dimensionCompletitud = useMemo(() => {
+    if (!data?.dimensiones) return null
+    return data.dimensiones.find((d) => d.dimension === "Completitud") || null
+  }, [data])
 
   const tablasDisponibles = useMemo(() => {
     if (!data) return []
@@ -142,36 +134,6 @@ const CalidadCompletitud: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Stack
-        direction={{ xs: "column", md: "row" }}
-        spacing={2}
-        justifyContent="space-between"
-        alignItems={{ xs: "stretch", md: "center" }}
-        sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          Completitud de datos por tabla
-        </Typography>
-
-        <Stack direction="row" spacing={2} alignItems="center">
-          <FormControl size="small" sx={{ minWidth: 220 }}>
-            <InputLabel>Tabla</InputLabel>
-            <Select
-              label="Tabla"
-              value={selectedTable}
-              onChange={(event) => setSelectedTable(event.target.value)}>
-              {tablasDisponibles.map((table) => (
-                <MenuItem key={table} value={table}>
-                  {table}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button variant="contained" onClick={refresh}>
-            Actualizar
-          </Button>
-        </Stack>
-      </Stack>
-
       {columnasTabla.length === 0 ? (
         <EmptyState />
       ) : (
@@ -222,21 +184,6 @@ const CalidadCompletitud: React.FC = () => {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} md={3}>
-              <Card>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
-                    Columnas críticas
-                  </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                    {numberFormatter.format(columnasCriticas)}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Menos de 50% de completitud
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
           </Grid>
 
           <Card>
@@ -244,87 +191,13 @@ const CalidadCompletitud: React.FC = () => {
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                 Detalle de completitud por columna
               </Typography>
-              <TableContainer component={Paper} elevation={0}>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Columna</TableCell>
-                      <TableCell>Descripción</TableCell>
-                      <TableCell align="center">Total registros</TableCell>
-                      <TableCell align="center">Valores con datos</TableCell>
-                      <TableCell align="center">Valores nulos</TableCell>
-                      <TableCell align="center">Completitud</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {columnasTabla
-                      .slice()
-                      .sort(
-                        (a, b) =>
-                          a.completenessPercentage - b.completenessPercentage
-                      )
-                      .map((column, index) => (
-                        <TableRow key={`${column.columnName}-${index}`} hover>
-                          <TableCell sx={{ maxWidth: 220 }}>
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                              }}>
-                              <Assessment color="primary" fontSize="small" />
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  fontWeight: 600,
-                                  fontFamily: "monospace",
-                                }}>
-                                {column.columnName}
-                              </Typography>
-                            </Box>
-                          </TableCell>
-                          <TableCell sx={{ maxWidth: 360 }}>
-                            <Typography variant="body2" color="text.secondary">
-                              {column.columnDescription || "—"}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography variant="body2">
-                              {numberFormatter.format(column.totalRecords)}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography
-                              variant="body2"
-                              color="success.main"
-                              sx={{ fontWeight: 600 }}>
-                              {numberFormatter.format(column.totalNonNulls)}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Typography
-                              variant="body2"
-                              color="error.main"
-                              sx={{ fontWeight: 600 }}>
-                              {numberFormatter.format(column.totalNulls)}
-                            </Typography>
-                          </TableCell>
-                          <TableCell align="center">
-                            <Chip
-                              label={`${column.completenessPercentage.toFixed(2)}%`}
-                              color={
-                                getStatusColor(
-                                  column.completenessPercentage
-                                ) as any
-                              }
-                              size="small"
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+              <TablaProblemasCalidad
+                dimension="Completitud"
+                data={dimensionCompletitud}
+                onDownload={handleDownload}
+                anio={anio}
+                mes={mes}
+              />
             </CardContent>
           </Card>
         </>

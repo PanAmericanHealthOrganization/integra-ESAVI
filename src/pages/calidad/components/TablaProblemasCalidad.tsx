@@ -139,7 +139,7 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
               </TableCell>
               <TableCell sx={{ width: "28%" }}>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  Válidos vs Errores
+                  Porcentaje
                 </Typography>
               </TableCell>
               <TableCell align="center" sx={{ width: "10%" }}>
@@ -217,20 +217,20 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
                 {/* Botón de Descarga */}
                 <TableCell align="center">
                   {problema.idNotificacionesNoValidos &&
-                  problema.idNotificacionesNoValidos.length > 0 ? (
-                    <Tooltip title="Descargar errores en CSV" arrow>
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleDownloadClick(problema.codigo)}>
-                        <DownloadIcon />
-                      </IconButton>
-                    </Tooltip>
-                  ) : (
-                    <Typography variant="caption" color="text.disabled">
-                      N/A
-                    </Typography>
-                  )}
+                    problema.idNotificacionesNoValidos.length > 0 && (
+                      <Tooltip title="Descargar errores en CSV" arrow>
+                        <>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() =>
+                              handleDownloadClick(problema.codigo)
+                            }>
+                            <DownloadIcon />
+                          </IconButton>
+                        </>
+                      </Tooltip>
+                    )}
                 </TableCell>
               </TableRow>
             ))}

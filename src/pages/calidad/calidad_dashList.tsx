@@ -1,10 +1,4 @@
-import {
-  Assessment,
-  CheckCircle,
-  Code,
-  Psychology,
-  Schedule,
-} from "@mui/icons-material"
+import { Assessment, CheckCircle, Code, Psychology } from "@mui/icons-material"
 import { Box, Container, Paper, Tab, Tabs } from "@mui/material"
 import React, { useState } from "react"
 
@@ -13,7 +7,6 @@ import CalidadCompletitud from "./tabs/calidad_completitud"
 import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
 import CalidadSintactica from "./tabs/calidad_sintactica"
-import CalidadTemporal from "./tabs/calidad_temporal"
 
 interface TabPanelProps {
   children?: React.ReactNode
@@ -62,7 +55,7 @@ export const CalidadDashList: React.FC = () => {
       component: <CalidadCompletitud />,
     },
     {
-      label: "Sintáctica",
+      label: "Exactitud",
       icon: <Code />,
       component: <CalidadSintactica />,
     },
@@ -70,11 +63,6 @@ export const CalidadDashList: React.FC = () => {
       label: "Semántica",
       icon: <Psychology />,
       component: <CalidadSemantica />,
-    },
-    {
-      label: "Temporal",
-      icon: <Schedule />,
-      component: <CalidadTemporal />,
     },
   ]
 

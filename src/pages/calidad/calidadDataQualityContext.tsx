@@ -179,26 +179,39 @@ const transformApiResponse = (
       idNotificacionesNoValidos: rule.idNotificacionesNoValidos,
     }))
 
-  // Filtrar reglas de completitud (subDimensión: Completitud)
-  const completenessQuality: CompletenessQualityRow[] = allRules
-    .filter((rule) => rule.subDimension === "Completitud")
-    .map((rule) => {
-      // Extraer nombre de tabla y columna del código de la regla
-      // Formato esperado del código: "CON_DOM_001_NOMBRE_COLUMNA" o similar
-      const partes = rule.codigo.split(".")
-      const tableName = partes.length > 1 ? partes[0] : "TR_NOTIFICACION"
-      const columnName = partes.length > 1 ? partes[1] : rule.regla
+  // Filtrar reglas de completitud por dimensión
+  const dimensionCompletitud = apiResponse.jsonQuality.find(
+    (d) => d.dimension === "Completitud"
+  )
 
-      return {
-        tableName,
-        columnName,
-        columnDescription: rule.descripcionRegla,
-        totalRecords: rule.totalRegistros,
-        totalNulls: rule.totalRegistrosInvalidos,
-        totalNonNulls: rule.totalRegistrosValidos,
-        completenessPercentage: rule.porcentajeRegistrosValidos,
-      }
-    })
+  const completenessQuality: CompletenessQualityRow[] = dimensionCompletitud
+    ? dimensionCompletitud.jsonDimensionQuality.map((rule) => {
+        // Intentar extraer tabla y columna de metaDatos si existe
+        let tableName = "DESCONOCIDA"
+        let columnName = "DESCONOCIDA"
+
+        if ((rule as any).metaDatos) {
+          tableName = (rule as any).metaDatos.tabla || rule.subDimension
+          columnName = (rule as any).metaDatos.columna || rule.regla
+        } else {
+          // Fallback: usar subDimension como tabla y extraer columna del código
+          tableName = rule.subDimension
+          const partes = rule.codigo.split("_")
+          columnName =
+            partes.length > 3 ? partes.slice(3).join("_") : rule.regla
+        }
+
+        return {
+          tableName,
+          columnName,
+          columnDescription: rule.descripcionRegla,
+          totalRecords: rule.totalRegistros,
+          totalNulls: rule.totalRegistrosInvalidos,
+          totalNonNulls: rule.totalRegistrosValidos,
+          completenessPercentage: rule.porcentajeRegistrosValidos,
+        }
+      })
+    : []
 
   // Calcular totales
   const totalRegistros = allRules.reduce((acc, rule) => {

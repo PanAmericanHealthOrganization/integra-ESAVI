@@ -41,6 +41,11 @@ export interface ICalidadDataProvider extends DataProvider {
     mes: number,
     codigo: string
   ) => Promise<void>
+  getHistory: (
+    resource: string,
+    startDay: string,
+    endDay: string
+  ) => Promise<any>
 }
 
 export const calidadDataProvider: ICalidadDataProvider = {
@@ -121,6 +126,17 @@ export const calidadDataProvider: ICalidadDataProvider = {
       console.error("Error al descargar CSV:", error)
       alert("Error al descargar el archivo CSV")
     }
+  },
+  getHistory: async function (
+    resource: string,
+    startDay: string,
+    endDay: string
+  ): Promise<any> {
+    const response = await intESAVIClient.post(`/${resource}/history`, {
+      startDay,
+      endDay,
+    })
+    return response.data
   },
   getList: function <RecordType extends RaRecord = any>(
     resource: string,
