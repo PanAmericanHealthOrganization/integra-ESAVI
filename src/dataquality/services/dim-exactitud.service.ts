@@ -20,15 +20,23 @@ export class DimExactitudService {
    * @returns
    */
   async processAll(day: Date): Promise<DimensionCalidadDatosDto> {
-    const [edadInicioEvaento, nombreVacunaDominio] = await Promise.all([
+    const [camposNumeros, edadInicioEvaento, nombreVacunaDominio] = await Promise.all([
+      this._camposNumeros(day),
       this._edadInicioEvento(day),
       this._nombreVacunaDominio(day),
     ]);
     return {
       dimension: DIMENSION_CALIDAD.EXACTITUD,
-      calidadTotal: DataQualityUtils.calcularCalidadDimension([edadInicioEvaento, nombreVacunaDominio]),
-      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad([edadInicioEvaento, nombreVacunaDominio], []),
-      jsonDimensionQuality: [edadInicioEvaento, nombreVacunaDominio],
+      calidadTotal: DataQualityUtils.calcularCalidadDimension([
+        ...camposNumeros,
+        edadInicioEvaento,
+        nombreVacunaDominio,
+      ]),
+      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad(
+        [...camposNumeros, edadInicioEvaento, nombreVacunaDominio],
+        [],
+      ),
+      jsonDimensionQuality: [...camposNumeros, edadInicioEvaento, nombreVacunaDominio],
     };
   }
 
@@ -99,5 +107,44 @@ export class DimExactitudService {
         'El nombre de la vacuna registrado debe corresponder a una vacuna dentro del catalogo nacional de referencia',
       ...totales,
     };
+  }
+
+  private async _camposNumeros(day: Date): Promise<CalidadDatosResultadoDto[]> {
+    const tablasYCampos = [
+      { tabla: 'TR_NOTIFICACION', campo: 'EDAD', minValor: 0, maxValor: 120 },
+      { tabla: 'TR_DESENLACE_ESAVI', campo: 'AUTOPSIA', minValor: 4, maxValor: 4 },
+    ];
+    const resultados: CalidadDatosResultadoDto[] = [];
+    for (const item of tablasYCampos) {
+      const query = `
+        select
+        count(tn."${item.campo}") as "totalRegistros",
+        count(tn."${item.campo}") filter (where tn."${item.campo}" between ${item.minValor} and ${
+        item.maxValor
+      }) "totalRegistrosValidos",
+        count(tn."${item.campo}") filter (where tn."${item.campo}" < ${item.minValor} or tn."${item.campo}" > ${
+        item.maxValor
+      }) "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT tn."ID") filter (where tn."${item.campo}" < ${item.minValor} or tn."${
+        item.campo
+      }" > ${item.maxValor}), '[]') as "idNotificacionesNoValidos"
+        from
+          dhi_esavi."${item.tabla}" tn
+        where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+        ;
+    `;
+      const result = await this.dataSource.query(query);
+      //
+      const totales = await DataQualityUtils.construirResultado(result);
+      resultados.push({
+        codigo: 'EXA_SIN_003.' + item.tabla + '.' + item.campo,
+        subDimension: SUB_DIMENSION_CALIDAD.EXAC_SINTACTICA,
+        regla: `Campo numérico ${item.campo} en tabla ${item.tabla}`,
+        condicion: `${item.campo} entre ${item.minValor} y ${item.maxValor}`,
+        descripcionRegla: `El campo ${item.campo} en la tabla ${item.tabla} debe tener valores entre ${item.minValor} y ${item.maxValor}.`,
+        ...totales,
+      });
+    }
+    return resultados;
   }
 }

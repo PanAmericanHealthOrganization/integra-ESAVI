@@ -145,6 +145,29 @@ export class GeneralService {
       .flat()
       .find((r) => r);
 
-    return filteredJsonQuality;
+    const ids = filteredJsonQuality.idNotificacionesNoValidos;
+    const q = `
+      SELECT
+      tn."ID",
+      tn."FECHA_NOTIFICACION",
+      CASE
+        WHEN tn."CODIGO_DHIS2_EVENTO" IS NOT NULL THEN 'DHIS2'
+        ELSE 'VIGIFLOW'
+      END AS "origen",
+      tp."NOMBRE",
+      tp."IDENTIFICACION"
+      FROM
+      dhi_esavi."TR_NOTIFICACION" tn
+      INNER JOIN 
+      dhi_esavi."TR_PACIENTE" tp 
+      ON
+      tp."ID" = tn."PACIENTE_ID"
+      WHERE
+      tn."ID" IN (${ids.map((id) => `'${id}'`).join(', ')})
+    `;
+    const result = await this.dataSource.query(q);
+    // elminar duplicados
+    const uniqueResults = Array.from(new Map(result.map((item) => [item.ID, item])).values());
+    return uniqueResults;
   }
 }
