@@ -67,7 +67,7 @@ export const calidadDataProvider: ICalidadDataProvider = {
     codigo: string
   ): Promise<any[]> {
     const response = await intESAVIClient.get(
-      `/${resource}/problems?anio=${anio}&mes=${mes}&codigo=${codigo}`
+      `/dataquality/problems?anio=${anio}&mes=${mes}&codigo=${codigo}`
     )
     return response.data
   },

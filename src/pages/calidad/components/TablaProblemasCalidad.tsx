@@ -1,8 +1,6 @@
-import DownloadIcon from "@mui/icons-material/Download"
 import {
   Box,
   Chip,
-  IconButton,
   Paper,
   Stack,
   Table,
@@ -17,6 +15,7 @@ import {
 import React, { useMemo, useState } from "react"
 import { DimensionCalidad } from "../types/calidad.types"
 import { BarraDeCalidad } from "./BarraDeCalidad"
+import { DescargaErrores } from "./descargaErrores"
 
 interface TablaProblemasCalidadProps {
   dimension: string
@@ -217,19 +216,14 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
                 {/* Botón de Descarga */}
                 <TableCell align="center">
                   {problema.idNotificacionesNoValidos &&
-                    problema.idNotificacionesNoValidos.length > 0 && (
-                      <Tooltip title="Descargar errores en CSV" arrow>
-                        <>
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() =>
-                              handleDownloadClick(problema.codigo)
-                            }>
-                            <DownloadIcon />
-                          </IconButton>
-                        </>
-                      </Tooltip>
+                    problema.idNotificacionesNoValidos.length > 0 &&
+                    anio !== undefined &&
+                    mes !== undefined && (
+                      <DescargaErrores
+                        anio={anio}
+                        mes={mes}
+                        codigoRegla={problema.codigo}
+                      />
                     )}
                 </TableCell>
               </TableRow>
