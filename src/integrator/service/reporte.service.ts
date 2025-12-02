@@ -115,13 +115,13 @@ export class ReporteService {
   }
 
   async casosEsaviPorSexoGrave(): Promise<string> {
-    const query = `select COALESCE(tc."DESCRIPCIONHOMOLOGADA", 'NO REGISTRA')  AS "sexo",
+    const query = ` select COALESCE(tc."DESCRIPCION_HOMOLOGADA", 'NO REGISTRA')  AS "sexo",
     count(*) AS "cantidad"
    from dhi_esavi."TR_PACIENTE" tp inner join
-      dhi_esavi."TR_NOTIFICACION" tn on tp."ID" = tn."PACIENTE_ID" inner join 
-      dhi_esavi."TR_GRAVEDADESAVI" tg on tn."NOTIFICACION_ID" = tg."NOTIFICACION_ID" and tg."TIPOGRAVEDAD" = 'GRAVE' inner join
-      dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."ID" 	 
-   group by tc."DESCRIPCIONHOMOLOGADA"`;
+      dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
+      dhi_esavi."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
+      dhi_esavi."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
+   group by tc."DESCRIPCION_HOMOLOGADA"`;
 
     try {
       const results = await this.pacientRepository.query(query);
@@ -133,18 +133,13 @@ export class ReporteService {
 
   async casosEsaviPorSexoNoGrave(): Promise<string> {
     const query = `
-      select
-        COALESCE(tc."DESCRIPCIONHOMOLOGADA", 'NO REGISTRA') AS "sexo",
-        count(*) AS "cantidad"
-      from dhi_esavi."TR_PACIENTE" tp
-      inner join dhi_esavi."TR_NOTIFICACION" tn
-        on tp."ID" = tn."PACIENTE_ID"
-      inner join dhi_esavi."TR_GRAVEDADESAVI" tg
-        on tn."NOTIFICACION_ID" = tg."NOTIFICACION_ID"
-        and tg."TIPOGRAVEDAD" <> 'GRAVE'
-      inner join dhi_esavi."TC_CATALOGO" tc
-        on tp."CTSEXO_ID" = tc."ID"
-      group by tc."DESCRIPCIONHOMOLOGADA"
+     select COALESCE(tc."DESCRIPCION_HOMOLOGADA", 'NO REGISTRA')  AS "sexo",
+    count(*) AS "cantidad"
+   from dhi_esavi."TR_PACIENTE" tp inner join
+      dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
+      dhi_esavi."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
+      dhi_esavi."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
+   group by tc."DESCRIPCION_HOMOLOGADA"
     `;
 
     try {
