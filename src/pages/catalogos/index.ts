@@ -1,5 +1,5 @@
 import { CatalogosEdit } from "./catalogosEdit"
-import { CatalogosList } from "./catalogoslist"
+import { CatalogosList } from "./catalogosList"
 
 export default {
   list: CatalogosList,
