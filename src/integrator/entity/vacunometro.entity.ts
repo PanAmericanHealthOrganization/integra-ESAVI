@@ -144,4 +144,26 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
  *
  */
 
-export class VacunometroCreateDto extends OmitType(VacunometroDto, ['id']) {}
+export class VacunometroCreateDto extends OmitType(VacunometroDto, ['id',
+  //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
+  'isEnabled',
+  'isActive',
+  'createdAt',
+  'updatedAt',
+  'createdBy',
+  'updatedBy',
+  'deletedAt',
+  'deletedBy',
+] as const) {}
+
+export class VacunometroUpdateDto extends OmitType(VacunometroDto, ['id',
+  //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
+  'isEnabled',
+  'isActive',
+  'createdAt',
+  'updatedAt',
+  'createdBy',
+  'updatedBy',
+  'deletedAt',
+  'deletedBy',
+] as const) {}

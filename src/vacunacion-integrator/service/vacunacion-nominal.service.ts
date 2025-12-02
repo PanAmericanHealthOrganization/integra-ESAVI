@@ -6,6 +6,7 @@ import { ISync } from 'src/integrator/dto/sync.dto';
 import { SyncService, VacunometroService } from 'src/integrator/service';
 import { Repository } from 'typeorm';
 import { VacunacionNominal } from '../entity/vacunacion.entity';
+import { SyncProcess } from 'src/integrator/entity/sync.entity';
 @Injectable()
 export class VacunacionNominalService {
   constructor(
@@ -63,7 +64,7 @@ export class VacunacionNominalService {
       await this.vacunometroService.createMany(vacunas);
 
       // SYNC, registro de proceso de sincronización
-      const syncProcess: ISync = {
+      /*const syncProcess: ISync = {
         name: `VacunacionNominalService.procesarVacunasAgregadas ${startDay} to ${endDay}`,
         status: 'COMPLETED',
         startTime: startTime,
@@ -71,8 +72,8 @@ export class VacunacionNominalService {
         errorMessage: '',
         errorStack: '',
         errorTrace: '',
-        createdAt: undefined,
-        createdBy: '',
+        createdAt: new Date(),
+        createdBy: 'SYSTEM',
         updatedAt: undefined,
         updatedBy: '',
         deletedAt: undefined,
@@ -80,6 +81,22 @@ export class VacunacionNominalService {
         isEnabled: false,
         isActive: false,
       };
+      await this.syncProcessService.createSyncProcess(syncProcess);*/
+      const syncProcess = new SyncProcess();
+      syncProcess.name = `VacunacionNominalService.procesarVacunasAgregadas ${startDay} to ${endDay}`;
+      syncProcess.status = 'COMPLETED';
+      syncProcess.startTime = startTime;
+      syncProcess.endTime = new Date();
+      syncProcess.errorMessage = '';
+      syncProcess.errorStack = '';
+      syncProcess.errorTrace = '';
+
+      // Auditoría: si no tienes usuario real, usa 'SYSTEM'
+      syncProcess.createdBy = 'SYSTEM';
+      syncProcess.createdAt = new Date();
+      syncProcess.isEnabled = true;
+      syncProcess.isActive = true;
+
       await this.syncProcessService.createSyncProcess(syncProcess);
       return;
     } catch (error) {
