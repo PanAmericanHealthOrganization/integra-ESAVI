@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DataqualityMaintenanceService } from '../services/maintenance.service';
 
@@ -32,6 +32,22 @@ export class DataqualityMaintenanceController {
     return {
       message: 'Evaluación del último mes procesada',
       ...result,
+    };
+  }
+
+  @Post('evaluations/range')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiResponse({
+    status: 202,
+    description: 'Inicia la evaluación de la calidad para un rango de fechas específico',
+  })
+  async evaluateQualityInDateRange(
+    @Body() rangeBody: { startDate: Date; endDate: Date },
+  ): Promise<{ message: string }> {
+    // Implementar la lógica para evaluar un rango de fechas específico
+    this.maintenanceService.evaluateQualityInDateRange(rangeBody.startDate, rangeBody.endDate);
+    return {
+      message: `Evaluación de calidad iniciada para el rango ${rangeBody.startDate} - ${rangeBody.endDate}`,
     };
   }
 }

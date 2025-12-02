@@ -4,9 +4,11 @@ import { Cron } from '@nestjs/schedule';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import { getMonth, getYear } from 'date-fns';
 import { IAuditoria } from 'src/integrator/entity';
-import { DataSource, Equal, Repository } from 'typeorm';
+import { Between, DataSource, Equal, Repository } from 'typeorm';
+import { HistoryQualityDto } from '../controllers/dto/historyQuality.dto';
 import { DimensionCalidadDatosDto, IDataQualityDimensions, QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
+import { convertirAHistoryQualityDto } from '../utils/dataQualityUtils';
 import { DimCompletitudService } from './dim-completitud';
 import { DimConsistenciaService } from './dim-consitencia';
 import { DimExactitudService } from './dim-exactitud.service';
@@ -169,5 +171,49 @@ export class GeneralService {
     // elminar duplicados
     const uniqueResults = Array.from(new Map(result.map((item) => [item.ID, item])).values());
     return uniqueResults;
+  }
+
+  public async getHistoryQuality(startDate: Date, endDate: Date): Promise<HistoryQualityDto[]> {
+    // Validar que las fechas sean válidas
+    if (!startDate || !endDate || isNaN(new Date(startDate).getTime()) || isNaN(new Date(endDate).getTime())) {
+      throw new Error('Fechas inválidas proporcionadas');
+    }
+
+    const parsedStartDate = new Date(startDate);
+    const parsedEndDate = new Date(endDate);
+
+    const startYear = getYear(parsedStartDate);
+    const startMonth = getMonth(parsedStartDate) + 1;
+    const endYear = getYear(parsedEndDate);
+    const endMonth = getMonth(parsedEndDate) + 1;
+
+    // Validar que los valores no sean NaN
+    if (isNaN(startYear) || isNaN(startMonth) || isNaN(endYear) || isNaN(endMonth)) {
+      throw new Error('Error al procesar las fechas');
+    }
+
+    const records = await this.dataQualityDimensionsRepository.find({
+      where: {
+        anio: Between(startYear, endYear),
+      },
+      order: {
+        anio: 'ASC',
+        mes: 'ASC',
+      },
+    });
+
+    const t = records.filter((record) => {
+      if (record.anio === startYear && record.anio === endYear) {
+        return record.mes >= startMonth && record.mes <= endMonth;
+      }
+      if (record.anio === startYear) {
+        return record.mes >= startMonth;
+      }
+      if (record.anio === endYear) {
+        return record.mes <= endMonth;
+      }
+      return true;
+    });
+    return convertirAHistoryQualityDto(t);
   }
 }

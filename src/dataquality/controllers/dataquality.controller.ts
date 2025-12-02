@@ -1,4 +1,4 @@
-import { BadRequestException, Controller, Get, Query } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { GeneralService } from '../services/general.service';
@@ -46,6 +46,38 @@ export class DataqualityController implements IController<QualityDto, QualityDto
     @Query('codigo') codigo: string,
   ): Promise<any[]> {
     return await this.generalService.qualityProblems(anio, mes, codigo);
+  }
+
+  /**
+   *
+   * @param body
+   * @returns
+   */
+  @Post('history')
+  public async getHistoryQuality(@Body() body: { startDay: Date; endDay: Date }): Promise<any[]> {
+    const { startDay, endDay } = body;
+
+    // Validar y parsear fechas
+    if (!startDay || !endDay) {
+      throw new BadRequestException('Se requieren las fechas startDay y endDay');
+    }
+
+    const parsedStartDay = new Date(startDay);
+    const parsedEndDay = new Date(endDay);
+
+    if (isNaN(parsedStartDay.getTime())) {
+      throw new BadRequestException(`Fecha de inicio inválida: "${startDay}". Use formato ISO (YYYY-MM-DD)`);
+    }
+
+    if (isNaN(parsedEndDay.getTime())) {
+      throw new BadRequestException(`Fecha de fin inválida: "${endDay}". Use formato ISO (YYYY-MM-DD)`);
+    }
+
+    if (parsedStartDay > parsedEndDay) {
+      throw new BadRequestException('La fecha de inicio debe ser anterior o igual a la fecha de fin');
+    }
+
+    return await this.generalService.getHistoryQuality(parsedStartDay, parsedEndDay);
   }
 
   getMany(params: IGetManyParams): Promise<QualityDto[]> {

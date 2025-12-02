@@ -1,7 +1,11 @@
 import { Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
-import { DIMENSION_CALIDAD, DimensionCalidadDatosDto, SUB_DIMENSION_CALIDAD } from '../controllers/dto/quality.dto';
+import {
+  CalidadDatosResultadoWhitMetadataDto,
+  DIMENSION_CALIDAD,
+  DimensionCalidadDatosDto,
+} from '../controllers/dto/quality.dto';
 import { DataQualityUtils } from './utils/dataquality.utils';
 
 export class DimCompletitudService {
@@ -37,55 +41,59 @@ export class DimCompletitudService {
    * @param day
    * @returns
    */
-  private async _completitudTablasObligatorias(day: Date): Promise<any> {
+  private async _completitudTablasObligatorias(day: Date): Promise<CalidadDatosResultadoWhitMetadataDto[]> {
     this.logger.log(`Iniciando evaluación de no fechas futuras para el día ${day.toISOString()}`);
-
-    // Mapeo de tablas a sus columnas ID
-    const tableIdMap = {
-      TR_NOTIFICACION: 'ID',
-      TR_PACIENTE: 'ID',
-      TR_ESAVI_DURANTE_EMBARAZO: 'ID',
-      TR_DATO_VACUNACION: 'ID',
-      TR_DESENLACE_ESAVI: 'ID',
-      TR_DATOS_ESAVI: 'ID',
-    };
 
     const evaluacion = [
       {
         tabla: 'TR_NOTIFICACION',
         columnas: ['FECHA_ATENCION', 'FECHA_NOTIFICACION', 'FECHA_REPORTE_NACIONAL', 'FECHA_LLENADO_FICHA'],
+        fkColumn: 'ID',
+        joinColumn: 'ID',
       },
       {
         tabla: 'TR_PACIENTE',
-        columnas: ['FECHA_NACIMIENTO'],
+        columnas: ['FECHA_NACIMIENTO', 'CT_SEXO_ID'],
+        fkColumn: 'PACIENTE_ID',
+        joinColumn: 'ID',
       },
-      { tabla: 'TR_ESAVI_DURANTE_EMBARAZO', columnas: ['FECHAULTIMAMENSTRUACIONESAVI'] },
-      { tabla: 'TR_DATO_VACUNACION', columnas: ['FECHA_VACUNACION'] },
-      { tabla: 'TR_DESENLACE_ESAVI', columnas: ['FECHAMUERTE', 'FECHANOTIFICAMUERTE'] },
-      { tabla: 'TR_PACIENTE', columnas: ['FECHA_NACIMIENTO'] },
+      { tabla: 'TR_DATO_VACUNACION', columnas: ['FECHA_VACUNACION'], fkColumn: 'ID', joinColumn: 'NOTIFICACION_ID' },
+      {
+        tabla: 'TR_DATOS_ESAVI',
+        columnas: ['CODIGO_LLT', 'COGIDOCASO'],
+        fkColumn: 'ID',
+        joinColumn: 'NOTIFICACION_ID',
+      },
     ];
     const resultados = [];
     for (const evalItem of evaluacion) {
-      const idColumn = tableIdMap[evalItem.tabla] || 'ID';
       for (const columna of evalItem.columnas) {
         const query = `
             select
-            count(tp."${columna}") filter (where tp."${columna}" is not null) as "totalRegistros",
-            count(tp."${columna}") filter (where tp."${columna}" <= tp."AUD_FECHA_CREACION") "totalRegistrosValidos",
-            count(tp."${columna}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION") "totalRegistrosNoValidos",
-            coalesce(json_agg(DISTINCT tp."${idColumn}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION"), '[]') as "idNotificacionesNoValidos"
+            count(tp."${columna}") as "totalRegistros",
+            count(tp."${columna}") filter (where tp."${columna}" is not null) "totalRegistrosValidos",
+            count(tp."${columna}") filter (where tp."${columna}" is null) "totalRegistrosNoValidos",
+            coalesce(json_agg(DISTINCT tp."${
+              evalItem.joinColumn
+            }") filter (where tp."${columna}" is null), '[]') as "idNotificacionesNoValidos"
             from
-              dhi_esavi."${evalItem.tabla}" tp
-            where tp."AUD_FECHA_CREACION" <= '${day.toISOString()}';`;
+              dhi_esavi."${evalItem.tabla}" tp inner 
+              join dhi_esavi."TR_NOTIFICACION" tn
+              on tn."${evalItem.fkColumn}" = tp."${evalItem.joinColumn}"
+            where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}';`;
         const result = await this.dataSource.query(query);
         //
         const totales = await DataQualityUtils.construirResultado(result);
         resultados.push({
-          codigo: `CON_DOM_001_${(columna || '').toUpperCase()}`,
-          subDimension: SUB_DIMENSION_CALIDAD.COMP_NO_NULL,
-          regla: `No fechas futuras en ${evalItem.tabla}.${columna}`,
-          condicion: `La columna ${columna} en la tabla ${evalItem.tabla} no debe contener fechas posteriores a la fecha de evaluación.`,
-          descripcionRegla: `El valor es correcto cuando la fecha registrada en ${columna} es anterior o igual a la fecha de evaluación.`,
+          codigo: `CON_COM_001.${(columna || '').toUpperCase()}`,
+          subDimension: evalItem.tabla,
+          regla: `No debe existir valores nulos o vacios en ${evalItem.tabla}.${columna}`,
+          condicion: `La columna ${columna} en la tabla ${evalItem.tabla} no debe vacios o nulos`,
+          descripcionRegla: `La columna ${columna} en la tabla ${evalItem.tabla} debe contener valores no nulos para garantizar la completitud de los datos.`,
+          metaDatos: {
+            tabla: evalItem.tabla,
+            columna: columna,
+          },
           ...totales,
         });
       }

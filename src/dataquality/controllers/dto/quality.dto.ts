@@ -80,6 +80,10 @@ export class CalidadDatosResultadoDto extends TotalesCalidDatosDto {
   descripcionRegla: string;
 }
 
+export class CalidadDatosResultadoWhitMetadataDto extends CalidadDatosResultadoDto {
+  metaData: any;
+}
+
 export class QualityDto {
   id?: string;
   @IsInt()
