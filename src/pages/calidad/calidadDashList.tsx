@@ -75,7 +75,7 @@ const CalidadDashListContent: React.FC = () => {
         component: <CalidadGeneral />,
       },
       {
-        label: "Sintáctica",
+        label: "Exactitud",
         icon: <CheckCircle />,
         component: <CalidadSintactica />,
       },
