@@ -78,6 +78,22 @@ Content-Type: application/json
 ###
 
 ### ============================================
+### PROBLEMAS DE CALIDAD
+### ============================================
+
+### Problemas de Calidad - Consultar primero el servicio general para ver códigos disponibles
+GET {{baseUrl}}/general?date=2025-01-01
+Content-Type: application/json
+
+###
+
+### Problemas de Calidad - Por año, mes y código (ajustar el código según la respuesta anterior)
+GET {{baseUrl}}/problems?anio=2025&mes=1&codigo=CON_INTRA_OO2
+Content-Type: application/json
+
+###
+
+### ============================================
 ### HISTORIAL DE CALIDAD (History)
 ### ============================================
 

@@ -129,7 +129,7 @@ export class GeneralService {
   }
 
   /**
-   *
+  /**
    * @param anio
    * @param mes
    * @param codigoRegla
@@ -141,13 +141,25 @@ export class GeneralService {
       .where('dimension_quality.anio = :anio AND dimension_quality.mes = :mes', { anio, mes })
       .getOne();
 
+    if (!t) {
+      throw new Error(`No se encontraron datos de calidad para año ${anio} y mes ${mes}`);
+    }
+
     const jsonQuality = JSON.parse(t.jsonQuality) as DimensionCalidadDatosDto[];
     const filteredJsonQuality = jsonQuality
       .map((dim) => dim.jsonDimensionQuality.filter((r) => r.codigo === codigoRegla))
       .flat()
       .find((r) => r);
 
+    if (!filteredJsonQuality) {
+      throw new Error(`No se encontró la regla de calidad con código: ${codigoRegla}`);
+    }
+
     const ids = filteredJsonQuality.idNotificacionesNoValidos;
+
+    if (!ids || ids.length === 0) {
+      return [];
+    }
     const q = `
       SELECT
       tn."ID",
