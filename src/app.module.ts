@@ -17,7 +17,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    //VacunacionIntegratorModule,
+    VacunacionIntegratorModule,
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,
