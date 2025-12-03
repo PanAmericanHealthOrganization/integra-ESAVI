@@ -24,7 +24,7 @@ export const ORACLE_VACUNACION_DS = 'ORACLE_VACUNACION_DS';
         password: configService.get('DB_VACUNACION_DB_PASS'),
         serviceName: configService.get('DB_VACUNACION_DB_NAME'),
         entities: [VacunacionNominal],
-        synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
+        synchronize: false, // NUNCA usar synchronize en producción con Oracle
         poolSize: 5,
       }),
       imports: [ConfigModule],
