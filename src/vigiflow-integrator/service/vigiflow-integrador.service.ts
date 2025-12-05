@@ -232,7 +232,7 @@ export class VigiflowIntegradorService {
       notificacion.nombreNotificador = reg['AB'];
       // Ubicacion residencia Paciente
       const ubicacionResidenciaPaciente = new UbicacionDto();
-      ubicacionResidenciaPaciente.provincia = reg['D'] && reg['D'].toUpperCase();
+      ubicacionResidenciaPaciente.provincia = reg['D'] && reg['D'] ? reg['D'].replace(/^(Provincia\s+(de|del)\s+)/i, "").trim().toUpperCase(): 'DESCONOCIDO';
       notificacion.residenciaPaciente = ubicacionResidenciaPaciente;
       // Unidad residencia Notificador
       const ubicacionResidenciaNotificador = new UbicacionDto();
