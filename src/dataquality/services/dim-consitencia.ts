@@ -62,6 +62,42 @@ export class DimConsistenciaService {
       this._integridadCasosFatales(day),
       this._integridadGestante(day),
     ]);
+    // del mes anterior
+    //TODO: MEJORAR la generacion
+    const previousMonth = new Date(day);
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
+
+    const [
+      noFechasFuturasPrevious,
+      fechaNacimientoMinimaPrevious,
+      edadMinimaPosiblePrevious,
+      notificacionEnviadaPrevious,
+      integridadEsaviPrevious,
+      integridadVacunaAndFechaVacunacionPrevious,
+      integridadFechaNacimientoPrevious,
+      integridadFechaVacunacionPrevious,
+      integridadFechaESAVIPrevious,
+      integridadFechaNotificacionPrevious,
+      integridadFechaDeMuertePrevious,
+      integridadGravedadEsaviPrevious,
+      integridadCasosFatalesPrevious,
+      integridadGestantePrevious,
+    ] = await Promise.all([
+      this._noFechasFuturas(previousMonth),
+      this._fechaNacimientoMinima(previousMonth),
+      this._edadMinimaPosible(previousMonth),
+      this._notificacionEnviada(previousMonth),
+      this._integridadEsavi(previousMonth),
+      this._integridadVacunaAndFechaVacunacion(previousMonth),
+      this._integridadFechaNacimiento(previousMonth),
+      this._integridadFechaVacunacion(previousMonth),
+      this._integridadFechaESAVI(previousMonth),
+      this._integridadFechaNotificacion(previousMonth),
+      this._integridadFechaDeMuerte(previousMonth),
+      this._integridadGravedadEsavi(previousMonth),
+      this._integridadCasosFatales(previousMonth),
+      this._integridadGestante(previousMonth),
+    ]);
     return {
       dimension: DIMENSION_CALIDAD.CONSISTENCIA,
       calidadTotal: DataQualityUtils.calcularCalidadDimension([
@@ -80,7 +116,40 @@ export class DimConsistenciaService {
         integridadCasosFatales,
         integridadGestante,
       ]),
-      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad([], []),
+      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad(
+        [
+          ...noFechasFuturas,
+          fechaNacimientoMinima,
+          edadMinimaPosible,
+          notificacionEnviada,
+          integridadEsavi,
+          integridadVacunaAndFechaVacunacion,
+          integridadFechaNacimiento,
+          integridadFechaVacunacion,
+          integridadFechaESAVI,
+          integridadFechaNotificacion,
+          integridadFechaDeMuerte,
+          integridadGravedadEsavi,
+          integridadCasosFatales,
+          integridadGestante,
+        ],
+        [
+          ...noFechasFuturasPrevious,
+          fechaNacimientoMinimaPrevious,
+          edadMinimaPosiblePrevious,
+          notificacionEnviadaPrevious,
+          integridadEsaviPrevious,
+          integridadVacunaAndFechaVacunacionPrevious,
+          integridadFechaNacimientoPrevious,
+          integridadFechaVacunacionPrevious,
+          integridadFechaESAVIPrevious,
+          integridadFechaNotificacionPrevious,
+          integridadFechaDeMuertePrevious,
+          integridadGravedadEsaviPrevious,
+          integridadCasosFatalesPrevious,
+          integridadGestantePrevious,
+        ],
+      ),
       jsonDimensionQuality: [
         ...noFechasFuturas,
         fechaNacimientoMinima,
@@ -749,6 +818,7 @@ export class DimConsistenciaService {
    */
   private async _integridadCasosFatales(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Casos Fatales para el día ${day.toISOString()}`);
+    // TODO: Revisar la lógica
     const query = `
       select
         count(*) as "totalRegistros",

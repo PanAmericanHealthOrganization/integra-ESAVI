@@ -15,7 +15,7 @@ export class DataQualityUtils {
         totalRegistros: 0,
         totalRegistrosValidos: 0,
         totalRegistrosInvalidos: 0,
-        porcentajeRegistrosValidos: 0,
+        porcentajeRegistrosValidos: 100,
         porcentajeRegistrosInvalidos: 0,
         idNotificacionesNoValidos: [],
       };

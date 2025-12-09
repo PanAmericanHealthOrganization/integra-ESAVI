@@ -28,10 +28,17 @@ export class DimCompletitudService {
   async processAll(day: Date): Promise<DimensionCalidadDatosDto> {
     this.logger.log(`Iniciando procesamiento de Dimensión de Consistencia para el día ${day.toISOString()}`);
     const [fechaNacimientoMinima] = await Promise.all([this._completitudTablasObligatorias(day)]);
+    const previusDay = new Date(day);
+    previusDay.setDate(day.getDate() - 1);
+    const [fechaNacimientoMinimaPrevious] = await Promise.all([this._completitudTablasObligatorias(previusDay)]);
+
     return {
       dimension: DIMENSION_CALIDAD.COMPLETITUD,
       calidadTotal: DataQualityUtils.calcularCalidadDimension([...fechaNacimientoMinima]),
-      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad([...fechaNacimientoMinima], []),
+      deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad(
+        [...fechaNacimientoMinima],
+        [...fechaNacimientoMinimaPrevious],
+      ),
       jsonDimensionQuality: [...fechaNacimientoMinima],
     };
   }

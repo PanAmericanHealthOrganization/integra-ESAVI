@@ -25,6 +25,15 @@ export class DimExactitudService {
       this._edadInicioEvento(day),
       this._nombreVacunaDominio(day),
     ]);
+    // histprico
+    const previousMonth = new Date(day);
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
+
+    const [camposNumerosHistorico, edadInicioEvaenoHistorico, nombreVacunaDominioHistorico] = await Promise.all([
+      this._camposNumeros(previousMonth),
+      this._edadInicioEvento(previousMonth),
+      this._nombreVacunaDominio(previousMonth),
+    ]);
     return {
       dimension: DIMENSION_CALIDAD.EXACTITUD,
       calidadTotal: DataQualityUtils.calcularCalidadDimension([
@@ -34,7 +43,7 @@ export class DimExactitudService {
       ]),
       deltaCalidadTotal: DataQualityUtils.calcularDeltaCalidad(
         [...camposNumeros, edadInicioEvaento, nombreVacunaDominio],
-        [],
+        [...camposNumerosHistorico, edadInicioEvaenoHistorico, nombreVacunaDominioHistorico],
       ),
       jsonDimensionQuality: [...camposNumeros, edadInicioEvaento, nombreVacunaDominio],
     };
