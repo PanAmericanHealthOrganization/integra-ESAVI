@@ -4,8 +4,8 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   Grid,
-  LinearProgress,
   Typography,
 } from "@mui/material"
 import { useMemo } from "react"
@@ -166,15 +166,24 @@ const CalidadSintactica: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 Promedio de exactitud
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {resumen.promedioValidez.toFixed(2)}%
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  {resumen.promedioValidez.toFixed(2)}%
+                </Typography>
+                <Chip
+                  label={getStatusLabel(resumen.promedioValidez)}
+                  color={getStatusColor(resumen.promedioValidez) as any}
+                  size="small"
+                />
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                {resumen.totalReglas} reglas evaluadas
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={resumen.promedioValidez}
-                sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                color={getStatusColor(resumen.promedioValidez) as any}
-              />
             </CardContent>
           </Card>
         </Grid>
@@ -184,17 +193,22 @@ const CalidadSintactica: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 Promedio de inexactitud
               </Typography>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "error.main" }}>
+                  {resumen.promedioInvalidez.toFixed(2)}%
+                </Typography>
+                <Chip label="Crítico" color="error" size="small" />
+              </Box>
               <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
-                {resumen.promedioInvalidez.toFixed(2)}%
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                {resumen.reglasCriticas} reglas críticas
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={resumen.promedioInvalidez}
-                sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                color="error"
-              />
             </CardContent>
           </Card>
         </Grid>
@@ -206,6 +220,13 @@ const CalidadSintactica: React.FC = () => {
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
                 {resumen.totalValidos.toLocaleString()}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                De {resumen.totalRegistros.toLocaleString()} registros
               </Typography>
             </CardContent>
           </Card>
@@ -220,6 +241,13 @@ const CalidadSintactica: React.FC = () => {
                 variant="h4"
                 sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
                 {resumen.totalInvalidos.toLocaleString()}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                Requieren corrección
               </Typography>
             </CardContent>
           </Card>

@@ -232,7 +232,7 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
         </Table>
       </TableContainer>
 
-      {problemasToDisplay.length === 0 && selectedSubDimension && (
+      {problemasToDisplay.length > 0 && selectedSubDimension && (
         <Box sx={{ p: 3, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
             No hay problemas para la subdimensión: {selectedSubDimension}

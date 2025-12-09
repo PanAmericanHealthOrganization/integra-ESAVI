@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  Grid,
-  Stack,
-  Typography,
-} from "@mui/material"
+import { Box, Card, CardContent, Chip, Grid, Typography } from "@mui/material"
 import { useMemo } from "react"
 import {
   PolarAngleAxis,
@@ -107,14 +99,6 @@ export const CalidadGeneral: React.FC = () => {
           ) / data.sintacticQuality.length
         : null
 
-    const consistenciaGlobal =
-      data.semanticQuality.length > 0
-        ? data.semanticQuality.reduce(
-            (acc, item) => acc + item.porcentajeRegistrosValidos,
-            0
-          ) / data.semanticQuality.length
-        : null
-
     // Información de dimensiones desde la nueva estructura
     const dimensionesInfo =
       data.dimensiones?.map((dim) => ({
@@ -123,6 +107,24 @@ export const CalidadGeneral: React.FC = () => {
         deltaCalidadTotal: dim.deltaCalidadTotal,
         totalReglas: dim.jsonDimensionQuality.length,
       })) ?? []
+
+    // Buscar la dimensión de Consistencia en la nueva estructura
+    const dimensionConsistencia = dimensionesInfo.find(
+      (dim) => dim.nombre === "Consistencia"
+    )
+
+    const consistenciaGlobal = dimensionConsistencia
+      ? dimensionConsistencia.calidadTotal
+      : data.semanticQuality.length > 0
+        ? data.semanticQuality.reduce(
+            (acc, item) => acc + item.porcentajeRegistrosValidos,
+            0
+          ) / data.semanticQuality.length
+        : null
+
+    const deltaConsistenciaGlobal = dimensionConsistencia
+      ? dimensionConsistencia.deltaCalidadTotal
+      : 0
 
     const indicadoresDisponibles = [exactitudGlobal, consistenciaGlobal].filter(
       (value): value is number => value !== null
@@ -156,6 +158,7 @@ export const CalidadGeneral: React.FC = () => {
       indicadorCalidadGlobal,
       exactitudGlobal,
       consistenciaGlobal,
+      deltaConsistenciaGlobal,
       porcentajeRegistrosSinErrores,
       registrosSinErrores,
       totalRegistros: data.totalRegistros,
@@ -315,27 +318,16 @@ export const CalidadGeneral: React.FC = () => {
 
   return (
     <Box sx={{ p: 3, bgcolor: "grey.50" }}>
-      <Stack spacing={1.5} sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          Vista general de la calidad de datos
-        </Typography>
-        <Typography variant="body2" color="text.secondary">
-          Resumen ejecutivo enfocado en las dimensiones de exactitud y
-          consistencia. Última actualización: {ultimaActualizacion}.
-        </Typography>
-      </Stack>
-
       {resumenGlobal.dimensionesInfo &&
         resumenGlobal.dimensionesInfo.length > 0 && (
           <>
-            <Typography variant="h5" sx={{ fontWeight: 600, mb: 2 }}>
-              Calidad por Dimensión
-            </Typography>
             <Grid container spacing={3} sx={{ mb: 4 }}>
               {resumenGlobal.dimensionesInfo.map((dimension) => {
                 const status = getScoreStatus(dimension.calidadTotal)
-                const deltaPositivo = dimension.deltaCalidadTotal > 0
-                const deltaNegativo = dimension.deltaCalidadTotal < 0
+                const deltaCalidad = dimension.deltaCalidadTotal ?? 0
+                const deltaPositivo = deltaCalidad > 0
+                const deltaNegativo = deltaCalidad < 0
+                const tieneDelta = deltaCalidad !== 0
 
                 return (
                   <Grid item xs={12} sm={6} md={4} key={dimension.nombre}>
@@ -354,7 +346,7 @@ export const CalidadGeneral: React.FC = () => {
                           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                             {formatPercentage(dimension.calidadTotal)}
                           </Typography>
-                          {dimension.deltaCalidadTotal !== 0 && (
+                          {tieneDelta && (
                             <Typography
                               variant="body2"
                               sx={{
@@ -366,8 +358,7 @@ export const CalidadGeneral: React.FC = () => {
                                 fontWeight: 600,
                               }}>
                               {deltaPositivo ? "↑" : "↓"}{" "}
-                              {Math.abs(dimension.deltaCalidadTotal).toFixed(2)}
-                              %
+                              {Math.abs(deltaCalidad).toFixed(2)}%
                             </Typography>
                           )}
                         </Box>

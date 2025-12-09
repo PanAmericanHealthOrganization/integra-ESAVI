@@ -3,8 +3,8 @@ import {
   Box,
   Card,
   CardContent,
+  Chip,
   Grid,
-  LinearProgress,
   Typography,
 } from "@mui/material"
 import { useMemo } from "react"
@@ -145,10 +145,6 @@ const CalidadSemantica: React.FC = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: "bold" }}>
-        Consistencia de datos
-      </Typography>
-
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={2.4}>
           <Card>
@@ -168,15 +164,24 @@ const CalidadSemantica: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 Promedio de consistencia
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                {resumen.promedioValidez.toFixed(2)}%
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  {resumen.promedioValidez.toFixed(2)}%
+                </Typography>
+                <Chip
+                  label={getStatusLabel(resumen.promedioValidez)}
+                  color={getStatusColor(resumen.promedioValidez) as any}
+                  size="small"
+                />
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                {resumen.totalReglas} reglas evaluadas
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={resumen.promedioValidez}
-                sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                color={getStatusColor(resumen.promedioValidez) as any}
-              />
             </CardContent>
           </Card>
         </Grid>
@@ -186,17 +191,22 @@ const CalidadSemantica: React.FC = () => {
               <Typography variant="body2" color="text.secondary">
                 Promedio de inconsistencia
               </Typography>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "error.main" }}>
+                  {resumen.promedioInvalidez.toFixed(2)}%
+                </Typography>
+                <Chip label="Crítico" color="error" size="small" />
+              </Box>
               <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
-                {resumen.promedioInvalidez.toFixed(2)}%
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                {resumen.reglasCriticas} reglas críticas
               </Typography>
-              <LinearProgress
-                variant="determinate"
-                value={resumen.promedioInvalidez}
-                sx={{ mt: 1, height: 8, borderRadius: 4 }}
-                color="error"
-              />
             </CardContent>
           </Card>
         </Grid>
@@ -208,6 +218,13 @@ const CalidadSemantica: React.FC = () => {
               </Typography>
               <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
                 {numberFormatter.format(resumen.totalValidos)}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                De {numberFormatter.format(resumen.totalRegistros)} registros
               </Typography>
             </CardContent>
           </Card>
@@ -222,6 +239,13 @@ const CalidadSemantica: React.FC = () => {
                 variant="h4"
                 sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
                 {numberFormatter.format(resumen.totalInvalidos)}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 1 }}>
+                Requieren corrección
               </Typography>
             </CardContent>
           </Card>

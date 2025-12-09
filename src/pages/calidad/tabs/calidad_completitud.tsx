@@ -157,15 +157,29 @@ const CalidadCompletitud: React.FC = () => {
                   <Typography variant="body2" color="text.secondary">
                     Promedio de completitud
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
-                    {promedioTabla.toFixed(2)}%
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      mt: 1,
+                    }}>
+                    <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                      {promedioTabla.toFixed(2)}%
+                    </Typography>
+                    <Chip
+                      label={getStatusLabel(promedioTabla)}
+                      color={getStatusColor(promedioTabla) as any}
+                      size="small"
+                    />
+                  </Box>
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    sx={{ mt: 1 }}>
+                    {totalColumnas} columnas evaluadas
                   </Typography>
-                  <Chip
-                    label={getStatusLabel(promedioTabla)}
-                    color={getStatusColor(promedioTabla) as any}
-                    size="small"
-                    sx={{ mt: 1 }}
-                  />
                 </CardContent>
               </Card>
             </Grid>
@@ -178,7 +192,11 @@ const CalidadCompletitud: React.FC = () => {
                   <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
                     {numberFormatter.format(totalNonNulls)}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                    sx={{ mt: 1 }}>
                     Sin valores nulos
                   </Typography>
                 </CardContent>
