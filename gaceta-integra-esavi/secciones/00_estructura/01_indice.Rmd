@@ -1,0 +1,120 @@
+# Tabla de Contenidos {-}
+
+\tableofcontents
+
+\newpage
+
+<!-- Lista de Figuras se genera automáticamente -->
+# Lista de Figuras {-}
+
+\listoffigures
+
+\newpage
+
+<!-- Lista de Tablas se genera automáticamente -->
+# Lista de Tablas {-}
+
+\listoftables
+
+\newpage
+
+## Lista de Abreviaciones {-}
+
+```{r abreviaciones, echo=FALSE}
+library(knitr)
+library(kableExtra)
+
+abreviaciones <- data.frame(
+  Abreviación = c(
+    "ESAVI",
+    "PAI", 
+    "OMS",
+    "OPS",
+    "MSP",
+    "DNVE",
+    "SIVE",
+    "VAERS",
+    "WHO-UMC",
+    "MedDRA",
+    "RAM",
+    "EA",
+    "EMA",
+    "FDA",
+    "ARCSA"
+  ),
+  Definición = c(
+    "Eventos Supuestamente Atribuidos a Vacunación o Inmunización",
+    "Programa Ampliado de Inmunizaciones",
+    "Organización Mundial de la Salud",
+    "Organización Panamericana de la Salud",
+    "Ministerio de Salud Pública",
+    "Dirección Nacional de Vigilancia Epidemiológica",
+    "Sistema Integrado de Vigilancia Epidemiológica",
+    "Vaccine Adverse Event Reporting System",
+    "World Health Organization - Uppsala Monitoring Centre",
+    "Medical Dictionary for Regulatory Activities",
+    "Reacciones Adversas a Medicamentos",
+    "Eventos Adversos",
+    "European Medicines Agency",
+    "Food and Drug Administration",
+    "Agencia nacional de Regulación, Control y Vigilancia Sanitaria"
+  )
+)
+
+kable(abreviaciones, 
+      booktabs = TRUE,
+      caption = "Lista de Abreviaciones Utilizadas") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE,
+    position = "left"
+  ) %>%
+  column_spec(1, bold = TRUE, width = "3cm") %>%
+  column_spec(2, width = "10cm")
+```
+
+\newpage
+
+## Glosario de Términos {-}
+
+```{r glosario, echo=FALSE}
+glosario <- data.frame(
+  Término = c(
+    "Evento Adverso",
+    "Reacción Adversa",
+    "Causalidad",
+    "Farmacovigilancia",
+    "Vacunovigilancia",
+    "Señal de Seguridad",
+    "Tasa de Notificación",
+    "Evento Serio",
+    "Evento Esperado",
+    "Evento Inesperado"
+  ),
+  Definición = c(
+    "Cualquier ocurrencia médica desfavorable que se presenta después de la administración de una vacuna, sin que necesariamente tenga una relación causal con su administración.",
+    "Respuesta nociva e involuntaria a una vacuna para la cual es posible una relación causal con la vacuna.",
+    "Evaluación de la probabilidad de que una vacuna haya causado un evento adverso específico.",
+    "Ciencia y actividades relativas a la detección, evaluación, comprensión y prevención de los efectos adversos de los medicamentos.",
+    "Proceso continuo y sistemático de monitoreo de la seguridad de las vacunas después de su comercialización.",
+    "Información reportada que sugiere una nueva asociación causal potencial, o un nuevo aspecto de una asociación conocida.",
+    "Número de eventos adversos reportados por número de dosis distribuidas o administradas en un período específico.",
+    "Evento que resulta en muerte, hospitalización, discapacidad significativa o anomalía congénita.",
+    "Evento adverso conocido que figura en la información del producto de la vacuna.",
+    "Evento adverso cuya naturaleza, severidad o frecuencia no es consistente con la información conocida de la vacuna."
+  )
+)
+
+kable(glosario, 
+      booktabs = TRUE,
+      caption = "Glosario de Términos Técnicos") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE,
+    position = "left"
+  ) %>%
+  column_spec(1, bold = TRUE, width = "4cm") %>%
+  column_spec(2, width = "9cm")
+```
+
+\newpage

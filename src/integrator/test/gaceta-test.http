@@ -4,10 +4,10 @@ Content-Type: application/json
 
 {
     "fechaPublicacion": "2025-01-28T00:00:00Z",
-    "numeroGaceta": 2,
+    "numeroGaceta": 3,
     "volumen": 2025,
-    "desde": "2025-02-01",
-    "hasta": "2025-02-28",
+    "desde": "2025-03-01",
+    "hasta": "2025-03-28",
     "urlGaceta": "https://www.salud.gob.ec/gaceta/2024/11/gaceta-001.pdf",
     "estado": "PENDIENTE",
     "autor": "Dr. Juan Pérez",

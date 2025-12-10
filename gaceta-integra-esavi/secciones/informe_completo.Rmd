@@ -1,0 +1,58 @@
+<!-- PORTADA EN PÁGINA ÚNICA -->
+\thispagestyle{empty}
+
+```{r child = "00_estructura/00_portada.Rmd"}
+```
+
+<!-- TABLA DE CONTENIDOS E ÍNDICES -->
+```{r child = "00_estructura/01_indice.Rmd"}
+```
+
+\newpage
+
+<!-- RESUMEN EJECUTIVO -->
+```{r child = "00_estructura/02_resumen_ejecutivo.Rmd"}
+```
+
+\newpage
+
+<!-- 1. INTRODUCCIÓN -->
+```{r child = "01_introduccion/01_introduccion.Rmd"}
+```
+
+\newpage
+
+<!-- 2. METODOLOGÍA -->
+```{r child = "02_metodologia/01_metodologia.Rmd"}
+```
+
+\newpage
+
+<!-- 3. RESULTADOS -->
+```{r child = "03_resultados/01_caracteristicas_poblacion.Rmd"}
+```
+
+```{r child = "03_resultados/02_distribucion_geografica.Rmd"}
+```
+
+```{r child = "03_resultados/03_analisis_vacunas.Rmd"}
+```
+
+```{r child = "03_resultados/04_analisis_gravedad.Rmd"}
+```
+
+```{r child = "03_resultados/05_analisis_temporal.Rmd"}
+```
+
+\newpage
+
+<!-- 4. CONCLUSIONES -->
+```{r child = "04_conclusiones/01_conclusiones.Rmd"}
+```
+
+\newpage
+
+<!-- REFERENCIAS BIBLIOGRÁFICAS -->
+# Referencias
+
+<div id="refs"></div>

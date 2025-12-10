@@ -1,0 +1,37 @@
+# Introducción
+
+## Antecedentes
+
+Los Eventos Supuestamente Atribuidos a Vacunación o Inmunización (ESAVI) representan un componente fundamental en el sistema de vigilancia de la seguridad de las vacunas (1). La detección, evaluación y respuesta oportuna a estos eventos es crucial para mantener la confianza pública en los programas de inmunización y garantizar la seguridad de las vacunas (2).
+
+La vigilancia de ESAVI se enmarca dentro del Sistema Nacional de Vigilancia Epidemiológica y sigue los lineamientos establecidos por la Organización Mundial de la Salud (OMS) y la Organización Panamericana de la Salud (OPS) (2,3). Los sistemas de vigilancia de seguridad de vacunas han demostrado ser herramientas efectivas para la detección temprana de eventos adversos (4).
+
+## Justificación
+
+```{r justificacion-stats}
+# Estadísticas que justifican el análisis
+# años_programa <- 2024 - 1980  # Años del PAI
+# vacunas_esquema <- 15  # Número aproximado de vacunas en esquema
+```
+
+El Programa Ampliado de Inmunizaciones ha demostrado ser una de las intervenciones de salud pública más exitosas, previniendo millones de muertes cada año. Sin embargo, como cualquier intervención médica, las vacunas pueden ocasionar eventos adversos. El monitoreo continuo de estos eventos permite:
+
+- Detectar señales de seguridad tempranamente
+- Caracterizar el perfil de seguridad de las vacunas
+- Tomar decisiones informadas sobre políticas de inmunización
+- Mantener la confianza pública en los programas de vacunación
+
+## Objetivos
+
+### Objetivo General
+
+Analizar los ESAVI reportados al sistema de vigilancia epidemiológica durante el período de estudio para caracterizar su perfil epidemiológico y evaluar la seguridad de las vacunas del esquema nacional.
+
+### Objetivos Específicos
+
+1. Describir las características epidemiológicas de los ESAVI reportados
+2. Analizar la distribución temporal y geográfica de los eventos
+3. Caracterizar los eventos según tipo de vacuna y grupo de edad
+4. Evaluar la gravedad y desenlace de los eventos reportados
+5. Identificar posibles señales de seguridad
+6. Formular recomendaciones para el fortalecimiento del sistema de vigilancia

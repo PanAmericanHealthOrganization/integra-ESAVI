@@ -1,0 +1,31 @@
+{
+  "informe": {
+    "titulo": "Informe de Análisis ESAVI",
+    "subtitulo": "Gaceta Integrada de Eventos Supuestamente Atribuidos a Vacunación o Inmunización",
+    "version": "1.0",
+    "estado": "Final"
+  },
+  "autor": {
+    "nombre": "Ing. Rolando Casigña",
+    "cargo": "Ingeniero de datos",
+    "correo": "rolo4336@gmail.com",
+    "telefono": "+593998521447"
+  },
+  "co_autor": {
+    "nombre": "Dra. Ana María González",
+    "cargo": "Coordinadora de Vigilancia",
+    "correo": "ana.gonzalez@msp.gob.ec",
+    "telefono": "+593-2-987654321"
+  },
+  "institucion": {
+    "nombre": "Ministerio de Salud Pública",
+    "direccion": "Dirección Nacional de Vigilancia Epidemiológica",
+    "pais": "Ecuador"
+  },
+  "descripcion": "Repositorio para la generación de la Gaceta de Eventos Supuestamente Atribuidos a Vacunación o Inmunización",
+  "total_eventos": 464,
+  "total_eventos_graves": 232,
+  "total_eventos_no_graves": 232,
+  "total_dhis2": 150,
+  "total_vigiflow": 0
+}

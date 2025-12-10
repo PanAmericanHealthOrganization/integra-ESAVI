@@ -1,0 +1,573 @@
+---
+# =============================================================================
+# INFORME ESAVI - GACETA INTEGRADA
+# =============================================================================
+# 
+# CONFIGURACIÓN DE PARÁMETROS:
+# Los parámetros se pasan desde el script render_simple.sh:
+# ./render_simple.sh pdf 2025-11-01 2025-11-30
+# 
+# =============================================================================
+
+title: ""
+subtitle: ""
+author: ""
+date: ""
+bibliography: referencias.bib
+csl: vancouver.csl
+link-citations: true
+always_allow_html: true
+params:
+  fecha_desde: "2025-11-01"
+  fecha_hasta: "2025-11-30"
+  anio_informe: 2025
+  mes_informe: 11
+output:
+  pdf_document:
+    toc: false
+    toc_depth: 3
+    number_sections: true
+    fig_caption: true
+    highlight: tango
+    keep_tex: false
+    latex_engine: xelatex
+    citation_package: natbib
+    includes:
+      in_header: header.tex
+  html_document:
+    toc: true
+    toc_float: true
+    theme: bootstrap
+    highlight: tango
+    code_folding: hide
+    fig_caption: true
+  word_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    fig_caption: true
+    fig_width: 6
+    fig_height: 4
+    highlight: tango
+    reference_docx: null
+header-includes:
+  - \usepackage{float}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+  - \usepackage{threeparttablex}
+  - \usepackage[normalem]{ulem}
+  - \usepackage{makecell}
+  - \usepackage{graphicx}
+  - \usepackage{lastpage}
+  - \usepackage{svg}
+geometry: margin=1in
+fontsize: 11pt
+linestretch: 1.5
+lang: es
+encoding: UTF-8
+---
+
+```{r setup, include=FALSE}
+# Crear directorio de figuras si no existe
+if (!dir.exists("output/figuras")) {
+  dir.create("output/figuras", recursive = TRUE)
+}
+
+# =============================================================================
+# PARÁMETROS DEL INFORME - RECIBIDOS DESDE SCRIPT SHELL
+# =============================================================================
+
+# Obtener parámetros del script o valores por defecto
+tryCatch({
+  # Intentar obtener desde variables de entorno (pasadas desde el script)
+  fecha_desde_env <- Sys.getenv("FECHA_DESDE_INFORME", "")
+  fecha_hasta_env <- Sys.getenv("FECHA_HASTA_INFORME", "")
+  anio_env <- Sys.getenv("ANIO_INFORME_PARAM", "")
+  mes_env <- Sys.getenv("MES_INFORME_PARAM", "")
+  
+  # Usar parámetros del script si están disponibles, sino usar los del YAML
+  FECHA_DESDE <- if(nchar(fecha_desde_env) > 0) fecha_desde_env else params$fecha_desde
+  FECHA_HASTA <- if(nchar(fecha_hasta_env) > 0) fecha_hasta_env else params$fecha_hasta
+  ANIO_INFORME <- if(nchar(anio_env) > 0) as.integer(anio_env) else params$anio_informe
+  MES_INFORME <- if(nchar(mes_env) > 0) as.integer(mes_env) else params$mes_informe
+  
+}, error = function(e) {
+  # Si hay error, usar valores por defecto del YAML
+  FECHA_DESDE <<- params$fecha_desde
+  FECHA_HASTA <<- params$fecha_hasta
+  ANIO_INFORME <<- params$anio_informe
+  MES_INFORME <<- params$mes_informe
+})
+
+# Generar identificadores de fecha basados en los parámetros
+fecha_informe <- sprintf("%04d%02d", ANIO_INFORME, MES_INFORME)  # Formato: 202511
+fecha_periodo <- sprintf("%04d-%02d", ANIO_INFORME, MES_INFORME)  # Formato: 2025-11
+fecha_completa <- format(Sys.Date(), "%Y-%m-%d")  # Fecha de generación del documento
+
+# Validar que el mes esté en rango válido
+if (MES_INFORME < 1 || MES_INFORME > 12) {
+  stop("❌ Error: MES_INFORME debe estar entre 1 y 12")
+}
+
+# Convertir fechas a objetos Date para validación
+fecha_desde_date <- as.Date(FECHA_DESDE)
+fecha_hasta_date <- as.Date(FECHA_HASTA)
+
+if (fecha_desde_date > fecha_hasta_date) {
+  stop("❌ Error: La fecha de inicio debe ser anterior o igual a la fecha de fin")
+}
+
+# Mostrar información del período configurado
+cat("📅 Configuración del informe:\n")
+cat(paste("   Período de datos:", FECHA_DESDE, "al", FECHA_HASTA, "\n"))
+cat(paste("   Año del informe:", ANIO_INFORME, "\n"))
+cat(paste("   Mes del informe:", MES_INFORME, "\n"))
+cat(paste("   Código del informe:", fecha_informe, "\n"))
+cat(paste("   Fecha de generación:", fecha_completa, "\n"))
+
+# Configuración global de chunks
+knitr::opts_chunk$set(
+  echo = FALSE,           # No mostrar código por defecto
+  warning = FALSE,        # No mostrar warnings
+  message = FALSE,        # No mostrar mensajes
+  fig.align = "center",   # Centrar figuras
+  fig.width = 4.4,        # Ancho de figuras (reducido 45%: 8 * 0.55 = 4.4)
+  fig.height = 3.3,       # Alto de figuras (reducido 45%: 6 * 0.55 = 3.3)
+  dpi = 300,              # Resolución de figuras
+  cache = TRUE,           # Cachear resultados
+  dev = c("pdf", "png"),  # Generar figuras en PDF y PNG
+  fig.path = paste0("output/", ANIO_INFORME, "/", sprintf("%02d", MES_INFORME), "/figuras/", fecha_informe, "_")  # Estructura mensual
+)
+
+# Cargar librerías necesarias
+# Función para instalar paquetes si no están instalados
+check_and_install <- function(packages, repos = "https://cloud.r-project.org") {
+  for (package in packages) {
+    if (!require(package, character.only = TRUE, quietly = TRUE)) {
+      tryCatch({
+        install.packages(package, repos = repos, quiet = TRUE)
+        library(package, character.only = TRUE, quietly = TRUE)
+      }, error = function(e) {
+        warning(paste("No se pudo instalar el paquete", package, ":", conditionMessage(e)))
+      })
+    }
+  }
+}
+
+# Lista de paquetes necesarios
+packages_needed <- c("knitr", "kableExtra", "ggplot2", "dplyr", 
+                     "lubridate", "scales", "readr", "tidyr", "stringr", "gridExtra", "ggtext")
+
+# Verificar e instalar paquetes
+check_and_install(packages_needed)
+
+# Verificar si ggtext está disponible para formato de texto enriquecido
+# Intentar cargar ggtext, pero no es crítico si no está disponible
+ggtext_available <- tryCatch({
+  if (require("ggtext", quietly = TRUE)) {
+    TRUE
+  } else {
+    # Intentar instalar solo si no está disponible
+    tryCatch({
+      install.packages("ggtext", repos = "https://cloud.r-project.org", quiet = TRUE)
+      require("ggtext", quietly = TRUE)
+    }, error = function(e) {
+      FALSE
+    })
+  }
+}, error = function(e) FALSE)
+
+# Si ggtext no está disponible, continuar sin él (el formato de negrita no funcionará en gráficos)
+if (!ggtext_available) {
+  # ggtext no está disponible, continuar sin formato de negrita en captions de gráficos
+  # El tamaño de fuente de 8pt seguirá funcionando
+}
+
+# Configurar tema de ggplot2
+# Para el caption, usar tamaño 8pt (en ggplot2, size se especifica en mm, 
+# pero para LaTeX/PDF se convierte a puntos aproximadamente)
+# 8pt ≈ 2.82mm (usando .pt = 2.834646)
+caption_size_pt <- 8
+caption_size_mm <- caption_size_pt / 2.834646  # Conversión de pt a mm para ggplot2
+
+if (ggtext_available) {
+  # Si ggtext está disponible, usar element_markdown para formato de texto enriquecido
+  theme_set(theme_minimal() +
+    theme(
+      text = element_text(family = "Arial", size = 11),
+      plot.title = element_text(size = 14, face = "bold"),
+      plot.subtitle = element_text(size = 12),
+      plot.caption = ggtext::element_markdown(size = caption_size_mm, hjust = 0, face = "plain", lineheight = 1.2),
+      axis.title = element_text(size = 11),
+      legend.title = element_text(size = 11, face = "bold"),
+      legend.text = element_text(size = 10)
+    ))
+} else {
+  # Si ggtext no está disponible, usar element_text normal
+  theme_set(theme_minimal() +
+    theme(
+      text = element_text(family = "Arial", size = 11),
+      plot.title = element_text(size = 14, face = "bold"),
+      plot.subtitle = element_text(size = 12),
+      plot.caption = element_text(size = caption_size_mm, hjust = 0, face = "plain", lineheight = 1.2),
+      axis.title = element_text(size = 11),
+      legend.title = element_text(size = 11, face = "bold"),
+      legend.text = element_text(size = 10)
+    ))
+}
+
+# Función para generar texto de fuente y elaborado por para gráficos
+# Devuelve el texto formateado según el formato de salida para usar en caption de ggplot2
+# El tamaño de fuente de 8pt se maneja en el tema de ggplot2
+get_fuente_elaborado_caption <- function() {
+  output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  if (is.null(output_format)) {
+    output_format <- "latex"
+  }
+  
+  # Verificar si ggtext está disponible
+  ggtext_available <- exists("ggtext_available") && ggtext_available
+  
+  if (ggtext_available) {
+    # Si ggtext está disponible, usar formato markdown para negrita
+    # Esto funcionará en todos los formatos (LaTeX, HTML, Word)
+    paste0(
+      "**Fuente:** DHIS2 Vigiflow | **Elaborado por:** Dirección Nacional de Vigilancia Epidemiológica"
+    )
+  } else if (output_format %in% c("latex", "pdf")) {
+    # Para LaTeX/PDF: usar formato LaTeX para negrita
+    # Nota: esto puede no funcionar directamente en ggplot2 sin ggtext
+    paste0(
+      "\\textbf{Fuente:} DHIS2 Vigiflow | \\textbf{Elaborado por:} Dirección Nacional de Vigilancia Epidemiológica"
+    )
+  } else if (output_format %in% c("html")) {
+    # Para HTML: usar formato HTML para negrita
+    paste0(
+      "<strong>Fuente:</strong> DHIS2 Vigiflow | <strong>Elaborado por:</strong> Dirección Nacional de Vigilancia Epidemiológica"
+    )
+  } else {
+    # Para Word/Pandoc: usar formato markdown
+    paste0(
+      "**Fuente:** DHIS2 Vigiflow | **Elaborado por:** Dirección Nacional de Vigilancia Epidemiológica"
+    )
+  }
+}
+
+# Función para agregar notas al pie a tablas kable
+# Esta función toma una tabla kable y agrega las notas de fuente y elaborado por
+add_fuente_elaborado_tabla <- function(tabla) {
+  output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  if (is.null(output_format)) {
+    output_format <- "latex"
+  }
+  
+  if (output_format %in% c("latex", "pdf")) {
+    # Para LaTeX/PDF: usar footnote de kableExtra
+    # Usar tamaño de fuente de 8pt explícitamente
+    tabla %>%
+      footnote(
+        general = c("\\fontsize{8}{10}\\selectfont \\textbf{Fuente:} DHIS2 Vigiflow",
+                   "\\fontsize{8}{10}\\selectfont \\textbf{Elaborado por:} Dirección Nacional de Vigilancia Epidemiológica"),
+        general_title = "",
+        footnote_as_chunk = FALSE,
+        escape = FALSE,
+        threeparttable = TRUE
+      )
+  } else if (output_format %in% c("html")) {
+    # Para HTML: usar footnote de kableExtra con tamaño de fuente 8pt
+    tabla %>%
+      footnote(
+        general = c("<span style='font-size:8pt;'><strong>Fuente:</strong> DHIS2 Vigiflow</span>",
+                   "<span style='font-size:8pt;'><strong>Elaborado por:</strong> Dirección Nacional de Vigilancia Epidemiológica</span>"),
+        general_title = "",
+        footnote_as_chunk = TRUE,
+        escape = FALSE
+      )
+  } else {
+    # Para Word/Pandoc: formato simple
+    tabla %>%
+      footnote(
+        general = c("**Fuente:** DHIS2 Vigiflow",
+                   "**Elaborado por:** Dirección Nacional de Vigilancia Epidemiológica"),
+        general_title = "",
+        footnote_as_chunk = TRUE
+      )
+  }
+}
+
+# Configurar opciones de idioma y codificación
+Sys.setlocale("LC_TIME", "es_ES.UTF-8")
+Sys.setlocale("LC_CTYPE", "es_ES.UTF-8")
+options(encoding = "UTF-8")
+
+# Configuración específica para Word
+if (!is.null(knitr::opts_knit$get("rmarkdown.pandoc.to")) && 
+    knitr::opts_knit$get("rmarkdown.pandoc.to") %in% c("docx", "word")) {
+  # Opciones específicas para Word
+  options(knitr.table.format = "pandoc")
+  options(scipen = 999)  # Evitar notación científica
+}
+
+# Función universal para crear tablas compatibles con todos los formatos de salida
+crear_tabla_universal <- function(data, caption = "", col_names = NULL, width_spec = NULL) {
+  # Detectar formato de salida
+  output_format <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  if (is.null(output_format)) {
+    output_format <- "latex"  # Por defecto
+  }
+  
+  # Asegurar codificación UTF-8 para caracteres especiales
+  if (is.data.frame(data)) {
+    for (i in seq_along(data)) {
+      if (is.character(data[[i]])) {
+        Encoding(data[[i]]) <- "UTF-8"
+      }
+    }
+  }
+  
+  # Configurar nombres de columnas si se proporcionan
+  if (!is.null(col_names)) {
+    names(data) <- col_names
+    # Asegurar codificación UTF-8 para nombres de columnas
+    Encoding(names(data)) <- "UTF-8"
+  }
+  
+  # Crear tabla base según el formato
+  if (output_format %in% c("docx", "word")) {
+    # Configuración específica para Word - usar formato más simple
+    tabla <- kable(data,
+                  format = "pandoc",  # Mejor compatibilidad con Word
+                  caption = caption,
+                  align = "c",
+                  digits = 1) %>%
+      kable_styling(
+        bootstrap_options = c("striped"),
+        full_width = FALSE,
+        position = "center",
+        font_size = 10,
+        protect_latex = FALSE
+      )
+    
+  } else if (output_format %in% c("latex", "pdf")) {
+    # Configuración para PDF/LaTeX
+    tabla <- kable(data, 
+                  format = "latex",
+                  caption = caption,
+                  booktabs = TRUE,
+                  align = "c",
+                  digits = 1,
+                  escape = FALSE) %>%
+      kable_styling(
+        latex_options = c("striped", "hold_position", "scale_down"),
+        full_width = FALSE,
+        position = "center"
+      )
+    
+    # Aplicar especificaciones de ancho si se proporcionan
+    if (!is.null(width_spec)) {
+      for (i in seq_along(width_spec)) {
+        tabla <- tabla %>% column_spec(i, width = width_spec[i])
+      }
+    }
+    
+  } else {
+    # Configuración para HTML y otros
+    tabla <- kable(data, 
+                  format = "html",
+                  caption = caption,
+                  align = "c",
+                  digits = 1,
+                  escape = FALSE) %>%
+      kable_styling(
+        bootstrap_options = c("striped", "hover", "condensed"),
+        full_width = FALSE,
+        position = "center"
+      )
+  }
+  
+  return(tabla)
+}
+
+# Función para copiar figuras PNG al directorio output
+organizar_figuras <- function() {
+  tryCatch({
+    cat("\nOrganizando figuras generadas...\n")
+    
+    # Buscar todas las figuras PNG generadas en el directorio mensual
+    figuras_temp_dir <- paste0("output/", ANIO_INFORME, "/", sprintf("%02d", MES_INFORME), "/figuras")
+    png_files <- list.files(path = figuras_temp_dir, 
+                           pattern = "\\.png$", 
+                           full.names = TRUE, 
+                           recursive = TRUE)
+    
+    if (length(png_files) > 0) {
+      # Crear directorio de figuras finales con estructura mensual
+      figuras_dir <- paste0("output/", ANIO_INFORME, "/", sprintf("%02d", MES_INFORME), "/figuras_informe_esavi_", fecha_informe)
+      if (!dir.exists(figuras_dir)) {
+        dir.create(figuras_dir, recursive = TRUE)
+      }
+      
+      # Crear información sobre las figuras
+      figuras_info <- data.frame(
+        archivo_original = character(),
+        archivo_final = character(),
+        descripcion = character(),
+        periodo_datos = character(),
+        fecha_generacion = character(),
+        tamaño_kb = numeric(),
+        stringsAsFactors = FALSE
+      )
+      
+      # Copiar figuras PNG con información
+      for (png_file in png_files) {
+        filename <- basename(png_file)
+        
+        # Extraer el nombre base de la figura (remover prefijo de fecha y número)
+        base_name <- gsub(paste0("^", fecha_informe, "_"), "", filename)
+        base_name <- gsub("-\\d+\\.png$", "", base_name)
+        # Convertir guiones a guiones bajos para consistencia
+        base_name <- gsub("-", "_", base_name)
+        
+        # Generar nombre final con formato: nombre_imagen_informe_esavi_YYYYMM.png
+        final_name <- paste0(base_name, "_informe_esavi_", fecha_informe, ".png")
+        dest_file <- file.path(figuras_dir, final_name)
+        
+        # Copiar archivo
+        file.copy(png_file, dest_file, overwrite = TRUE)
+        
+        # Obtener tamaño del archivo
+        file_size <- round(file.size(dest_file) / 1024, 2)  # Tamaño en KB
+        
+        # Obtener descripción de la figura
+        descripcion <- switch(base_name,
+          "piramide_edad" = "Pirámide de Edad de los Casos de ESAVI",
+          "mapa_incidencia" = "Distribución Geográfica de ESAVI por Provincia", 
+          "vacunas_grafico" = "Distribución de ESAVI por Tipo de Vacuna",
+          "gravedad_desenlace" = "Distribución de ESAVI por Gravedad y Desenlace",
+          "tendencia_temporal" = "Tendencia Temporal de Notificación de ESAVI",
+          paste("Figura:", base_name)
+        )
+        
+        # Usar el período configurado en los parámetros
+        periodo_datos <- fecha_periodo
+        
+        figuras_info <- rbind(figuras_info, data.frame(
+          archivo_original = filename,
+          archivo_final = final_name,
+          descripcion = descripcion,
+          periodo_datos = periodo_datos,
+          fecha_generacion = format(Sys.time(), "%Y-%m-%d %H:%M:%S"),
+          tamaño_kb = file_size,
+          stringsAsFactors = FALSE
+        ))
+      }
+      
+      # Guardar índice de figuras con información detallada
+      indice_file <- file.path(figuras_dir, paste0("indice_figuras_informe_esavi_", fecha_informe, ".csv"))
+      write.csv(figuras_info, indice_file, row.names = FALSE)
+      
+      # Crear archivo README con información
+      mes_nombre <- c("enero", "febrero", "marzo", "abril", "mayo", "junio",
+                      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre")[MES_INFORME]
+      
+      readme_content <- paste0(
+        "# Figuras del Informe ESAVI - ", mes_nombre, " ", ANIO_INFORME, "\n\n",
+        "**Período de datos:** ", FECHA_DESDE, " al ", FECHA_HASTA, "\n",
+        "**Mes/Año principal:** ", fecha_periodo, " (", mes_nombre, " ", ANIO_INFORME, ")\n",
+        "**Código del informe:** ", fecha_informe, "\n",
+        "**Fecha de generación:** ", fecha_completa, "\n",
+        "**Total de figuras:** ", nrow(figuras_info), "\n\n",
+        "## Parámetros de Configuración:\n\n",
+        "- **FECHA_DESDE:** ", FECHA_DESDE, "\n",
+        "- **FECHA_HASTA:** ", FECHA_HASTA, "\n",
+        "- **ANIO_INFORME:** ", ANIO_INFORME, "\n",
+        "- **MES_INFORME:** ", MES_INFORME, " (", mes_nombre, ")\n\n",
+        "## Lista de Figuras:\n\n"
+      )
+      
+      for (i in 1:nrow(figuras_info)) {
+        readme_content <- paste0(readme_content,
+          "- **", figuras_info$archivo_final[i], "**\n",
+          "  - Descripción: ", figuras_info$descripcion[i], "\n",
+          "  - Período de datos: ", figuras_info$periodo_datos[i], "\n",
+          "  - Tamaño: ", figuras_info$tamaño_kb[i], " KB\n\n"
+        )
+      }
+      
+      writeLines(readme_content, file.path(figuras_dir, "README.md"))
+      
+      cat("Figuras PNG organizadas con identificación temporal\n")
+      cat(paste("   Directorio:", figuras_dir, "\n"))
+      cat(paste("   Total de figuras:", nrow(figuras_info), "\n"))
+      cat(paste("   Período de datos:", figuras_info$periodo_datos[1], "\n"))
+      
+      # Listar las figuras generadas con descripción
+      for (i in 1:nrow(figuras_info)) {
+        cat(paste("   ", figuras_info$archivo_final[i], "-", figuras_info$descripcion[i], 
+                  "(", figuras_info$tamaño_kb[i], "KB )\n"))
+      }
+      
+      cat(paste("   Índice guardado en:", basename(indice_file), "\n"))
+      cat(paste("   Documentación en: README.md\n"))
+      
+    } else {
+      cat("No se encontraron figuras PNG para copiar\n")
+    }
+  }, error = function(e) {
+    cat("Error al organizar figuras:", e$message, "\n")
+  })
+}
+
+# Registrar la función para ejecutar al final
+knitr::knit_hooks$set(document = function(x) {
+  organizar_figuras()
+  x
+})
+```
+
+<!-- CARGAR DATOS Y PARÁMETROS GLOBALES -->
+```{r child = 'secciones/load_data.Rmd'}
+```
+
+<!-- CONTENIDO COMPLETO DEL INFORME -->
+```{r child = 'secciones/informe_completo.Rmd'}
+```
+
+\newpage
+
+# Anexos {-}
+
+## Anexo A: Metodología Detallada
+
+```{r metodologia-anexo, echo=TRUE, eval=FALSE}
+# Código de ejemplo para la metodología
+# Este chunk se puede expandir según las necesidades específicas
+```
+
+## Anexo B: Datos Adicionales
+
+```{r datos-adicionales-anexo}
+# Tablas o gráficos adicionales que complementen el análisis
+```
+
+```
+
+## Anexo A: Metodología Detallada
+
+```{r metodologia, echo=TRUE, eval=FALSE}
+# Código de ejemplo para la metodología
+# Este chunk se puede expandir según las necesidades específicas
+```
+
+## Anexo B: Datos Adicionales
+
+```{r datos-adicionales}
+# Tablas o gráficos adicionales que complementen el análisis
+```
