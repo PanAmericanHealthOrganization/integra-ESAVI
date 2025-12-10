@@ -90,11 +90,16 @@ const CalidadSemantica: React.FC = () => {
     const promedioValidez =
       reglas.reduce((acc, regla) => acc + regla.porcentajeRegistrosValidos, 0) /
       totalReglas
-    const promedioInvalidez =
-      reglas.reduce(
-        (acc, regla) => acc + regla.porcentajeRegistrosInvalidos,
-        0
-      ) / totalReglas
+    const promedioInvalidez = Math.min(
+      100,
+      Math.max(
+        0,
+        reglas.reduce(
+          (acc, regla) => acc + regla.porcentajeRegistrosInvalidos,
+          0
+        ) / totalReglas
+      )
+    )
     const reglasCriticas = reglas.filter(
       (regla) => regla.porcentajeRegistrosValidos < 85
     ).length
@@ -185,31 +190,7 @@ const CalidadSemantica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Promedio de inconsistencia
-              </Typography>
-              <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-                <Typography
-                  variant="h4"
-                  sx={{ fontWeight: "bold", color: "error.main" }}>
-                  {resumen.promedioInvalidez.toFixed(2)}%
-                </Typography>
-                <Chip label="Crítico" color="error" size="small" />
-              </Box>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 1 }}>
-                {resumen.reglasCriticas} reglas críticas
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+
         <Grid item xs={12} sm={6} md={2.4}>
           <Card>
             <CardContent>
