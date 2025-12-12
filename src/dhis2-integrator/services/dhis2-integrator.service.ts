@@ -530,7 +530,7 @@ export class Dhis2IntegratorService {
 
     // Create Gravedad
     const grave = new CreateGravedadEsaviDto();
-    grave.tipo = 'GRAVE';
+    grave.tipo = '1';//'GRAVE';
     grave.riesgoVida = this.esValorAfirmativo(
       row[
         headers.findIndex(
@@ -1032,7 +1032,7 @@ export class Dhis2IntegratorService {
 
       //Create Gravedad
       const grave = new CreateGravedadEsaviDto();
-      grave.tipo = 'GRAVE';
+      grave.tipo = '1';//'GRAVE';
       grave.riesgoVida = this.esValorAfirmativo(
         row[
           data.headers.findIndex(
