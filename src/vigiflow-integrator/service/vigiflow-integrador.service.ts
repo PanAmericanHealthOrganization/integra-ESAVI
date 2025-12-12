@@ -244,10 +244,10 @@ export class VigiflowIntegradorService {
 
       //Create Gravedad
       const grave = new CreateGravedadEsaviDto();
-      let gravedad = 'NO GRAVE';
+      let gravedad = '0';//'NO GRAVE';
       const tipoGravedad = reg['X'];
       if (tipoGravedad && tipoGravedad.toUpperCase().includes('S')) {
-        gravedad = 'GRAVE';
+        gravedad = '1';//'GRAVE';
       }
       grave.tipo = gravedad;
 

@@ -164,10 +164,16 @@ export class VigiflowCrawlerService {
       ],
       dictionarySearchIcsrsParameters: [
         {
+          dictionaryEnum: 23,   // <-- filtro de Gravedad
+          searchIcsrsField: 703,
+          values: ['2'],        // <-- "2" corresponde al valor "No" //['2', '4'], // <-- "2" corresponde al valor "No" y "4" a "Si"
+        },
+        {
           searchIcsrsField: 903,
-          dictionaryEnum: 26,
-          values: ['0', '2', '1'], //Que significa esto
-          // values: ['0'],
+          dictionaryEnum: 26, // <-- Estado del reporte <-- Reporte <-- filtro AVANZADO
+          values: ['0', '1'], //['0', '2', '1'], // <-- "0" corresponde a "Abierto", "2" a "Bajo evaluación" y "1" a "Cerrado"
+          // Se recomienda no utilizar el estado del reporte "2" (Bajo evaluación) ya que puede generar inconsistencias en los reportes,
+          // por ejemplo, las reacciones pueden ser consideradas como graves en algunos casos y en otros no.
         },
       ],
       dateSearchIcsrsParameters: [],
