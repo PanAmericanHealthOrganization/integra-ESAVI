@@ -1,4 +1,4 @@
-import { CheckCircle, Error, Warning } from "@mui/icons-material"
+import { CheckCircle, Warning } from "@mui/icons-material"
 import {
   Alert,
   Box,
@@ -134,7 +134,7 @@ const CalidadSintactica: React.FC = () => {
   const getSeverityIcon = (percentage: number) => {
     if (percentage >= 95) return <CheckCircle color="success" />
     if (percentage >= 80) return <Warning color="warning" />
-    return <Error color="error" />
+    return <ErrorOutline color="error" />
   }
 
   if (loading) {
