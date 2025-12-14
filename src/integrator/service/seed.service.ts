@@ -636,6 +636,18 @@ export class SeedService {
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
       },
       {
+        vigiflow: 'DIA',
+        dhis2: 'DIA',
+        homologada: '3',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'DÍA',
+        dhis2: 'DÍA',
+        homologada: '3',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
         vigiflow: 'AÑO',
         dhis2: 'AÑO',
         homologada: '1',
@@ -651,12 +663,6 @@ export class SeedService {
         vigiflow: 'SEMANA',
         dhis2: 'SEMANA',
         homologada: '5',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'DIA',
-        dhis2: 'DIA',
-        homologada: '3',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
       },
       {

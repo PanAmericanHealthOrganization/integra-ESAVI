@@ -176,6 +176,8 @@ export class VigiflowIntegradorService {
     const reports = utils.sheet_to_json(ws, {
       range: importRange,
       header: headers,
+      raw: true, // 👈 fuerza a no convertir tipos
+      defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
     reports.map(async (reg) => {
@@ -206,9 +208,13 @@ export class VigiflowIntegradorService {
         //Para no repetir la extracción, simplemente se asigna la fecha de nacimiento al paciente desde la notificación.
         paciente.fechaNacimiento = fecha;
       }
+      
+      // Al momento la edad y su unidad se toman directamente del excel. Los cálculos	
+      // que se hacen en el documento "notificacion-vigiflow.service.ts" son
+      // úncamente para calcular el grupo etario.
       const edad = this.formatoInteger(reg['H'] && reg['H']);
       const unidadEdad = reg['I'] && reg['I'].toUpperCase();
-      if (edad > 0 && edad < 121 && unidadEdad) {
+      if ((edad > 0 && edad < 121) && unidadEdad) {
         notificacion.edad = edad;
         notificacion.unidadEdadPaciente = unidadEdad;
       } else {

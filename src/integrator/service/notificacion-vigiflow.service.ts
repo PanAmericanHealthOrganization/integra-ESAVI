@@ -141,13 +141,26 @@ export class NotificacionVigiflowService {
                   unidadEdad = 'AÑOS';
                 }
               } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
-                // Convertimos días a años (1 día = 1/365 años)
-                edadFinal = ~~(createDto.edad / 365);
-                unidadEdad = 'AÑOS';
+                if (createDto.edad >= 0 && createDto.edad <= 364) {
+                  // Se convierte días a meses (1 mes = 30.44 días)
+                  edadFinal = ~~(createDto.edad / 30.44);
+                  unidadEdad = 'MESES';
+                } else {
+                  // Convertimos días a años (1 día = 1/365 años)
+                  edadFinal = ~~(createDto.edad / 365);
+                  unidadEdad = 'AÑOS';
+                }
+                
               } else if (unidadEdad === 'HORA') {
-                // Convertimos horas a años (1 hora = 1/8760 años)
-                edadFinal = ~~(createDto.edad / 8760);
-                unidadEdad = 'AÑOS';
+                if (createDto.edad >= 0 && createDto.edad <= 8759) {
+                  // Si la edad en horas es menor a 8760 (1 año), la convertimos a meses
+                  edadFinal = ~~(createDto.edad / 730); // cte sugerida: 730.001// Convertimos horas a meses (1 mes = 730.001 horas)
+                  unidadEdad = 'MESES';
+                } else {
+                  // Convertimos horas a años (1 hora = 1/8760 años)
+                  edadFinal = ~~(createDto.edad / 8760);
+                  unidadEdad = 'AÑOS';
+                }                
               } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
                 if (createDto.edad >= 0 && createDto.edad <= 11) {
                   // Si la edad en meses es menor a 12, la dejamos como meses
