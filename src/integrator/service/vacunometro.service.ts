@@ -1,17 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
+import { withAuditOnCreate } from 'src/common/utils/audit.util';
 import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
+import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { ILike, In, Raw, Repository } from 'typeorm';
-import { VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto } from '../entity/vacunometro.entity';
-import { Vacunometro } from '../entity/vacunometro.entity';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import { Vacunometro, VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto } from '../entity/vacunometro.entity';
 
 @Injectable()
-export class VacunometroService
-  implements IService<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto>
-{
+export class VacunometroService implements IService<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto> {
   /**
    * Logger  of vacunometro service
    */
@@ -95,8 +92,7 @@ export class VacunometroService
           buildFilter = {
             ...buildFilter,
             fechaAplicacion: Raw(
-              (alias) =>
-                `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
+              (alias) => `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
               {
                 year: year,
                 month: month,
@@ -211,13 +207,19 @@ export class VacunometroService
     return this.vacunometroRepository.findOne({ where: { id: id as string } });
   }
 
-  /**
-   *
-   * @param vacunometro
-   * @returns
-   */
-  /*public async createMany(vacunometro: any[]): Promise<Vacunometro[]> {
+  public async createMany(vacunometro: any[]): Promise<Vacunometro[]> {
     try {
+      const auditoriaDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'SYSTEM', // o el usuario actual si lo tienes
+        updatedAt: null,
+        updatedBy: null,
+        deletedAt: null,
+        deletedBy: null,
+        isEnabled: true,
+        isActive: true,
+      };
+
       const vacunometros: Vacunometro[] = vacunometro.map((v) => {
         const fecha = new Date(v.FECHA_APLICACION);
         return {
@@ -230,8 +232,10 @@ export class VacunometroService
           fechaAplicacion: fecha,
           sexo: v.SEXO,
           total: v.TOTAL,
+          ...auditoriaDto, // 👈 aquí se mezclan los campos de auditoría
         } as Vacunometro;
       });
+
       return this.vacunometroRepository.save(vacunometros);
     } catch (e) {
       this.logger.error(`Error al procesar los datos de vacuna: ${e.message}`);
@@ -239,43 +243,5 @@ export class VacunometroService
     } finally {
       this.logger.log(`DatoVacuna ha sido procesado: ${JSON.stringify(vacunometro)}`);
     }
-  }*/
-    public async createMany(vacunometro: any[]): Promise<Vacunometro[]> {
-      try {
-        const auditoriaDto: IAuditoria = {
-          createdAt: new Date(),
-          createdBy: 'SYSTEM',   // o el usuario actual si lo tienes
-          updatedAt: null,
-          updatedBy: null,
-          deletedAt: null,
-          deletedBy: null,
-          isEnabled: true,
-          isActive: true,
-        };
-    
-        const vacunometros: Vacunometro[] = vacunometro.map((v) => {
-          const fecha = new Date(v.FECHA_APLICACION);
-          return {
-            unicode: v.UNICODE,
-            nombreVacuna: v.NOMBRE_VACUNA,
-            dosisAplicada: '', // Este campo no está en la consulta, se deja vacío
-            diaAplicacion: fecha.getDate(),
-            mesAplicacion: fecha.getMonth() + 1, // Los meses en JavaScript son 0-indexados
-            anioAplicacion: fecha.getFullYear(),
-            fechaAplicacion: fecha,
-            sexo: v.SEXO,
-            total: v.TOTAL,
-            ...auditoriaDto,   // 👈 aquí se mezclan los campos de auditoría
-          } as Vacunometro;
-        });
-    
-        return this.vacunometroRepository.save(vacunometros);
-      } catch (e) {
-        this.logger.error(`Error al procesar los datos de vacuna: ${e.message}`);
-        throw new Error('Hubo un problema al crear o actualizar los datos de vacuna');
-      } finally {
-        this.logger.log(`DatoVacuna ha sido procesado: ${JSON.stringify(vacunometro)}`);
-      }
-    }
-    
+  }
 }
