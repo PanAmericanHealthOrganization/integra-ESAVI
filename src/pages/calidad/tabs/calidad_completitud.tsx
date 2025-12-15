@@ -133,26 +133,28 @@ const CalidadCompletitud: React.FC = () => {
   const totalColumnas = resumenTabla?.totalColumnas ?? 0
 
   return (
-    <Box sx={{ p: 3 }}>
+    <Box sx={{ p: 0.375 }}>
       {columnasTabla.length === 0 ? (
         <EmptyState />
       ) : (
         <>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
+          <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
                     Columnas evaluadas
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: "bold", mt: 0.375 }}>
                     {numberFormatter.format(totalColumnas)}
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
                     Promedio de completitud
@@ -161,8 +163,8 @@ const CalidadCompletitud: React.FC = () => {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      gap: 1,
-                      mt: 1,
+                      gap: 0.375,
+                      mt: 0.375,
                     }}>
                     <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                       {promedioTabla.toFixed(2)}%
@@ -177,26 +179,28 @@ const CalidadCompletitud: React.FC = () => {
                     variant="caption"
                     color="text.secondary"
                     display="block"
-                    sx={{ mt: 1 }}>
+                    sx={{ mt: 0.375 }}>
                     {totalColumnas} columnas evaluadas
                   </Typography>
                 </CardContent>
               </Card>
             </Grid>
             <Grid item xs={12} md={3}>
-              <Card>
+              <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
                     Registros con datos
                   </Typography>
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+                  <Typography
+                    variant="h4"
+                    sx={{ fontWeight: "bold", mt: 0.375 }}>
                     {numberFormatter.format(totalNonNulls)}
                   </Typography>
                   <Typography
                     variant="caption"
                     color="text.secondary"
                     display="block"
-                    sx={{ mt: 1 }}>
+                    sx={{ mt: 0.375 }}>
                     Sin valores nulos
                   </Typography>
                 </CardContent>
@@ -206,7 +210,7 @@ const CalidadCompletitud: React.FC = () => {
 
           <Card>
             <CardContent>
-              <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.375 }}>
                 Detalle de completitud por columna
               </Typography>
               <TablaProblemasCalidad

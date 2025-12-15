@@ -18,6 +18,8 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
   porcentajeRegistrosValidos,
   porcentajeRegistrosInvalidos,
 }) => {
+  const esVacio = totalRegistros === 0
+
   return (
     <Box sx={{ width: "100%" }}>
       {/* Total de registros sobre la barra */}
@@ -36,9 +38,32 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
           borderRadius: 1,
           overflow: "hidden",
           border: "1px solid #e5e7eb",
+          backgroundColor: esVacio ? "#9ca3af" : "transparent",
         }}>
+        {/* Sección gris cuando no hay registros */}
+        {esVacio && (
+          <Box
+            sx={{
+              width: "100%",
+              backgroundColor: "#9ca3af",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "white",
+                fontWeight: "bold",
+                fontSize: "0.75rem",
+              }}>
+              Sin registros
+            </Typography>
+          </Box>
+        )}
+
         {/* Sección verde (válidos) */}
-        {porcentajeRegistrosValidos > 0 && (
+        {!esVacio && porcentajeRegistrosValidos > 0 && (
           <Tooltip
             title={`Válidos: ${numberFormatter.format(totalRegistrosValidos)} registros`}
             arrow
@@ -72,7 +97,7 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
         )}
 
         {/* Sección roja salmon (inválidos) */}
-        {porcentajeRegistrosInvalidos > 0 && (
+        {!esVacio && porcentajeRegistrosInvalidos > 0 && (
           <Tooltip
             title={`Inválidos: ${numberFormatter.format(totalRegistrosInvalidos)} registros`}
             arrow
@@ -106,38 +131,40 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
         )}
       </Box>
 
-      {/* Leyenda debajo de la barra */}
-      <Stack
-        direction="row"
-        spacing={2}
-        sx={{ mt: 0.5, justifyContent: "center" }}>
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          <Box
-            sx={{
-              width: 12,
-              height: 12,
-              backgroundColor: "#22c55e",
-              borderRadius: 0.5,
-            }}
-          />
-          <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-            Válidos: {porcentajeRegistrosValidos.toFixed(1)}%
-          </Typography>
+      {/* Leyenda debajo de la barra - solo si hay registros */}
+      {!esVacio && (
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{ mt: 0.5, justifyContent: "center" }}>
+          <Stack direction="row" spacing={0.5} alignItems="center">
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
+                backgroundColor: "#22c55e",
+                borderRadius: 0.5,
+              }}
+            />
+            <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+              Válidos: {porcentajeRegistrosValidos.toFixed(1)}%
+            </Typography>
+          </Stack>
+          <Stack direction="row" spacing={0.5} alignItems="center">
+            <Box
+              sx={{
+                width: 12,
+                height: 12,
+                backgroundColor: "#fa8072",
+                borderRadius: 0.5,
+              }}
+            />
+            <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
+              Inválidos: {porcentajeRegistrosInvalidos.toFixed(1)}%
+            </Typography>
+          </Stack>
         </Stack>
-        <Stack direction="row" spacing={0.5} alignItems="center">
-          <Box
-            sx={{
-              width: 12,
-              height: 12,
-              backgroundColor: "#fa8072",
-              borderRadius: 0.5,
-            }}
-          />
-          <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-            Inválidos: {porcentajeRegistrosInvalidos.toFixed(1)}%
-          </Typography>
-        </Stack>
-      </Stack>
+      )}
     </Box>
   )
 }

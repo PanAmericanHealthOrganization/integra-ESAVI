@@ -149,28 +149,33 @@ const CalidadSemantica: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+    <Box sx={{ p: 0.375 }}>
+      <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Reglas evaluadas
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
                 {resumen.totalReglas}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Promedio de consistencia
               </Typography>
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.375,
+                  mt: 0.375,
+                }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                   {resumen.promedioValidez.toFixed(2)}%
                 </Typography>
@@ -184,7 +189,7 @@ const CalidadSemantica: React.FC = () => {
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 {resumen.totalReglas} reglas evaluadas
               </Typography>
             </CardContent>
@@ -192,40 +197,40 @@ const CalidadSemantica: React.FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Registros válidos
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
                 {numberFormatter.format(resumen.totalValidos)}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 De {numberFormatter.format(resumen.totalRegistros)} registros
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Registros inválidos
               </Typography>
               <Typography
                 variant="h4"
-                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                sx={{ fontWeight: "bold", mt: 0.375, color: "error.main" }}>
                 {numberFormatter.format(resumen.totalInvalidos)}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 Requieren corrección
               </Typography>
             </CardContent>
@@ -245,7 +250,7 @@ const CalidadSemantica: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Alert severity="info" sx={{ mt: 3 }}>
+      <Alert severity="info" sx={{ mt: 0.375 }}>
         <Typography variant="body2">
           La dimensión de consistencia verifica la coherencia entre variables
           relacionadas. Priorice las reglas críticas para alinear los datos

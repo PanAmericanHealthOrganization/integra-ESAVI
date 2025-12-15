@@ -215,8 +215,7 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
 
                 {/* Botón de Descarga */}
                 <TableCell align="center">
-                  {problema.idNotificacionesNoValidos &&
-                    problema.idNotificacionesNoValidos.length > 0 &&
+                  {problema.totalRegistrosInvalidos > 0 &&
                     anio !== undefined &&
                     mes !== undefined && (
                       <DescargaErrores

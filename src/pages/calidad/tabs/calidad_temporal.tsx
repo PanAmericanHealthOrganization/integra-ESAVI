@@ -44,7 +44,7 @@ const CalidadTemporal: React.FC = () => {
 
   if (temporalQuality.length === 0) {
     return (
-      <Box sx={{ p: 3 }}>
+      <Box sx={{ p: 0.375 }}>
         <EmptyState />
         <Alert severity="info">
           <Typography variant="body2">
@@ -58,8 +58,8 @@ const CalidadTemporal: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+    <Box sx={{ p: 0.375 }}>
+      <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.375 }}>
         Métricas temporales disponibles
       </Typography>
       <Alert severity="info">

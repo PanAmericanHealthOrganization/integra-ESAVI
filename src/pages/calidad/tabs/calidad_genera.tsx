@@ -9,6 +9,7 @@ import {
 
 import { useCalidadDataQuality } from "../calidadDataQualityContext"
 import { GraficoHistoricoCalidad } from "../components/GraficoHistoricoCalidad"
+import { GraficoTop10ProblemasCalidad } from "../components/GraficoTop10ProblemasCalidad"
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
@@ -231,7 +232,7 @@ export const CalidadGeneral: React.FC = () => {
       return (
         <Card sx={{ height: "100%" }}>
           <CardContent>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.375 }}>
               {title}
             </Typography>
             <ChartEmptyState message="No se recibieron datos para calcular esta métrica." />
@@ -245,10 +246,10 @@ export const CalidadGeneral: React.FC = () => {
     return (
       <Card sx={{ height: "100%" }}>
         <CardContent sx={{ height: "100%" }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.375 }}>
             {title}
           </Typography>
-          <Box sx={{ position: "relative", height: 220, mb: 2 }}>
+          <Box sx={{ position: "relative", height: 220, mb: 0.375 }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadialBarChart
                 data={[{ name: title, value: clampedValue }]}
@@ -284,7 +285,7 @@ export const CalidadGeneral: React.FC = () => {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                sx={{ mt: 0.5 }}>
+                sx={{ mt: 0.375 }}>
                 {status.label}
               </Typography>
             </Box>
@@ -293,7 +294,7 @@ export const CalidadGeneral: React.FC = () => {
             label={status.label}
             color={status.chipColor}
             size="small"
-            sx={{ mb: helperText ? 2 : 0 }}
+            sx={{ mb: helperText ? 0.375 : 0 }}
           />
           {helperText && (
             <Typography
@@ -317,11 +318,11 @@ export const CalidadGeneral: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3, bgcolor: "grey.50" }}>
+    <Box sx={{ p: 0.375, bgcolor: "grey.50" }}>
       {resumenGlobal.dimensionesInfo &&
         resumenGlobal.dimensionesInfo.length > 0 && (
           <>
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
               {resumenGlobal.dimensionesInfo.map((dimension) => {
                 const status = getScoreStatus(dimension.calidadTotal)
                 const deltaCalidad = dimension.deltaCalidadTotal ?? 0
@@ -331,7 +332,7 @@ export const CalidadGeneral: React.FC = () => {
 
                 return (
                   <Grid item xs={12} sm={6} md={4} key={dimension.nombre}>
-                    <Card>
+                    <Card sx={{ height: "100%" }}>
                       <CardContent>
                         <Typography variant="body2" color="text.secondary">
                           {dimension.nombre}
@@ -340,8 +341,8 @@ export const CalidadGeneral: React.FC = () => {
                           sx={{
                             display: "flex",
                             alignItems: "baseline",
-                            gap: 1,
-                            mt: 1,
+                            gap: 0.375,
+                            mt: 0.375,
                           }}>
                           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                             {formatPercentage(dimension.calidadTotal)}
@@ -366,13 +367,13 @@ export const CalidadGeneral: React.FC = () => {
                           label={status.label}
                           color={status.chipColor}
                           size="small"
-                          sx={{ mt: 1 }}
+                          sx={{ mt: 0.375 }}
                         />
                         <Typography
                           variant="caption"
                           color="text.secondary"
                           display="block"
-                          sx={{ mt: 1 }}>
+                          sx={{ mt: 0.375 }}>
                           {dimension.totalReglas} reglas evaluadas
                         </Typography>
                       </CardContent>
@@ -384,10 +385,15 @@ export const CalidadGeneral: React.FC = () => {
           </>
         )}
 
-      {/* Gráfico Histórico de Calidad */}
-      <Box sx={{ mb: 4 }}>
-        <GraficoHistoricoCalidad />
-      </Box>
+      {/* Gráficos de Calidad */}
+      <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
+        <Grid item xs={12} md={6}>
+          <GraficoHistoricoCalidad />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <GraficoTop10ProblemasCalidad />
+        </Grid>
+      </Grid>
     </Box>
   )
 }

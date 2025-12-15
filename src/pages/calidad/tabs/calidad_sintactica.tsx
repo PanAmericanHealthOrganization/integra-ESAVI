@@ -146,22 +146,22 @@ const CalidadSintactica: React.FC = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+    <Box sx={{ p: 0.375 }}>
+      <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Reglas evaluadas
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
                 {resumen.totalReglas}
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Promedio de exactitud
@@ -181,14 +181,14 @@ const CalidadSintactica: React.FC = () => {
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 {resumen.totalReglas} reglas evaluadas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Promedio de inexactitud
@@ -206,47 +206,47 @@ const CalidadSintactica: React.FC = () => {
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 {resumen.reglasCriticas} reglas críticas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Registros válidos
               </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 1 }}>
+              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
                 {resumen.totalValidos.toLocaleString()}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 De {resumen.totalRegistros.toLocaleString()} registros
               </Typography>
             </CardContent>
           </Card>
         </Grid>
         <Grid item xs={12} sm={6} md={2.4}>
-          <Card>
+          <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
                 Registros inválidos
               </Typography>
               <Typography
                 variant="h4"
-                sx={{ fontWeight: "bold", mt: 1, color: "error.main" }}>
+                sx={{ fontWeight: "bold", mt: 0.375, color: "error.main" }}>
                 {resumen.totalInvalidos.toLocaleString()}
               </Typography>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                sx={{ mt: 1 }}>
+                sx={{ mt: 0.375 }}>
                 Requieren corrección
               </Typography>
             </CardContent>
@@ -254,7 +254,7 @@ const CalidadSintactica: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={0.375}>
         <Grid item xs={12}>
           <Card>
             <CardContent>
@@ -270,7 +270,7 @@ const CalidadSintactica: React.FC = () => {
         </Grid>
       </Grid>
 
-      <Alert severity="info" sx={{ mt: 3 }}>
+      <Alert severity="info" sx={{ mt: 0.375 }}>
         <Typography variant="body2">
           La dimensión de exactitud verifica que cada campo cumpla con el
           formato esperado (longitud, caracteres y estructura). Priorice las
