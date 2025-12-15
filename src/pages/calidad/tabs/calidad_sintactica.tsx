@@ -243,7 +243,6 @@ const CalidadSintactica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        Promedio de consistencia
       </Grid>
 
       <Grid container spacing={0.375}>

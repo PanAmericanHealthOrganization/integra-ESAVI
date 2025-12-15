@@ -301,36 +301,6 @@ const CalidadSemantica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Promedio de inconsistencia
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 0.375,
-                  mt: 0.375,
-                }}>
-                <Typography
-                  variant="h4"
-                  sx={{ fontWeight: "bold", color: "error.main" }}>
-                  {resumen.promedioInvalidez.toFixed(2)}%
-                </Typography>
-                <Chip label="Crítico" color="error" size="small" />
-              </Box>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 0.375 }}>
-                {resumen.reglasCriticas} reglas críticas
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
       </Grid>
 
       <Card>

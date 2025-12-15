@@ -11,6 +11,12 @@ interface BarraDeCalidadProps {
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
+// Función para formatear porcentajes: muestra hasta 2 decimales, omite decimales si son .00
+const formatPercentage = (value: number): string => {
+  const rounded = Math.round(value * 100) / 100
+  return rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(2)
+}
+
 export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
   totalRegistros,
   totalRegistrosValidos,
@@ -89,7 +95,7 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
                     fontWeight: "bold",
                     fontSize: "0.75rem",
                   }}>
-                  {porcentajeRegistrosValidos.toFixed(1)}%
+                  {formatPercentage(porcentajeRegistrosValidos)}%
                 </Typography>
               )}
             </Box>
@@ -123,7 +129,7 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
                     fontWeight: "bold",
                     fontSize: "0.75rem",
                   }}>
-                  {porcentajeRegistrosInvalidos.toFixed(1)}%
+                  {formatPercentage(porcentajeRegistrosInvalidos)}%
                 </Typography>
               )}
             </Box>
@@ -147,7 +153,7 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
               }}
             />
             <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-              Válidos: {porcentajeRegistrosValidos.toFixed(1)}%
+              Válidos: {formatPercentage(porcentajeRegistrosValidos)}%
             </Typography>
           </Stack>
           <Stack direction="row" spacing={0.5} alignItems="center">
@@ -160,7 +166,7 @@ export const BarraDeCalidad: React.FC<BarraDeCalidadProps> = ({
               }}
             />
             <Typography variant="caption" sx={{ fontSize: "0.7rem" }}>
-              Inválidos: {porcentajeRegistrosInvalidos.toFixed(1)}%
+              Inválidos: {formatPercentage(porcentajeRegistrosInvalidos)}%
             </Typography>
           </Stack>
         </Stack>

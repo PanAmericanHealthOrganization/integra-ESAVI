@@ -98,14 +98,19 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
     return Array.from(unique)
   }, [problemasFiltered])
 
-  // Filtrar por subdimensión seleccionada
+  // Filtrar por subdimensión seleccionada y ordenar por mayor cantidad de problemas
   const problemasToDisplay = useMemo(() => {
-    if (!selectedSubDimension) {
-      return problemasFiltered
-    }
-    return problemasFiltered.filter(
-      (p) => p.subDimension === selectedSubDimension
-    )
+    let problemas = selectedSubDimension
+      ? problemasFiltered.filter((p) => p.subDimension === selectedSubDimension)
+      : problemasFiltered
+
+    // Ordenar por % inválidos descendente, luego por total de registros descendente
+    return [...problemas].sort((a, b) => {
+      const diffPorcentaje =
+        b.porcentajeRegistrosInvalidos - a.porcentajeRegistrosInvalidos
+      if (diffPorcentaje !== 0) return diffPorcentaje
+      return b.totalRegistros - a.totalRegistros
+    })
   }, [problemasFiltered, selectedSubDimension])
 
   const handleDownloadClick = (codigo: string) => {
