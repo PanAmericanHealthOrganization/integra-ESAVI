@@ -43,6 +43,21 @@ export const CalidadDashList: React.FC = () => {
     setCurrentTab(newValue)
   }
 
+  // Mapeo de dimensiones a índices de tabs
+  const dimensionToTabIndex: Record<string, number> = {
+    General: 0,
+    Completitud: 1,
+    Exactitud: 2,
+    Consistencia: 3,
+  }
+
+  const handleNavigateToTab = (dimension: string) => {
+    const tabIndex = dimensionToTabIndex[dimension]
+    if (tabIndex !== undefined) {
+      setCurrentTab(tabIndex)
+    }
+  }
+
   const tabs = [
     {
       label: "General",
@@ -67,42 +82,44 @@ export const CalidadDashList: React.FC = () => {
   ]
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
-      <Paper elevation={2} sx={{ width: "100%" }}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={currentTab}
-            onChange={handleTabChange}
-            aria-label="calidad dashboard tabs"
-            variant="scrollable"
-            scrollButtons="auto"
-            sx={{
-              "& .MuiTab-root": {
-                minHeight: 72,
-                textTransform: "none",
-                fontSize: "1rem",
-                fontWeight: 500,
-              },
-            }}>
-            {tabs.map((tab, index) => (
-              <Tab
-                key={index}
-                icon={tab.icon}
-                iconPosition="start"
-                label={tab.label}
-                {...a11yProps(index)}
-              />
-            ))}
-          </Tabs>
-        </Box>
+    <CalidadNavigationProvider onNavigateToTab={handleNavigateToTab}>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Paper elevation={2} sx={{ width: "100%" }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={currentTab}
+              onChange={handleTabChange}
+              aria-label="calidad dashboard tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+              sx={{
+                "& .MuiTab-root": {
+                  minHeight: 72,
+                  textTransform: "none",
+                  fontSize: "1rem",
+                  fontWeight: 500,
+                },
+              }}>
+              {tabs.map((tab, index) => (
+                <Tab
+                  key={index}
+                  icon={tab.icon}
+                  iconPosition="start"
+                  label={tab.label}
+                  {...a11yProps(index)}
+                />
+              ))}
+            </Tabs>
+          </Box>
 
-        {tabs.map((tab, index) => (
-          <TabPanel key={index} value={currentTab} index={index}>
-            {tab.component}
-          </TabPanel>
-        ))}
-      </Paper>
-    </Container>
+          {tabs.map((tab, index) => (
+            <TabPanel key={index} value={currentTab} index={index}>
+              {tab.component}
+            </TabPanel>
+          ))}
+        </Paper>
+      </Container>
+    </CalidadNavigationProvider>
   )
 }
 

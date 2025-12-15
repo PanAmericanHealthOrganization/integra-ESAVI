@@ -74,6 +74,17 @@ const CalidadSemantica: React.FC = () => {
   const resumen = useMemo(() => {
     if (reglas.length === 0) return null
 
+    // Separar reglas por subdimensión
+    const reglasDominio = reglas.filter(
+      (regla) => regla.subDimension === "Dominio"
+    )
+    const reglasIntrarelacion = reglas.filter(
+      (regla) => regla.subDimension === "Intrarelación"
+    )
+    const reglasInterrelacion = reglas.filter(
+      (regla) => regla.subDimension === "Interrelación"
+    )
+
     const totalReglas = reglas.length
     const totalRegistros = reglas.reduce(
       (acc, regla) => acc + regla.totalRecords,
@@ -104,6 +115,31 @@ const CalidadSemantica: React.FC = () => {
       (regla) => regla.porcentajeRegistrosValidos < 85
     ).length
 
+    // Calcular promedios por subdimensión
+    const promedioDominio =
+      reglasDominio.length > 0
+        ? reglasDominio.reduce(
+            (acc, regla) => acc + regla.porcentajeRegistrosValidos,
+            0
+          ) / reglasDominio.length
+        : 0
+
+    const promedioIntrarelacion =
+      reglasIntrarelacion.length > 0
+        ? reglasIntrarelacion.reduce(
+            (acc, regla) => acc + regla.porcentajeRegistrosValidos,
+            0
+          ) / reglasIntrarelacion.length
+        : 0
+
+    const promedioInterrelacion =
+      reglasInterrelacion.length > 0
+        ? reglasInterrelacion.reduce(
+            (acc, regla) => acc + regla.porcentajeRegistrosValidos,
+            0
+          ) / reglasInterrelacion.length
+        : 0
+
     return {
       totalReglas,
       totalRegistros,
@@ -112,6 +148,12 @@ const CalidadSemantica: React.FC = () => {
       promedioValidez,
       promedioInvalidez,
       reglasCriticas,
+      promedioDominio,
+      promedioIntrarelacion,
+      promedioInterrelacion,
+      totalReglasDominio: reglasDominio.length,
+      totalReglasIntrarelacion: reglasIntrarelacion.length,
+      totalReglasInterrelacion: reglasInterrelacion.length,
     }
   }, [reglas])
 
@@ -167,7 +209,7 @@ const CalidadSemantica: React.FC = () => {
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Promedio de consistencia
+                Promedio dominio
               </Typography>
               <Box
                 sx={{
@@ -177,11 +219,11 @@ const CalidadSemantica: React.FC = () => {
                   mt: 0.375,
                 }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                  {resumen.promedioValidez.toFixed(2)}%
+                  {resumen.promedioDominio.toFixed(2)}%
                 </Typography>
                 <Chip
-                  label={getStatusLabel(resumen.promedioValidez)}
-                  color={getStatusColor(resumen.promedioValidez) as any}
+                  label={getStatusLabel(resumen.promedioDominio)}
+                  color={getStatusColor(resumen.promedioDominio) as any}
                   size="small"
                 />
               </Box>
@@ -190,27 +232,7 @@ const CalidadSemantica: React.FC = () => {
                 color="text.secondary"
                 display="block"
                 sx={{ mt: 0.375 }}>
-                {resumen.totalReglas} reglas evaluadas
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Registros válidos
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
-                {numberFormatter.format(resumen.totalValidos)}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 0.375 }}>
-                De {numberFormatter.format(resumen.totalRegistros)} registros
+                {resumen.totalReglasDominio} reglas de dominio
               </Typography>
             </CardContent>
           </Card>
@@ -219,19 +241,92 @@ const CalidadSemantica: React.FC = () => {
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Registros inválidos
+                Promedio intrarelación
               </Typography>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", mt: 0.375, color: "error.main" }}>
-                {numberFormatter.format(resumen.totalInvalidos)}
-              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.375,
+                  mt: 0.375,
+                }}>
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  {resumen.promedioIntrarelacion.toFixed(2)}%
+                </Typography>
+                <Chip
+                  label={getStatusLabel(resumen.promedioIntrarelacion)}
+                  color={getStatusColor(resumen.promedioIntrarelacion) as any}
+                  size="small"
+                />
+              </Box>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
                 sx={{ mt: 0.375 }}>
-                Requieren corrección
+                {resumen.totalReglasIntrarelacion} reglas de intrarelación
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio interrelación
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.375,
+                  mt: 0.375,
+                }}>
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  {resumen.promedioInterrelacion.toFixed(2)}%
+                </Typography>
+                <Chip
+                  label={getStatusLabel(resumen.promedioInterrelacion)}
+                  color={getStatusColor(resumen.promedioInterrelacion) as any}
+                  size="small"
+                />
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 0.375 }}>
+                {resumen.totalReglasInterrelacion} reglas de interrelación
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={2.4}>
+          <Card sx={{ height: "100%" }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary">
+                Promedio de inconsistencia
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.375,
+                  mt: 0.375,
+                }}>
+                <Typography
+                  variant="h4"
+                  sx={{ fontWeight: "bold", color: "error.main" }}>
+                  {resumen.promedioInvalidez.toFixed(2)}%
+                </Typography>
+                <Chip label="Crítico" color="error" size="small" />
+              </Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                display="block"
+                sx={{ mt: 0.375 }}>
+                {resumen.reglasCriticas} reglas críticas
               </Typography>
             </CardContent>
           </Card>

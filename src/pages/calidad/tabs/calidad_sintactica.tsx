@@ -80,6 +80,14 @@ const CalidadSintactica: React.FC = () => {
       return null
     }
 
+    // Separar reglas sintácticas y semánticas
+    const reglasSintacticas = reglas.filter(
+      (item) => item.subDimension === "Sintáctica"
+    )
+    const reglasSemanticas = reglas.filter(
+      (item) => item.subDimension === "Semántica"
+    )
+
     const totalReglas = reglas.length
     const totalRegistros = reglas.reduce(
       (acc, item) => acc + item.totalRegistros,
@@ -103,6 +111,23 @@ const CalidadSintactica: React.FC = () => {
       (item) => item.porcentajeRegistrosValidos < 80
     ).length
 
+    // Calcular promedios específicos
+    const promedioSintactico =
+      reglasSintacticas.length > 0
+        ? reglasSintacticas.reduce(
+            (acc, item) => acc + item.porcentajeRegistrosValidos,
+            0
+          ) / reglasSintacticas.length
+        : 0
+
+    const promedioSemantico =
+      reglasSemanticas.length > 0
+        ? reglasSemanticas.reduce(
+            (acc, item) => acc + item.porcentajeRegistrosValidos,
+            0
+          ) / reglasSemanticas.length
+        : 0
+
     return {
       totalReglas,
       totalRegistros,
@@ -111,6 +136,10 @@ const CalidadSintactica: React.FC = () => {
       promedioValidez,
       promedioInvalidez,
       reglasCriticas,
+      promedioSintactico,
+      promedioSemantico,
+      totalReglasSintacticas: reglasSintacticas.length,
+      totalReglasSemanticas: reglasSemanticas.length,
     }
   }, [reglas])
 
@@ -148,7 +177,7 @@ const CalidadSintactica: React.FC = () => {
   return (
     <Box sx={{ p: 0.375 }}>
       <Grid container spacing={0.375} sx={{ mb: 0.375 }}>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
@@ -160,20 +189,20 @@ const CalidadSintactica: React.FC = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Promedio de exactitud
+                Promedio semántico
               </Typography>
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
                 <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-                  {resumen.promedioValidez.toFixed(2)}%
+                  {resumen.promedioSemantico.toFixed(2)}%
                 </Typography>
                 <Chip
-                  label={getStatusLabel(resumen.promedioValidez)}
-                  color={getStatusColor(resumen.promedioValidez) as any}
+                  label={getStatusLabel(resumen.promedioSemantico)}
+                  color={getStatusColor(resumen.promedioSemantico) as any}
                   size="small"
                 />
               </Box>
@@ -182,76 +211,39 @@ const CalidadSintactica: React.FC = () => {
                 color="text.secondary"
                 display="block"
                 sx={{ mt: 0.375 }}>
-                {resumen.totalReglas} reglas evaluadas
+                {resumen.totalReglasSemanticas} reglas semánticas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
+        <Grid item xs={12} sm={6} md={3}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="body2" color="text.secondary">
-                Promedio de inexactitud
+                Promedio sintáctico
               </Typography>
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mt: 1 }}>
-                <Typography
-                  variant="h4"
-                  sx={{ fontWeight: "bold", color: "error.main" }}>
-                  {resumen.promedioInvalidez.toFixed(2)}%
+                <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+                  {resumen.promedioSintactico.toFixed(2)}%
                 </Typography>
-                <Chip label="Crítico" color="error" size="small" />
+                <Chip
+                  label={getStatusLabel(resumen.promedioSintactico)}
+                  color={getStatusColor(resumen.promedioSintactico) as any}
+                  size="small"
+                />
               </Box>
               <Typography
                 variant="caption"
                 color="text.secondary"
                 display="block"
                 sx={{ mt: 0.375 }}>
-                {resumen.reglasCriticas} reglas críticas
+                {resumen.totalReglasSintacticas} reglas sintácticas
               </Typography>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Registros válidos
-              </Typography>
-              <Typography variant="h4" sx={{ fontWeight: "bold", mt: 0.375 }}>
-                {resumen.totalValidos.toLocaleString()}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 0.375 }}>
-                De {resumen.totalRegistros.toLocaleString()} registros
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} sm={6} md={2.4}>
-          <Card sx={{ height: "100%" }}>
-            <CardContent>
-              <Typography variant="body2" color="text.secondary">
-                Registros inválidos
-              </Typography>
-              <Typography
-                variant="h4"
-                sx={{ fontWeight: "bold", mt: 0.375, color: "error.main" }}>
-                {resumen.totalInvalidos.toLocaleString()}
-              </Typography>
-              <Typography
-                variant="caption"
-                color="text.secondary"
-                display="block"
-                sx={{ mt: 0.375 }}>
-                Requieren corrección
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+        Promedio de consistencia
       </Grid>
 
       <Grid container spacing={0.375}>

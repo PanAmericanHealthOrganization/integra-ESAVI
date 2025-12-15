@@ -1,28 +1,29 @@
 import {
-    Box,
-    Card,
-    CardContent,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    Typography,
+  Box,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Typography,
 } from "@mui/material"
-import React,{useEffect,useMemo,useState} from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
-    Bar,
-    BarChart,
-    CartesianGrid,
-    Cell,
-    Legend,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts"
 
-import {useCalidadDataQuality} from "../calidadDataQualityContext"
+import { useCalidadDataQuality } from "../calidadDataQualityContext"
+import { useCalidadNavigation } from "../contexts/CalidadNavigationContext"
 
 interface ProblemaCalidad {
   codigo: string
@@ -40,6 +41,7 @@ interface ChartDataPoint {
   problemas: number
   porcentaje: number
   descripcion: string
+  dimension: string
 }
 
 // Colores para las barras según el nivel de problemas
@@ -52,8 +54,10 @@ const getColorForProblems = (porcentaje: number): string => {
 
 export const GraficoTop10ProblemasCalidad: React.FC = () => {
   const { data, loading } = useCalidadDataQuality()
+  const { navigateToRule } = useCalidadNavigation()
 
-  const [dimensionSeleccionada, setDimensionSeleccionada] = useState<string>("Todos")
+  const [dimensionSeleccionada, setDimensionSeleccionada] =
+    useState<string>("Todos")
   const [subDimensionSeleccionada, setSubDimensionSeleccionada] =
     useState<string>("Todos")
 
@@ -103,7 +107,10 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
   useEffect(() => {
     if (dimensionSeleccionada === "Todos") {
       setSubDimensionSeleccionada("Todos")
-    } else if (subDimensionesUnicas.length > 0 && subDimensionSeleccionada === "Todos") {
+    } else if (
+      subDimensionesUnicas.length > 0 &&
+      subDimensionSeleccionada === "Todos"
+    ) {
       setSubDimensionSeleccionada(subDimensionesUnicas[0])
     } else if (
       subDimensionSeleccionada &&
@@ -146,8 +153,20 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
       problemas: p.totalRegistrosInvalidos,
       porcentaje: p.porcentajeRegistrosInvalidos,
       descripcion: p.descripcionRegla,
+      dimension: p.dimension,
     }))
   }, [problemasCalidad, dimensionSeleccionada, subDimensionSeleccionada])
+
+  // Manejador de click en las barras
+  const handleBarClick = (data: any, index: number, event: any) => {
+    // Verificar si se presionó Ctrl (Windows/Linux) o Cmd (Mac)
+    if (event?.ctrlKey || event?.metaKey) {
+      const chartPoint = chartData[index]
+      if (chartPoint) {
+        navigateToRule(chartPoint.dimension, chartPoint.codigo)
+      }
+    }
+  }
 
   const handleDimensionChange = (event: SelectChangeEvent<string>) => {
     setDimensionSeleccionada(event.target.value)
@@ -237,9 +256,7 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
               value={dimensionSeleccionada}
               label="Dimensión"
               onChange={handleDimensionChange}>
-              <MenuItem value="Todos">
-                Todos
-              </MenuItem>
+              <MenuItem value="Todos">Todos</MenuItem>
               {dimensionesUnicas.map((dim) => (
                 <MenuItem key={dim} value={dim}>
                   {dim}
@@ -249,16 +266,17 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 200, flex: 1 }}>
-            <InputLabel id="subdimension-select-label">
-              SubDimensión
-            </InputLabel>
+            <InputLabel id="subdimension-select-label">SubDimensión</InputLabel>
             <Select
               labelId="subdimension-select-label"
               id="subdimension-select"
               value={subDimensionSeleccionada}
               label="SubDimensión"
               onChange={handleSubDimensionChange}
-              disabled={dimensionSeleccionada === "Todos" || subDimensionesUnicas.length === 0}>
+              disabled={
+                dimensionSeleccionada === "Todos" ||
+                subDimensionesUnicas.length === 0
+              }>
               {subDimensionesUnicas.map((subDim) => (
                 <MenuItem key={subDim} value={subDim}>
                   {subDim}
@@ -284,16 +302,12 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
                 tick={{ fontSize: 12 }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend
-                payload={[
-                  {
-                    value: "Cantidad de registros con problemas",
-                    type: "square",
-                    color: "#f97316",
-                  },
-                ]}
-              />
-              <Bar dataKey="problemas" radius={[0, 4, 4, 0]}>
+              <Legend />
+              <Bar
+                dataKey="problemas"
+                radius={[0, 4, 4, 0]}
+                onClick={handleBarClick}
+                style={{ cursor: "pointer" }}>
                 {chartData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
@@ -321,13 +335,24 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
         {/* Información adicional */}
         {chartData.length > 0 && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block">
               Mostrando {chartData.length} problema(s) de calidad
-              {dimensionSeleccionada === "Todos" 
+              {dimensionSeleccionada === "Todos"
                 ? " para todas las dimensiones"
                 : subDimensionSeleccionada === "Todos"
                   ? ` para ${dimensionSeleccionada}`
                   : ` para ${dimensionSeleccionada} → ${subDimensionSeleccionada}`}
+            </Typography>
+            <Typography
+              variant="caption"
+              color="primary.main"
+              display="block"
+              sx={{ mt: 0.5, fontStyle: "italic" }}>
+              💡 Presiona Ctrl+Click (Cmd+Click en Mac) en una barra para
+              navegar a la regla en su dimensión
             </Typography>
           </Box>
         )}

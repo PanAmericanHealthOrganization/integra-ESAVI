@@ -12,7 +12,8 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { useCalidadNavigation } from "../contexts/CalidadNavigationContext"
 import { DimensionCalidad } from "../types/calidad.types"
 import { BarraDeCalidad } from "./BarraDeCalidad"
 import { DescargaErrores } from "./descargaErrores"
@@ -40,6 +41,9 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
   const [selectedSubDimension, setSelectedSubDimension] = useState<
     string | null
   >(null)
+  const { targetRuleCodigo, clearTargetRule } = useCalidadNavigation()
+  const tableRef = useRef<HTMLDivElement>(null)
+  const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({})
 
   // Filtrar problemas por la dimensión especificada
   const problemasFiltered = useMemo(() => {
@@ -48,6 +52,40 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
     }
     return data.jsonDimensionQuality || []
   }, [data, dimension])
+
+  // Efecto para hacer scroll a la regla objetivo
+  useEffect(() => {
+    if (targetRuleCodigo && data?.dimension === dimension) {
+      // Buscar si la regla objetivo está en esta dimensión
+      const targetRule = problemasFiltered.find(
+        (p) => p.codigo === targetRuleCodigo
+      )
+
+      if (targetRule) {
+        // Seleccionar la subdimensión correcta si existe
+        if (targetRule.subDimension) {
+          setSelectedSubDimension(targetRule.subDimension)
+        }
+
+        // Esperar a que la tabla se renderice con los filtros aplicados
+        setTimeout(() => {
+          const rowElement = rowRefs.current[targetRuleCodigo]
+          if (rowElement) {
+            rowElement.scrollIntoView({
+              behavior: "smooth",
+              block: "center",
+            })
+            // Destacar la fila temporalmente
+            rowElement.style.backgroundColor = "#fff3cd"
+            setTimeout(() => {
+              rowElement.style.backgroundColor = ""
+            }, 2000)
+          }
+          clearTargetRule()
+        }, 300)
+      }
+    }
+  }, [targetRuleCodigo, data, dimension, problemasFiltered, clearTargetRule])
 
   // Obtener subdimensiones únicas
   const subdimensiones = useMemo(() => {
@@ -150,7 +188,12 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
           </TableHead>
           <TableBody>
             {problemasToDisplay.map((problema, index) => (
-              <TableRow key={`${problema.codigo}-${index}`} hover>
+              <TableRow
+                key={`${problema.codigo}-${index}`}
+                hover
+                ref={(el) => {
+                  rowRefs.current[problema.codigo] = el
+                }}>
                 {/* Código / Regla */}
                 <TableCell>
                   <Stack spacing={0.5}>

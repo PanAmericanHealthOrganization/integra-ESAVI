@@ -143,20 +143,6 @@ const CalidadCompletitud: React.FC = () => {
               <Card sx={{ height: "100%" }}>
                 <CardContent>
                   <Typography variant="body2" color="text.secondary">
-                    Columnas evaluadas
-                  </Typography>
-                  <Typography
-                    variant="h4"
-                    sx={{ fontWeight: "bold", mt: 0.375 }}>
-                    {numberFormatter.format(totalColumnas)}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} md={3}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent>
-                  <Typography variant="body2" color="text.secondary">
                     Promedio de completitud
                   </Typography>
                   <Box
