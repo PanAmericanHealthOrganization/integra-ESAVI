@@ -114,10 +114,30 @@ export class NotificacionVigiflowService {
         //   }
         // }
 
+        /* calculo de la edad, udidad de edad y el grupo etario */
+        if( (createDto.fechaNotificacion && createDto.fechaNacimiento) && 
+        (createDto.fechaNotificacion >= createDto.fechaNacimiento) ){
+          try{
+
+            let resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);           
+            notificacion.edad = resultadoUnidadYedad.edadCalculada;
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada);
+            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
+              resultadoUnidadYedad.edadCalculada,
+              resultadoUnidadYedad.unidadEdadCalculada,
+            );
+            notificacion.grupoEtario = grupoEtarioPaciente;
+
+          }catch(error){
+            console.log('No se puede calcular edad');
+          }
+        } else {
+
+
         /**Este proceso es exclusivamente para el cálculo del grupo etario.
          * La edad y la unidad de edad son asignadas sin mayores transformaciones,
          * en la clase vigiflow-integrator.service.ts
-         */
+         */        
         if (createDto.edad && createDto.unidadEdadPaciente) {
           // se comprueba que no sean nulos
           try {
@@ -184,6 +204,7 @@ export class NotificacionVigiflowService {
               `Error al calcular grupo etario para la edad "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
             );
           }
+        }// fin de cálculo del grupo etario----------****---------
         }
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -195,6 +216,45 @@ export class NotificacionVigiflowService {
       throw new Error('pacienteUUID is a mandatory field to notification-vigiflow');
     }
   }
+  calcularEdad(fechaNotificacion: Date, fechaNacimiento: Date): {edadCalculada: number, unidadEdadCalculada: string} {
+      fechaNacimiento.setUTCHours(0, 0, 0, 0);
+      fechaNotificacion.setUTCHours(0, 0, 0, 0);
+    
+      let edadAnios = fechaNotificacion.getFullYear() - fechaNacimiento.getFullYear();
+    
+      // Ajuste de cumpleaños
+      if (
+        fechaNotificacion <
+        new Date(fechaNotificacion.getFullYear(), fechaNacimiento.getMonth(), fechaNacimiento.getDate())
+      ) {
+        edadAnios--;
+      }
+    
+      // Si ya tiene al menos 1 año → devolver en años
+      if (edadAnios > 0) {
+        return { edadCalculada: edadAnios, unidadEdadCalculada: 'AÑOS' }; // 1 = años
+      }
+    
+      // Calcular diferencia total en meses
+      let meses = (fechaNotificacion.getFullYear() - fechaNacimiento.getFullYear()) * 12 +
+                  (fechaNotificacion.getMonth() - fechaNacimiento.getMonth());
+    
+      // Ajustar si el día aún no ha llegado
+      if (fechaNotificacion.getDate() < fechaNacimiento.getDate()) {
+        meses--;
+      }
+    
+      // Si meses > 0 → devolver en meses
+      if (meses >= 0) {
+        return { edadCalculada: meses, unidadEdadCalculada: 'MESES' }; // 2 = meses
+      }
+    
+      // Si meses = 0 → calcular en días
+      /*const msPorDia = 1000 * 60 * 60 * 24;
+      const dias = Math.floor((fechaNotificacion.getTime() - fechaNacimiento.getTime()) / msPorDia);
+      return { edadCalculada: dias, unidadEdadCalculada: 'DÍA' };*/ // 3 = días        
+    
+  }//;
 
   async update(notificacion: NotificacionVigiflow, updateNotificacion: UpdateNotificacionDto) {
     try {
@@ -217,6 +277,27 @@ export class NotificacionVigiflowService {
       notificacion.ultimaEdicionRegistrada = updateNotificacion.ultimaEdicionRegistrada;
       notificacion.lactando = updateNotificacion.lactando;
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
+
+      //-------------------------------------actualización de la edad y unidad de edad-------------------------------------//
+      /* calculo de la edad, udidad de edad y el grupo etario */
+      if( (notificacion.fechaNotificacion && notificacion.fechaNacimiento) && 
+      (notificacion.fechaNotificacion >= notificacion.fechaNacimiento) ){
+        try{
+
+          let resultadoUnidadYedad = this.calcularEdad(notificacion.fechaNotificacion, notificacion.fechaNacimiento);           
+          notificacion.edad = resultadoUnidadYedad.edadCalculada;
+          notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada);
+          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
+            resultadoUnidadYedad.edadCalculada,
+            resultadoUnidadYedad.unidadEdadCalculada,
+          );
+          notificacion.grupoEtario = grupoEtarioPaciente;
+
+        }catch(error){
+          console.log('No se puede calcular edad');
+        }
+      }
+
 
       await this.notificacionRepository.update(notificacion.id, notificacion);
     } catch (error) {

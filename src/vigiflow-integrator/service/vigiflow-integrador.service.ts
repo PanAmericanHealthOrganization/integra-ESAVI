@@ -226,7 +226,7 @@ export class VigiflowIntegradorService {
       const fechaNotificacion = this.formatoFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
         notificacion.fechaNotificacion = fechaNotificacion;
-      }
+      }//esta fecha se actualiza luego al extraer el otro Excel que contiene la hoja "Reportes".
       const fechaReporte = this.formatoFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
       if (fechaReporte) {
         notificacion.fechaReporteNacional = fechaReporte;
@@ -320,6 +320,8 @@ export class VigiflowIntegradorService {
     const toUpdate = utils.sheet_to_json(ws2, {
       range: importRange2,
       header: headers2,
+      raw: true, // 👈 fuerza a no convertir tipos
+      defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
 
     toUpdate.map(async (reg) => {
