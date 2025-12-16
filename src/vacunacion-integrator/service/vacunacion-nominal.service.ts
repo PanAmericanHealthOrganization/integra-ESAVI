@@ -1,17 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { InjectRepository } from '@nestjs/typeorm';
-import { add, endOfDay, format, startOfDay } from 'date-fns';
-import { ISync } from 'src/integrator/dto/sync.dto';
-import { SyncService, VacunometroService } from 'src/integrator/service';
-import { Repository } from 'typeorm';
-import { VacunacionNominal } from '../entity/vacunacion.entity';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { add, format } from 'date-fns';
 import { SyncProcess } from 'src/integrator/entity/sync.entity';
+import { SyncService, VacunometroService } from 'src/integrator/service';
+import { DataSource } from 'typeorm';
 @Injectable()
 export class VacunacionNominalService {
   constructor(
-    @InjectRepository(VacunacionNominal, 'ORACLE_VACUNACION_DS')
-    private readonly vacunacionRepository: Repository<VacunacionNominal>,
+    @InjectDataSource('ORACLE_VACUNACION_DS')
+    private readonly oracleDataSource: DataSource,
     private readonly vacunometroService: VacunometroService,
     private readonly syncProcessService: SyncService,
   ) {}
@@ -21,9 +19,9 @@ export class VacunacionNominalService {
   @Cron(CronExpression.EVERY_DAY_AT_1AM)
   async procesarVacunasAgregadasCron() {
     // procesar dia anterior
-    const dia = new Date();
+    const dia = add(new Date(), { days: -1 });
     // procesar vacunas agregadas
-    await this.procesarVacunasAgregadas(dia);
+    await this.procesarVacunasAgregadas(dia, dia);
   }
 
   /**
@@ -31,59 +29,61 @@ export class VacunacionNominalService {
    * @param dia
    * @returns
    */
-  async procesarVacunasAgregadas(dia: Date): Promise<void> {
+  async procesarVacunasAgregadas(desde: Date, hasta: Date): Promise<void> {
     try {
       const startTime = new Date();
       // EXTRACT, extracción de datos
-      const startDay = format(startOfDay(add(dia, { days: -1 })), 'yyyy-MM-dd');
-      const endDay = format(endOfDay(add(dia, { days: 1 })), 'yyyy-MM-dd');
 
       // Ejecutar consulta consolidada directamente
       const query = `
-        SELECT 
-          dvcdc.FECHA_APLICACION as fecha_aplicacion,
-          dvcdc.UNICODIGO as unicode,
-          dvcdc.SEXO as sexo,
-          dvcdc.NOMBRE_VACUNA as nombre_vacuna,
-          COUNT(*) AS total
-        FROM HCUE_VACUNACION_DEPURADA.DB_VACUNACION_CONSOLIDADA_DEPURADA_COVID dvcdc
-        WHERE dvcdc.FECHA_APLICACION > TO_DATE('${startDay}', 'YYYY-MM-DD') AND dvcdc.FECHA_APLICACION  < TO_DATE('${endDay}', 'YYYY-MM-DD') and dvcdc.UNICODIGO IS NOT NULL
-        GROUP BY 
-          dvcdc.FECHA_APLICACION,
-          dvcdc.UNICODIGO,
-          dvcdc.SEXO,
-          dvcdc.NOMBRE_VACUNA
-        ORDER BY dvcdc.FECHA_APLICACION DESC
+        SELECT
+          r.FECHAVACUNACION AS FECHA_APLICACION,
+          LPAD(r.ENTIDAD_ID, 6, '0') AS UNICODIGO,
+          UPPER(v.NOMBREVACUNA) AS NOMBRE_VACUNA,
+          v.DOSIS AS DOSIS,
+          COUNT(CASE WHEN p2.CTSEXO_ID = 17 THEN 1 END) AS TOTAL_HOMBRES,
+          COUNT(CASE WHEN p2.CTSEXO_ID = 16 THEN 1 END) AS TOTAL_MUJERES,
+          COUNT(*) AS TOTAL_REGISTROS
+        FROM
+          HCUE_AMED.REGISTROVACUNACION r
+        INNER JOIN HCUE_AMED.ESQUEMAVACUNACION e ON
+          e.ID = r.ESQUEMAVACUNACION_ID
+        INNER JOIN HCUE_AMED.VACUNA v ON
+          v.ID = e.VACUNA_ID
+        INNER JOIN HCUE_AMED.PACIENTE p ON
+          p.ID = r.PACIENTE_ID
+        INNER JOIN HCUE_SISTEMA.PERSONA p2 ON
+          p2.ID = p.PERSONA_ID
+        WHERE
+          r.FECHAVACUNACION >= TO_DATE('${format(desde, 'yyyy-MM-dd')}', 'YYYY-MM-DD') 
+          AND r.FECHAVACUNACION <= TO_DATE('${format(hasta, 'yyyy-MM-dd')}', 'YYYY-MM-DD')
+          AND p2.CTSEXO_ID IN (17, 16)
+          AND LENGTH(TRIM(v.NOMBREVACUNA)) > 0
+        GROUP BY
+          r.FECHAVACUNACION,
+          r.ENTIDAD_ID,
+          v.DOSIS,
+          v.NOMBREVACUNA
+        ORDER BY
+          r.FECHAVACUNACION
       `;
-      console.log(query);
-
-      const vacunas = await this.vacunacionRepository.query(query);
+      const vacunas = await this.oracleDataSource.query(query);
       //
-      this.logger.log(`Encontradas ${vacunas.length} vacunas aplicadas para el día ${startDay}`);
+      this.logger.log(
+        `Encontradas ${vacunas.length} registro, para el rango ${format(desde, 'yyyy-MM-dd')} - ${format(
+          hasta,
+          'yyyy-MM-dd',
+        )}`,
+      );
       // LOAD, ALMACENAMIENTO DE LOS DATOS
       await this.vacunometroService.createMany(vacunas);
 
       // SYNC, registro de proceso de sincronización
-      /*const syncProcess: ISync = {
-        name: `VacunacionNominalService.procesarVacunasAgregadas ${startDay} to ${endDay}`,
-        status: 'COMPLETED',
-        startTime: startTime,
-        endTime: new Date(),
-        errorMessage: '',
-        errorStack: '',
-        errorTrace: '',
-        createdAt: new Date(),
-        createdBy: 'SYSTEM',
-        updatedAt: undefined,
-        updatedBy: '',
-        deletedAt: undefined,
-        deletedBy: '',
-        isEnabled: false,
-        isActive: false,
-      };
-      await this.syncProcessService.createSyncProcess(syncProcess);*/
       const syncProcess = new SyncProcess();
-      syncProcess.name = `VacunacionNominalService.procesarVacunasAgregadas ${startDay} to ${endDay}`;
+      syncProcess.name = `VacunacionNominalService.procesarVacunasAgregadas ${format(desde, 'yyyy-MM-dd')} to ${format(
+        hasta,
+        'yyyy-MM-dd',
+      )}`;
       syncProcess.status = 'COMPLETED';
       syncProcess.startTime = startTime;
       syncProcess.endTime = new Date();
@@ -99,22 +99,6 @@ export class VacunacionNominalService {
 
       await this.syncProcessService.createSyncProcess(syncProcess);
       return;
-    } catch (error) {
-      this.logger.error(error);
-    }
-  }
-
-  /**
-   *
-   * @param desde
-   * @param hasta
-   */
-  async procesarVacunasAgregadasFull(desde: Date, hasta: Date): Promise<void> {
-    try {
-      // recorremo el rango de fechas
-      for (let fecha = desde; fecha <= hasta; fecha.setDate(fecha.getDate() + 1)) {
-        await this.procesarVacunasAgregadas(fecha);
-      }
     } catch (error) {
       this.logger.error(error);
     }

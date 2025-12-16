@@ -1,12 +1,15 @@
-import 'reflect-metadata'; //primera línea necesaria para el modo depuración.
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import 'reflect-metadata'; //primera línea necesaria para el modo depuración.
 import { AppModule } from './app.module';
 
 import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 dotenv.config();
+
+// Configurar zona horaria de Ecuador (UTC-5)
+process.env.TZ = 'America/Guayaquil';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });

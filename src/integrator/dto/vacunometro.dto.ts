@@ -13,34 +13,13 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
    *
    */
   @ApiProperty()
-  unicode: string;
+  unicodigo: string;
   /**
    *  Identificador único del vacunómetro
    */
   @ApiProperty()
   nombreVacuna: string;
-  /**
-   * Api property of vacunometro dto
-   */
-  @ApiProperty()
-  dosisAplicada: string;
-  /**
-   *  Identificador único del vacunómetro
-   */
-  @ApiProperty()
-  diaAplicacion: number;
-  /**
-   * Identificador único del vacunómetro
-   *
-   */
-  @ApiProperty()
-  mesAplicacion: number;
-  /**
-   * Identificador único del vacunómetro
-   *
-   */
-  @ApiProperty()
-  anioAplicacion: number;
+
   /**
    *  Identificador único del vacunómetro
    */
@@ -50,7 +29,12 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
    *  Identificador único del vacunómetro
    */
   @ApiProperty()
-  sexo: string;
+  totalHombres: number;
+  /**
+   *  Identificador único del vacunómetro
+   */
+  @ApiProperty()
+  totalMujeres: number;
   /**
    *  Identificador único del vacunómetro
    */

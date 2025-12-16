@@ -27,9 +27,18 @@ export class Vacunometro extends Auditoria implements IVacunometro {
     name: 'UNICODE',
     comment: 'Código único del establecimiento de salud',
   })
-  unicode: string;
+  unicodigo: string;
 
-  /** */
+  /**
+   *
+   */
+  @Column({
+    name: 'FECHA_APLICACION',
+    nullable: false,
+    comment: 'Fecha de aplicación',
+    type: 'timestamp',
+  })
+  fechaAplicacion: Date;
 
   /**
    *
@@ -43,62 +52,26 @@ export class Vacunometro extends Auditoria implements IVacunometro {
    *
    */
   @Column({
-    name: 'DOSIS_APLICADA',
-    nullable: true,
-    comment: 'Dosis aplicada',
-  })
-  dosisAplicada: string;
-  /**
-   *
-   */
-  @Column({
-    name: 'DIA_APLICACION',
-    nullable: true,
-    comment: 'Día de aplicación',
-  })
-  diaAplicacion: number;
-  /**
-   *
-   */
-  @Column({
-    name: 'MES_APLICACION',
-    nullable: true,
-    comment: 'Mes de aplicación',
-  })
-  mesAplicacion: number;
-  /**
-   *
-   */
-  @Column({
-    name: 'ANIO_APLICACION',
-    nullable: true,
-    comment: 'Año de aplicación',
-  })
-  anioAplicacion: number;
-  /**
-   *
-   */
-  @Column({
-    name: 'FECHA_APLICACION',
-    nullable: true,
-    comment: 'Fecha de aplicación',
-  })
-  fechaAplicacion: Date;
-  /**
-   *
-   */
-  @Column({
-    name: 'SEXO',
-    nullable: true,
+    name: 'TOTAL_HOMBRES',
+    nullable: false,
     comment: 'Sexo de la persona vacunada',
   })
-  sexo: string;
+  totalHombres: number;
   /**
    *
    */
   @Column({
-    name: 'CANTIDAD_VACUNAS',
-    nullable: true,
+    name: 'TOTAL_MUJERES',
+    nullable: false,
+    comment: 'Sexo de la persona vacunada',
+  })
+  totalMujeres: number;
+  /**
+   *
+   */
+  @Column({
+    name: 'TOTAL_VACUNADOS',
+    nullable: false,
     comment: 'Cantidad de vacunas aplicadas',
   })
   total: number;
@@ -106,36 +79,57 @@ export class Vacunometro extends Auditoria implements IVacunometro {
 
 export interface IVacunometro extends IAuditoria {
   id: string;
-  unicode: string;
+  unicodigo: string;
   nombreVacuna: string;
-  dosisAplicada: string;
-  diaAplicacion: number;
-  mesAplicacion: number;
-  anioAplicacion: number;
   fechaAplicacion: Date;
-  sexo: string;
+  totalHombres: number;
+  totalMujeres: number;
   total: number;
 }
 
+/**
+ *
+ */
 export class VacunometroDto extends Auditoria implements IVacunometro {
+  /**
+   *
+   */
   @ApiProperty()
   id: string;
+
+  /**
+   *
+   */
   @ApiProperty()
-  unicode: string;
+  unicodigo: string;
+
+  /**
+   *
+   */
   @ApiProperty()
   nombreVacuna: string;
-  @ApiProperty()
-  dosisAplicada: string;
-  @ApiProperty()
-  diaAplicacion: number;
-  @ApiProperty()
-  mesAplicacion: number;
-  @ApiProperty()
-  anioAplicacion: number;
+
+  /**
+   *
+   */
   @ApiProperty()
   fechaAplicacion: Date;
+
+  /**
+   *
+   */
   @ApiProperty()
-  sexo: string;
+  totalHombres: number;
+
+  /**
+   *
+   */
+  @ApiProperty()
+  totalMujeres: number;
+
+  /**
+   *
+   */
   @ApiProperty()
   total: number;
 }
@@ -144,7 +138,8 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
  *
  */
 
-export class VacunometroCreateDto extends OmitType(VacunometroDto, ['id',
+export class VacunometroCreateDto extends OmitType(VacunometroDto, [
+  'id',
   //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
   'isEnabled',
   'isActive',
@@ -156,7 +151,8 @@ export class VacunometroCreateDto extends OmitType(VacunometroDto, ['id',
   'deletedBy',
 ] as const) {}
 
-export class VacunometroUpdateDto extends OmitType(VacunometroDto, ['id',
+export class VacunometroUpdateDto extends OmitType(VacunometroDto, [
+  'id',
   //Se deben omitir los campos de CustomBaseEntity, que son implementados desde "IBaseEntity" que no se envían al crear
   'isEnabled',
   'isActive',

@@ -1,4 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsDateString,
+  Validate,
+  ValidationArguments,
+  ValidatorConstraint,
+  ValidatorConstraintInterface,
+} from 'class-validator';
 
 /**
  * DTO para respuesta de datos consolidados de vacunación
@@ -123,4 +130,46 @@ export class TotalGeneralDto {
     type: Number,
   })
   totalGeneral: number;
+}
+
+/**
+ *
+ */
+@ValidatorConstraint({ name: 'maxDateRange', async: false })
+class MaxDateRangeConstraint implements ValidatorConstraintInterface {
+  validate(hasta: any, args: ValidationArguments) {
+    const obj = args.object as any;
+    const desde = new Date(obj.desde);
+    const hastaDate = new Date(hasta);
+
+    if (isNaN(desde.getTime()) || isNaN(hastaDate.getTime())) {
+      return false;
+    }
+
+    const unAnioEnMs = 365 * 24 * 60 * 60 * 1000; // 1 año en milisegundos
+    const diferencia = hastaDate.getTime() - desde.getTime();
+
+    return diferencia >= 0 && diferencia <= unAnioEnMs;
+  }
+
+  defaultMessage(args: ValidationArguments) {
+    return 'El rango de fechas debe ser máximo de 1 año y la fecha "hasta" debe ser posterior a "desde"';
+  }
+}
+
+/**
+ *
+ */
+export class SyncRangeDto {
+  @ApiProperty({ example: '2023-01-01', description: 'Fecha inicial en formato YYYY-MM-DD' })
+  @IsDateString()
+  desde: Date;
+
+  @ApiProperty({
+    example: '2023-12-31',
+    description: 'Fecha final en formato YYYY-MM-DD (máximo 1 año desde la fecha inicial)',
+  })
+  @IsDateString()
+  @Validate(MaxDateRangeConstraint)
+  hasta: Date;
 }

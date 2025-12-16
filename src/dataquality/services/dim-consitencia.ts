@@ -676,13 +676,16 @@ export class DimConsistenciaService {
             and tde."FECHAMUERTE" >= tde2."FECHA_ESAVI"
         ) as "totalRegistrosValidos",
         count(*) filter (
-          where
+          where 
+            tge."MUERTE" = true and (
             tde."FECHAMUERTE" is null
             or tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO"
             or tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION"
             or tde."FECHAMUERTE" < tdv."FECHA_VACUNACION"
             or tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
+          )
         ) as "totalRegistrosNoValidos"
+        
       , coalesce(json_agg(DISTINCT tn."ID") filter (
           where
             tde."FECHAMUERTE" is null
