@@ -2,11 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
-import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
+import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { ILike, In, Raw, Repository } from 'typeorm';
+import { Between, ILike, In, Raw, Repository } from 'typeorm';
 import { Vacunometro, VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto } from '../entity/vacunometro.entity';
+import { getCreateAuditDto } from './utils';
 
 @Injectable()
 export class VacunometroService implements IService<VacunometroCreateDto, VacunometroDto, VacunometroUpdateDto> {
@@ -209,19 +210,13 @@ export class VacunometroService implements IService<VacunometroCreateDto, Vacuno
     return this.vacunometroRepository.findOne({ where: { id: id as string } });
   }
 
+  /**
+   *
+   * @param vacunometro
+   * @returns
+   */
   public async createMany(vacunometro: any[]): Promise<Vacunometro[]> {
     try {
-      const auditoriaDto: IAuditoria = {
-        createdAt: new Date(),
-        createdBy: 'SYSTEM',
-        updatedAt: null,
-        updatedBy: null,
-        deletedAt: null,
-        deletedBy: null,
-        isEnabled: true,
-        isActive: true,
-      };
-
       const vacunometros: Vacunometro[] = vacunometro.map((v) => {
         return {
           unicodigo: v.UNICODIGO,
@@ -230,92 +225,24 @@ export class VacunometroService implements IService<VacunometroCreateDto, Vacuno
           totalHombres: v.TOTAL_HOMBRES,
           totalMujeres: v.TOTAL_MUJERES,
           total: v.TOTAL_REGISTROS,
-          ...auditoriaDto,
+          ...getCreateAuditDto(),
         } as Vacunometro;
       });
 
-      // Procesar en lotes para evitar stack overflow y límites de parámetros SQL
-      const BATCH_SIZE = 1000;
-      const QUERY_BATCH_SIZE = 500; // Límite para consultas IN()
-      const resultados: Vacunometro[] = [];
-      let insertados = 0;
-      let actualizados = 0;
+      // Eliminar registros existentes en el rango de fechas para evitar duplicados
+      await this.eliminarRegistros(vacunometros);
 
-      for (let i = 0; i < vacunometros.length; i += BATCH_SIZE) {
-        const lote = vacunometros.slice(i, i + BATCH_SIZE);
-        this.logger.log(
-          `Procesando lote ${Math.floor(i / BATCH_SIZE) + 1} de ${Math.ceil(vacunometros.length / BATCH_SIZE)} (${
-            lote.length
-          } registros)`,
-        );
-
-        // Crear un mapa para búsqueda rápida: "unicodigo_fecha" -> registro existente
-        const mapaExistentes = new Map<string, Vacunometro>();
-
-        // Dividir la consulta de existentes en sublotes más pequeños para evitar límite de parámetros
-        for (let j = 0; j < lote.length; j += QUERY_BATCH_SIZE) {
-          const sublote = lote.slice(j, j + QUERY_BATCH_SIZE);
-          const unicodigos = [...new Set(sublote.map((v) => v.unicodigo))]; // Eliminar duplicados
-          const fechas = [...new Set(sublote.map((v) => v.fechaAplicacion.toISOString().split('T')[0]))]; // Eliminar duplicados
-
-          if (unicodigos.length > 0 && fechas.length > 0) {
-            const existentes = await this.vacunometroRepository
-              .createQueryBuilder('vacunometro')
-              .where('vacunometro.unicodigo IN (:...unicodigos)', { unicodigos })
-              .andWhere('DATE(vacunometro.fechaAplicacion) IN (:...fechas)', { fechas })
-              .getMany();
-
-            existentes.forEach((registro) => {
-              const clave = `${registro.unicodigo}_${registro.fechaAplicacion.toISOString().split('T')[0]}`;
-              mapaExistentes.set(clave, registro);
-            });
-          }
-        }
-
-        // Separar registros para insertar y actualizar
-        const paraInsertar: Vacunometro[] = [];
-        const paraActualizar: Vacunometro[] = [];
-
-        for (const nuevoRegistro of lote) {
-          const clave = `${nuevoRegistro.unicodigo}_${nuevoRegistro.fechaAplicacion.toISOString().split('T')[0]}`;
-          const existente = mapaExistentes.get(clave);
-
-          if (existente) {
-            // Actualizar registro existente
-            paraActualizar.push({
-              ...existente,
-              totalHombres: nuevoRegistro.totalHombres,
-              totalMujeres: nuevoRegistro.totalMujeres,
-              total: nuevoRegistro.total,
-              nombreVacuna: nuevoRegistro.nombreVacuna,
-              updatedAt: new Date(),
-              updatedBy: 'SYSTEM',
-            });
-          } else {
-            // Insertar nuevo registro
-            paraInsertar.push(nuevoRegistro);
-          }
-        }
-
-        // Guardar inserciones
-        if (paraInsertar.length > 0) {
-          const guardados = await this.vacunometroRepository.save(paraInsertar);
-          resultados.push(...guardados);
-          insertados += guardados.length;
-        }
-
-        // Guardar actualizaciones
-        if (paraActualizar.length > 0) {
-          const guardados = await this.vacunometroRepository.save(paraActualizar);
-          resultados.push(...guardados);
-          actualizados += guardados.length;
-        }
+      const CHUNK_SIZE = 1000;
+      const result = [];
+      for (let i = 0; i < vacunometros.length; i += CHUNK_SIZE) {
+        const chunk = vacunometros.slice(i, i + CHUNK_SIZE);
+        result.push(await this.vacunometroRepository.insert(chunk));
+        this.logger.log(`Insertados registros ${i + 1} a ${i + chunk.length} de ${vacunometros.length}`);
       }
 
-      this.logger.log(
-        `Total de ${resultados.length} registros procesados (${insertados} insertados, ${actualizados} actualizados)`,
-      );
-      return resultados;
+      // Retornar array vacío ya que INSERT no retorna los registros creados
+      // Si necesitas los registros, deberías hacer un SELECT después
+      return result;
     } catch (e) {
       this.logger.error(`Error al procesar los datos de vacuna: ${e.message}`);
       throw new Error('Hubo un problema al crear o actualizar los datos de vacuna');
@@ -327,16 +254,22 @@ export class VacunometroService implements IService<VacunometroCreateDto, Vacuno
    * @param desde
    * @param hasta
    */
-  private async obtenerRegistrosParaActualizar(desde: Date, hasta: Date): Promise<void> {
-    this.vacunometroRepository.find({
-      where: {
-        fechaAplicacion: Raw(
-          (alias) =>
-            `${alias} >= TO_DATE('${desde.toISOString().split('T')[0]}', 'YYYY-MM-DD') AND ${alias} <= TO_DATE('${
-              hasta.toISOString().split('T')[0]
-            }', 'YYYY-MM-DD')`,
-        ),
-      },
+  private async eliminarRegistros(vacunometros: Vacunometro[]): Promise<void> {
+    const fechaMinima = vacunometros.reduce(
+      (min, v) => (v.fechaAplicacion < min ? v.fechaAplicacion : min),
+      vacunometros[0].fechaAplicacion,
+    );
+    const fechaMaxima = vacunometros.reduce(
+      (max, v) => (v.fechaAplicacion > max ? v.fechaAplicacion : max),
+      vacunometros[0].fechaAplicacion,
+    );
+    const deleteResult = await this.vacunometroRepository.delete({
+      fechaAplicacion: Between(fechaMinima, fechaMaxima),
     });
+    this.logger.log(
+      `Eliminados ${deleteResult.affected} registros de vacunometro entre ${
+        fechaMinima.toISOString().split('T')[0]
+      } y ${fechaMaxima.toISOString().split('T')[0]}`,
+    );
   }
 }
