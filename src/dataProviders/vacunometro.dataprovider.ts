@@ -63,7 +63,7 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
         }
       )
       return {
-        data: response.data.data,
+        data: response.data,
       }
     } catch (error) {
       throw new Error("Error al obtener la lista de vacunometro")

@@ -1,12 +1,9 @@
 export interface IVacunometro {
   id: string
-  unicode: string
+  fechaAplicacion: string
+  unicodigo: string
   nombreVacuna: string
-  dosisAplicada: number
-  diaAplicacion: number
-  mesAplicacion: number
-  anioAplicacion: number
-  fechaAplicacion: Date
-  sexo: string
-  cantidad: number
+  totalHombres: number
+  totalMujeres: number
+  total: number
 }

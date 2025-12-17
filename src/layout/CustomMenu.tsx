@@ -47,6 +47,11 @@ export const CustomMenu = () => (
         leftIcon={<TableChartIcon />}
       />
       <Menu.Item
+        to="/parametros"
+        primaryText="Parametros"
+        leftIcon={<SettingsIcon />}
+      />
+      <Menu.Item
         to="/gaceta"
         primaryText="Gaceta"
         leftIcon={<AutoStoriesIcon />}
