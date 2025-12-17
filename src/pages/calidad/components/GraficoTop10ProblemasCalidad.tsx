@@ -277,6 +277,7 @@ export const GraficoTop10ProblemasCalidad: React.FC = () => {
                 dimensionSeleccionada === "Todos" ||
                 subDimensionesUnicas.length === 0
               }>
+              <MenuItem value="Todos">Todos</MenuItem>
               {subDimensionesUnicas.map((subDim) => (
                 <MenuItem key={subDim} value={subDim}>
                   {subDim}
