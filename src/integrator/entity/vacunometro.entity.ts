@@ -1,10 +1,13 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria, IAuditoria } from './auditoria.entity';
 
 /**
- *
+ * Índices compuestos para optimizar consultas comunes de paginación y filtrado
  */
+@Index('IDX_VACUNOMETRO_FECHA_NOMBRE', ['fechaAplicacion', 'nombreVacuna'])
+@Index('IDX_VACUNOMETRO_UNICODIGO_FECHA', ['unicodigo', 'fechaAplicacion'])
+@Index('IDX_VACUNOMETRO_CREATED_AT', ['createdAt'])
 @Entity({
   schema: 'dhi_esavi',
   name: 'TR_VACUNOMETRO',
@@ -23,6 +26,7 @@ export class Vacunometro extends Auditoria implements IVacunometro {
   /**
    *
    */
+  @Index('IDX_VACUNOMETRO_UNICODIGO')
   @Column({
     name: 'UNICODE',
     comment: 'Código único del establecimiento de salud',
@@ -32,6 +36,7 @@ export class Vacunometro extends Auditoria implements IVacunometro {
   /**
    *
    */
+  @Index('IDX_VACUNOMETRO_FECHA_APLICACION')
   @Column({
     name: 'FECHA_APLICACION',
     nullable: false,
@@ -43,6 +48,7 @@ export class Vacunometro extends Auditoria implements IVacunometro {
   /**
    *
    */
+  @Index('IDX_VACUNOMETRO_NOMBRE_VACUNA')
   @Column({
     name: 'NOMBRE_VACUNA',
     comment: 'Nombre de la vacuna',
