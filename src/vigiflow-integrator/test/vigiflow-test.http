@@ -41,5 +41,5 @@ X-API-KEY: '6PxFc1GiLz8i2EWuJkj9qrJOrqjTNW4h'
 ###
 
 ### Bulk Import
-GET http://localhost:8081/integrator/vigiflow/bulk?fechaInicio=20250802&fechaFin=20250806&codigoATC=J07
+GET http://localhost:8081/integrator/vigiflow/bulk?fechaInicio=20220101&fechaFin=20221231&codigoATC=J07
 X-API-KEY: your-api-key-here

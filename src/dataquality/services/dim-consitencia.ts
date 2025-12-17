@@ -292,6 +292,7 @@ export class DimConsistenciaService {
       dhi_esavi."TR_NOTIFICACION" tn
       inner join dhi_esavi."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
       where
+      tn."EDAD" is not null AND
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
     `;
