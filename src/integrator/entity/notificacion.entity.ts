@@ -90,6 +90,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_NACIMIENTO',
+    type: 'date',
     nullable: true,
     comment: 'Fecha de nacimiento del paciente',
   })
@@ -343,8 +344,9 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_NOTIFICACION',
+    type: 'date',
     nullable: true,
-    comment: 'Fecha en que se realizó la notificación',
+    comment: 'Fecha en que se realizó la notificación. Se asigna para el caso de VigiFlow, desde la columna "Fecha de recepción inicial"',
   })
   fechaNotificacion: Date;
 
@@ -353,6 +355,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_REPORTE_NACIONAL',
+    type: 'date',
     nullable: true,
     comment: 'Fecha del reporte a nivel nacional',
   })

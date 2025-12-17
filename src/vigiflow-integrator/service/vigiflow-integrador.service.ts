@@ -105,6 +105,7 @@ export class VigiflowIntegradorService {
     }
   }
 
+  /* ARCHIVOS O R I G E N REMOTO*/ //----------------------------------------------------------------
   async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC = 'J07') {
     if (fechaFin <= fechaInicio) {
       throw new BadRequestException();
@@ -122,10 +123,7 @@ export class VigiflowIntegradorService {
     );
     //Retrieve excel to update elements
     const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC);
-
-    // *** ARCHIVOS LOCALES
-    // const reportTwo = read(archivo2);
-    // Procesamos el primer reporte
+   
     await this.extractedFromExcelToPersist(reportOne);
     await this.sleep(8000);
     this.logger.log('extractedFromJsonReportToUpdate..................');
@@ -143,6 +141,9 @@ export class VigiflowIntegradorService {
     this.logger.log('Fin Proceso..................');
   }
 
+   // *** ARCHIVOS LOCALES
+    // const reportTwo = read(archivo2);
+    // Procesamos el primer reporte
   public async createInBulkFromFile() {
     // Leer los archivos desde files_meddra
     const reportOne = read(
@@ -348,10 +349,12 @@ export class VigiflowIntegradorService {
           updateNotificacion.delegadoOrganizacion = reg['C'];
           updateNotificacion.ultimaEdicionRegistrada = reg['A'];
           updateNotificacion.lactando = reg['Z'] && this.esAfirmativo(reg['Z']);
-          // Actualizamos la fecha de recepcion inicial, si esta no existe se la deja con la fecha de notificacion
-          updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
-          // updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
-          // updateNotificacion.residenciaNotificador.canton = reg['AU'];
+          // Se actualiza la fecha de notificación asignándola, la
+          // "fecha de recepción inicial", si esta no existe se la deja con la fecha de notificacion.
+          //updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
+          updateNotificacion.fechaNotificacion = reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
+          updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
+          updateNotificacion.residenciaNotificador.canton = reg['AU'];
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
 
@@ -606,11 +609,46 @@ export class VigiflowIntegradorService {
   }
 
   /**
+ * Normaliza un valor textual según una lista de palabras/frases clave.
+ * Si coincide con alguna de ellas, devuelve "Desconocido".
+ * Caso contrario, devuelve el valor original.
+ */
+private transformarLoteVacuna(valor: string): string {// regex dinámica.
+  if (!valor) return valor;
+
+  // Lista de palabras/frases a homologar
+  const palabrasClave = [
+    'SE DESCONOCE EL LOTE',
+    'SE DESCONOCE',
+    'DESCONOCE',
+    'DESCONOCIDO',
+    'N/R',
+    'Ni idea',
+    'no aplica',
+    'no reporta',
+    'NO SE DISPONE',
+    'NO DISPONIBLE',
+    'NO REGISTRA',
+    'Asked But Unknown',
+    'NO INDICA',
+  ]; //Funciona muy bien, incluso no ha sido necesario agregar otro valor que aparece: "Número de lote desconocido"
+
+  // Construcción dinámica de la expresión regular
+  const regex = new RegExp(
+    `(^|\\s)(${palabrasClave.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})(\\s|$)`,
+    'i',
+  );
+
+  return regex.test(valor.trim()) ? 'Desconocido' : valor;
+}
+
+
+  /**
    *
    * @param input
    * @returns
    */
-  private transformarLoteVacuna(input: string): string | null {
+  private txCompletaLoteVacuna(input: string): string | null { // transformación completa del Lote de Vacuna, en 4 literales(abcd) con regex.
     if (!input) return null;
 
     let valor = input.trim();
@@ -630,12 +668,12 @@ export class VigiflowIntegradorService {
       return 'Desconocido';
     }
 
-    // d. Detectar cantidades/unidades de masa/volumen y asignar NULL
+    // c. Detectar cantidades/unidades de masa/volumen y asignar NULL
     if (/\d+\s*(mg|ml|g|kg|oz|l|mL|cc)\s*(\/\s*\d+\s*(mg|ml|g|kg|oz|l|mL|cc))?/i.test(valor)) {
       return null;
     }
 
-    // c. Eliminar espacios dentro del número de lote
+    // d. Eliminar espacios dentro del número de lote
     valor = valor.replace(/\s*(\w+)\s*(\d+)\s*/g, '$1$2');
 
     // Normalizar espacios finales/iniciales
@@ -679,6 +717,18 @@ export class VigiflowIntegradorService {
       return moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
+  }
+  analizarCadenaFecha(dateStr: string): Date | null {
+    if (!/^\d{8}$/.test(dateStr)) {
+       throw new Error("Formato inválido, se espera YYYYMMDD"); 
+      } 
+      const year = Number(dateStr.slice(0, 4)); 
+      const month = Number(dateStr.slice(4, 6)); 
+      const day = Number(dateStr.slice(6, 8));
+      if (month < 1 || month > 12 || day < 1 || day > 31) {
+        throw new Error("Fecha inválida");
+      }
+    return new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
   }
 
   formatoInteger = (valor: string) => {
