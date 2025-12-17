@@ -170,6 +170,7 @@ export class SeedService {
       { codigo: 'UED', descripcion: 'Unidad de Edad' },
       { codigo: 'PRF', descripcion: 'Profesión Notificador' },
       { codigo: 'EST', descripcion: 'Estado Registro' },
+      { codigo: 'BOOL', descripcion: 'Tipo de dato booleano' },
     ];
 
     const auditoriaDto: IAuditoria = {
@@ -230,15 +231,34 @@ export class SeedService {
       {
         vigiflow: 'Masculino',
         dhis2: 'Hombre',
-        homologada: 'Hombre',
+        homologada: '1',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },
       {
         vigiflow: 'Femenino',
         dhis2: 'Mujer',
-        homologada: 'Mujer',
+        homologada: '2',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
       },
+      {
+        vigiflow: 'Hombre',
+        dhis2: 'Hombre',
+        homologada: '1',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+      },
+      {
+        vigiflow: 'Mujer',
+        dhis2: 'Mujer',
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+      },
+      {
+        vigiflow: 'Otro',
+        dhis2: 'Otro',
+        homologada: '3',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+      },
+
 
       // Autoidentificación Étnica
       {
@@ -670,6 +690,36 @@ export class SeedService {
         dhis2: 'HORA',
         homologada: '4',
         tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+      },
+      {
+        vigiflow: 'true',
+        dhis2: 'true',
+        homologada: '1',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+      },
+      {
+        vigiflow: 'false',
+        dhis2: 'false',
+        homologada: '0',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+      },
+      {
+        vigiflow: 'Sí',
+        dhis2: 'Sí',
+        homologada: '1',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+      },
+      {
+        vigiflow: 'No',
+        dhis2: 'No',
+        homologada: '0',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+      },
+      {
+        vigiflow: null, //'Desconocido'
+        dhis2: null, //'Desconocido'
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
       },
     ];
 
