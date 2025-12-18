@@ -194,6 +194,18 @@ export class VigiflowIntegradorService {
         isActive: true,
       };
 
+      //Este campo debe ser asignado a datoVacuna.numeroDosisVacuna
+      const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
+      // Pero, tomar en cuenta que el CreateDatoVacunaDto aparece en el otro
+      // proceso de extracción, en el método "extractedFromJsonReportToCreateMedicamento".
+      // Para este proceso se debe analizar los siguientes elementos:
+      // dato-vacuna.entity.ts
+      // create-dato-vacuna.dto.ts
+      // dato-vacuna.service.ts
+      // integrador.service.ts
+      // update-dato-vacuna.dto.ts
+      // dato-vacuna.controller.ts
+
       // Create Paciente Vigiflow
       const paciente = new CreatePacienteVigiflowDto();
       paciente.identificacion = reg['E'];
@@ -286,6 +298,10 @@ export class VigiflowIntegradorService {
       datoVacunacionDto.nombreVacunatorio = reg['AF'];
       datoVacunacionDto.fechaVacunacion = this.formatoFecha(reg['N'] ? reg['N'].toString() : reg['N']);
 
+      //Create Dato Vacuna
+      const datoVacunaDto = new CreateDatoVacunaDto();
+      datoVacunaDto.numeroDosisVacuna = numeroDosisVacuna;
+
       //Paciente Embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
       embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si');
@@ -298,6 +314,7 @@ export class VigiflowIntegradorService {
       create.gravedadEsavi = grave;
       create.desenlaceEsavi = desenlaceEsaviDto;
       create.datoVacunacion = datoVacunacionDto;
+      create.datoVacuna = datoVacunaDto;
       if (embarazada.momentoEsavi) {
         create.pacienteEmbarazada = embarazada;
       }
