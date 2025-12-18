@@ -509,6 +509,7 @@ export class VigiflowIntegradorService {
         datoVacuna.indicacionMeddra = reg['Q'];
         datoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
         datoVacuna.codigoAtc = reg['G'];
+        datoVacuna.rolVacuna = reg['C']; // Se revisó, y es la misma variable "Rol del medicamento", no hay una variable específica para vacuna.
 
         const drugName = datoVacuna.nombreVacunaPatenteWhoDrug;
         const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
