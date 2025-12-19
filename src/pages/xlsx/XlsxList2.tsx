@@ -40,8 +40,16 @@ const XlsxDatagrid = () => {
 
 export const XlsxList2 = (props: any) => {
   return (
-    <List {...props} resource="xlsx" title="Datos de Campos BDD ESAVI" exporter={false} filters={<XlsxFilter />}>
-      <XlsxDatagrid />
-    </List>
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <h2 style={{ margin: 0 }}>Datos de Campos BDD ESAVI</h2>
+        <div style={{ color: '#888', fontSize: 14 }}>
+          <a href="/#/dashboard" style={{ color: '#888', textDecoration: 'underline', cursor: 'pointer' }}>Inicio</a> / Datos de Campos BDD ESAVI
+        </div>
+      </div>
+      <List {...props} resource="xlsx" title="Datos de Campos BDD ESAVI" exporter={false} filters={<XlsxFilter />}>
+        <XlsxDatagrid />
+      </List>
+    </>
   );
 };
