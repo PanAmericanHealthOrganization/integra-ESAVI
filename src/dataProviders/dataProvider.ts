@@ -1,6 +1,6 @@
 import { combineDataProviders } from "react-admin"
-import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { calidadDataProvider } from "./calidad.dataprovider"
+import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { gacetaDataProvider } from "./gaceta.dataprovider"
 import { reporteDataProvider } from "./reportes.dataprovider"
@@ -26,6 +26,7 @@ export const dataProvider = combineDataProviders((resource) => {
     case "gaceta":
       return gacetaDataProvider
     case "dataquality":
+    case "parametros":
       return calidadDataProvider
     case "xlsx":
       return xlsxDataProvider

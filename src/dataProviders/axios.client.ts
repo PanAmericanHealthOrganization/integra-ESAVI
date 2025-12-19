@@ -13,15 +13,9 @@ const intESAVIClient = axios.create({
 // Interceptor de solicitud (request)
 intESAVIClient.interceptors.request.use(
   function (config) {
-    // Puedes modificar la solicitud aquí antes de enviarla
-    // Por ejemplo, agregar más headers si es necesario
-    // console.log("Solicitud enviada:", config)
-    console.log("config", config)
     return config
   },
   function (error) {
-    // Manejar el error de la solicitud
-    // console.error("Error en la solicitud:", error)
     return Promise.reject(error)
   }
 )
@@ -29,13 +23,9 @@ intESAVIClient.interceptors.request.use(
 // Interceptor de respuesta (response)
 intESAVIClient.interceptors.response.use(
   function (response) {
-    // Puedes modificar la respuesta aquí antes de retornarla
-    // console.log("Respuesta recibida:", response)
     return response
   },
   function (error) {
-    // Manejar el error de la respuesta
-    // console.error("Error en la respuesta:", error)
     return Promise.reject(error)
   }
 )
