@@ -170,7 +170,10 @@ export class SeedService {
       { codigo: 'UED', descripcion: 'Unidad de Edad' },
       { codigo: 'PRF', descripcion: 'Profesión Notificador' },
       { codigo: 'EST', descripcion: 'Estado Registro' },
-      { codigo: 'BOOL', descripcion: 'Tipo de dato booleano' },
+      { codigo: 'BOOL-TF', descripcion: 'Tipo de dato booleano verdadero falso' },
+      { codigo: 'BOOL-YN', descripcion: 'Tipo de dato booleano Sí No' },
+      { codigo: 'BOOL-YNU', descripcion: 'Tipo de dato booleano Sí No Desconocido' },
+      { codigo: 'ROL-MED', descripcion: 'Rol del medicamento o vacuna' },
     ];
 
     const auditoriaDto: IAuditoria = {
@@ -695,33 +698,87 @@ export class SeedService {
         vigiflow: 'true',
         dhis2: 'true',
         homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
       },
       {
         vigiflow: 'false',
         dhis2: 'false',
         homologada: '0',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
       },
       {
         vigiflow: 'Sí',
         dhis2: 'Sí',
         homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
+      },
+      {
+        vigiflow: 'No',
+        dhis2: 'No',
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
+      },
+      {
+        vigiflow: 'Sí',
+        dhis2: 'Sí',
+        homologada: '1',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
       },
       {
         vigiflow: 'No',
         dhis2: 'No',
         homologada: '0',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+      },
+      {
+        vigiflow: 'Desconocido', //'Desconocido'
+        dhis2: 'Desconocido', //'Desconocido'
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+      },
+      {
+        vigiflow: '', //'Desconocido'
+        dhis2: '', //'Desconocido'
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
       },
       {
         vigiflow: null, //'Desconocido'
         dhis2: null, //'Desconocido'
         homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano'),
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+      },
+
+      //----Homologación de roles de medicamentos y vacunas
+      {
+        vigiflow: 'SOSPECHOSO',
+        dhis2: 'SOSPECHOSO',
+        homologada: '1',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+      },
+      {
+        vigiflow: 'CONCOMITANTE',
+        dhis2: 'CONCOMITANTE',
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+      },
+      {
+        vigiflow: 'INTERACTUANTANTE',
+        dhis2: 'INTERACTUANTANTE',
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+      },
+      {
+        vigiflow: 'MEDICAMENTO NO ADMINISTRADO',
+        dhis2: 'MEDICAMENTO NO ADMINISTRADO',
+        homologada: '2',
+        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
       },
     ];
+
+    //------------------Fin de arreglo ("TABLA") de homologación----------------------
+    //--------------------------------------------------------------------------------
+
 
     const auditoriaCatalogoHomologacionDto: IAuditoria = {
       createdAt: new Date(),
@@ -754,14 +811,6 @@ export class SeedService {
   private async seedGruposEtarios() {
     console.log('👥 Creando grupos etarios...');
 
-    /*const gruposEtarios = [
-      { inicio: 0, fin: 2, descripcion: 'Lactantes (0-2 años)' },
-      { inicio: 3, fin: 5, descripcion: 'Preescolares (3-5 años)' },
-      { inicio: 6, fin: 11, descripcion: 'Escolares (6-11 años)' },
-      { inicio: 12, fin: 17, descripcion: 'Adolescentes (12-17 años)' },
-      { inicio: 18, fin: 64, descripcion: 'Adultos (18-64 años)' },
-      { inicio: 65, fin: 120, descripcion: 'Adultos mayores (65+ años)' },
-    ];*/
     const auditoriaDto: IAuditoria = {
       createdAt: new Date(),
       createdBy: 'System',

@@ -24,7 +24,7 @@ export class TipoCatalogo extends Auditoria {
    */
   @Column({
     name: 'CODIGO',
-    length: 3,
+    length: 10,
     comment: 'Código único del tipo de catálogo',
   })
   codigo: string;
