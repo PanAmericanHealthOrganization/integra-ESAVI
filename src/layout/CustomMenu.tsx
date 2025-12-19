@@ -1,3 +1,9 @@
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+      <Menu.Item
+        to="/xlsx"
+        primaryText="Ver XLSX"
+        leftIcon={<InsertDriveFileIcon />}
+      />
 import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import PieChartIcon from "@mui/icons-material/PieChart"
@@ -76,6 +82,11 @@ export const CustomMenu = () => (
         to="/syncs"
         primaryText="Procesos de sincronización"
         leftIcon={<SyncIcon />}
+      />
+      <Menu.Item
+        to="/xlsx"
+        primaryText="Datos de Campos BDD"
+        leftIcon={<TableChartIcon />}
       />
       <Menu.Item
         to="/catalogos"

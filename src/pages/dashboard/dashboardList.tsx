@@ -1,4 +1,4 @@
-import { Box, Grid } from "@mui/material"
+import { Box, Grid, Button, Typography, Breadcrumbs, Link } from "@mui/material"
 import {
   ArcElement,
   BarElement,
@@ -567,8 +567,27 @@ const DashBoardList = () => {
     consultar6()
   }, [])
 
+  const handleImport = () => {
+    console.log('Importar datos action clicked')
+    // TODO: abrir diálogo de importación
+  }
+
   return (
     <Box sx={{ flexGrow: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ flex: 1 }}>
+          {/* left: breadcrumbs */}
+          <Breadcrumbs aria-label="breadcrumb">
+            <Link color="inherit" href="#/">Inicio</Link>
+            <Typography color="text.primary">Dashboard</Typography>
+          </Breadcrumbs>
+        </Box>
+
+        <Box sx={{ flex: 2, textAlign: 'center' }}>
+          <Typography variant="h5" component="div">Resumen Casos Esavi</Typography>
+        </Box>      
+      </Box>
+
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <Pie

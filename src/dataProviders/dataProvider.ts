@@ -7,6 +7,7 @@ import { reporteDataProvider } from "./reportes.dataprovider"
 import { syncsDataProvider } from "./syncs.dataprovider"
 import { vacunasDataProvider } from "./vacunas.dataprovider"
 import { vacunometroDataProvider } from "./vacunometro.dataprovider"
+import { xlsxDataProvider } from "./xlsx.dataprovider"
 
 export const dataProvider = combineDataProviders((resource) => {
   switch (resource) {
@@ -26,6 +27,8 @@ export const dataProvider = combineDataProviders((resource) => {
       return gacetaDataProvider
     case "dataquality":
       return calidadDataProvider
+    case "xlsx":
+      return xlsxDataProvider
     default:
       throw new Error(`Unknown resource: ${resource}`)
   }

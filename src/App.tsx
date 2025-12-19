@@ -16,28 +16,44 @@ import gaceta from "./pages/gaceta"
 import reportes from "./pages/reportes"
 import syncs from "./pages/syncs"
 import vacunometro from "./pages/vacunometro"
-import { theme } from "./theme"
+
+
+
+import { theme } from './theme';
+import { XlsxList } from './pages/xlsx/XlsxList';
+import { Route } from 'react-router-dom';
+import { CustomRoutes } from 'react-admin';
+//import { createHashHistory } from 'history';
 
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
 
+  //const history = createHashHistory();
   return (
     <Admin
+     // history={history}
       dataProvider={dataProvider}
       authProvider={myAuthKeyCloakProvider(keycloak, { updateInformationUser })}
       layout={CustomLayout}
       loginPage={CustomLoginPage}
-      theme={theme}>
-      <Resource name="dashboard" list={dashboard.list} />
+      theme={theme}
+    
+    >
+
+    
+      {/* Recurso XLSX como Resource usando dataProvider híbrido */}
+      <Resource name="xlsx" options={{ label: 'Datos de Campo de BDD ESAVI' }} list={XlsxList} />
+      <Resource name="dashboard" options={{ label: 'Dashboard' }} list={dashboard.list} />
       <Resource name="esavis" list={esavis.list} />
-      <Resource name="reportes" list={reportes.list} />
+      <Resource name="reportes"  options={{ label: 'Reportes' }} list={reportes.list} />
       <Resource name="analisis" list={analisis.list} />
-      <Resource name="vacunometro" {...vacunometro} />
+      <Resource name="vacunometro" options={{ label: 'Vacunometro' }} {...vacunometro} />
       <Resource name="calidad" {...calidad} />
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
+      
     </Admin>
   )
 }
