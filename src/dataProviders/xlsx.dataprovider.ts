@@ -1,7 +1,7 @@
 // DataProvider minimal para recurso "xlsx" que lee public/data.xlsx
 // Devuelve getList y getOne; otras operaciones devuelven rejected Promise.
 
-const XLSX_FILE = `${import.meta.env.BASE_URL || '/'}data.xlsx`;
+const XLSX_FILE = `${window.location.origin}${import.meta.env.BASE_URL || '/'}data.xlsx`;
 
 async function ensureXLSX() {
   if (!(window as any).XLSX) {
@@ -22,9 +22,40 @@ async function loadXlsxOnce() {
   if (_cachedData) return _cachedData;
   try {
     await ensureXLSX();
-    console.log('[xlsx.dataprovider] fetching XLSX at', XLSX_FILE);
-    const resp = await fetch(XLSX_FILE);
-    if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
+    console.log('[xlsx.dataprovider] attempting to fetch XLSX');
+    const attempts: Array<() => Promise<Response>> = [];
+    // 1) try relative URL (no credentials)
+    const relativeUrl = `${import.meta.env.BASE_URL || '/'}data.xlsx`;
+    attempts.push(() => fetch(relativeUrl));
+    // 2) try absolute URL (no credentials)
+    attempts.push(() => fetch(XLSX_FILE));
+    // 3) try absolute with credentials (in case file is behind auth)
+    attempts.push(() => fetch(XLSX_FILE, { credentials: 'include' }));
+
+    let resp: Response | null = null;
+    const errors: any[] = [];
+    for (let i = 0; i < attempts.length; i++) {
+      try {
+        const attemptUrl = i === 0 ? relativeUrl : XLSX_FILE;
+        console.log('[xlsx.dataprovider] fetch attempt', i + 1, attemptUrl);
+        resp = await attempts[i]();
+        console.log('[xlsx.dataprovider] response status', resp.status, 'ok', resp.ok);
+        if (resp && resp.ok) break;
+        // if not ok, capture body for debugging
+        const body = await resp.text().catch(() => '<no body>');
+        errors.push({ status: resp.status, body: body.slice(0, 200) });
+        resp = null;
+      } catch (networkErr) {
+        console.error('[xlsx.dataprovider] network error on attempt', i + 1, networkErr);
+        errors.push(networkErr);
+      }
+    }
+
+    if (!resp) {
+      console.error('[xlsx.dataprovider] All fetch attempts failed:', errors);
+      // throw the first error or a generic one
+      throw new Error('All fetch attempts for data.xlsx failed');
+    }
     const arrayBuffer = await resp.arrayBuffer();
     const workbook = (window as any).XLSX.read(arrayBuffer, { type: 'array' });
     const sheetName = workbook.SheetNames[0];
