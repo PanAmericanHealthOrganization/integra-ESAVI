@@ -1,7 +1,7 @@
 // DataProvider minimal para recurso "xlsx" que lee public/data.xlsx
 // Devuelve getList y getOne; otras operaciones devuelven rejected Promise.
 
-const XLSX_FILE = '/data.xlsx';
+const XLSX_FILE = `${import.meta.env.BASE_URL || '/'}data.xlsx`;
 
 async function ensureXLSX() {
   if (!(window as any).XLSX) {
@@ -22,6 +22,7 @@ async function loadXlsxOnce() {
   if (_cachedData) return _cachedData;
   try {
     await ensureXLSX();
+    console.log('[xlsx.dataprovider] fetching XLSX at', XLSX_FILE);
     const resp = await fetch(XLSX_FILE);
     if (!resp.ok) throw new Error(`Fetch failed: ${resp.status}`);
     const arrayBuffer = await resp.arrayBuffer();

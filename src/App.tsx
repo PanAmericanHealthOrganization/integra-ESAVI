@@ -20,7 +20,7 @@ import vacunometro from "./pages/vacunometro"
 
 
 import { theme } from './theme';
-import { XlsxList } from './pages/xlsx/XlsxList';
+import { XlsxList2 as XlsxList } from './pages/xlsx/XlsxList2';
 import { Route } from 'react-router-dom';
 import { CustomRoutes } from 'react-admin';
 //import { createHashHistory } from 'history';
