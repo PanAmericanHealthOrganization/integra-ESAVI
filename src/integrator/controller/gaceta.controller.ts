@@ -110,9 +110,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
       },
     },
   })
-  public getPaginated(
-    @Body() params: GetListParams,
-  ): Promise<{ data: GacetaDto[]; total: number }> {
+  public getPaginated(@Body() params: GetListParams): Promise<{ data: GacetaDto[]; total: number }> {
     return this.gacetaService.getPaginated(params);
   }
 
@@ -143,7 +141,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @ApiResponse({ status: 409, description: 'Ya existe una gaceta con los mismos datos' })
   public create(@Body() createGacetaDto: CreateGacetaDto): Promise<GacetaDto> {
-    return this.gacetaService.create(createGacetaDto);
+    return this.gacetaService.createGacetaFromBasic(createGacetaDto);
   }
 
   /**
@@ -164,17 +162,14 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   })
   @ApiResponse({ status: 404, description: 'Gaceta no encontrada' })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
-  public update(
-    @Param('id') id: Identificator,
-    @Body() updateGacetaDto: UpdateGacetaDto,
-  ): Promise<GacetaDto> {
+  public update(@Param('id') id: Identificator, @Body() updateGacetaDto: UpdateGacetaDto): Promise<GacetaDto> {
     return this.gacetaService.update(id, updateGacetaDto);
   }
 
   /**
    * Eliminar gaceta (soft delete)
    */
-  @Delete('delete/:id')
+  @Delete(':id')
   @ApiOperation({ summary: 'Eliminar gaceta (marcado como cancelado)' })
   @ApiParam({
     name: 'id',
@@ -209,10 +204,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
     description: 'Gacetas encontradas por período',
     type: [GacetaDto],
   })
-  public findByPeriodo(
-    @Param('anio') anio: number,
-    @Query('mes') mes?: number,
-  ): Promise<GacetaDto[]> {
+  public findByPeriodo(@Param('anio') anio: number, @Query('mes') mes?: number): Promise<GacetaDto[]> {
     return this.gacetaService.findByPeriodo(anio, mes);
   }
 

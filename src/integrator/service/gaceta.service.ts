@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { format } from 'date-fns';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
+import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
 import { Between, ILike, In, Raw, Repository } from 'typeorm';
 import { CreateGacetaDto } from '../dto/create-gaceta.dto';
@@ -13,6 +13,7 @@ import { GacetaDto } from '../dto/gaceta.dto';
 import { UpdateGacetaDto } from '../dto/update-gaceta.dto';
 import { Gaceta } from '../entity/gaceta.entity';
 import { ESTADO_GACETA } from '../entity/interfaces/gaceta.interface';
+import { crearGacetaBasica } from '../utils/gaceta.uitils';
 
 @Injectable()
 export class GacetaService implements IService<CreateGacetaDto, GacetaDto, UpdateGacetaDto> {
@@ -90,10 +91,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
     // ontener como blob la imagenes de un directorio
     t.graficoAnalisisPorGravedad = await this.getGraficoBlob('gravedad-desenlace-1', t.hasta);
     t.graficoAnalisisPoblacion = await this.getGraficoBlob('piramide-edad-1', t.hasta);
-    t.graficoAnalisisDistribucionGeografica = await this.getGraficoBlob(
-      'mapa-incidencia-1',
-      t.hasta,
-    );
+    t.graficoAnalisisDistribucionGeografica = await this.getGraficoBlob('mapa-incidencia-1', t.hasta);
     return t;
   }
 
@@ -114,9 +112,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       return `data:image/png;base64,${fileBuffer.toString('base64')}`;
     } catch (error) {
       this.logger.error(`Error al leer el archivo gráfico en ${filePath}: ${error.message}`);
-      throw new NotFoundException(
-        `El gráfico ${name} para la fecha ${format(hasta, 'yyyy-MM')} no fue encontrado.`,
-      );
+      throw new NotFoundException(`El gráfico ${name} para la fecha ${format(hasta, 'yyyy-MM')} no fue encontrado.`);
     }
   }
   /**
@@ -162,11 +158,10 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       if (filter?.anio && typeof filter.anio === 'number') {
         buildFilter = {
           ...buildFilter,
-          desde: Raw(
-            (alias) =>
-              `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
-            { year: filter.anio, month: filter.mes },
-          ),
+          desde: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`, {
+            year: filter.anio,
+            month: filter.mes,
+          }),
         };
       } else {
         // Solo filtro por mes sin año específico
@@ -230,8 +225,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
           buildFilter = {
             ...buildFilter,
             fechaPublicacion: Raw(
-              (alias) =>
-                `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
+              (alias) => `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
               {
                 year: year,
                 month: month,
@@ -306,6 +300,16 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
    * @param createGacetaDto
    * @returns
    */
+  public async createGacetaFromBasic(createGacetaDto: CreateGacetaDto): Promise<GacetaDto> {
+    const gaceta = this.gacetaRepository.create(crearGacetaBasica(createGacetaDto));
+    return await this.create(gaceta);
+  }
+
+  /**
+   *
+   * @param createGacetaDto
+   * @returns
+   */
   public async create(createGacetaDto: CreateGacetaDto): Promise<GacetaDto> {
     try {
       // Extraer año y mes de la fecha desde para la validación
@@ -317,19 +321,18 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       const existingGaceta = await this.gacetaRepository.findOne({
         where: {
           numeroGaceta: createGacetaDto.numeroGaceta,
-          desde: Raw(
-            (alias) =>
-              `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`,
-            { year: anio, month: mes },
-          ),
+          desde: Raw((alias) => `EXTRACT(YEAR FROM ${alias}) = :year AND EXTRACT(MONTH FROM ${alias}) = :month`, {
+            year: anio,
+            month: mes,
+          }),
         },
       });
 
       if (existingGaceta) {
         throw new Error(
-          `Ya existe una gaceta con el número ${
-            createGacetaDto.numeroGaceta
-          } para el período ${anio}/${mes.toString().padStart(2, '0')}`,
+          `Ya existe una gaceta con el número ${createGacetaDto.numeroGaceta} para el período ${anio}/${mes
+            .toString()
+            .padStart(2, '0')}`,
         );
       }
 
@@ -489,13 +492,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       const nombreArchivo = `informe_esavi_${ano}${mesFormateado}.pdf`;
 
       // Construir la ruta completa del archivo
-      const rutaCompleta = path.join(
-        pdfBasePath,
-        'output',
-        ano.toString(),
-        mesFormateado,
-        nombreArchivo,
-      );
+      const rutaCompleta = path.join(pdfBasePath, 'output', ano.toString(), mesFormateado, nombreArchivo);
 
       // Verificar si el archivo existe
       try {
@@ -566,9 +563,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
 
       // Si es un error de ejecución del comando, proporcionar más detalles
       if (error.code) {
-        throw new BadRequestException(
-          `Error en la ejecución del script (código ${error.code}): ${error.message}`,
-        );
+        throw new BadRequestException(`Error en la ejecución del script (código ${error.code}): ${error.message}`);
       }
 
       throw new BadRequestException(`Error al ejecutar script de renderizado: ${error.message}`);

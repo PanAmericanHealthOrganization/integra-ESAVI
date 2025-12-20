@@ -5,7 +5,7 @@ export enum ESTADO_GACETA {
   CANCELADO = 'CANCELADO',
 }
 export interface IGaceta {
-  id: string;
+  id?: string;
   fechaPublicacion: Date;
   numeroGaceta: number;
   volumen: number;
