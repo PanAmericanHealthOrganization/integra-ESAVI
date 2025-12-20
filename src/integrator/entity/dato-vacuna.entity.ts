@@ -1,6 +1,7 @@
 import * as moment from 'moment/moment';
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
+import { Catalogo } from './catalogo.entity';
 import { Notificacion } from './notificacion.entity';
 
 @Entity({
@@ -28,12 +29,9 @@ export class DatoVacuna extends Auditoria {
   /**
    *
    */
-  @Column({
-    name: 'ROL_VACUNA',
-    nullable: true,
-    comment: 'Rol de la vacuna en el evento (sospechosa, concomitante, etc.)',
-  })
-  rolVacuna: string;
+  @ManyToOne(() => Catalogo)
+  @JoinColumn({ name: 'CT_ROL_VACUNA_ID' })
+  rolVacuna: Catalogo;
 
   /**
    *

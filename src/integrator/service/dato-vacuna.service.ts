@@ -7,6 +7,7 @@ import { UpdateDatoVacunaDto } from '../dto/update-dato-vacuna.dto';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
+import { CatalogoService } from './catalogo.service';
 
 @Injectable()
 export class DatoVacunaService {
@@ -15,6 +16,7 @@ export class DatoVacunaService {
   constructor(
     @InjectRepository(DatoVacuna, 'POSTGRES_INTEGRATOR_DS')
     private readonly datoVacunaRepository: Repository<DatoVacuna>,
+    private readonly catalogoService: CatalogoService,
   ) {}
 
   /**
@@ -41,11 +43,20 @@ export class DatoVacunaService {
 
       if (existingDatoVacuna) {
         // Si existe, actualizamos los campos necesarios
-        Object.assign(existingDatoVacuna, createDto); // Actualizamos los valores del registro existente
-        return this.datoVacunaRepository.save(existingDatoVacuna); // Guardamos el registro actualizado
+        const { rolVacuna, ...otherFields } = createDto;
+        
+        if (rolVacuna) {
+          existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+        }
+        
+        Object.assign(existingDatoVacuna, otherFields);
+        return this.datoVacunaRepository.save(existingDatoVacuna);
       } else {
         // Si no existe, creamos un nuevo DatoVacuna
         const nuevoDatoVacuna = plainToClass(DatoVacuna, createDto);
+        if (createDto.rolVacuna) {
+          nuevoDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(createDto.rolVacuna);
+        }
         nuevoDatoVacuna.notificacion = notificacion; // Asociamos la notificación
         return this.datoVacunaRepository.save(nuevoDatoVacuna); // Guardamos el nuevo registro
       }
@@ -79,6 +90,9 @@ export class DatoVacunaService {
           createdBy: process.env.USUARIO_INSERTA_REGISTRO,
           ...dto,
         });
+        if (dto.rolVacuna) {
+          datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(dto.rolVacuna);
+        }
         datoVacuna.notificacion = notificacion;
 
         // Buscar si ya existe un DatoVacuna con la misma notificación y nombreVacuna
@@ -91,9 +105,15 @@ export class DatoVacunaService {
 
         if (existingDatoVacuna) {
           // Si existe, actualizamos el objeto
-          Object.assign(existingDatoVacuna, dto);
-          await this.datoVacunaRepository.save(existingDatoVacuna); // Guardamos la actualización
-          datoVacunaArray.push(existingDatoVacuna); // Añadimos al arreglo
+          const { rolVacuna, ...otherFields } = dto;
+          
+          if (rolVacuna) {
+            existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+          }
+          
+          Object.assign(existingDatoVacuna, otherFields);
+          await this.datoVacunaRepository.save(existingDatoVacuna);
+          datoVacunaArray.push(existingDatoVacuna);
         } else {
           // Si no existe, creamos un nuevo DatoVacuna
           await this.datoVacunaRepository.save(datoVacuna);
@@ -184,7 +204,13 @@ export class DatoVacunaService {
    */
   async update(uuid: string, vacunaDto: UpdateDatoVacunaDto): Promise<DatoVacuna> {
     const datoVacuna = await this.findOne(uuid);
-    this.datoVacunaRepository.merge(datoVacuna, vacunaDto);
+    const { rolVacuna, ...otherFields } = vacunaDto;
+    
+    if (rolVacuna) {
+      datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+    }
+    
+    Object.assign(datoVacuna, otherFields);
     return this.datoVacunaRepository.save(datoVacuna);
   }
 }
