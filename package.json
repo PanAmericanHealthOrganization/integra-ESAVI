@@ -11,7 +11,6 @@
     "start": "cross-env NODE_ENV=des nest start",
     "start:dev": "cross-env NODE_ENV=des nest start --watch",
     "start:julio": "cross-env NODE_ENV=des nest start --watch",
-    "start:rolando": "cross-env NODE_ENV=desrol nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "cross-env NODE_ENV=prod  node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

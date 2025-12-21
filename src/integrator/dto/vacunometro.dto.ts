@@ -25,6 +25,13 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
    */
   @ApiProperty()
   fechaAplicacion: Date;
+
+  /**
+   *
+   */
+  @ApiProperty()
+  grupoEtario: number;
+
   /**
    *  Identificador único del vacunómetro
    */

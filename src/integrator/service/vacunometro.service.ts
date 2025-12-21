@@ -190,6 +190,7 @@ export class VacunometroService implements IService<VacunometroCreateDto, Vacuno
         return {
           unicodigo: v.UNICODIGO,
           nombreVacuna: v.NOMBRE_VACUNA,
+          grupoEtario: v.GRUPO_ETARIO,
           fechaAplicacion: new Date(v.FECHA_APLICACION),
           totalHombres: v.TOTAL_HOMBRES,
           totalMujeres: v.TOTAL_MUJERES,

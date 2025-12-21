@@ -48,6 +48,17 @@ export class Vacunometro extends Auditoria implements IVacunometro {
   /**
    *
    */
+  @Index('IDX_VACUNOMETRO_GRUPO_ETARIO')
+  @Column({
+    name: 'GRUPO_ETARIO',
+    nullable: false,
+    comment: 'Grupo etario de las personas vacunada',
+  })
+  grupoEtario: number;
+
+  /**
+   *
+   */
   @Index('IDX_VACUNOMETRO_NOMBRE_VACUNA')
   @Column({
     name: 'NOMBRE_VACUNA',
@@ -88,6 +99,7 @@ export interface IVacunometro extends IAuditoria {
   unicodigo: string;
   nombreVacuna: string;
   fechaAplicacion: Date;
+  grupoEtario: number;
   totalHombres: number;
   totalMujeres: number;
   total: number;
@@ -120,6 +132,12 @@ export class VacunometroDto extends Auditoria implements IVacunometro {
    */
   @ApiProperty()
   fechaAplicacion: Date;
+
+  /**
+   *
+   */
+  @ApiProperty()
+  grupoEtario: number;
 
   /**
    *
