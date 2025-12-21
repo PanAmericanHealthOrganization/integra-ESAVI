@@ -3,11 +3,13 @@ import {
   Datagrid,
   DateField,
   FilterButton,
+  FunctionField,
   List,
   SearchInput,
   TextField,
   TopToolbar,
 } from "react-admin"
+import { GRUPO_ETARIO_OPTIONS } from "../../dataProviders/grupoEtario.provider"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
 
 const VacunometroFilters = [
@@ -37,6 +39,15 @@ const VacunometroList = () => {
             label="Fecha de Aplicación"
           />
           <TextField source="unicodigo" label="Establecimiento" />
+          <FunctionField
+            label="Grupo Etario"
+            render={(record) => {
+              const grupo = GRUPO_ETARIO_OPTIONS.find(
+                (ge) => ge.id === record.grupoEtario
+              )
+              return grupo?.label.toUpperCase() || ""
+            }}
+          />
           <TextField source="totalHombres" label="Tot. Hombres" />
           <TextField source="totalMujeres" label="Tot. Mujeres" />
           <TextField source="total" label="Total" />

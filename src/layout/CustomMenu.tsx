@@ -1,11 +1,6 @@
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-      <Menu.Item
-        to="/xlsx"
-        primaryText="Ver XLSX"
-        leftIcon={<InsertDriveFileIcon />}
-      />
 import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import FlakyIcon from "@mui/icons-material/Flaky"
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile"
 import PieChartIcon from "@mui/icons-material/PieChart"
 import SegmentIcon from "@mui/icons-material/Segment"
 import SettingsIcon from "@mui/icons-material/Settings"
@@ -15,6 +10,11 @@ import TableChartIcon from "@mui/icons-material/TableChart"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
 import { Menu } from "react-admin"
 import Authorize from "../authorization.utils"
+;<Menu.Item
+  to="/xlsx"
+  primaryText="Ver XLSX"
+  leftIcon={<InsertDriveFileIcon />}
+/>
 export const CustomMenu = () => (
   <>
     <Menu>
@@ -95,7 +95,7 @@ export const CustomMenu = () => (
       />
       <Menu.Item
         to="/catalogos"
-        primaryText="Catalogos"
+        primaryText="Catálogos"
         leftIcon={<SegmentIcon />}
       />
     </Menu>

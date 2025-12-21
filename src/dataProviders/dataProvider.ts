@@ -3,6 +3,7 @@ import { calidadDataProvider } from "./calidad.dataprovider"
 import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { gacetaDataProvider } from "./gaceta.dataprovider"
+import { grupoEtarioDataProvider } from "./grupoEtario.provider"
 import { reporteDataProvider } from "./reportes.dataprovider"
 import { syncsDataProvider } from "./syncs.dataprovider"
 import { vacunasDataProvider } from "./vacunas.dataprovider"
@@ -28,6 +29,8 @@ export const dataProvider = combineDataProviders((resource) => {
     case "dataquality":
     case "parametros":
       return calidadDataProvider
+    case "grupo-etario":
+      return grupoEtarioDataProvider
     case "xlsx":
       return xlsxDataProvider
     default:

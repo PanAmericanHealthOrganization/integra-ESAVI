@@ -1,9 +1,5 @@
-import {List} from "react-admin"
+import Proximamente from "../../components/errors/proximamente"
 
 export const ParametrosList = () => {
-  return (
-      <List actions={false} >
-        No hay parámetros para mostrar.
-      </List>
-  )
+  return <Proximamente />
 }
