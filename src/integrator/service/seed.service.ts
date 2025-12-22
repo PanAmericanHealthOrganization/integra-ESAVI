@@ -905,38 +905,41 @@ export class SeedService {
     });
   }
 
+  //----carga de catálogo de grupos etarios---------------------------------------------------------------------------------------------------------------------------------
   private async seedGruposEtarios() {
-    console.log('👥 Creando grupos etarios...');
+    await this.runSyncProcess('Carga de catálogo de Grupos Etarios según el Ministerio...', async () => {
+      console.log('👥 Creando grupos etarios...');
 
-    const auditoriaDto: IAuditoria = {
-      createdAt: new Date(),
-      createdBy: 'System',
-      updatedAt: undefined,
-      updatedBy: '',
-      deletedAt: undefined,
-      deletedBy: '',
-      isEnabled: true,
-      isActive: true,
-    };
-    const gruposEtarios: CreateGrupoEtarioDto[] = [
-      { inicioEdad: 0, finEdad: 11, unidadEdad: 'MESES', descripcion: 'Menor 1 año', ...auditoriaDto },
-      { inicioEdad: 1, finEdad: 4, unidadEdad: 'AÑOS', descripcion: '1 A 4 Años', ...auditoriaDto },
-      { inicioEdad: 5, finEdad: 9, unidadEdad: 'AÑOS', descripcion: '5 A 9 Años', ...auditoriaDto },
-      { inicioEdad: 10, finEdad: 14, unidadEdad: 'AÑOS', descripcion: '10 A 14 Años', ...auditoriaDto },
-      { inicioEdad: 15, finEdad: 19, unidadEdad: 'AÑOS', descripcion: '15 A 19 Años', ...auditoriaDto },
-      { inicioEdad: 20, finEdad: 64, unidadEdad: 'AÑOS', descripcion: '20 A 64 Años', ...auditoriaDto },
-      { inicioEdad: 65, finEdad: 120, unidadEdad: 'AÑOS', descripcion: '65 Años y más', ...auditoriaDto },
-    ];
+      const auditoriaDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+      const gruposEtarios: CreateGrupoEtarioDto[] = [
+        { inicioEdad: 0, finEdad: 11, unidadEdad: 'MESES', descripcion: 'Menor 1 año', ...auditoriaDto },
+        { inicioEdad: 1, finEdad: 4, unidadEdad: 'AÑOS', descripcion: '1 A 4 Años', ...auditoriaDto },
+        { inicioEdad: 5, finEdad: 9, unidadEdad: 'AÑOS', descripcion: '5 A 9 Años', ...auditoriaDto },
+        { inicioEdad: 10, finEdad: 14, unidadEdad: 'AÑOS', descripcion: '10 A 14 Años', ...auditoriaDto },
+        { inicioEdad: 15, finEdad: 19, unidadEdad: 'AÑOS', descripcion: '15 A 19 Años', ...auditoriaDto },
+        { inicioEdad: 20, finEdad: 64, unidadEdad: 'AÑOS', descripcion: '20 A 64 Años', ...auditoriaDto },
+        { inicioEdad: 65, finEdad: 120, unidadEdad: 'AÑOS', descripcion: '65 Años y más', ...auditoriaDto },
+      ];
 
-    for (const grupo of gruposEtarios) {
-      const existing = await this.grupoEtarioRepository.findOne({
-        where: { descripcion: grupo.descripcion },
-      });
+      for (const grupo of gruposEtarios) {
+        const existing = await this.grupoEtarioRepository.findOne({
+          where: { descripcion: grupo.descripcion },
+        });
 
-      if (!existing) {
-        await this.grupoEtarioRepository.save({ ...grupo, ...auditoriaDto } as GrupoEtario);
+        if (!existing) {
+          await this.grupoEtarioRepository.save({ ...grupo, ...auditoriaDto } as GrupoEtario);
+        }
       }
-    }
+    });
   }
 
   /* //---inicio del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
@@ -945,189 +948,195 @@ export class SeedService {
   */
   //--inicio carga de provincias desde CSV------------------------------------------------------------------------------------------------------
   private async loadProvinciasFromCSV() {
-    console.log('🗺️ Cargando provincias desde CSV...');
+    await this.runSyncProcess('Carga de catálogo de provincias del Ecuador, para homologación en DHIS2...', async () => {
+      console.log('🗺️ Cargando provincias desde CSV...');
 
-    try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
-      const csvContent = fs.readFileSync(csvPath, 'utf-8');
-      const lines = csvContent.split('\n').filter((line) => line.trim());
+      try {
+        const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
+        const csvContent = fs.readFileSync(csvPath, 'utf-8');
+        const lines = csvContent.split('\n').filter((line) => line.trim());
 
-      const tipoProvincia = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Provincia' },
-      });
+        const tipoProvincia = await this.tipoCatalogoRepository.findOne({
+          where: { descripcion: 'Provincia' },
+        });
 
-      if (!tipoProvincia) {
-        console.error('Tipo de catálogo "Provincia" no encontrado');
-        return;
-      }
+        if (!tipoProvincia) {
+          console.error('Tipo de catálogo "Provincia" no encontrado');
+          return;
+        }
 
-      const auditoria = {
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: '',
-        deletedAt: undefined,
-        deletedBy: '',
-        isEnabled: true,
-        isActive: true,
-      };
+        const auditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: '',
+          deletedAt: undefined,
+          deletedBy: '',
+          isEnabled: true,
+          isActive: true,
+        };
 
-      for (let i = 1; i < lines.length; i++) {
-        // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
+        for (let i = 1; i < lines.length; i++) {
+          // Skip header
+          const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
-        if (vigiflow && dhis2 && homologada) {
-          const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoProvincia },
-          });
+          if (vigiflow && dhis2 && homologada) {
+            const existing = await this.catalogoRepository.findOne({
+              where: { vigiflow, tipoCatalogo: tipoProvincia },
+            });
 
-          if (!existing) {
-            await this.catalogoRepository.save({
-              vigiflow,
-              dhis2,
-              homologada,
-              tipoCatalogo: tipoProvincia,
-              ...auditoria,
-            } as Catalogo);
+            if (!existing) {
+              await this.catalogoRepository.save({
+                vigiflow,
+                dhis2,
+                homologada,
+                tipoCatalogo: tipoProvincia,
+                ...auditoria,
+              } as Catalogo);
+            }
           }
         }
-      }
 
-      console.log('✅ Provincias cargadas desde CSV');
-    } catch (error) {
-      console.error('❌ Error al cargar provincias desde CSV:', error);
-    }
+        console.log('✅ Provincias cargadas desde CSV');
+      } catch (error) {
+        console.error('❌ Error al cargar provincias desde CSV:', error);
+      }
+    });
   }
   //--fin carga de provincias desde CSV------------------------------------------------------------------------------------------------------
 
   //--inicio carga de cantones desde CSV------------------------------------------------------------------------------------------------------
   private async loadCantonesFromCSV() {
-    console.log('🗺️ Cargando cantones desde CSV...');
+    await this.runSyncProcess('Carga de cantones del Ecuador para homologación desde DHIS2...', async () => {
+      console.log('🗺️ Cargando cantones desde CSV...');
 
-    try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
-      const csvContent = fs.readFileSync(csvPath, 'utf-8');
-      const lines = csvContent.split('\n').filter((line) => line.trim());
+      try {
+        const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
+        const csvContent = fs.readFileSync(csvPath, 'utf-8');
+        const lines = csvContent.split('\n').filter((line) => line.trim());
 
-      const tipoCanton = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Cantón' }, // observar que debe ser con tilde.
-      });
+        const tipoCanton = await this.tipoCatalogoRepository.findOne({
+          where: { descripcion: 'Cantón' }, // observar que debe ser con tilde.
+        });
 
-      if (!tipoCanton) {
-        console.error('Tipo de catálogo "Canton" no encontrado');
-        return;
-      }
+        if (!tipoCanton) {
+          console.error('Tipo de catálogo "Canton" no encontrado');
+          return;
+        }
 
-      const auditoria = {
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: '',
-        deletedAt: undefined,
-        deletedBy: '',
-        isEnabled: true,
-        isActive: true,
-      };
+        const auditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: '',
+          deletedAt: undefined,
+          deletedBy: '',
+          isEnabled: true,
+          isActive: true,
+        };
 
-      for (let i = 1; i < lines.length; i++) {
-        // Skip header
-        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
+        for (let i = 1; i < lines.length; i++) {
+          // Skip header
+          const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
-        if (vigiflow && dhis2 && homologada) {
-          const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoCanton },
-          });
+          if (vigiflow && dhis2 && homologada) {
+            const existing = await this.catalogoRepository.findOne({
+              where: { vigiflow, tipoCatalogo: tipoCanton },
+            });
 
-          if (!existing) {
-            await this.catalogoRepository.save({
-              vigiflow,
-              dhis2,
-              homologada,
-              tipoCatalogo: tipoCanton,
-              ...auditoria,
-            } as Catalogo);
+            if (!existing) {
+              await this.catalogoRepository.save({
+                vigiflow,
+                dhis2,
+                homologada,
+                tipoCatalogo: tipoCanton,
+                ...auditoria,
+              } as Catalogo);
+            }
           }
         }
-      }
 
-      console.log('✅ Cantones cargados desde CSV');
-    } catch (error) {
-      console.error('❌ Error al cargar cantones desde CSV:', error);
-    }
+        console.log('✅ Cantones cargados desde CSV');
+      } catch (error) {
+        console.error('❌ Error al cargar cantones desde CSV:', error);
+      }
+    });
   }
   //--fin carga de cantones desde CSV------------------------------------------------------------------------------------------------------
 
   //--inicio carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
   private async loadParroquiasFromCSV() {
-    console.log('🗺️ Cargando parroquias desde CSV...');
+    await this.runSyncProcess('Carga de catálogo de parroquias de Ecuador, para homologación DHIS2...', async () => {
+      console.log('🗺️ Cargando parroquias desde CSV...');
 
-    try {
-      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
-      const csvContent = fs.readFileSync(csvPath, 'utf-8');
+      try {
+        const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
+        const csvContent = fs.readFileSync(csvPath, 'utf-8');
 
-      // split() separa las líneas de "csvContent", para esto usa el salto de línea '\n', y
-      // el resultado es retornado como un arreglo de líneas. Luego,
-      // filter() transforma y devuelve un nuevo arreglo según la condición devuelta por
-      // la función de devolución de llamada (callback). Esta función flecha, mediante trim()
-      // elimina los espacios en blanco al inicio y al final de cada línea,
-      // y verifica si la línea no está vacía. Si está vacía, retorna una cadena vacía '', es decir,
-      // false (falsy en JavaScript), y filter() la excluye del arreglo final.
-      const lines = csvContent.split('\n').filter((line) => line.trim());
+        // split() separa las líneas de "csvContent", para esto usa el salto de línea '\n', y
+        // el resultado es retornado como un arreglo de líneas. Luego,
+        // filter() transforma y devuelve un nuevo arreglo según la condición devuelta por
+        // la función de devolución de llamada (callback). Esta función flecha, mediante trim()
+        // elimina los espacios en blanco al inicio y al final de cada línea,
+        // y verifica si la línea no está vacía. Si está vacía, retorna una cadena vacía '', es decir,
+        // false (falsy en JavaScript), y filter() la excluye del arreglo final.
+        const lines = csvContent.split('\n').filter((line) => line.trim());
 
-      const tipoParroquia = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: 'Parroquia' },
-      });
+        const tipoParroquia = await this.tipoCatalogoRepository.findOne({
+          where: { descripcion: 'Parroquia' },
+        });
 
-      if (!tipoParroquia) {
-        console.error('Tipo de catálogo "Parroquia" no encontrado');
-        return;
-      }
+        if (!tipoParroquia) {
+          console.error('Tipo de catálogo "Parroquia" no encontrado');
+          return;
+        }
 
-      const auditoria: IAuditoria = {
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: 'System',
-        deletedAt: undefined,
-        deletedBy: 'System',
-        isEnabled: true,
-        isActive: true,
-      };
+        const auditoria: IAuditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: 'System',
+          deletedAt: undefined,
+          deletedBy: 'System',
+          isEnabled: true,
+          isActive: true,
+        };
 
-      for (let i = 1; i < lines.length; i++) {
-        // Skip header "i=0"
-        /**
-         * .split(', ') separa cada línea en columnas, usando la coma seguida de un espacio como delimitador.
-         * .map(col => col.trim().replace(/"/g, '')) elimina las comillas dobles de cada columna y
-         * luego elimina los espacios en blanco alrededor de cada columna. La iteración por las columnas
-         * se realiza mediante la función de devolución de llamada (callback) de map(), por lo que no se
-         * requiere un lazo for adicional.
-         * Recordar que: map() llama a una función de devolución de llamada, para cada elemento
-         * de una matriz y devuelve una matriz que contiene los resultados.
-         */
-        const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
+        for (let i = 1; i < lines.length; i++) {
+          // Skip header "i=0"
+          /**
+           * .split(', ') separa cada línea en columnas, usando la coma seguida de un espacio como delimitador.
+           * .map(col => col.trim().replace(/"/g, '')) elimina las comillas dobles de cada columna y
+           * luego elimina los espacios en blanco alrededor de cada columna. La iteración por las columnas
+           * se realiza mediante la función de devolución de llamada (callback) de map(), por lo que no se
+           * requiere un lazo for adicional.
+           * Recordar que: map() llama a una función de devolución de llamada, para cada elemento
+           * de una matriz y devuelve una matriz que contiene los resultados.
+           */
+          const [vigiflow, dhis2, homologada] = lines[i].split(',').map((col) => col.trim().replace(/"/g, ''));
 
-        if (vigiflow && dhis2 && homologada) {
-          const existing = await this.catalogoRepository.findOne({
-            where: { vigiflow, tipoCatalogo: tipoParroquia },
-          });
+          if (vigiflow && dhis2 && homologada) {
+            const existing = await this.catalogoRepository.findOne({
+              where: { vigiflow, tipoCatalogo: tipoParroquia },
+            });
 
-          if (!existing) {
-            await this.catalogoRepository.save({
-              vigiflow,
-              dhis2,
-              homologada,
-              tipoCatalogo: tipoParroquia,
-              ...auditoria,
-            } as Catalogo);
+            if (!existing) {
+              await this.catalogoRepository.save({
+                vigiflow,
+                dhis2,
+                homologada,
+                tipoCatalogo: tipoParroquia,
+                ...auditoria,
+              } as Catalogo);
+            }
           }
         }
-      }
 
-      console.log('✅ Parroquias-DHIS2 cargadas desde CSV');
-    } catch (error) {
-      console.error('❌ Error al cargar parroquias-DHIS2 desde CSV:', error);
-    }
+        console.log('✅ Parroquias-DHIS2 cargadas desde CSV');
+      } catch (error) {
+        console.error('❌ Error al cargar parroquias-DHIS2 desde CSV:', error);
+      }
+    });
   }
   //--fin carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
 
