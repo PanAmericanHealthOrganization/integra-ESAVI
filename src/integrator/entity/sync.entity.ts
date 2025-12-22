@@ -33,7 +33,7 @@ export class SyncProcess extends Auditoria implements ISync {
     name: 'STATUS',
     comment: 'Estado actual del proceso (pendiente, en progreso, completado, error)',
   })
-  status: string;
+  status: SyncStatus;//string;
 
   /**
    *
@@ -56,7 +56,16 @@ export class SyncProcess extends Auditoria implements ISync {
     comment: 'Fecha y hora de finalización del proceso de sincronización',
   })
   endTime: Date;
-
+  /**
+   * 
+   */
+  @Column({//Columna para mostrar el mensaje de éxito en el proceso de sincronización.
+    name: 'MESSAGE',
+    type: 'text',
+    nullable: true,
+    comment: 'Mensaje de éxito del proceso de sincronización',
+  })
+  message?: string;
   /**
    *
    */
@@ -89,4 +98,11 @@ export class SyncProcess extends Auditoria implements ISync {
     comment: 'Traza detallada del error para depuración',
   })
   errorTrace: string;
+}
+
+export enum SyncStatus {
+  PENDING = 'PENDING',
+  RUNNING = 'RUNNING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
 }

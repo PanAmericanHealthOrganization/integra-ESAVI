@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 
 // Entidades
 import { ISync } from '../dto/sync.dto';
-import { IAuditoria, SyncProcess } from '../entity';
+import { IAuditoria, SyncProcess, SyncStatus } from '../entity';
 import { Catalogo } from '../entity/catalogo.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
@@ -104,8 +104,11 @@ export class SeedService {
       await this.seedDatosVacunacion();
 */
 
-      await this.createSyncProcess();
+      //await this.createSyncProcess();/// ---VERSIÓN ANTERIOR DE CREACIÓN DE PROCESO DE SINCRONIZACIÓN SIN AUDITORÍA DETALLADA----
       // Finalizar
+
+
+      //-----------
       console.log('✅ Valores cargados en catálogo de homologación exitosamente');
     } catch (error) {
       console.error('❌ Error al cargar valores en catálogo de homologación:', error);
@@ -159,26 +162,70 @@ export class SeedService {
   }
 
   private async seedTiposCatalogo() {
-    console.log('📋 Creando tipos de catálogo...');
+    await this.runSyncProcess('Carga de Tipos de Catálogo...', async () => {
+      console.log('📋 Creando tipos de catálogo...');
 
-    const tiposCatalogo = [
-      { codigo: 'SEX', descripcion: 'Sexo' },
-      { codigo: 'ETN', descripcion: 'Autoidentificación Étnica' },
-      { codigo: 'PRO', descripcion: 'Provincia' },
-      { codigo: 'CAN', descripcion: 'Cantón' },
-      { codigo: 'PAR', descripcion: 'Parroquia' },
-      { codigo: 'UED', descripcion: 'Unidad de Edad' },
-      { codigo: 'PRF', descripcion: 'Profesión Notificador' },
-      { codigo: 'EST', descripcion: 'Estado Registro' },
-      { codigo: 'BOOL-TF', descripcion: 'Tipo de dato booleano verdadero falso' },
-      { codigo: 'BOOL-YN', descripcion: 'Tipo de dato booleano Sí No' },
-      { codigo: 'BOOL-YNU', descripcion: 'Tipo de dato booleano Sí No Desconocido' },
-      { codigo: 'ROL-MED', descripcion: 'Rol del medicamento o vacuna' },
-    ];
+      const tiposCatalogo = [
+        { codigo: 'SEX', descripcion: 'Sexo' },
+        { codigo: 'ETN', descripcion: 'Autoidentificación Étnica' },
+        { codigo: 'PRO', descripcion: 'Provincia' },
+        { codigo: 'CAN', descripcion: 'Cantón' },
+        { codigo: 'PAR', descripcion: 'Parroquia' },
+        { codigo: 'UED', descripcion: 'Unidad de Edad' },
+        { codigo: 'PRF', descripcion: 'Profesión Notificador' },
+        { codigo: 'EST', descripcion: 'Estado Registro' },
+        { codigo: 'BOOL-TF', descripcion: 'Tipo de dato booleano verdadero falso' },
+        { codigo: 'BOOL-YN', descripcion: 'Tipo de dato booleano Sí No' },
+        { codigo: 'BOOL-YNU', descripcion: 'Tipo de dato booleano Sí No Desconocido' },
+        { codigo: 'ROL-MED', descripcion: 'Rol del medicamento o vacuna' },
+      ];
 
-    const auditoriaDto: IAuditoria = {
+      const auditoriaDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+
+      for (const tipo of tiposCatalogo) {
+        const existing = await this.tipoCatalogoRepository.findOne({
+          where: { descripcion: tipo.descripcion },
+        });
+
+        if (!existing) {
+          await this.tipoCatalogoRepository.save({ ...tipo, ...auditoriaDto } as TipoCatalogo);
+        }
+      }
+    });
+  }
+
+  //----------inicio de definición de la creación del proceso de sync (SINCRONIZACIÓN) para registrar la carga de datos en catálogo de homologación--------------------------------------------------------------
+  private async createSyncProcess(
+    name: string,
+    status: SyncStatus,
+    message?: string,
+    errorMessage?: string,
+    errorStack?: string,
+    errorTrace?: string,
+    createdBy: string = 'System',
+    startTime: Date = new Date(),
+  ): Promise<ISync> {
+    const syncProcess: ISync = {
+      id: undefined,
+      name,
+      status,
+      startTime,
+      endTime: new Date(),
+      message,
+      errorMessage,
+      errorStack,
+      errorTrace,
       createdAt: new Date(),
-      createdBy: 'System',
+      createdBy,
       updatedAt: undefined,
       updatedBy: '',
       deletedAt: undefined,
@@ -186,28 +233,73 @@ export class SeedService {
       isEnabled: true,
       isActive: true,
     };
-
-    for (const tipo of tiposCatalogo) {
-      const existing = await this.tipoCatalogoRepository.findOne({
-        where: { descripcion: tipo.descripcion },
-      });
-
-      if (!existing) {
-        await this.tipoCatalogoRepository.save({ ...tipo, ...auditoriaDto } as TipoCatalogo);
-      }
-    }
+  
+    return await this.syncProcessRepository.save(syncProcess);
   }
 
-  private async createSyncProcess() {
+  private async runSyncProcess(
+    name: string,
+    action: () => Promise<void>,
+    createdBy: string = 'System',
+  ): Promise<void> {
+    const startTime = new Date();
+  
+    try {
+      // Registrar inicio con auditoría
+      await this.createSyncProcess(
+        name,
+        SyncStatus.RUNNING,
+        `Proceso ${name} iniciado`,
+        null,
+        null,
+        null,
+        createdBy,
+        startTime,
+      );
+  
+      // Ejecutar la acción principal
+      await action();
+  
+      // Registrar éxito con auditoría
+      await this.createSyncProcess(
+        name,
+        SyncStatus.COMPLETED,
+        `Proceso ${name} completado exitosamente`,
+        null,
+        null,
+        null,
+        createdBy,
+        startTime,
+      );
+    } catch (error) {
+      // Registrar fallo con auditoría
+      await this.createSyncProcess(
+        name,
+        SyncStatus.FAILED,
+        null,
+        error.message,
+        error.stack,
+        JSON.stringify(error),
+        createdBy,
+        startTime,
+      );
+      throw error;
+    }
+  }
+  
+  
+  
+  /*private async createSyncProcess() {
     const l = [];
-    for (let i = 0; i < 25; i++) {
+    //for (let i = 0; i < 25; i++) {
       console.log('🔄 Creando proceso de sincronización...');
       const syncProcess: ISync = {
         name: 'Data Seeding',
-        status: 'COMPLETED',
+        status: 'COMPLETED',//SyncStatus.COMPLETED,
         startTime: new Date(),
         endTime: new Date(),
-        errorMessage: 'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
+        message: 'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
+        errorMessage: null,//'Proceso de carga de valores en catálogo de homologación, completado exitosamente.',
         errorStack: null,
         errorTrace: null,
         id: undefined,
@@ -221,591 +313,596 @@ export class SeedService {
         isActive: true,
       };
       l.push(syncProcess);
-    }
+    //}
     await this.syncProcessRepository.save(l);
-  }
+  }*/
+
+  // ------fin------ definición de creación de proceso de sincronización-------------------------------------------------------------------------------------------------------------------------------------------------
+    
   private async seedCatalogos() {
-    console.log('📚 Creando catálogos...');
+    await this.runSyncProcess('Carga de otros Catálogos: Sexo, Autoidentificación, Provincias-VigiFlow, Unidad de Edad, etc...', async () => {
+      console.log('📚 Creando catálogos...');
 
-    const tiposCatalogo = await this.tipoCatalogoRepository.find();
+      const tiposCatalogo = await this.tipoCatalogoRepository.find();
 
-    const catalogos = [
-      // Sexo
-      {
-        vigiflow: 'Masculino',
-        dhis2: 'Hombre',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
-      },
-      {
-        vigiflow: 'Femenino',
-        dhis2: 'Mujer',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
-      },
-      {
-        vigiflow: 'Hombre',
-        dhis2: 'Hombre',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
-      },
-      {
-        vigiflow: 'Mujer',
-        dhis2: 'Mujer',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
-      },
-      {
-        vigiflow: 'Otro',
-        dhis2: 'Otro',
-        homologada: '3',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
-      },
-
-
-      // Autoidentificación Étnica
-      {
-        vigiflow: 'Mestizo',
-        dhis2: 'Mestizo',
-        homologada: 'Mestizo',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'Indígena',
-        dhis2: 'Indigenous',
-        homologada: 'Indígena',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'Afroecuatoriano',
-        dhis2: 'Afro-Ecuadorian',
-        homologada: 'Afrodescendiente',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'INDÍGENA',
-        dhis2: 'INDÍGENA',
-        homologada: 'Indígena',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'AFROECUATORIANO/A AFRODESCENDIENTE',
-        dhis2: 'AFROECUATORIANO/A AFRODESCENDIENTE',
-        homologada: 'Afrodescendiente',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'NEGRO/A',
-        dhis2: 'NEGRO/A',
-        homologada: 'Negro',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'MULATO/A',
-        dhis2: 'MULATO/A',
-        homologada: 'Mulato',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'MONTUBIO/A',
-        dhis2: 'MONTUBIO/A',
-        homologada: 'Montubio',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'MESTIZO/A',
-        dhis2: 'MESTIZO/A',
-        homologada: 'Mestizo',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'BLANCO/A',
-        dhis2: 'BLANCO/A',
-        homologada: 'Blanco',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-      {
-        vigiflow: 'OTROS',
-        dhis2: 'OTROS',
-        homologada: 'Otros',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
-      },
-
-      // ----------inicio Provincias para VigiFlow -------------
-      {
-        vigiflow: 'GUAYAS',
-        dhis2: 'GUAYAS',
-        homologada: 'GUAYAS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'PICHINCHA',
-        dhis2: 'PICHINCHA',
-        homologada: 'PICHINCHA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'CARCHI',
-        dhis2: 'CARCHI',
-        homologada: 'CARCHI',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'IMBABURA',
-        dhis2: 'IMBABURA',
-        homologada: 'IMBABURA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'COTOPAXI',
-        dhis2: 'COTOPAXI',
-        homologada: 'COTOPAXI',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'EL ORO',
-        dhis2: 'EL ORO',
-        homologada: 'EL ORO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'LOJA',
-        dhis2: 'LOJA',
-        homologada: 'LOJA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'SANTO DOMINGO DE LOS TSACHILAS',
-        dhis2: 'SANTO DOMINGO DE LOS TSACHILAS',
-        homologada: 'SANTO DOMINGO DE LOS TSÁCHILAS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'SANTO DOMINGO DE LOS TSÁCHILAS',
-        dhis2: 'SANTO DOMINGO DE LOS TSÁCHILAS',
-        homologada: 'SANTO DOMINGO DE LOS TSÁCHILAS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'MANABI',
-        dhis2: 'MANABI',
-        homologada: 'MANABÍ',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'MANABÍ',
-        dhis2: 'MANABÍ',
-        homologada: 'MANABÍ',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'BOLIVAR',
-        dhis2: 'BOLIVAR',
-        homologada: 'BOLÍVAR',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'BOLÍVAR',
-        dhis2: 'BOLÍVAR',
-        homologada: 'BOLÍVAR',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'CAÑAR',
-        dhis2: 'CAÑAR',
-        homologada: 'CAÑAR',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'AZUAY',
-        dhis2: 'AZUAY',
-        homologada: 'AZUAY',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'ZAMORA CHINCHIPE',
-        dhis2: 'ZAMORA CHINCHIPE',
-        homologada: 'ZAMORA CHINCHIPE',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'ESMERALDAS',
-        dhis2: 'ESMERALDAS',
-        homologada: 'ESMERALDAS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'SUCUMBIOS',
-        dhis2: 'SUCUMBIOS',
-        homologada: 'SUCUMBÍOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'SUCUMBÍOS',
-        dhis2: 'SUCUMBÍOS',
-        homologada: 'SUCUMBÍOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'PASTAZA',
-        dhis2: 'PASTAZA',
-        homologada: 'PASTAZA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'GALAPAGOS',
-        dhis2: 'GALAPAGOS',
-        homologada: 'GALÁPAGOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'GALÁPAGOS',
-        dhis2: 'GALÁPAGOS',
-        homologada: 'GALÁPAGOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'LOS RIOS',
-        dhis2: 'LOS RIOS',
-        homologada: 'LOS RÍOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'LOS RÍOS',
-        dhis2: 'LOS RÍOS',
-        homologada: 'LOS RÍOS',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'TUNGURAHUA',
-        dhis2: 'TUNGURAHUA',
-        homologada: 'TUNGURAHUA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'CHIMBORAZO',
-        dhis2: 'CHIMBORAZO',
-        homologada: 'CHIMBORAZO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'ORELLANA',
-        dhis2: 'ORELLANA',
-        homologada: 'ORELLANA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'SANTA ELENA',
-        dhis2: 'SANTA ELENA',
-        homologada: 'SANTA ELENA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'NAPO',
-        dhis2: 'NAPO',
-        homologada: 'NAPO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'MORONA SANTIAGO',
-        dhis2: 'MORONA SANTIAGO',
-        homologada: 'MORONA SANTIAGO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      {
-        vigiflow: 'DESCONOCIDO',
-        dhis2: 'DESCONOCIDO',
-        homologada: 'DESCONOCIDO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
-      },
-      // ----------------------------------------fin Provincias para VigiFlow
-
-      // Estados de Registro
-      {
-        vigiflow: 'Activo',
-        dhis2: 'Active',
-        homologada: 'Activo',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
-      },
-      {
-        vigiflow: 'Inactivo',
-        dhis2: 'Inactive',
-        homologada: 'Inactivo',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
-      },
-
-      //Profesión notificador
-      /**
-       * const profesiones = [
-  'AUXILIAR',
-  'ENFERMERA',
-  'ESTUDIANTE',
-  'FARMACEUTICO',
-  'INTERNO',
-  'MEDICO',
-  'CONSUMIDOR U OTRO PROFESIONAL',
-  'OTRO PROFESIONAL DE LA SALUD',
-];
-       */
-      {
-        vigiflow: 'AUXILIAR',
-        dhis2: 'AUXILIAR',
-        homologada: 'AUXILIAR',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'ENFERMERA',
-        dhis2: 'ENFERMERA',
-        homologada: 'ENFERMERA',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'ESTUDIANTE',
-        dhis2: 'ESTUDIANTE',
-        homologada: 'ESTUDIANTE',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'ESTUDIANTES',
-        dhis2: 'ESTUDIANTES',
-        homologada: 'ESTUDIANTE',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'FARMACEUTICO',
-        dhis2: 'Pharmacist',
-        homologada: 'FARMACEUTICO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'INTERNO',
-        dhis2: 'INTERNO',
-        homologada: 'INTERNO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'MEDICO',
-        dhis2: 'MEDICO',
-        homologada: 'MEDICO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'MÉDICO',
-        dhis2: 'MÉDICO',
-        homologada: 'MEDICO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'CONSUMIDOR U OTRO PROFESIONAL',
-        dhis2: 'Other professional',
-        homologada: 'CONSUMIDOR U OTRO PROFESIONAL',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'OTRO PROFESIONAL DE LA SALUD',
-        dhis2: 'Other health professional',
-        homologada: 'OTRO PROFESIONAL DE LA SALUD',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'OTRO',
-        dhis2: 'OTRO',
-        homologada: 'OTRO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-      {
-        vigiflow: 'DESCONOCIDO',
-        dhis2: 'DESCONOCIDO',
-        homologada: 'DESCONOCIDO',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
-      },
-
-      //Unidad de Edad, o Tipo de edades
-      /**
-       * const unidadesEdad = [
-       * 'AÑOS',
-       * 'MESES',
-       * 'DÍAS',
-       * 'DIAS', //por si acaso alguien lo escribe sin tilde, para la homologación.
-       * 'AÑO',
-       * 'MES',
-       * 'SEMANA',
-       * 'DIA',
-       * 'HORA',
-       * ];
-       */
-      {
-        vigiflow: 'AÑOS',
-        dhis2: 'AÑOS',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'MESES',
-        dhis2: 'MESES',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'DÍAS',
-        dhis2: 'DÍAS',
-        homologada: '3',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'DIAS',
-        dhis2: 'DIAS',
-        homologada: '3',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'DIA',
-        dhis2: 'DIA',
-        homologada: '3',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'DÍA',
-        dhis2: 'DÍA',
-        homologada: '3',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'AÑO',
-        dhis2: 'AÑO',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'MES',
-        dhis2: 'MES',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'SEMANA',
-        dhis2: 'SEMANA',
-        homologada: '5',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'HORA',
-        dhis2: 'HORA',
-        homologada: '4',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
-      },
-      {
-        vigiflow: 'true',
-        dhis2: 'true',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
-      },
-      {
-        vigiflow: 'false',
-        dhis2: 'false',
-        homologada: '0',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
-      },
-      {
-        vigiflow: 'Sí',
-        dhis2: 'Sí',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
-      },
-      {
-        vigiflow: 'No',
-        dhis2: 'No',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
-      },
-      {
-        vigiflow: 'Sí',
-        dhis2: 'Sí',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
-      },
-      {
-        vigiflow: 'No',
-        dhis2: 'No',
-        homologada: '0',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
-      },
-      {
-        vigiflow: 'Desconocido', //'Desconocido'
-        dhis2: 'Desconocido', //'Desconocido'
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
-      },
-      {
-        vigiflow: '', //'Desconocido'
-        dhis2: '', //'Desconocido'
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
-      },
-      {
-        vigiflow: null, //'Desconocido'
-        dhis2: null, //'Desconocido'
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
-      },
-
-      //----Homologación de roles de medicamentos y vacunas
-      {
-        vigiflow: 'SOSPECHOSO',
-        dhis2: 'SOSPECHOSO',
-        homologada: '1',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
-      },
-      {
-        vigiflow: 'CONCOMITANTE',
-        dhis2: 'CONCOMITANTE',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
-      },
-      {
-        vigiflow: 'INTERACTUANTANTE',
-        dhis2: 'INTERACTUANTANTE',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
-      },
-      {
-        vigiflow: 'MEDICAMENTO NO ADMINISTRADO',
-        dhis2: 'MEDICAMENTO NO ADMINISTRADO',
-        homologada: '2',
-        tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
-      },
-    ];
-
-    //------------------Fin de arreglo ("TABLA") de homologación----------------------
-    //--------------------------------------------------------------------------------
-
-
-    const auditoriaCatalogoHomologacionDto: IAuditoria = {
-      createdAt: new Date(),
-      createdBy: 'System',
-      updatedAt: undefined,
-      updatedBy: '',
-      deletedAt: undefined,
-      deletedBy: '',
-      isEnabled: true,
-      isActive: true,
-    };
-
-    for (const catalogo of catalogos) {
-      const existing = await this.catalogoRepository.findOne({
-        where: {
-          vigiflow: catalogo.vigiflow,
-          tipoCatalogo: catalogo.tipoCatalogo,
+      const catalogos = [
+        // Sexo
+        {
+          vigiflow: 'Masculino',
+          dhis2: 'Hombre',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
         },
-      });
+        {
+          vigiflow: 'Femenino',
+          dhis2: 'Mujer',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+        },
+        {
+          vigiflow: 'Hombre',
+          dhis2: 'Hombre',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+        },
+        {
+          vigiflow: 'Mujer',
+          dhis2: 'Mujer',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+        },
+        {
+          vigiflow: 'Otro',
+          dhis2: 'Otro',
+          homologada: '3',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Sexo'),
+        },
 
-      if (!existing) {
-        await this.catalogoRepository.save({
-          ...catalogo,
-          ...auditoriaCatalogoHomologacionDto,
-        } as Catalogo);
+
+        // Autoidentificación Étnica
+        {
+          vigiflow: 'Mestizo',
+          dhis2: 'Mestizo',
+          homologada: 'Mestizo',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'Indígena',
+          dhis2: 'Indigenous',
+          homologada: 'Indígena',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'Afroecuatoriano',
+          dhis2: 'Afro-Ecuadorian',
+          homologada: 'Afrodescendiente',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'INDÍGENA',
+          dhis2: 'INDÍGENA',
+          homologada: 'Indígena',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'AFROECUATORIANO/A AFRODESCENDIENTE',
+          dhis2: 'AFROECUATORIANO/A AFRODESCENDIENTE',
+          homologada: 'Afrodescendiente',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'NEGRO/A',
+          dhis2: 'NEGRO/A',
+          homologada: 'Negro',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'MULATO/A',
+          dhis2: 'MULATO/A',
+          homologada: 'Mulato',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'MONTUBIO/A',
+          dhis2: 'MONTUBIO/A',
+          homologada: 'Montubio',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'MESTIZO/A',
+          dhis2: 'MESTIZO/A',
+          homologada: 'Mestizo',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'BLANCO/A',
+          dhis2: 'BLANCO/A',
+          homologada: 'Blanco',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+        {
+          vigiflow: 'OTROS',
+          dhis2: 'OTROS',
+          homologada: 'Otros',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Autoidentificación Étnica'),
+        },
+
+        // ----------inicio Provincias para VigiFlow -------------
+        {
+          vigiflow: 'GUAYAS',
+          dhis2: 'GUAYAS',
+          homologada: 'GUAYAS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'PICHINCHA',
+          dhis2: 'PICHINCHA',
+          homologada: 'PICHINCHA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'CARCHI',
+          dhis2: 'CARCHI',
+          homologada: 'CARCHI',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'IMBABURA',
+          dhis2: 'IMBABURA',
+          homologada: 'IMBABURA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'COTOPAXI',
+          dhis2: 'COTOPAXI',
+          homologada: 'COTOPAXI',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'EL ORO',
+          dhis2: 'EL ORO',
+          homologada: 'EL ORO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'LOJA',
+          dhis2: 'LOJA',
+          homologada: 'LOJA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'SANTO DOMINGO DE LOS TSACHILAS',
+          dhis2: 'SANTO DOMINGO DE LOS TSACHILAS',
+          homologada: 'SANTO DOMINGO DE LOS TSÁCHILAS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'SANTO DOMINGO DE LOS TSÁCHILAS',
+          dhis2: 'SANTO DOMINGO DE LOS TSÁCHILAS',
+          homologada: 'SANTO DOMINGO DE LOS TSÁCHILAS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'MANABI',
+          dhis2: 'MANABI',
+          homologada: 'MANABÍ',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'MANABÍ',
+          dhis2: 'MANABÍ',
+          homologada: 'MANABÍ',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'BOLIVAR',
+          dhis2: 'BOLIVAR',
+          homologada: 'BOLÍVAR',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'BOLÍVAR',
+          dhis2: 'BOLÍVAR',
+          homologada: 'BOLÍVAR',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'CAÑAR',
+          dhis2: 'CAÑAR',
+          homologada: 'CAÑAR',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'AZUAY',
+          dhis2: 'AZUAY',
+          homologada: 'AZUAY',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'ZAMORA CHINCHIPE',
+          dhis2: 'ZAMORA CHINCHIPE',
+          homologada: 'ZAMORA CHINCHIPE',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'ESMERALDAS',
+          dhis2: 'ESMERALDAS',
+          homologada: 'ESMERALDAS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'SUCUMBIOS',
+          dhis2: 'SUCUMBIOS',
+          homologada: 'SUCUMBÍOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'SUCUMBÍOS',
+          dhis2: 'SUCUMBÍOS',
+          homologada: 'SUCUMBÍOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'PASTAZA',
+          dhis2: 'PASTAZA',
+          homologada: 'PASTAZA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'GALAPAGOS',
+          dhis2: 'GALAPAGOS',
+          homologada: 'GALÁPAGOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'GALÁPAGOS',
+          dhis2: 'GALÁPAGOS',
+          homologada: 'GALÁPAGOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'LOS RIOS',
+          dhis2: 'LOS RIOS',
+          homologada: 'LOS RÍOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'LOS RÍOS',
+          dhis2: 'LOS RÍOS',
+          homologada: 'LOS RÍOS',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'TUNGURAHUA',
+          dhis2: 'TUNGURAHUA',
+          homologada: 'TUNGURAHUA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'CHIMBORAZO',
+          dhis2: 'CHIMBORAZO',
+          homologada: 'CHIMBORAZO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'ORELLANA',
+          dhis2: 'ORELLANA',
+          homologada: 'ORELLANA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'SANTA ELENA',
+          dhis2: 'SANTA ELENA',
+          homologada: 'SANTA ELENA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'NAPO',
+          dhis2: 'NAPO',
+          homologada: 'NAPO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'MORONA SANTIAGO',
+          dhis2: 'MORONA SANTIAGO',
+          homologada: 'MORONA SANTIAGO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        {
+          vigiflow: 'DESCONOCIDO',
+          dhis2: 'DESCONOCIDO',
+          homologada: 'DESCONOCIDO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Provincia'),
+        },
+        // ----------------------------------------fin Provincias para VigiFlow
+
+        // Estados de Registro
+        {
+          vigiflow: 'Activo',
+          dhis2: 'Active',
+          homologada: 'Activo',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
+        },
+        {
+          vigiflow: 'Inactivo',
+          dhis2: 'Inactive',
+          homologada: 'Inactivo',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Estado Registro'),
+        },
+
+        //Profesión notificador
+        /**
+         * const profesiones = [
+          'AUXILIAR',
+          'ENFERMERA',
+          'ESTUDIANTE',
+          'FARMACEUTICO',
+          'INTERNO',
+          'MEDICO',
+          'CONSUMIDOR U OTRO PROFESIONAL',
+          'OTRO PROFESIONAL DE LA SALUD',
+        ];
+        */
+        {
+          vigiflow: 'AUXILIAR',
+          dhis2: 'AUXILIAR',
+          homologada: 'AUXILIAR',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'ENFERMERA',
+          dhis2: 'ENFERMERA',
+          homologada: 'ENFERMERA',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'ESTUDIANTE',
+          dhis2: 'ESTUDIANTE',
+          homologada: 'ESTUDIANTE',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'ESTUDIANTES',
+          dhis2: 'ESTUDIANTES',
+          homologada: 'ESTUDIANTE',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'FARMACEUTICO',
+          dhis2: 'Pharmacist',
+          homologada: 'FARMACEUTICO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'INTERNO',
+          dhis2: 'INTERNO',
+          homologada: 'INTERNO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'MEDICO',
+          dhis2: 'MEDICO',
+          homologada: 'MEDICO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'MÉDICO',
+          dhis2: 'MÉDICO',
+          homologada: 'MEDICO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'CONSUMIDOR U OTRO PROFESIONAL',
+          dhis2: 'Other professional',
+          homologada: 'CONSUMIDOR U OTRO PROFESIONAL',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'OTRO PROFESIONAL DE LA SALUD',
+          dhis2: 'Other health professional',
+          homologada: 'OTRO PROFESIONAL DE LA SALUD',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'OTRO',
+          dhis2: 'OTRO',
+          homologada: 'OTRO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+        {
+          vigiflow: 'DESCONOCIDO',
+          dhis2: 'DESCONOCIDO',
+          homologada: 'DESCONOCIDO',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Profesión Notificador'),
+        },
+
+        //Unidad de Edad, o Tipo de edades
+        /**
+         * const unidadesEdad = [
+         * 'AÑOS',
+         * 'MESES',
+         * 'DÍAS',
+         * 'DIAS', //por si acaso alguien lo escribe sin tilde, para la homologación.
+         * 'AÑO',
+         * 'MES',
+         * 'SEMANA',
+         * 'DIA',
+         * 'HORA',
+         * ];
+         */
+        {
+          vigiflow: 'AÑOS',
+          dhis2: 'AÑOS',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'MESES',
+          dhis2: 'MESES',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'DÍAS',
+          dhis2: 'DÍAS',
+          homologada: '3',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'DIAS',
+          dhis2: 'DIAS',
+          homologada: '3',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'DIA',
+          dhis2: 'DIA',
+          homologada: '3',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'DÍA',
+          dhis2: 'DÍA',
+          homologada: '3',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'AÑO',
+          dhis2: 'AÑO',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'MES',
+          dhis2: 'MES',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'SEMANA',
+          dhis2: 'SEMANA',
+          homologada: '5',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'HORA',
+          dhis2: 'HORA',
+          homologada: '4',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Unidad de Edad'),
+        },
+        {
+          vigiflow: 'true',
+          dhis2: 'true',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
+        },
+        {
+          vigiflow: 'false',
+          dhis2: 'false',
+          homologada: '0',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano verdadero falso'),
+        },
+        {
+          vigiflow: 'Sí',
+          dhis2: 'Sí',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
+        },
+        {
+          vigiflow: 'No',
+          dhis2: 'No',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No'),
+        },
+        {
+          vigiflow: 'Sí',
+          dhis2: 'Sí',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+        },
+        {
+          vigiflow: 'No',
+          dhis2: 'No',
+          homologada: '0',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+        },
+        {
+          vigiflow: 'Desconocido', //'Desconocido'
+          dhis2: 'Desconocido', //'Desconocido'
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+        },
+        {
+          vigiflow: '', //'Desconocido'
+          dhis2: '', //'Desconocido'
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+        },
+        {
+          vigiflow: null, //'Desconocido'
+          dhis2: null, //'Desconocido'
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
+        },
+
+        //----Homologación de roles de medicamentos y vacunas
+        {
+          vigiflow: 'SOSPECHOSO',
+          dhis2: 'SOSPECHOSO',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
+        {
+          vigiflow: 'CONCOMITANTE',
+          dhis2: 'CONCOMITANTE',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
+        {
+          vigiflow: 'INTERACTUANTANTE',
+          dhis2: 'INTERACTUANTANTE',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
+        {
+          vigiflow: 'MEDICAMENTO NO ADMINISTRADO',
+          dhis2: 'MEDICAMENTO NO ADMINISTRADO',
+          homologada: '2',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
+      ];
+
+      //------------------Fin de arreglo ("TABLA") de homologación----------------------
+      //--------------------------------------------------------------------------------
+
+
+      const auditoriaCatalogoHomologacionDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+
+      for (const catalogo of catalogos) {
+        const existing = await this.catalogoRepository.findOne({
+          where: {
+            vigiflow: catalogo.vigiflow,
+            tipoCatalogo: catalogo.tipoCatalogo,
+          },
+        });
+
+        if (!existing) {
+          await this.catalogoRepository.save({
+            ...catalogo,
+            ...auditoriaCatalogoHomologacionDto,
+          } as Catalogo);
+        }
       }
-    }
+    });
   }
 
   private async seedGruposEtarios() {
@@ -843,377 +940,7 @@ export class SeedService {
   }
 
   /* //---inicio del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
-  private async seedPacientes() {
-    console.log('👤 Creando pacientes...');
-
-    const sexos = await this.catalogoRepository.find({
-      where: { tipoCatalogo: { descripcion: 'Sexo' } },
-    });
-
-    const autoIdentificaciones = await this.catalogoRepository.find({
-      where: { tipoCatalogo: { descripcion: 'Autoidentificación Étnica' } },
-    });
-
-    const pacientes = [];
-
-    for (let i = 0; i < 1000; i++) {
-      const paciente = new Paciente();
-      paciente.nombre = faker.person.fullName();
-      paciente.identificacion = faker.string.numeric(10);
-      paciente.sexo = faker.helpers.arrayElement(sexos);
-      paciente.autoIdentificacion = faker.helpers.arrayElement(autoIdentificaciones);
-      paciente.registroSincronizado = faker.datatype.boolean();
-      paciente.fechaNacimiento = faker.date.birthdate();
-
-      pacientes.push(paciente);
-    }
-
-    await this.pacienteRepository.save(pacientes);
-  }
-
-  private async seedNotificaciones() {
-    console.log('📢 Creando notificaciones...');
-
-    const pacientes = await this.pacienteRepository.find();
-    const provincias = await this.catalogoRepository.find({
-      where: { tipoCatalogo: { descripcion: 'Provincia' } },
-    });
-    const gruposEtarios = await this.grupoEtarioRepository.find();
-    const estadosRegistro = await this.catalogoRepository.find({
-      where: { tipoCatalogo: { descripcion: 'Estado Registro' } },
-    });
-
-    const notificaciones = [];
-
-    for (let i = 0; i < 1000; i++) {
-      const notificacion = new Notificacion();
-      notificacion.paciente = faker.helpers.arrayElement(pacientes);
-      notificacion.provinciaResidencia = faker.helpers.arrayElement(provincias);
-      notificacion.peso = faker.number.int({ min: 1, max: 150 });
-      notificacion.altura = faker.number.int({ min: 30, max: 220 });
-      notificacion.fechaNacimiento = faker.date.birthdate();
-      notificacion.edad = faker.number.int({ min: 0, max: 100 });
-      notificacion.lactando = faker.datatype.boolean();
-      notificacion.grupoEtario = faker.helpers.arrayElement(gruposEtarios);
-      notificacion.nombreNotificador = faker.person.fullName();
-      notificacion.identificacionNotificador = faker.string.numeric(10);
-      notificacion.casoNarrativo = faker.lorem.paragraph();
-      notificacion.tituloReporte = faker.lorem.sentence();
-      notificacion.estadoRegistro = faker.helpers.arrayElement(estadosRegistro);
-      notificacion.fechaNotificacion = faker.date.recent();
-      notificacion.fechaReporteNacional = faker.date.recent();
-      notificacion.fechaLlenadoFicha = faker.date.recent();
-      notificacion.fechaAtencion = faker.date.recent();
-      notificacion.codigoUnidadSalud = faker.string.alphanumeric(8);
-
-//(notificacion as any).TIPO_NOTIFICACION = 'ficticia'; // Asignación manual, con esto se evita crear una clase hija de "Notificacion", es decir, "NotificacionFicticia" o crear un campo opcional "tipoNotificacion" en la entidad padre "Notificacion".
-      notificaciones.push(notificacion);
-    }
-
-    await this.notificacionRepository.save(notificaciones);
-  }
-
-  private async seedDatosEsavi() {
-    console.log('🏥 Creando datos ESAVI...');
-
-    const notificaciones = await this.notificacionRepository.find();
-
-    const datosEsavi = [];
-
-    for (let i = 0; i < 1500; i++) {
-      const datoEsavi = new DatoEsavi();
-      datoEsavi.notificacion = faker.helpers.arrayElement(notificaciones);
-      datoEsavi.nombre = faker.helpers.arrayElement([
-        'Fiebre',
-        'Dolor de cabeza',
-        'Náuseas',
-        'Vómitos',
-        'Diarrea',
-        'Erupción cutánea',
-        'Dolor muscular',
-        'Fatiga',
-        'Mareos',
-        'Dificultad para respirar',
-        'Tos',
-        'Dolor de garganta',
-      ]);
-      datoEsavi.descripcion = faker.lorem.sentence();
-      datoEsavi.nombreReportado = datoEsavi.nombre;
-      datoEsavi.codigoLLT = faker.string.alphanumeric(8);
-      datoEsavi.fechaEsavi = faker.date.recent();
-      datoEsavi.fechaFinalizacion = faker.date.future();
-      datoEsavi.duracion = faker.helpers.arrayElement([
-        '1-3 días',
-        '4-7 días',
-        '8-14 días',
-        '15+ días',
-      ]);
-      datoEsavi.resultado = faker.helpers.arrayElement([
-        'Resuelto',
-        'En curso',
-        'Secuelas',
-        'Fallecimiento',
-      ]);
-      datoEsavi.codigoCaso = faker.string.alphanumeric(10);
-
-      datosEsavi.push(datoEsavi);
-    }
-
-    await this.datoEsaviRepository.save(datosEsavi);
-  }
-
-  private async seedMedicamentos() {
-    console.log('💊 Creando medicamentos...');
-
-    const medicamentos = [];
-
-    for (let i = 0; i < 500; i++) {
-      const medicamento = new Medicamento();
-      medicamento.nombre = faker.helpers.arrayElement([
-        'Paracetamol',
-        'Ibuprofeno',
-        'Aspirina',
-        'Omeprazol',
-        'Loratadina',
-        'Cetirizina',
-        'Dexametasona',
-        'Prednisona',
-        'Amoxicilina',
-        'Azitromicina',
-      ]);
-      medicamento.rolMedicamento = faker.helpers.arrayElement([
-        'Sospechoso',
-        'Concomitante',
-        'Interaccion',
-      ]);
-      medicamento.codigoATC = faker.string.alphanumeric(7);
-      medicamento.sistemaCodificacion = faker.helpers.arrayElement(['ATC', 'WHO Drug']);
-      medicamento.codigo = faker.string.alphanumeric(8);
-      medicamento.nombreNormalizado = medicamento.nombre;
-      medicamento.codigoFormaFarmaceutica = faker.string.alphanumeric(4);
-      medicamento.nombreFormaFarmaceutica = faker.helpers.arrayElement([
-        'Tableta',
-        'Cápsula',
-        'Jarabe',
-        'Inyección',
-      ]);
-      medicamento.codigoViaAdministracion = faker.string.alphanumeric(4);
-      medicamento.nombreViaAdministracion = faker.helpers.arrayElement([
-        'Oral',
-        'Intramuscular',
-        'Intravenosa',
-        'Tópica',
-      ]);
-
-      medicamentos.push(medicamento);
-    }
-
-    await this.medicamentoRepository.save(medicamentos);
-  }
-
-  private async seedCausalidadesEsavi() {
-    console.log('🔍 Creando causalidades ESAVI...');
-
-    const notificaciones = await this.notificacionRepository.find();
-    const datosEsavi = await this.datoEsaviRepository.find();
-
-    const causalidades = [];
-
-    for (let i = 0; i < 300; i++) {
-      const causalidad = new CausalidadEsavi();
-      causalidad.datoEsavi = faker.helpers.arrayElement(datosEsavi);
-      causalidad.fechaCausalidadEsavi = faker.date.recent();
-      causalidad.sistemaClasificacionCausalidad = faker.helpers.arrayElement([
-        'WHO-AEFI',
-        'WHO-UMC',
-        'Naranjo',
-      ]);
-      causalidad.clasificacionCausaEsavi = faker.lorem.sentence();
-      causalidad.clasificacionCausalidadWHOAEFI = faker.helpers.arrayElement([
-        'Definitiva',
-        'Probable',
-        'Posible',
-        'Improbable',
-      ]);
-      causalidad.clasificacionCausalidadWHOUMC = faker.helpers.arrayElement([
-        'Certain',
-        'Probable',
-        'Possible',
-        'Unlikely',
-      ]);
-      causalidad.clasificacionCausalidadNaranjo = faker.helpers.arrayElement([
-        'Definitiva',
-        'Probable',
-        'Posible',
-        'Dudosa',
-      ]);
-      causalidad.notificacion = faker.helpers.arrayElement(notificaciones);
-
-      causalidades.push(causalidad);
-    }
-
-    await this.causalidadEsaviRepository.save(causalidades);
-  }
-
-  private async seedGravedadesEsavi() {
-    console.log('⚠️ Creando gravedades ESAVI...');
-
-    const notificaciones = await this.notificacionRepository.find();
-    const gravedades = [];
-
-    for (let i = 0; i < 200; i++) {
-      const gravedad = new GravedadEsavi();
-      gravedad.tipo = faker.helpers.arrayElement([
-        'Leve',
-        'Moderada',
-        'Grave',
-        'Muy grave',
-        'Fatal',
-      ]);
-      gravedad.muerte = faker.datatype.boolean();
-      gravedad.riesgoVida = faker.datatype.boolean();
-      gravedad.discapacidad = faker.datatype.boolean();
-      gravedad.hospitalizacion = faker.datatype.boolean();
-      gravedad.anomaliaCongenita = faker.datatype.boolean();
-      gravedad.aborto = faker.datatype.boolean();
-      gravedad.muerteFetal = faker.datatype.boolean();
-      gravedad.eventoImportante = faker.datatype.boolean();
-      gravedad.comentarioEventoImportante = faker.lorem.sentence();
-      gravedad.parteEventosPreocupacion = faker.datatype.boolean();
-      gravedad.nuevoEventos = faker.datatype.boolean();
-      gravedad.condicionEgreso = faker.lorem.sentence();
-      gravedad.notificacion = faker.helpers.arrayElement(notificaciones);
-
-      gravedades.push(gravedad);
-    }
-
-    await this.gravedadEsaviRepository.save(gravedades);
-  }
-
-  private async seedDesenlacesEsavi() {
-    console.log('📈 Creando desenlaces ESAVI...');
-
-    const notificaciones = await this.notificacionRepository.find();
-    const catalogos = await this.catalogoRepository.find();
-    const desenlaces = [];
-
-    for (let i = 0; i < 400; i++) {
-      const desenlace = new DesenlaceEsavi();
-      desenlace.codigo = faker.string.alphanumeric(8);
-      desenlace.fechaMuerte = faker.datatype.boolean() ? faker.date.recent() : null;
-      desenlace.autopsia = faker.number.int({ min: 0, max: 1 });
-      desenlace.fechaNotificacionMuerte = faker.date.recent();
-      desenlace.autopsiaFetal = faker.number.int({ min: 0, max: 1 });
-      desenlace.fechaNotififacionMuerteFetal = faker.date.recent();
-      desenlace.comentarios = faker.lorem.paragraph();
-      desenlace.fechaInicioInvestigacion = faker.date.recent();
-      desenlace.clasificacionFinalCaso = faker.lorem.sentence();
-      desenlace.clasificacionFinalCasoA = faker.lorem.sentence();
-      desenlace.clasificacionFinalCasoB = faker.lorem.sentence();
-      desenlace.notificacion = faker.helpers.arrayElement(notificaciones);
-      desenlace.causalidadEsavi = faker.helpers.arrayElement(catalogos);
-
-      desenlaces.push(desenlace);
-    }
-
-    await this.desenlaceEsaviRepository.save(desenlaces);
-  }
-
-  private async seedDatosVacunas() {
-    console.log('💉 Creando datos de vacunas...');
-
-    const notificaciones = await this.notificacionRepository.find();
-    const datosVacunas = [];
-
-    for (let i = 0; i < 800; i++) {
-      const datoVacuna = new DatoVacuna();
-      datoVacuna.codigoAtc = faker.string.alphanumeric(7);
-      datoVacuna.rolVacuna = faker.helpers.arrayElement(['Sospechosa', 'Concomitante']);
-      datoVacuna.sistemaDeCodificacion = faker.helpers.arrayElement(['WHUDRUG', 'ATC']);
-      datoVacuna.nombreVacuna = faker.helpers.arrayElement([
-        'BCG',
-        'Pentavalente',
-        'Rotavirus',
-        'Neumococo',
-        'Influenza',
-        'COVID-19',
-        'Hepatitis B',
-        'Triple Viral',
-        'Varicela',
-      ]);
-      datoVacuna.nombreVacunaPatenteWhoDrug = datoVacuna.nombreVacuna;
-      datoVacuna.drugCode = faker.string.alphanumeric(8);
-      datoVacuna.codigoOtro = faker.string.alphanumeric(8);
-      datoVacuna.identificadorVacuna = faker.string.alphanumeric(10);
-      datoVacuna.nombreFabricante = faker.company.name();
-      datoVacuna.nombreFabricanteWhoDrug = datoVacuna.nombreFabricante;
-      datoVacuna.codigoFabricanteWhoDrug = faker.string.alphanumeric(6);
-      datoVacuna.numeroDosisVacuna = faker.number.int({ min: 1, max: 5 });
-      datoVacuna.dosis = faker.helpers.arrayElement(['1ra dosis', '2da dosis', '3ra dosis']);
-      datoVacuna.dosis1 = faker.helpers.arrayElement(['0.5ml', '1ml', '0.25ml']);
-      datoVacuna.intervaloDosificacion = faker.helpers.arrayElement([
-        '4 semanas',
-        '8 semanas',
-        '6 meses',
-      ]);
-      datoVacuna.numeroLote = faker.string.alphanumeric(8);
-      datoVacuna.fechaVencimientoVacuna = faker.date.future();
-      datoVacuna.nombreDiluyenteVacuna = faker.lorem.words(2);
-      datoVacuna.fechaVencimientoDiluyente = faker.date.future();
-      datoVacuna.paisAutorizacion = faker.location.country();
-      datoVacuna.concentracion = faker.helpers.arrayElement(['0.5ml', '1ml', '0.25ml']);
-      datoVacuna.ingredienteSospechoso = faker.lorem.words(2);
-      datoVacuna.accionTomada = faker.lorem.sentence();
-      datoVacuna.informacionAdicionalMedicamento = faker.lorem.paragraph();
-      datoVacuna.indicacionMeddra = faker.lorem.sentence();
-      datoVacuna.indicacionNotificadorPrimario = faker.lorem.sentence();
-      datoVacuna.duracion = faker.helpers.arrayElement(['1 día', '3 días', '7 días']);
-      datoVacuna.inicioAdministracion = faker.date.recent();
-      datoVacuna.finAdministracion = faker.date.future();
-      datoVacuna.formaFarmaceutica = faker.helpers.arrayElement(['Inyección', 'Oral', 'Nasal']);
-      datoVacuna.formaFarmaceuticaEDQM = datoVacuna.formaFarmaceutica;
-      datoVacuna.viaAdministracion = faker.helpers.arrayElement([
-        'Intramuscular',
-        'Subcutánea',
-        'Oral',
-        'Intradérmica',
-      ]);
-      datoVacuna.viaAdministracionEDQM = datoVacuna.viaAdministracion;
-      datoVacuna.notificacion = faker.helpers.arrayElement(notificaciones);
-
-      datosVacunas.push(datoVacuna);
-    }
-
-    await this.datoVacunaRepository.save(datosVacunas);
-  }
-
-  private async seedDatosVacunacion() {
-    console.log('📋 Creando datos de vacunación...');
-
-    const notificaciones = await this.notificacionRepository.find();
-    const catalogos = await this.catalogoRepository.find();
-    const datosVacunacion = [];
-
-    for (let i = 0; i < 1200; i++) {
-      const datoVacunacion = new DatoVacunacion();
-      datoVacunacion.nombreVacunatorio = faker.company.name();
-      datoVacunacion.fechaVacunacion = faker.date.recent();
-      datoVacunacion.horaVacunacion = faker.date.recent();
-      datoVacunacion.provincia = faker.helpers.arrayElement(catalogos);
-      datoVacunacion.canton = faker.helpers.arrayElement(catalogos);
-      datoVacunacion.parroquia = faker.helpers.arrayElement(catalogos);
-      datoVacunacion.otraParroquia = faker.lorem.words(2);
-      datoVacunacion.direccion = faker.location.streetAddress();
-      datoVacunacion.codigoMecanismoVerificacion = faker.string.alphanumeric(8);
-      datoVacunacion.nombreOtroMecanismo = faker.lorem.words(3);
-      datoVacunacion.fechaReconstitucion = faker.date.recent();
-      datoVacunacion.horaReconstitucion = faker.date.recent();
-      datoVacunacion.notificacion = faker.helpers.arrayElement(notificaciones);
-
-      datosVacunacion.push(datoVacunacion);
-    }
-
-    await this.datoVacunacionRepository.save(datosVacunacion);
+  
   } //---fin del semillero de los datos ficticios------------------------------------------------------------------------------------------------------
   */
   //--inicio carga de provincias desde CSV------------------------------------------------------------------------------------------------------

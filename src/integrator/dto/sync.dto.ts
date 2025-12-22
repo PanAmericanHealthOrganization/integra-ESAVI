@@ -1,5 +1,5 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
-import { IAuditoria } from '../entity';
+import { IAuditoria, SyncStatus } from '../entity';
 
 /**
  *
@@ -16,7 +16,8 @@ export interface ISync extends IAuditoria {
   /**
    * Estado del proceso de sincronización
    */
-  status: string;
+  //status: string;
+  status: SyncStatus;//Se podría utilizar un tipo enumerado "enum"
   /**
    * Fecha y hora de inicio del proceso de sincronización
    */
@@ -26,8 +27,12 @@ export interface ISync extends IAuditoria {
    */
   endTime: Date;
   /**
-   * Mensaje de error del proceso de sincronización
+   * Mensaje de éxito del proceso de sincronización
    */
+  message?: string;
+  /**
+   * Mensaje de error del proceso de sincronización
+   */  
   errorMessage: string;
   /**
    * Stack del error del proceso de sincronización
@@ -38,13 +43,20 @@ export interface ISync extends IAuditoria {
    */
   errorTrace: string;
 }
+/*export enum SyncStatus {
+  PENDING = 'PENDING',
+  RUNNING = 'RUNNING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+}*/
 
 export class SyncDto {
   id: string;
   name: string;
-  status: string;
+  status: SyncStatus;
   startTime: Date;
   endTime: Date;
+  message?: string;
   errorMessage: string;
   errorStack: string;
   errorTrace: string;

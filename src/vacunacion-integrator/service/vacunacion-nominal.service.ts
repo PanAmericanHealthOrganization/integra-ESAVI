@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { add, format } from 'date-fns';
-import { SyncProcess } from 'src/integrator/entity/sync.entity';
+import { SyncProcess, SyncStatus } from 'src/integrator/entity/sync.entity';
 import { SyncService, VacunometroService } from 'src/integrator/service';
 import { DataSource } from 'typeorm';
 @Injectable()
@@ -105,7 +105,7 @@ export class VacunacionNominalService {
         hasta,
         'yyyy-MM-dd',
       )}`;
-      syncProcess.status = 'COMPLETED';
+      syncProcess.status = SyncStatus.COMPLETED;//'COMPLETED';
       syncProcess.startTime = startTime;
       syncProcess.endTime = new Date();
       syncProcess.errorMessage = '';
