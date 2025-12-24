@@ -14,7 +14,15 @@ process.env.TZ = 'America/Guayaquil';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   const configService = app.get(ConfigService);
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,                  // ← Importante: convierte tipos
+      transformOptions: {
+        enableImplicitConversion: true, // opcional, pero ayuda
+      },
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle('API de Conexión ' + configService.get('NAME_PROYECT'))
     .setDescription(configService.get('DETAIL_PROYECT'))

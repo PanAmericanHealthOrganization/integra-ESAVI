@@ -215,11 +215,11 @@ export class VigiflowIntegradorService {
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
-      const fecha = this.formatoFecha(reg['G'] ? reg['G'].toString() : reg['G']);
-      if (fecha) {
-        notificacion.fechaNacimiento = fecha;
+      const fechaNacimiento = this.analizarCadenaFecha(reg['G'] ? reg['G'].toString() : reg['G']);
+      if (fechaNacimiento) {
+        notificacion.fechaNacimiento = fechaNacimiento;
         //Para no repetir la extracción, simplemente se asigna la fecha de nacimiento al paciente desde la notificación.
-        paciente.fechaNacimiento = fecha;
+        paciente.fechaNacimiento = fechaNacimiento;
       }
       
       // Al momento la edad y su unidad se toman directamente del excel. Los cálculos	
@@ -235,12 +235,13 @@ export class VigiflowIntegradorService {
         notificacion.edad = null;
         notificacion.unidadEdadPaciente = null;
         throwError(`Edad o unidad de edad, no válida para el paciente con código Vigiflow: ${paciente.codigoVigiflow}`);
+        //el cálculo a partir de esas dos fechas, se realiza en el servicio de notificación VigiFlow.
       }
-      const fechaNotificacion = this.formatoFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
+      const fechaNotificacion = this.analizarCadenaFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
         notificacion.fechaNotificacion = fechaNotificacion;
       }//esta fecha se actualiza luego al extraer el otro Excel que contiene la hoja "Reportes".
-      const fechaReporte = this.formatoFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
+      const fechaReporte = this.analizarCadenaFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
       if (fechaReporte) {
         notificacion.fechaReporteNacional = fechaReporte;
       }
@@ -369,7 +370,7 @@ export class VigiflowIntegradorService {
           // Se actualiza la fecha de notificación asignándola, la
           // "fecha de recepción inicial", si esta no existe se la deja con la fecha de notificacion.
           //updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
-          updateNotificacion.fechaNotificacion = reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
+          updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
           updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
           updateNotificacion.residenciaNotificador.canton = reg['AU'];
 
@@ -738,7 +739,8 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
   }
   analizarCadenaFecha(dateStr: string): Date | null {
     if (!/^\d{8}$/.test(dateStr)) {
-       throw new Error("Formato inválido, se espera YYYYMMDD"); 
+       console.log(`Formato inválido, se espera YYYYMMDD: ${dateStr}`);
+       return null;
       } 
       const year = Number(dateStr.slice(0, 4)); 
       const month = Number(dateStr.slice(4, 6)); 
@@ -746,7 +748,8 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       if (month < 1 || month > 12 || day < 1 || day > 31) {
         throw new Error("Fecha inválida");
       }
-    return new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
+      const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
+    return new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate())); 
   }
 
   formatoInteger = (valor: string) => {

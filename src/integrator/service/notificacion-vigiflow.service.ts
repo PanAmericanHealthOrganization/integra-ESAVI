@@ -117,7 +117,7 @@ export class NotificacionVigiflowService {
         /* calculo de la edad, udidad de edad y el grupo etario */
         if( (createDto.fechaNotificacion && createDto.fechaNacimiento) && 
         (createDto.fechaNotificacion >= createDto.fechaNacimiento) ){
-          try{
+          try{          
 
             let resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);           
             notificacion.edad = resultadoUnidadYedad.edadCalculada;
@@ -126,85 +126,97 @@ export class NotificacionVigiflowService {
               resultadoUnidadYedad.edadCalculada,
               resultadoUnidadYedad.unidadEdadCalculada,
             );
-            notificacion.grupoEtario = grupoEtarioPaciente;
+            notificacion.grupoEtario = grupoEtarioPaciente;            
+            /**
+             * Para el cálculo del grupo etario, según el catálogo del Ministerio de Salud Pública,
+             * está bien utilizar la unidad de edad en años y meses solamente. Pero, para edades
+             * inferiores a un mes, se debe almacenar en la tabla, la unidad en días.
+             */
+            if(resultadoUnidadYedad.edadCalculada === 0 && resultadoUnidadYedad.unidadEdadCalculada === 'MESES'){// El método calcularEdad devuelve  las unidades en PLURAL.
+              notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow('DÍAS'); //Aquí ya se homologa la unidad de dad, con los valores numéricos (FK) del catálogo.
+              // como el grupo etario se calcula con meses y años, no es necesario recalcularlo,
+              // ahora se calcula el valor numérico de la edad en días
+              const msPorDia = 1000 * 60 * 60 * 24; // cálculo del número de milisegundos en un día.
+              const edadDias = Math.floor((notificacion.fechaNotificacion.getTime() - notificacion.fechaNacimiento.getTime()) / msPorDia);
+              notificacion.edad = edadDias;            
+            }
 
           }catch(error){
             console.log('No se puede calcular edad');
           }
         } else {
+          
+          /**Este proceso es exclusivamente para el cálculo del grupo etario.
+           * La edad y la unidad de edad son asignadas sin mayores transformaciones,
+           * en la clase vigiflow-integrator.service.ts
+           */        
+          if (createDto.edad && createDto.unidadEdadPaciente) {
+            // se comprueba que no sean nulos
+            try {
+              // Aseguramos que la unidad de edad esté en mayúsculas
+              let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
+              let edadFinal = createDto.edad;
 
-
-        /**Este proceso es exclusivamente para el cálculo del grupo etario.
-         * La edad y la unidad de edad son asignadas sin mayores transformaciones,
-         * en la clase vigiflow-integrator.service.ts
-         */        
-        if (createDto.edad && createDto.unidadEdadPaciente) {
-          // se comprueba que no sean nulos
-          try {
-            // Aseguramos que la unidad de edad esté en mayúsculas
-            let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
-            let edadFinal = createDto.edad;
-
-            // Si la unidad no es "AÑO" o "AÑOS", realizar la conversión
-            if (unidadEdad !== 'AÑO' && unidadEdad !== 'AÑOS') {
-              if (unidadEdad === 'DÉCADA') {
-                // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
-                edadFinal = ~~(createDto.edad * 10);
-                unidadEdad = 'AÑOS'; // Actualizamos la unidad a "AÑOS" después de la conversión
-              } else if (unidadEdad === 'SEMANA') {
-                if (createDto.edad >= 0 && createDto.edad <= 52) {
-                  edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
-                  unidadEdad = 'MESES';
-                } else {
-                  // Convertimos semanas a años (1 semana = 1/52 años)
-                  edadFinal = ~~(createDto.edad / 52.1429);
-                  unidadEdad = 'AÑOS';
+              // Si la unidad no es "AÑO" o "AÑOS", realizar la conversión
+              if (unidadEdad !== 'AÑO' && unidadEdad !== 'AÑOS') {
+                if (unidadEdad === 'DÉCADA') {
+                  // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
+                  edadFinal = ~~(createDto.edad * 10);
+                  unidadEdad = 'AÑOS'; // Actualizamos la unidad a "AÑOS" después de la conversión
+                } else if (unidadEdad === 'SEMANA') {
+                  if (createDto.edad >= 0 && createDto.edad <= 52) {
+                    edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
+                    unidadEdad = 'MESES';
+                  } else {
+                    // Convertimos semanas a años (1 semana = 1/52 años)
+                    edadFinal = ~~(createDto.edad / 52.1429);
+                    unidadEdad = 'AÑOS';
+                  }
+                } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
+                  if (createDto.edad >= 0 && createDto.edad <= 364) {
+                    // Se convierte días a meses (1 mes = 30.44 días)
+                    edadFinal = ~~(createDto.edad / 30.44);
+                    unidadEdad = 'MESES';
+                  } else {
+                    // Convertimos días a años (1 día = 1/365 años)
+                    edadFinal = ~~(createDto.edad / 365);
+                    unidadEdad = 'AÑOS';
+                  }
+                  
+                } else if (unidadEdad === 'HORA') {
+                  if (createDto.edad >= 0 && createDto.edad <= 8759) {
+                    // Si la edad en horas es menor a 8760 (1 año), la convertimos a meses
+                    edadFinal = ~~(createDto.edad / 730); // cte sugerida: 730.001// Convertimos horas a meses (1 mes = 730.001 horas)
+                    unidadEdad = 'MESES';
+                  } else {
+                    // Convertimos horas a años (1 hora = 1/8760 años)
+                    edadFinal = ~~(createDto.edad / 8760);
+                    unidadEdad = 'AÑOS';
+                  }                
+                } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
+                  if (createDto.edad >= 0 && createDto.edad <= 11) {
+                    // Si la edad en meses es menor a 12, la dejamos como meses
+                    edadFinal = createDto.edad;
+                    unidadEdad = 'MESES';
+                  } else {
+                    // Convertimos meses a años (1 mes = 1/12 años)
+                    edadFinal = ~~(createDto.edad / 12);
+                    unidadEdad = 'AÑOS';
+                  }
                 }
-              } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
-                if (createDto.edad >= 0 && createDto.edad <= 364) {
-                  // Se convierte días a meses (1 mes = 30.44 días)
-                  edadFinal = ~~(createDto.edad / 30.44);
-                  unidadEdad = 'MESES';
-                } else {
-                  // Convertimos días a años (1 día = 1/365 años)
-                  edadFinal = ~~(createDto.edad / 365);
-                  unidadEdad = 'AÑOS';
-                }
-                
-              } else if (unidadEdad === 'HORA') {
-                if (createDto.edad >= 0 && createDto.edad <= 8759) {
-                  // Si la edad en horas es menor a 8760 (1 año), la convertimos a meses
-                  edadFinal = ~~(createDto.edad / 730); // cte sugerida: 730.001// Convertimos horas a meses (1 mes = 730.001 horas)
-                  unidadEdad = 'MESES';
-                } else {
-                  // Convertimos horas a años (1 hora = 1/8760 años)
-                  edadFinal = ~~(createDto.edad / 8760);
-                  unidadEdad = 'AÑOS';
-                }                
-              } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
-                if (createDto.edad >= 0 && createDto.edad <= 11) {
-                  // Si la edad en meses es menor a 12, la dejamos como meses
-                  edadFinal = createDto.edad;
-                  unidadEdad = 'MESES';
-                } else {
-                  // Convertimos meses a años (1 mes = 1/12 años)
-                  edadFinal = ~~(createDto.edad / 12);
-                  unidadEdad = 'AÑOS';
-                }
+              } else {
+                unidadEdad = 'AÑOS';
               }
-            } else {
-              unidadEdad = 'AÑOS';
-            }
 
-            // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
-            notificacion.grupoEtario = grupoEtarioPaciente;
-          } catch (error) {
-            console.error(
-              `Error al calcular grupo etario para la edad "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
-            );
-          }
-        }// fin de cálculo del grupo etario----------****---------
+              // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
+              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
+              notificacion.grupoEtario = grupoEtarioPaciente;
+            } catch (error) {
+              console.error(
+                `Error al calcular grupo etario para la edad "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
+              );
+            }
+          }// fin de cálculo del grupo etario----------****---------
         }
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -280,18 +292,36 @@ export class NotificacionVigiflowService {
 
       //-------------------------------------actualización de la edad y unidad de edad-------------------------------------//
       /* calculo de la edad, udidad de edad y el grupo etario */
-      if( (notificacion.fechaNotificacion && notificacion.fechaNacimiento) && 
-      (notificacion.fechaNotificacion >= notificacion.fechaNacimiento) ){
+      updateNotificacion.fechaNacimiento = typeof notificacion.fechaNacimiento === 'string'
+      ? new Date(notificacion.fechaNacimiento)
+      : notificacion.fechaNacimiento;// Al recuperar el valor desde el DTO, TypeScript devulve un string, por lo que es necesario volver a converitir a Date.
+      notificacion.fechaNacimiento=updateNotificacion.fechaNacimiento;
+      notificacion.fechaNacimiento?console.log(notificacion.fechaNacimiento.toISOString().split("T")[0]):console.log('valor de fecha inválido'); // Si las dos fechas no tienen el mismo tipo, nunca serán iguales, y no entrará en la condición del if.
+      if( (updateNotificacion.fechaNotificacion && updateNotificacion.fechaNacimiento) && (updateNotificacion.fechaNotificacion >= updateNotificacion.fechaNacimiento) ){
         try{
 
-          let resultadoUnidadYedad = this.calcularEdad(notificacion.fechaNotificacion, notificacion.fechaNacimiento);           
+          let resultadoUnidadYedad = this.calcularEdad(updateNotificacion.fechaNotificacion, notificacion.fechaNacimiento);           
           notificacion.edad = resultadoUnidadYedad.edadCalculada;
-          notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada);
+          notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada); //Aquí ya se homologa con los valores numéricos (FK) del catálogo.
           const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
             resultadoUnidadYedad.edadCalculada,
             resultadoUnidadYedad.unidadEdadCalculada,
           );
           notificacion.grupoEtario = grupoEtarioPaciente;
+
+          /**
+           * Para el cálculo del grupo etario, según el catálogo del Ministerio de Salud Pública,
+           * está bien utilizar la unidad de edad en años y meses solamente. Pero, para edades
+           * inferiores a un mes, se debe almacenar en la tabla, la unidad en días.
+           */
+          if(resultadoUnidadYedad.edadCalculada === 0 && resultadoUnidadYedad.unidadEdadCalculada === 'MESES'){// El método calcularEdad devuelve  las unidades en PLURAL.
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow('DÍAS'); //Aquí ya se homologa la unidad de dad, con los valores numéricos (FK) del catálogo.
+            // como el grupo etario se calcula con meses y años, no es necesario recalcularlo,
+            // ahora se calcula el valor numérico de la edad en días
+            const msPorDia = 1000 * 60 * 60 * 24; // cálculo del número de milisegundos en un día.
+            const edadDias = Math.floor((notificacion.fechaNotificacion.getTime() - notificacion.fechaNacimiento.getTime()) / msPorDia);
+            notificacion.edad = edadDias;            
+          }
 
         }catch(error){
           console.log('No se puede calcular edad');

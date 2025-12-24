@@ -1,11 +1,15 @@
 import { Optional } from '@nestjs/common';
 import { Catalogo } from '../entity/catalogo.entity';
 import { UbicacionDto } from './ubicacion.dto';
+import { Type } from 'class-transformer';
+import { IsDate } from 'class-validator';
 
 export class CreateNotificacionDto {
   residenciaPaciente: UbicacionDto;
   peso: number;
   altura: number;
+  @IsDate({ message: 'fechaNacimiento debe ser una fecha válida' })
+  @Type(() => Date)  // ¡Esto es clave!
   fechaNacimiento: Date;
   edad: number;
   lactando : boolean;
@@ -29,6 +33,8 @@ export class CreateNotificacionDto {
   organizacionEmisor: string;
   nombreEmisor: string;
   estadoRegistroParam: string;
+  @IsDate({ message: 'fechaNotificacion debe ser una fecha válida' })
+  @Type(() => Date)  // ¡Esto es clave!
   fechaNotificacion: Date;
   fechaReporteNacional: Date;
   fechaLlenadoFicha: Date;
