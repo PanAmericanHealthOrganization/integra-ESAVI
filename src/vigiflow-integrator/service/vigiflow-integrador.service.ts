@@ -746,10 +746,13 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       const month = Number(dateStr.slice(4, 6)); 
       const day = Number(dateStr.slice(6, 8));
       if (month < 1 || month > 12 || day < 1 || day > 31) {
-        throw new Error("Fecha inválida");
+        //throw new Error("Fecha inválida");
+        console.log(`Texto inválido, se espera este formato YYYYMMDD: ${dateStr}`);
+        return null;
       }
-      const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
-    return new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate())); 
+      //const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
+    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0)); // Retorna la fecha en formato UTC
+    //return fecha.setHours(0,0,0,0), fecha; // Para trabajar solo a nivel nacional, no se necesita UTC. Además al trabajar con formato local, evita errores de desfase horario, y se puede comparar las entradas con las salidas, o las que se almacenan en la base de datos.
   }
 
   formatoInteger = (valor: string) => {

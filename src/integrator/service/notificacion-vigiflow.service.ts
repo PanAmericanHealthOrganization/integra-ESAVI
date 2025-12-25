@@ -293,10 +293,10 @@ export class NotificacionVigiflowService {
       //-------------------------------------actualización de la edad y unidad de edad-------------------------------------//
       /* calculo de la edad, udidad de edad y el grupo etario */
       updateNotificacion.fechaNacimiento = typeof notificacion.fechaNacimiento === 'string'
-      ? new Date(notificacion.fechaNacimiento)
+      ? this.analizarCadenaFechaGuionMedio(notificacion.fechaNacimiento)
       : notificacion.fechaNacimiento;// Al recuperar el valor desde el DTO, TypeScript devulve un string, por lo que es necesario volver a converitir a Date.
-      notificacion.fechaNacimiento=updateNotificacion.fechaNacimiento;
-      notificacion.fechaNacimiento?console.log(notificacion.fechaNacimiento.toISOString().split("T")[0]):console.log('valor de fecha inválido'); // Si las dos fechas no tienen el mismo tipo, nunca serán iguales, y no entrará en la condición del if.
+      notificacion.fechaNacimiento = updateNotificacion.fechaNacimiento;
+      //notificacion.fechaNacimiento?console.log(notificacion.fechaNacimiento.toISOString().split("T")[0]):console.log('valor de fecha inválido'); // Si las dos fechas no tienen el mismo tipo, nunca serán iguales, y no entrará en la condición del if.
       if( (updateNotificacion.fechaNotificacion && updateNotificacion.fechaNacimiento) && (updateNotificacion.fechaNotificacion >= updateNotificacion.fechaNacimiento) ){
         try{
 
@@ -379,4 +379,38 @@ export class NotificacionVigiflowService {
     }
     return null;
   }
+
+  analizarCadenaFechaGuionMedio(dateStr: string): Date | null {
+    // Validar formato YYYY-MM-DD
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      console.log(`Formato inválido, se espera YYYY-MM-DD: ${dateStr}`);
+      return null;
+    }
+  
+    const [yearStr, monthStr, dayStr] = dateStr.split("-"); //= dateStr.split("-").map(Number);
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    const day = Number(dayStr);
+  
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+      console.log(`Texto inválido, se espera este formato YYYY-MM-DD: ${dateStr}`);
+      return null;
+    }
+  
+    // 🚀 Crear directamente en UTC con hora 00:00:00
+    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+    //return (new Date(year, month - 1, day)).setUTCHours(0,0,0,0), new Date(year, month - 1, day);
+    //const fecha = new Date(year, month - 1, day);
+    //return fecha.setUTCHours(0, 0, 0, 0), fecha;
+    //fecha.setHours(0, 0, 0, 0);
+    //return fecha;
+    /**
+     * Si la aplicación trabaja solo a nivel nacional, no es
+     * necesario manejar las fechas en UTC, por lo que se
+     * puede retornar la fecha directamente sin convertir a UTC. Se debe tener en cuenta
+     * que al convertir a UTC, el desfase es innevitable, en comparación con los datos
+     * que han sido capturados en formato local.
+     */
+  }
+  
 }
