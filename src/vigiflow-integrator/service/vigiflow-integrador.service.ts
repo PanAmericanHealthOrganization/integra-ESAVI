@@ -28,6 +28,7 @@ import { CreateMedicamentoDto } from '../../integrator/dto/create-medicamento.dt
 import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
 import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-vigiflow.dto';
 import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
+import { UpdateDatoVacunaDto } from '../../integrator/dto/update-dato-vacuna.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
@@ -192,19 +193,7 @@ export class VigiflowIntegradorService {
         deletedBy: 'System',
         isEnabled: true,
         isActive: true,
-      };
-
-      //Este campo debe ser asignado a datoVacuna.numeroDosisVacuna
-      const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
-      // Pero, tomar en cuenta que el CreateDatoVacunaDto aparece en el otro
-      // proceso de extracción, en el método "extractedFromJsonReportToCreateMedicamento".
-      // Para este proceso se debe analizar los siguientes elementos:
-      // dato-vacuna.entity.ts
-      // create-dato-vacuna.dto.ts
-      // dato-vacuna.service.ts
-      // integrador.service.ts
-      // update-dato-vacuna.dto.ts
-      // dato-vacuna.controller.ts
+      };     
 
       // Create Paciente Vigiflow
       const paciente = new CreatePacienteVigiflowDto();
@@ -299,7 +288,19 @@ export class VigiflowIntegradorService {
       datoVacunacionDto.nombreVacunatorio = reg['AF'];
       datoVacunacionDto.fechaVacunacion = this.formatoFecha(reg['N'] ? reg['N'].toString() : reg['N']);
 
-      //Create Dato Vacuna
+      //Este campo debe ser asignado a datoVacuna.numeroDosisVacuna
+      const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
+      // Pero, tomar en cuenta que el CreateDatoVacunaDto aparece en el otro
+      // proceso de extracción, en el método "extractedFromJsonReportToCreateMedicamento".
+      // Para este proceso se debe analizar los siguientes elementos:
+      // dato-vacuna.entity.ts
+      // create-dato-vacuna.dto.ts
+      // dato-vacuna.service.ts
+      // integrador.service.ts
+      // update-dato-vacuna.dto.ts
+      // dato-vacuna.controller.ts
+      //Create Dato Vacunacion
+      //Create Dato Vacuna con numeroDosisVacuna
       const datoVacunaDto = new CreateDatoVacunaDto();
       datoVacunaDto.numeroDosisVacuna = numeroDosisVacuna;
 
@@ -488,47 +489,50 @@ export class VigiflowIntegradorService {
         medicamento.codigoATC = reg['G'];
         medicamento = { ...medicamento, ...auditoria };
 
-        // Comentado el método de creación de medicamento para no ejecutarlo
+        // Crear medicamento
         await this.medicamentoService.createOneToOne(notificacion, medicamento);
 
-        let datoVacuna = new CreateDatoVacunaDto();
-        datoVacuna.nombreVacuna = reg['D'];
-        datoVacuna.accionTomada = reg['M'];
-        datoVacuna.dosis = reg['S'];
-        datoVacuna.intervaloDosificacion = reg['T'];
-        datoVacuna.dosis1 = reg['U'];
-        datoVacuna.duracion = reg['V'];
-        datoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
-        datoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
-        datoVacuna.formaFarmaceutica = reg['Y'];
-        datoVacuna.formaFarmaceuticaEDQM = reg['Z'];
-        datoVacuna.viaAdministracion = reg['AA'];
-        datoVacuna.viaAdministracionEDQM = reg['AB'];
-        datoVacuna.paisAutorizacion = reg['J'];
-        //datoVacuna.numeroLote = reg['AE'];
-        datoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
-        datoVacuna.indicacionMeddra = reg['Q'];
-        datoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
-        datoVacuna.codigoAtc = reg['G'];
-        datoVacuna.rolVacuna = reg['C']; // Se revisó, y es la misma variable "Rol del medicamento", no hay una variable específica para vacuna.
+        // Buscar datoVacuna existente y actualizarlo
+        const datoVacunaList = await this.datoVacunaService.findByNotificacionId(notificacion.id);
+        const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
+        if (datoVacunaExistente && datoVacunaExistente.id) {
+          const updateDatoVacuna = new UpdateDatoVacunaDto();
+          updateDatoVacuna.nombreVacuna = reg['D'];
+          updateDatoVacuna.accionTomada = reg['M'];
+          updateDatoVacuna.dosis = reg['S'];
+          updateDatoVacuna.intervaloDosificacion = reg['T'];
+          updateDatoVacuna.dosis1 = reg['U'];
+          updateDatoVacuna.duracion = reg['V'];
+          updateDatoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
+          updateDatoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
+          updateDatoVacuna.formaFarmaceutica = reg['Y'];
+          updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
+          updateDatoVacuna.viaAdministracion = reg['AA'];
+          updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
+          updateDatoVacuna.paisAutorizacion = reg['J'];
+          updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
+          updateDatoVacuna.indicacionMeddra = reg['Q'];
+          updateDatoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
+          updateDatoVacuna.codigoAtc = reg['G'];
+          updateDatoVacuna.rolVacuna = reg['C'];
 
-        const drugName = datoVacuna.nombreVacunaPatenteWhoDrug;
+          const drugName = updateDatoVacuna.nombreVacunaPatenteWhoDrug;
         const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
         if (whodrug.length > 0) {
-          datoVacuna.drugCode = whodrug[0]?.drugCode;
+          updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
           const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-          datoVacuna.mahholdersJson = mah.map((item) => ({
+          updateDatoVacuna.mahholdersJson = mah.map((item) => ({
             name: item.name,
             medicinalProductID: item.medicinalProductID,
           }));
           const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-          datoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
+          updateDatoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
             ingredent: item.ingredient,
           }));
         }
-        datoVacuna = { ...datoVacuna, ...auditoria };
 
-        await this.datoVacunaService.createVigiflow(notificacion, datoVacuna);
+          await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
+        }
       } else {
         console.log(`Please checkout ${paciente}`);
       }
