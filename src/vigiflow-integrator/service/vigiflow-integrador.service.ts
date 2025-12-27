@@ -517,19 +517,54 @@ export class VigiflowIntegradorService {
           updateDatoVacuna.rolVacuna = reg['C'];
 
           const drugName = updateDatoVacuna.nombreVacunaPatenteWhoDrug;
-        const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
-        if (whodrug.length > 0) {
-          updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
-          const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-          updateDatoVacuna.mahholdersJson = mah.map((item) => ({
-            name: item.name,
-            medicinalProductID: item.medicinalProductID,
-          }));
-          const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-          updateDatoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
-            ingredent: item.ingredient,
-          }));
-        }
+          const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
+          if (whodrug.length > 0) {
+            updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+            const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
+            updateDatoVacuna.mahholdersJson = mah.map((item) => ({
+              name: item.name,
+              medicinalProductID: item.medicinalProductID,
+            }));
+            const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
+            //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
+            updateDatoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
+              ingredent: item.ingredient,
+            }));
+            if (ingredentActive.length > 0) {
+              // Ver todos los registros de traducciones
+              //const allTranslations = await this.activeIngredentService.ingredientTranslationService.getAllTranslationsWithIds();
+              //console.log('Todas las traducciones en BD:', allTranslations.slice(0, 5)); // Solo primeros 5
+              
+              // Verificar si hay traducciones para cualquier ingrediente
+              /**for (const ingredient of ingredentActive) {
+                const debugTranslations = await this.activeIngredentService.ingredientTranslationService.debugTranslations(ingredient.id);
+                console.log(`Traducciones para ${ingredient.id}:`, debugTranslations);
+                if (debugTranslations.length > 0) {
+                  const translation = await this.activeIngredentService.getIngredientTranslation(ingredient.id, 'es-ES');
+                  console.log(`Traducción encontrada para ${ingredient.id}:`, translation);
+                  break;
+                }
+              }*/
+              // 1. Obtener los ingredientes activos
+              ////const ingredientsActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
+
+              // 2. Para cada ingrediente activo, obtener su traducción en español
+              const translatedIngredients = await Promise.all(
+                ingredentActive.map(async (ingredient) => {
+                  const translation = await this.activeIngredentService.getIngredientTranslation(
+                    ingredient.id,
+                    'es-ES'
+                  );
+
+                  return { ingredient: translation };//|| ingredient.ingredient };
+                })
+              );
+
+              // 3. Resultado final
+              console.log(JSON.stringify(translatedIngredients, null, 2));
+
+            }
+          }
 
           await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
         }
