@@ -512,11 +512,12 @@ export class VigiflowIntegradorService {
           updateDatoVacuna.paisAutorizacion = reg['J'];
           updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
           updateDatoVacuna.indicacionMeddra = reg['Q'];
-          updateDatoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
+          updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'];
+          updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
           updateDatoVacuna.codigoAtc = reg['G'];
           updateDatoVacuna.rolVacuna = reg['C'];
 
-          const drugName = updateDatoVacuna.nombreVacunaPatenteWhoDrug;
+          const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
           const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
           if (whodrug.length > 0) {
             updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
@@ -527,10 +528,10 @@ export class VigiflowIntegradorService {
             }));
             const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
             //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
-            updateDatoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
-              ingredent: item.ingredient,
+            updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
+              ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
             }));
-            if (ingredentActive.length > 0) {
+            if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson)) {
               // Ver todos los registros de traducciones
               //const allTranslations = await this.activeIngredentService.ingredientTranslationService.getAllTranslationsWithIds();
               //console.log('Todas las traducciones en BD:', allTranslations.slice(0, 5)); // Solo primeros 5
@@ -545,23 +546,25 @@ export class VigiflowIntegradorService {
                   break;
                 }
               }*/
-              // 1. Obtener los ingredientes activos
-              ////const ingredientsActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-
-              // 2. Para cada ingrediente activo, obtener su traducción en español
+              
+              // Para cada ingrediente activo, obtener su traducción en español
               const translatedIngredients = await Promise.all(
                 ingredentActive.map(async (ingredient) => {
                   const translation = await this.activeIngredentService.getIngredientTranslation(
                     ingredient.id,
                     'es-ES'
-                  );
+                  ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data.
 
                   return { ingredient: translation };//|| ingredient.ingredient };
                 })
               );
 
-              // 3. Resultado final
+              // Resultado final, JSON de traducciones de ingredientes activos
               console.log(JSON.stringify(translatedIngredients, null, 2));
+              /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
+                ingredient: item.ingredient,
+              }));*/
+              updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
 
             }
           }
@@ -792,6 +795,15 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       //const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
     return new Date(Date.UTC(year, month - 1, day, 0, 0, 0)); // Retorna la fecha en formato UTC
     //return fecha.setHours(0,0,0,0), fecha; // Para trabajar solo a nivel nacional, no se necesita UTC. Además al trabajar con formato local, evita errores de desfase horario, y se puede comparar las entradas con las salidas, o las que se almacenan en la base de datos.
+  }
+
+  /** * Convierte una cadena con saltos de línea en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] */
+  parseIngredients(rawText: string): { ingredient: string }[] {
+    return rawText
+      .split(/\r?\n/) // divide por \n o \r\n 
+      .map(line => line.trim()) // limpia espacios y posibles \r 
+      .filter(line => line !== '') // descarta líneas vacías 
+      .map(line => ({ ingredient: line })); // construye el objeto
   }
 
   formatoInteger = (valor: string) => {

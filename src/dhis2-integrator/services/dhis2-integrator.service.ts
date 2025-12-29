@@ -718,6 +718,21 @@ export class Dhis2IntegratorService {
             (header) => header.column === `DNVE ESAVI TRK - Vía de aplicación vacuna ${i}`,
           )
         ];
+      datoVacuna.fechaVencimientoDiluyente = this.formatoFecha(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === `DNVE ESAVI TRK - Fecha de expiración del diluyente vacuna ${i}`,
+          )
+        ],
+      );
+      datoVacuna.nombreDiluyenteVacuna =
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === `DNVE ESAVI TRK - Nombre del diluyente usado vacuna ${i}`,
+          )
+        ];
       datoVacuna.inicioAdministracion = this.formatoFecha(
         row[
           headers.findIndex(
@@ -732,6 +747,8 @@ export class Dhis2IntegratorService {
         datoVacuna.numeroLote ||
         datoVacuna.fechaVencimientoVacuna ||
         datoVacuna.viaAdministracion ||
+        datoVacuna.fechaVencimientoDiluyente ||
+        datoVacuna.nombreDiluyenteVacuna ||
         datoVacuna.inicioAdministracion
       ) {
         datoVacunas.push(datoVacuna);
