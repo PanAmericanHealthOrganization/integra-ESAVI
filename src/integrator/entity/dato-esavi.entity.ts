@@ -21,6 +21,7 @@ export class DatoEsavi extends Auditoria {
    */
   @Column({
     name: 'SISTEMA_DE_CODIFICACION',
+    default: 'MedDRA',
     nullable: true,
     comment: 'Sistema de codificación utilizado para el ESAVI (ej: MedDRA, CIE-10)',
   })

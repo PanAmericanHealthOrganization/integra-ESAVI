@@ -182,7 +182,8 @@ export class VigiflowIntegradorService {
       defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
-    reports.map(async (reg) => {
+    // Usar for...of para esperar que cada operación asíncrona termine
+    for (const reg of reports) {
       // TODO: colocar auditoria correcta
       const auditoria: IAuditoria = {
         createdAt: new Date(),
@@ -323,9 +324,7 @@ export class VigiflowIntegradorService {
       create = { ...create, ...auditoria };
 
       await this.integradorService.create(create);
-
-      return;
-    });
+    }
   }
 
   //Extracción de los datos de la hoja [1] de nombre 'Reportes', del libro
@@ -344,7 +343,8 @@ export class VigiflowIntegradorService {
       defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
 
-    toUpdate.map(async (reg) => {
+    // Usar for...of para esperar que cada operación asíncrona termine
+    for (const reg of toUpdate) {
       const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['G']);
 
       if (paciente && paciente.id) {
@@ -386,7 +386,7 @@ export class VigiflowIntegradorService {
           }
         }
       }
-    });
+    }
   }
 
   // async extractedFromJsonReportToCreateMedicamento(workbook2: WorkBook) {
@@ -532,21 +532,7 @@ export class VigiflowIntegradorService {
               ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
             }));
             if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson)) {
-              // Ver todos los registros de traducciones
-              //const allTranslations = await this.activeIngredentService.ingredientTranslationService.getAllTranslationsWithIds();
-              //console.log('Todas las traducciones en BD:', allTranslations.slice(0, 5)); // Solo primeros 5
-              
-              // Verificar si hay traducciones para cualquier ingrediente
-              /**for (const ingredient of ingredentActive) {
-                const debugTranslations = await this.activeIngredentService.ingredientTranslationService.debugTranslations(ingredient.id);
-                console.log(`Traducciones para ${ingredient.id}:`, debugTranslations);
-                if (debugTranslations.length > 0) {
-                  const translation = await this.activeIngredentService.getIngredientTranslation(ingredient.id, 'es-ES');
-                  console.log(`Traducción encontrada para ${ingredient.id}:`, translation);
-                  break;
-                }
-              }*/
-              
+                            
               // Para cada ingrediente activo, obtener su traducción en español
               const translatedIngredients = await Promise.all(
                 ingredentActive.map(async (ingredient) => {
