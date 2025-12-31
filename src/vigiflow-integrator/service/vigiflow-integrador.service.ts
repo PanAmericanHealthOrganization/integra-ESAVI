@@ -479,86 +479,98 @@ export class VigiflowIntegradorService {
 
     // Iterar con for...of para esperar las respuestas
     for (const reg of toUpdate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['B']);
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['A']); // No es .findByVigiflowCode(reg['B']); porque ya se comparó los valores con la hoja AEFI, y en realidad su equivalente es la columna 'A' en "Medicamentos".
       if (paciente) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
-        const notificacion = notificacionList.at(0);
+        const notificacionMed = notificacionList.at(0);//TODO: Iterar por todas las notificaciones asociadas al paciente, o lo que es lo mismo, a su código vigiflow. RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07. Y finalmente, un J07 no siempre aparece en la primera ocurrencia o posiciión del array notificacionList.
         let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
         medicamento.nombre = reg['D'];
-        medicamento.codigoATC = reg['G'];
+        medicamento.codigoATC = reg['G']; 
         medicamento = { ...medicamento, ...auditoria };
 
         // Crear medicamento
-        await this.medicamentoService.createOneToOne(notificacion, medicamento);
+        await this.medicamentoService.createOneToOne(notificacionMed, medicamento);
 
-        // Buscar datoVacuna existente y actualizarlo
-        const datoVacunaList = await this.datoVacunaService.findByNotificacionId(notificacion.id);
-        const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
-        if (datoVacunaExistente && datoVacunaExistente.id) {
-          const updateDatoVacuna = new UpdateDatoVacunaDto();
-          updateDatoVacuna.nombreVacuna = reg['D'];
-          updateDatoVacuna.accionTomada = reg['M'];
-          updateDatoVacuna.dosis = reg['S'];
-          updateDatoVacuna.intervaloDosificacion = reg['T'];
-          updateDatoVacuna.dosis1 = reg['U'];
-          updateDatoVacuna.duracion = reg['V'];
-          updateDatoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
-          updateDatoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
-          updateDatoVacuna.formaFarmaceutica = reg['Y'];
-          updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
-          updateDatoVacuna.viaAdministracion = reg['AA'];
-          updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
-          updateDatoVacuna.paisAutorizacion = reg['J'];
-          updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
-          updateDatoVacuna.indicacionMeddra = reg['Q'];
-          updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'];
-          updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
-          updateDatoVacuna.codigoAtc = reg['G'];
-          updateDatoVacuna.rolVacuna = reg['C'];
+        /**
+         * La hoja "Medicamentos", para el código ATC no tiene filtro de J07, y a primera vista, 
+         * parecería no ser necesario volver a aplicar otro filtro, porque, el ATC J07 está 
+         * filtrado en el libro AEFI (cantidad de registros comparable con el mensaje de la página VigiFlow).
+         * Sin embargo, se debe tener en cuenta que un mismo código Vigiflow puede tener varios ATC asociados,
+         * incluyendo el J07. Por lo tanto, es necesario validar que el código ATC de la fila actual
+         * corresponda a una vacuna (J07) antes de proceder a crear o actualizar el datoVacuna.
+         */
+        const validacionCdgAtcVacunas = reg['G'] && this.validarCodigoAtcVacuna(reg['G'].toString());
+        for(const notificacion of notificacionList){
+          // Buscar datoVacuna existente y actualizarlo
+          const datoVacunaList = await this.datoVacunaService.findByNotificacionId(notificacion.id);
+          const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
+          if (datoVacunaExistente && datoVacunaExistente.id && validacionCdgAtcVacunas) {
+            const updateDatoVacuna = new UpdateDatoVacunaDto();
+            updateDatoVacuna.nombreVacuna = reg['D'];
+            updateDatoVacuna.accionTomada = reg['M'];
+            updateDatoVacuna.dosis = reg['S'];
+            updateDatoVacuna.intervaloDosificacion = reg['T'];
+            updateDatoVacuna.dosis1 = reg['U'];
+            updateDatoVacuna.duracion = reg['V'];
+            updateDatoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
+            updateDatoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
+            updateDatoVacuna.formaFarmaceutica = reg['Y'];
+            updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
+            updateDatoVacuna.viaAdministracion = reg['AA'];
+            updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
+            updateDatoVacuna.paisAutorizacion = reg['J'];
+            updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
+            updateDatoVacuna.indicacionMeddra = reg['Q'];
+            updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'];
+            updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
+            updateDatoVacuna.codigoAtc = reg['G'];
+            updateDatoVacuna.rolVacuna = reg['C'];
 
-          const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
-          const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
-          if (whodrug.length > 0) {
-            updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
-            const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-            updateDatoVacuna.mahholdersJson = mah.map((item) => ({
-              name: item.name,
-              medicinalProductID: item.medicinalProductID,
-            }));
-            const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-            //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
-            updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
-              ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
-            }));
-            if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson)) {
-                            
-              // Para cada ingrediente activo, obtener su traducción en español
-              const translatedIngredients = await Promise.all(
-                ingredentActive.map(async (ingredient) => {
-                  const translation = await this.activeIngredentService.getIngredientTranslation(
-                    ingredient.id,
-                    'es-ES'
-                  ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data.
+            const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
+            const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
+            if (whodrug.length > 0) {
+              updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+              const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
+              updateDatoVacuna.mahholdersJson = mah.map((item) => ({
+                name: item.name,
+                medicinalProductID: item.medicinalProductID,
+              }));
+              const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
+              //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
+              updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
+                ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+              }));
+              if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson)) {
+                              
+                // Para cada ingrediente activo, obtener su traducción en español
+                const translatedIngredients = await Promise.all(
+                  ingredentActive.map(async (ingredient) => {
+                    const translation = await this.activeIngredentService.getIngredientTranslation(
+                      ingredient.id,
+                      'es-ES'
+                    ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data.
 
-                  return { ingredient: translation };//|| ingredient.ingredient };
-                })
-              );
+                    return { ingredient: translation };//|| ingredient.ingredient };
+                  })
+                );
 
-              // Resultado final, JSON de traducciones de ingredientes activos
-              console.log(JSON.stringify(translatedIngredients, null, 2));
-              /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
-                ingredient: item.ingredient,
-              }));*/
-              updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
+                // Resultado final, JSON de traducciones de ingredientes activos
+                console.log(JSON.stringify(translatedIngredients, null, 2));
+                /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
+                  ingredient: item.ingredient,
+                }));*/
+                updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
 
+              }
             }
-          }
 
-          await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
+            await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
+            break; // Salir del bucle una vez que se ha actualizado el datoVacuna
+          }
         }
       } else {
-        console.log(`Please checkout ${paciente}`);
+        console.log(`Por favor, verificar el paciente con id: ${paciente}`);
       }
     }
   }
@@ -790,6 +802,17 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       .map(line => line.trim()) // limpia espacios y posibles \r 
       .filter(line => line !== '') // descarta líneas vacías 
       .map(line => ({ ingredient: line })); // construye el objeto
+  }
+  
+  validarCodigoAtcVacuna(cadena: string): boolean {
+    // Verifica que la cadena empiece con "J07"
+    const empiezaConPrefijo = cadena.startsWith('J07');
+  
+    // Verifica que la longitud sea como máximo 7 caracteres
+    const longitudValida = cadena.length <= 7;
+  
+    // Retorna true solo si ambas condiciones se cumplen
+    return empiezaConPrefijo && longitudValida;
   }
 
   formatoInteger = (valor: string) => {
