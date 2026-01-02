@@ -201,7 +201,7 @@ export class VigiflowIntegradorService {
       paciente.identificacion = reg['E'];
       paciente.sexoPaciente = reg['F'];
       paciente.codigoVigiflow = reg['B'];
-      paciente.nombre = reg['C'];
+      paciente.inicialesNombre = reg['C'];
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
