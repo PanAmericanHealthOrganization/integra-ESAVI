@@ -9,18 +9,18 @@ export class AntecedenteEvento extends Antecedente {
     comment: 'Número de antecedentes de eventos adversos similares',
   })
   antecedente: number;
-  @Column({
+  /*@Column({
     name: 'ALERGIA_VACUNAS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a vacunas',
   })
-  alergiaVacuna: boolean;
+  alergiaVacuna: boolean;*/ //variable no encontrada en los orígenes. En realidad una vacuna es un medicamento.
   @Column({
     name: 'ALERGIA_MEDICAMENTOS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a medicamentos',
   })
-  alergiaMedicamento: boolean;
+  alergiaMedicamento: string;
 
   @Column({
     name: 'ALERGIA_ALIMENTOS',

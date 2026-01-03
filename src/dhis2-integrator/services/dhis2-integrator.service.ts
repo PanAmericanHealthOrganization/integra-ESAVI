@@ -370,7 +370,7 @@ export class Dhis2IntegratorService {
    */
   private async buildCreateCompleteDto(row: any[], headers: any[]): Promise<CreateCompleteDto> {
     // Create Paciente
-    const semanasEmbarazo = 42;
+    const semanasEmbarazo = 43;//= 42; //entre 1 y 43: cambio solicitado por el personal funcional.
     const paciente = new CreatePacienteDhis2Dto();
     paciente.identificacion =
       row[headers.findIndex((header) => header.column === 'Nro. de identificación')];
@@ -526,7 +526,35 @@ export class Dhis2IntegratorService {
     ); // En notificacion ya está este campo como antecedenteEventoPrevio. Pero, se conserva hasta pedir confirmación.
     antecedenteEventoAdverso.alergiaMedicamento = this.esValorAfirmativo(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Medicamentos')],
+    ).toString();
+
+    antecedenteEventoAdverso.alergiaAlimentos = this.esValorAfirmativo(
+      row[
+        headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos')
+      ],
     );
+    antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(
+      row[
+        headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Insectos')
+      ],
+    );
+    antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(
+      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Polvo')],
+    );
+    antecedenteEventoAdverso.otrasAlergias =
+      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Otro Alergias')];
+
+    // Create AntecedenteEnfermedadesPrevias //tabla: 'TR_ANTECEDENTES_ENFERMEDADES_PREVIAS'
+    const antecedentePreexistencia = new CreateAntecedentePreexistenciaDto();
+    const antecedentePrevio = this.separarCodigoYDescripcion(
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Antecedente patológico personal 1',
+        )
+      ],
+    );
+    antecedentePreexistencia.codigoEsaviCIE10 = antecedentePrevio.codigo;
+    antecedentePreexistencia.descripcion = antecedentePrevio.descripcion;
 
     // Create Gravedad
     const grave = new CreateGravedadEsaviDto();
@@ -828,8 +856,18 @@ export class Dhis2IntegratorService {
     create.datoVacuna = datoVacunas;
     create.gravedadEsavi = grave;
     create.desenlaceEsavi = desenlaceEsavi;
+    if (antecedentePreexistencia.descripcion) {
+      create.antecedentePreexistencia = antecedentePreexistencia;
+    }
+
     //investigacion.datoEsaviId= datoEsavis.id;
     create.investigacion = investigacion;
+
+    //Validar para crear
+    if (embarazada.momentoEsavi) {
+      create.pacienteEmbarazada = embarazada;
+      create.antecedenteEmbarazo = antecedenteEmbarazada;
+    }
 
     if (
       antecedenteMedico.descripcionPrincipal &&
@@ -837,12 +875,7 @@ export class Dhis2IntegratorService {
     ) {
       create.antecedenteMedico = antecedenteMedico;
     }
-    create.antecedenteEvento = antecedenteEventoAdverso;
-
-    if (embarazada.momentoEsavi) {
-      create.pacienteEmbarazada = embarazada;
-      create.antecedenteEmbarazo = antecedenteEmbarazada;
-    }
+    create.antecedenteEvento = antecedenteEventoAdverso;    
 
     return create;
   }
@@ -865,7 +898,7 @@ export class Dhis2IntegratorService {
     //   const row = data.rows[i];
     for (const row of data.rows) {
       // Create Paciente
-      const semanasEmbarazo = 42;
+      const semanasEmbarazo = 43;//= 42; //entre 1 y 43: cambio solicitado por el personal funcional.
       const paciente = new CreatePacienteDhis2Dto();
       paciente.identificacion =
         row[data.headers.findIndex((header) => header.column === 'Nro. de identificación')];
@@ -1018,7 +1051,7 @@ export class Dhis2IntegratorService {
             (header) => header.column === 'DNVE ESAVI TRK - Alergia Medicamentos',
           )
         ],
-      );
+      ).toString();
       antecedenteEventoAdverso.alergiaAlimentos = this.esValorAfirmativo(
         row[
           data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos')
@@ -1404,6 +1437,10 @@ export class Dhis2IntegratorService {
       if (antecedentePreexistencia.descripcion) {
         create.antecedentePreexistencia = antecedentePreexistencia;
       }
+
+      //investigacion.datoEsaviId= datoEsavis.id;
+      create.investigacion = investigacion;
+      
       //Validar para crear
       if (embarazada.momentoEsavi) {
         create.pacienteEmbarazada = embarazada;
