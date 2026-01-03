@@ -532,15 +532,15 @@ export class Dhis2IntegratorService {
       row[
         headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos')
       ],
-    );
+    ).toString();
     antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(
       row[
         headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Insectos')
       ],
-    );
+    ).toString();// dhis2 entrega 1 si el cuadro de check está marcado, y null si no lo está.
     antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Polvo')],
-    );
+    ).toString();
     antecedenteEventoAdverso.otrasAlergias =
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Otro Alergias')];
 
@@ -1056,15 +1056,15 @@ export class Dhis2IntegratorService {
         row[
           data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos')
         ],
-      );
+      ).toString();
       antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(
         row[
           data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Insectos')
         ],
-      );
+      ).toString();// dhis2 entrega 1 si el cuadro de check está marcado, y null si no lo está.
       antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(
         row[data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Polvo')],
-      );
+      ).toString();
       antecedenteEventoAdverso.otrasAlergias =
         row[data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Otro Alergias')];
 

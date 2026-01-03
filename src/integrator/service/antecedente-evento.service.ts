@@ -7,6 +7,7 @@ import { UpdateAntecedenteEventoDto } from '../dto/update-antecedente-evento.dto
 import { AntecedenteEvento } from '../entity/antecedente-evento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
+import { CatalogoService } from './catalogo.service';
 
 @Injectable()
 export class AntecedenteEventoService {
@@ -15,6 +16,7 @@ export class AntecedenteEventoService {
   constructor(
     @InjectRepository(AntecedenteEvento, 'POSTGRES_INTEGRATOR_DS')
     private readonly antecedenteEventoRepository: Repository<AntecedenteEvento>,
+    private readonly catalogoService: CatalogoService,
   ) {}
 
   async create(
@@ -25,12 +27,24 @@ export class AntecedenteEventoService {
       const antecedenteEvento = plainToClass(AntecedenteEvento, createDto);
       antecedenteEvento.notificacion = notificacion;
       antecedenteEvento.createdBy = 'AUTOMATICO';
+      antecedenteEvento.alergiaMedicamento = await this.catalogoService.findByDescriptionToDhis2(
+        createDto.alergiaMedicamento,
+      );
+      antecedenteEvento.alergiaAlimentos = await this.catalogoService.findByDescriptionToDhis2(
+        createDto.alergiaAlimentos,
+      );
+      antecedenteEvento.alergiaInsectos = await this.catalogoService.findByDescriptionToDhis2(
+        createDto.alergiaInsectos,
+      );
+      antecedenteEvento.alergiaPolvo = await this.catalogoService.findByDescriptionToDhis2(
+        createDto.alergiaPolvo,
+      );
       return this.antecedenteEventoRepository.save(antecedenteEvento);
     } catch (e) {
       throw e;
     } finally {
       this.logger.log(
-        `AntecedenteEvento has been created: ${JSON.stringify(createDto)}`,
+        `Antecedente Evento Adverso ha sido creado: ${JSON.stringify(createDto)}`,
       );
     }
   }
@@ -39,12 +53,24 @@ export class AntecedenteEventoService {
     uuid: string,
     updateAntecedenteEventoDto: UpdateAntecedenteEventoDto,
   ): Promise<AntecedenteEvento> {
-    const antecedenteEmbarazo = await this.findOne(uuid);
-    this.antecedenteEventoRepository.merge(
-      antecedenteEmbarazo,
-      updateAntecedenteEventoDto,
+    const antecedenteEvento = await this.findOne(uuid);
+    const updatedAlergiaMedicamento = await this.catalogoService.findByDescriptionToDhis2(
+      updateAntecedenteEventoDto.alergiaMedicamento,
     );
-    return this.antecedenteEventoRepository.save(antecedenteEmbarazo);
+    const updatedAlergiaAlimentos = await this.catalogoService.findByDescriptionToDhis2(
+      updateAntecedenteEventoDto.alergiaAlimentos,
+    );
+    const updatedAlergiaInsectos = await this.catalogoService.findByDescriptionToDhis2(
+      updateAntecedenteEventoDto.alergiaInsectos,
+    );
+    const updatedAlergiaPolvo = await this.catalogoService.findByDescriptionToDhis2(
+      updateAntecedenteEventoDto.alergiaPolvo,
+    );
+    this.antecedenteEventoRepository.merge(
+      antecedenteEvento, updatedAlergiaMedicamento, updatedAlergiaAlimentos, updatedAlergiaInsectos, updatedAlergiaPolvo,
+      //updateAntecedenteEventoDto,
+    );
+    return this.antecedenteEventoRepository.save(antecedenteEvento);
   }
 
   delete(uuid: string): Promise<AntecedenteEvento> {
