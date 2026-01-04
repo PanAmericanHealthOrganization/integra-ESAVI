@@ -45,15 +45,16 @@ export class CausalidadEsavi extends Auditoria {
 
   @Column({
     name: 'CLASIFICACION_CAUSA_ESAVI',
-    type: 'text',
+    type: 'text', //En el origen se captura como boolean pero en dhis2 se almacena como texto true=1 y false=0
     nullable: true,
-    comment: 'Clasificación de la causa del ESAVI',
+    comment: 'Variable booleana que almacena la respuesta a la pregunta: ¿Caso analizado por comité ESAVI?',
   })
-  clasificacionCausaEsavi: string;
+  clasificacionCausaEsavi: string; //Recordar que desde dhis2 ya viene el texto true=1 y false=0
 
   @Column({
     name: 'CLASIFICACION_DE_CAUSALIDAD_WHO_AEFI',
-    length: 16,
+    type: 'text',//length: 16,
+    nullable: true,
     comment: 'Clasificación de causalidad según WHO-AEFI',
   })
   clasificacionCausalidadWHOAEFI: string;
@@ -61,6 +62,7 @@ export class CausalidadEsavi extends Auditoria {
   @Column({
     name: 'CLASIFICACION_DE_CAUSALIDAD_WHO_UMC',
     length: 16,
+    nullable: true,
     comment: 'Clasificación de causalidad según WHO-UMC',
   })
   clasificacionCausalidadWHOUMC: string;
@@ -75,6 +77,7 @@ export class CausalidadEsavi extends Auditoria {
   @Column({
     name: 'CLASIFICACION_DE_CAUSALIDAD_NARANJO',
     length: 16,
+    nullable: true,
     comment: 'Clasificación de causalidad según escala de Naranjo',
   })
   clasificacionCausalidadNaranjo: string;

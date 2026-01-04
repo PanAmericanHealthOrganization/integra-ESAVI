@@ -33,6 +33,7 @@ import { Dhis2EventsService } from './dhis2-events.service';
 import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
+import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -254,6 +255,47 @@ export class Dhis2IntegratorService {
     nuevaFecha.setDate(nuevaFecha.getDate() + dias);
     return nuevaFecha;
   };
+
+  obtenerClasificacion(
+    clasificacionFinalCaso: string,
+    clasificacionFinalSubcategoria?: string
+  ): string {
+    switch (clasificacionFinalCaso) {
+      case "A. Con asociación causal congruente con la vacuna o con el proceso de vacunación":
+        switch (clasificacionFinalSubcategoria) {
+          case "A1. Evento relacionado con la vacuna o cualquiera de sus componentes":
+            return "A1 -- Evento relacionado con la vacuna o cualquiera de sus componentes";
+          case "A2. Evento relacionado con una desviación de calidad de la vacuna":
+            return "A2 -- Evento relacionado con una desviación de calidad del producto biológico o la vacuna";
+          case "A3. Evento relacionado con un error programático":
+            return "A3 -- Evento relacionado con un error programático";
+          case "A4 -- Evento por estrés que tuvo lugar inmediatamente antes, durante o inmediatamente después del proceso de vacunación":
+            return "A4 -- Evento por estrés que tuvo lugar inmediatamente antes, durante o inmediatamente después del proceso de vacunación";
+          default:
+            return "Clasificación A -- Subcategoría no reconocida";
+        }
+  
+      case "B. Indeterminado":
+        switch (clasificacionFinalSubcategoria) {
+          case "B1. La relación temporal es congruente, pero no hay suficiente evidencia definitiva para asignar la causalidad a la vacuna":
+            return "B1 -- La relación temporal es congruente, pero no hay evidencia definitiva suficiente sobre una relación causal con la vacuna (posible señal)";
+          case "B2. Factores determinantes para la clasificación muestran tendencias conflictivas a favor y en contra de una asociación causal con la vacunación":
+            return "B2 -- Factores determinantes muestran tendencias conflictivas a favor y en contra de una asociación causal con la vacunación";
+          default:
+            return "Clasificación B -- Subcategoría no reconocida";
+        }
+  
+      case "C. Sin asociación causal congruente con la vacuna o la vacunación (evento coincidente)":
+        return "C -- Causa coincidente";
+  
+      case "D. No clasificable":
+        return "D -- No clasificable";
+  
+      default:
+        return "Clasificación no reconocida";
+    }
+  }
+  
 
   /**
    * Procesa registros con manejo de duplicados
@@ -562,7 +604,48 @@ export class Dhis2IntegratorService {
     );
     antecedentePreexistencia.codigoEsaviCIE10 = antecedentePrevio.codigo;
     antecedentePreexistencia.descripcion = antecedentePrevio.descripcion;
-
+    // Create Causalidad Esavi
+    const causalidadEsavi = new CreateCausalidadEsaviDto();
+    causalidadEsavi.clasificacionCausaEsavi = 
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Caso analizado por comité ESAVI?',
+        )
+      ];
+    //PROCESO para determinar una clasificación de causalidad WHO-AEFI, de todas las 8 posibles combinaciones.
+    if(causalidadEsavi.clasificacionCausaEsavi){
+      const clasificacionFinalCaso =
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              'DNVE ESAVI TRK - Clasificación final del caso',
+          )
+        ];
+      let clasificacionFinalSubcategoria ='';
+      if (clasificacionFinalCaso === 'A. Con asociación causal congruente con la vacuna o con el proceso de vacunación' ){
+        clasificacionFinalSubcategoria = 
+          row[
+            headers.findIndex(
+              (header) =>
+                header.column ===
+                'DNVE ESAVI TRK - Clasificación final del caso A',
+            )
+          ];
+      } else if(clasificacionFinalCaso === 'B. Indeterminado'){
+        clasificacionFinalSubcategoria = 
+          row[
+            headers.findIndex(
+              (header) =>
+                header.column ===
+                'DNVE ESAVI TRK - Clasificación final del caso B',
+            )
+          ];
+      } else {
+        clasificacionFinalSubcategoria = '';
+      }
+      causalidadEsavi.clasificacionCausalidadWHOAEFI = this.obtenerClasificacion(clasificacionFinalCaso, clasificacionFinalSubcategoria);
+    }
     // Create Gravedad
     const grave = new CreateGravedadEsaviDto();
     grave.tipo = '1';//'GRAVE';
@@ -882,7 +965,11 @@ export class Dhis2IntegratorService {
     ) {
       create.antecedenteMedico = antecedenteMedico;
     }
-    create.antecedenteEvento = antecedenteEventoAdverso;    
+    create.antecedenteEvento = antecedenteEventoAdverso;
+    
+    if (causalidadEsavi) {
+      create.causalidadEsavi = causalidadEsavi;
+    }
 
     return create;
   }
