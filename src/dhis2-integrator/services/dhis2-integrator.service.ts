@@ -479,6 +479,13 @@ export class Dhis2IntegratorService {
 
     // Create Antecedente Medico: TR_ANTECEDENTES_MEDICO
     const antecedenteMedico = new CreateAntecedenteMedicoDto();
+    antecedenteMedico.ensayoClinicoCovid19 = 
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - ¿Estaba participando o participa la persona vacunada en un ensayo clínico de vacunas contra la COVID-19?',
+        )
+      ]
+    ;// En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL.
     const comorbilidadPrincipal = this.separarCodigoYDescripcion(
       row[
         headers.findIndex(

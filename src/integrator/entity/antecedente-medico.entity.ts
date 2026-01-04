@@ -6,11 +6,11 @@ import * as moment from 'moment/moment';
 export class AntecedenteMedico extends Antecedente {
   @Column({
     name: 'ENSAYO_CLINICO_COVID19',
-    type: 'integer',
+    type: 'varchar',
     nullable: true,
-    comment: 'Indica si el paciente participó en ensayos clínicos de COVID-19',
+    comment: 'Indica si el paciente participó en ensayos clínicos de COVID-19. En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL.',
   })
-  ensayoClinicoCovid19: number;
+  ensayoClinicoCovid19: string; //En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL.
 
   @Column({
     name: 'COMORBILIDAD_PRINCIPAL',

@@ -1,5 +1,5 @@
 export class CreateAntecedenteMedicoDto {
-  ensayoClinicoCovid19: number;
+  ensayoClinicoCovid19: string;
   descripcionPrincipal : string;
   descripcionDos : string;
   descripcionTres : string;
