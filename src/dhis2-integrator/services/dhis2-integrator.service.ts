@@ -776,10 +776,10 @@ export class Dhis2IntegratorService {
           (header) => header.column === 'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
         )
       ];
-    embarazada.momentoVacuna = embarazadaMomentoVacuna ? true : false;
-    embarazada.momentoEsavi = this.esValorAfirmativo(
-      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')],
-    );
+    embarazada.momentoVacuna = embarazadaMomentoVacuna ? '1' : '0';//true : false;
+    embarazada.momentoEsavi = //this.esValorAfirmativo(
+      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')]//,
+    ;//).toString();
 
     // Antecedentes embarazo
     const antecedenteEmbarazada = new CreateAntecedenteEmbarazoDto();
@@ -849,6 +849,12 @@ export class Dhis2IntegratorService {
           headers.findIndex(
             (header) =>
               header.column === `DNVE ESAVI TRK - Nombre del diluyente usado vacuna ${i}`,
+          )
+        ];
+      datoVacuna.rolVacuna =
+        row[
+          headers.findIndex(
+            (header) => header.column === `DNVE ESAVI TRK - Es sospechosa vacuna ${i}`,
           )
         ];
       datoVacuna.inicioAdministracion = this.formatoFecha(
@@ -1395,10 +1401,10 @@ export class Dhis2IntegratorService {
             (header) => header.column === 'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
           )
         ];
-      embarazada.momentoVacuna = embarazadaMomentoVacuna ? true : false;
-      embarazada.momentoEsavi = this.esValorAfirmativo(
-        row[data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')],
-      );
+      embarazada.momentoVacuna = embarazadaMomentoVacuna ? '1' : '0';//true : false;
+      embarazada.momentoEsavi = //this.esValorAfirmativo(
+        row[data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')]//,
+      ;//).toString();
 
       // Antecedentes embarazo
       const antecedenteEmbarazada = new CreateAntecedenteEmbarazoDto();

@@ -845,7 +845,19 @@ export class SeedService {
           tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Tipo de dato booleano Sí No Desconocido'),
         },
 
-        //----Homologación de roles de medicamentos y vacunas
+        //----Homologación de roles de medicamentos y vacunas //Falta cubrir los valores NULL. El valor false='0', solo es para el caso de DHIS2. Para las opciones de VigiFlow, ya está definida su propia regla de transformación, en donde la opción "SOSPECHOSO=1" coincide con "true=1" de DHIS2.
+        {
+          vigiflow: '1', //para no implementar más control de flujo en el servicio, se reutiliza el método de VigiFlow también para DHIS2.
+          dhis2: '1',
+          homologada: '1',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
+        {
+          vigiflow: '0', //para no implementar más control de flujo en el servicio, se reutiliza el método de VigiFlow también para DHIS2.
+          dhis2: '0',
+          homologada: '0',
+          tipoCatalogo: tiposCatalogo.find((t) => t.descripcion === 'Rol del medicamento o vacuna'),
+        },
         {
           vigiflow: 'SOSPECHOSO',
           dhis2: 'SOSPECHOSO',

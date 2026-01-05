@@ -47,7 +47,7 @@ export class DatoVacunaService {
         
         if (rolVacuna) {
           existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
-        }
+        } //para no implementar más control de flujo en el servicio, se reutiliza el método de VigiFlow también para DHIS2.
         
         Object.assign(existingDatoVacuna, otherFields);
         return this.datoVacunaRepository.save(existingDatoVacuna);
