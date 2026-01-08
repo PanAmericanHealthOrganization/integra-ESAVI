@@ -504,8 +504,8 @@ export class VigiflowIntegradorService {
         for(const notificacion of notificacionList){
           // Buscar datoVacuna existente y actualizarlo
           const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
-          const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
-          if (datoVacunaList.length > 0 && datoVacunaExistente.id && validacionCdgAtcVacunas) {
+          //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
+          if (validacionCdgAtcVacunas) {
             let updateDatoVacuna = new UpdateDatoVacunaDto();
             updateDatoVacuna.nombreVacuna = reg['D'];
             updateDatoVacuna.accionTomada = reg['M'];
@@ -565,8 +565,8 @@ export class VigiflowIntegradorService {
                   ingredient: item.ingredient,
                 }));*/
                 updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
-
               }
+
             } else {
               //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
               /*const drugNameFromCsv = buscarWHODrugNameEnCatalogoCsv(drugName);
@@ -579,8 +579,16 @@ export class VigiflowIntegradorService {
               updateDatoVacuna.activeIngredientJson = [];
               }*/
             }
+            if(datoVacunaList.length > 0){
+              //actualizar el datoVacuna 'm í n i m o' existente, asociado a la notificación. Mínimo, porque no todas las columnas se encuentran en esta hoja Excel.
+              //y fue creado inicialmente con los datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones asociadas al paciente.
 
-            await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
+              await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
+            } else {
+              //crear un registro completamente nuevo de DatoVacuna asociado a la notificación, utilizando el método create del servicio datoVacunaService.
+              await this.datoVacunaService.create(notificacion, updateDatoVacuna); //Existe otra forma, utilizando la actualización propia que tiene este método create.
+              
+            }
             break; // Salir del bucle una vez que se ha actualizado el datoVacuna
           }
         }
