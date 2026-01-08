@@ -943,7 +943,7 @@ export class SeedService {
       ];
 
       for (const grupo of gruposEtarios) {
-        const existing = await this.grupoEtarioRepository.findOne({
+        const existing = await this.grupoEtarioRepository.findOne({ // findOne devuelve todo el objeto o "registro con todas sus columnas" que coincide con la condición de where.
           where: { descripcion: grupo.descripcion },
         });
 

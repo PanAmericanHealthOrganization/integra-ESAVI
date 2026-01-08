@@ -71,7 +71,7 @@ export class ActiveIngredientsService {
         drug: { id: drugId }, // Compara el id de la entidad relacionada 'drug'
       },
     });
-    console.log(r);
+    //console.log(r); //Temporalmente se comenta el log que muestra los ingredientes activos.
     return r;
   }
   public async getIngredientTranslation(activeIngredientId: string, languageCode: string): Promise<string | null> {

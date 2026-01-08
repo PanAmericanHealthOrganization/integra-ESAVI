@@ -17,7 +17,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    VacunacionIntegratorModule,
+    //VacunacionIntegratorModule, // Temporarily disabled. Enable when update the ORACLE DATABASE credentials.
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,

@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import * as fs from 'fs/promises';
+import * as fs from 'fs/promises';import * as fsappend from 'fs';
 import * as moment from 'moment/moment';
 import { throwError } from 'rxjs';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
@@ -307,7 +307,7 @@ export class VigiflowIntegradorService {
 
       //Paciente Embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
-      embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si');
+      embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si')?'1':'0';
 
       //Complete the dto
       let create = new CreateCompleteDto();
@@ -503,10 +503,10 @@ export class VigiflowIntegradorService {
         const validacionCdgAtcVacunas = reg['G'] && this.validarCodigoAtcVacuna(reg['G'].toString());
         for(const notificacion of notificacionList){
           // Buscar datoVacuna existente y actualizarlo
-          const datoVacunaList = await this.datoVacunaService.findByNotificacionId(notificacion.id);
+          const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
           const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
-          if (datoVacunaExistente && datoVacunaExistente.id && validacionCdgAtcVacunas) {
-            const updateDatoVacuna = new UpdateDatoVacunaDto();
+          if (datoVacunaList.length > 0 && datoVacunaExistente.id && validacionCdgAtcVacunas) {
+            let updateDatoVacuna = new UpdateDatoVacunaDto();
             updateDatoVacuna.nombreVacuna = reg['D'];
             updateDatoVacuna.accionTomada = reg['M'];
             updateDatoVacuna.dosis = reg['S'];
@@ -522,15 +522,19 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.paisAutorizacion = reg['J'];
             updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
             updateDatoVacuna.indicacionMeddra = reg['Q'];
-            updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'];
+            updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'] && reg['E'] ? this.limpiarNombrePatenteWHODrug(reg['E']) : reg['E'];
             updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
             updateDatoVacuna.codigoAtc = reg['G'];
             updateDatoVacuna.rolVacuna = reg['C'];
 
             const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
-            const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
+            const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
+            fsappend.appendFileSync('C:/reposGit/20251231-gl-gh-api/20260106-salidaDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
             if (whodrug.length > 0) {
               updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+              // escribir txt de log con los whodrug encontrados //"C:\reposGit\20251231-gl-gh-api\20260106-salidaDrugName.txt"
+              //fsappend.appendFileSync('C:/reposGit/20251231-gl-gh-api/20260106-salidaDrugName.txt', `${whodrug.length}|${JSON.stringify(whodrug)}\n`);
+
               const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
               updateDatoVacuna.mahholdersJson = mah.map((item) => ({
                 name: item.name,
@@ -549,20 +553,31 @@ export class VigiflowIntegradorService {
                     const translation = await this.activeIngredentService.getIngredientTranslation(
                       ingredient.id,
                       'es-ES'
-                    ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data.
+                    ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data. //Es probable que no sea necesario, porque, desde VigiFlow ya vienen traducidos varios ingredientes activos.
 
                     return { ingredient: translation };//|| ingredient.ingredient };
                   })
                 );
 
                 // Resultado final, JSON de traducciones de ingredientes activos
-                console.log(JSON.stringify(translatedIngredients, null, 2));
+                //-----------console.log(JSON.stringify(translatedIngredients, null, 2));
                 /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
                   ingredient: item.ingredient,
                 }));*/
                 updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
 
               }
+            } else {
+              //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
+              /*const drugNameFromCsv = buscarWHODrugNameEnCatalogoCsv(drugName);
+              if( drugNameFromCsv ){
+                updateDatoVacuna.nombreVacPatenteWHODrug = drugNameFromCsv; //El alcance sería hasta aquí, porque no se tiene el ID para buscar los demás datos relacionados.
+                //updateDatoVacuna.drugCode = drugCodeFromCsv;
+              } else {
+              updateDatoVacuna.drugCode = null;
+              updateDatoVacuna.mahholdersJson = [];
+              updateDatoVacuna.activeIngredientJson = [];
+              }*/
             }
 
             await this.datoVacunaService.update(datoVacunaExistente.id, updateDatoVacuna);
@@ -814,6 +829,31 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
     // Retorna true solo si ambas condiciones se cumplen
     return empiezaConPrefijo && longitudValida;
   }
+
+  /**
+ * Limpia una cadena de texto según las reglas:
+ * - Elimina espacios al inicio y al final
+ * - Reemplaza comas por punto y coma
+ * - Reemplaza saltos de línea internos por punto y coma
+ * - Elimina saltos de línea al final de la cadena
+ * - Elimina espacios antes y después del punto y coma
+ */
+private limpiarNombrePatenteWHODrug(input: string): string {
+  if (!input) return '';
+
+  return input
+    .trim() // elimina espacios al inicio y al final
+    // reemplaza saltos de línea internos por ;
+    .replace(/[\r\n]+(?!$)/g, ';')
+    // elimina saltos de línea al final (si los hay)
+    .replace(/[\r\n]+$/g, '')
+    // reemplaza comas por punto y coma
+    .replace(/,/g, ';')
+    // elimina espacios alrededor de ;
+    .replace(/\s*;\s*/g, ';');
+}
+
+
 
   formatoInteger = (valor: string) => {
     let resultado = 0;
