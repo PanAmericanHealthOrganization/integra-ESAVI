@@ -521,7 +521,7 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
             updateDatoVacuna.paisAutorizacion = reg['J'];
             updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
-            updateDatoVacuna.indicacionMeddra = reg['Q'];
+            updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
             updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'] && reg['E'] ? this.limpiarNombrePatenteWHODrug(reg['E']) : reg['E'];
             updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
             updateDatoVacuna.codigoAtc = reg['G'];
@@ -529,12 +529,11 @@ export class VigiflowIntegradorService {
 
             const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
             const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
-            fsappend.appendFileSync('C:/reposGit/20251231-gl-gh-api/20260106-salidaDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
+            // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
+            //fsappend.appendFileSync('C:/logsNumElementosDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
             if (whodrug.length > 0) {
               updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
-              // escribir txt de log con los whodrug encontrados //"C:\reposGit\20251231-gl-gh-api\20260106-salidaDrugName.txt"
-              //fsappend.appendFileSync('C:/reposGit/20251231-gl-gh-api/20260106-salidaDrugName.txt', `${whodrug.length}|${JSON.stringify(whodrug)}\n`);
-
+              
               const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
               updateDatoVacuna.mahholdersJson = mah.map((item) => ({
                 name: item.name,
@@ -801,8 +800,8 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
     return null;
   }
   analizarCadenaFecha(dateStr: string): Date | null {
-    if (!/^\d{8}$/.test(dateStr)) {
-       console.log(`Formato inválido, se espera YYYYMMDD: ${dateStr}`);
+    if (!/^\d{8}$/.test(dateStr)) {// Verifica que la cadena tenga exactamente 8 dígitos
+       //console.log(`La fecha: "${dateStr}" no es válida, se esperan 8 dígitos.`);
        return null;
       } 
       const year = Number(dateStr.slice(0, 4)); 
@@ -810,7 +809,7 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       const day = Number(dateStr.slice(6, 8));
       if (month < 1 || month > 12 || day < 1 || day > 31) {
         //throw new Error("Fecha inválida");
-        console.log(`Texto inválido, se espera este formato YYYYMMDD: ${dateStr}`);
+        //console.log(`Fecha: "${dateStr}" inválida", se espera este formato YYYYMMDD`);
         return null;
       }
       //const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0

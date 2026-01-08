@@ -78,6 +78,40 @@ export class Dhis2IntegratorService {
     return resultado;
   };
 
+  private transformarDosis(dosisTexto: string): number {
+    // Diccionario de mapeo
+    const mapaDosis: Record<string, number> = {      
+      'DOSIS ÚNICA': 0,
+      'PRIMERA DOSIS': 1,
+      'SEGUNDA DOSIS': 2,
+      'TERCERA DOSIS': 3,
+      'CUARTA DOSIS': 4,
+      'QUINTA DOSIS': 5,
+      'PRIMER REFUERZO': 6,      
+      'SEGUNDO REFUERZO': 7,
+      'REFUERZO ANUAL': 8,
+    };  
+
+    if (dosisTexto) {
+      // Normalizamos el texto
+      const dosis = dosisTexto.trim().toUpperCase();
+  
+      // Retornamos el valor si existe en el diccionario
+      if (mapaDosis[dosis] !== undefined) {
+        return mapaDosis[dosis];
+      } else {      
+        //--------throw new Error(`Valor de dosis no reconocido: ${dosisTexto}`);
+        //console.log(`Valor de dosis no reconocido: "${dosisTexto}". Se asignará null.`);
+        return null; // return null si no se reconoce el valor
+      }
+    } else {
+      //console.log(`Valor de dosis vacío: "${dosisTexto}". Se asignará null.`);
+      return null; // return null si no se reconoce el valor
+    }
+    
+  }
+  
+
   async createInBulk(
     fechaInicio: Date,
     fechaFin: Date,
@@ -812,7 +846,14 @@ export class Dhis2IntegratorService {
           headers.findIndex(
             (header) => header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`,
           )
-        ];
+        ];        
+      datoVacuna.numeroDosisVacuna = this.transformarDosis(
+        row[
+          headers.findIndex(
+            (header) => header.column === `DNVE ESAVI TRK - Dosis de la vacuna ${i}`,
+          )
+        ],
+      );
       datoVacuna.nombreFabricante =
         row[
           headers.findIndex(

@@ -37,7 +37,7 @@ export class NotificacionVigiflowService {
               createDto.residenciaPaciente.provincia,
             );
           } catch (error) {
-            console.log('Provincia no encontrada');
+            console.log(`Provincia "${createDto.residenciaPaciente.provincia}" paciente vf no encontrada`);
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.canton)) {
@@ -64,7 +64,7 @@ export class NotificacionVigiflowService {
               createDto.residenciaNotificador.provincia,
             );
           } catch (error) {
-            console.log(`Provincia "${createDto.residenciaNotificador.provincia}" notificador no encontrada `);
+            console.log(`Provincia "${createDto.residenciaNotificador.provincia}" notificador no encontrada`);
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)) {
