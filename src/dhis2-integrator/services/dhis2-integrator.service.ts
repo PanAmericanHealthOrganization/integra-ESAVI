@@ -837,10 +837,20 @@ export class Dhis2IntegratorService {
           )
         ],
       );
+      datoVacunacion.fechaVacunacion = this.formatoFecha(
+        row[
+           headers.findIndex(
+            (header) =>
+              header.column ===
+              `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`,
+          )
+        ],
+      );
 
       if(
         datoVacunacion.nombreVacunatorio ||
-        datoVacunacion.fechaReconstitucion
+        datoVacunacion.fechaReconstitucion ||
+        datoVacunacion.fechaVacunacion
       ){
         datoVacunaciones.push(datoVacunacion);
       }
