@@ -361,7 +361,7 @@ export class VigiflowIntegradorService {
           updateNotificacion.comentario = reg['AD'];
           // updateNotificacion.profesionNotificadorParam = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);;
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
-          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones);
+          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones); //TODO: En dhis2 y figiflow ya está integrado con FK, solo está pendiente la equivalencia de valores numéricos.
           updateNotificacion.tipoReporte = reg['N'];
           updateNotificacion.organizacionEmisor = reg['D'];
           updateNotificacion.identificacionNotificador = reg['R'];

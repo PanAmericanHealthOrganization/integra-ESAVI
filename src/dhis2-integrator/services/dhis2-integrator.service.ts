@@ -461,6 +461,7 @@ export class Dhis2IntegratorService {
 
     // Create Notificacion
     const notificacion = new CreateNotificacionDto();
+    notificacion.medioNotificacion = 'Medio electrónico DHIS2';	
     notificacion.fechaNacimiento = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'Fecha de nacimiento')],
     );
@@ -510,8 +511,14 @@ export class Dhis2IntegratorService {
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Parroquia residencia')];
     notificacion.residenciaPaciente = ubicacionResidencia;
 
-    // Profesion quien notifica. Si es nulo, asignar 'DESCONOCIDO'
 
+    notificacion.nombreNotificador = 
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Nombre de quien notifica',
+        )
+      ],
+    // Profesion quien notifica. Si es nulo, asignar 'DESCONOCIDO'
     notificacion.profesionNotificadorParam = this.revisarValorNulo(
       row[
         headers.findIndex(

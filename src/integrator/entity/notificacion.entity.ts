@@ -147,9 +147,9 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'TITULO_NOTIFICADOR',
     nullable: true,
-    comment: 'Título profesional del notificador',
+    comment: 'Título profesional del notificador. Campo exclusivo de VigiFlow.',
   })
-  tituloNotificador: string;
+  tituloNotificador: string; //El Título aparece únicamente en VigiFlow. La columna que sí tiene en común con DHIS2 es la Profesión, y está integrada mediante FK.
 
   /**
    *
