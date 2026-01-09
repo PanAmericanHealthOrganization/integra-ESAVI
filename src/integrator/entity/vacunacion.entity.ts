@@ -45,7 +45,7 @@ export class Vacunacion extends Auditoria implements IVacunacion {
   @Column({
     name: 'FECHA_RECONSTITUCION_VACUNA',
     nullable: true,
-    comment: 'Fecha de reconstitución de la vacuna',
+    comment: 'Fecha de reconstitución o dilución de la vacuna',
   })
   fechaReconstitucion: Date;
 
@@ -55,7 +55,7 @@ export class Vacunacion extends Auditoria implements IVacunacion {
   @Column({
     name: 'HORA_RECONSTITUCION_VACUNA',
     nullable: true,
-    comment: 'Hora de reconstitución de la vacuna',
+    comment: 'Hora de reconstitución o dilución de la vacuna',
   })
   horaReconstitucion: Date;
 

@@ -25,7 +25,7 @@ export class DatoVacunacionService {
    * @param createDto
    * @returns
    */
-  public async create(notificacion: Notificacion, createDto: CreateDatoVacunacionDto): Promise<DatoVacunacion> {
+  public async create(notificacion: Notificacion, createDto: CreateDatoVacunacionDto | CreateDatoVacunacionDto[]): Promise<DatoVacunacion | DatoVacunacion[]> {
     try {
       // Verificar si ya existe un DatoVacunacion con la misma notificación
       const existingDatoVacunacion = await this.datoVacunacionRepository.findOne({

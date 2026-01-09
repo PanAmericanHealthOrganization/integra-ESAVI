@@ -34,6 +34,7 @@ import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
 import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
+import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -799,15 +800,51 @@ export class Dhis2IntegratorService {
       }
     }
 
-    // Datos Lugar vacunacion
-    const datoLugarVacuna = new CreateDatoVacunacionDto();
-    datoLugarVacuna.nombreVacunatorio =
-      row[
-        headers.findIndex(
-          (header) =>
-            header.column === 'DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1',
-        )
+    // Dato V-a-c-u-n-a-c-i-ó-n------------------------------------------------------
+    const numeroAntecedenteVacunal = 5;
+    const datoVacunaciones: CreateDatoVacunacionDto[] = [];
+
+    for (let i = 1; i <= numeroAntecedenteVacunal; i++) {
+      // TODO: colocar auditoria correcta
+            const auditoria: IAuditoria = {
+              createdAt: new Date(),
+              createdBy: 'System',
+              updatedAt: undefined,
+              updatedBy: 'System',
+              deletedAt: undefined,
+              deletedBy: 'System',
+              isEnabled: true,
+              isActive: true,
+            };
+      //const datoVacuna = new CreateDatoVacunaDto();
+      // Datos Lugar vacunacion
+      let datoVacunacion = new CreateDatoVacunacionDto();
+      datoVacunacion = {...datoVacunacion, ...auditoria};
+      datoVacunacion.nombreVacunatorio =
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column ===
+              `DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna ${i}`,
+          )
       ];
+      datoVacunacion.fechaReconstitucion = this.formatoFecha(
+        row[
+           headers.findIndex(
+            (header) =>
+              header.column ===
+              `DNVE ESAVI TRK - Fecha de la dilución vacuna ${i}`,
+          )
+        ],
+      );
+
+      if(
+        datoVacunacion.nombreVacunatorio ||
+        datoVacunacion.fechaReconstitucion
+      ){
+        datoVacunaciones.push(datoVacunacion);
+      }
+    }    
 
     // Paciente embarazada
     const embarazada = new CreatePacienteEmbarazadaDto();
@@ -997,6 +1034,7 @@ export class Dhis2IntegratorService {
     create.pacienteDhis2 = paciente;
     create.notificacion = notificacion;
     create.datoEsavi = datoEsavis;
+    create.datoVacunacion = datoVacunaciones;
     create.datoVacuna = datoVacunas;
     create.gravedadEsavi = grave;
     create.desenlaceEsavi = desenlaceEsavi;
@@ -1430,16 +1468,40 @@ export class Dhis2IntegratorService {
 
       console.log('DtaoooEsaviiiiii:::', datoEsavis);
 
-      // Datos Lugar vacunacion
-      const datoLugarVacuna = new CreateDatoVacunacionDto();
-      datoLugarVacuna.nombreVacunatorio =
-        row[
-          data.headers.findIndex(
-            (header) =>
-              header.column ===
-              'DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1',
-          )
+      
+      // Dato V-a-c-u-n-a-c-i-ó-n------------------------------------------------------
+      const numeroAntecedenteVacunal = 5;
+      const datoVacunaciones: CreateDatoVacunacionDto[] = [];
+
+      for (let i = 1; i <= numeroAntecedenteVacunal; i++) {
+        //const datoVacuna = new CreateDatoVacunaDto();
+        // Datos Lugar vacunacion
+        const datoVacunacion = new CreateDatoVacunacionDto();
+        datoVacunacion.nombreVacunatorio =
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna ${i}`,
+            )
         ];
+        datoVacunacion.fechaReconstitucion = this.formatoFecha(
+          row[
+            data.headers.findIndex(
+              (header) =>
+                header.column ===
+                `DNVE ESAVI TRK - Fecha de la dilución vacuna ${i}`,
+            )
+          ],
+        );
+
+        if(
+          datoVacunacion.nombreVacunatorio ||
+          datoVacunacion.fechaReconstitucion
+        ){
+          datoVacunaciones.push(datoVacunacion);
+        }
+      }
 
       // Paciente embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
