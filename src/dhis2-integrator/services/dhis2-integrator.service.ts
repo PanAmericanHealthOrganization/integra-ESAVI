@@ -772,7 +772,7 @@ export class Dhis2IntegratorService {
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Fecha fallecimiento')],
     );
 
-    // DatoEsavi
+    // DatoEsavi -- Diagnóstico inicial
     const numeroIncidencias = 3;
     const datoEsavis: CreateDatoEsaviDto[] = [];
 
@@ -794,11 +794,59 @@ export class Dhis2IntegratorService {
             )
           ]?.split(' ')[0],
         );
-        datoEsaviInicial.descripcion = `Diagnostico inicial ${i}`;
+        datoEsaviInicial.descripcion = `Diagnostico inicial DHIS2 ${i}`;
         datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
         datoEsavis.push(datoEsaviInicial);
       }
     }
+
+    // DatoEsavi -- Sintomatología 1-5 ------------------------------------------------------
+    const numeroSintomatologias = 5;
+    //const datoEsavisSint: CreateDatoEsaviDto[] = [];
+
+    for (let i = 1; i <= numeroSintomatologias; i++) {
+      const setOpciones = 
+        row[
+          headers.findIndex(
+            (header) => header.column === `DNVE ESAVI TRK - Sintomatología ${i}`,
+          )
+        ];
+      if (setOpciones) {
+        const datoEsaviSintomatologiai = new CreateDatoEsaviDto();
+        datoEsaviSintomatologiai.nombreReportado = setOpciones;
+        datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
+          row[
+            headers.findIndex(
+              (h) => h.column === 'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
+            )
+          ]?.split(' ')[0],
+        );
+        datoEsaviSintomatologiai.descripcion = `Sintomatología DHIS2 ${i}`;
+        datoEsaviSintomatologiai.codigoCaso = notificacion.codigoDhis2Evento;
+        datoEsavis.push(datoEsaviSintomatologiai); //agregar al array principal
+      }
+    }
+    // DatoEsavi -- Sintomatología    O t r o   ---------
+    const setOpcionesOtro = 
+        row[
+          headers.findIndex(
+            (header) => header.column === `DNVE ESAVI TRK - Sintomatología Otro`,
+          )
+        ];
+      if (setOpcionesOtro) {
+        const datoEsaviSintomatologiaOtro = new CreateDatoEsaviDto();
+        datoEsaviSintomatologiaOtro.nombreReportado = setOpcionesOtro;
+        datoEsaviSintomatologiaOtro.fechaEsavi = this.formatoFecha(
+          row[
+            headers.findIndex(
+              (h) => h.column === 'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
+            )
+          ]?.split(' ')[0],
+        );
+        datoEsaviSintomatologiaOtro.descripcion = `Sintomatología Otro DHIS2`;
+        datoEsaviSintomatologiaOtro.codigoCaso = notificacion.codigoDhis2Evento;
+        datoEsavis.push(datoEsaviSintomatologiaOtro);
+      }
 
     // Dato V-a-c-u-n-a-c-i-ó-n------------------------------------------------------
     const numeroAntecedenteVacunal = 5;

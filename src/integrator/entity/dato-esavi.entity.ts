@@ -34,7 +34,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Nombre del evento supuestamente atribuido a la vacunación o inmunización',
   })
-  nombre: string;
+  nombre: string; //Aparece de la definición según VigiFlow, pero, para llevar a cabo la integración será reutilizado para DHIS2
   /**
    *
    */
@@ -43,7 +43,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Descripción detallada de la complicación o evento adverso',
   })
-  descripcion: string;
+  descripcion: string; //Este campo permite diferenciar el nombre del ESAVI y su descripción: Diagnóstico inicial DHIS2, Diagnóstico final DHIS2, Sintomatología Otro DHIS2, 
   /**
    *
    */
@@ -52,7 +52,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Nombre del ESAVI tal como fue reportado inicialmente',
   })
-  nombreReportado: string;
+  nombreReportado: string; //Aparece de la definición según VigiFlow, pero, para llevar a cabo la integración será reutilizado para DHIS2
   /**
    *
    */
@@ -168,7 +168,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Código del ESAVI según clasificación CIE-10',
   })
-  codigoEsaviCie10: string;
+  codigoEsaviCie10: string; //Variable propia de DHIS2, y es reutilizada por la variable "Sintomatología DHIS2". Las variables "Diagnóstico inicial DHIS2" y "Diagnóstico final DHIS2" tienen cada una su propio campo en esta entidad.
 
   @Column({
     name: 'FECHA_ESAVI',
