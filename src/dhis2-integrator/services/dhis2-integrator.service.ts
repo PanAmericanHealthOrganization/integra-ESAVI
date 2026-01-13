@@ -784,21 +784,70 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      if (dato.descripcion && dato.codigo) {
-        const datoEsaviInicial = new CreateDatoEsaviDto();
-        datoEsaviInicial.nombre = dato.descripcion;
-        datoEsaviInicial.fechaEsavi = this.formatoFecha(
+      const fechaInicio =
           row[
             headers.findIndex(
               (h) => h.column === 'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
             )
-          ]?.split(' ')[0],
-        );
-        datoEsaviInicial.descripcion = `Diagnostico inicial DHIS2 ${i}`;
+          ]?.split(' ')[0];
+        const horaInicio =
+          row[
+            headers.findIndex(
+              (h) => h.column === 'DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI',
+            )
+          ];
+        const fechaEsavi =
+          fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
+
+        // Verifica que nombre y código no estén vacíos
+      if (dato.descripcion && dato.codigo) {
+        const datoEsaviInicial = new CreateDatoEsaviDto();
+        datoEsaviInicial.nombre = dato.descripcion;
+        datoEsaviInicial.fechaEsavi = fechaEsavi;
+        datoEsaviInicial.descripcion = `Diagnóstico inicial DHIS2 ${i}`;
         datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
         datoEsavis.push(datoEsaviInicial);
       }
     }
+
+    // DatoEsavi -- Diagnóstico final
+    for (let i = 1; i <= numeroIncidencias; i++) {
+      const dato = this.separarCodigoYDescripcion(
+        row[
+          headers.findIndex(
+            (header) => header.column === `DNVE ESAVI TRK - Diagnostico final ${i}`,
+          )
+        ],
+      );
+      const fechaInicio =
+        row[
+          headers.findIndex(
+            (h) => h.column === 'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI',
+          )
+        ]?.split(' ')[0];
+      const horaInicio =
+        row[
+          headers.findIndex(
+            (h) => h.column === 'DNVE ESAVI TRK - Hora de Inicio de síntomas del ESAVI',
+          )
+        ];
+      const fechaEsavi =
+        fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
+
+      // Verifica que nombre y código no estén vacíos
+      if (dato.descripcion && dato.codigo) {
+        const datoEsavi = new CreateDatoEsaviDto();
+        datoEsavi.nombre = dato.descripcion;
+        // datoEsavi.codigoEsaviCie10 = dato.codigo;
+        datoEsavi.fechaEsavi = fechaEsavi;
+        datoEsavi.descripcion = `Diagnóstico final DHIS2 ${i}`;
+        datoEsavi.codigoCaso = notificacion.codigoDhis2Evento;
+
+        datoEsavis.push(datoEsavi);
+      }
+    }
+    //console.log('DtaoooEsaviiiiii:::', datoEsavis);
+
 
     // DatoEsavi -- Sintomatología 1-5 ------------------------------------------------------
     const numeroSintomatologias = 5;
