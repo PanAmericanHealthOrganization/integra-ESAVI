@@ -284,6 +284,9 @@ export class Dhis2IntegratorService {
   esValorAfirmativo(valor: string): boolean {
     return valor === '1';
   }
+  transformarTipoSoloSiDhis2(tipoTexto: string): string {
+    return ( tipoTexto === '1' )? '1' : '0' ;
+  }
 
   ajustarFecha = (fecha, dias) => {
     const nuevaFecha = new Date(fecha);
@@ -743,7 +746,7 @@ export class Dhis2IntegratorService {
         )
       ],
     );
-    grave.parteEventosPreocupacion = this.esValorAfirmativo(
+    grave.parteEventosPreocupacion = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -752,7 +755,7 @@ export class Dhis2IntegratorService {
         )
       ],
     );
-    grave.nuevoEventos = this.esValorAfirmativo(
+    grave.sonEventosNuevos = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -760,6 +763,15 @@ export class Dhis2IntegratorService {
         )
       ],
     );
+    if(grave.sonEventosNuevos){
+      grave.descripcionEventoNuevo = 
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Evento nuevo - notificación',
+          )
+        ];
+    }
     grave.condicionEgreso =
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Condición de egreso')];
 
@@ -773,7 +785,7 @@ export class Dhis2IntegratorService {
     );
     if(grave.muerteFetal){
       desenlaceEsavi.fechaNotififacionMuerteFetal =
-        desenlaceEsavi.fechaMuerte ? desenlaceEsavi.fechaMuerte : null; //'FECHANOTIFICAMUERTEFETAL';
+        notificacion.fechaNotificacion ? notificacion.fechaNotificacion : null; //'FECHANOTIFICAMUERTEFETAL';
 
     }
     desenlaceEsavi.fechaInicioInvestigacion = this.formatoFecha(
@@ -1460,7 +1472,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.parteEventosPreocupacion = this.esValorAfirmativo(
+      grave.parteEventosPreocupacion = this.transformarTipoSoloSiDhis2( //this.esValorAfirmativo
         row[
           data.headers.findIndex(
             (header) =>
@@ -1469,7 +1481,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.nuevoEventos = this.esValorAfirmativo(
+      grave.sonEventosNuevos = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) =>

@@ -1,9 +1,9 @@
 export class CreateDesenlaceEsaviDto {
   codigo: string;
   fechaMuerte: Date;
-  autopsia: number;
+  autopsia: number; //utiliza dhis2 y vigiflow.
   fechaNotificacionMuerte: Date;
-  autopsiaFetal: number;
+  //autopsiaFetal: number;
   fechaNotififacionMuerteFetal: Date;
   comentarios: string;
   fechaInicioInvestigacion: Date;

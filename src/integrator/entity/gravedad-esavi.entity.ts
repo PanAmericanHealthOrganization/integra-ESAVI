@@ -104,24 +104,24 @@ export class GravedadEsavi extends Auditoria {
   /**
    *
    */
-  @Column({
+  /*@Column({
     name: 'OTROS_EVENTOS_IMPORTANTES',
     nullable: false,
     default: false,
     comment: 'Indica si hubo otros eventos importantes',
   })
-  eventoImportante: boolean;
+  eventoImportante: boolean;*/
 
   /**
    *
    */
-  @Column({
+  /*@Column({
     name: 'OTROS_EVENTOS_IMPORTANTES_TX',
     nullable: true,
     length: 2000,
     comment: 'Descripción de otros eventos importantes',
   })
-  comentarioEventoImportante: string;
+  comentarioEventoImportante: string;*/
 
   /**
    *
@@ -131,17 +131,27 @@ export class GravedadEsavi extends Auditoria {
     nullable: true,
     comment: 'Indica si forma parte de eventos de especial preocupación',
   })
-  parteEventosPreocupacion: boolean;
+  parteEventosPreocupacion: string;
 
   /**
    *
    */
   @Column({
-    name: 'NUEVO_EVENTOS',
+    name: 'SON_EVENTOS_NUEVOS',//'NUEVO_EVENTOS',
     nullable: true,
     comment: 'Indica si es un evento nuevo no reportado anteriormente',
   })
-  nuevoEventos: boolean;
+  sonEventosNuevos: string; //nuevoEventos: boolean;
+   /**
+   *
+   */
+  @Column({
+    name: 'DESCRI_EVENTOS_NUEVOS',
+    nullable: true,
+    type: 'text',
+    comment: 'Descripción del evento nuevo no reportado anteriormente',
+  })
+  descripcionEventoNuevo: string;
 
   /**
    *

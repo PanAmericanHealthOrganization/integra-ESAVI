@@ -7,9 +7,10 @@ export class CreateGravedadEsaviDto {
   anomaliaCongenita: boolean;
   aborto: boolean;
   muerteFetal: boolean;
-  eventoImportante: boolean;
-  comentarioEventoImportante: string;
-  parteEventosPreocupacion: boolean;
-  nuevoEventos: boolean;
+  //eventoImportante: boolean;
+  //comentarioEventoImportante: string;
+  parteEventosPreocupacion: string;
+  sonEventosNuevos: string;//nuevoEventos: boolean;
+  descripcionEventoNuevo: string;
   condicionEgreso: string;
 }

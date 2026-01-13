@@ -41,12 +41,12 @@ export class DesenlaceEsavi extends Auditoria {
    *
    */
   @Column({
-    name: 'AUTOPSIA',
+    name: 'AUTOPSIA', //Columna utilizada por DHIS2 y VigiFlow
     nullable: true,
     comment:
       'Indica si se realizó autopsia (si=1, no=0, [no sabe | ignorado | desconoce] = 2, "configuración por defecto para otras opciones no contempladas" = 2)',
   })
-  autopsia: number;
+  autopsia: number; //Columna utilizada por DHIS2 y VigiFlow
 
   /**
    *
@@ -61,12 +61,12 @@ export class DesenlaceEsavi extends Auditoria {
   /**
    *
    */
-  @Column({
+  /*@Column({
     name: 'AUTOPSIAFETAL',
     nullable: true,
     comment: 'Indica si se realizó autopsia fetal (0=No, 1=Sí)',
   })
-  autopsiaFetal: number;
+  autopsiaFetal: number; *///El campo no existe en los orígenes. Se deja comentado.
 
   /**
    *

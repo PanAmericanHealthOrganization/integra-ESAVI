@@ -276,8 +276,8 @@ export class VigiflowIntegradorService {
         autopsia && this.eliminarTildes(autopsia).includes('si')
           ? 1
           : autopsia && this.eliminarTildes(autopsia).includes('no')
-          ? 2
-          : 3;
+          ? 0//2
+          : 2;//3;
       desenlaceEsaviDto.comentarios = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
       const fechaInvestigacion = this.formatoFecha(reg['AM'] ? reg['AM'].toString() : reg['AM']);
       if (fechaInvestigacion) {
