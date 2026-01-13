@@ -233,13 +233,13 @@ export class Dhis2IntegratorService {
       case 'si':
         return 1; // Si es 'SI'
       case 'no':
-        return 2; // Si es 'NO'
+        return 0; // Si es 'NO'
       case 'no sabe':
       case 'ignorando':
       case 'desconoce':
-        return 3; // Si es 'NO SABE', 'IGNORADO' o 'DESCONOCE'
+        return 2; // Si es 'NO SABE', 'IGNORADO' o 'DESCONOCE'
       default:
-        return 3; // Si no se encuentra en los valores conocidos, consideramos '3' (como un valor por defecto)
+        return 2; // Si no se encuentra en los valores conocidos, consideramos '3' (como un valor por defecto)
     }
   }
 
@@ -771,6 +771,36 @@ export class Dhis2IntegratorService {
     desenlaceEsavi.fechaMuerte = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Fecha fallecimiento')],
     );
+    if(grave.muerteFetal){
+      desenlaceEsavi.fechaNotififacionMuerteFetal =
+        desenlaceEsavi.fechaMuerte ? desenlaceEsavi.fechaMuerte : null; //'FECHANOTIFICAMUERTEFETAL';
+
+    }
+    desenlaceEsavi.fechaInicioInvestigacion = this.formatoFecha(
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Fecha de investigación',
+        )
+      ],
+    );
+    desenlaceEsavi.clasificacionFinalCaso =
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Clasificación final del caso',
+        )
+      ];
+    desenlaceEsavi.clasificacionFinalCasoA =
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Clasificación final del caso A',
+        )
+      ];
+    desenlaceEsavi.clasificacionFinalCasoB =
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Clasificación final del caso B',
+        )
+      ];
 
     // DatoEsavi -- Diagnóstico inicial
     const numeroIncidencias = 3;
