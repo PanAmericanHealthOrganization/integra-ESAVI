@@ -29,77 +29,77 @@ export class GravedadEsavi extends Auditoria {
    */
   @Column({
     name: 'MUERTE',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI resultó en muerte',
   })
-  muerte: boolean;
+  muerte: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'RIESGO_VIDA',
-    nullable: false,
-    default: false,
-    comment: 'Indica si el ESAVI puso en riesgo la vida del paciente',
+    nullable: true,//false,
+    //default: false,
+    comment: 'Indica si el ESAVI puso en riesgo la vida del paciente. En el origen se lo puede localizar con el término "Amenaza a la vida"',
   })
-  riesgoVida: boolean;
+  riesgoVida: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'DISCAPACIDAD',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI resultó en discapacidad',
   })
-  discapacidad: boolean;
+  discapacidad: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'HOSPITALIZACION',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI requirió hospitalización',
   })
-  hospitalizacion: boolean;
+  hospitalizacion: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'ANOMALIA_CONGENITA',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI causó anomalía congénita',
   })
-  anomaliaCongenita: boolean;
+  anomaliaCongenita: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'ABORTO',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI resultó en aborto',
   })
-  aborto: boolean;
+  aborto: string;//boolean;
 
   /**
    *
    */
   @Column({
     name: 'MUERTE_FETAL',
-    nullable: false,
-    default: false,
+    nullable: true,//false,
+    //default: false,
     comment: 'Indica si el ESAVI resultó en muerte fetal',
   })
-  muerteFetal: boolean;
+  muerteFetal: string;//boolean;
 
   /**
    *
@@ -159,7 +159,7 @@ export class GravedadEsavi extends Auditoria {
   @Column({
     name: 'CONDICION_EGRESO',
     nullable: true,
-    length: 2000,
+    type: 'text',//length: 2000, //usa la propiedad "type" text en vez de "length" para textos largos
     comment: 'Descripción de la condición del paciente al egreso',
   })
   condicionEgreso: string;

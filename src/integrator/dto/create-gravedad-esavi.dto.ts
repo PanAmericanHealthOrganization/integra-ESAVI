@@ -1,12 +1,12 @@
 export class CreateGravedadEsaviDto {
   tipo: string;
-  muerte: boolean;
-  riesgoVida: boolean;
-  discapacidad: boolean;
-  hospitalizacion: boolean;
-  anomaliaCongenita: boolean;
-  aborto: boolean;
-  muerteFetal: boolean;
+  muerte: string;//boolean;
+  riesgoVida: string;//boolean;
+  discapacidad: string;//boolean;
+  hospitalizacion: string;//boolean;
+  anomaliaCongenita: string;//boolean;
+  aborto: string;//boolean;
+  muerteFetal: string;//boolean;
   //eventoImportante: boolean;
   //comentarioEventoImportante: string;
   parteEventosPreocupacion: string;

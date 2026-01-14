@@ -694,7 +694,7 @@ export class Dhis2IntegratorService {
     // Create Gravedad
     const grave = new CreateGravedadEsaviDto();
     grave.tipo = '1';//'GRAVE';
-    grave.riesgoVida = this.esValorAfirmativo(
+    grave.riesgoVida = this.transformarTipoSoloSiDhis2(//this.esValorAfirmativo(
       row[
         headers.findIndex(
           (header) =>
@@ -702,14 +702,14 @@ export class Dhis2IntegratorService {
         )
       ],
     );
-    grave.discapacidad = this.esValorAfirmativo(
+    grave.discapacidad = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - discapacidad',
         )
       ],
     );
-    grave.hospitalizacion = this.esValorAfirmativo(
+    grave.hospitalizacion = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -717,7 +717,7 @@ export class Dhis2IntegratorService {
         )
       ],
     ); //---después de esto va la CORRECCIÓN:
-    grave.anomaliaCongenita = this.esValorAfirmativo(
+    grave.anomaliaCongenita = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -725,21 +725,21 @@ export class Dhis2IntegratorService {
         )
       ],
     );
-    grave.aborto = this.esValorAfirmativo(
+    grave.aborto = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - aborto',
         )
       ],
     );
-    grave.muerteFetal = this.esValorAfirmativo(
+    grave.muerteFetal = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - muerte fetal',
         )
       ],
     );
-    grave.muerte = this.esValorAfirmativo(
+    grave.muerte = this.transformarTipoSoloSiDhis2(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - muerte',
@@ -1418,7 +1418,7 @@ export class Dhis2IntegratorService {
       //Create Gravedad
       const grave = new CreateGravedadEsaviDto();
       grave.tipo = '1';//'GRAVE';
-      grave.riesgoVida = this.esValorAfirmativo(
+      grave.riesgoVida = this.transformarTipoSoloSiDhis2( //this.esValorAfirmativo
         row[
           data.headers.findIndex(
             (header) =>
@@ -1426,7 +1426,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.discapacidad = this.esValorAfirmativo(
+      grave.discapacidad = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) =>
@@ -1434,7 +1434,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.hospitalizacion = this.esValorAfirmativo(
+      grave.hospitalizacion = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) =>
@@ -1442,7 +1442,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.anomaliaCongenita = this.esValorAfirmativo(
+      grave.anomaliaCongenita = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) =>
@@ -1450,14 +1450,14 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.aborto = this.esValorAfirmativo(
+      grave.aborto = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - aborto',
           )
         ],
       );
-      grave.muerteFetal = this.esValorAfirmativo(
+      grave.muerteFetal = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) =>
@@ -1465,7 +1465,7 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      grave.muerte = this.esValorAfirmativo(
+      grave.muerte = this.transformarTipoSoloSiDhis2(
         row[
           data.headers.findIndex(
             (header) => header.column === 'DNVE ESAVI TRK - Criterio de notificación - muerte',
