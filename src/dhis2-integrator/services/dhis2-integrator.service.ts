@@ -54,7 +54,7 @@ export class Dhis2IntegratorService {
       return moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
-  }
+  }//Se comprobó que no devuelve la fecha ajustada la hora en  UTC 00:00:00.000Z. Preguntar al personal funcional si es necesario ajustar la hora.
 
   formatoInteger = (valor: string) => {
     let resultado = 0;
@@ -487,7 +487,7 @@ export class Dhis2IntegratorService {
       notificacion.unidadEdadPaciente = null;
     }
 
-    notificacion.organizacion =
+    notificacion.organizacionNotificador =
       row[headers.findIndex((header) => header.column === 'Organisation unit name')];
     notificacion.organizacionUnitCode =
       row[headers.findIndex((header) => header.column === 'Organisation unit code')];
@@ -498,6 +498,9 @@ export class Dhis2IntegratorService {
     notificacion.fechaNotificacion = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'Fecha de notificación')],
     );
+    notificacion.fechaReporteNacional = this.formatoFecha(
+      row[headers.findIndex((header) => header.column === 'Fecha de notificación')],
+    );// Se acoge la recomendción del personal funcional, pero, los valores quedan duplicados con el campo FECHA_NOTIFICACION.
     notificacion.fechaAtencion = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Fecha de atención')],
     );
@@ -1260,7 +1263,7 @@ export class Dhis2IntegratorService {
 
       notificacion.unidadEdadPaciente =
         row[data.headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Tipo edad')];
-      notificacion.organizacion =
+      notificacion.organizacionNotificador =
         row[data.headers.findIndex((header) => header.column === 'Organisation unit name')];
 
       notificacion.organizacionUnitCode =

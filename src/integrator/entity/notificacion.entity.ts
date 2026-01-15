@@ -129,9 +129,9 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'LACTANDO',
     nullable: true,
-    comment: 'Indica si la paciente se encuentra lactando',
+    comment: 'Indica si la paciente se encuentra lactando. Variable propia de VigiFLow no existente en DHIS2.',
   })
-  lactando: boolean;
+  lactando: string; //boolean; //Variable propia de VigiFLow no existente en DHIS2.
 
   /**
    *
@@ -172,7 +172,7 @@ export class Notificacion extends Auditoria {
     nullable: true,
     comment: 'Organización o institución del notificador',
   })
-  organizacion: string;
+  organizacionNotificador: string;
 
   /**
    *
@@ -392,7 +392,7 @@ export class Notificacion extends Auditoria {
     nullable: true,
     comment: 'Fecha de atención médica del paciente',
   })
-  fechaAtencion: Date;
+  fechaAtencion: Date; // Variable propia de DHIS2 no existente en VigiFlow.
 
   /**
    *

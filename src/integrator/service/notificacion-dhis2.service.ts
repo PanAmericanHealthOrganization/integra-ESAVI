@@ -401,7 +401,7 @@ export class NotificacionDhis2Service {
     notificacionExistente.fechaNotificacion = createDto.fechaNotificacion;
     notificacionExistente.fechaNacimiento = createDto.fechaNacimiento;
     notificacionExistente.edad = createDto.edad;
-    notificacionExistente.organizacion = createDto.organizacion;
+    notificacionExistente.organizacionNotificador = createDto.organizacionNotificador;
     notificacionExistente.casoNarrativo = createDto.casoNarrativo;
     notificacionExistente.fechaLlenadoFicha = createDto.fechaLlenadoFicha;
     notificacionExistente.beforeUpdate();

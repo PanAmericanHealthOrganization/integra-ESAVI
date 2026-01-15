@@ -237,7 +237,7 @@ export class VigiflowIntegradorService {
       }
 
       //notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
-      notificacion.organizacion = reg['AF'];
+      notificacion.organizacionNotificador = reg['AF']; //Más adelante se actualiza este campo.
       notificacion.codigoVigiflow = reg['B'];
       notificacion.nombreNotificador = reg['AB'];
       // Ubicacion residencia Paciente
@@ -363,15 +363,21 @@ export class VigiflowIntegradorService {
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
           updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones); //TODO: En dhis2 y figiflow ya está integrado con FK, solo está pendiente la equivalencia de valores numéricos.
           updateNotificacion.tipoReporte = reg['N'];
-          updateNotificacion.organizacionEmisor = reg['D'];
+
+          updateNotificacion.organizacionNotificador = reg['AS']; //Se actualiza por recomendación del personal funcional.
+          updateNotificacion.organizacionEmisor = reg['AS'];//reg['D']; //Se actualiza por recomendación del personal funcional.
           updateNotificacion.identificacionNotificador = reg['R'];
           updateNotificacion.delegadoOrganizacion = reg['C'];
           updateNotificacion.ultimaEdicionRegistrada = reg['A'];
-          updateNotificacion.lactando = reg['Z'] && this.esAfirmativo(reg['Z']);
+          updateNotificacion.lactando = reg['Z'] && this.transformarTipoSiNo(reg['Z']);//reg['Z'] && this.esAfirmativo(reg['Z']);
           // Se actualiza la fecha de notificación asignándola, la
           // "fecha de recepción inicial", si esta no existe se la deja con la fecha de notificacion.
           //updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
           updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
+          
+          //Por recomendación de PAHO (personal funcional), se actualiza la fecha de reporte nacional con la "fecha de recepción inicial"
+          //Recordar que para que surta efecto el nuevo valor asignado, se debe también actualizar en el servicio "notificacion-vigiflow.service.ts", en el método "update".
+          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['K'] && this.analizarCadenaFecha(reg['K'] && reg['K'].toString());
           updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
           updateNotificacion.residenciaNotificador.canton = reg['AU'];
 
@@ -798,7 +804,7 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
       return moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
-  }
+  }//Se comprobó que cuando la fecha viene con la parte de la hora y zona horaria, este método no devuelve ajustado a cero horas, minutos, segundos y milisegundos. En vigiflow no es probable que vengan con la parte de la hora, pero, en DHIS2 si puede venir con la parte de la hora y zona horaria.
   analizarCadenaFecha(dateStr: string): Date | null {
     if (!/^\d{8}$/.test(dateStr)) {// Verifica que la cadena tenga exactamente 8 dígitos
        //console.log(`La fecha: "${dateStr}" no es válida, se esperan 8 dígitos.`);
@@ -916,5 +922,9 @@ private limpiarNombrePatenteWHODrug(input: string): string {
   esAfirmativo(valor) {
     const val = (valor || '').toString().trim().toLowerCase();
     return val === 'si' ? true : val === 'no' ? false : null;
+  }
+  transformarTipoSiNo(valor) {
+    const val = (valor || '').toString().trim().toLowerCase();
+    return val === 'si' ? '1' : val === 'no' ? '0' : null;
   }
 }

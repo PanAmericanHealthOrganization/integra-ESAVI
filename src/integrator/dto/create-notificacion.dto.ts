@@ -12,13 +12,13 @@ export class CreateNotificacionDto {
   @Type(() => Date)  // ¡Esto es clave!
   fechaNacimiento: Date;
   edad: number;
-  lactando : boolean;
+  lactando : string;//boolean;
   unidadEdadPaciente: string;
   grupoEtarioPaciente: string;
   identificacionNotificador : string;
   profesionNotificadorParam: string ;
   tituloNotificador: string;
-  organizacion: string;
+  organizacionNotificador: string;
   organizacionUnitCode : string;
   organizacionUnit : string;
   delegadoOrganizacion : string;
