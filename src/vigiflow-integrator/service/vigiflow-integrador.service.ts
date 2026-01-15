@@ -278,7 +278,7 @@ export class VigiflowIntegradorService {
           : autopsia && this.eliminarTildes(autopsia).includes('no')
           ? 0//2
           : 2;//3;
-      desenlaceEsaviDto.comentarios = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
+      desenlaceEsaviDto.comentarioResultado = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
       const fechaInvestigacion = this.formatoFecha(reg['AM'] ? reg['AM'].toString() : reg['AM']);
       if (fechaInvestigacion) {
         desenlaceEsaviDto.fechaInicioInvestigacion = fechaInvestigacion;
@@ -358,7 +358,7 @@ export class VigiflowIntegradorService {
           // updateNotificacion.peso = this.formatoInteger(reg['AA']);
           // updateNotificacion.altura = this.formatoFloat(reg['AB']);
           updateNotificacion.casoNarrativo = reg['AC'];
-          updateNotificacion.comentario = reg['AD'];
+          updateNotificacion.comentarioNotificador = reg['AD'];
           // updateNotificacion.profesionNotificadorParam = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);;
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
           updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones); //TODO: En dhis2 y figiflow ya está integrado con FK, solo está pendiente la equivalencia de valores numéricos.

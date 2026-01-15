@@ -5,7 +5,7 @@ export class CreateDesenlaceEsaviDto {
   fechaNotificacionMuerte: Date;
   //autopsiaFetal: number;
   fechaNotififacionMuerteFetal: Date;
-  comentarios: string;
+  comentarioResultado: string;
   fechaInicioInvestigacion: Date;
   clasificacionFinalCaso: string;
   clasificacionFinalCasoA: string;

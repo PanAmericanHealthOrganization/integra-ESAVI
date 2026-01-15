@@ -1417,7 +1417,15 @@ export class Dhis2IntegratorService {
 
       //Create Gravedad
       const grave = new CreateGravedadEsaviDto();
-      grave.tipo = '1';//'GRAVE';
+      //grave.tipo = '1';//'GRAVE';
+      grave.tipo = this.transformarTipoSoloSiDhis2( //this.esValorAfirmativo
+        row[
+          data.headers.findIndex(
+            (header) =>
+              header.column === 'DNVE ESAVI TRK - Criterio de investigación - cumple con criterios de esavi',
+          )
+        ],
+      );
       grave.riesgoVida = this.transformarTipoSoloSiDhis2( //this.esValorAfirmativo
         row[
           data.headers.findIndex(

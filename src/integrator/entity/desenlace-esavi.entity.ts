@@ -82,12 +82,12 @@ export class DesenlaceEsavi extends Auditoria {
    *
    */
   @Column({
-    name: 'COMENTARIOS',
+    name: 'COMENTARIO_RESULTADO',
     type: 'text',
     nullable: true,
-    comment: 'Comentarios adicionales sobre el desenlace',
+    comment: 'Comentarios adicionales sobre el desenlace. Campo utilizado por VigiFlow, en el origen se lo puede localizar en la hoja AEFI en la columna "Resultado"',
   })
-  comentarios: string;
+  comentarioResultado: string;
 
   /**
    *

@@ -282,7 +282,7 @@ export class NotificacionVigiflowService {
       }
 
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
-      notificacion.comentario = updateNotificacion.comentario;
+      notificacion.comentarioNotificador = updateNotificacion.comentarioNotificador;
       notificacion.tipoReporte = updateNotificacion.tipoReporte;
       notificacion.identificacionNotificador = updateNotificacion.identificacionNotificador;
       notificacion.delegadoOrganizacion = updateNotificacion.delegadoOrganizacion;

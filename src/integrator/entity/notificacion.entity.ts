@@ -240,7 +240,7 @@ export class Notificacion extends Auditoria {
     nullable: true,
     comment: 'Comentarios adicionales del notificador',
   })
-  comentario: string;
+  comentarioNotificador: string;
 
   /**
    *

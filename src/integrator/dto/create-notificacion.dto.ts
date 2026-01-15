@@ -24,7 +24,7 @@ export class CreateNotificacionDto {
   delegadoOrganizacion : string;
   nombreNotificador: string;
   residenciaNotificador: UbicacionDto;
-  comentario: string;
+  comentarioNotificador: string;
   casoNarrativo: string;
   tituloReporte: string;
   tipoReporte: string;
