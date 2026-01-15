@@ -37,23 +37,40 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID' })
+  @Column({
+    nullable: true,
+    comment: 'Provincia de residencia del paciente. FK a catálogo de provincias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTPROVINCIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo,{nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
+  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID'})
   provinciaResidencia: Catalogo;
 
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @Column({
+    nullable: true,
+    comment: 'Cantón de residencia del paciente. FK a catálogo de cantones. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTCANTORESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
   @JoinColumn({ name: 'CTCANTORESIDENCIA_ID' })
   cantonResidencia: Catalogo;
 
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @Column({
+    nullable: true,
+    comment: 'Parroquia de residencia del paciente. FK a catálogo de parroquias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTPARROQUIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
   @JoinColumn({ name: 'CTPARROQUIARESIDENCIA_ID' })
   parroquiaResidencia: Catalogo;
+
+  //-- Cuando la columna de la relación no tiene comentario explícito, su propiedad comentario hereda el comentario de la tabla foránea (de la principal a la cual tiene relación).
 
   /**
    *
@@ -64,7 +81,7 @@ export class Notificacion extends Auditoria {
     comment: 'Otra parroquia de residencia del paciente no contemplada en catálogo',
   })
   otraParroquiaResidencia: string;
-
+//--------------------------------------------------------------------------------------------------------------
   /**
    *
    */
@@ -128,10 +145,6 @@ export class Notificacion extends Auditoria {
    */
   @ManyToOne(() => GrupoEtario)
   @JoinColumn({ name: 'CTGRUPOETARIO_ID' })
-
-  /**
-   *
-   */
   grupoEtario: GrupoEtario;
 
   /**
