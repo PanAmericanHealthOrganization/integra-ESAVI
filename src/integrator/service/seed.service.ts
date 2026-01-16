@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Repository } from 'typeorm';
+import { read, utils, WorkBook } from 'xlsx';
 
 // Entidades
 import { ISync } from '../dto/sync.dto';
@@ -19,14 +20,18 @@ import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
 import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
+import { CreateCtIcd10meddraDto, CtIcd10meddra } from '../entity/ct-icd10meddra.entity';
 
 @Injectable()
 export class SeedService {
+  private readonly logger = new Logger(SeedService.name);
   constructor(
     @InjectRepository(TipoCatalogo, 'POSTGRES_INTEGRATOR_DS')
     private tipoCatalogoRepository: Repository<TipoCatalogo>,
     @InjectRepository(Catalogo, 'POSTGRES_INTEGRATOR_DS')
     private catalogoRepository: Repository<Catalogo>,
+    @InjectRepository(CtIcd10meddra, 'POSTGRES_INTEGRATOR_DS')
+    private ctIcd10meddraRepository: Repository<CtIcd10meddra>,
     @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
     private grupoEtarioRepository: Repository<GrupoEtario>,
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
@@ -72,6 +77,9 @@ export class SeedService {
 
       // 2.3. Cargar parroquias desde CSV
       await this.loadParroquiasFromCSV();
+
+      // 2.4. Cargar reacciones, diagnósticos o enfermedades desde Excel
+      await this.loadIcd10meddraFromExcel();
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
@@ -1151,6 +1159,60 @@ export class SeedService {
     });
   }
   //--fin carga de parroquias desde CSV------------------------------------------------------------------------------------------------------
+
+  //--inicio de la carga del catálogo para el mapeo de ICD-10 MedDRA desde el documento Excel------------------------------------------------------------------------------------------------------
+  private async loadIcd10meddraFromExcel() {
+    await this.runSyncProcess('Carga de catálogo CIE-10 MedDRA, para el mapeo de ICD-10 MedDRA...', async () => {
+      console.log('🗺️ Cargando registros ICD-10 MedDRA desde Excel...');
+      try{
+        const catalogoIcd10meddra = read(
+          await fs.promises.readFile(path.join(process.cwd(), 'upload_files', 'catalogos-excel', 'ICD-10_to_MedDRA_28.0_Map-June2025.xlsx')),
+        );
+        const ws = catalogoIcd10meddra.Sheets[catalogoIcd10meddra.SheetNames[0]];
+        const importRange = 'A3:I11195'; //Rango de datos a importar desde el archivo Excel, excluyendo las filas de encabezado.
+        const headers = 'A'; //Fila de encabezados en el archivo Excel.
+        const catalogoJson = utils.sheet_to_json(ws, { 
+          range: importRange, 
+          header: headers,//utils.sheet_to_json(ws, { range: headers, header: 1 })[0] });
+        });
+        this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros ICD-10 MedDRA en el archivo Excel.`);
+
+        // Usar for...of para esperar que cada operación asíncrona termine
+        for (const col of catalogoJson) {
+          // TODO: colocar auditoria correcta
+          const auditoria: IAuditoria = {
+            createdAt: new Date(),
+            createdBy: 'System',
+            updatedAt: undefined,
+            updatedBy: 'System',
+            deletedAt: undefined,
+            deletedBy: 'System',
+            isEnabled: true,
+            isActive: true,
+          };     
+    
+          // Create CtICD10MedDRADto object
+          const ctIcd10meddra = new CreateCtIcd10meddraDto();
+          ctIcd10meddra.icd10ChapterNumber = col['A'];
+          ctIcd10meddra.icd10ChapterTitle = col['B'];
+          ctIcd10meddra.icd10Code = col['C'];
+          ctIcd10meddra.icd10Term = col['D'];
+          ctIcd10meddra.meddraLlt = col['E'];
+          ctIcd10meddra.meddraLltCode = col['F'];
+          ctIcd10meddra.mapAttribute = col['G'];
+          ctIcd10meddra.meddraPt = col['H'];
+          ctIcd10meddra.meddraPtCode = col['I'];
+
+          await this.ctIcd10meddraRepository.save({ ...ctIcd10meddra, ...auditoria } as CtIcd10meddra);
+
+        }
+        console.log('✅ Registros ICD-10 MedDRA cargados desde Excel');
+      }catch(error){
+        console.error('❌ Error al cargar ICD-10 MedDRA desde Excel:', error);
+      }    
+    });
+  }
+  //--fin de carga catálogo Excel mapeo de ICD-10 MedDRA------------------------------------------------------------------------------------------------------
 
   /**
    * Método para limpiar el contenido de todas las tablas que inician con "TR"
