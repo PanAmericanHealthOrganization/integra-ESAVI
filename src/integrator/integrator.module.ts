@@ -49,6 +49,7 @@ import {
   Vacunacion,
   Vacunometro,
 } from './entity';
+import {CtIcd10meddra} from './entity/ct-icd10meddra.entity';
 import { Establecimiento } from './entity/establecimiento.entity';
 import { Investigacion } from './entity/investigacion.entity';
 import { IntegradorService } from './facade/integrador.service';
@@ -112,6 +113,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Establecimiento,
         Catalogo,
         CausalidadEsavi,
+        CtIcd10meddra,
         DatoEsavi,
         DatoVacuna,
         DatoVacunacion,
