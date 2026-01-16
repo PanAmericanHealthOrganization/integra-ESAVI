@@ -293,6 +293,7 @@ export class NotificacionVigiflowService {
 
       notificacion.organizacionNotificador = updateNotificacion.organizacionNotificador; //Se actualiza por recomendación del personal funcional.
       notificacion.organizacionEmisor = updateNotificacion.organizacionEmisor; //Se actualiza por recomendación del personal funcional.
+      notificacion.tipoEmisor = updateNotificacion.tipoEmisor; //Se actualiza por recomendación del personal funcional.
       //-------------------------------------actualización de la edad y unidad de edad-------------------------------------//
       /* calculo de la edad, udidad de edad y el grupo etario */
       updateNotificacion.fechaNacimiento = typeof notificacion.fechaNacimiento === 'string'

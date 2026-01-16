@@ -291,6 +291,7 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'MEDIO_NOTIFICACION',
     nullable: true,
+    default: 'Medio electrónico',
     comment: 'Medio por el cual se realizó la notificación',
   })
   medioNotificacion: string;
@@ -301,7 +302,7 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'TIPO_EMISOR',
     nullable: true,
-    comment: 'Tipo de emisor del reporte',
+    comment: 'Tipo de emisor del reporte. 1 = Profesional de la salud, 2 = Paciente / consumidor, 3 = Laboratorio farmacéutico, 4 = Centro regional de farmacovigilancia, 5 = Otro. Para DHIS2 el vlor predeterminado es "1" (Profesional de la salud).',
   })
   tipoEmisor: string;
 

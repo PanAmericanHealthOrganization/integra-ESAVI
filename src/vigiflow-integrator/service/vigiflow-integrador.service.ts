@@ -236,6 +236,7 @@ export class VigiflowIntegradorService {
         notificacion.fechaReporteNacional = fechaReporte;
       }
 
+      notificacion.medioNotificacion = 'Medio electrónico VigiFlow';//Por recomendación del equipo funcional, se asigna un valor estático.// si se toma de la hoja Reportes reg['E'];, se debe usar updateNotificacion.
       //notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
       notificacion.organizacionNotificador = reg['AF']; //Más adelante se actualiza este campo.
       notificacion.codigoVigiflow = reg['B'];
@@ -380,6 +381,7 @@ export class VigiflowIntegradorService {
           updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['K'] && this.analizarCadenaFecha(reg['K'] && reg['K'].toString());
           updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
           updateNotificacion.residenciaNotificador.canton = reg['AU'];
+          updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
 
@@ -866,6 +868,39 @@ private limpiarNombrePatenteWHODrug(input: string): string {
     .replace(/\s*;\s*/g, ';');
 }
 
+
+
+// Función para transformar el valor a número
+/*transformarTipoEmisor(tipo: string): number | null {
+  return tipoEmisorMap[tipo] ?? null; 
+}*/
+
+private transformarTipoEmisor(tipoEmisorTexto: string): string | null {
+  // Definimos un diccionario para mapear los valores
+  let tipoEmisorMap: Record<string, string> = {
+    'Profesional de la salud': '1',
+    'Paciente / consumidor': '2',
+    'Laboratorio farmacéutico': '3',
+    'Centro regional de farmacovigilancia': '4',
+    'Otro': '5',
+  }; 
+
+  if (tipoEmisorTexto) {
+    // Normalizamos el texto
+    const tipoEmisor = tipoEmisorTexto.trim();//.toUpperCase();
+
+    // Retornamos el valor si existe en el diccionario
+    if (tipoEmisorMap[tipoEmisor] !== undefined) {
+      return tipoEmisorMap[tipoEmisor];
+    } else {
+      //console.log(`Valor de ... no reconocido: "${Texto}". Se asignará null.`);
+      return null; // return null si no se reconoce el valor
+    }
+  } else {
+    //console.log(`Valor de ... vacío o nulo: "${Texto}". Se asignará null.`);
+    return null; // return null si no se reconoce el valor
+  }  
+}
 
 
   formatoInteger = (valor: string) => {

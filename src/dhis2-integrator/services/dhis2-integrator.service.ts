@@ -501,6 +501,8 @@ export class Dhis2IntegratorService {
     notificacion.fechaReporteNacional = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'Fecha de notificación')],
     );// Se acoge la recomendción del personal funcional, pero, los valores quedan duplicados con el campo FECHA_NOTIFICACION.
+    notificacion.tipoEmisor = '1'; //'Profesional de la salud': '1',
+    
     notificacion.fechaAtencion = this.formatoFecha(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Fecha de atención')],
     );
