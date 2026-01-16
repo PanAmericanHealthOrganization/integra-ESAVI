@@ -125,7 +125,7 @@ export class SeedService {
   }
 
   async cleanData() {
-    console.log('🧹 Limpiando datos existentes...');
+    console.log('🧹 Limpiando datos existentes con el método "cleanData"...');
 
     try {
       // Obtener el query runner para ejecutar SQL directo
@@ -186,7 +186,7 @@ export class SeedService {
         { codigo: 'BOOL-YN', descripcion: 'Tipo de dato booleano Sí No' },
         { codigo: 'BOOL-YNU', descripcion: 'Tipo de dato booleano Sí No Desconocido' },
         { codigo: 'ROL-MED', descripcion: 'Rol del medicamento o vacuna' },
-      ];
+      ];// Algunos catálogos han sido gestionados fuera de este seeders (Catálogo de homologación Principal) por su volumen o complejidad. Por ejemplo: GrupoEtario, ICDF10-MEDDRA, Medicamentos, Vacunas, etc.
 
       const auditoriaDto: IAuditoria = {
         createdAt: new Date(),
@@ -1203,9 +1203,26 @@ export class SeedService {
           ctIcd10meddra.meddraPt = col['H'];
           ctIcd10meddra.meddraPtCode = col['I'];
 
-          await this.ctIcd10meddraRepository.save({ ...ctIcd10meddra, ...auditoria } as CtIcd10meddra);
+          const existing =  await this.ctIcd10meddraRepository.findOne({
+            where: {
+              //icd10ChapterNumber: col['A'],
+              //icd10ChapterTitle: col['B'],
+              icd10Code: col['C'], //ctIcd10meddra.icd10Code,
+              //icd10Term: col['D'],
+              //meddraLlt: col['E'],
+              meddraLltCode: col['F'], //ctIcd10meddra.meddraLltCode,
+              //mapAttribute: col['G'],
+              //meddraPt: col['H'],
+              //meddraPtCode: col['I'],
+            }
+          });
+          if(!existing){
+            await this.ctIcd10meddraRepository.save({ ...ctIcd10meddra, ...auditoria } as CtIcd10meddra);
+          }        
 
-        }
+        } //--fin del for...of
+        const total = await this.ctIcd10meddraRepository.count();
+        console.log(`✅ Total de registros ICD-10 MedDRA en la base de datos: ${total}`);
         console.log('✅ Registros ICD-10 MedDRA cargados desde Excel');
       }catch(error){
         console.error('❌ Error al cargar ICD-10 MedDRA desde Excel:', error);
