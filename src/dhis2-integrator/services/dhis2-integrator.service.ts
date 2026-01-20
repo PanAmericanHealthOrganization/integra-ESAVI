@@ -34,8 +34,10 @@ import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
 import { CtSymptom2lltService } from 'src/integrator/service/ct-symptom2llt.service';
+import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
+import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -43,6 +45,8 @@ export class Dhis2IntegratorService {
     private readonly configService: ConfigService,
     private readonly integradorService: IntegradorService,
     private readonly ctSymptom2lltService: CtSymptom2lltService,
+    private readonly meddraLltService: MeddraLLTService,
+    private readonly meddraPtService: MeddraPtService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
@@ -913,10 +917,24 @@ export class Dhis2IntegratorService {
         const datoEsaviSintomatologiai = new CreateDatoEsaviDto();
         datoEsaviSintomatologiai.nombreReportado = setOpciones;
         
+        //Estandrización de sintomatología a LLT a partir de CT_SYMPTOM_TO_LLT
         const catalogoSymptom2llt = await this.ctSymptom2lltService.mapSymptomToLlt(setOpciones);
         datoEsaviSintomatologiai.codigoLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltCode ? catalogoSymptom2llt.lltCode : null;
         datoEsaviSintomatologiai.nameLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltName ? catalogoSymptom2llt.lltName : null;
 
+        //Estandrización de sintomatología, utilizando el diccionario MEDDRA.
+        if(catalogoSymptom2llt.lltCode){//Recordar que el valor de 'name' está en idioma inglés, y la base de datos MEDDRA versión 28 está en ESPAÑOL.
+          const meddraLlt = await this.meddraLltService.searchLltByCode(catalogoSymptom2llt.lltCode);
+          datoEsaviSintomatologiai.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
+          datoEsaviSintomatologiai.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
+          //datoEsaviSintomatologiai.namePT = meddraLlt && meddraLlt.ptName ? meddraLlt.ptName : null;
+          //datoEsaviSintomatologiai.codigoEsaviCie10 = meddraLlt && meddraLlt.icd10Code ? meddraLlt.icd10Code : null; //como no se tiene cargada la relación ICD10-LLT, se omite este campo. Si se coloca de todas formas, entregará solo el valor 'Y' de yes y 'N' de no.
+
+          const meddraPt = await this.meddraPtService.searchPtByCode(datoEsaviSintomatologiai.codigoPT);
+          datoEsaviSintomatologiai.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
+          datoEsaviSintomatologiai.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
+        }
+        
         datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
           row[
             headers.findIndex(

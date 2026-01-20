@@ -35,4 +35,29 @@ export class MeddraPtService {
 
     return pt;
   }
+
+  //---------------
+  /**
+   * Searches for a PT entity by its code, case-insensitively.
+   * @param code
+   * @returns PT entity if found, otherwise undefined.
+   */
+  public async searchPtByCode(term: string): Promise<PT> {
+    if (!term || term.trim() === '') {
+      this.logger.warn('Término de búsqueda PT vacío o nulo');
+      return null;
+    }
+
+    term = term.trim();
+    const pt = await this.ptRepository
+      .createQueryBuilder('pt')
+      .where('LOWER(pt.code) = :term', { term: (term || '').toLowerCase() })
+      .getOne();
+
+    if (!pt) {
+      this.logger.warn(`PT no encontrado para el código: "${term}"`);
+    }
+
+    return pt;
+  }
 }

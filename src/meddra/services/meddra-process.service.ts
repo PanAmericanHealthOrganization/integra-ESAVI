@@ -134,8 +134,8 @@ export class MeddraProcessFilesService {
       const pt = withAuditOnCreate(new PT());
       pt.code = line[0];
       pt.name = line[1];
-      pt.socCode = line[3];
-      pt.soc = socs.find((soc) => soc.code === line[3]);
+      pt.socCode = line[3];//line[3];
+      pt.soc = socs.find((soc) => soc.code === line[3]);//socs.find((soc) => soc.code === line[3]);
       ptList.push(pt);
     });
     const insertedResultIds = [];
@@ -162,12 +162,13 @@ export class MeddraProcessFilesService {
   private async processLLT(socs: string[][], pts: PT[]): Promise<InsertResult[]> {
     const lltList = [];
     socs.forEach((line) => {
-      const socs = withAuditOnCreate(new LLT());
-      socs.code = line[0];
-      socs.name = line[1];
-      socs.ptCode = line[3];
-      socs.pt = pts.find((pt) => pt.code === line[3]);
-      lltList.push(socs);
+      const llt = withAuditOnCreate(new LLT());
+      llt.code = line[0];
+      llt.name = line[1];
+      llt.ptCode = line[2];//line[3];
+      llt.pt = pts.find((pt) => pt.code === line[2]);//pts.find((pt) => pt.code === line[3]);
+      llt.icd10Code = line[9];
+      lltList.push(llt);
     });
     // procesar de 5000 en 5000
     const batchSize = 5000;
