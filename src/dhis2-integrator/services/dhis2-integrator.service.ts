@@ -38,6 +38,8 @@ import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
+import { CtIcd10meddra } from 'src/integrator/entity/ct-icd10meddra.entity';
+import { CtIcd10meddraService } from 'src/integrator/service/ct-icd10meddra.service';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -47,6 +49,7 @@ export class Dhis2IntegratorService {
     private readonly ctSymptom2lltService: CtSymptom2lltService,
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
+    private readonly icd10MeddraService: CtIcd10meddraService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
@@ -922,7 +925,7 @@ export class Dhis2IntegratorService {
         datoEsaviSintomatologiai.codigoLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltCode ? catalogoSymptom2llt.lltCode : null;
         datoEsaviSintomatologiai.nameLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltName ? catalogoSymptom2llt.lltName : null;
 
-        //Estandrización de sintomatología, utilizando el diccionario MEDDRA.
+        //Estandarización de sintomatología, utilizando el diccionario MEDDRA. También se utiliza el anexo o complemento ICD-10 MedDRA.
         if(catalogoSymptom2llt.lltCode){//Recordar que el valor de 'name' está en idioma inglés, y la base de datos MEDDRA versión 28 está en ESPAÑOL.
           const meddraLlt = await this.meddraLltService.searchLltByCode(catalogoSymptom2llt.lltCode);
           datoEsaviSintomatologiai.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
@@ -933,6 +936,9 @@ export class Dhis2IntegratorService {
           const meddraPt = await this.meddraPtService.searchPtByCode(datoEsaviSintomatologiai.codigoPT);
           datoEsaviSintomatologiai.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
           datoEsaviSintomatologiai.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
+
+          const icd10meddra = await this.icd10MeddraService.mapLltToIcd10ByCode(catalogoSymptom2llt.lltCode);
+          datoEsaviSintomatologiai.codigoEsaviCie10 = icd10meddra && icd10meddra.icd10Code ? icd10meddra.icd10Code : null;
         }
         
         datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
