@@ -82,6 +82,7 @@ import {
 } from './service';
 import { EstablecimientosService } from './service/establecimientos.service';
 import { InvestigacionService } from './service/investigacion.service';
+import { CtSymptom2lltService } from './service/ct-symptom2llt.service';
 import { PacienteService } from './service/paciente.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
@@ -197,11 +198,13 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SeedService,
     VacunometroService,
     InvestigacionService,
+    CtSymptom2lltService,
     GacetaService,
   ],
   exports: [
     SyncService,
     IntegradorService,
+    CtSymptom2lltService,
     PacienteVigiflowService,
     PacienteDhis2Service,
     MedicamentoService,

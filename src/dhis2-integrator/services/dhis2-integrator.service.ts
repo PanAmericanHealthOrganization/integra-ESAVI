@@ -33,6 +33,7 @@ import { Dhis2EventsService } from './dhis2-events.service';
 import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
+import { CtSymptom2lltService } from 'src/integrator/service/ct-symptom2llt.service';
 import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 @Injectable()
@@ -41,6 +42,7 @@ export class Dhis2IntegratorService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly integradorService: IntegradorService,
+    private readonly ctSymptom2lltService: CtSymptom2lltService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
@@ -910,6 +912,11 @@ export class Dhis2IntegratorService {
       if (setOpciones) {
         const datoEsaviSintomatologiai = new CreateDatoEsaviDto();
         datoEsaviSintomatologiai.nombreReportado = setOpciones;
+        
+        const catalogoSymptom2llt = await this.ctSymptom2lltService.mapSymptomToLlt(setOpciones);
+        datoEsaviSintomatologiai.codigoLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltCode ? catalogoSymptom2llt.lltCode : null;
+        datoEsaviSintomatologiai.nameLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltName ? catalogoSymptom2llt.lltName : null;
+
         datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
           row[
             headers.findIndex(
@@ -919,6 +926,7 @@ export class Dhis2IntegratorService {
         );
         datoEsaviSintomatologiai.descripcion = `Sintomatología DHIS2 ${i}`;
         datoEsaviSintomatologiai.codigoCaso = notificacion.codigoDhis2Evento;
+
         datoEsavis.push(datoEsaviSintomatologiai); //agregar al array principal
       }
     }
