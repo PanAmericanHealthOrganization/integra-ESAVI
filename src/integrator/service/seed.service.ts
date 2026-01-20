@@ -21,6 +21,7 @@ import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
 import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
 import { CreateCtIcd10meddraDto, CtIcd10meddra } from '../entity/ct-icd10meddra.entity';
+import { CreateCtSymptom2lltDto, CtSymptom2llt } from '../entity/ct-symptom2llt.entity';
 
 @Injectable()
 export class SeedService {
@@ -32,6 +33,8 @@ export class SeedService {
     private catalogoRepository: Repository<Catalogo>,
     @InjectRepository(CtIcd10meddra, 'POSTGRES_INTEGRATOR_DS')
     private ctIcd10meddraRepository: Repository<CtIcd10meddra>,
+    @InjectRepository(CtSymptom2llt, 'POSTGRES_INTEGRATOR_DS')
+    private ctSymptom2lltRepository: Repository<CtSymptom2llt>,
     @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
     private grupoEtarioRepository: Repository<GrupoEtario>,
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
@@ -80,6 +83,9 @@ export class SeedService {
 
       // 2.4. Cargar reacciones, diagnósticos o enfermedades desde Excel
       await this.loadIcd10meddraFromExcel();
+
+      // 2.5. Cargar síntomas DHIS2 a LLT desde Excel
+      await this.loadSymptomToLltFromExcel();
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
@@ -1230,6 +1236,66 @@ export class SeedService {
     });
   }
   //--fin de carga catálogo Excel mapeo de ICD-10 MedDRA------------------------------------------------------------------------------------------------------
+
+  //--inicio de la carga del catálogo para el mapeo de SÍNTOMAS DE DHIS2 a LLT MedDRA desde el documento Excel------------------------------------------------------------------------------------------------------
+  private async loadSymptomToLltFromExcel() {
+    await this.runSyncProcess('Carga de catálogo SÍNTOMAS DHIS2, para el mapeo a LLT MedDRA...', async () => {
+      console.log('🗺️ Cargando registros SÍNTOMAS DHIS2 desde Excel...');
+      try{
+        const catalogoSymptom2llt = read(
+          await fs.promises.readFile(path.join(process.cwd(), 'upload_files', 'catalogos-excel', 'Sintomas-DHIS2_MedDRA-LLT.xlsx')),
+        );
+        const ws = catalogoSymptom2llt.Sheets[catalogoSymptom2llt.SheetNames[0]];
+        const importRange = 'A2:E68'; //Rango de datos a importar desde el archivo Excel, excluyendo las filas de encabezado.
+        const headers = 'A'; //Fila de encabezados en el archivo Excel.
+        const catalogoJson = utils.sheet_to_json(ws, { 
+          range: importRange, 
+          header: headers,//utils.sheet_to_json(ws, { range: headers, header: 1 })[0] });
+        });
+        this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros SÍNTOMAS DHIS2 en el archivo Excel.`);
+
+        // Usar for...of para esperar que cada operación asíncrona termine
+        for (const col of catalogoJson) {
+          // TODO: colocar auditoria correcta
+          const auditoria: IAuditoria = {
+            createdAt: new Date(),
+            createdBy: 'System',
+            updatedAt: undefined,
+            updatedBy: 'System',
+            deletedAt: undefined,
+            deletedBy: 'System',
+            isEnabled: true,
+            isActive: true,
+          };     
+    
+          // Create CtSymtom2llt object
+          const ctSymptom2llt = new CreateCtSymptom2lltDto();
+          ctSymptom2llt.item = col['A'] && col['A'] ? col['A'] : null;
+          ctSymptom2llt.symptom = col['B'] && col['B'] ? col['B'] : null; //col['B'] && col['B'] ? col['B'] : null;
+          ctSymptom2llt.lltName = col['C'] && col['C'] ? col['C'] : null;
+          ctSymptom2llt.lltCode = col['D'] && col['D'] ? col['D'] : null;
+          ctSymptom2llt.observation = col['E'] && col['E'] ? col['E'] : null;
+
+          const existing =  await this.ctSymptom2lltRepository.findOne({
+            where: {
+              symptom: ctSymptom2llt.symptom,
+              lltCode: ctSymptom2llt.lltCode,
+            }
+          });
+          if(!existing){
+            await this.ctSymptom2lltRepository.save({ ...ctSymptom2llt, ...auditoria } as CtSymptom2llt);
+          }        
+
+        } //--fin del for...of
+        const total = await this.ctSymptom2lltRepository.count();
+        console.log(`✅ Total de registros SÍNTOMAS DHIS2 en la base de datos: ${total}`);
+        console.log('✅ Registros SÍNTOMAS DHIS2 cargados desde Excel');
+      }catch(error){
+        console.error('❌ Error al cargar SÍNTOMAS DHIS2 desde Excel:', error);
+      }    
+    });
+  }
+  //--fin de carga catálogo Excel mapeo de SÍNTOMAS DE DHIS2 a LLT MedDRA ------------------------------------------------------------------------------------------------------
 
   /**
    * Método para limpiar el contenido de todas las tablas que inician con "TR"
