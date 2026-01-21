@@ -859,9 +859,25 @@ export class Dhis2IntegratorService {
       if (dato.descripcion && dato.codigo) {
         const datoEsaviInicial = new CreateDatoEsaviDto();
         datoEsaviInicial.nombre = dato.descripcion;
+        datoEsaviInicial.codigoEsaviCie10 = dato.codigo;
         datoEsaviInicial.fechaEsavi = fechaEsavi;
         datoEsaviInicial.descripcion = `Diagnóstico inicial DHIS2 ${i}`;
         datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
+
+        //Mapeo a MEDDRA llt a partir del código CIE10
+        const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(dato.codigo);
+        if(icd10meddra && icd10meddra.meddraLltCode){
+          datoEsaviInicial.codigoLLT = icd10meddra.meddraLltCode;
+
+          const meddraLlt = await this.meddraLltService.searchLltByCode(icd10meddra.meddraLltCode);
+          datoEsaviInicial.nameLLT = meddraLlt && meddraLlt.name ? meddraLlt.name : null;
+          datoEsaviInicial.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
+
+          datoEsaviInicial.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
+          const meddraPt = await this.meddraPtService.searchPtByCode(meddraLlt.ptCode);
+          datoEsaviInicial.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
+          datoEsaviInicial.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
+        }
         datoEsavis.push(datoEsaviInicial);
       }
     }
