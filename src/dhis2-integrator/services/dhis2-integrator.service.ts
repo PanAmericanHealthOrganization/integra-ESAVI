@@ -906,17 +906,31 @@ export class Dhis2IntegratorService {
       const fechaEsavi =
         fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
 
-      // Verifica que nombre y código no estén vacíos
-      if (dato.descripcion && dato.codigo) {
-        const datoEsavi = new CreateDatoEsaviDto();
-        datoEsavi.nombre = dato.descripcion;
-        // datoEsavi.codigoEsaviCie10 = dato.codigo;
-        datoEsavi.fechaEsavi = fechaEsavi;
-        datoEsavi.descripcion = `Diagnóstico final DHIS2 ${i}`;
-        datoEsavi.codigoCaso = notificacion.codigoDhis2Evento;
-
-        datoEsavis.push(datoEsavi);
-      }
+      // Verifica que nombre y código no estén vacíos      
+        if (dato.descripcion && dato.codigo) {
+          const datoEsaviFinal = new CreateDatoEsaviDto();
+          datoEsaviFinal.nombre = dato.descripcion;
+          datoEsaviFinal.codigoEsaviCie10 = dato.codigo;
+          datoEsaviFinal.fechaEsavi = fechaEsavi;
+          datoEsaviFinal.descripcion = `Diagnóstico final DHIS2 ${i}`;
+          datoEsaviFinal.codigoCaso = notificacion.codigoDhis2Evento;
+  
+          //Mapeo a MEDDRA llt a partir del código CIE10
+          const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(dato.codigo);
+          if(icd10meddra && icd10meddra.meddraLltCode){
+            datoEsaviFinal.codigoLLT = icd10meddra.meddraLltCode;
+  
+            const meddraLlt = await this.meddraLltService.searchLltByCode(icd10meddra.meddraLltCode);
+            datoEsaviFinal.nameLLT = meddraLlt && meddraLlt.name ? meddraLlt.name : null;
+            datoEsaviFinal.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
+  
+            datoEsaviFinal.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
+            const meddraPt = await this.meddraPtService.searchPtByCode(meddraLlt.ptCode);
+            datoEsaviFinal.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
+            datoEsaviFinal.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
+          }
+          datoEsavis.push(datoEsaviFinal);
+        }
     }
     //console.log('DtaoooEsaviiiiii:::', datoEsavis);
 
