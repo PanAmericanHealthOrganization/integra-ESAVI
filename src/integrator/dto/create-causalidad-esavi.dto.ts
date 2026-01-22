@@ -10,6 +10,12 @@ export class CreateCausalidadEsaviDto {
   referenciaIdentificadorVacuna: string;
   clasificacionCausalidadNaranjo: string;
   //propiedades nuevas
-  codigoDxFinalCie10: string;
-  codigoDxFinalMeddraLlt: string;
+  codigoCie10DxFinal1: string;
+  codMeddraLltDxFinal1: string;
+
+  codigoCie10DxFinal2: string;
+  codMeddraLltDxFinal2: string;
+
+  codigoCie10DxFinal3: string;
+  codMeddraLltDxFinal3: string;
 }

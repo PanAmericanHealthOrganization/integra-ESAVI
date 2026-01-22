@@ -40,6 +40,7 @@ import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { CtIcd10meddra } from 'src/integrator/entity/ct-icd10meddra.entity';
 import { CtIcd10meddraService } from 'src/integrator/service/ct-icd10meddra.service';
+import { CausalidadEsavi } from 'src/integrator/entity';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
@@ -663,8 +664,39 @@ export class Dhis2IntegratorService {
     );
     antecedentePreexistencia.codigoEsaviCIE10 = antecedentePrevio.codigo;
     antecedentePreexistencia.descripcion = antecedentePrevio.descripcion;
+    
     // Create Causalidad Esavi
     const causalidadEsavi = new CreateCausalidadEsaviDto();
+    // Implementación temporal, mientras se revisa la Relación entre tablas.
+    const cantDxFinales=3;
+    for(let i=1; i<=cantDxFinales; i++){
+      const diagnosticoFinal = this.separarCodigoYDescripcion(
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === `DNVE ESAVI TRK - Diagnostico final ${i}`, //`DNVE ESAVI TRK - Diagnostico final ${i}`
+          )
+        ],
+      );
+      /*if(i===1){
+        causalidadEsavi.codigoCie10DxFinal1 = diagnosisFinal.codigo;
+      } else if(i===2){
+        causalidadEsavi.codigoCie10DxFinal2 = diagnosisFinal.codigo;
+      } else if(i===3){
+        causalidadEsavi.codigoCie10DxFinal3 = diagnosisFinal.codigo;
+      }*/
+     
+     if(  diagnosticoFinal.codigo && diagnosticoFinal.descripcion ){//Si ambos valores están presentes, se asigna el código.){
+      causalidadEsavi[`codigoCie10DxFinal${i}` as keyof CausalidadEsavi] = diagnosticoFinal.codigo; //Usando indexación de tipo para asignar dinámicamente. //El keyof no es "CreateCausalidadEsaviDto" pero, es para evitar error de TS.
+      // Mapeo a MEDDRA llt a partir del código CIE10
+      const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(diagnosticoFinal.codigo);
+      if(  icd10meddra  && icd10meddra.meddraLltCode){
+        causalidadEsavi[ `codMeddraLltDxFinal${i}` as keyof CausalidadEsavi ] = icd10meddra.meddraLltCode;
+      }
+     }
+    }
+
+    //---fin de implementación temporal.
     causalidadEsavi.clasificacionCausaEsavi = 
       row[
         headers.findIndex(
