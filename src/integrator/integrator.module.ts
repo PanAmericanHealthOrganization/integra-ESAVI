@@ -51,6 +51,8 @@ import {
 } from './entity';
 import { CtIcd10meddra } from './entity/ct-icd10meddra.entity';
 import { CtSymptom2llt } from './entity/ct-symptom2llt.entity';
+import { WhodrugHomologaVacs } from './entity/whodrug-homologavacs.entity';
+import { WhodrugVacsTemp } from './entity/whodrug-vacstemp.entity';
 import { Establecimiento } from './entity/establecimiento.entity';
 import { Investigacion } from './entity/investigacion.entity';
 import { IntegradorService } from './facade/integrador.service';
@@ -118,6 +120,8 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         CausalidadEsavi,
         CtIcd10meddra,
         CtSymptom2llt,
+        WhodrugHomologaVacs,
+        WhodrugVacsTemp,
         DatoEsavi,
         DatoVacuna,
         DatoVacunacion,
