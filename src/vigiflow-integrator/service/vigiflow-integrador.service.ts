@@ -535,6 +535,9 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.codigoAtc = reg['G'];
             updateDatoVacuna.rolVacuna = reg['C'];
 
+            //----------------------------------------------
+            const utilizarSoloCatalogosWHODrugExcelTemp = true; // cambiar a false para usar solo diccionario oficial WHODrug.
+
             const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
             const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
             // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
