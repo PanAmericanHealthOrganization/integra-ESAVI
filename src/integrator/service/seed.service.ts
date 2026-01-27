@@ -1361,8 +1361,8 @@ export class SeedService {
           whodrugVacsTemp.pharFormMediProdId = col['P'] && col['P'] ? col['P'] : null;
           whodrugVacsTemp.strength = col['Q'] && col['Q'] ? col['Q'] : null;
           whodrugVacsTemp.strengthMediProdId = col['R'] && col['R'] ? col['R'] : null;
-          whodrugVacsTemp.isGeneric = col['S'] && col['S'] ? col['S'] : null;
-          whodrugVacsTemp.isPreferred = col['T'] && col['T'] ? col['T'] : null;
+          whodrugVacsTemp.isGeneric = col['S'] && col['S'] ? String( col['S'] ) : null;
+          whodrugVacsTemp.isPreferred = col['T'] && col['T'] ? String( col['T'] ) : null;
 
           const existing =  await this.whodrugVacsTempRepository.findOne({
             where: {
