@@ -22,6 +22,8 @@ import { Paciente } from '../entity/paciente.entity';
 import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
 import { CreateCtIcd10meddraDto, CtIcd10meddra } from '../entity/ct-icd10meddra.entity';
 import { CreateCtSymptom2lltDto, CtSymptom2llt } from '../entity/ct-symptom2llt.entity';
+import { CreateWhodrugHomologaVacsDto, WhodrugHomologaVacs } from '../entity/whodrug-homologavacs.entity';
+import { CreateWhodrugVacsTempDto, WhodrugVacsTemp } from '../entity/whodrug-vacstemp.entity';
 
 @Injectable()
 export class SeedService {
@@ -35,6 +37,10 @@ export class SeedService {
     private ctIcd10meddraRepository: Repository<CtIcd10meddra>,
     @InjectRepository(CtSymptom2llt, 'POSTGRES_INTEGRATOR_DS')
     private ctSymptom2lltRepository: Repository<CtSymptom2llt>,
+    @InjectRepository(WhodrugHomologaVacs, 'POSTGRES_INTEGRATOR_DS')
+    private whodrugHomologaVacsRepository: Repository<WhodrugHomologaVacs>,
+    @InjectRepository(WhodrugVacsTemp, 'POSTGRES_INTEGRATOR_DS')
+    private whodrugVacsTempRepository: Repository<WhodrugVacsTemp>,
     @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
     private grupoEtarioRepository: Repository<GrupoEtario>,
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
@@ -86,6 +92,12 @@ export class SeedService {
 
       // 2.5. Cargar síntomas DHIS2 a LLT desde Excel
       await this.loadSymptomToLltFromExcel();
+
+      // 2.6. Cargar WHODrug Vacunas Provisional o Temporal desde Excel
+      await this.loadWhodrugVacsTempFromExcel();
+
+      //2.7. Cargar WHODrug Homologación de Vacunas VigiFlow desde Excel
+      await this.loadWhodrugHomologacionVfFromExcel();
 
       // 3. Crear grupos etarios
       await this.seedGruposEtarios();
@@ -1236,7 +1248,6 @@ export class SeedService {
     });
   }
   //--fin de carga catálogo Excel mapeo de ICD-10 MedDRA------------------------------------------------------------------------------------------------------
-
   //--inicio de la carga del catálogo para el mapeo de SÍNTOMAS DE DHIS2 a LLT MedDRA desde el documento Excel------------------------------------------------------------------------------------------------------
   private async loadSymptomToLltFromExcel() {
     await this.runSyncProcess('Carga de catálogo SÍNTOMAS DHIS2, para el mapeo a LLT MedDRA...', async () => {
@@ -1296,6 +1307,173 @@ export class SeedService {
     });
   }
   //--fin de carga catálogo Excel mapeo de SÍNTOMAS DE DHIS2 a LLT MedDRA ------------------------------------------------------------------------------------------------------
+
+  //--inicio de la carga del catálogo Provisional o TEMPORAL WHODrug desde el documento Excel------------------------------------------------------------------------------------------------------
+  private async loadWhodrugVacsTempFromExcel() { //TODO: Comprobar las características (por ejemplo tipo de dato, que la última fila y columna estén vacías) del archivo Excel, para no cargar por error registros de otro catálogo. Puede ser un paso adicional de validación antes de proceder a la carga, o en la capa de Presentación o Usuario (Frontend).
+    await this.runSyncProcess('Carga de catálogo Provisional WHODrug, para mapeo con VigiFLow...', async () => {
+      console.log('🗺️ Cargando registros WHODRUG PROVISIONAL desde Excel...');
+      try{
+        const catalogoWhodrugVacsTemp = read(
+          await fs.promises.readFile(path.join(process.cwd(), 'upload_files', 'catalogos-excel', '20260126-WHODrug-vacunas-temporal.xlsx')),
+        );
+        const ws = catalogoWhodrugVacsTemp.Sheets[catalogoWhodrugVacsTemp.SheetNames[0]];
+        const importRange = 'A2:T318'; //Rango de datos a importar desde el archivo Excel, excluyendo las filas de encabezado.
+        const headers = 'A'; //Fila de encabezados en el archivo Excel.
+        const catalogoJson = utils.sheet_to_json(ws, { 
+          range: importRange, 
+          header: headers,//utils.sheet_to_json(ws, { range: headers, header: 1 })[0] });
+          raw: true, // 👈 fuerza a no convertir tipos
+          defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
+        });
+        this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros WHODRUG PROVISIONAL en el archivo Excel.`);
+
+        // Usar for...of para esperar que cada operación asíncrona termine
+        for (const col of catalogoJson) {
+          // TODO: colocar auditoria correcta
+          const auditoria: IAuditoria = {
+            createdAt: new Date(),
+            createdBy: 'System',
+            updatedAt: undefined,
+            updatedBy: 'System',
+            deletedAt: undefined,
+            deletedBy: 'System',
+            isEnabled: true,
+            isActive: true,
+          };     
+    
+          // Create WhodrugVacsTemp object
+          const whodrugVacsTemp = new CreateWhodrugVacsTempDto();
+          whodrugVacsTemp.item = col['A'] && col['A'] ? col['A'] : null;
+          whodrugVacsTemp.drugCode = col['B'] && col['B'] ? col['B'] : null; //col['B'] && col['B'] ? col['B'] : null;
+          whodrugVacsTemp.drugName = col['C'] && col['C'] ? col['C'] : null;
+          whodrugVacsTemp.medicinalProductId = col['D'] && col['D'] ? col['D'] : null;
+          whodrugVacsTemp.atcCode = col['E'] && col['E'] ? col['E'] : null;
+          whodrugVacsTemp.abbreviation = col['F'] && col['F'] ? col['F'] : null;
+          whodrugVacsTemp.activeIngredient = col['G'] && col['G'] ? col['G'] : null;
+          whodrugVacsTemp.actiIngredientTranslation = col['H'] && col['H'] ? col['H'] : null;
+          whodrugVacsTemp.languageCode = col['I'] && col['I'] ? col['I'] : null;
+          whodrugVacsTemp.countryIso3Code = col['J'] && col['J'] ? col['J'] : null;
+          whodrugVacsTemp.countryMediProdId = col['K'] && col['K'] ? col['K'] : null;
+          whodrugVacsTemp.maHolder = col['L'] && col['L'] ? col['L'] : null;
+          whodrugVacsTemp.maHolderMediProdId = col['M'] && col['M'] ? col['M'] : null;
+          whodrugVacsTemp.pharmaceuticalForm = col['N'] && col['N'] ? col['N'] : null;
+          whodrugVacsTemp.pharFormTranslation = col['O'] && col['O'] ? col['O'] : null;
+          whodrugVacsTemp.pharFormMediProdId = col['P'] && col['P'] ? col['P'] : null;
+          whodrugVacsTemp.strength = col['Q'] && col['Q'] ? col['Q'] : null;
+          whodrugVacsTemp.strengthMediProdId = col['R'] && col['R'] ? col['R'] : null;
+          whodrugVacsTemp.isGeneric = col['S'] && col['S'] ? col['S'] : null;
+          whodrugVacsTemp.isPreferred = col['T'] && col['T'] ? col['T'] : null;
+
+          const existing =  await this.whodrugVacsTempRepository.findOne({
+            where: {
+              //A  //Otra opción sería asegurarse de que esta primera columna "item" sea única en el archivo Excel. Y al usar este filtro, ya se comentarían todos los filtros  de las otras 10 columnas (BCDJKLMPQR).
+              /*item: whodrugVacsTemp.item,*/
+
+              //B
+              drugCode: whodrugVacsTemp.drugCode,
+
+              //C
+              drugName: whodrugVacsTemp.drugName,
+
+              //D
+              medicinalProductId: whodrugVacsTemp.medicinalProductId,
+
+              //J
+              countryIso3Code: whodrugVacsTemp.countryIso3Code,
+
+              //K
+              countryMediProdId: whodrugVacsTemp.countryMediProdId,
+
+              //L
+              maHolder: whodrugVacsTemp.maHolder,
+
+              //M
+              maHolderMediProdId: whodrugVacsTemp.maHolderMediProdId,
+
+              //P
+              pharFormMediProdId: whodrugVacsTemp.pharFormMediProdId,
+
+              //Q
+              strength: whodrugVacsTemp.strength,
+
+              //R
+              strengthMediProdId: whodrugVacsTemp.strengthMediProdId,
+            }
+          });
+          if(!existing){
+            await this.whodrugVacsTempRepository.save({ ...whodrugVacsTemp, ...auditoria } as WhodrugVacsTemp);
+          }        
+
+        } //--fin del for...of
+        const total = await this.whodrugVacsTempRepository.count();
+        console.log(`✅ Total de registros WHODRUG VACS PROVISIONAL en la base de datos: ${total}`);
+        console.log('✅ Registros WHODRUG VACS PROVISIONAL cargados desde Excel');
+      }catch(error){
+        console.error('❌ Error al cargar WHODRUG VACS PROVISIONAL desde Excel:', error);
+      }    
+    });
+  }
+  //--fin de carga catálogo Excel WHODrug Provisional VigiFlow ------------------------------------------------------------------------------------------------------
+
+  //--inicio de la carga del catálogo auxiliar WHODrug Homologación Vacunas VigiFlow desde el documento Excel------------------------------------------------------------------------------------------------------
+  private async loadWhodrugHomologacionVfFromExcel() { //TODO: Comprobar las características (por ejemplo tipo de dato, que la última fila y columna estén vacías) del archivo Excel, para no cargar por error registros de otro catálogo. Puede ser un paso adicional de validación antes de proceder a la carga, o en la capa de Presentación o Usuario (Frontend).
+    await this.runSyncProcess('Carga de catálogo auxiliar WHODrug Homologación Vacunas VigiFlow, para mapeo...', async () => {
+      console.log('🗺️ Cargando registros WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow desde Excel...');
+      try{
+        const catalogoWhodrugHomologaVf = read(
+          await fs.promises.readFile(path.join(process.cwd(), 'upload_files', 'catalogos-excel', '20260126-ECU-WHODrug-Homologacion-Vacunas-VigiFlow.xlsx')),
+        );
+        const ws = catalogoWhodrugHomologaVf.Sheets[catalogoWhodrugHomologaVf.SheetNames[0]];
+        const importRange = 'A2:C36'; //Rango de datos a importar desde el archivo Excel, excluyendo las filas de encabezado.
+        const headers = 'A'; //Fila de encabezados en el archivo Excel.
+        const catalogoJson = utils.sheet_to_json(ws, { 
+          range: importRange, 
+          header: headers,//utils.sheet_to_json(ws, { range: headers, header: 1 })[0] });
+          raw: true, // 👈 fuerza a no convertir tipos
+          defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
+        });
+        this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow en el archivo Excel.`);
+
+        // Usar for...of para esperar que cada operación asíncrona termine
+        for (const col of catalogoJson) {
+          // TODO: colocar auditoria correcta
+          const auditoria: IAuditoria = {
+            createdAt: new Date(),
+            createdBy: 'System',
+            updatedAt: undefined,
+            updatedBy: 'System',
+            deletedAt: undefined,
+            deletedBy: 'System',
+            isEnabled: true,
+            isActive: true,
+          };     
+    
+          // Create WhodrugVacsTemp object
+          const whodrugHomologaVacs = new CreateWhodrugHomologaVacsDto();
+          whodrugHomologaVacs.patenteWhodrugVigiflow = col['A'] && col['A'] ? col['A'] : null;
+          whodrugHomologaVacs.drugNameWhodrug = col['B'] && col['B'] ? col['B'] : null; //col['B'] && col['B'] ? col['B'] : null;
+          whodrugHomologaVacs.mpIdWhodrug = col['C'] && col['C'] ? col['C'] : null;
+          
+          const existing =  await this.whodrugHomologaVacsRepository.findOne({
+            where: {
+              patenteWhodrugVigiflow: whodrugHomologaVacs.patenteWhodrugVigiflow,
+            }
+          });
+          if(!existing){
+            await this.whodrugHomologaVacsRepository.save({ ...whodrugHomologaVacs, ...auditoria } as WhodrugHomologaVacs);
+          }        
+
+        } //--fin del for...of
+        const total = await this.whodrugHomologaVacsRepository.count();
+        console.log(`✅ Total de registros WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow en la base de datos: ${total}`);
+        console.log('✅ Registros WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow cargados desde Excel');
+      }catch(error){
+        console.error('❌ Error al cargar WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow desde Excel:', error);
+      }    
+    });
+  }
+  //--fin de carga catálogo Excel WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow ------------------------------------------------------------------------------------------------------
+
 
   /**
    * Método para limpiar el contenido de todas las tablas que inician con "TR"
