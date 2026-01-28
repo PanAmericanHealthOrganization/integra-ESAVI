@@ -86,6 +86,7 @@ import { EstablecimientosService } from './service/establecimientos.service';
 import { InvestigacionService } from './service/investigacion.service';
 import { CtSymptom2lltService } from './service/ct-symptom2llt.service';
 import { CtIcd10meddraService } from './service/ct-icd10meddra.service';
+import { WhodrugVacsTempService } from './service/whodrug-vacstemp.service';
 import { PacienteService } from './service/paciente.service';
 import { SyncService } from './service/sync.service';
 import { VacunometroService } from './service/vacunometro.service';
@@ -205,6 +206,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     InvestigacionService,
     CtSymptom2lltService,
     CtIcd10meddraService,
+    WhodrugVacsTempService,
     GacetaService,
   ],
   exports: [
@@ -212,6 +214,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     IntegradorService,
     CtIcd10meddraService,
     CtSymptom2lltService,
+    WhodrugVacsTempService,
     PacienteVigiflowService,
     PacienteDhis2Service,
     MedicamentoService,

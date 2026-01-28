@@ -1133,7 +1133,7 @@ export class Dhis2IntegratorService {
 
     for (let i = 1; i <= numeroVacunas; i++) {
       const datoVacuna = new CreateDatoVacunaDto();
-      datoVacuna.nombreVacuna =
+      datoVacuna.drugName =
         row[
           headers.findIndex(
             (header) => header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`,
@@ -1199,7 +1199,7 @@ export class Dhis2IntegratorService {
       );
 
       if (
-        datoVacuna.nombreVacuna ||
+        datoVacuna.drugName ||
         datoVacuna.nombreFabricante ||
         datoVacuna.numeroLote ||
         datoVacuna.fechaVencimientoVacuna ||
@@ -1811,7 +1811,7 @@ export class Dhis2IntegratorService {
 
       for (let i = 1; i <= numeroVacunas; i++) {
         const datoVacuna = new CreateDatoVacunaDto();
-        datoVacuna.nombreVacuna =
+        datoVacuna.drugName =
           row[
             data.headers.findIndex(
               (header) => header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`,
@@ -1867,7 +1867,7 @@ export class Dhis2IntegratorService {
         // datoVacuna.numeroDosisVacuna = (row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`)])
 
         if (
-          datoVacuna.nombreVacuna ||
+          datoVacuna.drugName ||
           datoVacuna.nombreFabricante ||
           datoVacuna.numeroLote ||
           datoVacuna.fechaVencimientoVacuna ||

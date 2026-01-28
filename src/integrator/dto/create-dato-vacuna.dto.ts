@@ -2,11 +2,12 @@ export class CreateDatoVacunaDto {
   codigoAtc: string;
   rolVacuna: string; // Se mantiene como string en el DTO para recibir la descripción
   sistemaDeCodificacion: string;
-  nombreVacuna: string;
+  
   nombreVacPatenteWHODrug: string;
   //nombreVacunaNormalizada: string;
   //principioActivoWhoDrug: string;
 
+  drugName: string; //nombreVacuna: string;
   drugCode : string;
   mahholdersJson : any
   activeIngredientJson : any

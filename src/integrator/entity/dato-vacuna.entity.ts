@@ -48,21 +48,20 @@ export class DatoVacuna extends Auditoria {
    *
    */
   @Column({
-    name: 'NOMBRE_VACUNA',
-    nullable: true,
-    comment: 'Nombre comercial de la vacuna administrada',
-  })
-  nombreVacuna: string;// utilizado por vf y d2.
-
-  /**
-   *
-   */
-  @Column({
     name: 'NOMBRE_VAC_PATENTE_WHODRUG', // drugName //'NOMBRE_VACUNA_PATENTE_WHO_DRUG'
     nullable: true,
     comment: 'Nombre de la vacuna según la patente del estándar WHODrug',
   })
   nombreVacPatenteWHODrug: string; // utilizado por vf.
+  /**
+   *
+   */
+  @Column({
+    name: 'DRUG_NAME',//'NOMBRE_VACUNA',
+    nullable: true,
+    comment: 'Nombre de la vacuna administrada, según el diccionario WHODrug Global de Uppsala Monitoring Centre.', //'Nombre comercial de la vacuna administrada',
+  })
+  drugName: string;//nombreVacuna: string; // utilizado por vf y d2.
 
   /**
    *

@@ -34,7 +34,7 @@ export class DatoVacunaService {
       // 1. Buscar si ya existe un DatoVacuna con los mismos valores (nombreVacuna, codigoAtc, numeroLote, notificacion)
       const existingDatoVacuna = await this.datoVacunaRepository.findOne({
         where: {
-          nombreVacuna: createDto.nombreVacuna,
+          drugName: createDto.drugName,
           codigoAtc: createDto.codigoAtc,
           numeroLote: createDto.numeroLote,
           notificacion: notificacion, // Asociamos la notificación al buscar
@@ -99,7 +99,7 @@ export class DatoVacunaService {
         const existingDatoVacuna = await this.datoVacunaRepository.findOne({
           where: {
             notificacion: { id: notificacion.id },
-            nombreVacuna: dto.nombreVacuna, // Buscar por nombreVacuna además de la notificación
+            drugName: dto.drugName, // Buscar por nombreVacuna además de la notificación
           },
         });
 
@@ -144,7 +144,7 @@ export class DatoVacunaService {
       const datosVacuna = await this.datoVacunaRepository.find({
         where: {
           notificacion: { id: uuidNotificacion }, // Buscar por el id de la notificación
-          nombreVacuna: IsNull(),
+          drugName: IsNull(),
           rolVacuna: IsNull(),
           numeroLote: IsNull(),
           nombreVacPatenteWHODrug: IsNull(),
@@ -203,7 +203,7 @@ export class DatoVacunaService {
       where: { 
         isActive: true, 
         id: uuid, 
-        nombreVacuna: IsNull(), 
+        drugName: IsNull(), 
         nombreVacPatenteWHODrug: IsNull(), 
         numeroLote: IsNull(), 
         codigoAtc: IsNull(), 

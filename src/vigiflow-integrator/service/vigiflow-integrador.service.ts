@@ -36,6 +36,8 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
+import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
+import { WhodrugVacsTempService } from 'src/integrator/service/whodrug-vacstemp.service';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -69,6 +71,8 @@ export class VigiflowIntegradorService {
     private readonly drugService: DrugService,
     private readonly maholderService: MaholderService,
     private readonly activeIngredentService: ActiveIngredientsService,
+    private readonly whodrugVacsTempService: WhodrugVacsTempService,
+
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
     private readonly meddraSocService: MeddraSocService,
@@ -515,7 +519,7 @@ export class VigiflowIntegradorService {
           //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
           if (validacionCdgAtcVacunas) {
             let updateDatoVacuna = new UpdateDatoVacunaDto();
-            updateDatoVacuna.nombreVacuna = reg['D'];
+            //updateDatoVacuna.nombre = reg['D'];//updateDatoVacuna.drugName = reg['D']; //Nombre del medicamento tal como fue reportado por el notificador inicial / original
             updateDatoVacuna.accionTomada = reg['M'];
             updateDatoVacuna.dosis = reg['S'];
             updateDatoVacuna.intervaloDosificacion = reg['T'];
@@ -530,65 +534,125 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.paisAutorizacion = reg['J'];
             updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
             updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
-            updateDatoVacuna.nombreVacPatenteWHODrug = reg['E'] && reg['E'] ? this.limpiarNombrePatenteWHODrug(reg['E']) : reg['E'];
-            updateDatoVacuna.acIngredientTranslationJson = reg['F'] && this.parseIngredients(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
+            
+            const nombreVacPatenteWHODrugVigiFlow = reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
+            updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;//reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
+            
+            const principioActivoWHODrugVigiFlow = reg['F'] && reg['F'] ? this.limpiarCampoWHODrug(reg['F']) : reg['F'];
+            updateDatoVacuna.acIngredientTranslationJson = this.parseIngredientsToJson( principioActivoWHODrugVigiFlow );//reg['F'] && this.parseIngredientsToJson(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
             updateDatoVacuna.codigoAtc = reg['G'];
             updateDatoVacuna.rolVacuna = reg['C'];
 
-            //----------------------------------------------
-            const utilizarSoloCatalogosWHODrugExcelTemp = true; // cambiar a false para usar solo diccionario oficial WHODrug.
+            //----------------------------------------------------------------------------------------------------------------//
+            //----------------------------------------------------------------------------------------------------------------//
+            const utilizarSoloDiccionarioWhodrugGlobalUmc = false; // cambiar a true para usar solo catálogos Excel provisionales o temporales, mientras concluye el proceso de actulización del diccionario oficial.
 
-            const drugName = updateDatoVacuna.nombreVacPatenteWHODrug;
-            const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
-            // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
-            //fsappend.appendFileSync('C:/logsNumElementosDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
-            if (whodrug.length > 0) {
-              updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
-              
-              const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-              updateDatoVacuna.mahholdersJson = mah.map((item) => ({
-                name: item.name,
-                medicinalProductID: item.medicinalProductID,
-              }));
-              const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-              //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
-              updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
-                ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
-              }));
-              if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson)) {
-                              
-                // Para cada ingrediente activo, obtener su traducción en español
-                const translatedIngredients = await Promise.all(
-                  ingredentActive.map(async (ingredient) => {
-                    const translation = await this.activeIngredentService.getIngredientTranslation(
-                      ingredient.id,
-                      'es-ES'
-                    ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data. //Es probable que no sea necesario, porque, desde VigiFlow ya vienen traducidos varios ingredientes activos.
+            if( utilizarSoloDiccionarioWhodrugGlobalUmc ){
+              //----INICIO estandarización utilizando el diccionario oficial de WHODrug Global de Uppsala Monitoring Centre.----
+              const drugName = nombreVacPatenteWHODrugVigiFlow;//updateDatoVacuna.nombreVacPatenteWHODrug;
+              const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
+              // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
+              //fsappend.appendFileSync('C:/logsNumElementosDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
+              if (whodrug.length > 0) {
+                updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrug[0]?.drugName;
+                
+                const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
+                updateDatoVacuna.mahholdersJson = mah.map((item) => ({
+                  name: item.name,
+                  medicinalProductID: item.medicinalProductID,
+                }));
+                const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
+                //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
+                updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
+                  ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                }));
+                if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson) ) {
+                                
+                  // Para cada ingrediente activo, obtener su traducción en español
+                  const translatedIngredients = await Promise.all(
+                    ingredentActive.map(async (ingredient) => {
+                      const translation = await this.activeIngredentService.getIngredientTranslation(
+                        ingredient.id,
+                        'es-ES'
+                      ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data. //Es probable que no sea necesario, porque, desde VigiFlow ya vienen traducidos varios ingredientes activos.
 
-                    return { ingredient: translation };//|| ingredient.ingredient };
-                  })
-                );
+                      return { ingredient: translation };//|| ingredient.ingredient };
+                    })
+                  );
 
-                // Resultado final, JSON de traducciones de ingredientes activos
-                //-----------console.log(JSON.stringify(translatedIngredients, null, 2));
-                /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
-                  ingredient: item.ingredient,
-                }));*/
-                updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
-              }
+                  // Resultado final, JSON de traducciones de ingredientes activos
+                  //-----------console.log(JSON.stringify(translatedIngredients, null, 2));
+                  /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
+                    ingredient: item.ingredient,
+                  }));*/
+                  updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
+                }
 
-            } else {
-              //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
-              /*const drugNameFromCsv = buscarWHODrugNameEnCatalogoCsv(drugName);
-              if( drugNameFromCsv ){
-                updateDatoVacuna.nombreVacPatenteWHODrug = drugNameFromCsv; //El alcance sería hasta aquí, porque no se tiene el ID para buscar los demás datos relacionados.
-                //updateDatoVacuna.drugCode = drugCodeFromCsv;
               } else {
-              updateDatoVacuna.drugCode = null;
-              updateDatoVacuna.mahholdersJson = [];
-              updateDatoVacuna.activeIngredientJson = [];
-              }*/
-            }
+                /**
+                 * updateDatoVacuna.drugCode = null;
+                  updateDatoVacuna.mahholdersJson = [];
+                  updateDatoVacuna.activeIngredientJson = [];
+                */
+              } //---- f i n -- estandarización utilizando el diccionario oficial de WHODrug---------------
+            }else{ // TODO: Se recomienda implementar la comprobación de la existencia de las tablas de los catálogos WHODRUG en la base de datos, antes de utilizar los catálogos Excel provisionales o temporales.
+              //--Inicio --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
+              //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
+                /*const drugNameFromCsv = buscarWHODrugNameEnCatalogoCsv(drugName);
+                if( drugNameFromCsv ){
+                  updateDatoVacuna.nombreVacPatenteWHODrug = drugNameFromCsv; //El alcance sería hasta aquí, porque no se tiene el ID para buscar los demás datos relacionados.
+                  //updateDatoVacuna.drugCode = drugCodeFromCsv;
+                } else {
+                updateDatoVacuna.drugCode = null;
+                updateDatoVacuna.mahholdersJson = [];
+                updateDatoVacuna.activeIngredientJson = [];
+                }*/
+              const drugName = nombreVacPatenteWHODrugVigiFlow;
+              const activeIngredient = principioActivoWHODrugVigiFlow;
+              const whodrug: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
+              const cantElementos = whodrug.length;//whodrug.sort((a, b) => a.drugName.length - b.drugName.length); // Ordenar por longitud del nombre del medicamento (de menor a mayor)
+              
+              if ( cantElementos === 0 ) { //drugName
+                const whodrugActiIngr: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient) : [];
+                const cantElementosActIng = whodrugActiIngr.length;
+                
+                if( cantElementosActIng === 0 ){ //activeIngredient
+                  const whodrugActiIngrTranslation: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient) : [];
+                  const cantElementosActIngTransl = whodrugActiIngrTranslation.length;
+
+                  if( cantElementosActIngTransl === 0 ){ // activeIngredientTranslation
+                    //Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, entonces se debe comparar usando el catálogo Excel uxiliar de homologación.
+                  }else if( cantElementosActIngTransl === 1 ){
+                    updateDatoVacuna.drugCode = whodrugActiIngrTranslation[0]?.drugCode;
+                    updateDatoVacuna.drugName = whodrugActiIngrTranslation[0]?.drugName;
+                  }else if( cantElementosActIngTransl > 1 ){
+                    const wdActiIngrTranslation: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActIngTranslationAndIso3CodeNull(activeIngredient);
+                    updateDatoVacuna.drugCode = wdActiIngrTranslation[0]?.drugCode;
+                    updateDatoVacuna.drugName = wdActiIngrTranslation[0]?.drugName;
+                  } else {}
+
+                }else if( cantElementosActIng === 1 ){
+                  updateDatoVacuna.drugCode = whodrugActiIngr[0]?.drugCode;
+                  updateDatoVacuna.drugName = whodrugActiIngr[0]?.drugName;
+                }else if( cantElementosActIng > 1 ){
+                  const wdActiIngr: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActiveIngredientAndIso3CodeNull(activeIngredient);
+                  updateDatoVacuna.drugCode = wdActiIngr[0]?.drugCode;
+                  updateDatoVacuna.drugName = wdActiIngr[0]?.drugName;
+                } else {}
+                
+              }else if( cantElementos === 1 ){ //cantElementos === 1 //cantElementos >0
+                updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrug[0]?.drugName;
+              }else if( cantElementos > 1 ){
+                const whodrugs: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName);//(await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName) : [];
+                updateDatoVacuna.drugCode = whodrugs[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrugs[0]?.drugName;
+              } else {}            
+
+            }//--- Fin --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
+
+
             if(datoVacunaList.length > 0){
               //actualizar el datoVacuna 'm í n i m o' existente, asociado a la notificación. Mínimo, porque no todas las columnas se encuentran en esta hoja Excel.
               //y fue creado inicialmente con los datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones asociadas al paciente.
@@ -829,7 +893,7 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
   }
 
   /** * Convierte una cadena con saltos de línea en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] */
-  parseIngredients(rawText: string): { ingredient: string }[] {
+  parseIngredientsToJson(rawText: string): { ingredient: string }[] {
     return rawText
       .split(/\r?\n/) // divide por \n o \r\n 
       .map(line => line.trim()) // limpia espacios y posibles \r 
@@ -856,7 +920,7 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
  * - Elimina saltos de línea al final de la cadena
  * - Elimina espacios antes y después del punto y coma
  */
-private limpiarNombrePatenteWHODrug(input: string): string {
+private limpiarCampoWHODrug(input: string): string {
   if (!input) return '';
 
   return input
@@ -865,9 +929,9 @@ private limpiarNombrePatenteWHODrug(input: string): string {
     .replace(/[\r\n]+(?!$)/g, ';')
     // elimina saltos de línea al final (si los hay)
     .replace(/[\r\n]+$/g, '')
-    // reemplaza comas por punto y coma
-    .replace(/,/g, ';')
-    // elimina espacios alrededor de ;
+    // reemplaza comas por punto y coma // Para omitir este paso, se utiliza otro catálogo Excel auxiliar con los valores posibles existenes en VigiFlow, y mapeados manualmente a WHODrug oficial.
+    //--//.replace(/,/g, ';') //No se puede reemplazar de forma sencilla la coma por el punto y coma, porque, en varios nombres de patente WHODrug, existen comas que son parte del nombre oficial, por ejm: |(13949709002T) Hexasiil - Vacuna Conjugada (Adsorbida) Antidiftérica, Antitetánica y Contra la Tosferina (de célula entera), Hepatitis B (rADN), Poliomielitis (inactivada) y Haemophilus influenzae Tipo b|(13950602109)BE Td - Vacuna Contra La Difteria Y El Tétanos (Adsorbida, Contenido De Antígeno(s) Reducido) (Tiomersal Reducido)|.
+    // elimina espacios alrededor del ; (punto y coma)
     .replace(/\s*;\s*/g, ';');
 }
 
