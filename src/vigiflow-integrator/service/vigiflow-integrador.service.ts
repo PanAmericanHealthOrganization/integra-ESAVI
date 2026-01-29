@@ -384,7 +384,8 @@ export class VigiflowIntegradorService {
           //Recordar que para que surta efecto el nuevo valor asignado, se debe también actualizar en el servicio "notificacion-vigiflow.service.ts", en el método "update".
           updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['K'] && this.analizarCadenaFecha(reg['K'] && reg['K'].toString());
           updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
-          updateNotificacion.residenciaNotificador.canton = reg['AU'];
+          updateNotificacion.residenciaNotificador.canton = reg['AU']; //Distrito/Municipio
+          updateNotificacion.residenciaNotificador.parroquia = reg['AT']; //Ciudad (sub-distrito)
           updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
@@ -599,15 +600,7 @@ export class VigiflowIntegradorService {
             }else{ // TODO: Se recomienda implementar la comprobación de la existencia de las tablas de los catálogos WHODRUG en la base de datos, antes de utilizar los catálogos Excel provisionales o temporales.
               //--Inicio --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
               //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
-                /*const drugNameFromCsv = buscarWHODrugNameEnCatalogoCsv(drugName);
-                if( drugNameFromCsv ){
-                  updateDatoVacuna.nombreVacPatenteWHODrug = drugNameFromCsv; //El alcance sería hasta aquí, porque no se tiene el ID para buscar los demás datos relacionados.
-                  //updateDatoVacuna.drugCode = drugCodeFromCsv;
-                } else {
-                updateDatoVacuna.drugCode = null;
-                updateDatoVacuna.mahholdersJson = [];
-                updateDatoVacuna.activeIngredientJson = [];
-                }*/
+              
               const drugName = nombreVacPatenteWHODrugVigiFlow;
               const activeIngredient = principioActivoWHODrugVigiFlow;
               const whodrug: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
@@ -622,7 +615,7 @@ export class VigiflowIntegradorService {
                   const cantElementosActIngTransl = whodrugActiIngrTranslation.length;
 
                   if( cantElementosActIngTransl === 0 ){ // activeIngredientTranslation
-                    //Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, entonces se debe comparar usando el catálogo Excel uxiliar de homologación.
+                    //Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, entonces se debe comparar usando el catálogo Excel auxiliar de homologación.
                   }else if( cantElementosActIngTransl === 1 ){
                     updateDatoVacuna.drugCode = whodrugActiIngrTranslation[0]?.drugCode;
                     updateDatoVacuna.drugName = whodrugActiIngrTranslation[0]?.drugName;

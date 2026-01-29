@@ -57,7 +57,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'El vacunatorio cumple con los estándares de calidad',
   })
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   /**
    *
@@ -67,7 +67,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'El personal de salud está capacitado en inmunizaciones',
   })
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   /**
    *
@@ -77,7 +77,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Evidenció algún problema en el biológico',
   })
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   /**
    *
@@ -87,7 +87,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',
   })
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   /**
    *
@@ -97,7 +97,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',
   })
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   /**
    *
@@ -107,7 +107,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Muestra de Laboratorio',
   })
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 
   /*@BeforeInsert()
     beforeInsert() {
@@ -118,12 +118,12 @@ export class Investigacion extends Auditoria implements IInvestigacion {
 export interface IInvestigacion extends IAuditoria {
   id: string;
   fechaInvestigacion: Date | null;
-  vacunatorioCalidad: boolean;
-  personalCapacitado: boolean;
-  problemaBiologico: boolean;
-  busquedaCasosSintomatologiaConVacuna: boolean;
-  busquedaCasosSintomatologiaSinVacuna: boolean;
-  muestraLaboratorio: boolean;
+  vacunatorioCalidad: string;//boolean;
+  personalCapacitado: string;//boolean;
+  problemaBiologico: string;//boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
+  muestraLaboratorio: string;//boolean;string;//
 }
 
 export class InvestigacionDto extends Auditoria implements IInvestigacion {
@@ -137,22 +137,22 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
   fechaInvestigacion: Date | null;
 
   @ApiProperty()
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   @ApiProperty()
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   @ApiProperty()
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   @ApiProperty()
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 }
 
 /**

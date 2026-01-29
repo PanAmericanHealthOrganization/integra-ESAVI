@@ -26,37 +26,37 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
    * El vacunatorio cumple con los estándares de calidad
    * */
   @ApiProperty()
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   /**
    * El personal de salud está capacitado en inmunizaciones
    * */
   @ApiProperty()
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   /**
    * Evidenció algún problema en el biológico
    * */
   @ApiProperty()
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   /**
    * Número de casos con sintomatología que recibieron vacuna
    * */
   @ApiProperty()
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   /**
    * Número de casos con sintomatología sin antecedente de vacuna
    * */
   @ApiProperty()
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   /**
    * Muestra de Laboratorio
    * */
   @ApiProperty()
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 }
 
 /**

@@ -294,8 +294,13 @@ export class Dhis2IntegratorService {
   esValorAfirmativo(valor: string): boolean {
     return valor === '1';
   }
+
   transformarTipoSoloSiDhis2(tipoTexto: string): string {
     return ( tipoTexto === '1' )? '1' : '0' ;
+  }
+
+  transformarBooleanoSiNoDhis2(valor: string): string | null{
+    return ( valor ) ? valor.toString() :  null ;
   }
 
   ajustarFecha = (fecha, dias) => {
@@ -1222,7 +1227,7 @@ export class Dhis2IntegratorService {
       ],
     );
     //column: DNVE ESAVI TRK - El vacunatorio cumple con los estándares de calidad. Utilizar el método this.esAfirmativo
-    investigacion.vacunatorioCalidad = this.esValorAfirmativo(
+    investigacion.vacunatorioCalidad = this.transformarBooleanoSiNoDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -1230,9 +1235,10 @@ export class Dhis2IntegratorService {
             'DNVE ESAVI TRK - El vacunatorio cumple con los estándares de calidad',
         )
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
+     
     //column: DNVE ESAVI TRK - El personal de salud está capacitado en inmunizaciones. Utilizar el método this.esAfirmativo
-    investigacion.personalCapacitado = this.esValorAfirmativo(
+    investigacion.personalCapacitado = this.transformarBooleanoSiNoDhis2( 
       row[
         headers.findIndex(
           (header) =>
@@ -1240,17 +1246,19 @@ export class Dhis2IntegratorService {
             'DNVE ESAVI TRK - El personal de salud está capacitado en inmunizaciones',
         )
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
+     
     //column: DNVE ESAVI TRK - Evidenció algún problema en el biológico. Utilizar el método this.esAfirmativo
-    investigacion.problemaBiologico = this.esValorAfirmativo(
+    investigacion.problemaBiologico = this.transformarBooleanoSiNoDhis2(
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Evidenció algún problema en el biológico',
         )
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
+    
     //column: DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna. Utilizar el método this.esAfirmativo
-    investigacion.busquedaCasosSintomatologiaConVacuna = this.esValorAfirmativo(
+    investigacion.busquedaCasosSintomatologiaConVacuna = this.transformarBooleanoSiNoDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -1258,9 +1266,10 @@ export class Dhis2IntegratorService {
             'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',
         )
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
+
     //column: DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna. Utilizar el método this.esAfirmativo
-    investigacion.busquedaCasosSintomatologiaSinVacuna = this.esValorAfirmativo(
+    investigacion.busquedaCasosSintomatologiaSinVacuna = this.transformarBooleanoSiNoDhis2(
       row[
         headers.findIndex(
           (header) =>
@@ -1268,13 +1277,14 @@ export class Dhis2IntegratorService {
             'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',
         )
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
+    
     //column: DNVE ESAVI TRK - Muestra de Laboratorio. Utilizar el método this.esAfirmativo
-    investigacion.muestraLaboratorio = this.esValorAfirmativo(
+    investigacion.muestraLaboratorio = this.transformarBooleanoSiNoDhis2(
       row[
         headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Muestra de Laboratorio')
       ],
-    );
+    );// En DHIS2 para los tipos booleanos la API Anlytics devuelve '1' o '0' como string. Pero, recordar que toString no funciona con null o undefined.
 
     // Complete the dto
     const create = new CreateCompleteDto();
