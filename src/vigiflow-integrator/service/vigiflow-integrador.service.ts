@@ -38,6 +38,8 @@ import { PacienteVigiflowService } from '../../integrator/service/paciente-vigif
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
 import { WhodrugVacsTempService } from 'src/integrator/service/whodrug-vacstemp.service';
+import { WhodrugHomologaVacsService } from 'src/integrator/service/whodrug-homologavacs.service';
+import { WhodrugHomologaVacs } from 'src/integrator/entity/whodrug-homologavacs.entity';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -72,6 +74,7 @@ export class VigiflowIntegradorService {
     private readonly maholderService: MaholderService,
     private readonly activeIngredentService: ActiveIngredientsService,
     private readonly whodrugVacsTempService: WhodrugVacsTempService,
+    private readonly whodrugHomologaVacsService: WhodrugHomologaVacsService,
 
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
@@ -513,12 +516,17 @@ export class VigiflowIntegradorService {
          * incluyendo el J07. Por lo tanto, es necesario validar que el código ATC de la fila actual
          * corresponda a una vacuna (J07) antes de proceder a crear o actualizar el datoVacuna.
          */
-        const validacionCdgAtcVacunas = reg['G'] && this.validarCodigoAtcVacuna(reg['G'].toString());
+        //const validacionCdgAtcVacunas = reg['G'] && this.validarCodigoAtcVacuna(reg['G'].toString());
+        /**
+         * OBSERVACIÓN IMPORTANTE: En la columna 'G' ('Código(s) ATC') de la hoja "Medicamentos", pueden existir varios códigos o elementos
+         * separados por saltos de línea. De los cuales, temporalmente se asume que solo uno de ellos es J07, es decir una vacuna.
+         */
+        const codigoAtcVacunaTransformado = reg['G'] && reg['G'] ? this.extraerCodigoAtcVacuna(reg['G'].toString()) : null;
         for(const notificacion of notificacionList){
           // Buscar datoVacuna existente y actualizarlo
           const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
           //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
-          if (validacionCdgAtcVacunas) {
+          if ( codigoAtcVacunaTransformado ) { //if (validacionCdgAtcVacunas) {
             let updateDatoVacuna = new UpdateDatoVacunaDto();
             //updateDatoVacuna.nombre = reg['D'];//updateDatoVacuna.drugName = reg['D']; //Nombre del medicamento tal como fue reportado por el notificador inicial / original
             updateDatoVacuna.accionTomada = reg['M'];
@@ -541,7 +549,7 @@ export class VigiflowIntegradorService {
             
             const principioActivoWHODrugVigiFlow = reg['F'] && reg['F'] ? this.limpiarCampoWHODrug(reg['F']) : reg['F'];
             updateDatoVacuna.acIngredientTranslationJson = this.parseIngredientsToJson( principioActivoWHODrugVigiFlow );//reg['F'] && this.parseIngredientsToJson(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
-            updateDatoVacuna.codigoAtc = reg['G'];
+            updateDatoVacuna.codigoAtc = codigoAtcVacunaTransformado; //reg['G'];
             updateDatoVacuna.rolVacuna = reg['C'];
 
             //----------------------------------------------------------------------------------------------------------------//
@@ -615,7 +623,21 @@ export class VigiflowIntegradorService {
                   const cantElementosActIngTransl = whodrugActiIngrTranslation.length;
 
                   if( cantElementosActIngTransl === 0 ){ // activeIngredientTranslation
-                    //Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, entonces se debe comparar usando el catálogo Excel auxiliar de homologación.
+                    // Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, 
+                    // entonces se debe comparar usando el catálogo Excel auxiliar de homologación.
+                    const dnHomologacionVigiFlow: WhodrugHomologaVacs[] = (await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName)).length > 0? await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName) : [];
+                    const nElementosHomologacionVigiFlow = dnHomologacionVigiFlow.length;
+
+                    if( nElementosHomologacionVigiFlow === 1 && dnHomologacionVigiFlow[0].drugNameWhodrug != 'Sin coincidencia' ){ // drugName homologado en VigiFlow // Como en el algoritmo no se considera la posibilidad de existencia de más de un elemento, se asume que en este nivel solo habrá uno.
+                      const whodrugTemp: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName( dnHomologacionVigiFlow[0].drugNameWhodrug )).length > 0? await this.whodrugVacsTempService.getVaccinesByName( dnHomologacionVigiFlow[0].drugNameWhodrug ) : [];
+                      const cantElementosTemp = whodrugTemp.length;
+
+                      if( cantElementosTemp === 1 ){
+                        updateDatoVacuna.drugCode = whodrugTemp[0]?.drugCode;
+                        updateDatoVacuna.drugName = whodrugTemp[0]?.drugName;
+                        //---updateDatoVacuna.medicinalProductId = whodrugTemp[0]?.medicinalProductId;
+                      }
+                    }
                   }else if( cantElementosActIngTransl === 1 ){
                     updateDatoVacuna.drugCode = whodrugActiIngrTranslation[0]?.drugCode;
                     updateDatoVacuna.drugName = whodrugActiIngrTranslation[0]?.drugName;
@@ -904,6 +926,27 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
     // Retorna true solo si ambas condiciones se cumplen
     return empiezaConPrefijo && longitudValida;
   }
+
+  extraerCodigoAtcVacuna(celda: string): string | null {
+    if (!celda) return null;
+  
+    // Dividir el contenido de la celda por saltos de línea
+    const elementos = celda.split(/\r?\n/);
+  
+    // Buscar el código ATC válido
+    for (const elemento of elementos) {
+      const valor = elemento.trim();
+  
+      // Validar: empieza con J07 y longitud máxima de 7 caracteres
+      if (valor.startsWith("J07") && valor.length <= 7) {
+        return valor;
+      }
+    }
+  
+    // Si no se encuentra ningún código válido
+    return null;
+  }
+  
 
   /**
  * Limpia una cadena de texto según las reglas:
