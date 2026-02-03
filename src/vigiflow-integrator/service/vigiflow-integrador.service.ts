@@ -606,6 +606,8 @@ export class VigiflowIntegradorService {
                 */
               } //---- f i n -- estandarización utilizando el diccionario oficial de WHODrug---------------
             }else{ // TODO: Se recomienda implementar la comprobación de la existencia de las tablas de los catálogos WHODRUG en la base de datos, antes de utilizar los catálogos Excel provisionales o temporales.
+              
+              //const { WorkBook, utils } = require('xlsx');
               //--Inicio --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
               //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
               

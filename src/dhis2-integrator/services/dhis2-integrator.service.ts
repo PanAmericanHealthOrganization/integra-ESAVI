@@ -1335,8 +1335,11 @@ export class Dhis2IntegratorService {
     const diffSeconds = Math.floor((diffMs % 60000) / 1000);
     return `${diffMinutes}m ${diffSeconds}s`;
   }
-
-  extractedFromDHIS2ToPersist = async (data: IData) => {
+  /* //--------------------------------------------------------------------------//
+  // INICIO COMENTARIO -- Método antiguo de extracción desde DHIS2 con duplicación.
+  // ANTES DE ELIMINAR, REVISAR QUE SE HAYA MIGRADO TODO LO NECESARIO AL NUEVO MÉTODO SIN DUPLICACIÓN.
+  //--------------------------------------------------------------------------//
+  extractedFromDHIS2ToPersist = async (data: IData) => { //Conservar este método mientras se implementa la extracción sin duplicación.
     // data.rows.map(async (row, i) => {
     // for (let i = 0; i < data.rows.length; i++) {
     //   const row = data.rows[i];
@@ -2077,5 +2080,7 @@ export const agregarRegistros = (workSheet: Worksheet, events: any) => {
       row[dataValue.dataElement] = dataValue.value;
     });
     workSheet.addRow(row);
-  });
-};
+  });*/
+
+  // FIN COMENTARIO -- Método antiguo de extracción desde DHIS2 con duplicación.
+}; //Cierre de la clase del servicio. No comentar ni borrar.
