@@ -72,6 +72,24 @@ export class DatoVacuna extends Auditoria {
     comment: 'Código del medicamento en WHO Drug',
   })
   drugCode: string;//utilizado por vf.
+  /**
+   *
+   */
+  /*@Column({
+    name: 'IDENTIFICADOR_VACUNA',
+    nullable: true,
+    comment: 'Identificador único de la vacuna',
+  })
+  identificadorVacuna: string;*/
+  /**
+   *
+   */
+  @Column({
+    name: 'RID_MEDICINAL_PRODUCT_ID', //'IDENTIFICADOR_VACUNA',
+    nullable: true,
+    comment: 'Identifica de forma única el producto medicinal según los estándares de la EMA (Agencia Europea de Medicamentos) o la OMS. En WHODrug Global, el MPID (Medicinal Product Identifier) y el RID (Record Identifier) se consideran equivalentes o intercambiables al codificar porque ambos apuntan al nivel más alto y específico de un producto farmacéutico.',
+  })
+  medicinalProductId: string;
 
   /**
    *
@@ -134,17 +152,6 @@ export class DatoVacuna extends Auditoria {
     comment: 'Otro código alternativo de identificación de la vacuna',
   })
   codigoOtro: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'IDENTIFICADOR_VACUNA',
-    nullable: true,
-    comment: 'Identificador único de la vacuna',
-  })
-  identificadorVacuna: string;
-
   /**
    *
    */
@@ -259,11 +266,11 @@ export class DatoVacuna extends Auditoria {
    *
    */
   @Column({
-    name: 'PAIS_AUTORIZACION',
+    name: 'PAIS_AUTORIZACION_ISO3CODE', // 'PAIS_AUTORIZACION',
     nullable: true,
-    comment: 'País que autorizó la comercialización de la vacuna',
+    comment: 'País que autorizó la comercialización de la vacuna. Identifica de forma única el país donde se comercializa o registra el medicamento. Utiliza el código ISO 3166-1 alfa-3 de tres letras para representar el país.',
   })
-  paisAutorizacion: string; // utilizado por vf.
+  paisAutorizacionIso3Code: string; //paisAutorizacion // utilizado por vf.
 
   /**
    *

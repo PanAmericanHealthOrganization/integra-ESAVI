@@ -540,7 +540,7 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
             updateDatoVacuna.viaAdministracion = reg['AA'];
             updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
-            updateDatoVacuna.paisAutorizacion = reg['J'];
+            updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] && reg['J'] ? reg['J'].toString().toUpperCase() : 'ECUADOR';
             updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
             updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
             
