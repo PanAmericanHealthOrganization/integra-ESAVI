@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs/promises';import * as fsappend from 'fs';
 import * as moment from 'moment/moment';
+import * as countries from 'i18n-iso-countries';
+import * as enLocale from 'i18n-iso-countries/langs/en.json';
+import * as esLocale from 'i18n-iso-countries/langs/es.json';
 import { throwError } from 'rxjs';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
@@ -54,6 +57,12 @@ const profesiones = [
   'CONSUMIDOR U OTRO PROFESIONAL',
   'OTRO PROFESIONAL DE LA SALUD',
 ];
+//var countries = require("i18n-iso-countries");
+//countries.registerLocale(require("i18n-iso-countries/langs/es.json")); // in a browser environment
+//--- Registrar idiomas
+countries.registerLocale(enLocale);
+countries.registerLocale(esLocale);
+const idiomaParaPaisIso3Code = 'es';
 
 @Injectable()
 export class VigiflowIntegradorService {
@@ -540,7 +549,7 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
             updateDatoVacuna.viaAdministracion = reg['AA'];
             updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
-            updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] && reg['J'] ? reg['J'].toString().toUpperCase() : 'ECUADOR';
+            updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] && reg['J'] ? countries.getAlpha3Code( reg['J'].toString().toUpperCase(), idiomaParaPaisIso3Code) : 'ECU';//TODO:En caso de necesitar solo una lista fija de paises autorizados, lo más eficiente es implementar un diccionario con la equivalencia del código ISO3 alfa-3 o catálogo de países autorizados.
             updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
             updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
             
