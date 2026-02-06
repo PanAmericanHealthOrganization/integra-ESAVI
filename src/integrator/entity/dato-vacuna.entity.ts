@@ -90,17 +90,26 @@ export class DatoVacuna extends Auditoria {
     comment: 'Identifica de forma única el producto medicinal según los estándares de la EMA (Agencia Europea de Medicamentos) o la OMS. En WHODrug Global, el MPID (Medicinal Product Identifier) y el RID (Record Identifier) se consideran equivalentes o intercambiables al codificar porque ambos apuntan al nivel más alto y específico de un producto farmacéutico.',
   })
   medicinalProductId: string;
+  /**
+   * 
+   */
+  @Column({
+    name: 'ES_GENERICO',
+    nullable: true,
+    comment: 'Marcador de registro Generico en WHODrug. Indica si la vacuna es genérica.',
+  })
+  esGenerico: string;
 
   /**
    *
    */
   @Column({
-    name: 'MAHOLDERS_JSON',
+    name: 'MAHOLDER_JSONB',//'MAHOLDERS_JSON'
     type: 'jsonb',
     nullable: true,
-    comment: 'Datos JSON de los titulares de autorización de comercialización',
+    comment: 'Datos JSONB de los titulares de autorización de comercialización. MAH (Marketing Authorization Holder / Titular de la autorización de comercialización).',
   })
-  mahholdersJson: any;
+  maHolderJsonb: any;//mahholdersJson: any;
 
   /**
    *
@@ -218,9 +227,9 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'INTERVALO_DOSIFICACION',
     nullable: true,
-    comment: 'Intervalo entre dosis de vacunación',
+    comment: 'Intervalo entre dosis de vacunación. Variable utilizada solo por VigiFlow.',
   })
-  intervaloDosificacion: string;
+  intervaloDosificacion: string; // utilizado por vf.
 
   /**
    *
@@ -276,11 +285,11 @@ export class DatoVacuna extends Auditoria {
    *
    */
   @Column({
-    name: 'CONCENTRACION',
+    name: 'STRENGTH_POTENCIA', //'CONCENTRACION',
     nullable: true,
-    comment: 'Concentración de la vacuna administrada',
+    comment: 'En WHODrug, el campo Strength o Potencia describe la cantidad del ingrediente activo por unidad de presentación, no siempre una concentración. Ejemplo, formas líquidas multidosis: Amoxicillin 250 mg/5 mL suspension, la concentración real sería 50 mg/mL. En WHODrug, la concentración se deduce, no se almacena como tal.',
   })
-  concentracion: string;
+  strengthPotencia: string;//concentracion: string;
 
   /**
    *

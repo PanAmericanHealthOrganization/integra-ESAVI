@@ -39,12 +39,20 @@ export class WhodrugVacsTempService {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true, //revisar si el id, y o el item son los campos que probablemente no permiten mostrar todas las coincidencias.
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,
+                countryIso3Code: true,
+                medicinalProductId: true,
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+                
                 activeIngredient: true,
                 actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
             }
         });
 
@@ -70,12 +78,20 @@ export class WhodrugVacsTempService {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true, //revisar si el id, y o el item son los campos que probablemente no permiten mostrar todas las coincidencias.
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,              
+                countryIso3Code: true,                               
+                medicinalProductId: true, 
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+
                 activeIngredient: true,
-                actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
+                actiIngredientTranslation: true,                
             },
             where: {
                 countryIso3Code: IsNull(), // Filtrar por countryIso3Code nulo

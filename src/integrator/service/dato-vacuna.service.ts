@@ -100,6 +100,11 @@ export class DatoVacunaService {
           where: {
             notificacion: { id: notificacion.id },
             drugName: dto.drugName, // Buscar por nombreVacuna además de la notificación
+            drugCode: dto.drugCode,
+            codigoAtc: dto.codigoAtc,
+            medicinalProductId: dto.medicinalProductId,
+            //activeIngredientJson: dto.activeIngredientJson,
+            //acIngredientTranslationJson: dto.acIngredientTranslationJson,
           },
         });
 
@@ -129,7 +134,8 @@ export class DatoVacunaService {
       throw new Error('Hubo un problema al crear o actualizar los datos de vacuna');
     } finally {
       // Registro de la operación
-      this.logger.log(`DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`);
+      // this.logger.log(`DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`); // Muy útil en ambiente de desarrollo, pero puede ser demasiado verboso en producción, considerar ajustar el nivel de log o el contenido registrado.
+      this.logger.log(`Registro de DatoVacuna ha sido procesado`);
     }
   }
 

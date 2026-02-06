@@ -216,7 +216,7 @@ export class VigiflowIntegradorService {
       const paciente = new CreatePacienteVigiflowDto();
       paciente.identificacion = reg['E'];
       paciente.sexoPaciente = reg['F'];
-      paciente.codigoVigiflow = reg['B'];
+      paciente.codigoVigiflow = reg['B'] && reg['B'] ? reg['B'].toString().trim():null; // Viene desde la hoja AEFI columna B
       paciente.inicialesNombre = reg['C'];
 
       // Create Notificacion
@@ -502,19 +502,22 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
-    // Iterar con for...of para esperar las respuestas
+    // Iterar con for...of, para esperar que cada operación asíncrona termine.
+    // "toUpdate" es un arreglo de objetos JSON, cada uno de esos objetos representa una fila de la hoja "Medicamentos".
     for (const reg of toUpdate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['A']); // No es .findByVigiflowCode(reg['B']); porque ya se comparó los valores con la hoja AEFI, y en realidad su equivalente es la columna 'A' en "Medicamentos".
+      const medNumIdUnicoMundial = reg['A'] && reg['A'] ? reg['A'].toString().trim():null; 
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode( medNumIdUnicoMundial ); // No es .findByVigiflowCode(reg['B']); porque ya se comparó los valores con la hoja AEFI, y en realidad su equivalente es la columna 'A' en "Medicamentos".
       if (paciente) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
         const notificacionMed = notificacionList.at(0);//TODO: Iterar por todas las notificaciones asociadas al paciente, o lo que es lo mismo, a su código vigiflow. RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07. Y finalmente, un J07 no siempre aparece en la primera ocurrencia o posiciión del array notificacionList.
         let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
         medicamento.nombre = reg['D'];
+        medicamento.nombreMedPatenteWHODrug = reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
         medicamento.codigoATC = reg['G']; 
         medicamento = { ...medicamento, ...auditoria };
 
-        // Crear medicamento
+        // Crear medicamento. Observar que "medicamentoService.createOneToOne" filtra los posibles medicamentos duplicados sobre la base de NOTIFICACION_ID, NOMBRE_MEDICAMENTO, y ATC
         await this.medicamentoService.createOneToOne(notificacionMed, medicamento);
 
         /**
@@ -532,9 +535,12 @@ export class VigiflowIntegradorService {
          */
         const codigoAtcVacunaTransformado = reg['G'] && reg['G'] ? this.extraerCodigoAtcVacuna(reg['G'].toString()) : null;
         for(const notificacion of notificacionList){
-          // Buscar datoVacuna existente y actualizarlo
+
+          // Buscar datoVacuna existente y actualizarlo. Se filtra por notificación.id y comprobando que sus campos principales sean NULL o vacíos.
           const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
           //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
+
+          //En realidad este fragmento de código no solo actualiza registros, también crea nuevos registros de datoVacuna cuando es necesario (ver datoVacunaService.create al final del bloque).
           if ( codigoAtcVacunaTransformado ) { //if (validacionCdgAtcVacunas) {
             let updateDatoVacuna = new UpdateDatoVacunaDto();
             //updateDatoVacuna.nombre = reg['D'];//updateDatoVacuna.drugName = reg['D']; //Nombre del medicamento tal como fue reportado por el notificador inicial / original
@@ -556,8 +562,8 @@ export class VigiflowIntegradorService {
             const nombreVacPatenteWHODrugVigiFlow = reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
             updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;//reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
             
-            const principioActivoWHODrugVigiFlow = reg['F'] && reg['F'] ? this.limpiarCampoWHODrug(reg['F']) : reg['F'];
-            updateDatoVacuna.acIngredientTranslationJson = this.parseIngredientsToJson( principioActivoWHODrugVigiFlow );//reg['F'] && this.parseIngredientsToJson(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
+            const principioActivoWHODrugVigiFlow = reg['F'] && reg['F'] ? this.limpiarCampoWHODrug(reg['F']) : reg['F']; // Reemplaza comas o saltos de línea por punto y coma.
+            updateDatoVacuna.acIngredientTranslationJson = this.parseIngredientsWithSemicolonsToJson( principioActivoWHODrugVigiFlow );//reg['F'] && this.parseIngredientsToJson(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
             updateDatoVacuna.codigoAtc = codigoAtcVacunaTransformado; //reg['G'];
             updateDatoVacuna.rolVacuna = reg['C'];
 
@@ -576,9 +582,9 @@ export class VigiflowIntegradorService {
                 updateDatoVacuna.drugName = whodrug[0]?.drugName;
                 
                 const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-                updateDatoVacuna.mahholdersJson = mah.map((item) => ({
+                updateDatoVacuna.maHolderJsonb = mah.map((item) => ({ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
                   name: item.name,
-                  medicinalProductID: item.medicinalProductID,
+                  medicinalProductID: item.medicinalProductID, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
                 }));
                 const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
                 //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
@@ -670,24 +676,54 @@ export class VigiflowIntegradorService {
               }else if( cantElementos === 1 ){ //cantElementos === 1 //cantElementos >0
                 updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
                 updateDatoVacuna.drugName = whodrug[0]?.drugName;
+                updateDatoVacuna.strengthPotencia = whodrug[0]?.strength;
+                updateDatoVacuna.formaFarmaceutica = whodrug[0]?.pharmaceuticalForm;
+                updateDatoVacuna.paisAutorizacionIso3Code = whodrug[0]?.countryIso3Code;
+                updateDatoVacuna.medicinalProductId = whodrug[0]?.medicinalProductId;
+                updateDatoVacuna.esGenerico = whodrug[0]?.isGeneric;
+
+                updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                  name: whodrug[0]?.maHolder,
+                  medicinalProductID: whodrug[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                }];
+                updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                  whodrug[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                );
               }else if( cantElementos > 1 ){
                 const whodrugs: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName);//(await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName) : [];
                 updateDatoVacuna.drugCode = whodrugs[0]?.drugCode;
                 updateDatoVacuna.drugName = whodrugs[0]?.drugName;
+                updateDatoVacuna.strengthPotencia = whodrugs[0]?.strength;
+                updateDatoVacuna.formaFarmaceutica = whodrugs[0]?.pharmaceuticalForm;
+                updateDatoVacuna.paisAutorizacionIso3Code = whodrugs[0]?.countryIso3Code;
+                updateDatoVacuna.medicinalProductId = whodrugs[0]?.medicinalProductId;
+                updateDatoVacuna.esGenerico = whodrugs[0]?.isGeneric;
+
+                updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                  name: whodrugs[0]?.maHolder,
+                  medicinalProductID: whodrugs[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                }];
+                updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                  whodrugs[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                );
               } else {}            
 
             }//--- Fin --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
 
 
             if(datoVacunaList.length > 0){
-              //actualizar el datoVacuna 'm í n i m o' existente, asociado a la notificación. Mínimo, porque no todas las columnas se encuentran en esta hoja Excel.
+              //actualizar el datoVacuna 'm í n i m o' existente, asociado a la notificación. Se denomina "Mínimo", porque no todas las columnas se encuentran en esta hoja Excel.
               //y fue creado inicialmente con los datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones asociadas al paciente.
 
               await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
             } else {
-              //crear un registro completamente nuevo de DatoVacuna asociado a la notificación, utilizando el método create del servicio datoVacunaService.
+              /**Crear un registro completamente nuevo de DatoVacuna asociado a la 
+               * notificación, utilizando el método "create" del servicio datoVacunaService.
+               * "create" utiliza filtros internos de TypeORM para evitar duplicados.
+               * */
               await this.datoVacunaService.create(notificacion, updateDatoVacuna); //Existe otra forma, utilizando la actualización propia que tiene este método create.
-              
+              //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
+              //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
             }
             break; // Salir del bucle una vez que se ha actualizado el datoVacuna
           }
@@ -919,12 +955,34 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
   }
 
   /** * Convierte una cadena con saltos de línea en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] */
-  parseIngredientsToJson(rawText: string): { ingredient: string }[] {
+  parseIngredientsToJson(rawText?: string): { ingredient: string }[] {
+    if (!rawText || typeof rawText !== 'string') {
+      return []; // Retorna un arreglo vacío si no hay texto o no es string
+    }
+
     return rawText
       .split(/\r?\n/) // divide por \n o \r\n 
       .map(line => line.trim()) // limpia espacios y posibles \r 
       .filter(line => line !== '') // descarta líneas vacías 
       .map(line => ({ ingredient: line })); // construye el objeto
+  }
+
+  /** * Convierte una cadena con punto y comas en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] 
+   * - Divide la cadena por punto y coma ';'
+   * - Limpia espacios y posibles caracteres de retorno de carro '\r' alrededor de cada término
+   * - Descarta términos vacíos resultantes de divisiones consecutivas o espacios
+   * - Construye un arreglo de objetos con la propiedad "ingredient" para cada término válido
+  */
+  parseIngredientsWithSemicolonsToJson(rawText?: string): { ingredient: string }[] {
+    if (!rawText || typeof rawText !== 'string') {
+      return []; // Retorna un arreglo vacío si no hay texto o no es string
+    }
+
+    return rawText
+      .split(';') // divide por punto y coma
+      .map( termino => termino.trim() ) // limpia espacios y posibles \r 
+      .filter(termino => termino !== '') // descarta términos vacías 
+      .map(termino => ({ ingredient: termino })); // construye el objeto
   }
   
   validarCodigoAtcVacuna(cadena: string): boolean {
@@ -967,7 +1025,7 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
  * - Elimina saltos de línea al final de la cadena
  * - Elimina espacios antes y después del punto y coma
  */
-private limpiarCampoWHODrug(input: string): string {
+private limpiarCampoWHODrug(input?: string): string {
   if (!input) return '';
 
   return input

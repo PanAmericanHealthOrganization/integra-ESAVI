@@ -9,10 +9,11 @@ export class CreateDatoVacunaDto {
 
   drugName: string; //nombreVacuna: string;
   drugCode : string;
-  mahholdersJson : any
-  activeIngredientJson : any
+  maHolderJsonb : any; //mahholdersJson: any
+  activeIngredientJson : any;
   acIngredientTranslationJson: any;
   medicinalProductId: string;//identificadorVacuna: string;
+  esGenerico: string;
 
   codigoOtro: string;  
   nombreFabricante: string;
@@ -27,7 +28,7 @@ export class CreateDatoVacunaDto {
   nombreDiluyenteVacuna: string;
   fechaVencimientoDiluyente: Date;
   paisAutorizacionIso3Code: string;//paisAutorizacion: string;
-  concentracion: string;
+  strengthPotencia: string;//concentracion: string;
   ingredienteSospechoso: string;
   accionTomada: string;
   informacionAdicionalMedicamento: string;
