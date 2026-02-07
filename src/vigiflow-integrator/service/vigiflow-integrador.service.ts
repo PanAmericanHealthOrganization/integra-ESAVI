@@ -623,23 +623,26 @@ export class VigiflowIntegradorService {
             }else{ // TODO: Se recomienda implementar la comprobación de la existencia de las tablas de los catálogos WHODRUG en la base de datos, antes de utilizar los catálogos Excel provisionales o temporales.
               
               //const { WorkBook, utils } = require('xlsx');
-              //--Inicio --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
+              //--Inicio --- estandarización utilizando catálogos  E x c e l  provisionales o temporales de WHODRUG.--
               //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
               
               const drugName = nombreVacPatenteWHODrugVigiFlow;
               const activeIngredient = principioActivoWHODrugVigiFlow;
               const whodrug: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
               const cantElementos = whodrug.length;//whodrug.sort((a, b) => a.drugName.length - b.drugName.length); // Ordenar por longitud del nombre del medicamento (de menor a mayor)
+              const algunIso3CodeEsNulo = VigiflowIntegradorService.tienePropiedadNula(whodrug, 'countryIso3Code');
               
-              if ( cantElementos === 0 ) { //drugName
+              if ( cantElementos === 0 || (cantElementos > 1  && !algunIso3CodeEsNulo) ) { //drugName
                 const whodrugActiIngr: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient) : [];
                 const cantElementosActIng = whodrugActiIngr.length;
+                const algunIso3CodeEsNuloActIng = VigiflowIntegradorService.tienePropiedadNula(whodrugActiIngr, 'countryIso3Code');
                 
-                if( cantElementosActIng === 0 ){ //activeIngredient
+                if( cantElementosActIng === 0 || (cantElementosActIng > 1  && !algunIso3CodeEsNuloActIng) ){ //activeIngredient
                   const whodrugActiIngrTranslation: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient) : [];
                   const cantElementosActIngTransl = whodrugActiIngrTranslation.length;
+                  const algunIso3CodeEsNuloActIngTransl = VigiflowIntegradorService.tienePropiedadNula(whodrugActiIngrTranslation, 'countryIso3Code');
 
-                  if( cantElementosActIngTransl === 0 ){ // activeIngredientTranslation
+                  if( cantElementosActIngTransl === 0 || (cantElementosActIngTransl > 1  && !algunIso3CodeEsNuloActIngTransl ) ){ // activeIngredientTranslation
                     // Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, 
                     // entonces se debe comparar usando el catálogo Excel auxiliar de homologación.
                     const dnHomologacionVigiFlow: WhodrugHomologaVacs[] = (await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName)).length > 0? await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName) : [];
@@ -652,25 +655,92 @@ export class VigiflowIntegradorService {
                       if( cantElementosTemp === 1 ){
                         updateDatoVacuna.drugCode = whodrugTemp[0]?.drugCode;
                         updateDatoVacuna.drugName = whodrugTemp[0]?.drugName;
-                        //---updateDatoVacuna.medicinalProductId = whodrugTemp[0]?.medicinalProductId;
+                        updateDatoVacuna.strengthPotencia = whodrugTemp[0]?.strength;
+                        updateDatoVacuna.formaFarmaceutica = whodrugTemp[0]?.pharmaceuticalForm;
+                        updateDatoVacuna.paisAutorizacionIso3Code = whodrugTemp[0]?.countryIso3Code;
+                        updateDatoVacuna.medicinalProductId = whodrugTemp[0]?.medicinalProductId;
+                        updateDatoVacuna.esGenerico = whodrugTemp[0]?.isGeneric;
+
+                        updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                          name: whodrugTemp[0]?.maHolder,
+                          medicinalProductID: whodrugTemp[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                        }];
+                        updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                          whodrugTemp[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                        );
                       }
+
                     }
                   }else if( cantElementosActIngTransl === 1 ){
                     updateDatoVacuna.drugCode = whodrugActiIngrTranslation[0]?.drugCode;
                     updateDatoVacuna.drugName = whodrugActiIngrTranslation[0]?.drugName;
-                  }else if( cantElementosActIngTransl > 1 ){
+                    updateDatoVacuna.strengthPotencia = whodrugActiIngrTranslation[0]?.strength;
+                    updateDatoVacuna.formaFarmaceutica = whodrugActiIngrTranslation[0]?.pharmaceuticalForm;
+                    updateDatoVacuna.paisAutorizacionIso3Code = whodrugActiIngrTranslation[0]?.countryIso3Code;
+                    updateDatoVacuna.medicinalProductId = whodrugActiIngrTranslation[0]?.medicinalProductId;
+                    updateDatoVacuna.esGenerico = whodrugActiIngrTranslation[0]?.isGeneric;
+
+                    updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                      name: whodrugActiIngrTranslation[0]?.maHolder,
+                      medicinalProductID: whodrugActiIngrTranslation[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                    }];
+                    updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                      whodrugActiIngrTranslation[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                    );
+
+                  }else if( cantElementosActIngTransl > 1 && algunIso3CodeEsNuloActIngTransl ){
                     const wdActiIngrTranslation: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActIngTranslationAndIso3CodeNull(activeIngredient);
                     updateDatoVacuna.drugCode = wdActiIngrTranslation[0]?.drugCode;
                     updateDatoVacuna.drugName = wdActiIngrTranslation[0]?.drugName;
+                    updateDatoVacuna.strengthPotencia = wdActiIngrTranslation[0]?.strength;
+                    updateDatoVacuna.formaFarmaceutica = wdActiIngrTranslation[0]?.pharmaceuticalForm;
+                    updateDatoVacuna.paisAutorizacionIso3Code = wdActiIngrTranslation[0]?.countryIso3Code;
+                    updateDatoVacuna.medicinalProductId = wdActiIngrTranslation[0]?.medicinalProductId;
+                    updateDatoVacuna.esGenerico = wdActiIngrTranslation[0]?.isGeneric;
+
+                    updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                      name: wdActiIngrTranslation[0]?.maHolder,
+                      medicinalProductID: wdActiIngrTranslation[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                    }];
+                    updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                      wdActiIngrTranslation[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                    );
                   } else {}
 
                 }else if( cantElementosActIng === 1 ){
                   updateDatoVacuna.drugCode = whodrugActiIngr[0]?.drugCode;
                   updateDatoVacuna.drugName = whodrugActiIngr[0]?.drugName;
-                }else if( cantElementosActIng > 1 ){
+                  updateDatoVacuna.strengthPotencia = whodrugActiIngr[0]?.strength;
+                  updateDatoVacuna.formaFarmaceutica = whodrugActiIngr[0]?.pharmaceuticalForm;
+                  updateDatoVacuna.paisAutorizacionIso3Code = whodrugActiIngr[0]?.countryIso3Code;
+                  updateDatoVacuna.medicinalProductId = whodrugActiIngr[0]?.medicinalProductId;
+                  updateDatoVacuna.esGenerico = whodrugActiIngr[0]?.isGeneric;
+
+                  updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                    name: whodrugActiIngr[0]?.maHolder,
+                    medicinalProductID: whodrugActiIngr[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                  }];
+                  updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                    whodrugActiIngr[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                  );
+
+                }else if( cantElementosActIng > 1 && algunIso3CodeEsNuloActIng ){
                   const wdActiIngr: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActiveIngredientAndIso3CodeNull(activeIngredient);
                   updateDatoVacuna.drugCode = wdActiIngr[0]?.drugCode;
                   updateDatoVacuna.drugName = wdActiIngr[0]?.drugName;
+                  updateDatoVacuna.strengthPotencia = wdActiIngr[0]?.strength;
+                  updateDatoVacuna.formaFarmaceutica = wdActiIngr[0]?.pharmaceuticalForm;
+                  updateDatoVacuna.paisAutorizacionIso3Code = wdActiIngr[0]?.countryIso3Code;
+                  updateDatoVacuna.medicinalProductId = wdActiIngr[0]?.medicinalProductId;
+                  updateDatoVacuna.esGenerico = wdActiIngr[0]?.isGeneric;
+
+                  updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                    name: wdActiIngr[0]?.maHolder,
+                    medicinalProductID: wdActiIngr[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                  }];
+                  updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                    wdActiIngr[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                  );
                 } else {}
                 
               }else if( cantElementos === 1 ){ //cantElementos === 1 //cantElementos >0
@@ -689,13 +759,14 @@ export class VigiflowIntegradorService {
                 updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
                   whodrug[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
                 );
-              }else if( cantElementos > 1 ){
+
+              }else if( cantElementos > 1 && algunIso3CodeEsNulo ){
                 const whodrugs: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName);//(await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName) : [];
                 updateDatoVacuna.drugCode = whodrugs[0]?.drugCode;
                 updateDatoVacuna.drugName = whodrugs[0]?.drugName;
                 updateDatoVacuna.strengthPotencia = whodrugs[0]?.strength;
                 updateDatoVacuna.formaFarmaceutica = whodrugs[0]?.pharmaceuticalForm;
-                updateDatoVacuna.paisAutorizacionIso3Code = whodrugs[0]?.countryIso3Code;
+                updateDatoVacuna.paisAutorizacionIso3Code = whodrugs[0]?.countryIso3Code; //TODO: Probar previamente si no tiene valor, para que no se sobrescriba.
                 updateDatoVacuna.medicinalProductId = whodrugs[0]?.medicinalProductId;
                 updateDatoVacuna.esGenerico = whodrugs[0]?.isGeneric;
 
@@ -1038,6 +1109,29 @@ private limpiarCampoWHODrug(input?: string): string {
     //--//.replace(/,/g, ';') //No se puede reemplazar de forma sencilla la coma por el punto y coma, porque, en varios nombres de patente WHODrug, existen comas que son parte del nombre oficial, por ejm: |(13949709002T) Hexasiil - Vacuna Conjugada (Adsorbida) Antidiftérica, Antitetánica y Contra la Tosferina (de célula entera), Hepatitis B (rADN), Poliomielitis (inactivada) y Haemophilus influenzae Tipo b|(13950602109)BE Td - Vacuna Contra La Difteria Y El Tétanos (Adsorbida, Contenido De Antígeno(s) Reducido) (Tiomersal Reducido)|.
     // elimina espacios alrededor del ; (punto y coma)
     .replace(/\s*;\s*/g, ';');
+}
+
+/**
+   * Verifica si algún objeto del array tiene la propiedad indicada en null.
+   * @param items Array de objetos
+   * @param prop Nombre de la propiedad a validar
+   * @returns true si existe al menos un objeto con la propiedad en null, false en caso contrario
+   */
+static tienePropiedadNula<T extends Record<string, any>>(items: T[] | null | undefined, prop: keyof T): boolean {
+  // Validar si no se recibe nada o el array está vacío
+  if (!items || items.length === 0) {
+    //console.warn("No se recibió ningún objeto para validar.");
+    return false;
+  }
+
+  // Recorrido eficiente con for...of
+  for (const obj of items) {
+    if (obj[prop] === null) {
+      return true; // se detiene en el primer hallazgo
+    }
+  }
+
+  return false; // si no encontró ninguno
 }
 
 

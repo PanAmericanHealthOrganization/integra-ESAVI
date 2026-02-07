@@ -120,12 +120,20 @@ export class WhodrugVacsTempService {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true,
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,              
+                countryIso3Code: true,                               
+                medicinalProductId: true, 
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+
                 activeIngredient: true,
                 actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
             },
             /*where: [
                 { activeIngredient: activeIngredient }
@@ -144,22 +152,30 @@ export class WhodrugVacsTempService {
                 (activeIngredient && `${vaccine.activeIngredient}`.toUpperCase() === `${activeIngredient}`.toUpperCase()), // Comparación exacta
         );
 
-        return vaccinePartial;
+        return final;
     }
 
     async getVaccsByActiveIngredientAndIso3CodeNull(activeIngredient: string): Promise<WhodrugVacsTemp[]> {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true,
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,              
+                countryIso3Code: true,                               
+                medicinalProductId: true, 
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+
                 activeIngredient: true,
                 actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
             },
             where: {
-                actiIngredientTranslation: activeIngredient,
+                //actiIngredientTranslation: activeIngredient,
                 countryIso3Code: IsNull(), // Filtrar por countryIso3Code nulo
             },
         });
@@ -176,7 +192,7 @@ export class WhodrugVacsTempService {
                 (activeIngredient && `${vaccine.activeIngredient}`.toUpperCase() === `${activeIngredient}`.toUpperCase()), // Comparación exacta
         );
 
-        return vaccinePartial;
+        return final;
     }
 
     //--------------------------------------------------------------------------------------------//
@@ -184,12 +200,20 @@ export class WhodrugVacsTempService {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true,
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,              
+                countryIso3Code: true,                               
+                medicinalProductId: true, 
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+
                 activeIngredient: true,
                 actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
             },
             /*where: [
                 { actiIngredientTranslation: actIngTranslation }
@@ -208,22 +232,30 @@ export class WhodrugVacsTempService {
                 (actIngTranslation && `${vaccine.actiIngredientTranslation}`.toUpperCase() === `${actIngTranslation}`.toUpperCase()), // Comparación exacta
         );
 
-        return vaccinePartial;
+        return final;
     }
 
     async getVaccsByActIngTranslationAndIso3CodeNull(actIngTranslation: string): Promise<WhodrugVacsTemp[]> {
         const vaccinePartial = await this.whodrugVacsTempRepository.find({
             select: {
                 item: true,
-                drugName: true,
+                
                 drugCode: true,
+                drugName: true,
+                strength: true,
+                pharmaceuticalForm: true,              
+                countryIso3Code: true,                               
+                medicinalProductId: true, 
+                isGeneric: true,
+
+                maHolder: true,
+                maHolderMediProdId: true,
+
                 activeIngredient: true,
                 actiIngredientTranslation: true,
-                medicinalProductId: true,
-                countryIso3Code: true,
             },
             where: {
-                actiIngredientTranslation: actIngTranslation,
+                //actiIngredientTranslation: actIngTranslation,
                 countryIso3Code: IsNull(), // Filtrar por countryIso3Code nulo
             },
         });
@@ -240,7 +272,7 @@ export class WhodrugVacsTempService {
                 (actIngTranslation && `${vaccine.actiIngredientTranslation}`.toUpperCase() === `${actIngTranslation}`.toUpperCase()), // Comparación exacta
         );
 
-        return vaccinePartial;
+        return final;
     }
 
 }
