@@ -1003,10 +1003,15 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
 
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
-      return moment(valor, 'YYYYMMDD)').toDate();
+      return moment.utc(valor, 'YYYYMMDD').toDate(); //return moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
   }//Se comprobó que cuando la fecha viene con la parte de la hora y zona horaria, este método no devuelve ajustado a cero horas, minutos, segundos y milisegundos. En vigiflow no es probable que vengan con la parte de la hora, pero, en DHIS2 si puede venir con la parte de la hora y zona horaria.
+  // Actualización: se elimina el paréntesis de cierre del formato de fecha.
+  // La definición de la columna en la entidad 'timestamp with time zone': convierte automáticamente a UTC al persistir.
+  // Para forzar a UTC, se utiliza 'moment.utc'.
+  // Comprobar qué sucese cuando se concatena con la hora cuando los campos diponen este valor en otro Elemento de Datos.
+
   analizarCadenaFecha(dateStr: string): Date | null {
     if (!/^\d{8}$/.test(dateStr)) {// Verifica que la cadena tenga exactamente 8 dígitos
        //console.log(`La fecha: "${dateStr}" no es válida, se esperan 8 dígitos.`);

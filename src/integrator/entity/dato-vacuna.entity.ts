@@ -246,7 +246,8 @@ export class DatoVacuna extends Auditoria {
    */
   @Column({
     name: 'FECHA_VENCIMIENTO_VACUNA',
-    nullable: true,
+    type: 'timestamptz', // con el tipo 'timestamptz' se forza a UTC.
+    nullable: true,    
     comment: 'Fecha de vencimiento de la vacuna',
   })
   fechaVencimientoVacuna: Date; // utilizado por d2.
@@ -266,6 +267,7 @@ export class DatoVacuna extends Auditoria {
    */
   @Column({
     name: 'FECHA_VENCIMIENTO_DILUYENTE',
+    type: 'timestamptz', // con el tipo 'timestamptz' se forza a UTC.
     nullable: true,
     comment: 'Fecha de vencimiento del diluyente',
   })

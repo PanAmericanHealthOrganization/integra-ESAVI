@@ -380,6 +380,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_LLENADO_FICHA',
+    type: 'timestamptz', // con el tipo 'type: 'timestamptz', se forza a UTC.
     nullable: true,
     comment: 'Fecha en que se llenó la ficha de notificación',
   })
@@ -390,6 +391,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_ATENCION',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de atención médica del paciente',
   })

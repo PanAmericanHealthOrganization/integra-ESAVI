@@ -172,12 +172,14 @@ export class DatoEsavi extends Auditoria {
 
   @Column({
     name: 'FECHA_ESAVI',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de inicio del evento supuestamente atribuido a la vacunación',
   })
   fechaEsavi: Date;
   @Column({
     name: 'FECHA_FINALIZACION',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de finalización o resolución del ESAVI',
   })

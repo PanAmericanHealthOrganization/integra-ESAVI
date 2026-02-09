@@ -22,6 +22,7 @@ export class CausalidadEsavi extends Auditoria {
 
   @Column({
     name: 'FECHA_CAUSALIDAD_ESAVI',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de evaluación de la causalidad del ESAVI',
   })

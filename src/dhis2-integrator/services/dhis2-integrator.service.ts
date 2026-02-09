@@ -61,10 +61,14 @@ export class Dhis2IntegratorService {
 
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
-      return moment(valor, 'YYYYMMDD)').toDate();
+      return moment.utc(valor, 'YYYYMMDD').toDate(); //moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
   }//Se comprobó que no devuelve la fecha ajustada la hora en  UTC 00:00:00.000Z. Preguntar al personal funcional si es necesario ajustar la hora.
+  // Actualización: se elimina el paréntesis de cierre del formato de fecha.
+  // La definición de la columna en la entidad 'timestamp with time zone': convierte automáticamente a UTC al persistir.
+  // Para forzar a UTC, se utiliza 'moment.utc'.
+  // Comprobar qué sucese cuando se concatena con la hora cuando los campos diponen este valor en otro Elemento de Datos.
 
   formatoInteger = (valor: string) => {
     let resultado = 0;
@@ -742,6 +746,17 @@ export class Dhis2IntegratorService {
       }
       causalidadEsavi.clasificacionCausalidadWHOAEFI = this.obtenerClasificacion(clasificacionFinalCaso, clasificacionFinalSubcategoria);
     }
+
+    causalidadEsavi.fechaCausalidadEsavi = this.formatoFecha(
+      row[
+        headers.findIndex(
+          (header) => header.column === 'DNVE ESAVI TRK - Fecha cierre del evento',
+        )
+      ],
+      // 'YYYY-MM-DDTHH:mm:ss.sssZ'
+    );
+
+
     // Create Gravedad
     const grave = new CreateGravedadEsaviDto();
     grave.tipo = '1';//'GRAVE';
