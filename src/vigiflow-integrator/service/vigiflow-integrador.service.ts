@@ -627,12 +627,15 @@ export class VigiflowIntegradorService {
               //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
               
               const drugName = nombreVacPatenteWHODrugVigiFlow;
-              const activeIngredient = principioActivoWHODrugVigiFlow;
-              const whodrug: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
+              let activeIngredient = principioActivoWHODrugVigiFlow;
+              const whodrugAuxiliar: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByName(drugName);//(await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
+              const whodrug: WhodrugVacsTemp[] = whodrugAuxiliar.length > 0? whodrugAuxiliar : [];
               const cantElementos = whodrug.length;//whodrug.sort((a, b) => a.drugName.length - b.drugName.length); // Ordenar por longitud del nombre del medicamento (de menor a mayor)
               const algunIso3CodeEsNulo = VigiflowIntegradorService.tienePropiedadNula(whodrug, 'countryIso3Code');
+              const vacunasEncontradasNoTienenIso3CodeNulo = cantElementos > 1 && !algunIso3CodeEsNulo;
+              if( vacunasEncontradasNoTienenIso3CodeNulo ){ activeIngredient = whodrug[0]?.activeIngredient; } // Si se encuentran varias coincidencias pero ninguna tiene código ISO3 de país, se asume que todas corresponden a la vacuna reportada, y se toma el ingrediente activo de la primera coincidencia para continuar con el proceso de comparación.
               
-              if ( cantElementos === 0 || (cantElementos > 1  && !algunIso3CodeEsNulo) ) { //drugName
+              if ( cantElementos === 0 || ( vacunasEncontradasNoTienenIso3CodeNulo ) ) { //drugName
                 const whodrugActiIngr: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient) : [];
                 const cantElementosActIng = whodrugActiIngr.length;
                 const algunIso3CodeEsNuloActIng = VigiflowIntegradorService.tienePropiedadNula(whodrugActiIngr, 'countryIso3Code');
