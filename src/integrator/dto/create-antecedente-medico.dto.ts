@@ -8,11 +8,12 @@ export class CreateAntecedenteMedicoDto {
   comorbilidadTresCIE10 : string;
 
   // --------Propiedades nuevas. Referencia: "antecedente-medico.entity.ts"------------
-  codigoComorbilidadMeddraLlt: string;
-  antecedentePatologicoAgudoCIE10: string;
-  antecedentePatologicoAgudoMeddraLlt: string;
-  antecedenteFamiliarCIE10: string;
-  antecedenteFamiliarMeddraLlt: string;
+  codMeddraLltComorbilidadPrincipal: string; //codigoComorbilidadMeddraLlt: string;
+
+  codCie10PatologicoAgudo: string; //antecedentePatologicoAgudoCIE10: string;
+  codMeddraLltPatologicoAgudo: string; //ntecedentePatologicoAgudoMeddraLlt: string;
+  codCie10Familiar: string; //antecedenteFamiliarCIE10: string;
+  codMeddraLltFamiliar: string; //antecedenteFamiliarMeddraLlt: string;
   antecedenteQuirurgicoCIE10: string;
   antecedenteQuirurgicoMeddraLlt: string;
   antecedenteFarmacologicoWhodrug: string;
