@@ -116,9 +116,10 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     }*/
 }
 
+// TODO: Se recomienda crear cada clase e interfaz en un archivo separado (o eliminar las definiciones duplicadas en otros documentos), para evitar problemas de importación circular. Si se desea conservar este esquema se debe cambiar de nombre a las clases e interfaces para evitar el conflicto de nombres (En esta versión de NestJS, se considera como warning, en las siguientes ya será error).
 export interface IInvestigacion extends IAuditoria {
   id: string;
-  notificacion: Notificacion;
+  notificacion: Notificacion; //Para habilitar este campo, se recomienda crear cada clase e interfaz en un archivo separado, para evitar problemas de importación circular. Si se desea conservar este esquema se debe cambiar de nombre a las clases e interfaces para evitar el conflicto de nombres (En esta versión de NestJS, se considera como warning, en las siguientes ya será error).
   fechaInvestigacion: Date | null;
   vacunatorioCalidad: string;//boolean;
   personalCapacitado: string;//boolean;
