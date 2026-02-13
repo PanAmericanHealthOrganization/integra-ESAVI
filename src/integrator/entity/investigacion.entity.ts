@@ -16,6 +16,7 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria, IAuditoria } from './auditoria.entity';
 import { DatoEsavi } from './dato-esavi.entity';
+import { Notificacion } from './notificacion.entity';
 
 /**
  *
@@ -35,9 +36,9 @@ export class Investigacion extends Auditoria implements IInvestigacion {
   /**
    *@OneToOne(() => DatoEsavi, { nullable: false })
    */
-  @OneToOne(() => DatoEsavi)
-  @JoinColumn({ name: 'DATOS_ESAVI_ID' })
-  datoEsavi: DatoEsavi;
+  @OneToOne(() => Notificacion) //DatoEsavi)
+  @JoinColumn({ name: 'NOTIFICACION_ID' }) //'DATOS_ESAVI_ID' })
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
 
   /**
    *
@@ -117,6 +118,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
 
 export interface IInvestigacion extends IAuditoria {
   id: string;
+  notificacion: Notificacion;
   fechaInvestigacion: Date | null;
   vacunatorioCalidad: string;//boolean;
   personalCapacitado: string;//boolean;
@@ -131,7 +133,7 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
   id: string;
 
   @ApiProperty()
-  datoEsavi: DatoEsavi;
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
 
   @ApiProperty()
   fechaInvestigacion: Date | null;

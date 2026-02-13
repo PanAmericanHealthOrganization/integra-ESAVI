@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IInvestigacion } from '../entity/investigacion.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
+import { Notificacion } from '../entity/notificacion.entity';
 import { Auditoria } from '../entity';
 /**
  *
@@ -15,7 +16,7 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
    * Datos del ESAVI asociado a la investigación
    */
   @ApiProperty()
-  datoEsavi: DatoEsavi;
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
   /**
    * Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2
    * */
