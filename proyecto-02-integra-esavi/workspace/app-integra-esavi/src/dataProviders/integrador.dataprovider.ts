@@ -1,0 +1,121 @@
+import {
+  CreateParams,
+  CreateResult,
+  DataProvider,
+  DeleteManyParams,
+  DeleteManyResult,
+  DeleteParams,
+  DeleteResult,
+  GetListParams,
+  GetListResult,
+  GetManyParams,
+  GetManyReferenceParams,
+  GetManyReferenceResult,
+  GetManyResult,
+  GetOneParams,
+  GetOneResult,
+  RaRecord,
+  UpdateManyParams,
+  UpdateManyResult,
+  UpdateParams,
+  UpdateResult,
+} from "react-admin"
+import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
+
+/**
+ *
+ */
+export const integradorDataProvider: DataProvider = {
+  importDataVigiflow: async (startDate: string, endDate: string) => {
+    const response = await fetch(
+      `${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=${startDate}&fechaFin=${endDate}`,
+      {
+        // const response = await fetch(`${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=20240702&fechaFin=20240706`, {
+
+        headers: {
+          "X-API-KEY": INT_API_KEY || "",
+        },
+      }
+    )
+
+    const data = await response.json()
+    return data
+  },
+  importDataDHIS2: async (startDate: string, endDate: string) => {
+    const response = await fetch(
+      `${INT_ESAV_API}/integrator/dhis2/bulk?codigoATC=''&fechaInicio=${startDate}&fechaFin=${endDate}`,
+      {
+        headers: {
+          "X-API-KEY": INT_API_KEY || "",
+        },
+      }
+    )
+
+    const data = await response.json()
+    return data
+  },
+  getList: async (
+    resource: string,
+    params: GetListParams
+  ): Promise<GetListResult<any>> => {
+    const respuesta = {
+      data: [],
+      total: 0,
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: true,
+      },
+    }
+
+    return respuesta
+  },
+
+  getOne: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: GetOneParams<any>
+  ): Promise<GetOneResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  getMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: GetManyParams
+  ): Promise<GetManyResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  getManyReference: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: GetManyReferenceParams
+  ): Promise<GetManyReferenceResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  update: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: UpdateParams<any>
+  ): Promise<UpdateResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  updateMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: UpdateManyParams<any>
+  ): Promise<UpdateManyResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  create: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: CreateParams<any>
+  ): Promise<CreateResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  delete: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: DeleteParams<RecordType>
+  ): Promise<DeleteResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+  deleteMany: function <RecordType extends RaRecord = any>(
+    resource: string,
+    params: DeleteManyParams<RecordType>
+  ): Promise<DeleteManyResult<RecordType>> {
+    throw new Error("Function not implemented.")
+  },
+}

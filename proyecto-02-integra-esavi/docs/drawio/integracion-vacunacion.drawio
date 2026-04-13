@@ -1,0 +1,36 @@
+<mxfile host="65bd71144e">
+    <diagram id="_ziuOk1e2SrzyB6QYKdo" name="Página-1">
+        <mxGraphModel dx="631" dy="627" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="SCAN-MSP-PROD02.msp.gob.ec" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="70" y="70" width="250" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=5;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="150" width="60" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="REPLICA&#xa;HCUE_AMED&#xa;REGISTROVACUNACION" style="text;whiteSpace=wrap;fontSize=9;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="100" width="150" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="API-INTEGRA-ESAVI:8080" style="verticalAlign=top;align=left;spacingTop=8;spacingLeft=2;spacingRight=12;shape=cube;size=10;direction=south;fontStyle=4;html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="70" width="270" height="170" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="api-integra-esavi" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=40;tabHeight=14;tabPosition=left;html=1;whiteSpace=wrap;align=left;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="370" y="110" width="220" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="vacunacion-integrador" style="shape=module;align=left;spacingLeft=20;align=center;verticalAlign=top;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="165" width="145" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" style="edgeStyle=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="8" target="3">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="typeorm" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="9">
+                    <mxGeometry x="0.0256" y="-4" relative="1" as="geometry">
+                        <mxPoint x="52" y="-7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

@@ -1,0 +1,123 @@
+
+specification {
+  element actor
+  element system 
+  element component
+
+  element person
+  element container
+}
+
+
+model {
+  user_investigador = person "Investigador"
+
+  // Sistemas del MSP (Ministerio de Salud Pública)
+  msp = system "MSP" {
+    container dhis2_esavi_grave "DHIS2 - ESAVI Grave" "Sistema DHIS2 del MSP" "API"
+    container vacunas "Vacunas" "Sistema de Vacunas del MSP" "API"
+    container keycloak_msp "Keycloak" "Servidor SSO del MSP" "OAuth2"
+  }
+
+  // Sistemas del ARCSA
+  arcsa = system "ARCSA" {
+    container vigiflow "VigiFlow" "ESAVI grave y no grave" "API"
+  }
+
+  // Estándares médicos externos
+  estandares_medicos = system "Estándares Médicos" {
+    container meddra "MedDRA" "Estándar médico" "Database"
+    container whodrug "WHODrug" "Estándar médico" "Database"
+    container hl7_fhir "HL7-FHIR" "Estándar de interoperabilidad" "API"
+  }
+
+  // Sistema central Integra-ESAVI
+  integra_esavi = system "Integra-ESAVI" {
+    container dhis2_service "Servicio DHIS2" "Servicio homólogo" "NestJS"
+    container vacunas_service "Servicio Vacunas" "Servicio homólogo" "NestJS"
+    container vigiflow_service "Servicio VigiFlow" "Servicio homólogo" "NestJS"
+    container meddra_service "Servicio MedDRA" "Servicio estándar" "NestJS"
+    container whodrug_service "Servicio WHODrug" "Servicio estándar" "NestJS"
+    container fhir_service "Servicio HL7-FHIR" "Servicio estándar" "NestJS"
+    
+    container integra_esavi_web "INTEGRA ESAVI WEB" "Front-end" "ReactAdmin" {
+      component ui_dashboard "Dashboard" "Interfaz principal" "ReactAdmin"
+      component ui_reportes "Reportes" "Visualización de datos" "ReactAdmin"
+      component ui_auth "Autenticación" "Componente de login" "ReactAdmin"
+    }
+    
+  }
+
+  // Capa de persistencia (destino)
+  persistencia = system "Persistencia" {
+    container bd_principal "Base de Datos Principal" "Almacenamiento central" "PostgreSQL"
+    container bd_reportes "Base de Datos Reportes" "Datos para visualización" "PostgreSQL"
+  }
+
+  // Flujo de datos desde orígenes externos hacia Integra-ESAVI
+  msp.dhis2_esavi_grave -> integra_esavi.dhis2_service "Datos ESAVI grave" "1d"
+  msp.vacunas -> integra_esavi.vacunas_service "Datos de vacunación" "1m"
+  arcsa.vigiflow -> integra_esavi.vigiflow_service "Datos ESAVI" "1d"
+  
+  // Integración con estándares médicos
+  estandares_medicos.meddra -> integra_esavi.meddra_service "Consulta terminología" "6m"
+  estandares_medicos.whodrug -> integra_esavi.whodrug_service "Consulta medicamentos" "1m"
+  integra_esavi.fhir_service -> estandares_medicos.hl7_fhir "Envío de datos a FHIR"
+  estandares_medicos.hl7_fhir -> integra_esavi.fhir_service "Recepción de acuse de recibo"
+  // Autenticación
+  msp.keycloak_msp -> integra_esavi.integra_esavi_web.ui_auth "SSO"
+  
+  // Servicios hacia persistencia
+  integra_esavi.dhis2_service -> persistencia.bd_principal "Almacenar datos"
+  integra_esavi.vacunas_service -> persistencia.bd_principal "Almacenar datos"
+  integra_esavi.vigiflow_service -> persistencia.bd_principal "Almacenar datos"
+  integra_esavi.meddra_service -> persistencia.bd_principal "Almacenar datos"
+  integra_esavi.whodrug_service -> persistencia.bd_principal "Almacenar datos"
+  
+  // Datos para visualización
+  persistencia.bd_principal -> persistencia.bd_reportes "ETL para reportes"
+  persistencia.bd_reportes -> integra_esavi.integra_esavi_web "Datos para visualización"
+  
+  // Acceso del investigador
+  user_investigador -> integra_esavi.integra_esavi_web "Acceso web seguro"
+
+}
+  
+views {
+        view systemlandscape  integra_esavi "SystemLandscape" {
+          title "Integra-ESAVI - Vista General"
+          include *
+        }
+        
+        view systemcontext integra_esavi "SystemContext" {
+          //title "Arquitectura - Nivel Contenedor"
+          title "Integra-ESAVI - Contexto del Sistema"
+          include *
+        }
+        
+        view container integra_esavi "ContainerView" {
+          title "Integra-ESAVI - Vista de Contenedores"
+          include *
+
+          style customer {
+          color muted
+        }
+s       style integra_esavi {
+          backgroundrgb(126, 189, 17)
+          colorrgb(92, 184, 43)
+        }
+
+        style system {
+          background #1168bd
+          color #ffffff
+        }
+        style container {
+          background #438dd5
+          color #ffffff
+        }
+        style component {
+          background #85bbf0
+          color #000000
+        }           
+}
+

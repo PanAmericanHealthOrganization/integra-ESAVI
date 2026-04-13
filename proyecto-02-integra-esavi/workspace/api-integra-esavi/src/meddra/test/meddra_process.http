@@ -1,0 +1,9 @@
+### Consumo del servicio MedDRA Process
+POST http://localhost:8081/v1/meddra/version/process
+Accept: application/json
+Content-Type: application/json
+
+{
+    "version": 27,
+    "lang": "ES"
+}

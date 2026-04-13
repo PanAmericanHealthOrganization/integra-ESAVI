@@ -1,0 +1,423 @@
+{
+  "anio": 2026,
+  "mes": 1,
+  "jsonQuality": [
+    {
+      "dimension": "Exactitud",
+      "calidadTotal": 50.22267899965742,
+      "deltaCalidadTotal": -49.77732100034258,
+      "jsonDimensionQuality": [
+        {
+          "codigo": "EXA_SIN_003.TR_NOTIFICACION.EDAD",
+          "subDimension": "Sintáctica",
+          "descripcionRegla": "El campo EDAD en la tabla TR_NOTIFICACION debe tener valores entre 0 y 120.",
+          "totalRegistros": 2956,
+          "totalRegistrosValidos": 2956,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "EXA_SIN_003.TR_DESENLACE_ESAVI.AUTOPSIA",
+          "subDimension": "Sintáctica",
+          "descripcionRegla": "El campo AUTOPSIA en la tabla TR_DESENLACE_ESAVI debe tener valores entre 4 y 4.",
+          "totalRegistros": 2989,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 2989,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 100
+        },
+        {
+          "codigo": "EXA_SEM_001",
+          "subDimension": "Semántica",
+          "descripcionRegla": "La edad registrada  debe ser la edad de la persona al inicio del evento.",
+          "totalRegistros": 2901,
+          "totalRegistrosValidos": 2901,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "EXA_SEM_002",
+          "subDimension": "Semántica",
+          "descripcionRegla": "El nombre de la vacuna registrado debe corresponder a una vacuna dentro del catalogo nacional de referencia",
+          "totalRegistros": 2830,
+          "totalRegistrosValidos": 7,
+          "totalRegistrosInvalidos": 2823,
+          "porcentajeRegistrosValidos": 0.24734982332155478,
+          "porcentajeRegistrosInvalidos": 99.75265017667844
+        }
+      ]
+    },
+    {
+      "dimension": "Consistencia",
+      "calidadTotal": 77.5307720999627,
+      "deltaCalidadTotal": 11.169369374923619,
+      "jsonDimensionQuality": [
+        {
+          "codigo": "CON_DOM_001_FECHA_ATENCION",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_NOTIFICACION",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 2933,
+          "totalRegistrosValidos": 2933,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_REPORTE_NACIONAL",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 2760,
+          "totalRegistrosValidos": 2760,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_LLENADO_FICHA",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_NACIMIENTO",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 153,
+          "totalRegistrosValidos": 153,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHAULTIMAMENSTRUACIONESAVI",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_VACUNACION",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 2903,
+          "totalRegistrosValidos": 2903,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHAMUERTE",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHANOTIFICAMUERTE",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_001_FECHA_NACIMIENTO",
+          "subDimension": "Dominio",
+          "descripcionRegla": "Descripción fechas futuras: Determinadas variables de tipo fecha no pueden ser posteriores a la fecha en que se realiza el análisis de calidad.",
+          "totalRegistros": 153,
+          "totalRegistrosValidos": 153,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_02",
+          "subDimension": "Dominio",
+          "descripcionRegla": "El valor es correcto cuando la fecha de nacimiento es al menos 120 años menor que la fecha de creación del registro.",
+          "totalRegistros": 122,
+          "totalRegistrosValidos": 122,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_03",
+          "subDimension": "Dominio",
+          "descripcionRegla": "El valor es correcto cuando la edad es mayor o igual a cero.",
+          "totalRegistros": 2901,
+          "totalRegistrosValidos": 2901,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_INTRA_OO1",
+          "subDimension": "Intrarelación",
+          "descripcionRegla": "El valor es correcto cuando la fecha de notificación no es nula.",
+          "totalRegistros": 2933,
+          "totalRegistrosValidos": 2933,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_INTRA_OO2",
+          "subDimension": "Intrarelación",
+          "descripcionRegla": "Si la notificación fue enviada debe existir al menos un signo, síntoma o hallazgo anormal de laboratorio reportado como ESAVI",
+          "totalRegistros": 2910,
+          "totalRegistrosValidos": 2909,
+          "totalRegistrosInvalidos": 1,
+          "porcentajeRegistrosValidos": 99.96563573883162,
+          "porcentajeRegistrosInvalidos": 0.03436426116838488
+        },
+        {
+          "codigo": "CON_DOM_02.A",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "El valor es correcto cuando se cumple la fórmula",
+          "totalRegistros": 5763,
+          "totalRegistrosValidos": 2796,
+          "totalRegistrosInvalidos": 2967,
+          "porcentajeRegistrosValidos": 48.51639770952629,
+          "porcentajeRegistrosInvalidos": 51.483602290473705
+        },
+        {
+          "codigo": "CON_DOM_001",
+          "subDimension": "Dominio",
+          "descripcionRegla": "La fecha de nacimiento se debe relacionar en forma logica con otras variables de tipo fecha",
+          "totalRegistros": 84,
+          "totalRegistrosValidos": 84,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_002",
+          "subDimension": "Dominio",
+          "descripcionRegla": "La fecha de vacunación se debe relacionar en forma logica con otras variables de tipo fecha",
+          "totalRegistros": 84,
+          "totalRegistrosValidos": 83,
+          "totalRegistrosInvalidos": 1,
+          "porcentajeRegistrosValidos": 98.80952380952381,
+          "porcentajeRegistrosInvalidos": 1.1904761904761905
+        },
+        {
+          "codigo": "CON_DOM_003",
+          "subDimension": "Dominio",
+          "descripcionRegla": "La fecha de ESAVI se debe relacionar en forma logica con otras variables de tipo fecha",
+          "totalRegistros": 84,
+          "totalRegistrosValidos": 48,
+          "totalRegistrosInvalidos": 36,
+          "porcentajeRegistrosValidos": 57.14285714285714,
+          "porcentajeRegistrosInvalidos": 42.857142857142854
+        },
+        {
+          "codigo": "CON_DOM_004",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha",
+          "totalRegistros": 84,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 84,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 100
+        },
+        {
+          "codigo": "CON_DOM_005",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "En casos con desenlace fatal, la fecha de muerte debe ser coherente respecto a las demás fechas relacionadas.",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_006",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha",
+          "totalRegistros": 10,
+          "totalRegistrosValidos": 8,
+          "totalRegistrosInvalidos": 2,
+          "porcentajeRegistrosValidos": 80,
+          "porcentajeRegistrosInvalidos": 20
+        },
+        {
+          "codigo": "CON_DOM_007",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "Los casos de ESAVI con desenlace fatal tienen que tener coherencia en sus variable relacionadas",
+          "totalRegistros": 2933,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_DOM_008",
+          "subDimension": "Interrelación",
+          "descripcionRegla": "Los ESAVI en gestantes deben tener una relación lógica con la variable sexo ",
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        }
+      ]
+    },
+    {
+      "dimension": "Completitud",
+      "calidadTotal": 100,
+      "deltaCalidadTotal": 0,
+      "jsonDimensionQuality": [
+        {
+          "codigo": "CON_COM_001.FECHA_ATENCION",
+          "subDimension": "TR_NOTIFICACION",
+          "descripcionRegla": "La columna FECHA_ATENCION en la tabla TR_NOTIFICACION debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_NOTIFICACION",
+            "columna": "FECHA_ATENCION"
+          },
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.FECHA_NOTIFICACION",
+          "subDimension": "TR_NOTIFICACION",
+          "descripcionRegla": "La columna FECHA_NOTIFICACION en la tabla TR_NOTIFICACION debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_NOTIFICACION",
+            "columna": "FECHA_NOTIFICACION"
+          },
+          "totalRegistros": 2933,
+          "totalRegistrosValidos": 2933,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.FECHA_REPORTE_NACIONAL",
+          "subDimension": "TR_NOTIFICACION",
+          "descripcionRegla": "La columna FECHA_REPORTE_NACIONAL en la tabla TR_NOTIFICACION debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_NOTIFICACION",
+            "columna": "FECHA_REPORTE_NACIONAL"
+          },
+          "totalRegistros": 2706,
+          "totalRegistrosValidos": 2706,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.FECHA_LLENADO_FICHA",
+          "subDimension": "TR_NOTIFICACION",
+          "descripcionRegla": "La columna FECHA_LLENADO_FICHA en la tabla TR_NOTIFICACION debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_NOTIFICACION",
+            "columna": "FECHA_LLENADO_FICHA"
+          },
+          "totalRegistros": 0,
+          "totalRegistrosValidos": 0,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 0,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.FECHA_NACIMIENTO",
+          "subDimension": "TR_PACIENTE",
+          "descripcionRegla": "La columna FECHA_NACIMIENTO en la tabla TR_PACIENTE debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_PACIENTE",
+            "columna": "FECHA_NACIMIENTO"
+          },
+          "totalRegistros": 122,
+          "totalRegistrosValidos": 122,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.CT_SEXO_ID",
+          "subDimension": "TR_PACIENTE",
+          "descripcionRegla": "La columna CT_SEXO_ID en la tabla TR_PACIENTE debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_PACIENTE",
+            "columna": "CT_SEXO_ID"
+          },
+          "totalRegistros": 2909,
+          "totalRegistrosValidos": 2909,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.FECHA_VACUNACION",
+          "subDimension": "TR_DATO_VACUNACION",
+          "descripcionRegla": "La columna FECHA_VACUNACION en la tabla TR_DATO_VACUNACION debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_DATO_VACUNACION",
+            "columna": "FECHA_VACUNACION"
+          },
+          "totalRegistros": 2849,
+          "totalRegistrosValidos": 2849,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.CODIGO_LLT",
+          "subDimension": "TR_DATOS_ESAVI",
+          "descripcionRegla": "La columna CODIGO_LLT en la tabla TR_DATOS_ESAVI debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_DATOS_ESAVI",
+            "columna": "CODIGO_LLT"
+          },
+          "totalRegistros": 2848,
+          "totalRegistrosValidos": 2848,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        },
+        {
+          "codigo": "CON_COM_001.COGIDOCASO",
+          "subDimension": "TR_DATOS_ESAVI",
+          "descripcionRegla": "La columna COGIDOCASO en la tabla TR_DATOS_ESAVI debe contener valores no nulos para garantizar la completitud de los datos.",
+          "metaDatos": {
+            "tabla": "TR_DATOS_ESAVI",
+            "columna": "COGIDOCASO"
+          },
+          "totalRegistros": 2910,
+          "totalRegistrosValidos": 2910,
+          "totalRegistrosInvalidos": 0,
+          "porcentajeRegistrosValidos": 100,
+          "porcentajeRegistrosInvalidos": 0
+        }
+      ]
+    }
+  ]
+}

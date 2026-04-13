@@ -1,0 +1,37 @@
+
+    codigo; dimension; subDimension; totalRegistros; totalRegistrosEsperados; totalRegistrosValidos; totalRegistrosValidosEsperados; totalRegistrosInvalidos; totalRegistrosInvalidosEsperados
+    EXA_SIN_003.TR_NOTIFICACION.EDAD; Exactitud;Sintáctica; 2956; 2956; 2956; 2956; 0; 0
+    EXA_SIN_003.TR_DESENLACE_ESAVI.AUTOPSIA; Exactitud;Sintáctica; 2989; 2989; 0; 0; 2989; 2989
+    EXA_SEM_001; Exactitud;Semántica; 2901; 2901; 2901; 2901; 0; 0
+    EXA_SEM_002; Exactitud;Semántica; 2830; 2830; 7; 7; 2823; 2823
+    CON_DOM_001_FECHA_ATENCION; Consistencia;Dominio; 0; 0; 0; 0; 0; 0
+    CON_DOM_001_FECHA_NOTIFICACION; Consistencia;Dominio; 2933; 2933; 2933; 2933; 0; 0
+    CON_DOM_001_FECHA_REPORTE_NACIONAL; Consistencia;Dominio; 2760; 2760; 2760; 2760; 0; 0
+    CON_DOM_001_FECHA_LLENADO_FICHA; Consistencia;Dominio; 0; 0; 0; 0; 0; 0
+    CON_DOM_001_FECHA_NACIMIENTO; Consistencia;Dominio; 153; 153; 153; 153; 0; 0
+    CON_DOM_001_FECHAULTIMAMENSTRUACIONESAVI; Consistencia;Dominio; 0; 0; 0; 0; 0; 0
+    CON_DOM_001_FECHA_VACUNACION; Consistencia;Dominio; 2903; 2903; 2903; 2903; 0; 0
+    CON_DOM_001_FECHAMUERTE; Consistencia;Dominio; 0; 0; 0; 0; 0; 0
+    CON_DOM_001_FECHANOTIFICAMUERTE; Consistencia;Dominio; 0; 0; 0; 0; 0; 0
+    CON_DOM_001_FECHA_NACIMIENTO; Consistencia;Dominio; 153; 153; 153; 153; 0; 0
+    CON_DOM_02; Consistencia;Dominio; 122; 122; 122; 122; 0; 0
+    CON_DOM_03; Consistencia;Dominio; 2901; 2901; 2901; 2901; 0; 0
+    CON_INTRA_OO1; Consistencia;Intrarelación; 2933; 2933; 2933; 2933; 0; 0
+    CON_INTRA_OO2; Consistencia;Intrarelación; 2910; 2910; 2909; 2909; 1; 1
+    CON_DOM_02.A; Consistencia;Interrelación; 5763; 5763; 2796; 2796; 2967; 2967
+    CON_DOM_001; Consistencia;Dominio; 84; 84; 84; 84; 0; 0
+    CON_DOM_002; Consistencia;Dominio; 84; 84; 83; 83; 1; 1
+    CON_DOM_003; Consistencia;Dominio; 84; 84; 48; 48; 36; 36
+    CON_DOM_004; Consistencia;Interrelación; 84; 84; 0; 0; 84; 84
+    CON_DOM_005; Consistencia;Interrelación; 0; 0; 0; 0; 0; 0
+    CON_DOM_006; Consistencia;Interrelación; 10; 10; 8; 8; 2; 2
+    CON_DOM_007; Consistencia;Interrelación; 2933; 2933; 0; 0; 0; 0
+    CON_DOM_008; Consistencia;Interrelación; 0; 0; 0; 0; 0; 0
+    CON_COM_001.FECHA_ATENCION; Completitud;TR_NOTIFICACION; 0; 0; 0; 0; 0; 0
+    CON_COM_001.FECHA_NOTIFICACION; Completitud;TR_NOTIFICACION; 2933; 2933; 2933; 2933; 0; 0
+    CON_COM_001.FECHA_REPORTE_NACIONAL; Completitud;TR_NOTIFICACION; 2706; 2706; 2706; 2706; 0; 0
+    CON_COM_001.FECHA_LLENADO_FICHA; Completitud;TR_NOTIFICACION; 0; 0; 0; 0; 0; 0
+    CON_COM_001.FECHA_NACIMIENTO; Completitud;TR_PACIENTE; 122; 122; 122; 122; 0; 0
+    CON_COM_001.CT_SEXO_ID; Completitud;TR_PACIENTE; 2909; 2909; 2909; 2909; 0; 0
+    CON_COM_001.FECHA_VACUNACION; Completitud;TR_DATO_VACUNACION; 2849; 2849; 2849; 2849; 0; 0
+    CON_COM_001.CODIGO_LLT; Completitud;TR_DATOS_ESAVI; 2848; 2848; 2848; 2848; 0; 0

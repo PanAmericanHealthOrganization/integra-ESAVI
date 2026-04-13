@@ -1,0 +1,58 @@
+# compiled output
+/dist
+/node_modules
+/postgres_data
+/postgres_sdata
+/data
+/oracle_data
+/postgis_data
+/mssql_data
+/mysql_data
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+integra-esavi-calidad
+
+
+# OS
+.DS_Store
+.pnpm-store
+.vscode
+.vscode/*
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+/package-lock.json
+
+# Ignorar archivo de configuración de entorno
+.des.env
+#Ignorar
+.env
+~$*
+borrar*
+
+pnpm-lock.yaml
+pnpm-workspace.yaml
+
+integra-esavi.code-workspace

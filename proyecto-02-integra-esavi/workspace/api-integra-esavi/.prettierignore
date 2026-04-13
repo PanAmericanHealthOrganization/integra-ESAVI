@@ -1,0 +1,30 @@
+# Ignore artifacts:
+build
+dist
+
+# Ignore all files in node_modules, except for package.json (when using npm/yarn):
+node_modules
+
+# Ignore editorconfig files (if you have one):
+.editorconfig
+
+# Ignore dotfiles:
+.git
+.github
+.vscode
+
+# Ignore logs and other generated files:
+logs
+*.log
+
+# Ignore coverage directories:
+coverage
+
+# Ignore various config files:
+*.env
+*.env.*
+.prettierrc
+
+# Specific files to ignore, if any:
+
+
