@@ -1,0 +1,71 @@
+
+\begin{center}
+
+```{r escudo-superior, echo=FALSE, fig.show='hold', out.width="15%", fig.align="center"}
+knitr::include_graphics("images/logos/escudo_ecuador.png")
+```
+
+\vspace{1cm}
+
+{\Huge\bfseries Informe de Análisis ESAVI}
+
+\vspace{0.8cm}
+
+{\large\bfseries Ministerio de Salud Pública}
+
+\vspace{0.6cm}
+
+{\Large Gaceta Integrada de Eventos Supuestamente Atribuidos a Vacunación o Inmunización}
+
+\vspace{0.6cm}
+
+{\large Dirección Nacional de Vigilancia Epidemiológica y Dirección Nacional de Inmunizaciones}
+
+\vspace{0.5cm}
+
+```{r elaborado-por, echo=FALSE, results='asis', warning=FALSE, message=FALSE}
+# CARGAR DATOS DIRECTAMENTE EN LA PORTADA
+library(jsonlite)
+
+# Cargar parámetros directamente
+cat("{\\large\n")
+cat("\\textbf{Elaborado por:}\\\\\n")
+cat("\\vspace{2.5cm}\n")
+cat("\\begin{minipage}[t]{0.48\\textwidth}\n")
+cat("\\centering\n")
+cat(paste0(autor_principal, "\\\\\n"))
+cat(paste0("{\\footnotesize ", cargo_autor, "}\n"))
+cat("\\end{minipage}\n")
+cat("\\hfill\n")
+cat("\\begin{minipage}[t]{0.48\\textwidth}\n")
+cat("\\centering\n")
+cat(paste0(coautor, "\\\\\n"))
+cat(paste0("{\\footnotesize ", cargo_coautor, "}\n"))
+cat("\\end{minipage}\n")
+cat("}\n")
+```
+
+\vspace{1cm}
+
+
+```{r version-info, echo=FALSE, results='asis'}
+cat("{\\large\n")
+cat(paste0("\\textbf{Versión:} ", version_informe, "\\\\\n"))
+cat(paste0("\\textbf{Estado:} ", estado_informe, "\n"))
+cat("}\n")
+```
+
+\vspace{0.5cm}
+
+{\large
+\textbf{Fecha de reporte:}\\
+`r format(Sys.Date(), "%d de %B de %Y")`
+}
+
+\vfill
+
+\end{center}
+
+\footnotetext{\fontsize{6}{8}\selectfont\textbf{Este documento contiene información confidencial y está destinado únicamente para uso interno del Ministerio de Salud Pública. La distribución de este documento debe ser autorizada por Subsecretaria de Vigilancia Epidemiológica u Control de la Salud.}}
+
+\newpage

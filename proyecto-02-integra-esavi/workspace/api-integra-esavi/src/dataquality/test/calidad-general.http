@@ -1,0 +1,174 @@
+### Variables comunes
+@baseUrl = http://localhost:8081/v1/dataquality
+@fechaHoy = {{$datetime iso8601}}
+@fechaManual = 2025-01-15
+@fechaInicio = 2025-01-01
+@fechaFin = 2025-03-31
+
+### ============================================
+### CALIDAD GENERAL
+### ============================================
+
+### Calidad General - Obtener datos del día de hoy
+GET {{baseUrl}}/calidad-general?fecha={{fechaHoy}}
+Content-Type: application/json
+
+###
+
+### Calidad General - Datos de fecha específica
+GET {{baseUrl}}/calidad-general?fecha={{fechaManual}}
+Content-Type: application/json
+
+###
+
+### Calidad General - Rango de fechas
+GET {{baseUrl}}/calidad-general?fechaInicio=2025-01-01&fechaFin=2025-01-31
+Content-Type: application/json
+
+###
+
+### Calidad General - POST datos del día
+POST {{baseUrl}}/calidad-general
+Content-Type: application/json
+
+{
+    "fecha": "{{fechaHoy}}"
+}
+
+###
+
+### ============================================
+### RANGO DE FECHAS - NUEVO SERVICIO
+### ============================================
+
+### Calidad por Rango de Fechas - Datos detallados por mes
+GET http://localhost:8081/v1/dataquality/range?startDate={{fechaInicio}}&endDate={{fechaFin}}
+Content-Type: application/json
+
+###
+
+### Calidad por Rango de Fechas - Resumen agregado
+GET http://localhost:8081/v1/dataquality/range/summary?startDate={{fechaInicio}}&endDate={{fechaFin}}
+Content-Type: application/json
+
+###
+
+### Calidad por Rango de Fechas - Ejemplo rango corto (1 mes)
+GET http://localhost:8081/v1/dataquality/range?startDate=2025-01-01&endDate=2026-01-01
+Content-Type: application/json
+
+###
+
+### Calidad por Rango de Fechas - Ejemplo rango largo (6 meses)
+GET http://localhost:8081/v1/dataquality/range?startDate=2024-07-01&endDate=2024-12-31
+Content-Type: application/json
+
+###
+
+### Calidad por Rango de Fechas - Resumen trimestral
+GET http://localhost:8081/v1/dataquality/range/summary?startDate=2025-01-01&endDate=2025-03-31
+Content-Type: application/json
+
+###
+
+### Calidad por Rango de Fechas - Resumen semestral
+GET http://localhost:8081/v1/dataquality/range/summary?startDate=2024-07-01&endDate=2024-12-31
+Content-Type: application/json
+
+###
+
+### ============================================
+### PROBLEMAS DE CALIDAD
+### ============================================
+
+### Problemas de Calidad - Consultar primero el servicio general para ver códigos disponibles
+GET {{baseUrl}}/general?date=2025-01-01
+Content-Type: application/json
+
+###
+
+### Problemas de Calidad - Por año, mes y código (ajustar el código según la respuesta anterior)
+GET {{baseUrl}}/problems?anio=2025&mes=1&codigo=CON_INTRA_OO2
+Content-Type: application/json
+
+###
+
+### ============================================
+### HISTORIAL DE CALIDAD (History)
+### ============================================
+
+### Historial de Calidad - Rango de fechas corto
+POST {{baseUrl}}/history
+Content-Type: application/json
+
+{
+    "startDay": "2025-01-01",
+    "endDay": "2025-03-31"
+}
+
+###
+
+### Historial de Calidad - Rango de fechas largo
+POST {{baseUrl}}/history
+Content-Type: application/json
+
+{
+    "startDay": "2024-01-01",
+    "endDay": "2024-12-31"
+}
+
+###
+
+### Historial de Calidad - Año actual
+POST {{baseUrl}}/history
+Content-Type: application/json
+
+{
+    "startDay": "2025-01-01",
+    "endDay": "2025-12-31"
+}
+
+###
+
+### ============================================
+### VALIDACIONES
+### ============================================
+
+### Validar datos - Por ID
+GET {{baseUrl}}/dataquality/validar/12345
+Content-Type: application/json
+
+###
+
+### Validar lote de datos
+POST {{baseUrl}}/dataquality/validar
+Content-Type: application/json
+
+{
+    "registros": [
+        {"id": "001", "campo1": "valor1"},
+        {"id": "002", "campo1": "valor2"}
+    ]
+}
+
+###
+
+### Validar lote de datos
+POST {{baseUrl}}/maintenance/evaluations/range
+Content-Type: application/json
+
+{
+    "startDate": "2021-01-01",
+    "endDate": "2026-12-31"
+}
+
+### Validar lote de datos
+POST {{baseUrl}}/history
+Content-Type: application/json
+
+{
+    "startDay": "2024-01-01",
+    "endDay": "2024-12-31"
+}
+
+###

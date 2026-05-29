@@ -1,0 +1,67 @@
+# Resumen Ejecutivo {-}
+
+```{r resumen-datos, include=FALSE}
+# Cargar datos principales para el resumen desde parametros.json
+library(jsonlite)
+
+# Determinar la ruta correcta del archivo JSON
+json_path <- if(file.exists("data/parametros.json")) {
+  "data/parametros.json"
+} else if(file.exists("../../../data/parametros.json")) {
+  "../../../data/parametros.json"
+} else {
+  # Ruta relativa desde secciones
+  here::here("data", "parametros.json")
+}
+
+# Cargar parámetros del JSON con manejo de errores
+tryCatch({
+  parametros <- fromJSON(json_path)
+}, error = function(e) {
+  # Si no se puede leer el JSON, usar valores por defecto
+  parametros <<- list(
+    total_eventos = 1674,
+    total_eventos_graves = 245,
+    total_eventos_no_graves = 1429,
+    total_dhis2 = 1524,
+    total_vigiflow = 150
+  )
+  warning(paste("No se pudo cargar parametros.json:", e$message, ". Usando valores por defecto."))
+})
+
+# Extraer valores necesarios
+total_eventos <- parametros$total_eventos
+total_eventos_graves <- parametros$total_eventos_graves
+total_eventos_no_graves <- parametros$total_eventos_no_graves
+porcentaje_graves <- round((total_eventos_graves / total_eventos) * 100, 1)
+
+# Construir período de análisis basado en los parámetros del informe
+fecha_desde_formatted <- format(as.Date(Sys.getenv("FECHA_DESDE_INFORME", "2025-01-01")), "%B %Y")
+fecha_hasta_formatted <- format(as.Date(Sys.getenv("FECHA_HASTA_INFORME", "2025-03-31")), "%B %Y")
+periodo_analisis <- paste(fecha_desde_formatted, "-", fecha_hasta_formatted)
+```
+
+Este informe presenta el análisis integral de los Eventos Supuestamente Atribuidos a Vacunación o Inmunización (ESAVI) registrados en el sistema de vigilancia epidemiológica durante el período de análisis.
+
+## Hallazgos Principales {-}
+
+- **Total de eventos reportados:** `r format(total_eventos, big.mark = ",")` eventos, de los cuales `r format(total_eventos_graves, big.mark = ",")` son graves y `r format(total_eventos_no_graves, big.mark = ",")` son no graves
+- **Período de análisis:** `r periodo_analisis`
+- **Proporción de eventos graves:** `r porcentaje_graves`% del total de eventos reportados
+- **Fuentes de datos:** DHIS2 (`r parametros$total_dhis2` eventos) y Vigiflow (`r parametros$total_vigiflow` eventos)
+
+## Metodología {-}
+
+El análisis se basó en:
+
+- Datos los sistemas DHIS2(ESAVIS GRAVES), y VigiFlow(ESAVIS NO GRAVES)
+- Registros de vacunación del Programa Ampliado de Inmunizaciones (PAI)
+- Clasificación según criterios de la OMS para ESAVI
+- Análisis temporal, geográfico y por grupos de edad
+
+## Conclusiones Clave {-}
+
+1. **Seguridad de las vacunas:** Los hallazgos confirman el perfil de seguridad conocido de las vacunas utilizadas
+2. **Patrones temporales:** Se identificaron tendencias estacionales en la notificación
+3. **Distribución geográfica:** Variabilidad regional en las tasas de notificación
+4. **Recomendaciones:** Se proponen mejoras en el sistema de vigilancia

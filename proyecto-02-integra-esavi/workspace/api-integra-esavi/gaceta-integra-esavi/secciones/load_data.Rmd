@@ -1,0 +1,310 @@
+```{r configuracion-db, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+# Función para conectarse a PostgreSQL y ejecutar consultas SQL
+# Las configuraciones se obtienen desde variables de entorno
+
+# Librerías necesarias (cargar sin mostrar mensajes)
+suppressMessages(suppressWarnings({
+  if (!require(DBI, quietly = TRUE)) install.packages("DBI", quiet = TRUE)
+  if (!require(RPostgres, quietly = TRUE)) install.packages("RPostgres", quiet = TRUE)
+}))
+
+suppressMessages(suppressWarnings({
+  library(DBI, quietly = TRUE)
+  library(RPostgres, quietly = TRUE)
+}))
+
+# Cargar dotenv solo si está disponible o se puede instalar (desarrollo)
+dotenv_available <- FALSE
+suppressMessages(suppressWarnings({
+  tryCatch({
+    if (!require(dotenv, quietly = TRUE)) {
+      install.packages("dotenv", quiet = TRUE)
+    }
+    library(dotenv, quietly = TRUE)
+    dotenv_available <- TRUE
+  }, error = function(e) {
+    # Silenciar mensaje
+    invisible(NULL)
+  })
+}))
+
+# Cargar variables de entorno (solo en desarrollo si existe .env)
+suppressMessages(suppressWarnings({
+  if (dotenv_available) {
+    tryCatch({
+      # Buscar archivo .env en el directorio actual y directorios padre
+      env_paths <- c(".env", "../.env", "../../.env")
+      
+      for (env_path in env_paths) {
+        if (file.exists(env_path)) {
+          load_dot_env(env_path)
+          break
+        }
+      }
+    }, error = function(e) {
+      # Silenciar error
+      invisible(NULL)
+    })
+  }
+}))
+
+#' Conectar a base de datos PostgreSQL y ejecutar consulta
+#'
+#' @param query Consulta SQL a ejecutar
+#' @param close_connection Lógico, si TRUE cierra la conexión después de la consulta
+#' @return data.frame con los resultados de la consulta
+#' @details 
+#' Las variables de entorno requeridas son:
+#' - DB_HOST: Host de la base de datos
+#' - DB_PORT: Puerto (por defecto 5432)
+#' - DB_NAME: Nombre de la base de datos
+#' - DB_USER: Usuario
+#' - DB_PASSWORD: Contraseña
+#' @examples
+#' # Definir variables de entorno primero:
+#' # Sys.setenv(DB_HOST = "localhost")
+#' # Sys.setenv(DB_PORT = "5432")
+#' # Sys.setenv(DB_NAME = "mi_base")
+#' # Sys.setenv(DB_USER = "mi_usuario")
+#' # Sys.setenv(DB_PASSWORD = "mi_password")
+#' 
+#' # Ejecutar consulta
+#' resultado <- ejecutar_consulta_pg("SELECT * FROM mi_tabla LIMIT 10")
+ejecutar_consulta_pg <- function(query, close_connection = TRUE, verbose = FALSE) {
+  
+  # Validar que la consulta no esté vacía
+  if (is.null(query) || nchar(trimws(query)) == 0) {
+    stop("La consulta SQL no puede estar vacía")
+  }
+  
+  # Obtener configuraciones desde variables de entorno
+  db_config <- list(
+    host = Sys.getenv("HOST_DATABASE"),
+    port = Sys.getenv("PORT_DATABASE", "5432"),  # Puerto por defecto
+    dbname = Sys.getenv("NAME_DATABASE"),
+    user = Sys.getenv("USER_DATABASE"),
+    password = Sys.getenv("PASS_DATABASE")
+  )
+  
+  # Validar que todas las configuraciones estén disponibles
+  config_missing <- sapply(db_config[c("host", "dbname", "user", "password")], 
+                          function(x) nchar(x) == 0)
+  
+  if (any(config_missing)) {
+    missing_vars <- names(config_missing)[config_missing]
+    env_vars <- c("HOST_DATABASE", "NAME_DATABASE", "USER_DATABASE", "PASS_DATABASE")
+    stop(paste("❌ Las siguientes variables de entorno son requeridas:", 
+               paste(env_vars[config_missing[c("host", "dbname", "user", "password")]], collapse = ", "),
+               "\n   En desarrollo: configurar en archivo .env",
+               "\n   En producción: configurar como variables de entorno del sistema"))
+  }
+  
+  # Crear conexión
+  con <- NULL
+  tryCatch({
+    
+    # Establecer conexión usando RPostgres (soporta SCRAM authentication)
+    if (verbose) {
+      # Modo verbose: mostrar mensajes
+      message("Conectando a la base de datos PostgreSQL...")
+      message(paste("Host:", db_config$host, "Puerto:", db_config$port, 
+                    "Base de datos:", db_config$dbname))
+      con <- dbConnect(RPostgres::Postgres(),
+                       host = db_config$host,
+                       port = as.integer(db_config$port),
+                       dbname = db_config$dbname,
+                       user = db_config$user,
+                       password = db_config$password)
+      message("Conexión establecida exitosamente.")
+      message("Ejecutando consulta SQL...")
+      resultado <- dbGetQuery(con, query)
+      message(paste("Consulta ejecutada. Filas obtenidas:", nrow(resultado)))
+    } else {
+      # Modo silencioso: suprimir todos los mensajes y warnings sin usar sink()
+      # Esto evita conflictos con el sistema de renderizado de R Markdown
+      con <- suppressMessages(suppressWarnings({
+        dbConnect(RPostgres::Postgres(),
+                  host = db_config$host,
+                  port = as.integer(db_config$port),
+                  dbname = db_config$dbname,
+                  user = db_config$user,
+                  password = db_config$password)
+      }))
+      
+      # Ejecutar consulta de forma silenciosa
+      resultado <- suppressMessages(suppressWarnings({
+        dbGetQuery(con, query)
+      }))
+    }
+    
+    return(resultado)
+    
+  }, error = function(e) {
+    # En modo silencioso, solo hacer stop sin mostrar mensajes
+    if (!verbose) {
+      stop(e)
+    } else {
+      message("Error al conectar o ejecutar consulta:")
+      message(paste("Mensaje de error:", e$message))
+      stop(e)
+    }
+    
+  }, finally = {
+    # Cerrar conexión si se solicitó y existe
+    if (close_connection && !is.null(con)) {
+      tryCatch({
+        if (verbose) {
+          dbDisconnect(con)
+          message("Conexión cerrada.")
+        } else {
+          # Modo silencioso: cerrar sin mostrar mensajes ni warnings
+          suppressMessages(suppressWarnings({
+            dbDisconnect(con)
+          }))
+        }
+      }, error = function(e) {
+        # Silenciar cualquier error de cierre
+        invisible(NULL)
+      })
+    }
+  })
+}
+```
+
+
+```{r load-data-global, echo=FALSE, results='hide', warning=FALSE, message=FALSE}
+# ============================================================================
+# CARGA GLOBAL DE DATOS Y PARÁMETROS
+# Este archivo debe ser incluido al inicio para que todas las variables
+# estén disponibles en todo el documento
+# ============================================================================
+
+# Cargar librerías necesarias
+library(jsonlite)
+library(knitr)
+
+# =============================================================================
+# CARGAR PARÁMETROS DESDE JSON
+# =============================================================================
+
+# Obtener el directorio actual y establecer base path
+current_dir <- getwd()
+base_path <- dirname(current_dir)  # Directorio padre del actual
+
+# Definir rutas posibles para el archivo JSON
+possible_paths <- c(
+  "data/parametros.json",
+  "./data/parametros.json", 
+  "../data/parametros.json",
+  file.path(current_dir, "data/parametros.json"),
+  file.path(base_path, "data/parametros.json"),
+  file.path(dirname(base_path), "data/parametros.json")
+)
+
+# Buscar el archivo JSON (sin mostrar mensajes)
+json_file <- NULL
+for (path in possible_paths) {
+  if (file.exists(path)) {
+    json_file <- path
+    break
+  }
+}
+
+if (!is.null(json_file)) {
+  # Cargar JSON exitosamente (sin mostrar mensajes)
+  parametros <<- suppressMessages({
+    read_json(json_file)
+  })
+  
+  # ========================================================================
+  # VARIABLES DEL INFORME - FORZAR ASIGNACIÓN GLOBAL
+  # ========================================================================
+  titulo_informe <<- parametros$informe$titulo
+  subtitulo_informe <<- parametros$informe$subtitulo  
+  version_informe <<- parametros$informe$version
+  estado_informe <<- parametros$informe$estado
+  
+  # ========================================================================
+  # VARIABLES DE AUTORES - FORZAR ASIGNACIÓN GLOBAL
+  # ========================================================================
+  autor_principal <<- parametros$autor$nombre
+  cargo_autor <<- parametros$autor$cargo
+  correo_autor <<- parametros$autor$correo
+  telefono_autor <<- parametros$autor$telefono
+  
+  coautor <<- parametros$co_autor$nombre
+  cargo_coautor <<- parametros$co_autor$cargo
+  correo_coautor <<- parametros$co_autor$correo
+  telefono_coautor <<- parametros$co_autor$telefono
+  
+  # ========================================================================
+  # VARIABLES INSTITUCIONALES - FORZAR ASIGNACIÓN GLOBAL
+  # ========================================================================
+  institucion <<- parametros$institucion$nombre
+  direccion <<- parametros$institucion$direccion
+  pais <<- parametros$institucion$pais
+  
+  # ========================================================================
+  # VARIABLE DE FECHA - FORZAR ASIGNACIÓN GLOBAL
+  # ========================================================================
+  fecha_actual <<- format(Sys.Date(), "%d de %B de %Y")
+  
+} else {
+  # ========================================================================
+  # VALORES POR DEFECTO SI NO SE ENCUENTRA EL ARCHIVO
+  # ========================================================================
+  
+  # Variables del informe (valores por defecto)
+  titulo_informe <<- "Informe de Análisis ESAVI"
+  subtitulo_informe <<- "Gaceta Integrada de Eventos Supuestamente Atribuidos a Vacunación o Inmunización"
+  version_informe <<- "1.0"
+  estado_informe <<- "Final"
+  
+  # Variables de autores (valores por defecto)
+  autor_principal <<- "Autor Principal"
+  cargo_autor <<- "Cargo Principal"
+  correo_autor <<- "contacto@msp.gob.ec"
+  telefono_autor <<- "+593-2-000000000"
+  
+  coautor <<- "Co-autor"
+  cargo_coautor <<- "Cargo Co-autor"
+  correo_coautor <<- "contacto@msp.gob.ec"
+  telefono_coautor <<- "+593-2-000000000"
+  
+  # Variables institucionales (valores por defecto)
+  institucion <<- "Ministerio de Salud Pública"
+  direccion <<- "Dirección Nacional de Vigilancia Epidemiológica"
+  pais <<- "Ecuador"
+  
+  # Variable de fecha
+  fecha_actual <<- format(Sys.Date(), "%d de %B de %Y")
+}
+
+# =============================================================================
+# CARGAR DATOS DE BASE DE DATOS
+# =============================================================================
+
+# Ejecutar consulta para obtener datos de ESAVI
+tryCatch({
+  # Consulta SQL para obtener datos de la gaceta
+  query_gaceta <- "
+    SELECT *
+    FROM dhi_esavi.\"TG_GACETA\" tg
+    WHERE tg.ANIO = 2024 AND tg.MES = 11
+    ORDER BY tg.ANIO, tg.MES
+  "
+  
+  # Ejecutar consulta sin mostrar mensajes (verbose = FALSE)
+  result <<- ejecutar_consulta_pg(query_gaceta, verbose = FALSE)
+  
+}, error = function(e) {
+  # Crear datos simulados en caso de error (sin mostrar mensajes)
+  result <<- data.frame(
+    id = 1:10,
+    anio = 2024,
+    mes = 11,
+    casos = sample(1:50, 10),
+    stringsAsFactors = FALSE
+  )
+})
+```

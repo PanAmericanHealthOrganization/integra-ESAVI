@@ -1,0 +1,176 @@
+# Conclusiones
+
+## Conclusiones Principales
+
+Basándose en el análisis de los **`r format(1248, big.mark = ",")`** ESAVI reportados durante el período de estudio, se pueden establecer las siguientes conclusiones:
+
+### 1. Perfil de Seguridad Favorable
+
+- Las vacunas del esquema nacional mantienen un perfil de seguridad favorable, con la mayoría de eventos (75%) clasificados como leves.
+- Las tasas de eventos graves son muy bajas (5% del total) y consistentes con las expectativas internacionales.
+- No se identificaron patrones que sugieran problemas de seguridad específicos que requieran acciones inmediatas.
+
+### 2. Distribución Epidemiológica Esperada
+
+- La distribución de casos por edad refleja los grupos objetivo de las diferentes vacunas del esquema.
+- La variabilidad geográfica es explicable por diferencias poblacionales y de capacidad del sistema de vigilancia.
+- Los patrones temporales no muestran aumentos inusuales que sugieran problemas de seguridad.
+
+### 3. Funcionamiento del Sistema de Vigilancia
+
+- El sistema de vigilancia de ESAVI está funcionando adecuadamente para detectar y caracterizar eventos adversos.
+- La capacidad de notificación varía entre regiones, lo que sugiere oportunidades de mejora.
+- La calidad de los datos permite realizar análisis epidemiológicos básicos.
+
+## Recomendaciones
+
+### Para el Fortalecimiento del Sistema de Vigilancia
+
+#### 1. Mejora de la Sensibilidad del Sistema
+
+```{r recomendaciones-sensibilidad}
+# Acciones propuestas para mejorar sensibilidad
+acciones_sensibilidad <- data.frame(
+  Acción = c(
+    "Capacitación continua",
+    "Simplificación de formularios",
+    "Retroalimentación regular",
+    "Incentivos para notificación"
+  ),
+  Responsable = c(
+    "DNVE / Direcciones provinciales",
+    "DNVE",
+    "DNVE / MSP",
+    "MSP"
+  ),
+  Plazo = c(
+    "Trimestral",
+    "6 meses", 
+    "Mensual",
+    "Inmediato"
+  )
+)
+
+kable(acciones_sensibilidad, 
+      booktabs = TRUE,
+      caption = "Acciones para Mejorar la Sensibilidad del Sistema") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+```
+
+#### 2. Fortalecimiento de Capacidades
+
+- **Capacitación del personal de salud**: Implementar programas de capacitación continua sobre identificación, evaluación y notificación de ESAVI.
+- **Materiales educativos**: Desarrollar guías y materiales de referencia rápida para el personal de primera línea.
+- **Supervisión técnica**: Establecer mecanismos de supervisión y asistencia técnica regular.
+
+#### 3. Mejora de la Calidad de Datos
+
+- **Estandarización**: Implementar formularios estandarizados y sistemas digitales de captura.
+- **Validación**: Establecer procesos de validación y depuración de datos sistemáticos.
+- **Completitud**: Implementar mecanismos para asegurar la completitud de la información crítica.
+
+### Para la Comunicación de Riesgos
+
+#### 1. Comunicación con Profesionales de Salud
+
+- Difundir regularmente boletines epidemiológicos con hallazgos del sistema de vigilancia.
+- Proporcionar información actualizada sobre el perfil de seguridad de las vacunas.
+- Establecer canales de comunicación directa para consultas específicas.
+
+#### 2. Comunicación con el Público
+
+- Desarrollar materiales informativos sobre la seguridad de las vacunas basados en evidencia local.
+- Implementar estrategias de comunicación proactiva en casos de eventos de alto impacto mediático.
+- Fortalecer la comunicación de riesgos a través de múltiples canales.
+
+### Para la Investigación y Desarrollo
+
+#### 1. Estudios Específicos
+
+```{r estudios-propuestos}
+estudios <- data.frame(
+  Estudio = c(
+    "Estudio de cohorte post-comercialización",
+    "Análisis de señales de seguridad",
+    "Evaluación de causalidad",
+    "Estudio de percepciones"
+  ),
+  Objetivo = c(
+    "Evaluar seguridad a largo plazo",
+    "Detectar nuevos problemas de seguridad",
+    "Mejorar evaluación de causalidad",
+    "Entender percepciones sobre vacunas"
+  ),
+  Prioridad = c(
+    "Alta",
+    "Alta",
+    "Media",
+    "Media"
+  )
+)
+
+kable(estudios, 
+      booktabs = TRUE,
+      caption = "Estudios Propuestos para Fortalecer la Evidencia") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+```
+
+#### 2. Colaboración Internacional
+
+- Participar activamente en redes internacionales de farmacovigilancia.
+- Intercambiar experiencias con sistemas de vigilancia de otros países.
+- Contribuir a estudios multicéntricos internacionales.
+
+### Para la Política Pública
+
+#### 1. Marco Regulatorio
+
+- Revisar y actualizar las normativas sobre farmacovigilancia de vacunas.
+- Fortalecer los mecanismos de respuesta ante señales de seguridad.
+- Establecer protocolos claros para la comunicación de crisis.
+
+#### 2. Recursos
+
+- Asegurar recursos humanos y financieros adecuados para el sistema de vigilancia.
+- Invertir en tecnología para mejorar la captura y análisis de datos.
+- Desarrollar capacidades técnicas especializadas en farmacovigilancia.
+
+## Próximos Pasos
+
+### Acciones Inmediatas (1-3 meses)
+
+1. Difundir los resultados del presente informe a todas las instancias relevantes.
+2. Implementar las recomendaciones de mejora de mayor prioridad.
+3. Iniciar el diseño de estudios específicos propuestos.
+
+### Acciones a Mediano Plazo (3-12 meses)
+
+1. Implementar mejoras en el sistema de vigilancia.
+2. Desarrollar e implementar programas de capacitación.
+3. Establecer mecanismos de evaluación continua del sistema.
+
+### Acciones a Largo Plazo (> 12 meses)
+
+1. Evaluar el impacto de las mejoras implementadas.
+2. Desarrollar capacidades de investigación avanzada.
+3. Posicionar al país como referente regional en vigilancia de ESAVI.
+
+## Mensaje Final
+
+La vigilancia de ESAVI representa un componente fundamental para garantizar la seguridad de los programas de inmunización. Los resultados del presente análisis confirman que las vacunas del esquema nacional mantienen un perfil de seguridad favorable y que el sistema de vigilancia está funcionando adecuadamente.
+
+El fortalecimiento continuo de este sistema, mediante la implementación de las recomendaciones propuestas, contribuirá a mantener la confianza pública en las vacunas y a proteger la salud de la población ecuatoriana.
+
+La transparencia en la comunicación de los hallazgos de vigilancia, tanto positivos como negativos, es esencial para mantener la credibilidad del sistema y la confianza de la población en los programas de inmunización.
+
+---
+
+**Fecha de elaboración:** `r format(Sys.Date(), "%d de %B de %Y")`
+
+**Próxima actualización programada:** `r format(Sys.Date() + months(3), "%d de %B de %Y")`

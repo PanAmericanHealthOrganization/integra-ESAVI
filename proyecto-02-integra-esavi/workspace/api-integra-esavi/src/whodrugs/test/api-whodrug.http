@@ -1,0 +1,4 @@
+### WHO Drug Sync API Test
+POST http://localhost:8081/v1/whodrug/sync
+Accept: application/json
+Content-Type: application/json
