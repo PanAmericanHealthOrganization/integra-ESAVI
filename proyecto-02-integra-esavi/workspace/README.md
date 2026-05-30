@@ -5,6 +5,8 @@ Plataforma de integración que actúa como middleware y ETL entre las tres fuent
 
 Este directorio _workspace_ se creó de forma manual, puesto que contendrá la versión original sin fusionar con otras ramas desde el 23 de diciembre de 2025, del código fuente de la API y APP.
 
+Si se desea coservar de forma íntegra estos repositorios individuales, se recomienda no ejecutar los comandos pull, fetch, merge, o algún otro comando que altere el contenido, dentro de la rama _jp-dev-paho-sie_.
+
 ## Estructura
 ```
 proyecto-02-integra-esavi/
