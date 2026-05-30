@@ -1,0 +1,202 @@
+﻿TABLA;CAMPO;COMENTARIO
+TR_GRAVEDAD_ESAVI;ABORTO;Indica si el ESAVI resultó en aborto
+TR_DATO_VACUNA;ACCION_TOMADA;Acción tomada con respecto a la vacuna tras el evento
+TR_DATO_VACUNA;ACTIVE_INGREDENTS_JSON;Datos JSON de los ingredientes activos de la vacuna
+TR_ANTECEDENTES_EVENTO_ADVERSO;ALERGIA_ALIMENTOS;Indica si el paciente tiene alergia conocida a alimentos
+TR_ANTECEDENTES_EVENTO_ADVERSO;ALERGIA_INSECTOS;Indica si el paciente tiene alergia conocida a insectos
+TR_ANTECEDENTES_EVENTO_ADVERSO;ALERGIA_MEDICAMENTOS;Indica si el paciente tiene alergia conocida a medicamentos
+TR_ANTECEDENTES_EVENTO_ADVERSO;ALERGIA_POLVO;Indica si el paciente tiene alergia conocida al polvo
+TR_ANTECEDENTES_EVENTO_ADVERSO;ALERGIA_VACUNAS;Indica si el paciente tiene alergia conocida a vacunas
+TR_NOTIFICACION;ALTURA;Altura del paciente en centímetros
+TR_VACUNOMETRO;ANIO_APLICACION;Año de aplicación
+TR_GRAVEDAD_ESAVI;ANOMALIA_CONGENITA;Indica si el ESAVI causó anomalía congénita
+TR_NOTIFICACION;ANTECEDENTE_EVENTO_PREVIO;Número de antecedentes de eventos adversos previos
+TR_NOTIFICACION;ANTECEDENTE_VACUNAL;Número de antecedentes vacunales del paciente
+TR_ANTECEDENTES_EVENTO_ADVERSO;ANTECEDENTES_ADVSIMILAR;Número de antecedentes de eventos adversos similares
+TR_DESENLACE_ESAVI;AUTOPSIA;Indica si se realizó autopsia (0=No, 1=Sí)
+TR_DESENLACE_ESAVI;AUTOPSIAFETAL;Indica si se realizó autopsia fetal (0=No, 1=Sí)
+TR_VACUNOMETRO;CANTIDAD_VACUNAS;Cantidad de vacunas aplicadas
+TR_NOTIFICACION;CASO_NARRATIVO;Descripción narrativa del caso clínico
+TR_CAUSALIDAD_ESAVI;CLASIFICACION_CAUSA_ESAVI;Clasificación de la causa del ESAVI
+TR_CAUSALIDAD_ESAVI;CLASIFICACION_DE_CAUSALIDAD_NARANJO;Clasificación de causalidad según escala de Naranjo
+TR_CAUSALIDAD_ESAVI;CLASIFICACION_DE_CAUSALIDAD_WHO_AEFI;Clasificación de causalidad según WHO-AEFI
+TR_CAUSALIDAD_ESAVI;CLASIFICACION_DE_CAUSALIDAD_WHO_UMC;Clasificación de causalidad según WHO-UMC
+TR_DESENLACE_ESAVI;CLASIFICACIONFINALCASO;Clasificación final del caso
+TR_DESENLACE_ESAVI;CLASIFICACIONFINALCASOA;Clasificación final del caso - Opción A
+TR_DESENLACE_ESAVI;CLASIFICACIONFINALCASOB;Clasificación final del caso - Opción B
+TR_DESENLACE_ESAVI;CODDESENLACEESAVI;Código del desenlace del ESAVI
+TC_TIPO_CATALOGO;CODIGO;Código único del tipo de catálogo
+TR_MEDICAMENTO;CODIGO_ATC;Código ATC (Anatomical Therapeutic Chemical) del medicamento
+TR_PACIENTE;CODIGO_DHIS2_ENTIDAD;Código único del paciente en el sistema DHIS2
+TR_NOTIFICACION;CODIGO_DHIS2_EVENTO;Código del evento de notificación en el sistema DHIS2
+TR_ANTECEDENTES_ENFERMEDADES_PREVIAS;CODIGO_ESAVI_CIE10;Código CIE-10 de la enfermedad previa
+TR_DATOS_ESAVI;CODIGO_ESAVI_CIE10;Código del ESAVI según clasificación CIE-10
+TR_DATO_VACUNA;CODIGO_FABRICANTE_WHO_DRUG;Código del fabricante según WHODrug
+TR_MEDICAMENTO;CODIGO_FORMA_FARMACEUTICA;Código de la forma farmacéutica
+TR_DATOS_ESAVI;CODIGO_HLGT;Código del grupo de términos de alto nivel (HLGT) en MedDRA
+TR_DATOS_ESAVI;CODIGO_HLT;Código del término de alto nivel (HLT) en MedDRA
+TR_DATOS_ESAVI;CODIGO_LLT;Código del término de nivel más bajo (LLT) en MedDRA
+TR_MEDICAMENTO;CODIGO_MEDICAMENTO;Código identificador del medicamento
+TR_DATOS_ESAVI;CODIGO_PT;Código del término preferido (PT) en MedDRA
+TR_DATOS_ESAVI;CODIGO_SOC;Código de la clase de sistema orgánico (SOC) en MedDRA
+TR_DATO_VACUNA;CODIGO_VACUNA_OTRO;Otro código alternativo de identificación de la vacuna
+TR_MEDICAMENTO;CODIGO_VIA_ADMINISTRACION;Código de la vía de administración
+TR_NOTIFICACION;CODIGO_VIGIFLOW;Código de la notificación en el sistema Vigiflow
+TR_PACIENTE;CODIGO_VIGIFLOW;Código único del paciente en el sistema Vigiflow
+TR_DATO_VACUNA;CODIGOATC;Código ATC (Anatomical Therapeutic Chemical) de la vacuna
+TR_ESAVI_DURANTE_EMBARAZO;CODIGOEMBARAZODURANTEESAVI;Código del embarazo durante el ESAVI
+TR_DATO_VACUNACION;CODIGOMECANISMOVERIFICACION;Código del mecanismo utilizado para verificar la vacunación
+TR_ESAVI_DURANTE_EMBARAZO;CODIGOMEDDRACOMPLICACIONEMBARAZOESAVI;Código MedDRA de la complicación del embarazo durante el ESAVI
+TR_ESAVI_DURANTE_EMBARAZO;CODIGOMONITOREOPOSTERIORVACUNAESAVI;Código de monitoreo posterior a la vacuna durante el ESAVI
+TR_ESAVI_DURANTE_EMBARAZO;CODIGOTIPOCOMPLICACIONESAVI;Código del tipo de complicación durante el ESAVI
+TR_DATOS_ESAVI;COGIDOCASO;Código único del caso reportado
+TR_NOTIFICACION;COMENTARIO_NOTIFICADOR;Comentarios adicionales del notificador
+TR_DESENLACE_ESAVI;COMENTARIOS;Comentarios adicionales sobre el desenlace
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_DOS;Descripción de la segunda comorbilidad del paciente
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_DOS_CIE10;Código CIE-10 de la segunda comorbilidad
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_PRINCIPAL;Descripción de la comorbilidad principal del paciente
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_PRINCIPAL_CIE10;Código CIE-10 de la comorbilidad principal
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_TRES;Descripción de la tercera comorbilidad del paciente
+TR_ANTECEDENTES_MEDICO;COMORBILIDAD_TRES_CIE10;Código CIE-10 de la tercera comorbilidad
+TR_DATO_VACUNA;CONCENTRACION;Concentración de la vacuna administrada
+TR_GRAVEDAD_ESAVI;CONDICION_EGRESO;Descripción de la condición del paciente al egreso
+TR_DATOS_ESAVI;CT_HLGT_MEDDRA_ID;ID del catálogo HLGT (High Level Group Term) de MedDRA
+TR_DATOS_ESAVI;CT_HLT_MEDDRA_ID;ID del catálogo HLT (High Level Term) de MedDRA
+TR_DATOS_ESAVI;CT_LLT_MEDDRA_ID;ID del catálogo LLT (Lowest Level Term) de MedDRA
+TR_DATOS_ESAVI;CT_PT_MEDDRA_ID;ID del catálogo PT (Preferred Term) de MedDRA
+TR_DATOS_ESAVI;CT_SOC_MEDDRA_ID;ID del catálogo SOC (System Organ Class) de MedDRA
+TR_NOTIFICACION;DELEGADO_ORGANIZACION;Delegado de la organización emisora
+TR_DATOS_ESAVI;DESCRIPCION;Descripción detallada de la complicación o evento adverso
+TC_CATALOGO;DESCRIPCION_DHIS2;Descripción en DHIS2
+TR_ANTECEDENTES_ENFERMEDADES_PREVIAS;DESCRIPCION_ENF_PREVIAS;Descripción de la enfermedad previa del paciente
+TC_CATALOGO;DESCRIPCION_HOMOLOGADA;Descripción homologada
+TC_GRUPO_ETARIO;DESCRIPCION_RANGO;Descripción del rango etario según el MSP
+TC_TIPO_CATALOGO;DESCRIPCION_TIPO_CATALOGO;Descripción del tipo de catálogo
+TC_CATALOGO;DESCRIPCION_VIGIFLOW;Descripción en Vigiflow
+TR_VACUNOMETRO;DIA_APLICACION;Día de aplicación
+TR_DATO_VACUNACION;DIRECCIONVACUNATORIO;Dirección completa del vacunatorio
+TR_GRAVEDAD_ESAVI;DISCAPACIDAD;Indica si el ESAVI resultó en discapacidad
+TR_DATO_VACUNA;DOSIS;Dosis administrada de la vacuna
+TR_DATO_VACUNA;DOSIS_1;Primera dosis administrada
+TR_VACUNOMETRO;DOSIS_APLICADA;Dosis aplicada
+TR_DATO_VACUNA;DRUG_CODE;Código del medicamento en WHO Drug
+TR_DATOS_ESAVI;DURACION_EVENTO;Duración del evento adverso
+TR_DATO_VACUNA;DURACION_TRATAMIENTO;Duración del tratamiento con la vacuna
+TR_NOTIFICACION;EDAD;Edad del paciente al momento de la notificación
+TR_ANTECEDENTES_EMBARAZO;EDAD_GESTACIONAL;Edad gestacional de la paciente en semanas
+TR_PACIENTE_EMBARAZADA;EMBARAZADA_MOMENTO_ESAVI;Indica si la paciente estaba embarazada al momento del ESAVI
+TR_PACIENTE_EMBARAZADA;EMBARAZADA_MOMENTO_VACUNA;Indica si la paciente estaba embarazada al momento de la vacunación
+TR_ANTECEDENTES_MEDICO;ENSAYO_CLINICO_COVID19;Indica si el paciente participó en ensayos clínicos de COVID-19
+TR_VACUNOMETRO;FECHA_APLICACION;Fecha de aplicación
+TR_NOTIFICACION;FECHA_ATENCION;Fecha de atención médica del paciente
+TR_CAUSALIDAD_ESAVI;FECHA_CAUSALIDAD_ESAVI;Fecha de evaluación de la causalidad del ESAVI
+TR_DATOS_ESAVI;FECHA_ESAVI;Fecha de inicio del evento supuestamente atribuido a la vacunación
+TR_DATOS_ESAVI;FECHA_FINALIZACION;Fecha de finalización o resolución del ESAVI
+TR_NOTIFICACION;FECHA_LLENADO_FICHA;Fecha en que se llenó la ficha de notificación
+TR_NOTIFICACION;FECHA_NACIMIENTO;Fecha de nacimiento del paciente
+TR_NOTIFICACION;FECHA_NOTIFICACION;Fecha en que se realizó la notificación
+TR_ANTECEDENTES_EMBARAZO;FECHA_PARTO;Fecha probable o real del parto
+TR_DATO_VACUNACION;FECHA_RECONSTITUCION_VACUNA;Fecha de reconstitución de la vacuna
+TR_NOTIFICACION;FECHA_REPORTE_NACIONAL;Fecha del reporte a nivel nacional
+TR_ANTECEDENTES_EMBARAZO;FECHA_ULTIMA_MENSTRUACION;Fecha de la última menstruación de la paciente
+TR_DATO_VACUNACION;FECHA_VACUNACION;Fecha en que se administró la vacuna
+TR_DATO_VACUNA;FECHA_VENCIMIENTO_DILUYENTE;Fecha de vencimiento del diluyente
+TR_DATO_VACUNA;FECHA_VENCIMIENTO_VACUNA;Fecha de vencimiento de la vacuna
+TR_DESENLACE_ESAVI;FECHAINICIOINVESTIGACION;Fecha de inicio de la investigación del caso
+TR_DESENLACE_ESAVI;FECHAMUERTE;Fecha de fallecimiento del paciente
+TR_DESENLACE_ESAVI;FECHANOTIFICAMUERTE;Fecha de notificación del fallecimiento
+TR_DESENLACE_ESAVI;FECHANOTIFICAMUERTEFETAL;Fecha de notificación de muerte fetal
+TR_ESAVI_DURANTE_EMBARAZO;FECHAPARTOESAVI;Fecha del parto relacionado con el ESAVI
+TR_DATO_VACUNACION;FECHARECONSTITUCIONVACUNA;Fecha de reconstitución de la vacuna
+TR_ESAVI_DURANTE_EMBARAZO;FECHAULTIMAMENSTRUACIONESAVI;Fecha de la última menstruación durante el ESAVI
+TR_DATO_VACUNA;FIN_ADMINISTRACION;Fecha y hora de fin de administración de la vacuna
+TC_GRUPO_ETARIO;FIN_EDAD;Edad de fin del grupo etario en años
+TR_DATO_VACUNA;FORMA_FARMACEUTICA;Forma farmacéutica de la vacuna
+TR_DATO_VACUNA;FORMA_FARMACEUTICA_EDQM;Forma farmacéutica según estándares EDQM
+TR_DATO_VACUNACION;HORA_RECONSTITUCION_VACUNA;Hora de reconstitución de la vacuna
+TR_DATO_VACUNACION;HORA_VACUNACION;Hora en que se administró la vacuna
+TR_DATO_VACUNACION;HORARECONSTITUCIONVACUNA;Hora de reconstitución de la vacuna
+TR_GRAVEDAD_ESAVI;HOSPITALIZACION;Indica si el ESAVI requirió hospitalización
+TR_PACIENTE;IDENTIFICACION;Número de identificación del paciente
+TR_NOTIFICACION;IDENTIFICACION_NOTIFICADOR;Número de identificación del notificador
+TR_DATO_VACUNA;IDENTIFICADOR_VACUNA;Identificador único de la vacuna
+TR_DATO_VACUNA;INDICACION_MEDDRA;Indicación de la vacuna codificada en MedDRA
+TR_DATO_VACUNA;INDICACION_NOTIFICADOR_PRIMARIO;Indicación de la vacuna según el notificador primario
+TR_DATO_VACUNA;INFORMACION_ADICIONAL_MEDICAMENTO;Información adicional sobre el medicamento/vacuna
+TR_DATO_VACUNA;INGREDIENTE_SOSPECHOSO;Ingrediente sospechoso de causar el evento adverso
+TR_DATO_VACUNA;INICIO_ADMINISTRACION;Fecha y hora de inicio de administración de la vacuna
+TC_GRUPO_ETARIO;INICIO_EDAD;Edad de inicio del grupo etario en años
+TR_DATO_VACUNA;INTERVALO_DOSIFICACION;Intervalo entre dosis de vacunación
+TR_NOTIFICACION;LACTANDO;Indica si la paciente se encuentra lactando
+TR_DATO_VACUNA;MAHOLDERS_JSON;Datos JSON de los titulares de autorización de comercialización
+TR_NOTIFICACION;MEDIO_NOTIFICACION;Medio por el cual se realizó la notificación
+TR_VACUNOMETRO;MES_APLICACION;Mes de aplicación
+TR_NOTIFICACION;MONITOREO_ESTABLECIMIENTO_SALUD;Indicador de monitoreo del establecimiento de salud
+TR_GRAVEDAD_ESAVI;MUERTE;Indica si el ESAVI resultó en muerte
+TR_GRAVEDAD_ESAVI;MUERTE_FETAL;Indica si el ESAVI resultó en muerte fetal
+TR_DATOS_ESAVI;NAME_HLGT;Nombre del grupo de términos de alto nivel (HLGT) en MedDRA
+TR_DATOS_ESAVI;NAME_HLT;Nombre del término de alto nivel (HLT) en MedDRA
+TR_DATOS_ESAVI;NAME_LLT;Nombre del término de nivel más bajo (LLT) en MedDRA
+TR_DATOS_ESAVI;NAME_PT;Nombre del término preferido (PT) en MedDRA
+TR_DATOS_ESAVI;NAME_SOC;Nombre de la clase de sistema orgánico (SOC) en MedDRA
+TR_PACIENTE;NOMBRE;Nombre completo del paciente
+TR_DATO_VACUNA;NOMBRE_DILUYENTE_VACUNA;Nombre del diluyente utilizado para la vacuna
+TR_NOTIFICACION;NOMBRE_EMISOR;Nombre del emisor del reporte
+TR_DATOS_ESAVI;NOMBRE_ESAVI;Nombre del evento supuestamente atribuido a la vacunación o inmunización
+TR_DATOS_ESAVI;NOMBRE_ESAVI_REPORTADO;Nombre del ESAVI tal como fue reportado inicialmente
+TR_DATO_VACUNA;NOMBRE_FABRICANTE;Nombre del fabricante de la vacuna
+TR_DATO_VACUNA;NOMBRE_FABRICANTE_WHO_DRUG;Nombre del fabricante según WHODrug
+TR_MEDICAMENTO;NOMBRE_FORMA_FARMACEUTICA;Nombre de la forma farmacéutica (tableta, jarabe, etc.)
+TR_MEDICAMENTO;NOMBRE_MEDICAMENTO;Nombre comercial del medicamento
+TR_MEDICAMENTO;NOMBRE_NORMALIZADO_MEDICAMENTO;Nombre normalizado del medicamento
+TR_DATO_VACUNA;NOMBRE_NORMALIZADO_VACUNA;Nombre normalizado de la vacuna
+TR_NOTIFICACION;NOMBRE_NOTIFICADOR;Nombre completo del profesional notificador
+TR_DATO_VACUNA;NOMBRE_VACUNA;Nombre comercial de la vacuna administrada
+TR_VACUNOMETRO;NOMBRE_VACUNA;Nombre de la vacuna
+TR_DATO_VACUNA;NOMBRE_VACUNA_PATENTE_WHO_DRUG;Nombre de patente de la vacuna según WHO Drug
+TR_DATO_VACUNACION;NOMBRE_VACUNATORIO;Nombre del establecimiento donde se aplicó la vacuna
+TR_MEDICAMENTO;NOMBRE_VIA_ADMINISTRACION;Nombre de la vía de administración (oral, intravenosa, etc.)
+TR_ESAVI_DURANTE_EMBARAZO;NOMBRECOMPLICACIONEMBARAZOESAVI;Nombre de la complicación del embarazo durante el ESAVI
+TR_DATO_VACUNACION;NOMBREOTROMECANISMOVERIFICACION;Nombre de otro mecanismo de verificación no contemplado
+TR_GRAVEDAD_ESAVI;NUEVO_EVENTOS;Indica si es un evento nuevo no reportado anteriormente
+TR_DATO_VACUNA;NUMERO_DOSIS_VACUNA;Número de dosis de la vacuna administrada
+TR_DATO_VACUNA;NUMERO_LOTE;Número de lote de la vacuna
+TR_NOTIFICACION;ORGANIZACION_EMISOR;Organización emisora del reporte
+TR_NOTIFICACION;ORGANIZACION_NOTIFICADOR;Organización o institución del notificador
+TR_NOTIFICACION;ORGANIZACION_UNIT;Nombre de la unidad organizacional
+TR_NOTIFICACION;ORGANIZACION_UNIT_CODIGO;Código de la unidad organizacional en DHIS2
+TR_PACIENTE;ORIGEN;
+TR_NOTIFICACION;OTRA_PARROQUIA_NOTIFICADOR;Otra parroquia del notificador no contemplada en catálogo
+TR_DATO_VACUNACION;OTRAPARROQUIANOTIFICADOR;Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio
+TR_NOTIFICACION;OTRAPARROQUIARESIDENCIA;Otra parroquia de residencia del paciente no contemplada en catálogo
+TR_ANTECEDENTES_EVENTO_ADVERSO;OTRAS_ALERGIAS;Descripción de otras alergias no contempladas anteriormente
+TR_CAUSALIDAD_ESAVI;OTRO_SISTEMA_CLASF_CAUSALIDAD;Otro sistema de clasificación de causalidad no contemplado
+TR_GRAVEDAD_ESAVI;OTROS_EVENTOS_IMPORTANTES;Indica si hubo otros eventos importantes
+TR_GRAVEDAD_ESAVI;OTROS_EVENTOS_IMPORTANTES_TX;Descripción de otros eventos importantes
+TR_ESAVI_DURANTE_EMBARAZO;OTROSCODIGOSCOMPLICACIONEMBARAZOESAVI;Otros códigos de complicación del embarazo durante el ESAVI
+TR_DATO_VACUNA;PAIS_AUTORIZACION;País que autorizó la comercialización de la vacuna
+TR_GRAVEDAD_ESAVI;PARTE_EVENTOS_PREOCUPACION;Indica si forma parte de eventos de especial preocupación
+TR_NOTIFICACION;PESO;Peso del paciente en kilogramos
+TR_DATO_VACUNA;PRINCIPIO_ACTIVO_WHO_DRUG;Principio activo de la vacuna según WHODrug
+TR_CAUSALIDAD_ESAVI;REFERENCIA_IDENTIFICADOR_VACUNA;Referencia al identificador de la vacuna evaluada
+TR_PACIENTE;REGISTRO_SINCRONIZADO;Indica si el registro ha sido sincronizado con sistemas externos
+TR_DATOS_ESAVI;RESULTADO_EVENTO;Resultado o desenlace del evento adverso
+TR_GRAVEDAD_ESAVI;RIESGO_VIDA;Indica si el ESAVI puso en riesgo la vida del paciente
+TR_MEDICAMENTO;ROL_MEDICAMENTO;Rol del medicamento en el evento (sospechoso, concomitante, etc.)
+TR_DATO_VACUNA;ROL_VACUNA;Rol de la vacuna en el evento (sospechosa, concomitante, etc.)
+TR_VACUNOMETRO;SEXO;Sexo de la persona vacunada
+TR_CAUSALIDAD_ESAVI;SISTEMA_CLASF_CAUSALIDAD;Sistema de clasificación de causalidad utilizado
+TR_MEDICAMENTO;SISTEMA_DE_CODIFICACION;Sistema de codificación utilizado para el medicamento
+TR_DATO_VACUNA;SISTEMA_DE_CODIFICACION;Sistema de codificación utilizado (WHUDRUG, ATC, etc.)
+TR_DATOS_ESAVI;SISTEMA_DE_CODIFICACION;Sistema de codificación utilizado para el ESAVI (ej: MedDRA, CIE-10)
+TR_NOTIFICACION;TIPO_EMISOR;Tipo de emisor del reporte
+TR_GRAVEDAD_ESAVI;TIPO_GRAVEDAD;Tipo de gravedad del ESAVI
+TR_NOTIFICACION;TIPO_NOTIFICACION;
+TR_NOTIFICACION;TIPO_REPORTE;Tipo de reporte (inicial, seguimiento, final)
+TR_NOTIFICACION;TITULO_NOTIFICADOR;Título profesional del notificador
+TR_NOTIFICACION;TITULO_REPORTE;Título del reporte de ESAVI
+TR_NOTIFICACION;ULTIMA_EDICION_REGISTRADA;Fecha y hora de la última edición registrada
+TR_NOTIFICACION;UNICO_CODIGO_UNIDAD_SALUD;Código único de la unidad de salud
+TR_VACUNOMETRO;UNICODE;Código único del establecimiento de salud
+TR_DATO_VACUNA;VIA_ADMINISTRACION;Vía de administración de la vacuna
+TR_DATO_VACUNA;VIA_ADMINISTRACION_EDQM;Vía de administración según estándares EDQM
