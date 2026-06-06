@@ -1,0 +1,48 @@
+GUÍA DE CONFIGURACIÓN DE DESPLIEGUE: Proyecto MedraWhodrug
+
+1. REQUISITOS DE ENTORNO
+- Servidor de Aplicaciones: WildFly 26.1.3.Final (o versiones compatibles con Java EE 8 / Jakarta EE 8).
+- Java Runtime: JDK 11.
+- Base de Datos: PostgreSQL 13+ (Recomendado) o cualquier base de datos compatible con JPA/Hibernate.
+
+2. CONFIGURACIÓN DE LA BASE DE DATOS (DATASOURCE)
+El proyecto utiliza un DataSource configurado externamente en el servidor WildFly. Es imperativo que el nombre del JNDI coincida con el definido en la clase `Utils.java`.
+
+- Nombre del JNDI: java:jboss/datasources/DsMedraWhodrug
+- Driver: PostgreSQL Driver (debe estar instalado en WildFly como módulo).
+- Cadena de Conexión (Ejemplo): 
+  jdbc:postgresql://<host>:<puerto>/<nombre_base_datos>
+- Usuario: <usuario_db>
+- Contraseña: <contraseña_db>
+
+Pasos para configurar en WildFly:
+1. Acceder a la consola de administración (http://localhost:9990).
+2. Navegar a Configuration -> Subsystems -> Datasources -> Non-XA.
+3. Crear un nuevo DataSource con el nombre "DsMedraWhodrug" y el JNDI "java:jboss/datasources/DsMedraWhodrug".
+
+3. CONFIGURACIÓN DE CARGA DE ARCHIVOS (EXCEL/CSV)
+La aplicación cuenta con un mecanismo de carga automática al iniciar (@Startup). El sistema busca los archivos en rutas relativas al directorio raíz de la instalación de WildFly (`jboss.home.dir`).
+
+Se deben crear las siguientes carpetas en la raíz de la instalación de WildFly:
+
+A. Datos de MedDRA:
+- Ruta: ${jboss.home.dir}/data-medra/
+- Formato esperado: Archivos de texto/excel delimitados por punto y coma (;).
+
+B. Datos de WhoDrug:
+- Ruta: ${jboss.home.dir}/data-whodrug/
+- Formato esperado: Archivos CSV delimitados por tubería (|) con codificación UTF-8.
+
+Importante: Una vez que el servidor inicia, el `ExcelReaderSingleton` procesará los archivos presentes en estas carpetas y los eliminará automáticamente después de insertarlos en la base de datos.
+
+4. PASOS DE DESPLIEGUE
+1. Instalar el Driver de la base de datos en el servidor WildFly.
+2. Configurar el DataSource "DsMedraWhodrug".
+3. Crear las carpetas `data-medra` y `data-whodrug` en la raíz de WildFly.
+4. Colocar los archivos de datos correspondientes en dichas carpetas.
+5. Desplegar el archivo .war de la aplicación en la carpeta `standalone/deployments` o a través de la consola de administración.
+6. Reiniciar el servidor para disparar la carga inicial de datos.
+
+5. VERIFICACIÓN
+- Revisar los logs del servidor (`server.log`) para confirmar que el `ExcelReaderSingleton` haya encontrado y procesado los archivos correctamente.
+- Probar los endpoints de la API en: http://<host>:<puerto>/api/whodrug/abbreviation

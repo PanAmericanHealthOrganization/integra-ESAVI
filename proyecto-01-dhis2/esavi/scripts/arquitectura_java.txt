@@ -1,0 +1,45 @@
+DOCUMENTO DE ARQUITECTURA: Proyecto MedraWhodrug (Java WebDynamicApplication)
+
+1. RESUMEN DEL PROYECTO
+El proyecto MedraWhodrug es una aplicación Java Web diseñada para gestionar el mapeo entre terminologías médicas (MedDRA y CIE-10) y administrar datos de medicamentos (WhoDrug). La aplicación expone una API REST para permitir la consulta y actualización de estos datos.
+
+2. STACK TECNOLÓGICO
+- Lenguaje: Java
+- Framework de API: JAX-RS (Java API for RESTful Web Services)
+- Persistencia: JPA (Java Persistence API) / Hibernate
+- Contenedor: EJB (Enterprise JavaBeans) - Uso de @Stateless y @Singleton
+- Formato de Intercambio de Datos: JSON (UTF-8)
+
+3. ARQUITECTURA DE CAPAS
+La aplicación está organizada en las siguientes capas lógicas:
+
+3.1. Capa de Presentación / API (REST Layer)
+Ubicada principalmente en los paquetes `com.ec.medrawhodrug.method` y `com.ec.medrawhodrug.service`.
+- Service.java: Configuración global de la aplicación JAX-RS (@ApplicationPath("/api")).
+- MedraToCie10.java: Endpoint para la gestión de mapeos MedDRA a CIE-10.
+- ServiceWhoDrug.java: Endpoint para la gestión de datos de WhoDrug.
+
+3.2. Capa de Negocio / Servicios (Business Logic Layer)
+Implementada a través de EJBs y Singletons:
+- ExcelReaderSingleton.java: Encargado de la lógica de procesamiento de archivos Excel para la carga masiva de datos.
+- ConexionBaseDatosSingleton.java: Gestiona la instancia única de conexión a la base de datos y provee acceso a los DAOs.
+
+3.3. Capa de Acceso a Datos (DAO Layer)
+Sigue el patrón DAO (Data Access Object) para desacoplar la lógica de negocio de la persistencia:
+- MedraToCie10Dao (Interfaz): Define las operaciones CRUD y consultas específicas.
+- MedraToCie10DaoImp (Implementación): Implementa la lógica de acceso a datos utilizando JPA y NamedQueries.
+
+3.4. Capa de Modelo (Model Layer)
+Se divide en dos tipos de objetos:
+- Entidades (@Entity): Mapean directamente a las tablas de la base de datos (ej. DatosWhodrug, MapeoMedraCie10).
+- Beans/DTOs: Objetos de transferencia de datos para simplificar las respuestas de la API (ej. BeanDataSearch, BeanCie10ToMedra).
+
+4. FLUJO DE DATOS PRINCIPAL
+1. El cliente realiza una petición HTTP a un endpoint de la API (ej. /api/whodrug/abbreviation).
+2. El servicio REST recibe la petición y utiliza el Singleton de conexión para obtener el DAO correspondiente.
+3. El DAO ejecuta una consulta JPA (NamedQuery) sobre la base de datos.
+4. Los resultados se mapean a Beans de búsqueda (BeanDataSearch) y se devuelven al cliente en formato JSON.
+
+5. COMPONENTES CRÍTICOS
+- Gestión de Archivos: El sistema posee un mecanismo automatizado de lectura de archivos Excel que se dispara al inicio de la aplicación (@Startup) para actualizar la base de datos.
+- Mapeo de Identidades: Uso de claves compuestas (@Embeddable) en MapeoMedraCie10PK para asegurar la integridad de la relación entre MedDRA y CIE-10.
