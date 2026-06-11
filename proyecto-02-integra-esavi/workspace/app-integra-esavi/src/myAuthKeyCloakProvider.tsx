@@ -68,11 +68,10 @@ export const myAuthKeyCloakProvider = (
     if (options.updateInformationUser) {
       options.updateInformationUser(user)
     }
-    // Extraer roles del token
-    const roles = decoded.realm_access?.roles || []
-
     return Promise.resolve(
-      options.onPermissions ? options.onPermissions(decoded) : decoded
+      options.onPermissions
+        ? options.onPermissions(decoded)
+        : decoded.realm_access?.roles || []
     )
   },
   async getIdentity() {
