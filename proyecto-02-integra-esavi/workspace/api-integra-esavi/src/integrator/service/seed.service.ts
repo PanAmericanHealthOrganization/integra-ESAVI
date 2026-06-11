@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -26,7 +26,7 @@ import { CreateWhodrugHomologaVacsDto, WhodrugHomologaVacs } from '../entity/who
 import { CreateWhodrugVacsTempDto, WhodrugVacsTemp } from '../entity/whodrug-vacstemp.entity';
 
 @Injectable()
-export class SeedService {
+export class SeedService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SeedService.name);
   constructor(
     @InjectRepository(TipoCatalogo, 'POSTGRES_INTEGRATOR_DS')
@@ -64,6 +64,10 @@ export class SeedService {
     @InjectRepository(SyncProcess, 'POSTGRES_INTEGRATOR_DS')
     private syncProcessRepository: Repository<SyncProcess>,
   ) {}
+
+  async onApplicationBootstrap() {
+    await this.seedData();
+  }
 
   async seedData() {
     //console.log('🌱 Iniciando carga de datos de ejemplo...'); // Cuando se cargaban datos fake para pruebas.
