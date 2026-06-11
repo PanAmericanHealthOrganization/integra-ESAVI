@@ -26,21 +26,9 @@ services:
         condition: service_healthy
     environment:
       PGPASSWORD: dhis
-    entrypoint: >
-      bash -c "
-        psql -h postgres -U dhis -d dhi_esavi            -c 'CREATE SCHEMA IF NOT EXISTS dhi_esavi;';
-        psql -h postgres -U dhis -c \"CREATE USER keycloak WITH PASSWORD 'password123';\" || true;
-        createdb -h postgres -U dhis -O keycloak keycloak                    || true;
-        createdb -h postgres -U dhis -O dhis who_drug                        || true;
-        psql -h postgres -U dhis -d who_drug             -c 'CREATE SCHEMA IF NOT EXISTS who_drug;';
-        createdb -h postgres -U dhis -O dhis meddra                          || true;
-        psql -h postgres -U dhis -d meddra               -c 'CREATE SCHEMA IF NOT EXISTS meddra;';
-        psql -h postgres -U dhis -d meddra               -c 'CREATE SCHEMA IF NOT EXISTS who_drug;';
-        createdb -h postgres -U dhis -O dhis DATAQUALITY_DS                  || true;
-        psql -h postgres -U dhis -d DATAQUALITY_DS       -c 'CREATE SCHEMA IF NOT EXISTS \"DATAQUALITY_DS\";';
-        createdb -h postgres -U dhis -O dhis POSTGRES_INTEGRATOR_DS          || true;
-        psql -h postgres -U dhis -d POSTGRES_INTEGRATOR_DS -c 'CREATE SCHEMA IF NOT EXISTS \"POSTGRES_INTEGRATOR_DS\";'
-      "
+    volumes:
+      - ./scripts/init-db.sh:/init-db.sh
+    entrypoint: ["/bin/bash", "/init-db.sh"]
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
