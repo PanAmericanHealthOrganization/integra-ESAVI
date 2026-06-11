@@ -1,29 +1,71 @@
 services:
-  db_dhis2_esavi:
-    container_name: db_dhis2_2_36_12
-    platform: linux/amd64
-    image: postgis/postgis:14-3.4-alpine
+  postgres:
+    image: postgres:15
+    container_name: postgres_esavi
     environment:
-      POSTGRES_DB: dhi_esavi
       POSTGRES_USER: dhis
       POSTGRES_PASSWORD: dhis
-    volumes:
-      - ./data:/var/lib/postgresql
+      POSTGRES_DB: dhi_esavi
+      TZ: America/Guayaquil
     ports:
-      - "5432:5432"
-  oracle_db:
-    image: gvenzl/oracle-free:latest
-    container_name: oracle_db
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dhis -d dhi_esavi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
+
+  db-init:
+    image: postgres:15
+    container_name: db_init_esavi
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
-      ORACLE_DATABASE: DB_VACUNACION
-      ORACLE_USER: USR.ROLANDOCASIGNA
-      ORACLE_PASSWORD: Salud.2025
-      ORACLE_PASSWORD_SECRET: Salud.2025
-      ORACLE_ALLOW_REMOTE: true
+      PGPASSWORD: dhis
+    entrypoint: >
+      bash -c "
+        psql -h postgres -U dhis -d dhi_esavi            -c 'CREATE SCHEMA IF NOT EXISTS dhi_esavi;';
+        psql -h postgres -U dhis -c \"CREATE USER keycloak WITH PASSWORD 'password123';\" || true;
+        createdb -h postgres -U dhis -O keycloak keycloak                    || true;
+        createdb -h postgres -U dhis -O dhis who_drug                        || true;
+        psql -h postgres -U dhis -d who_drug             -c 'CREATE SCHEMA IF NOT EXISTS who_drug;';
+        createdb -h postgres -U dhis -O dhis meddra                          || true;
+        psql -h postgres -U dhis -d meddra               -c 'CREATE SCHEMA IF NOT EXISTS meddra;';
+        psql -h postgres -U dhis -d meddra               -c 'CREATE SCHEMA IF NOT EXISTS who_drug;';
+        createdb -h postgres -U dhis -O dhis DATAQUALITY_DS                  || true;
+        psql -h postgres -U dhis -d DATAQUALITY_DS       -c 'CREATE SCHEMA IF NOT EXISTS \"DATAQUALITY_DS\";';
+        createdb -h postgres -U dhis -O dhis POSTGRES_INTEGRATOR_DS          || true;
+        psql -h postgres -U dhis -d POSTGRES_INTEGRATOR_DS -c 'CREATE SCHEMA IF NOT EXISTS \"POSTGRES_INTEGRATOR_DS\";'
+      "
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.3
+    container_name: keycloak_server
+    restart: unless-stopped
+    command: start-dev
+    environment:
+      # Initial Admin Credentials
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin_password
+      
+      # Database Configuration
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password123
+      
+      # HTTP Settings
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
     ports:
-      - "1521:1521"
-    volumes:
-      - ./oracle_data:/opt/oracle/oradata
-    extra_hosts:
-      - "scan19c-mspvacuna-prod.msp.gob.ec:host-gateway"
+      - "8080:8080"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres_data:
