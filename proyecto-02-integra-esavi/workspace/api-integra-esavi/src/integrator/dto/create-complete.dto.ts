@@ -47,7 +47,7 @@ export class CreateCompleteDto {
   // datoEsavi : CreateDatoEsaviDto ;
 
 
-  datoVacunacion: CreateDatoVacunacionDto ;
+  datoVacunacion: CreateDatoVacunacionDto | CreateDatoVacunacionDto[];
   createdBy: string;
 
   //--> TR_INVESTIGACION

@@ -11,6 +11,7 @@ import { Dhis2OptionsService } from './services/dhis2-options.service';
 import { Dhis2ProcessingLogService } from './services/dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './services/dhis2-program-stage.service';
 import { Dhis2ProgramService } from './services/dhis2-program.service';
+import { MeddraModule } from 'src/meddra/meddra.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { Dhis2ProgramService } from './services/dhis2-program.service';
       maxRedirects: 5,
     }),
     IntegratorModule,
+    MeddraModule,
   ],
   providers: [
     Dhis2DataElementService,

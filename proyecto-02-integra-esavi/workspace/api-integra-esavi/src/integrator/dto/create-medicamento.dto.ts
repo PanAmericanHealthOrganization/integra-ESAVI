@@ -4,6 +4,7 @@ export class CreateMedicamentoDto {
   sistemaCodificacion: string;
   codigo: string;
   nombre: string;
+  nombreMedPatenteWHODrug: string;
   nombreNormalizado: string;
   codigoFormaFarmaceutica: string;
   nombreFormaFarmaceutica: string;

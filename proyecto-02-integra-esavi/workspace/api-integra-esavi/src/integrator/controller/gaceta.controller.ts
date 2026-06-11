@@ -140,7 +140,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @ApiResponse({ status: 409, description: 'Ya existe una gaceta con los mismos datos' })
-  public create(@Body() createGacetaDto: any): Promise<GacetaDto> {
+  public create(@Body() createGacetaDto: CreateGacetaDto): Promise<GacetaDto> {
     return this.gacetaService.createGacetaFromBasic(createGacetaDto);
   }
 

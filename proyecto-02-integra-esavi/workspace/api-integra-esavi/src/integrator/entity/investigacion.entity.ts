@@ -16,6 +16,7 @@ import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria, IAuditoria } from './auditoria.entity';
 import { DatoEsavi } from './dato-esavi.entity';
+import { Notificacion } from './notificacion.entity';
 
 /**
  *
@@ -35,9 +36,9 @@ export class Investigacion extends Auditoria implements IInvestigacion {
   /**
    *@OneToOne(() => DatoEsavi, { nullable: false })
    */
-  @OneToOne(() => DatoEsavi)
-  @JoinColumn({ name: 'DATOS_ESAVI_ID' })
-  datoEsavi: DatoEsavi;
+  @OneToOne(() => Notificacion) //DatoEsavi)
+  @JoinColumn({ name: 'NOTIFICACION_ID' }) //'DATOS_ESAVI_ID' })
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
 
   /**
    *
@@ -57,7 +58,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'El vacunatorio cumple con los estándares de calidad',
   })
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   /**
    *
@@ -67,7 +68,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'El personal de salud está capacitado en inmunizaciones',
   })
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   /**
    *
@@ -77,7 +78,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Evidenció algún problema en el biológico',
   })
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   /**
    *
@@ -87,7 +88,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',
   })
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   /**
    *
@@ -97,7 +98,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',
   })
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   /**
    *
@@ -107,7 +108,7 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     nullable: true,
     comment: 'Muestra de Laboratorio',
   })
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 
   /*@BeforeInsert()
     beforeInsert() {
@@ -115,15 +116,17 @@ export class Investigacion extends Auditoria implements IInvestigacion {
     }*/
 }
 
+// TODO: Se recomienda crear cada clase e interfaz en un archivo separado (o eliminar las definiciones duplicadas en otros documentos), para evitar problemas de importación circular. Si se desea conservar este esquema se debe cambiar de nombre a las clases e interfaces para evitar el conflicto de nombres (En esta versión de NestJS, se considera como warning, en las siguientes ya será error).
 export interface IInvestigacion extends IAuditoria {
   id: string;
+  notificacion: Notificacion; //Para habilitar este campo, se recomienda crear cada clase e interfaz en un archivo separado, para evitar problemas de importación circular. Si se desea conservar este esquema se debe cambiar de nombre a las clases e interfaces para evitar el conflicto de nombres (En esta versión de NestJS, se considera como warning, en las siguientes ya será error).
   fechaInvestigacion: Date | null;
-  vacunatorioCalidad: boolean;
-  personalCapacitado: boolean;
-  problemaBiologico: boolean;
-  busquedaCasosSintomatologiaConVacuna: boolean;
-  busquedaCasosSintomatologiaSinVacuna: boolean;
-  muestraLaboratorio: boolean;
+  vacunatorioCalidad: string;//boolean;
+  personalCapacitado: string;//boolean;
+  problemaBiologico: string;//boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
+  muestraLaboratorio: string;//boolean;string;//
 }
 
 export class InvestigacionDto extends Auditoria implements IInvestigacion {
@@ -131,28 +134,28 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
   id: string;
 
   @ApiProperty()
-  datoEsavi: DatoEsavi;
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
 
   @ApiProperty()
   fechaInvestigacion: Date | null;
 
   @ApiProperty()
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   @ApiProperty()
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   @ApiProperty()
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   @ApiProperty()
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   @ApiProperty()
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 }
 
 /**

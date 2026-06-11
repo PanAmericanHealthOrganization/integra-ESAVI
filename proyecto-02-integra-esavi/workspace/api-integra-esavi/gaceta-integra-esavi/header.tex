@@ -1,0 +1,73 @@
+% =============================================================================
+% CONFIGURACIÓN ADICIONAL DE ENCABEZADOS Y PIES DE PÁGINA
+% =============================================================================
+
+% Configuración de colores institucionales
+\usepackage{xcolor}
+\definecolor{MSPBlue}{RGB}{0, 51, 102}
+\definecolor{MSPGray}{RGB}{128, 128, 128}
+
+% Configuración de encabezados y pies de página
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+% Establecer estilo de página
+\pagestyle{fancy}
+\fancyhf{} % Limpiar encabezados y pies existentes
+
+% Configurar altura del encabezado
+\setlength{\headheight}{50pt}
+\addtolength{\topmargin}{-20pt}
+
+% Encabezado izquierdo - Solo si existe la imagen
+\IfFileExists{images/logos/logo_cabecera.jpg}{
+  \lhead{\includegraphics[height=1.2cm]{images/logos/logo_cabecera.jpg}}
+}{}
+
+% Encabezado derecho - Solo si existe la imagen
+\IfFileExists{images/logos/logo_msp.jpg}{
+  \rhead{\includegraphics[height=1.2cm]{images/logos/logo_msp.jpg}}
+}{}
+
+% Pie de página central - Solo si existe la imagen
+\IfFileExists{images/logos/logo_msp2.jpg}{
+  \cfoot{\includegraphics[height=0.8cm]{images/logos/logo_msp2.jpg}}
+}{}
+
+% Pie de página derecho - Número de página
+\rfoot{\textcolor{MSPGray}{\small Página \thepage\ de \pageref{LastPage}}}
+
+% Líneas de separación
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{MSPBlue}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrule}{\hbox to\headwidth{\color{MSPBlue}\leaders\hrule height \footrulewidth\hfill}}
+
+% Configuración de títulos de secciones
+\usepackage{titlesec}
+\titleformat{\section}
+  {\Large\bfseries\color{MSPBlue}}
+  {\thesection}{1em}{}
+\titleformat{\subsection}
+  {\large\bfseries\color{MSPBlue}}
+  {\thesubsection}{1em}{}
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{MSPBlue}}
+  {\thesubsubsection}{1em}{}
+
+% Espaciado entre párrafos
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0em}
+
+% Configuración de tamaño de fuente para captions de figuras
+% Usar tamaño de fuente de 8pt (footnotesize es aproximadamente 8pt)
+\usepackage{caption}
+\captionsetup{
+  font={footnotesize},
+  labelfont=bf,
+  textfont=normal
+}
+
+% Configuración para notas al pie en tablas
+% Definir comando personalizado para notas al pie con tamaño 8pt
+\newcommand{\notapie}[1]{\footnotesize #1}

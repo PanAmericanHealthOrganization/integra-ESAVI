@@ -10,7 +10,7 @@ import { withAuditOnCreate } from 'src/common/utils/audit.util';
 @Injectable()
 export class ActiveIngredientsService {
   constructor(
-    private readonly ingredientTranslationService: IngredientTranslationService,
+    public readonly ingredientTranslationService: IngredientTranslationService,
 
     @InjectRepository(ActiveIngredient, 'who_drug')
     private readonly activeIngredientsRepository: Repository<ActiveIngredient>,
@@ -71,7 +71,10 @@ export class ActiveIngredientsService {
         drug: { id: drugId }, // Compara el id de la entidad relacionada 'drug'
       },
     });
-    console.log(r);
+    //console.log(r); //Temporalmente se comenta el log que muestra los ingredientes activos.
     return r;
+  }
+  public async getIngredientTranslation(activeIngredientId: string, languageCode: string): Promise<string | null> {
+    return await this.ingredientTranslationService.getTranslation(activeIngredientId, languageCode);
   }
 }

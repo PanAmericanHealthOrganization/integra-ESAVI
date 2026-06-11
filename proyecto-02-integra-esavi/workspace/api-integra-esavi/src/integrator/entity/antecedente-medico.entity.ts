@@ -6,11 +6,11 @@ import * as moment from 'moment/moment';
 export class AntecedenteMedico extends Antecedente {
   @Column({
     name: 'ENSAYO_CLINICO_COVID19',
-    type: 'integer',
+    type: 'varchar',
     nullable: true,
-    comment: 'Indica si el paciente participó en ensayos clínicos de COVID-19',
+    comment: 'Indica si el paciente participó en ensayos clínicos de COVID-19. En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL.',
   })
-  ensayoClinicoCovid19: number;
+  ensayoClinicoCovid19: string; //En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL.
 
   @Column({
     name: 'COMORBILIDAD_PRINCIPAL',
@@ -60,13 +60,12 @@ export class AntecedenteMedico extends Antecedente {
   })
   comorbilidadTresCIE10: number;
 
-  //----------Nuevos campos agregados ----------
-  // NUEVOS CAMPOS: 
-  // CODIGO_COMORBILIDAD_MEDDRA_LLT, 
-  // ANTECEDENTE_PATOLOGICO_AGUDO_CIE10,
-  // ANTECEDENTE_PATOLOGICO_AGUDO_MEDDRA_LLT,
-  // ANTECEDENTE_FAMILIAR_CIE10,
-  // ANTECEDENTE_FAMILIAR_MEDDRA_LLT,
+  //----------Campos nuevos agregados (actualización): -------------
+  // CODIGO_COMORBILIDAD_MEDDRA_LLT, //COD_MEDDRALLT_COMORBILIDAD_UNO //COD_MEDDRALLT_COMORBILIDAD_DOS //COD_MEDDRALLT_COMORBILIDAD_TRES
+  // ANTECEDENTE_PATOLOGICO_AGUDO_CIE10, //COD_CIE10_PATOLOGICO_AGUDO
+  // ANTECEDENTE_PATOLOGICO_AGUDO_MEDDRA_LLT, //COD_MEDDRALLT_PATOLOGICO_AGUDO
+  // ANTECEDENTE_FAMILIAR_CIE10, //COD_CIE10_FAMILIAR
+  // ANTECEDENTE_FAMILIAR_MEDDRA_LLT, //COD_MEDDRALLT_FAMILIAR
   // ANTECEDENTE_QUIRURGICO_CIE10,
   // ANTECEDENTE_QUIRURGICO_MEDDRA_LLT,
   // ANTECEDENTE_FARMACOLOGICO_WHODRUG,
@@ -79,44 +78,45 @@ export class AntecedenteMedico extends Antecedente {
   // CODIGO_ENF_PREVIAS_MEDDRA_LLT
 //--------------------------------------------------
   @Column({
-    name: 'CODIGO_COMORBILIDAD_MEDDRA_LLT',
+    name: 'COD_MEDDRALLT_COMORBILIDAD_UNO',
     type: 'text',
     nullable: true,
-    comment: 'Código CIE-10 de la comorbilidad principal, 2 y 3',
+    comment: 'Códido MedDRA LLT de la comorbilidad principal.',
   })
-  codigoComorbilidadMeddraLlt: string;
+  codMeddraLltComorbilidadPrincipal: string; //codigoComorbilidadMeddraLlt: string;
 
+  //-------------------------------------------------
   @Column({
-    name: 'ANTECEDENTE_PATOLOGICO_AGUDO_CIE10',
+    name: 'COD_CIE10_PATOLOGICO_AGUDO',
     type: 'text',
     nullable: true,
     comment: 'Código CIE-10 del antecedente patológico agudo. Código CIE-10 de DNVE ESAVI TRK - Antecedente patológico agudo previo a las 72 horas de ocurrido el evento 1 - 3',
   })
-  antecedentePatologicoAgudoCIE10: string;
+  codCie10PatologicoAgudo: string; //antecedentePatologicoAgudoCIE10: string;
 
   @Column({
-    name: 'ANTECEDENTE_PATOLOGICO_AGUDO_MEDDRA_LLT',
+    name: 'COD_MEDDRALLT_PATOLOGICO_AGUDO',
     type: 'text',
     nullable: true,
     comment: 'Código LLT MedDRA del antecedente patológico agudo. Código MedDRA LLT de DNVE ESAVI TRK - Antecedente patológico agudo previo a las 72 horas de ocurrido el evento 1 - 3',
   })
-  antecedentePatologicoAgudoMeddraLlt: string;
+  codMeddraLltPatologicoAgudo: string; //antecedentePatologicoAgudoMeddraLlt: string;
 
   @Column({
-    name: 'ANTECEDENTE_FAMILIAR_CIE10',
+    name: 'COD_CIE10_FAMILIAR',
     type: 'text',
     nullable: true,
     comment: 'Código CIE-10 del antecedente familiar.',
   })
-  antecedenteFamiliarCIE10: string;
+  codCie10Familiar: string; //antecedenteFamiliarCIE10: string;
 
   @Column({
-    name: 'ANTECEDENTE_FAMILIAR_MEDDRA_LLT',
+    name: 'COD_MEDDRALLT_FAMILIAR',
     type: 'text',
     nullable: true,
     comment: 'Código MedDRA LLT del antecedente familiar.',
   })
-  antecedenteFamiliarMeddraLlt: string;
+  codMeddraLltFamiliar: string; //antecedenteFamiliarMeddraLlt: string;
 
   @Column({
     name: 'ANTECEDENTE_QUIRURGICO_CIE10',

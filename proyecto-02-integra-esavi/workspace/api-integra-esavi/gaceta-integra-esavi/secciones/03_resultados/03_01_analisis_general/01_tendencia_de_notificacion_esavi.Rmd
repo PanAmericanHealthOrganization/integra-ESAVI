@@ -1,0 +1,20 @@
+Gráfico Tendencua de notificación de ESAVI por Semana Epidemiologica
+Gráfico Distribución geogrfacia de notificaicone spor provincia 
+tabla Características Demográficas y de Gravedad del ESAVI
+tendencua de inicidencia por vacuna
+Distribución de latencia en dias?
+
+Distribución por Código SOC y PT, según Gravedad
+Análisis por Vacuna (COVID-19)
+Distribución Geográfica (Vacuna COVID-19)
+Características Demográficas y de Gravedad (COVID-19)
+
+
+Análisis por vacunas
+vacuna
+    tasa de notiticación por edad, sexo y gravedad (vacuna)
+    Distribución por código SOC y PT (vacuna)
+
+Caracterización de ESAVI contra COVID-19 en Gestantes
+Caracterización de ESAVI contra COVID-19 Graves
+ Caracterización de ESAVI contra COVID-19 Fatales

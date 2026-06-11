@@ -2,7 +2,6 @@ import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 import { SyncRangeDto } from '../dto/vacunacion-consolidada.dto';
-import { BulkVacunacionService } from '../service/BulkVacunacion.service';
 import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
 
 interface JobStatus {
@@ -25,10 +24,7 @@ export class VacunacionNominalSyncController {
   private readonly logger = new Logger(VacunacionNominalSyncController.name);
   private readonly jobs = new Map<string, JobStatus>();
 
-  constructor(
-    private readonly vacunacionService: VacunacionNominalService,
-    private readonly bulkVacunacionService: BulkVacunacionService,
-  ) {}
+  constructor(private readonly vacunacionService: VacunacionNominalService) {}
 
   /**
    * Endpoint para sincronizar vacunaciones en un rango de fechas
@@ -112,14 +108,5 @@ export class VacunacionNominalSyncController {
   @Get('/sync-jobs')
   async getAllJobs() {
     return Array.from(this.jobs.values()).sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
-  }
-
-  /**
-   *
-   * @returns
-   */
-  @Get('/sync-bulk')
-  async getBulkVacunas() {
-    return await this.bulkVacunacionService.bulkVacunas();
   }
 }

@@ -9,8 +9,8 @@ import { HistoryQualityDto } from '../controllers/dto/historyQuality.dto';
 import { DimensionCalidadDatosDto, IDataQualityDimensions, QualityDto } from '../controllers/dto/quality.dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { convertirAHistoryQualityDto } from '../utils/dataQualityUtils';
-import { DimCompletitudService } from './dim-completitud.service';
-import { DimConsistenciaService } from './dim-consitencia.service';
+import { DimCompletitudService } from './dim-completitud';
+import { DimConsistenciaService } from './dim-consitencia';
 import { DimExactitudService } from './dim-exactitud.service';
 
 /**
@@ -185,12 +185,6 @@ export class GeneralService {
     return uniqueResults;
   }
 
-  /**
-   *
-   * @param startDate
-   * @param endDate
-   * @returns
-   */
   public async getHistoryQuality(startDate: Date, endDate: Date): Promise<HistoryQualityDto[]> {
     // Validar que las fechas sean válidas
     if (!startDate || !endDate || isNaN(new Date(startDate).getTime()) || isNaN(new Date(endDate).getTime())) {

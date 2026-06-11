@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
+import { Catalogo } from './catalogo.entity';
 
 @Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_EVENTO_ADVERSO', comment: 'Tabla de antecedentes de eventos adversos' })
 export class AntecedenteEvento extends Antecedente {
@@ -9,37 +10,50 @@ export class AntecedenteEvento extends Antecedente {
     comment: 'Número de antecedentes de eventos adversos similares',
   })
   antecedente: number;
-  @Column({
+  /*@Column({
     name: 'ALERGIA_VACUNAS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a vacunas',
   })
-  alergiaVacuna: boolean;
-  @Column({
+  alergiaVacuna: boolean;*/ //variable no encontrada en los orígenes. En realidad una vacuna es un medicamento.
+  /*@Column({
     name: 'ALERGIA_MEDICAMENTOS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a medicamentos',
   })
-  alergiaMedicamento: boolean;
+  alergiaMedicamento: string;*/
+  @ManyToOne(() => Catalogo)
+    @JoinColumn({ name: 'CT_ALERGIA_MEDICAMENTO_ID' })
+    alergiaMedicamento: Catalogo;
 
-  @Column({
+  /*@Column({
     name: 'ALERGIA_ALIMENTOS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a alimentos',
   })
-  alergiaAlimentos: boolean;
-  @Column({
+  alergiaAlimentos: boolean;*/
+  @ManyToOne(() => Catalogo)
+    @JoinColumn({ name: 'CT_ALERGIA_ALIMENTO_ID' })
+    alergiaAlimentos: Catalogo;
+
+  /*@Column({
     name: 'ALERGIA_INSECTOS',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida a insectos',
   })
-  alergiaInsectos: boolean;
-  @Column({
+  alergiaInsectos: boolean;*/
+  @ManyToOne(() => Catalogo)
+    @JoinColumn({ name: 'CT_ALERGIA_INSECTO_ID' })
+    alergiaInsectos: Catalogo;
+  /*@Column({
     name: 'ALERGIA_POLVO',
     nullable: true,
     comment: 'Indica si el paciente tiene alergia conocida al polvo',
   })
-  alergiaPolvo: boolean;
+  alergiaPolvo: boolean;*/
+  @ManyToOne(() => Catalogo)
+    @JoinColumn({ name: 'CT_ALERGIA_POLVO_ID' })
+    alergiaPolvo: Catalogo;
   @Column({
     name: 'OTRAS_ALERGIAS',
     nullable: true,

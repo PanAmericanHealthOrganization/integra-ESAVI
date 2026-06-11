@@ -5,6 +5,7 @@ import PieChartIcon from "@mui/icons-material/PieChart"
 import SegmentIcon from "@mui/icons-material/Segment"
 import SettingsIcon from "@mui/icons-material/Settings"
 import SickIcon from "@mui/icons-material/Sick"
+import SyncIcon from "@mui/icons-material/Sync"
 import TableChartIcon from "@mui/icons-material/TableChart"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
 import { Menu } from "react-admin"
@@ -44,6 +45,8 @@ export const CustomMenu = () => (
 
       <Menu.Item to="/esavis" primaryText="ESAVIS" leftIcon={<SickIcon />} />
 
+      {/* Reportes: visible solo si el usuario tiene el rol "Administrador" */}
+
       <Menu.Item
         to="/reportes"
         primaryText="Reportes"
@@ -69,15 +72,6 @@ export const CustomMenu = () => (
         primaryText="ESAVIS Dashboard"
         leftIcon={<FlakyIcon />}
       />
-      <Menu.Item
-        to="/esavis-dashboard"
-        primaryText="ESAVIS Dashboard"
-        leftIcon={<FlakyIcon />}
-        onClick={() => {
-          window.location.href =
-            "http://0.0.0.0:80/?token=ff077f9ffab37231143330481a589ec3b7f4de183a97cf149c93ebefc88adaeb"
-        }}
-      />
 
       <Menu.Item
         to="/configuraciones"
@@ -91,6 +85,11 @@ export const CustomMenu = () => (
       />
       <Menu.Item
         to="/syncs"
+        primaryText="Procesos de sincronización"
+        leftIcon={<SyncIcon />}
+      />
+      <Menu.Item
+        to="/xlsx"
         primaryText="Datos de Campos BDD"
         leftIcon={<TableChartIcon />}
       />

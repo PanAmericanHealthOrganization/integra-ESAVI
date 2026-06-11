@@ -37,23 +37,40 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID' })
+  @Column({
+    nullable: true,
+    comment: 'Provincia de residencia del paciente. FK a catálogo de provincias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTPROVINCIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo,{nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
+  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID'})
   provinciaResidencia: Catalogo;
 
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @Column({
+    nullable: true,
+    comment: 'Cantón de residencia del paciente. FK a catálogo de cantones. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTCANTORESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
   @JoinColumn({ name: 'CTCANTORESIDENCIA_ID' })
   cantonResidencia: Catalogo;
 
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @Column({
+    nullable: true,
+    comment: 'Parroquia de residencia del paciente. FK a catálogo de parroquias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
+  })
+  CTPARROQUIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
+  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
   @JoinColumn({ name: 'CTPARROQUIARESIDENCIA_ID' })
   parroquiaResidencia: Catalogo;
+
+  //-- Cuando la columna de la relación no tiene comentario explícito, su propiedad comentario hereda el comentario de la tabla foránea (de la principal a la cual tiene relación).
 
   /**
    *
@@ -64,7 +81,7 @@ export class Notificacion extends Auditoria {
     comment: 'Otra parroquia de residencia del paciente no contemplada en catálogo',
   })
   otraParroquiaResidencia: string;
-
+//--------------------------------------------------------------------------------------------------------------
   /**
    *
    */
@@ -90,7 +107,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_NACIMIENTO',
-    type: 'date',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de nacimiento del paciente',
   })
@@ -112,9 +129,9 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'LACTANDO',
     nullable: true,
-    comment: 'Indica si la paciente se encuentra lactando',
+    comment: 'Indica si la paciente se encuentra lactando. Variable propia de VigiFLow no existente en DHIS2.',
   })
-  lactando: boolean;
+  lactando: string; //boolean; //Variable propia de VigiFLow no existente en DHIS2.
 
   /**
    *
@@ -128,10 +145,6 @@ export class Notificacion extends Auditoria {
    */
   @ManyToOne(() => GrupoEtario)
   @JoinColumn({ name: 'CTGRUPOETARIO_ID' })
-
-  /**
-   *
-   */
   grupoEtario: GrupoEtario;
 
   /**
@@ -147,9 +160,9 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'TITULO_NOTIFICADOR',
     nullable: true,
-    comment: 'Título profesional del notificador',
+    comment: 'Título profesional del notificador. Campo exclusivo de VigiFlow.',
   })
-  tituloNotificador: string;
+  tituloNotificador: string; //El Título aparece únicamente en VigiFlow. La columna que sí tiene en común con DHIS2 es la Profesión, y está integrada mediante FK.
 
   /**
    *
@@ -159,7 +172,7 @@ export class Notificacion extends Auditoria {
     nullable: true,
     comment: 'Organización o institución del notificador',
   })
-  organizacion: string;
+  organizacionNotificador: string;
 
   /**
    *
@@ -240,7 +253,7 @@ export class Notificacion extends Auditoria {
     nullable: true,
     comment: 'Comentarios adicionales del notificador',
   })
-  comentario: string;
+  comentarioNotificador: string;
 
   /**
    *
@@ -278,6 +291,7 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'MEDIO_NOTIFICACION',
     nullable: true,
+    default: 'Medio electrónico',
     comment: 'Medio por el cual se realizó la notificación',
   })
   medioNotificacion: string;
@@ -288,7 +302,7 @@ export class Notificacion extends Auditoria {
   @Column({
     name: 'TIPO_EMISOR',
     nullable: true,
-    comment: 'Tipo de emisor del reporte',
+    comment: 'Tipo de emisor del reporte. 1 = Profesional de la salud, 2 = Paciente / consumidor, 3 = Laboratorio farmacéutico, 4 = Centro regional de farmacovigilancia, 5 = Otro. Para DHIS2 el vlor predeterminado es "1" (Profesional de la salud).',
   })
   tipoEmisor: string;
 
@@ -344,7 +358,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_NOTIFICACION',
-    type: 'date',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha en que se realizó la notificación. Se asigna para el caso de VigiFlow, desde la columna "Fecha de recepción inicial"',
   })
@@ -355,7 +369,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_REPORTE_NACIONAL',
-    type: 'date',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha del reporte a nivel nacional',
   })
@@ -366,6 +380,7 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_LLENADO_FICHA',
+    type: 'timestamptz', // con el tipo 'type: 'timestamptz', se forza a UTC.
     nullable: true,
     comment: 'Fecha en que se llenó la ficha de notificación',
   })
@@ -376,10 +391,11 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'FECHA_ATENCION',
+    type: 'timestamptz',
     nullable: true,
     comment: 'Fecha de atención médica del paciente',
   })
-  fechaAtencion: Date;
+  fechaAtencion: Date; // Variable propia de DHIS2 no existente en VigiFlow.
 
   /**
    *

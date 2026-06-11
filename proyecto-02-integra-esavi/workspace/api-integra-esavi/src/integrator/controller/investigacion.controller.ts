@@ -1,16 +1,17 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { ApiTags} from '@nestjs/swagger';
-import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
+import { Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
-import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../dto/investigacion.dto';
-import { InvestigacionService } from '../service/investigacion.service';
+import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';//'../dto/investigacion.dto';
+import { InvestigacionService, IControllerCreateOmit } from '../service/investigacion.service';
+import { Notificacion } from '../entity/notificacion.entity';
 
 //--Se recomienda usar las interfaces icontroller y la iservice,
 //que se encuentran en src/utils/IController.ts
 @ApiTags('Investigacion')
 @Controller({ path: 'integrator/investigacion', version: '1' })
 export class InvestigacionController 
-  implements IController<InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto>
+  implements IControllerCreateOmit<InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto>
 {
     constructor(private readonly investigacionService: InvestigacionService) {}
 
@@ -43,9 +44,16 @@ export class InvestigacionController
   /**
    *
    */
-  @Post('create')
+  /*@Post('create')
   public create(@Body() data: any): Promise<any> {
     return this.investigacionService.create(data);
+  }*/
+  @Post('create')
+  public create(
+    @Body() investigacionCreateDto: InvestigacionCreateDto,
+    @Body() notificacion: Notificacion,
+  ): Promise<any> {
+    return this.investigacionService.create(investigacionCreateDto, notificacion);
   }
 
   /**

@@ -1,9 +1,9 @@
 export class CreateAntecedenteEventoDto {
   antecedente: number;
-  alergiaVacuna: boolean;
-  alergiaMedicamento: boolean;
-  alergiaAlimentos : boolean;
-  alergiaInsectos : boolean;
-  alergiaPolvo : boolean;
+  //alergiaVacuna: boolean;  //variable no encontrada en los orígenes. En realidad una vacuna es un medicamento.
+  alergiaMedicamento: string;
+  alergiaAlimentos : string;
+  alergiaInsectos : string;
+  alergiaPolvo : string;
   otrasAlergias : string;
 }

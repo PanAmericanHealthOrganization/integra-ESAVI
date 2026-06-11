@@ -1,4 +1,4 @@
   export class CreatePacienteEmbarazadaDto {
-    momentoVacuna : boolean;
-    momentoEsavi : boolean;
+    momentoVacuna : string;//boolean;
+    momentoEsavi : string;//boolean;
   }

@@ -1,6 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IInvestigacion } from '../entity/investigacion.entity';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
+import { Notificacion } from '../entity/notificacion.entity';
 import { Auditoria } from '../entity';
 /**
  *
@@ -15,7 +16,7 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
    * Datos del ESAVI asociado a la investigación
    */
   @ApiProperty()
-  datoEsavi: DatoEsavi;
+  notificacion: Notificacion; //datoEsavi: DatoEsavi;
   /**
    * Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2
    * */
@@ -26,37 +27,37 @@ export class InvestigacionDto extends Auditoria implements IInvestigacion {
    * El vacunatorio cumple con los estándares de calidad
    * */
   @ApiProperty()
-  vacunatorioCalidad: boolean;
+  vacunatorioCalidad: string;//boolean;
 
   /**
    * El personal de salud está capacitado en inmunizaciones
    * */
   @ApiProperty()
-  personalCapacitado: boolean;
+  personalCapacitado: string;//boolean;
 
   /**
    * Evidenció algún problema en el biológico
    * */
   @ApiProperty()
-  problemaBiologico: boolean;
+  problemaBiologico: string;//boolean;
 
   /**
    * Número de casos con sintomatología que recibieron vacuna
    * */
   @ApiProperty()
-  busquedaCasosSintomatologiaConVacuna: boolean;
+  busquedaCasosSintomatologiaConVacuna: string;//boolean;
 
   /**
    * Número de casos con sintomatología sin antecedente de vacuna
    * */
   @ApiProperty()
-  busquedaCasosSintomatologiaSinVacuna: boolean;
+  busquedaCasosSintomatologiaSinVacuna: string;//boolean;
 
   /**
    * Muestra de Laboratorio
    * */
   @ApiProperty()
-  muestraLaboratorio: boolean;
+  muestraLaboratorio: string;//boolean;
 }
 
 /**

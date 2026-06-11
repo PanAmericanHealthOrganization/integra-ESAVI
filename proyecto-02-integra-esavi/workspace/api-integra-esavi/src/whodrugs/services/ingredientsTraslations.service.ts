@@ -29,4 +29,49 @@ export class IngredientTranslationService {
       }
     }
   }
+
+  /*public async getTranslation(activeIngredientId: string, languageCode: string): Promise<string | null> {
+    const result = await this.ingredientTranslationRepository
+      .createQueryBuilder('it')
+      .select('it.int_ingredient', 'ingredient')
+      .where('it.aci_id = :activeIngredientId', { activeIngredientId })
+      .andWhere('it.int_languageCode = :languageCode', { languageCode })
+      .andWhere('it.AUD_HABILITADO = true')
+      .andWhere('it.AUD_ESTADO = true')
+      .getRawOne();
+    
+    return result?.ingredient || null;
+  }*/
+    public async getTranslation(activeIngredientId: string, languageCode: string): Promise<string | null> {
+      const result = await this.ingredientTranslationRepository.findOne({
+        select: {          
+          id: true, ingredient: true, // Seleccionamos solo la columna necesaria
+        },
+        where: {
+          activeIngredient: { id: activeIngredientId }, // Está entre llaves porque es una relación y es de tipo objeto 'ActiveIngredient'
+          languageCode: languageCode,
+          isEnabled: true,//auditoria
+          isActive: true,//auditoria
+        }
+      });
+    
+      return result?.ingredient || null;
+    }
+
+  public async debugTranslations(activeIngredientId: string): Promise<any[]> {
+    return await this.ingredientTranslationRepository
+      .createQueryBuilder('it')
+      .select(['it.int_languageCode as languageCode', 'it.int_ingredient as ingredient', 'it.aci_id as aciId'])
+      .where('it.aci_id = :activeIngredientId', { activeIngredientId })
+      .andWhere('it.AUD_HABILITADO = true')
+      .andWhere('it.AUD_ESTADO = true')
+      .getRawMany();
+  }
+
+  public async getAllTranslationsWithIds(): Promise<any[]> {
+    return await this.ingredientTranslationRepository
+      .createQueryBuilder('it')
+      .select(['it.id', 'it.aci_id', 'it.int_languageCode', 'it.int_ingredient'])
+      .getRawMany();
+  }
 }

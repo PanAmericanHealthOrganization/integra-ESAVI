@@ -64,12 +64,21 @@ export class Medicamento extends Auditoria {
     comment: 'Nombre comercial del medicamento',
   })
   nombre: string;
+  /**
+   *
+   */
+  @Column({
+    name: 'NOMBRE_MED_PATENTE_WHODRUG', //'NOMBRE_MEDICAMENTO_PATENTE_WHO_DRUG' //Variable nueva
+    nullable: true,
+    comment: 'Nombre del medicamento según la patente del estándar WHODrug. Aquí se registran todos los medicamentos, es decir, para todos los ATC, no solo para J07.',
+  })
+  nombreMedPatenteWHODrug: string; // utilizado por vf.
 
   /**
    *
    */
   @Column({
-    name: 'NOMBRE_NORMALIZADO_MEDICAMENTO',
+    name: 'NOMBRE_NORMALIZADO_MEDICAMENTO', // debe ser DRUG_NAME
     nullable: true,
     comment: 'Nombre normalizado del medicamento',
   })

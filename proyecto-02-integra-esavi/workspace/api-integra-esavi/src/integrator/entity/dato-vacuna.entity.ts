@@ -24,14 +24,14 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Código ATC (Anatomical Therapeutic Chemical) de la vacuna',
   })
-  codigoAtc: string;
+  codigoAtc: string;// Utilizado por vf.
 
   /**
    *
    */
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_ROL_VACUNA_ID' })
-  rolVacuna: Catalogo;
+  rolVacuna: Catalogo;// utilizado por vf.
 
   /**
    *
@@ -39,30 +39,29 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'SISTEMA_DE_CODIFICACION',
     nullable: true,
-    default: 'WHUDRUG',
-    comment: 'Sistema de codificación utilizado (WHUDRUG, ATC, etc.)',
+    default: 'WHODrug', //Actualmente se autocompleta con WHODrug
+    comment: 'Sistema de codificación utilizado (WHODrug, ATC, etc.)',
   })
-  sistemaDeCodificacion: string;
+  sistemaDeCodificacion: string;// utilizado por vf y d2.
 
   /**
    *
    */
   @Column({
-    name: 'NOMBRE_VACUNA',
+    name: 'NOMBRE_VAC_PATENTE_WHODRUG', // drugName //'NOMBRE_VACUNA_PATENTE_WHO_DRUG'
     nullable: true,
-    comment: 'Nombre comercial de la vacuna administrada',
+    comment: 'Nombre de la vacuna según la patente del estándar WHODrug',
   })
-  nombreVacuna: string;
-
+  nombreVacPatenteWHODrug: string; // utilizado por vf.
   /**
    *
    */
   @Column({
-    name: 'NOMBRE_VACUNA_PATENTE_WHO_DRUG',
+    name: 'DRUG_NAME',//'NOMBRE_VACUNA',
     nullable: true,
-    comment: 'Nombre de patente de la vacuna según WHO Drug',
+    comment: 'Nombre de la vacuna administrada, según el diccionario WHODrug Global de Uppsala Monitoring Centre.', //'Nombre comercial de la vacuna administrada',
   })
-  nombreVacunaPatenteWhoDrug: string;
+  drugName: string;//nombreVacuna: string; // utilizado por vf y d2.
 
   /**
    *
@@ -72,49 +71,86 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Código del medicamento en WHO Drug',
   })
-  drugCode: string;
+  drugCode: string;//utilizado por vf.
+  /**
+   *
+   */
+  /*@Column({
+    name: 'IDENTIFICADOR_VACUNA',
+    nullable: true,
+    comment: 'Identificador único de la vacuna',
+  })
+  identificadorVacuna: string;*/
+  /**
+   *
+   */
+  @Column({
+    name: 'RID_MEDICINAL_PRODUCT_ID', //'IDENTIFICADOR_VACUNA',
+    nullable: true,
+    comment: 'Identifica de forma única el producto medicinal según los estándares de la EMA (Agencia Europea de Medicamentos) o la OMS. En WHODrug Global, el MPID (Medicinal Product Identifier) y el RID (Record Identifier) se consideran equivalentes o intercambiables al codificar porque ambos apuntan al nivel más alto y específico de un producto farmacéutico.',
+  })
+  medicinalProductId: string;
+  /**
+   * 
+   */
+  @Column({
+    name: 'ES_GENERICO',
+    nullable: true,
+    comment: 'Marcador de registro Generico en WHODrug. Indica si la vacuna es genérica.',
+  })
+  esGenerico: string;
 
   /**
    *
    */
   @Column({
-    name: 'MAHOLDERS_JSON',
+    name: 'MAHOLDER_JSONB',//'MAHOLDERS_JSON'
     type: 'jsonb',
     nullable: true,
-    comment: 'Datos JSON de los titulares de autorización de comercialización',
+    comment: 'Datos JSONB de los titulares de autorización de comercialización. MAH (Marketing Authorization Holder / Titular de la autorización de comercialización).',
   })
-  mahholdersJson: any;
+  maHolderJsonb: any;//mahholdersJson: any;
 
   /**
    *
    */
   @Column({
-    name: 'ACTIVE_INGREDENTS_JSON',
-    type: 'jsonb',
+    name: 'ACTIVE_INGREDIENT_JSON', //Campo "ingredient" de WHODrug
+    type: 'json', //type: 'jsonb',
     nullable: true,
-    comment: 'Datos JSON de los ingredientes activos de la vacuna',
+    comment: 'Datos JSON de los ingredientes activos de la vacuna. Campo "ingredient" de WHODrug',
   })
-  activeIngredientsJson: any;
-
+  activeIngredientJson: any; // utilizado por vf.
   /**
    *
    */
   @Column({
-    name: 'NOMBRE_NORMALIZADO_VACUNA',
+    name: 'AC_INGREDIENT_TRANSLATION_JSON', //Campo "ingredient" de WHODrug
+    type: 'json', //type: 'jsonb',
+    nullable: true,
+    comment: 'Datos en formato JSON de la traducción al idioma español ("es-ES") de los ingredientes activos de la vacuna. Campo "ingredientTranslations" de WHODrug',
+  })
+  acIngredientTranslationJson: any; // utilizado por vf.
+  // En TypeScript el tipo 'any' es el más fácil y recomendable para manejar datos JSON dinámicos o desconocidos.
+  /**
+   *
+   */
+  /*@Column({
+    name: 'NOMBRE_NORMALIZADO_VACUNA', //campo duplicado con 'NOMBRE_VAC_PATENTE_WHODRUG'
     nullable: true,
     comment: 'Nombre normalizado de la vacuna',
   })
-  nombreVacunaNormalizada: string;
+  nombreVacunaNormalizada: string;*/
 
   /**
    *
    */
-  @Column({
-    name: 'PRINCIPIO_ACTIVO_WHO_DRUG',
+  /*@Column({
+    name: 'PRINCIPIO_ACTIVO_WHO_DRUG', // Campo duplicado con 'ACTIVE_INGREDIENT_JSON'.
     nullable: true,
     comment: 'Principio activo de la vacuna según WHODrug',
   })
-  principioActivoWhoDrug: string;
+  principioActivoWhoDrug: string;*/
 
   /**
    *
@@ -125,17 +161,6 @@ export class DatoVacuna extends Auditoria {
     comment: 'Otro código alternativo de identificación de la vacuna',
   })
   codigoOtro: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'IDENTIFICADOR_VACUNA',
-    nullable: true,
-    comment: 'Identificador único de la vacuna',
-  })
-  identificadorVacuna: string;
-
   /**
    *
    */
@@ -144,7 +169,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Nombre del fabricante de la vacuna',
   })
-  nombreFabricante: string;
+  nombreFabricante: string; // utilizado por d2.
 
   /**
    *
@@ -174,7 +199,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Número de dosis de la vacuna administrada',
   })
-  numeroDosisVacuna: number;
+  numeroDosisVacuna: number; // utilizado por vf.
 
   /**
    *
@@ -184,7 +209,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Dosis administrada de la vacuna',
   })
-  dosis: string;
+  dosis: string;// utilizado por vf.
 
   /**
    *
@@ -194,7 +219,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Primera dosis administrada',
   })
-  dosis1: string;
+  dosis1: string;//utilizado por vf.
 
   /**
    *
@@ -202,9 +227,9 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'INTERVALO_DOSIFICACION',
     nullable: true,
-    comment: 'Intervalo entre dosis de vacunación',
+    comment: 'Intervalo entre dosis de vacunación. Variable utilizada solo por VigiFlow.',
   })
-  intervaloDosificacion: string;
+  intervaloDosificacion: string; // utilizado por vf.
 
   /**
    *
@@ -214,17 +239,18 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Número de lote de la vacuna',
   })
-  numeroLote: string;
+  numeroLote: string;// utilizado por vf y d2.
 
   /**
    *
    */
   @Column({
     name: 'FECHA_VENCIMIENTO_VACUNA',
-    nullable: true,
+    type: 'timestamptz', // con el tipo 'timestamptz' se forza a UTC.
+    nullable: true,    
     comment: 'Fecha de vencimiento de la vacuna',
   })
-  fechaVencimientoVacuna: Date;
+  fechaVencimientoVacuna: Date; // utilizado por d2.
 
   /**
    *
@@ -234,37 +260,38 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Nombre del diluyente utilizado para la vacuna',
   })
-  nombreDiluyenteVacuna: string;
+  nombreDiluyenteVacuna: string; // utilizado por d2.
 
   /**
    *
    */
   @Column({
     name: 'FECHA_VENCIMIENTO_DILUYENTE',
+    type: 'timestamptz', // con el tipo 'timestamptz' se forza a UTC.
     nullable: true,
     comment: 'Fecha de vencimiento del diluyente',
   })
-  fechaVencimientoDiluyente: Date;
+  fechaVencimientoDiluyente: Date; // utilizado por d2.
 
   /**
    *
    */
   @Column({
-    name: 'PAIS_AUTORIZACION',
+    name: 'PAIS_AUTORIZACION_ISO3CODE', // 'PAIS_AUTORIZACION',
     nullable: true,
-    comment: 'País que autorizó la comercialización de la vacuna',
+    comment: 'País que autorizó la comercialización de la vacuna. Identifica de forma única el país donde se comercializa o registra el medicamento. Utiliza el código ISO 3166-1 alfa-3 de tres letras para representar el país.',
   })
-  paisAutorizacion: string;
+  paisAutorizacionIso3Code: string; //paisAutorizacion // utilizado por vf.
 
   /**
    *
    */
   @Column({
-    name: 'CONCENTRACION',
+    name: 'STRENGTH_POTENCIA', //'CONCENTRACION',
     nullable: true,
-    comment: 'Concentración de la vacuna administrada',
+    comment: 'En WHODrug, el campo Strength o Potencia describe la cantidad del ingrediente activo por unidad de presentación, no siempre una concentración. Ejemplo, formas líquidas multidosis: Amoxicillin 250 mg/5 mL suspension, la concentración real sería 50 mg/mL. En WHODrug, la concentración se deduce, no se almacena como tal.',
   })
-  concentracion: string;
+  strengthPotencia: string;//concentracion: string;
 
   /**
    *
@@ -284,7 +311,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Acción tomada con respecto a la vacuna tras el evento',
   })
-  accionTomada: string;
+  accionTomada: string;// utilizado por vf.
 
   /**
    *
@@ -305,7 +332,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Indicación de la vacuna codificada en MedDRA',
   })
-  indicacionMeddra: string;
+  indicacionMeddra: string; // utilizado por vf.
 
   /**
    *
@@ -326,7 +353,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Duración del tratamiento con la vacuna',
   })
-  duracion: string;
+  duracion: string; // utilizado por vf.
 
   /**
    *
@@ -337,7 +364,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Fecha y hora de inicio de administración de la vacuna',
   })
-  inicioAdministracion: Date;
+  inicioAdministracion: Date; // utilizado por vf y d2.
 
   /**
    *
@@ -348,7 +375,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Fecha y hora de fin de administración de la vacuna',
   })
-  finAdministracion: Date;
+  finAdministracion: Date; // utilizado por vf.
 
   /**
    *
@@ -358,7 +385,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Forma farmacéutica de la vacuna',
   })
-  formaFarmaceutica: string;
+  formaFarmaceutica: string; // utilizado por vf.
 
   /**
    *
@@ -368,8 +395,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Forma farmacéutica según estándares EDQM',
   })
-  formaFarmaceuticaEDQM: string;
-
+  formaFarmaceuticaEDQM: string; // utilizado por vf.
   /**
    *
    */
@@ -378,8 +404,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Vía de administración de la vacuna',
   })
-  viaAdministracion: string;
-
+  viaAdministracion: string; // utilizado por vf y d2.
   /**
    *
    */
@@ -388,7 +413,7 @@ export class DatoVacuna extends Auditoria {
     nullable: true,
     comment: 'Vía de administración según estándares EDQM',
   })
-  viaAdministracionEDQM: string;
+  viaAdministracionEDQM: string; // utilizado por vf.
 
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })

@@ -3,7 +3,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { IntegratorModule } from 'src/integrator/integrator.module';
 import { VacunacionNominalSyncController } from './controllers/vacunacion-nominal-sync.controller';
-import { BulkVacunacionService } from './service/BulkVacunacion.service';
 import { VacunacionNominalService } from './service/vacunacion-nominal.service';
 
 // Nombre de la conexión Oracle
@@ -31,7 +30,7 @@ export const ORACLE_VACUNACION_DS = 'ORACLE_VACUNACION_DS';
       inject: [ConfigService],
     }),
   ],
-  providers: [VacunacionNominalService, BulkVacunacionService],
+  providers: [VacunacionNominalService],
   controllers: [VacunacionNominalSyncController],
 })
 export class VacunacionIntegratorModule {}

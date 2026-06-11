@@ -11,6 +11,11 @@ import { IIngredientTranslation } from './dtos/drug.dto';
   name: 'ingredient_translation',
 })
 export class IngredientTranslation extends Auditoria implements IIngredientTranslation {
+  constructor() {
+    super();
+    this.activeIngredient = new ActiveIngredient();
+  }
+
   /**
    *
    */

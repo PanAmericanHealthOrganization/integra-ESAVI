@@ -2,8 +2,11 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import * as fs from 'fs/promises';
+import * as fs from 'fs/promises';import * as fsappend from 'fs';
 import * as moment from 'moment/moment';
+import * as countries from 'i18n-iso-countries';
+import * as enLocale from 'i18n-iso-countries/langs/en.json';
+import * as esLocale from 'i18n-iso-countries/langs/es.json';
 import { throwError } from 'rxjs';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
@@ -28,6 +31,7 @@ import { CreateMedicamentoDto } from '../../integrator/dto/create-medicamento.dt
 import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
 import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-vigiflow.dto';
 import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
+import { UpdateDatoVacunaDto } from '../../integrator/dto/update-dato-vacuna.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
@@ -35,6 +39,10 @@ import { MedicamentoService } from '../../integrator/service/medicamento.service
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
+import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
+import { WhodrugVacsTempService } from 'src/integrator/service/whodrug-vacstemp.service';
+import { WhodrugHomologaVacsService } from 'src/integrator/service/whodrug-homologavacs.service';
+import { WhodrugHomologaVacs } from 'src/integrator/entity/whodrug-homologavacs.entity';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -49,6 +57,12 @@ const profesiones = [
   'CONSUMIDOR U OTRO PROFESIONAL',
   'OTRO PROFESIONAL DE LA SALUD',
 ];
+//var countries = require("i18n-iso-countries");
+//countries.registerLocale(require("i18n-iso-countries/langs/es.json")); // in a browser environment
+//--- Registrar idiomas
+countries.registerLocale(enLocale);
+countries.registerLocale(esLocale);
+const idiomaParaPaisIso3Code = 'es';
 
 @Injectable()
 export class VigiflowIntegradorService {
@@ -68,6 +82,9 @@ export class VigiflowIntegradorService {
     private readonly drugService: DrugService,
     private readonly maholderService: MaholderService,
     private readonly activeIngredentService: ActiveIngredientsService,
+    private readonly whodrugVacsTempService: WhodrugVacsTempService,
+    private readonly whodrugHomologaVacsService: WhodrugHomologaVacsService,
+
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
     private readonly meddraSocService: MeddraSocService,
@@ -181,7 +198,8 @@ export class VigiflowIntegradorService {
       defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
-    reports.map(async (reg) => {
+    // Usar for...of para esperar que cada operación asíncrona termine
+    for (const reg of reports) {
       // TODO: colocar auditoria correcta
       const auditoria: IAuditoria = {
         createdAt: new Date(),
@@ -192,26 +210,14 @@ export class VigiflowIntegradorService {
         deletedBy: 'System',
         isEnabled: true,
         isActive: true,
-      };
-
-      //Este campo debe ser asignado a datoVacuna.numeroDosisVacuna
-      const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
-      // Pero, tomar en cuenta que el CreateDatoVacunaDto aparece en el otro
-      // proceso de extracción, en el método "extractedFromJsonReportToCreateMedicamento".
-      // Para este proceso se debe analizar los siguientes elementos:
-      // dato-vacuna.entity.ts
-      // create-dato-vacuna.dto.ts
-      // dato-vacuna.service.ts
-      // integrador.service.ts
-      // update-dato-vacuna.dto.ts
-      // dato-vacuna.controller.ts
+      };     
 
       // Create Paciente Vigiflow
       const paciente = new CreatePacienteVigiflowDto();
       paciente.identificacion = reg['E'];
       paciente.sexoPaciente = reg['F'];
-      paciente.codigoVigiflow = reg['B'];
-      paciente.nombre = reg['C'];
+      paciente.codigoVigiflow = reg['B'] && reg['B'] ? reg['B'].toString().trim():null; // Viene desde la hoja AEFI columna B
+      paciente.inicialesNombre = reg['C'];
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
@@ -246,8 +252,9 @@ export class VigiflowIntegradorService {
         notificacion.fechaReporteNacional = fechaReporte;
       }
 
+      notificacion.medioNotificacion = 'Medio electrónico VigiFlow';//Por recomendación del equipo funcional, se asigna un valor estático.// si se toma de la hoja Reportes reg['E'];, se debe usar updateNotificacion.
       //notificacion.unidadEdadPaciente = reg['I'] && reg['I'].toUpperCase();
-      notificacion.organizacion = reg['AF'];
+      notificacion.organizacionNotificador = reg['AF']; //Más adelante se actualiza este campo.
       notificacion.codigoVigiflow = reg['B'];
       notificacion.nombreNotificador = reg['AB'];
       // Ubicacion residencia Paciente
@@ -286,9 +293,9 @@ export class VigiflowIntegradorService {
         autopsia && this.eliminarTildes(autopsia).includes('si')
           ? 1
           : autopsia && this.eliminarTildes(autopsia).includes('no')
-          ? 2
-          : 3;
-      desenlaceEsaviDto.comentarios = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
+          ? 0//2
+          : 2;//3;
+      desenlaceEsaviDto.comentarioResultado = reg['Z'] && this.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
       const fechaInvestigacion = this.formatoFecha(reg['AM'] ? reg['AM'].toString() : reg['AM']);
       if (fechaInvestigacion) {
         desenlaceEsaviDto.fechaInicioInvestigacion = fechaInvestigacion;
@@ -299,13 +306,25 @@ export class VigiflowIntegradorService {
       datoVacunacionDto.nombreVacunatorio = reg['AF'];
       datoVacunacionDto.fechaVacunacion = this.formatoFecha(reg['N'] ? reg['N'].toString() : reg['N']);
 
-      //Create Dato Vacuna
+      //Este campo debe ser asignado a datoVacuna.numeroDosisVacuna
+      const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
+      // Pero, tomar en cuenta que el CreateDatoVacunaDto aparece en el otro
+      // proceso de extracción, en el método "extractedFromJsonReportToCreateMedicamento".
+      // Para este proceso se debe analizar los siguientes elementos:
+      // dato-vacuna.entity.ts
+      // create-dato-vacuna.dto.ts
+      // dato-vacuna.service.ts
+      // integrador.service.ts
+      // update-dato-vacuna.dto.ts
+      // dato-vacuna.controller.ts
+      //Create Dato Vacunacion
+      //Create Dato Vacuna con numeroDosisVacuna
       const datoVacunaDto = new CreateDatoVacunaDto();
       datoVacunaDto.numeroDosisVacuna = numeroDosisVacuna;
 
       //Paciente Embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
-      embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si');
+      embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si')?'1':'0';
 
       //Complete the dto
       let create = new CreateCompleteDto();
@@ -322,9 +341,7 @@ export class VigiflowIntegradorService {
       create = { ...create, ...auditoria };
 
       await this.integradorService.create(create);
-
-      return;
-    });
+    }
   }
 
   //Extracción de los datos de la hoja [1] de nombre 'Reportes', del libro
@@ -343,7 +360,8 @@ export class VigiflowIntegradorService {
       defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
     });
 
-    toUpdate.map(async (reg) => {
+    // Usar for...of para esperar que cada operación asíncrona termine
+    for (const reg of toUpdate) {
       const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['G']);
 
       if (paciente && paciente.id) {
@@ -357,22 +375,30 @@ export class VigiflowIntegradorService {
           // updateNotificacion.peso = this.formatoInteger(reg['AA']);
           // updateNotificacion.altura = this.formatoFloat(reg['AB']);
           updateNotificacion.casoNarrativo = reg['AC'];
-          updateNotificacion.comentario = reg['AD'];
+          updateNotificacion.comentarioNotificador = reg['AD'];
           // updateNotificacion.profesionNotificadorParam = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);;
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
-          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones);
+          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones); //TODO: En dhis2 y figiflow ya está integrado con FK, solo está pendiente la equivalencia de valores numéricos.
           updateNotificacion.tipoReporte = reg['N'];
-          updateNotificacion.organizacionEmisor = reg['D'];
+
+          updateNotificacion.organizacionNotificador = reg['AS']; //Se actualiza por recomendación del personal funcional.
+          updateNotificacion.organizacionEmisor = reg['AS'];//reg['D']; //Se actualiza por recomendación del personal funcional.
           updateNotificacion.identificacionNotificador = reg['R'];
           updateNotificacion.delegadoOrganizacion = reg['C'];
           updateNotificacion.ultimaEdicionRegistrada = reg['A'];
-          updateNotificacion.lactando = reg['Z'] && this.esAfirmativo(reg['Z']);
+          updateNotificacion.lactando = reg['Z'] && this.transformarTipoSiNo(reg['Z']);//reg['Z'] && this.esAfirmativo(reg['Z']);
           // Se actualiza la fecha de notificación asignándola, la
           // "fecha de recepción inicial", si esta no existe se la deja con la fecha de notificacion.
           //updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
           updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
+          
+          //Por recomendación de PAHO (personal funcional), se actualiza la fecha de reporte nacional con la "fecha de recepción inicial"
+          //Recordar que para que surta efecto el nuevo valor asignado, se debe también actualizar en el servicio "notificacion-vigiflow.service.ts", en el método "update".
+          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['K'] && this.analizarCadenaFecha(reg['K'] && reg['K'].toString());
           updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
-          updateNotificacion.residenciaNotificador.canton = reg['AU'];
+          updateNotificacion.residenciaNotificador.canton = reg['AU']; //Distrito/Municipio
+          updateNotificacion.residenciaNotificador.parroquia = reg['AT']; //Ciudad (sub-distrito)
+          updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
 
@@ -385,7 +411,7 @@ export class VigiflowIntegradorService {
           }
         }
       }
-    });
+    }
   }
 
   // async extractedFromJsonReportToCreateMedicamento(workbook2: WorkBook) {
@@ -476,61 +502,308 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
-    // Iterar con for...of para esperar las respuestas
+    // Iterar con for...of, para esperar que cada operación asíncrona termine.
+    // "toUpdate" es un arreglo de objetos JSON, cada uno de esos objetos representa una fila de la hoja "Medicamentos".
     for (const reg of toUpdate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['B']);
+      const medNumIdUnicoMundial = reg['A'] && reg['A'] ? reg['A'].toString().trim():null; 
+      const paciente = await this.pacienteVigiflowService.findByVigiflowCode( medNumIdUnicoMundial ); // No es .findByVigiflowCode(reg['B']); porque ya se comparó los valores con la hoja AEFI, y en realidad su equivalente es la columna 'A' en "Medicamentos".
       if (paciente) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
-        const notificacion = notificacionList.at(0);
+        const notificacionMed = notificacionList.at(0);//TODO: Iterar por todas las notificaciones asociadas al paciente, o lo que es lo mismo, a su código vigiflow. RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07. Y finalmente, un J07 no siempre aparece en la primera ocurrencia o posiciión del array notificacionList.
         let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
         medicamento.nombre = reg['D'];
-        medicamento.codigoATC = reg['G'];
+        medicamento.nombreMedPatenteWHODrug = reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
+        medicamento.codigoATC = reg['G']; 
         medicamento = { ...medicamento, ...auditoria };
 
-        // Comentado el método de creación de medicamento para no ejecutarlo
-        await this.medicamentoService.createOneToOne(notificacion, medicamento);
+        // Crear medicamento. Observar que "medicamentoService.createOneToOne" filtra los posibles medicamentos duplicados sobre la base de NOTIFICACION_ID, NOMBRE_MEDICAMENTO, y ATC
+        await this.medicamentoService.createOneToOne(notificacionMed, medicamento);
 
-        let datoVacuna = new CreateDatoVacunaDto();
-        datoVacuna.nombreVacuna = reg['D'];
-        datoVacuna.accionTomada = reg['M'];
-        datoVacuna.dosis = reg['S'];
-        datoVacuna.intervaloDosificacion = reg['T'];
-        datoVacuna.dosis1 = reg['U'];
-        datoVacuna.duracion = reg['V'];
-        datoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
-        datoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
-        datoVacuna.formaFarmaceutica = reg['Y'];
-        datoVacuna.formaFarmaceuticaEDQM = reg['Z'];
-        datoVacuna.viaAdministracion = reg['AA'];
-        datoVacuna.viaAdministracionEDQM = reg['AB'];
-        datoVacuna.paisAutorizacion = reg['J'];
-        //datoVacuna.numeroLote = reg['AE'];
-        datoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
-        datoVacuna.indicacionMeddra = reg['Q'];
-        datoVacuna.nombreVacunaPatenteWhoDrug = reg['E'];
-        datoVacuna.codigoAtc = reg['G'];
-        datoVacuna.rolVacuna = reg['C']; // Se revisó, y es la misma variable "Rol del medicamento", no hay una variable específica para vacuna.
+        /**
+         * La hoja "Medicamentos", para el código ATC no tiene filtro de J07, y a primera vista, 
+         * parecería no ser necesario volver a aplicar otro filtro, porque, el ATC J07 está 
+         * filtrado en el libro AEFI (cantidad de registros comparable con el mensaje de la página VigiFlow).
+         * Sin embargo, se debe tener en cuenta que un mismo código Vigiflow puede tener varios ATC asociados,
+         * incluyendo el J07. Por lo tanto, es necesario validar que el código ATC de la fila actual
+         * corresponda a una vacuna (J07) antes de proceder a crear o actualizar el datoVacuna.
+         */
+        //const validacionCdgAtcVacunas = reg['G'] && this.validarCodigoAtcVacuna(reg['G'].toString());
+        /**
+         * OBSERVACIÓN IMPORTANTE: En la columna 'G' ('Código(s) ATC') de la hoja "Medicamentos", pueden existir varios códigos o elementos
+         * separados por saltos de línea. De los cuales, temporalmente se asume que solo uno de ellos es J07, es decir una vacuna.
+         */
+        const codigoAtcVacunaTransformado = reg['G'] && reg['G'] ? this.extraerCodigoAtcVacuna(reg['G'].toString()) : null;
+        for(const notificacion of notificacionList){
 
-        const drugName = datoVacuna.nombreVacunaPatenteWhoDrug;
-        const whodrug: any[] = await this.drugService.getDrugsOnly(drugName, country);
-        if (whodrug.length > 0) {
-          datoVacuna.drugCode = whodrug[0]?.drugCode;
-          const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
-          datoVacuna.mahholdersJson = mah.map((item) => ({
-            name: item.name,
-            medicinalProductID: item.medicinalProductID,
-          }));
-          const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
-          datoVacuna.activeIngredientsJson = ingredentActive.map((item) => ({
-            ingredent: item.ingredient,
-          }));
+          // Buscar datoVacuna existente y actualizarlo. Se filtra por notificación.id y comprobando que sus campos principales sean NULL o vacíos.
+          const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
+          //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
+
+          //En realidad este fragmento de código no solo actualiza registros, también crea nuevos registros de datoVacuna cuando es necesario (ver datoVacunaService.create al final del bloque).
+          if ( codigoAtcVacunaTransformado ) { //if (validacionCdgAtcVacunas) {
+            let updateDatoVacuna = new UpdateDatoVacunaDto();
+            //updateDatoVacuna.nombre = reg['D'];//updateDatoVacuna.drugName = reg['D']; //Nombre del medicamento tal como fue reportado por el notificador inicial / original
+            updateDatoVacuna.accionTomada = reg['M'];
+            updateDatoVacuna.dosis = reg['S'];
+            updateDatoVacuna.intervaloDosificacion = reg['T'];
+            updateDatoVacuna.dosis1 = reg['U'];
+            updateDatoVacuna.duracion = reg['V'];
+            updateDatoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
+            updateDatoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
+            updateDatoVacuna.formaFarmaceutica = reg['Y'];
+            updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
+            updateDatoVacuna.viaAdministracion = reg['AA'];
+            updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
+            updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] && reg['J'] ? countries.getAlpha3Code( reg['J'].toString().toUpperCase(), idiomaParaPaisIso3Code) : 'ECU';//TODO:En caso de necesitar solo una lista fija de paises autorizados, lo más eficiente es implementar un diccionario con la equivalencia del código ISO3 alfa-3 o catálogo de países autorizados.
+            updateDatoVacuna.numeroLote = reg['AE'] && this.transformarLoteVacuna(reg['AE']);
+            updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
+            
+            const nombreVacPatenteWHODrugVigiFlow = reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
+            updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;//reg['E'] && reg['E'] ? this.limpiarCampoWHODrug(reg['E']) : reg['E'];
+            
+            const principioActivoWHODrugVigiFlow = reg['F'] && reg['F'] ? this.limpiarCampoWHODrug(reg['F']) : reg['F']; // Reemplaza comas o saltos de línea por punto y coma.
+            updateDatoVacuna.acIngredientTranslationJson = this.parseIngredientsWithSemicolonsToJson( principioActivoWHODrugVigiFlow );//reg['F'] && this.parseIngredientsToJson(reg['F']);//Se asigna esta columna porque la mayoría ya viene con la traducción al español.
+            updateDatoVacuna.codigoAtc = codigoAtcVacunaTransformado; //reg['G'];
+            updateDatoVacuna.rolVacuna = reg['C'];
+
+            //----------------------------------------------------------------------------------------------------------------//
+            //----------------------------------------------------------------------------------------------------------------//
+            const utilizarSoloDiccionarioWhodrugGlobalUmc = false; // cambiar a true para usar solo catálogos Excel provisionales o temporales, mientras concluye el proceso de actulización del diccionario oficial.
+
+            if( utilizarSoloDiccionarioWhodrugGlobalUmc ){
+              //----INICIO estandarización utilizando el diccionario oficial de WHODrug Global de Uppsala Monitoring Centre.----
+              const drugName = nombreVacPatenteWHODrugVigiFlow;//updateDatoVacuna.nombreVacPatenteWHODrug;
+              const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
+              // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
+              //fsappend.appendFileSync('C:/logsNumElementosDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
+              if (whodrug.length > 0) {
+                updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrug[0]?.drugName;
+                
+                const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
+                updateDatoVacuna.maHolderJsonb = mah.map((item) => ({ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                  name: item.name,
+                  medicinalProductID: item.medicinalProductID, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                }));
+                const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
+                //console.log('ingredentActive IDs:::', ingredentActive.map(item => ({ id: item.id, ingredient: item.ingredient })));
+                updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
+                  ingredient: item.ingredient, //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                }));
+                if ( (ingredentActive.length > 0) && !(updateDatoVacuna.acIngredientTranslationJson) ) {
+                                
+                  // Para cada ingrediente activo, obtener su traducción en español
+                  const translatedIngredients = await Promise.all(
+                    ingredentActive.map(async (ingredient) => {
+                      const translation = await this.activeIngredentService.getIngredientTranslation(
+                        ingredient.id,
+                        'es-ES'
+                      ); // TODO: if translation is null, use ingredient.ingredient, or map Excel Data. //Es probable que no sea necesario, porque, desde VigiFlow ya vienen traducidos varios ingredientes activos.
+
+                      return { ingredient: translation };//|| ingredient.ingredient };
+                    })
+                  );
+
+                  // Resultado final, JSON de traducciones de ingredientes activos
+                  //-----------console.log(JSON.stringify(translatedIngredients, null, 2));
+                  /*updateDatoVacuna.acIngredientTranslationJson = translatedIngredients.map((item) => ({
+                    ingredient: item.ingredient,
+                  }));*/
+                  updateDatoVacuna.acIngredientTranslationJson = translatedIngredients;
+                }
+
+              } else {
+                /**
+                 * updateDatoVacuna.drugCode = null;
+                  updateDatoVacuna.mahholdersJson = [];
+                  updateDatoVacuna.activeIngredientJson = [];
+                */
+              } //---- f i n -- estandarización utilizando el diccionario oficial de WHODrug---------------
+            }else{ // TODO: Se recomienda implementar la comprobación de la existencia de las tablas de los catálogos WHODRUG en la base de datos, antes de utilizar los catálogos Excel provisionales o temporales.
+              
+              //const { WorkBook, utils } = require('xlsx');
+              //--Inicio --- estandarización utilizando catálogos  E x c e l  provisionales o temporales de WHODRUG.--
+              //------------console.log(`No se encontró el nombre de la vacuna en WHODrug: ${drugName} y país: ${country}. Buscando en catálogo CSV...`);
+              
+              const drugName = nombreVacPatenteWHODrugVigiFlow;
+              let activeIngredient = principioActivoWHODrugVigiFlow;
+              const whodrugAuxiliar: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByName(drugName);//(await this.whodrugVacsTempService.getVaccinesByName(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByName(drugName) : [];
+              const whodrug: WhodrugVacsTemp[] = whodrugAuxiliar.length > 0? whodrugAuxiliar : [];
+              const cantElementos = whodrug.length;//whodrug.sort((a, b) => a.drugName.length - b.drugName.length); // Ordenar por longitud del nombre del medicamento (de menor a mayor)
+              const algunIso3CodeEsNulo = VigiflowIntegradorService.tienePropiedadNula(whodrug, 'countryIso3Code');
+              const vacunasEncontradasNoTienenIso3CodeNulo = cantElementos > 1 && !algunIso3CodeEsNulo;
+              if( vacunasEncontradasNoTienenIso3CodeNulo ){ activeIngredient = whodrug[0]?.activeIngredient; } // Si se encuentran varias coincidencias pero ninguna tiene código ISO3 de país, se asume que todas corresponden a la vacuna reportada, y se toma el ingrediente activo de la primera coincidencia para continuar con el proceso de comparación.
+              
+              if ( cantElementos === 0 || ( vacunasEncontradasNoTienenIso3CodeNulo ) ) { //drugName
+                const whodrugActiIngr: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActiveIngredient(activeIngredient) : [];
+                const cantElementosActIng = whodrugActiIngr.length;
+                const algunIso3CodeEsNuloActIng = VigiflowIntegradorService.tienePropiedadNula(whodrugActiIngr, 'countryIso3Code');
+                
+                if( cantElementosActIng === 0 || (cantElementosActIng > 1  && !algunIso3CodeEsNuloActIng) ){ //activeIngredient
+                  const whodrugActiIngrTranslation: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient)).length > 0? await this.whodrugVacsTempService.getVaccinesByActIngTranslation(activeIngredient) : [];
+                  const cantElementosActIngTransl = whodrugActiIngrTranslation.length;
+                  const algunIso3CodeEsNuloActIngTransl = VigiflowIntegradorService.tienePropiedadNula(whodrugActiIngrTranslation, 'countryIso3Code');
+
+                  if( cantElementosActIngTransl === 0 || (cantElementosActIngTransl > 1  && !algunIso3CodeEsNuloActIngTransl ) ){ // activeIngredientTranslation
+                    // Si no hay coincidencia al comparar el drugName, activeIngredient y activeIngredientTranslation, 
+                    // entonces se debe comparar usando el catálogo Excel auxiliar de homologación.
+                    const dnHomologacionVigiFlow: WhodrugHomologaVacs[] = (await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName)).length > 0? await this.whodrugHomologaVacsService.getHomologatedVaccByDrugName(drugName) : [];
+                    const nElementosHomologacionVigiFlow = dnHomologacionVigiFlow.length;
+
+                    if( nElementosHomologacionVigiFlow === 1 && dnHomologacionVigiFlow[0].drugNameWhodrug != 'Sin coincidencia' ){ // drugName homologado en VigiFlow // Como en el algoritmo no se considera la posibilidad de existencia de más de un elemento, se asume que en este nivel solo habrá uno.
+                      const whodrugTemp: WhodrugVacsTemp[] = (await this.whodrugVacsTempService.getVaccinesByName( dnHomologacionVigiFlow[0].drugNameWhodrug )).length > 0? await this.whodrugVacsTempService.getVaccinesByName( dnHomologacionVigiFlow[0].drugNameWhodrug ) : [];
+                      const cantElementosTemp = whodrugTemp.length;
+
+                      if( cantElementosTemp === 1 ){
+                        updateDatoVacuna.drugCode = whodrugTemp[0]?.drugCode;
+                        updateDatoVacuna.drugName = whodrugTemp[0]?.drugName;
+                        updateDatoVacuna.strengthPotencia = whodrugTemp[0]?.strength;
+                        updateDatoVacuna.formaFarmaceutica = whodrugTemp[0]?.pharmaceuticalForm;
+                        updateDatoVacuna.paisAutorizacionIso3Code = whodrugTemp[0]?.countryIso3Code;
+                        updateDatoVacuna.medicinalProductId = whodrugTemp[0]?.medicinalProductId;
+                        updateDatoVacuna.esGenerico = whodrugTemp[0]?.isGeneric;
+
+                        updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                          name: whodrugTemp[0]?.maHolder,
+                          medicinalProductID: whodrugTemp[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                        }];
+                        updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                          whodrugTemp[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                        );
+                      }
+
+                    }
+                  }else if( cantElementosActIngTransl === 1 ){
+                    updateDatoVacuna.drugCode = whodrugActiIngrTranslation[0]?.drugCode;
+                    updateDatoVacuna.drugName = whodrugActiIngrTranslation[0]?.drugName;
+                    updateDatoVacuna.strengthPotencia = whodrugActiIngrTranslation[0]?.strength;
+                    updateDatoVacuna.formaFarmaceutica = whodrugActiIngrTranslation[0]?.pharmaceuticalForm;
+                    updateDatoVacuna.paisAutorizacionIso3Code = whodrugActiIngrTranslation[0]?.countryIso3Code;
+                    updateDatoVacuna.medicinalProductId = whodrugActiIngrTranslation[0]?.medicinalProductId;
+                    updateDatoVacuna.esGenerico = whodrugActiIngrTranslation[0]?.isGeneric;
+
+                    updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                      name: whodrugActiIngrTranslation[0]?.maHolder,
+                      medicinalProductID: whodrugActiIngrTranslation[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                    }];
+                    updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                      whodrugActiIngrTranslation[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                    );
+
+                  }else if( cantElementosActIngTransl > 1 && algunIso3CodeEsNuloActIngTransl ){
+                    const wdActiIngrTranslation: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActIngTranslationAndIso3CodeNull(activeIngredient);
+                    updateDatoVacuna.drugCode = wdActiIngrTranslation[0]?.drugCode;
+                    updateDatoVacuna.drugName = wdActiIngrTranslation[0]?.drugName;
+                    updateDatoVacuna.strengthPotencia = wdActiIngrTranslation[0]?.strength;
+                    updateDatoVacuna.formaFarmaceutica = wdActiIngrTranslation[0]?.pharmaceuticalForm;
+                    updateDatoVacuna.paisAutorizacionIso3Code = wdActiIngrTranslation[0]?.countryIso3Code;
+                    updateDatoVacuna.medicinalProductId = wdActiIngrTranslation[0]?.medicinalProductId;
+                    updateDatoVacuna.esGenerico = wdActiIngrTranslation[0]?.isGeneric;
+
+                    updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                      name: wdActiIngrTranslation[0]?.maHolder,
+                      medicinalProductID: wdActiIngrTranslation[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                    }];
+                    updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                      wdActiIngrTranslation[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                    );
+                  } else {}
+
+                }else if( cantElementosActIng === 1 ){
+                  updateDatoVacuna.drugCode = whodrugActiIngr[0]?.drugCode;
+                  updateDatoVacuna.drugName = whodrugActiIngr[0]?.drugName;
+                  updateDatoVacuna.strengthPotencia = whodrugActiIngr[0]?.strength;
+                  updateDatoVacuna.formaFarmaceutica = whodrugActiIngr[0]?.pharmaceuticalForm;
+                  updateDatoVacuna.paisAutorizacionIso3Code = whodrugActiIngr[0]?.countryIso3Code;
+                  updateDatoVacuna.medicinalProductId = whodrugActiIngr[0]?.medicinalProductId;
+                  updateDatoVacuna.esGenerico = whodrugActiIngr[0]?.isGeneric;
+
+                  updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                    name: whodrugActiIngr[0]?.maHolder,
+                    medicinalProductID: whodrugActiIngr[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                  }];
+                  updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                    whodrugActiIngr[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                  );
+
+                }else if( cantElementosActIng > 1 && algunIso3CodeEsNuloActIng ){
+                  const wdActiIngr: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccsByActiveIngredientAndIso3CodeNull(activeIngredient);
+                  updateDatoVacuna.drugCode = wdActiIngr[0]?.drugCode;
+                  updateDatoVacuna.drugName = wdActiIngr[0]?.drugName;
+                  updateDatoVacuna.strengthPotencia = wdActiIngr[0]?.strength;
+                  updateDatoVacuna.formaFarmaceutica = wdActiIngr[0]?.pharmaceuticalForm;
+                  updateDatoVacuna.paisAutorizacionIso3Code = wdActiIngr[0]?.countryIso3Code;
+                  updateDatoVacuna.medicinalProductId = wdActiIngr[0]?.medicinalProductId;
+                  updateDatoVacuna.esGenerico = wdActiIngr[0]?.isGeneric;
+
+                  updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                    name: wdActiIngr[0]?.maHolder,
+                    medicinalProductID: wdActiIngr[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                  }];
+                  updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                    wdActiIngr[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                  );
+                } else {}
+                
+              }else if( cantElementos === 1 ){ //cantElementos === 1 //cantElementos >0
+                updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrug[0]?.drugName;
+                updateDatoVacuna.strengthPotencia = whodrug[0]?.strength;
+                updateDatoVacuna.formaFarmaceutica = whodrug[0]?.pharmaceuticalForm;
+                updateDatoVacuna.paisAutorizacionIso3Code = whodrug[0]?.countryIso3Code;
+                updateDatoVacuna.medicinalProductId = whodrug[0]?.medicinalProductId;
+                updateDatoVacuna.esGenerico = whodrug[0]?.isGeneric;
+
+                updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                  name: whodrug[0]?.maHolder,
+                  medicinalProductID: whodrug[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                }];
+                updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                  whodrug[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                );
+
+              }else if( cantElementos > 1 && algunIso3CodeEsNulo ){
+                const whodrugs: WhodrugVacsTemp[] = await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName);//(await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName)).length > 0? await this.whodrugVacsTempService.getVaccinesByNameAndIso3CodeNull(drugName) : [];
+                updateDatoVacuna.drugCode = whodrugs[0]?.drugCode;
+                updateDatoVacuna.drugName = whodrugs[0]?.drugName;
+                updateDatoVacuna.strengthPotencia = whodrugs[0]?.strength;
+                updateDatoVacuna.formaFarmaceutica = whodrugs[0]?.pharmaceuticalForm;
+                updateDatoVacuna.paisAutorizacionIso3Code = whodrugs[0]?.countryIso3Code; //TODO: Probar previamente si no tiene valor, para que no se sobrescriba.
+                updateDatoVacuna.medicinalProductId = whodrugs[0]?.medicinalProductId;
+                updateDatoVacuna.esGenerico = whodrugs[0]?.isGeneric;
+
+                updateDatoVacuna.maHolderJsonb = [{ // Se genera un valor compatible con JSONB, pero el mapeo a JSONB ocurre en la capa de persistencia (ORM/driver + PostgreSQL), no en el código map en sí.
+                  name: whodrugs[0]?.maHolder,
+                  medicinalProductID: whodrugs[0]?.maHolderMediProdId, // Se debe recordar que el MPID principal del medicamento es diferente al valor del MPID del maHolder.
+                }];
+                updateDatoVacuna.activeIngredientJson = this.parseIngredientsWithSemicolonsToJson(
+                  whodrugs[0]?.activeIngredient //La propiedad "ingredient" solo es etiqueta y se converirá en la clave dentro del objeto JSON.
+                );
+              } else {}            
+
+            }//--- Fin --- estandarización utilizando catálogos Excel provisionales o temporales de WHODRUG.--
+
+
+            if(datoVacunaList.length > 0){
+              //actualizar el datoVacuna 'm í n i m o' existente, asociado a la notificación. Se denomina "Mínimo", porque no todas las columnas se encuentran en esta hoja Excel.
+              //y fue creado inicialmente con los datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones asociadas al paciente.
+
+              await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
+            } else {
+              /**Crear un registro completamente nuevo de DatoVacuna asociado a la 
+               * notificación, utilizando el método "create" del servicio datoVacunaService.
+               * "create" utiliza filtros internos de TypeORM para evitar duplicados.
+               * */
+              await this.datoVacunaService.create(notificacion, updateDatoVacuna); //Existe otra forma, utilizando la actualización propia que tiene este método create.
+              //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
+              //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
+            }
+            break; // Salir del bucle una vez que se ha actualizado el datoVacuna
+          }
         }
-        datoVacuna = { ...datoVacuna, ...auditoria };
-
-        await this.datoVacunaService.createVigiflow(notificacion, datoVacuna);
       } else {
-        console.log(`Please checkout ${paciente}`);
+        console.log(`Por favor, verificar el paciente con id: ${paciente}`);
       }
     }
   }
@@ -733,24 +1006,176 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
 
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
-      return moment(valor, 'YYYYMMDD)').toDate();
+      return moment.utc(valor, 'YYYYMMDD').toDate(); //return moment(valor, 'YYYYMMDD)').toDate();
     }
     return null;
-  }
+  }//Se comprobó que cuando la fecha viene con la parte de la hora y zona horaria, este método no devuelve ajustado a cero horas, minutos, segundos y milisegundos. En vigiflow no es probable que vengan con la parte de la hora, pero, en DHIS2 si puede venir con la parte de la hora y zona horaria.
+  // Actualización: se elimina el paréntesis de cierre del formato de fecha.
+  // La definición de la columna en la entidad 'timestamp with time zone': convierte automáticamente a UTC al persistir.
+  // Para forzar a UTC, se utiliza 'moment.utc'.
+  // Comprobar qué sucese cuando se concatena con la hora cuando los campos diponen este valor en otro Elemento de Datos.
+
   analizarCadenaFecha(dateStr: string): Date | null {
-    if (!/^\d{8}$/.test(dateStr)) {
-       console.log(`Formato inválido, se espera YYYYMMDD: ${dateStr}`);
+    if (!/^\d{8}$/.test(dateStr)) {// Verifica que la cadena tenga exactamente 8 dígitos
+       //console.log(`La fecha: "${dateStr}" no es válida, se esperan 8 dígitos.`);
        return null;
       } 
       const year = Number(dateStr.slice(0, 4)); 
       const month = Number(dateStr.slice(4, 6)); 
       const day = Number(dateStr.slice(6, 8));
       if (month < 1 || month > 12 || day < 1 || day > 31) {
-        throw new Error("Fecha inválida");
+        //throw new Error("Fecha inválida");
+        //console.log(`Fecha: "${dateStr}" inválida", se espera este formato YYYYMMDD`);
+        return null;
       }
-      const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
-    return new Date(Date.UTC(fecha.getUTCFullYear(), fecha.getUTCMonth(), fecha.getUTCDate())); 
+      //const fecha = new Date(year, month - 1, day); //mes en TypeScript empieza en 0 o es base 0
+    return new Date(Date.UTC(year, month - 1, day, 0, 0, 0)); // Retorna la fecha en formato UTC
+    //return fecha.setHours(0,0,0,0), fecha; // Para trabajar solo a nivel nacional, no se necesita UTC. Además al trabajar con formato local, evita errores de desfase horario, y se puede comparar las entradas con las salidas, o las que se almacenan en la base de datos.
   }
+
+  /** * Convierte una cadena con saltos de línea en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] */
+  parseIngredientsToJson(rawText?: string): { ingredient: string }[] {
+    if (!rawText || typeof rawText !== 'string') {
+      return []; // Retorna un arreglo vacío si no hay texto o no es string
+    }
+
+    return rawText
+      .split(/\r?\n/) // divide por \n o \r\n 
+      .map(line => line.trim()) // limpia espacios y posibles \r 
+      .filter(line => line !== '') // descarta líneas vacías 
+      .map(line => ({ ingredient: line })); // construye el objeto
+  }
+
+  /** * Convierte una cadena con punto y comas en un arreglo JSON * con la estructura [{ ingredient: "..." }, ...] 
+   * - Divide la cadena por punto y coma ';'
+   * - Limpia espacios y posibles caracteres de retorno de carro '\r' alrededor de cada término
+   * - Descarta términos vacíos resultantes de divisiones consecutivas o espacios
+   * - Construye un arreglo de objetos con la propiedad "ingredient" para cada término válido
+  */
+  parseIngredientsWithSemicolonsToJson(rawText?: string): { ingredient: string }[] {
+    if (!rawText || typeof rawText !== 'string') {
+      return []; // Retorna un arreglo vacío si no hay texto o no es string
+    }
+
+    return rawText
+      .split(';') // divide por punto y coma
+      .map( termino => termino.trim() ) // limpia espacios y posibles \r 
+      .filter(termino => termino !== '') // descarta términos vacías 
+      .map(termino => ({ ingredient: termino })); // construye el objeto
+  }
+  
+  validarCodigoAtcVacuna(cadena: string): boolean {
+    // Verifica que la cadena empiece con "J07"
+    const empiezaConPrefijo = cadena.startsWith('J07');
+  
+    // Verifica que la longitud sea como máximo 7 caracteres
+    const longitudValida = cadena.length <= 7;
+  
+    // Retorna true solo si ambas condiciones se cumplen
+    return empiezaConPrefijo && longitudValida;
+  }
+
+  extraerCodigoAtcVacuna(celda: string): string | null {
+    if (!celda) return null;
+  
+    // Dividir el contenido de la celda por saltos de línea
+    const elementos = celda.split(/\r?\n/);
+  
+    // Buscar el código ATC válido
+    for (const elemento of elementos) {
+      const valor = elemento.trim();
+  
+      // Validar: empieza con J07 y longitud máxima de 7 caracteres
+      if (valor.startsWith("J07") && valor.length <= 7) {
+        return valor;
+      }
+    }
+  
+    // Si no se encuentra ningún código válido
+    return null;
+  }
+  
+
+  /**
+ * Limpia una cadena de texto según las reglas:
+ * - Elimina espacios al inicio y al final
+ * - Reemplaza comas por punto y coma
+ * - Reemplaza saltos de línea internos por punto y coma
+ * - Elimina saltos de línea al final de la cadena
+ * - Elimina espacios antes y después del punto y coma
+ */
+private limpiarCampoWHODrug(input?: string): string {
+  if (!input) return '';
+
+  return input
+    .trim() // elimina espacios al inicio y al final
+    // reemplaza saltos de línea internos por ;
+    .replace(/[\r\n]+(?!$)/g, ';')
+    // elimina saltos de línea al final (si los hay)
+    .replace(/[\r\n]+$/g, '')
+    // reemplaza comas por punto y coma // Para omitir este paso, se utiliza otro catálogo Excel auxiliar con los valores posibles existenes en VigiFlow, y mapeados manualmente a WHODrug oficial.
+    //--//.replace(/,/g, ';') //No se puede reemplazar de forma sencilla la coma por el punto y coma, porque, en varios nombres de patente WHODrug, existen comas que son parte del nombre oficial, por ejm: |(13949709002T) Hexasiil - Vacuna Conjugada (Adsorbida) Antidiftérica, Antitetánica y Contra la Tosferina (de célula entera), Hepatitis B (rADN), Poliomielitis (inactivada) y Haemophilus influenzae Tipo b|(13950602109)BE Td - Vacuna Contra La Difteria Y El Tétanos (Adsorbida, Contenido De Antígeno(s) Reducido) (Tiomersal Reducido)|.
+    // elimina espacios alrededor del ; (punto y coma)
+    .replace(/\s*;\s*/g, ';');
+}
+
+/**
+   * Verifica si algún objeto del array tiene la propiedad indicada en null.
+   * @param items Array de objetos
+   * @param prop Nombre de la propiedad a validar
+   * @returns true si existe al menos un objeto con la propiedad en null, false en caso contrario
+   */
+static tienePropiedadNula<T extends Record<string, any>>(items: T[] | null | undefined, prop: keyof T): boolean {
+  // Validar si no se recibe nada o el array está vacío
+  if (!items || items.length === 0) {
+    //console.warn("No se recibió ningún objeto para validar.");
+    return false;
+  }
+
+  // Recorrido eficiente con for...of
+  for (const obj of items) {
+    if (obj[prop] === null) {
+      return true; // se detiene en el primer hallazgo
+    }
+  }
+
+  return false; // si no encontró ninguno
+}
+
+
+
+// Función para transformar el valor a número
+/*transformarTipoEmisor(tipo: string): number | null {
+  return tipoEmisorMap[tipo] ?? null; 
+}*/
+
+private transformarTipoEmisor(tipoEmisorTexto: string): string | null {
+  // Definimos un diccionario para mapear los valores
+  let tipoEmisorMap: Record<string, string> = {
+    'Profesional de la salud': '1',
+    'Paciente / consumidor': '2',
+    'Laboratorio farmacéutico': '3',
+    'Centro regional de farmacovigilancia': '4',
+    'Otro': '5',
+  }; 
+
+  if (tipoEmisorTexto) {
+    // Normalizamos el texto
+    const tipoEmisor = tipoEmisorTexto.trim();//.toUpperCase();
+
+    // Retornamos el valor si existe en el diccionario
+    if (tipoEmisorMap[tipoEmisor] !== undefined) {
+      return tipoEmisorMap[tipoEmisor];
+    } else {
+      //console.log(`Valor de ... no reconocido: "${Texto}". Se asignará null.`);
+      return null; // return null si no se reconoce el valor
+    }
+  } else {
+    //console.log(`Valor de ... vacío o nulo: "${Texto}". Se asignará null.`);
+    return null; // return null si no se reconoce el valor
+  }  
+}
+
 
   formatoInteger = (valor: string) => {
     let resultado = 0;
@@ -806,5 +1231,9 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
   esAfirmativo(valor) {
     const val = (valor || '').toString().trim().toLowerCase();
     return val === 'si' ? true : val === 'no' ? false : null;
+  }
+  transformarTipoSiNo(valor) {
+    const val = (valor || '').toString().trim().toLowerCase();
+    return val === 'si' ? '1' : val === 'no' ? '0' : null;
   }
 }

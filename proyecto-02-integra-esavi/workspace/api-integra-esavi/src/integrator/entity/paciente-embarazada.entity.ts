@@ -18,9 +18,9 @@ export class PacienteEmbarazada extends Auditoria {
   @Column({
     name: 'EMBARAZADA_MOMENTO_VACUNA',
     nullable: true,
-    comment: 'Indica si la paciente estaba embarazada al momento de la vacunación',
+    comment: 'Indica si la paciente estaba embarazada al momento de la vacunación. Variable de tipo booleana, es parte de proceso de enriquecimiento de datos, su valor se obtiene comprobando si la variable "DNVE ESAVI TRK - Semanas gestación al recibir la vacuna" tiene o no valor. Valores esperados: true="1", false="0"',
   })
-  momentoVacuna: boolean;
+  momentoVacuna: string;
 
   /**
    * Column  of paciente embarazada
@@ -28,9 +28,9 @@ export class PacienteEmbarazada extends Auditoria {
   @Column({
     name: 'EMBARAZADA_MOMENTO_ESAVI',
     default: false,
-    comment: 'Indica si la paciente estaba embarazada al momento del ESAVI',
+    comment: 'Indica si la paciente estaba embarazada al momento del ESAVI. DHIS2 entrega este valor booleano como texto, donde true="1" y false="0".',
   })
-  momentoEsavi: boolean;
+  momentoEsavi: string;
 
   /**
    * Many to one of paciente embarazada

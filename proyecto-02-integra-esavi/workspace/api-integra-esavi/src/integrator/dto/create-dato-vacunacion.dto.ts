@@ -9,7 +9,7 @@ export class CreateDatoVacunacionDto {
   direccion: string;
   codigoMecanismoVerificacion: string;
   nombreOtroMecanismo: string;
-  fechaConstitucion: Date;
+  fechaReconstitucion: Date;
   horaConstitucion: Date;
   usuarioCreacion : string
 }

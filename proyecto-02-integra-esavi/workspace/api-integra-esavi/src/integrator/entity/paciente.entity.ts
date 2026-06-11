@@ -25,9 +25,18 @@ export class Paciente extends Auditoria {
   @Column({
     name: 'NOMBRE',
     nullable: true,
-    comment: 'Nombre completo del paciente',
+    comment: 'Nombre completo del paciente. Disponible en DHIS2.',
   })
   nombre: string;
+  /**
+   *
+   */
+  @Column({
+    name: 'INICIALES_NOMBRE',
+    nullable: true,
+    comment: 'Iniciales del nombre del paciente. Disponible en VigiFlow.',
+  })
+  inicialesNombre: string;
 
   /**
    *

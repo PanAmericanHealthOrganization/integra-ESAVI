@@ -1,0 +1,466 @@
+# Introducción
+
+## Antecedentes
+
+Los Eventos Supuestamente Atribuidos a Vacunación o Inmunización (ESAVI) representan un componente fundamental en el sistema de vigilancia de la seguridad de las vacunas (1). La detección, evaluación y respuesta oportuna a estos eventos es crucial para mantener la confianza pública en los programas de inmunización y garantizar la seguridad de las vacunas (2).
+
+La vigilancia de ESAVI se enmarca dentro del Sistema Nacional de Vigilancia Epidemiológica y sigue los lineamientos establecidos por la Organización Mundial de la Salud (OMS) y la Organización Panamericana de la Salud (OPS) (2,3). En Colombia, estos lineamientos son implementados según los protocolos del Ministerio de Salud y Protección Social y el Instituto Nacional de Salud (4,5).
+
+## Justificación
+
+```{r justificacion-stats}
+# Estadísticas que justifican el análisis
+# años_programa <- 2024 - 1980  # Años del PAI
+# vacunas_esquema <- 15  # Número aproximado de vacunas en esquema
+```
+
+El Programa Ampliado de Inmunizaciones ha demostrado ser una de las intervenciones de salud pública más exitosas, previniendo millones de muertes cada año. Sin embargo, como cualquier intervención médica, las vacunas pueden ocasionar eventos adversos. El monitoreo continuo de estos eventos permite:
+
+- Detectar señales de seguridad tempranamente
+- Caracterizar el perfil de seguridad de las vacunas
+- Tomar decisiones informadas sobre políticas de inmunización
+- Mantener la confianza pública en los programas de vacunación
+
+## Objetivos
+
+### Objetivo General
+
+Analizar los ESAVI reportados al sistema de vigilancia epidemiológica durante el período de estudio para caracterizar su perfil epidemiológico y evaluar la seguridad de las vacunas del esquema nacional.
+
+### Objetivos Específicos
+
+1. Describir las características epidemiológicas de los ESAVI reportados
+2. Analizar la distribución temporal y geográfica de los eventos
+3. Caracterizar los eventos según tipo de vacuna y grupo de edad
+4. Evaluar la gravedad y desenlace de los eventos reportados
+5. Identificar posibles señales de seguridad
+6. Formular recomendaciones para el fortalecimiento del sistema de vigilancia
+
+# Metodología
+
+## Diseño del Estudio
+
+Se realizó un estudio descriptivo de corte transversal de los ESAVI reportados al Sistema Nacional de Vigilancia Epidemiológica durante el período de análisis yyyy-mm-dd al yyyy_mm_dd.
+
+## Población de Estudio
+
+### Criterios de Inclusión
+
+- Todos los ESAVI reportados al sistema durante el período de estudio
+- Eventos con información mínima requerida para el análisis
+- Eventos ocurridos en territorio nacional
+
+### Criterios de Exclusión
+
+- Reportes duplicados
+- Eventos con información insuficiente que impida la clasificación
+- Reportes fuera del período de análisis
+
+## Variables de Estudio
+
+```{r variables-tabla}
+# Definir cada vector por separado para verificar longitudes
+variables_names <- c(
+  "Edad",
+  "Sexo", 
+  "Provincia",
+  "Tipo de vacuna",
+  "Lote de vacuna",
+  "Fecha de vacunación",
+  "Fecha de inicio del evento",
+  "Tipo de evento",
+  "Gravedad",
+  "Desenlace",
+  "Hospitalización",
+  "Causalidad"
+)
+
+variables_tipos <- c(
+  "Cuantitativa continua",
+  "Cualitativa nominal",
+  "Cualitativa nominal", 
+  "Cualitativa nominal",
+  "Cualitativa nominal",
+  "Fecha",
+  "Fecha",
+  "Cualitativa nominal",
+  "Cualitativa ordinal",
+  "Cualitativa nominal",
+  "Cualitativa nominal",
+  "Cualitativa ordinal"
+)
+
+variables_descripciones <- c(
+  "Edad en años al momento de la vacunación",
+  "Masculino, Femenino",
+  "24 provincias del Ecuador",
+  "Según esquema nacional de vacunación",
+  "Identificación del lote de la vacuna",
+  "Fecha de administración de la vacuna",
+  "Fecha de aparición del primer síntoma",
+  "Clasificación clínica del evento",
+  "Leve, moderado, grave",
+  "Recuperado, con secuelas, muerte",
+  "Sí, No",
+  "Muy probable, probable, posible, improbable"
+)
+
+# Verificar que todos los vectores tengan la misma longitud
+if (length(variables_names) == length(variables_tipos) && 
+    length(variables_tipos) == length(variables_descripciones)) {
+  
+  variables <- data.frame(
+    Variable = variables_names,
+    Tipo = variables_tipos,
+    Descripción = variables_descripciones,
+    stringsAsFactors = FALSE
+  )
+  
+} else {
+  # Mensaje de error para debugging
+  cat("Error: Longitudes diferentes -", 
+      "Variables:", length(variables_names),
+      "Tipos:", length(variables_tipos),
+      "Descripciones:", length(variables_descripciones))
+}
+
+# Crear tabla con formato condicional según el tipo de salida
+if (knitr::is_latex_output()) {
+  # Formato para PDF/LaTeX - tabla compacta que no se rompe
+  kable(variables, 
+        format = "latex",
+        booktabs = TRUE,
+        longtable = FALSE,  # Usar tabla normal para evitar saltos de página
+        caption = "Variables Incluidas en el Análisis") %>%
+    kable_styling(
+      latex_options = c("striped", "hold_position", "scale_down"),
+      font_size = 8,
+      full_width = FALSE
+    ) %>%
+    column_spec(1, bold = TRUE, width = "2.3cm") %>%
+    column_spec(2, width = "2.5cm") %>%
+    column_spec(3, width = "5.5cm")
+} else {
+  # Formato para Word/HTML
+  crear_tabla_universal(variables, 
+                       caption = "Variables Incluidas en el Análisis")
+}
+```
+
+## Fuentes de Información
+
+### Datos Primarios
+
+- Sistema Nacional de Vigilancia Epidemiológica (SIVE)
+- Formularios de notificación de ESAVI
+- Reportes de seguimiento clínico
+
+### Datos Secundarios
+
+- Registros del Programa Ampliado de Inmunizaciones
+- Datos demográficos del INEC
+- Información de dosis distribuidas y aplicadas
+
+## Análisis Estadístico
+
+### Análisis Descriptivo
+
+```{r analisis-descriptivo, eval=FALSE}
+# Ejemplo de código para análisis descriptivo
+# Estadísticas descriptivas para variables cuantitativas
+summary_stats <- datos_esavi %>%
+  summarise(
+    n = n(),
+    edad_media = mean(edad, na.rm = TRUE),
+    edad_mediana = median(edad, na.rm = TRUE),
+    edad_min = min(edad, na.rm = TRUE),
+    edad_max = max(edad, na.rm = TRUE)
+  )
+
+# Frecuencias para variables categóricas
+tabla_sexo <- table(datos_esavi$sexo)
+tabla_gravedad <- table(datos_esavi$gravedad)
+```
+
+- Medidas de tendencia central y dispersión para variables cuantitativas
+- Frecuencias absolutas y relativas para variables categóricas
+- Tasas de incidencia por 100,000 dosis administradas
+
+### Análisis Temporal
+
+```{r analisis-temporal, eval=FALSE}
+# Análisis de tendencias temporales
+tendencia_mensual <- datos_esavi %>%
+  mutate(mes_año = floor_date(fecha_evento, "month")) %>%
+  count(mes_año) %>%
+  arrange(mes_año)
+```
+
+- Series de tiempo para identificar tendencias y estacionalidad
+- Análisis de intervalos de confianza para tasas
+
+### Análisis Geográfico
+
+```{r analisis-geografico, eval=FALSE}
+# Análisis por provincias
+eventos_provincia <- datos_esavi %>%
+  count(provincia) %>%
+  arrange(desc(n))
+```
+
+- Distribución de eventos por provincias
+- Mapas de incidencia
+- Tasas ajustadas por población
+
+## Consideraciones Éticas
+
+El presente estudio utilizó datos secundarios del sistema de vigilancia epidemiológica, manteniendo la confidencialidad de la información personal de acuerdo con las normativas nacionales de protección de datos.
+
+# Resultados
+
+## Características Generales de la Población
+
+```{r carga-datos, echo=FALSE}
+# Simular datos para el ejemplo (en la práctica, cargar datos reales)
+set.seed(123)
+n_eventos <- 1248
+
+datos_simulados <- data.frame(
+  id = 1:n_eventos,
+  edad = sample(c(rep(0:1, 400), rep(2:17, 300), rep(18:59, 400), rep(60:90, 148)), n_eventos),
+  sexo = sample(c("Femenino", "Masculino"), n_eventos, replace = TRUE, prob = c(0.52, 0.48)),
+  provincia = sample(c("Pichincha", "Guayas", "Azuay", "Manabí", "Los Ríos", "Tungurahua", 
+                      "El Oro", "Chimborazo", "Imbabura", "Santo Domingo", "Otros"), 
+                    n_eventos, replace = TRUE, 
+                    prob = c(0.25, 0.20, 0.08, 0.07, 0.06, 0.05, 0.05, 0.04, 0.04, 0.04, 0.12)),
+  vacuna = sample(c("COVID-19", "Influenza", "Hepatitis B", "BCG", "Pentavalente", 
+                   "Rotavirus", "Neumococo", "SRP", "DPT", "Otros"), 
+                 n_eventos, replace = TRUE,
+                 prob = c(0.35, 0.15, 0.10, 0.08, 0.07, 0.06, 0.05, 0.05, 0.04, 0.05)),
+  gravedad = sample(c("Leve", "Moderado", "Grave"), n_eventos, replace = TRUE, prob = c(0.75, 0.20, 0.05)),
+  desenlace = sample(c("Recuperado", "En seguimiento", "Con secuelas", "Muerte"), 
+                    n_eventos, replace = TRUE, prob = c(0.85, 0.12, 0.025, 0.005))
+)
+
+# Crear grupos de edad
+datos_simulados$grupo_edad <- cut(datos_simulados$edad,
+                                 breaks = c(-1, 1, 4, 11, 17, 59, 100),
+                                 labels = c("< 2 años", "2-4 años", "5-11 años", 
+                                           "12-17 años", "18-59 años", "60+ años"))
+```
+
+Durante el período de análisis se reportaron **`r format(n_eventos, big.mark = ",")`** ESAVI al sistema de vigilancia epidemiológica.
+
+### Distribución por Edad y Sexo
+
+```{r demografia-tabla}
+# Tabla resumen por edad y sexo
+demo_tabla <- datos_simulados %>%
+  group_by(grupo_edad, sexo) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  pivot_wider(names_from = sexo, values_from = n, values_fill = 0) %>%
+  mutate(Total = Femenino + Masculino,
+         `% del Total` = round(Total / sum(Total) * 100, 1))
+
+kable(demo_tabla, 
+      booktabs = TRUE,
+      caption = "Distribución de ESAVI por Grupo de Edad y Sexo") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  ) %>%
+  add_header_above(c(" " = 1, "Sexo" = 2, " " = 2))
+```
+
+```{r piramide-edad, fig.cap="Pirámide de Edad de los Casos de ESAVI Reportados"}
+# Crear pirámide de edad
+piramide_data <- datos_simulados %>%
+  count(grupo_edad, sexo) %>%
+  mutate(n_plot = ifelse(sexo == "Masculino", -n, n))
+
+ggplot(piramide_data, aes(x = grupo_edad, y = n_plot, fill = sexo)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = function(x) abs(x),
+                    breaks = seq(-200, 200, 50)) +
+  scale_fill_manual(values = c("Femenino" = "#E74C3C", "Masculino" = "#3498DB")) +
+  labs(
+    title = "Distribución de ESAVI por Edad y Sexo",
+    x = "Grupo de Edad",
+    y = "Número de Casos",
+    fill = "Sexo"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+```
+
+### Distribución Geográfica
+
+```{r distribucion-geografica}
+# Tabla de distribución por provincias
+geo_tabla <- datos_simulados %>%
+  count(provincia, sort = TRUE) %>%
+  mutate(
+    porcentaje = round(n / sum(n) * 100, 1),
+    tasa_100k = round(n / c(2800000, 4100000, 880000, 1560000, 920000, 
+                            590000, 720000, 520000, 480000, 460000, 
+                            rep(200000, 1)) * 100000, 1)  # Poblaciones aproximadas
+  )
+
+kable(geo_tabla, 
+      col.names = c("Provincia", "Casos", "% del Total", "Tasa por 100,000 hab"),
+      booktabs = TRUE,
+      caption = "Distribución de ESAVI por Provincia") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+```
+
+```{r mapa-incidencia, fig.cap="Distribución Geográfica de ESAVI por Provincia"}
+# Gráfico de barras por provincia
+ggplot(head(geo_tabla, 10), aes(x = reorder(provincia, n), y = n)) +
+  geom_col(fill = "#3498DB", alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "ESAVI Reportados por Provincia",
+    subtitle = "Top 10 provincias con mayor número de casos",
+    x = "Provincia",
+    y = "Número de Casos"
+  ) +
+  geom_text(aes(label = n), hjust = -0.1, size = 3) +
+  theme_minimal()
+```
+
+## Caracterización por Tipo de Vacuna
+
+```{r vacunas-analisis}
+# Análisis por tipo de vacuna
+vacunas_tabla <- datos_simulados %>%
+  count(vacuna, sort = TRUE) %>%
+  mutate(
+    porcentaje = round(n / sum(n) * 100, 1),
+    tasa_100k_dosis = round(n / c(2500000, 800000, 600000, 400000, 350000,
+                                  300000, 280000, 250000, 200000, 150000) * 100000, 1)
+  )
+
+kable(vacunas_tabla, 
+      col.names = c("Tipo de Vacuna", "Casos", "% del Total", "Tasa por 100,000 dosis"),
+      booktabs = TRUE,
+      caption = "ESAVI por Tipo de Vacuna") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+```
+
+```{r vacunas-grafico, fig.cap="Distribución de ESAVI por Tipo de Vacuna"}
+ggplot(vacunas_tabla, aes(x = reorder(vacuna, n), y = n)) +
+  geom_col(fill = "#E67E22", alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "ESAVI Reportados por Tipo de Vacuna",
+    x = "Tipo de Vacuna",
+    y = "Número de Casos"
+  ) +
+  geom_text(aes(label = paste0(n, " (", porcentaje, "%)")), 
+            hjust = -0.1, size = 3) +
+  theme_minimal()
+```
+
+## Análisis de Gravedad y Desenlaces
+
+```{r gravedad-analisis}
+# Análisis de gravedad
+gravedad_tabla <- datos_simulados %>%
+  count(gravedad) %>%
+  mutate(porcentaje = round(n / sum(n) * 100, 1))
+
+kable(gravedad_tabla, 
+      col.names = c("Gravedad", "Casos", "% del Total"),
+      booktabs = TRUE,
+      caption = "Distribución de ESAVI por Gravedad") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+
+# Análisis de desenlaces
+desenlace_tabla <- datos_simulados %>%
+  count(desenlace) %>%
+  mutate(porcentaje = round(n / sum(n) * 100, 1))
+
+kable(desenlace_tabla, 
+      col.names = c("Desenlace", "Casos", "% del Total"),
+      booktabs = TRUE,
+      caption = "Distribución de ESAVI por Desenlace") %>%
+  kable_styling(
+    latex_options = c("striped", "hold_position"),
+    full_width = FALSE
+  )
+```
+
+```{r gravedad-desenlace, fig.cap="Distribución de ESAVI por Gravedad y Desenlace"}
+# Gráfico combinado
+p1 <- ggplot(gravedad_tabla, aes(x = "", y = n, fill = gravedad)) +
+  geom_col() +
+  coord_polar("y", start = 0) +
+  scale_fill_manual(values = c("Leve" = "#2ECC71", "Moderado" = "#F39C12", "Grave" = "#E74C3C")) +
+  labs(title = "Distribución por Gravedad", fill = "Gravedad") +
+  theme_void() +
+  theme(legend.position = "bottom")
+
+p2 <- ggplot(desenlace_tabla, aes(x = reorder(desenlace, n), y = n)) +
+  geom_col(fill = "#9B59B6", alpha = 0.8) +
+  coord_flip() +
+  labs(
+    title = "Distribución por Desenlace",
+    x = "Desenlace",
+    y = "Número de Casos"
+  ) +
+  geom_text(aes(label = paste0(n, " (", porcentaje, "%)")), 
+            hjust = -0.1, size = 3) +
+  theme_minimal()
+
+# Mostrar gráficos por separado (más compatible)
+print(p1)
+print(p2)
+```
+
+## Análisis Temporal
+
+```{r tendencia-temporal, fig.cap="Tendencia Temporal de Notificación de ESAVI"}
+# Simular datos temporales
+set.seed(123)
+fechas_sim <- seq(as.Date("2024-01-01"), as.Date("2024-10-31"), by = "day")
+eventos_diarios <- rpois(length(fechas_sim), lambda = 4)
+
+datos_temporales <- data.frame(
+  fecha = fechas_sim,
+  eventos = eventos_diarios
+) %>%
+  mutate(
+    mes = floor_date(fecha, "month"),
+    semana = floor_date(fecha, "week")
+  )
+
+# Agregación mensual
+eventos_mensuales <- datos_temporales %>%
+  group_by(mes) %>%
+  summarise(total_eventos = sum(eventos), .groups = "drop")
+
+ggplot(eventos_mensuales, aes(x = mes, y = total_eventos)) +
+  geom_line(color = "#3498DB", size = 1.2) +
+  geom_point(color = "#E74C3C", size = 3) +
+  scale_x_date(date_labels = "%b %Y", date_breaks = "1 month") +
+  labs(
+    title = "Tendencia Mensual de Notificación de ESAVI",
+    subtitle = "Enero - Octubre 2024",
+    x = "Mes",
+    y = "Número de ESAVI Reportados"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+\newpage

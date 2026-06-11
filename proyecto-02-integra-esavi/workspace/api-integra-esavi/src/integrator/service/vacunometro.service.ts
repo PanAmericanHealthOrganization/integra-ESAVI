@@ -206,10 +206,9 @@ export class VacunometroService implements IService<VacunometroCreateDto, Vacuno
       const result = [];
       for (let i = 0; i < vacunometros.length; i += CHUNK_SIZE) {
         const chunk = vacunometros.slice(i, i + CHUNK_SIZE);
-        result.push(this.vacunometroRepository.insert(chunk));
+        result.push(await this.vacunometroRepository.insert(chunk));
         this.logger.log(`Insertados registros ${i + 1} a ${i + chunk.length} de ${vacunometros.length}`);
       }
-      Promise.all(result);
 
       // Retornar array vacío ya que INSERT no retorna los registros creados
       // Si necesitas los registros, deberías hacer un SELECT después

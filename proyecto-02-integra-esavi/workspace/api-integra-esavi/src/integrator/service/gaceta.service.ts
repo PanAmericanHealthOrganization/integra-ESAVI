@@ -347,7 +347,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
 
       const t = await this.gacetaRepository.save(gaceta);
       // ejecutar de forma sincrona el script de renderizado
-      this.ejecutarRenderScript(new Date(createGacetaDto.desde), new Date(createGacetaDto.hasta))
+      this.ejecutarRenderScript(createGacetaDto.desde, createGacetaDto.hasta)
         .then(() => {
           this.logger.log(
             `Renderizado ejecutado tras actualización de gaceta, ${createGacetaDto.desde}/${createGacetaDto.hasta}`,

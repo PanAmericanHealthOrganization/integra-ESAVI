@@ -1,0 +1,158 @@
+# Metodología
+
+## Diseño del Estudio
+
+Se realizó un estudio descriptivo de corte transversal de los ESAVI reportados al Sistema Nacional de Vigilancia Epidemiológica durante el período de análisis.
+
+## Población de Estudio
+
+### Criterios de Inclusión
+
+- Todos los ESAVI graves y no graves reportados al sistema durante el período de estudio
+- Eventos con información mínima requerida para el análisis
+- Eventos ocurridos en territorio nacional
+
+### Criterios de Exclusión
+
+- Reportes duplicados
+- Eventos con información insuficiente que impida la clasificación según criterios Brighton Collaboration (3)
+- Reportes fuera del período de análisis
+
+## Variables de Estudio
+
+```{r variables-tabla}
+variables <- data.frame(
+  Variable = c(
+    "Edad",
+    "Sexo", 
+    "Provincia",
+    "Tipo de vacuna",
+    "Lote de vacuna",
+    "Fecha de vacunación",
+    "Fecha de inicio del evento",
+    "Tipo de evento",
+    "Gravedad",
+    "Desenlace",
+    "Hospitalización",
+    "Causalidad"
+  ),
+  Tipo = c(
+    "Cuantitativa continua",
+    "Cualitativa nominal",
+    "Cualitativa nominal", 
+    "Cualitativa nominal",
+    "Cualitativa nominal",
+    "Fecha",
+    "Fecha",
+    "Cualitativa nominal",
+    "Cualitativa ordinal",
+    "Cualitativa nominal",
+    "Cualitativa nominal",
+    "Cualitativa ordinal"
+  ),
+  Descripción = c(
+    "Edad en años al momento de la vacunación",
+    "Masculino, Femenino",
+    "24 provincias del Ecuador",
+    "Según esquema nacional de vacunación",
+    "Identificación del lote de la vacuna",
+    "Fecha de administración de la vacuna",
+    "Fecha de aparición del primer síntoma",
+    "Clasificación clínica del evento",
+    "Leve, moderado, grave",
+    "Recuperado, con secuelas, muerte",
+    "Sí, No",
+    "Muy probable, probable, posible, improbable"
+  )
+)
+
+# Crear tabla con formato condicional según el tipo de salida
+if (knitr::is_latex_output()) {
+  # Formato para PDF/LaTeX - tabla compacta que no se rompe
+  kable(variables, 
+        format = "latex",
+        booktabs = TRUE,
+        longtable = FALSE,  # Usar tabla normal para evitar saltos de página
+        caption = "Variables Incluidas en el Análisis") %>%
+    kable_styling(
+      latex_options = c("striped", "hold_position", "scale_down"),
+      font_size = 8,
+      full_width = FALSE
+    ) %>%
+    column_spec(1, bold = TRUE, width = "2.3cm") %>%
+    column_spec(2, width = "2.5cm") %>%
+    column_spec(3, width = "5.5cm")
+} else {
+  # Formato para Word/HTML
+  crear_tabla_universal(variables, 
+                       caption = "Variables Incluidas en el Análisis",
+                       width_spec = c("3cm", "3cm", "7cm"))
+}
+```
+
+## Fuentes de Información
+
+### Datos Primarios
+
+- DHIS2, formulario de notificación ESAVI
+- Reportes de seguimiento clínico y epidemiológico
+
+### Datos Secundarios
+
+- Registros del Programa Ampliado de Inmunizaciones
+- Información de dosis distribuidas y aplicadas a nivel nacional
+
+## Análisis Estadístico
+
+### Análisis Descriptivo
+
+```{r analisis-descriptivo, eval=FALSE}
+# Ejemplo de código para análisis descriptivo
+# Estadísticas descriptivas para variables cuantitativas
+summary_stats <- datos_esavi %>%
+  summarise(
+    n = n(),
+    edad_media = mean(edad, na.rm = TRUE),
+    edad_mediana = median(edad, na.rm = TRUE),
+    edad_min = min(edad, na.rm = TRUE),
+    edad_max = max(edad, na.rm = TRUE)
+  )
+
+# Frecuencias para variables categóricas
+tabla_sexo <- table(datos_esavi$sexo)
+tabla_gravedad <- table(datos_esavi$gravedad)
+```
+
+- Medidas de tendencia central y dispersión para variables cuantitativas
+- Frecuencias absolutas y relativas para variables categóricas
+- Tasas de incidencia por 100,000 dosis administradas
+
+### Análisis Temporal
+
+```{r analisis-temporal, eval=FALSE}
+# Análisis de tendencias temporales
+tendencia_mensual <- datos_esavi %>%
+  mutate(mes_año = floor_date(fecha_evento, "month")) %>%
+  count(mes_año) %>%
+  arrange(mes_año)
+```
+
+- Series de tiempo para identificar tendencias y estacionalidad
+- Análisis de intervalos de confianza para tasas
+
+### Análisis Geográfico
+
+```{r analisis-geografico, eval=FALSE}
+# Análisis por provincias
+eventos_provincia <- datos_esavi %>%
+  count(provincia) %>%
+  arrange(desc(n))
+```
+
+- Distribución de eventos por provincias
+- Mapas de incidencia
+- Tasas ajustadas por población
+
+## Consideraciones Éticas
+
+El presente estudio utilizó datos secundarios del sistema de vigilancia epidemiológica, manteniendo la confidencialidad de la información personal de acuerdo con las normativas nacionales de protección de datos.

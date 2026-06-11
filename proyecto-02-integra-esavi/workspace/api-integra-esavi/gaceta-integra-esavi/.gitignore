@@ -1,0 +1,12 @@
+*.pdf
+*.docx
+*.html
+*.log
+logs/
+informe_cache/*
+
+**/figure_labels/**
+**/figure/**
+**/temp/**
+/output/*
+.env

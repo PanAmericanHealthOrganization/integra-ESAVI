@@ -2,17 +2,20 @@ export class CreateDatoVacunaDto {
   codigoAtc: string;
   rolVacuna: string; // Se mantiene como string en el DTO para recibir la descripción
   sistemaDeCodificacion: string;
-  nombreVacuna: string;
-  nombreVacunaPatenteWhoDrug : string;
-  nombreVacunaNormalizada: string;
-  principioActivoWhoDrug: string;
+  
+  nombreVacPatenteWHODrug: string;
+  //nombreVacunaNormalizada: string;
+  //principioActivoWhoDrug: string;
 
+  drugName: string; //nombreVacuna: string;
   drugCode : string;
-  mahholdersJson : any
-  activeIngredientsJson : any
+  maHolderJsonb : any; //mahholdersJson: any
+  activeIngredientJson : any;
+  acIngredientTranslationJson: any;
+  medicinalProductId: string;//identificadorVacuna: string;
+  esGenerico: string;
 
-  codigoOtro: string;
-  identificadorVacuna: string;
+  codigoOtro: string;  
   nombreFabricante: string;
   nombreFabricanteWhoDrug: string;
   codigoFabricanteWhoDrug: string;
@@ -24,8 +27,8 @@ export class CreateDatoVacunaDto {
   fechaVencimientoVacuna: Date;
   nombreDiluyenteVacuna: string;
   fechaVencimientoDiluyente: Date;
-  paisAutorizacion: string;
-  concentracion: string;
+  paisAutorizacionIso3Code: string;//paisAutorizacion: string;
+  strengthPotencia: string;//concentracion: string;
   ingredienteSospechoso: string;
   accionTomada: string;
   informacionAdicionalMedicamento: string;

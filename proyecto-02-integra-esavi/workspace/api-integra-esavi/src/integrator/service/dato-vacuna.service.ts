@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateDatoVacunaDto } from '../dto/create-dato-vacuna.dto';
 import { UpdateDatoVacunaDto } from '../dto/update-dato-vacuna.dto';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
@@ -34,7 +34,7 @@ export class DatoVacunaService {
       // 1. Buscar si ya existe un DatoVacuna con los mismos valores (nombreVacuna, codigoAtc, numeroLote, notificacion)
       const existingDatoVacuna = await this.datoVacunaRepository.findOne({
         where: {
-          nombreVacuna: createDto.nombreVacuna,
+          drugName: createDto.drugName,
           codigoAtc: createDto.codigoAtc,
           numeroLote: createDto.numeroLote,
           notificacion: notificacion, // Asociamos la notificación al buscar
@@ -47,7 +47,7 @@ export class DatoVacunaService {
         
         if (rolVacuna) {
           existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
-        }
+        } //para no implementar más control de flujo en el servicio, se reutiliza el método de VigiFlow también para DHIS2.
         
         Object.assign(existingDatoVacuna, otherFields);
         return this.datoVacunaRepository.save(existingDatoVacuna);
@@ -99,7 +99,12 @@ export class DatoVacunaService {
         const existingDatoVacuna = await this.datoVacunaRepository.findOne({
           where: {
             notificacion: { id: notificacion.id },
-            nombreVacuna: dto.nombreVacuna, // Buscar por nombreVacuna además de la notificación
+            drugName: dto.drugName, // Buscar por nombreVacuna además de la notificación
+            drugCode: dto.drugCode,
+            codigoAtc: dto.codigoAtc,
+            medicinalProductId: dto.medicinalProductId,
+            //activeIngredientJson: dto.activeIngredientJson,
+            //acIngredientTranslationJson: dto.acIngredientTranslationJson,
           },
         });
 
@@ -129,7 +134,8 @@ export class DatoVacunaService {
       throw new Error('Hubo un problema al crear o actualizar los datos de vacuna');
     } finally {
       // Registro de la operación
-      this.logger.log(`DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`);
+      // this.logger.log(`DatoVacuna(s) procesado(s): ${JSON.stringify(createDtos)}`); // Muy útil en ambiente de desarrollo, pero puede ser demasiado verboso en producción, considerar ajustar el nivel de log o el contenido registrado.
+      this.logger.log(`Registro de DatoVacuna ha sido procesado`);
     }
   }
 
@@ -139,11 +145,17 @@ export class DatoVacunaService {
    * @param createDto
    * @returns
    */
-  async findByNotificacionId(uuidNotificacion: string): Promise<DatoVacuna[]> {
+  async findByNotifIdDtoMinimo(uuidNotificacion: string): Promise<DatoVacuna[]> {
     try {
       const datosVacuna = await this.datoVacunaRepository.find({
         where: {
           notificacion: { id: uuidNotificacion }, // Buscar por el id de la notificación
+          drugName: IsNull(),
+          rolVacuna: IsNull(),
+          numeroLote: IsNull(),
+          nombreVacPatenteWHODrug: IsNull(),
+          codigoAtc: IsNull(),
+          indicacionMeddra: IsNull(),
         },
       });
       return datosVacuna || []; // Devolver un arreglo vacío si no se encuentran registros
@@ -184,14 +196,28 @@ export class DatoVacunaService {
    * @returns
    */
   async findOne(uuid: string): Promise<DatoVacuna> {
-    const antecedenteEmbarazo = await this.datoVacunaRepository.findOne({
-      where: {
+    const datoVacuna = await this.datoVacunaRepository.findOne({
+      /*where: {
         isActive: true,
         id: uuid,
+        nombreVacuna: null,
+        nombreVacPatenteWHODrug: null,
+        numeroLote: null,
+        codigoAtc: null,
+        indicacionMeddra: null,
+      },*/
+      where: { 
+        isActive: true, 
+        id: uuid, 
+        drugName: IsNull(), 
+        nombreVacPatenteWHODrug: IsNull(), 
+        numeroLote: IsNull(), 
+        codigoAtc: IsNull(), 
+        indicacionMeddra: IsNull(), 
       },
     });
-    if (antecedenteEmbarazo) {
-      return antecedenteEmbarazo;
+    if (datoVacuna) {
+      return datoVacuna;
     }
     throw new EntityNotFoundException('DatoVacuna', uuid);
   }
@@ -204,13 +230,17 @@ export class DatoVacunaService {
    */
   async update(uuid: string, vacunaDto: UpdateDatoVacunaDto): Promise<DatoVacuna> {
     const datoVacuna = await this.findOne(uuid);
-    const { rolVacuna, ...otherFields } = vacunaDto;
+    const { rolVacuna, nombreVacPatenteWHODrug, ...otherFields } = vacunaDto;
     
     if (rolVacuna) {
       datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
     }
+    if (vacunaDto.nombreVacPatenteWHODrug) {
+       datoVacuna.nombreVacPatenteWHODrug = vacunaDto.nombreVacPatenteWHODrug; 
+    }
     
     Object.assign(datoVacuna, otherFields);
-    return this.datoVacunaRepository.save(datoVacuna);
+    const savedDatoVacuna = await this.datoVacunaRepository.save(datoVacuna);
+    return savedDatoVacuna;
   }
 }

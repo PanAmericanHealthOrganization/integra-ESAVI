@@ -33,7 +33,7 @@ export class MedicamentoService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(`Medicamento has been created(createOneToMany): ${JSON.stringify(createDto)}`);
+      this.logger.log(`Medicamento has been created(createOneToMany)`);//: ${JSON.stringify(createDto)}`);
     }
   }
 

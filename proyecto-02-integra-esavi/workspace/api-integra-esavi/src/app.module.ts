@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import 'reflect-metadata';
-import { DataqualityModule } from './dataquality/dataquality.module';
 import { Dhis2IntegratorModule } from './dhis2-integrator/dhis2-integrator.module';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
+import { DataqualityModule } from './dataquality/dataquality.module';
+import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
 
@@ -16,7 +17,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     }),
     IntegratorModule,
     Dhis2IntegratorModule,
-    //VacunacionIntegratorModule,
+    //VacunacionIntegratorModule, // Temporarily disabled. Enable when update the ORACLE DATABASE credentials.
     VigiflowIntegratorModule,
     WhodrugsModule,
     MeddraModule,
