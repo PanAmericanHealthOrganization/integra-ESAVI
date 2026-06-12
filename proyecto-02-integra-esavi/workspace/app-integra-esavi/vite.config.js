@@ -14,8 +14,14 @@ export default defineConfig({
         }
     },
     resolve: {
-        alias: {
-            '@': '/src',
-        },
+        alias: [
+            // @mui/icons-material v5 es CJS sin campo "exports"; ra-ui-materialui
+            // (type: module) lo importa con interop estilo Node y los iconos llegan
+            // como {default: Componente} => "Element type is invalid ... got: object".
+            // Se fuerza la build ESM de los iconos para evitar la interop CJS.
+            { find: /^@mui\/icons-material$/, replacement: '@mui/icons-material/esm/index.js' },
+            { find: /^@mui\/icons-material\/(?!esm\/)(.+)$/, replacement: '@mui/icons-material/esm/$1.js' },
+            { find: '@', replacement: '/src' },
+        ],
     },
 });
