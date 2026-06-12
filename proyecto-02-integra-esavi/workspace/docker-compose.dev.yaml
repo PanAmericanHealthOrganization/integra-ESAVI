@@ -1,0 +1,120 @@
+# Entorno de DESARROLLO completo de Integra-ESAVI
+# Levanta: Postgres + init de BD + Keycloak + API (NestJS, hot reload) + APP (Vite, HMR)
+#
+#   docker compose -f docker-compose.dev.yaml up --build
+#
+# URLs:
+#   APP (React):     http://localhost:5173
+#   API (NestJS):    http://localhost:8081
+#   Keycloak:        http://localhost:8080  (admin / admin_password)
+#   Postgres:        localhost:5433         (dhis / dhis, BD dhi_esavi)
+
+name: integra-esavi-dev
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_esavi_dev
+    environment:
+      POSTGRES_USER: dhis
+      POSTGRES_PASSWORD: dhis
+      POSTGRES_DB: dhi_esavi
+      TZ: America/Guayaquil
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dhis -d dhi_esavi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  db-init:
+    image: postgres:15
+    container_name: db_init_esavi_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: dhis
+    volumes:
+      - ./api-integra-esavi/scripts/init-db.sh:/init-db.sh
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.3
+    container_name: keycloak_esavi_dev
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin_password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password123
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api-integra-esavi/scripts/keycloak-realm.json:/opt/keycloak/data/import/realm-export.json
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+  api:
+    build:
+      context: ./api-integra-esavi
+      dockerfile: Dockerfile.dev
+    container_name: api_esavi_dev
+    ports:
+      - "8081:8081"
+    volumes:
+      # Código fuente montado para hot reload (nest start --watch)
+      - ./api-integra-esavi:/app
+      # node_modules viven en un volumen (no se pisan con los del host/macOS)
+      - api_node_modules:/app/node_modules
+    environment:
+      # Dentro de la red de Docker la BD es postgres:5432 (no localhost:5433).
+      # Estas variables tienen prioridad sobre el archivo .env montado.
+      HOST_DATABASE: postgres
+      PORT_DATABASE: 5432
+      WHD_DB_HOST: postgres
+      WHD_DB_PORT: 5432
+      MDD_DB_HOST: postgres
+      MDD_DB_PORT: 5432
+      # Chromium instalado en la imagen (reemplaza la ruta de Chrome de macOS)
+      PATH_BROWSER_PUPPETEER: /usr/bin/chromium
+      PATH_GACETA_ESAVI_PROJECT: /app/gaceta-integra-esavi
+      TZ: America/Guayaquil
+      # Watch confiable sobre bind mounts de Docker Desktop
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  app:
+    build:
+      context: ./app-integra-esavi
+      dockerfile: Dockerfile.dev
+    container_name: app_esavi_dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./app-integra-esavi:/app
+      - app_node_modules:/app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - api
+      - keycloak
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  api_node_modules:
+  app_node_modules:

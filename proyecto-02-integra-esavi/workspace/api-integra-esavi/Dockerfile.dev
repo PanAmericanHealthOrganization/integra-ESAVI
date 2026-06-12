@@ -1,0 +1,27 @@
+# Imagen de desarrollo: NestJS con hot reload (pnpm start:dev)
+# El código fuente se monta como volumen desde docker-compose.dev.yaml
+FROM node:22-bookworm-slim
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true \
+    TZ=America/Guayaquil
+
+# Chromium para la generación de PDFs con Puppeteer
+# (la imagen de producción además instala R + Quarto para la gaceta;
+#  se omiten aquí para mantener liviana la imagen de desarrollo)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      chromium \
+      && rm -rf /var/lib/apt/lists/*
+
+# pnpm 10 (el pnpm-workspace.yaml usa "allowBuilds", propio de pnpm >= 10)
+RUN npm install -g pnpm@10
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install
+
+COPY . .
+
+EXPOSE 8081
+
+CMD ["pnpm", "run", "start:dev"]
