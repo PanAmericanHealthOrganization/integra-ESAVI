@@ -89,14 +89,14 @@ export class DimExactitudService {
     const listaVacunas = ['COVID 19', 'HB ADULTO', 'PENTAVALENTE']; // Ejemplo de dominio de vacunas
     const query = `
     select
-    count(tn."NOMBRE_VACUNA") filter (where tn."NOMBRE_VACUNA" is not null) as "totalRegistros",
-    count(tn."NOMBRE_VACUNA") filter (where tn."NOMBRE_VACUNA" in (${listaVacunas
+    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" is not null) as "totalRegistros",
+    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})) "totalRegistrosValidos",
-    count(tn."NOMBRE_VACUNA") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
+    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" not in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})) "totalRegistrosNoValidos"
-    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."NOMBRE_VACUNA" not in (${listaVacunas
+    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."DRUG_NAME" not in (${listaVacunas
       .map((v) => `'${v}'`)
       .join(', ')})), '[]') as "idNotificacionesNoValidos"
     from

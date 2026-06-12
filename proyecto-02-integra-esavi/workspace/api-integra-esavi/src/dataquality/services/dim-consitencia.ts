@@ -462,12 +462,12 @@ export class DimConsistenciaService {
         count(*) filter (
         where
         tdvn."FECHA_VACUNACION" is not null
-        and tdv."NOMBRE_VACUNA" is not null) as "totalRegistrosValidos",
+        and tdv."DRUG_NAME" is not null) as "totalRegistrosValidos",
         count(*) filter (
         where
         tdvn."FECHA_VACUNACION" is null
-        or tdv."NOMBRE_VACUNA" is null) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."NOMBRE_VACUNA" is null), '[]') as "idNotificacionesNoValidos"
+        or tdv."DRUG_NAME" is null) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."DRUG_NAME" is null), '[]') as "idNotificacionesNoValidos"
       from
         dhi_esavi."TR_NOTIFICACION" tn
       inner join dhi_esavi."TR_DATO_VACUNACION" tdvn on
@@ -665,9 +665,11 @@ export class DimConsistenciaService {
    */
   private async _integridadFechaDeMuerte(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Muerte para el día ${day.toISOString()}`);
+    // Las banderas de gravedad (MUERTE, RIESGO_VIDA, etc.) son varchar en la BD:
+    // el integrador DHIS2 guarda '1'/'0' y el de Vigiflow 'true'/'false'.
     const query = `
       select
-        count(*) filter (where tge."MUERTE" = true) as "totalRegistros",
+        count(*) filter (where tge."MUERTE" in ('1', 'true')) as "totalRegistros",
         count(*) filter (
           where
             tde."FECHAMUERTE" is not null
@@ -678,7 +680,7 @@ export class DimConsistenciaService {
         ) as "totalRegistrosValidos",
         count(*) filter (
           where 
-            tge."MUERTE" = true and (
+            tge."MUERTE" in ('1', 'true') and (
             tde."FECHAMUERTE" is null
             or tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO"
             or tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION"
@@ -741,44 +743,41 @@ export class DimConsistenciaService {
       count(*) filter (where tde."TIPO_GRAVEDAD" = 'GRAVE') as "totalRegistros",
       count(*) filter (
         where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and 
+        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
         (
-          tde."MUERTE" = true OR
-          tde."RIESGO_VIDA" = true OR
-          tde."DISCAPACIDAD" = true OR
-          tde."HOSPITALIZACION" = true OR
-          tde."ANOMALIA_CONGENITA" = true OR
-          tde."ABORTO" = true OR
-          tde."MUERTE_FETAL" = true OR
-          tde."OTROS_EVENTOS_IMPORTANTES" = true
+          tde."MUERTE" in ('1', 'true') OR
+          tde."RIESGO_VIDA" in ('1', 'true') OR
+          tde."DISCAPACIDAD" in ('1', 'true') OR
+          tde."HOSPITALIZACION" in ('1', 'true') OR
+          tde."ANOMALIA_CONGENITA" in ('1', 'true') OR
+          tde."ABORTO" in ('1', 'true') OR
+          tde."MUERTE_FETAL" in ('1', 'true')
         ))
       ) as "totalRegistrosValidos",
       count(*) filter (
         where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and  
+        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
         (
-          tde."MUERTE" = false AND
-          tde."RIESGO_VIDA" = false AND
-          tde."DISCAPACIDAD" = false AND
-          tde."HOSPITALIZACION" = false AND
-          tde."ANOMALIA_CONGENITA" = false AND
-          tde."ABORTO" = false AND
-          tde."MUERTE_FETAL" = false AND
-          tde."OTROS_EVENTOS_IMPORTANTES" = false
+          tde."MUERTE" in ('0', 'false') AND
+          tde."RIESGO_VIDA" in ('0', 'false') AND
+          tde."DISCAPACIDAD" in ('0', 'false') AND
+          tde."HOSPITALIZACION" in ('0', 'false') AND
+          tde."ANOMALIA_CONGENITA" in ('0', 'false') AND
+          tde."ABORTO" in ('0', 'false') AND
+          tde."MUERTE_FETAL" in ('0', 'false')
         ))
       ) as "totalRegistrosNoValidos"
       , coalesce(json_agg(DISTINCT tn."ID") filter (
         where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and  
+        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
         (
-          tde."MUERTE" = false AND
-          tde."RIESGO_VIDA" = false AND
-          tde."DISCAPACIDAD" = false AND
-          tde."HOSPITALIZACION" = false AND
-          tde."ANOMALIA_CONGENITA" = false AND
-          tde."ABORTO" = false AND
-          tde."MUERTE_FETAL" = false AND
-          tde."OTROS_EVENTOS_IMPORTANTES" = false
+          tde."MUERTE" in ('0', 'false') AND
+          tde."RIESGO_VIDA" in ('0', 'false') AND
+          tde."DISCAPACIDAD" in ('0', 'false') AND
+          tde."HOSPITALIZACION" in ('0', 'false') AND
+          tde."ANOMALIA_CONGENITA" in ('0', 'false') AND
+          tde."ABORTO" in ('0', 'false') AND
+          tde."MUERTE_FETAL" in ('0', 'false')
         ))
       ), '[]') as "idNotificacionesNoValidos"
       
@@ -806,8 +805,7 @@ export class DimConsistenciaService {
           HOSPITALIZACION
           ANOMALIA_CONGENITA
           ABORTO
-          MUERTE_FETAL
-          OTROS_EVENTOS_IMPORTANTES`,
+          MUERTE_FETAL`,
 
       descripcionRegla:
         'La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha',
@@ -830,14 +828,14 @@ export class DimConsistenciaService {
           where
             tde2."FECHAMUERTE" is not null
             and tde."TIPO_GRAVEDAD" = 'GRAVE'
-            and tde."MUERTE" = true
+            and tde."MUERTE" in ('1', 'true')
         ) as "totalRegistrosValidos",
         count(*) filter (
           where
             tde2."FECHAMUERTE" is not null
             and (
               tde."TIPO_GRAVEDAD" != 'GRAVE'
-              or tde."MUERTE" = false
+              or tde."MUERTE" in ('0', 'false')
             )
         ) as "totalRegistrosNoValidos"
       , coalesce(json_agg(DISTINCT tn."ID") filter (
@@ -845,7 +843,7 @@ export class DimConsistenciaService {
             tde2."FECHAMUERTE" is not null
             and (
               tde."TIPO_GRAVEDAD" != 'GRAVE'
-              or tde."MUERTE" = false
+              or tde."MUERTE" in ('0', 'false')
             )
         ), '[]') as "idNotificacionesNoValidos" 
       from
@@ -879,17 +877,17 @@ export class DimConsistenciaService {
         count(*) as "totalRegistros", 
         count(*) filter (
           where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" = true OR tpe."EMBARAZADA_MOMENTO_ESAVI" = true)
+            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
             and upper(tc."DESCRIPCION_HOMOLOGADA") = 'MUJER'
         ) as "totalRegistrosValidos",
         count(*) filter (
           where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" = true OR tpe."EMBARAZADA_MOMENTO_ESAVI" = true)
+            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
             and upper(tc."DESCRIPCION_HOMOLOGADA") != 'MUJER'
         ) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (
           where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" = true OR tpe."EMBARAZADA_MOMENTO_ESAVI" = true)
+            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
             and upper(tc."DESCRIPCION_HOMOLOGADA") != 'MUJER'
         ), '[]') as "idNotificacionesNoValidos"
       from
