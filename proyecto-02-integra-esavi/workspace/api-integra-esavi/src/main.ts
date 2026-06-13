@@ -12,7 +12,18 @@ dotenv.config();
 process.env.TZ = 'America/Guayaquil';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const allowedOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((o) => o.trim())
+    : true;
+
+  const app = await NestFactory.create(AppModule, {
+    cors: {
+      origin: allowedOrigins,
+      methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY'],
+      credentials: true,
+    },
+  });
   const configService = app.get(ConfigService);
   app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
