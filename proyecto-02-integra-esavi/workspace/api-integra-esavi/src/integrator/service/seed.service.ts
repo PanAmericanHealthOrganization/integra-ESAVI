@@ -72,6 +72,13 @@ export class SeedService implements OnApplicationBootstrap {
   async seedData() {
     //console.log('🌱 Iniciando carga de datos de ejemplo...'); // Cuando se cargaban datos fake para pruebas.
     console.log('🌱 Iniciando carga de valores en catálogo de homolgación...');
+
+    const existingCount = await this.tipoCatalogoRepository.count();
+    if (existingCount > 0) {
+      console.log(`ℹ️ Catálogos ya cargados (${existingCount} tipos de catálogo encontrados). Se omite la carga inicial.`);
+      return;
+    }
+
     try {
       // 0. Limpiar datos existentes (opcional)
       await this.cleanData();
