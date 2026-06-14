@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import 'reflect-metadata';
 import { Dhis2IntegratorModule } from './dhis2-integrator/dhis2-integrator.module';
 import { HealthModule } from './health/health.module';
+import { HomologatorModule } from './homologator/homologator.module';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { DataqualityModule } from './dataquality/dataquality.module';
@@ -24,6 +25,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     WhodrugsModule,
     MeddraModule,
     DataqualityModule,
+    HomologatorModule,
   ],
   providers: [],
 })

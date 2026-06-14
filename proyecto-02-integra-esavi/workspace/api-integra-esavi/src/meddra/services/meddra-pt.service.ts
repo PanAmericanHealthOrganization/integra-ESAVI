@@ -12,6 +12,15 @@ export class MeddraPtService {
 
   private readonly logger = new Logger(MeddraPtService.name);
 
+  async listPTs(socCode: string, page: number, size: number, term?: string): Promise<{ data: PT[]; total: number }> {
+    const qb = this.ptRepository.createQueryBuilder('pt').where('pt.socCode = :socCode', { socCode });
+    if (term) {
+      qb.andWhere('LOWER(pt.name) LIKE :term', { term: `%${term.toLowerCase()}%` });
+    }
+    const [data, total] = await qb.orderBy('pt.name', 'ASC').skip(page * size).take(size).getManyAndCount();
+    return { data, total };
+  }
+
   /**
    * Searches for a PT entity by its name, case-insensitively.
    * @param term

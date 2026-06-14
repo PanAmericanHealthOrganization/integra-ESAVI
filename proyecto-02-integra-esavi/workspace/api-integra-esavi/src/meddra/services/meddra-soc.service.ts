@@ -16,6 +16,17 @@ export class MeddraSocService {
   //
   private readonly logger = new Logger(MeddraSocService.name);
 
+  async listSOCs(page: number, size: number, term?: string): Promise<{ data: SOC[]; total: number }> {
+    const qb = this.socRepository.createQueryBuilder('soc');
+    if (term) {
+      qb.where('LOWER(soc.name) LIKE :term OR LOWER(soc.abbrev) LIKE :term', {
+        term: `%${term.toLowerCase()}%`,
+      });
+    }
+    const [data, total] = await qb.orderBy('soc.name', 'ASC').skip(page * size).take(size).getManyAndCount();
+    return { data, total };
+  }
+
   /**
    * Searches for a SOC entity by its name or abbreviation, case-insensitively.
    * @param term

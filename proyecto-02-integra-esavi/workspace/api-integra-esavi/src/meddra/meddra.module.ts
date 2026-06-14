@@ -8,6 +8,7 @@ import { MeddraController } from './controllers/meddra.controller';
 import { MeddraLltController } from './controllers/meddra.llt.controller';
 import { MeddraPtController } from './controllers/meddra.pt.controller';
 import { MeddraSocController } from './controllers/meddra.soc.controller';
+import { MeddraSyncController } from './controllers/meddra.sync.controller';
 import { MeddraVersionController } from './controllers/meddra.version.controller';
 import { cie10Meddra } from './models/mapping/cie19meddra.entity';
 import { MappingDefinition } from './models/mapping/mappingDefinition.entity';
@@ -25,6 +26,7 @@ import { MeddraProcessFilesService } from './services/meddra-process.service';
 import { MeddraPtService } from './services/meddra-pt.service';
 import { MeddraSocService } from './services/meddra-soc.service';
 import { MeddraStandarService } from './services/meddra-standar.service';
+import { MeddraSyncService } from './services/meddra-sync.service';
 
 export const MEDDRA_DS = 'meddra';
 @Module({
@@ -67,6 +69,7 @@ export const MEDDRA_DS = 'meddra';
     MeddraSocService,
     MeddraPtService,
     MeddraLLTService,
+    MeddraSyncService,
   ],
   controllers: [
     MeddraController,
@@ -74,6 +77,7 @@ export const MEDDRA_DS = 'meddra';
     MeddraSocController,
     MeddraPtController,
     MeddraLltController,
+    MeddraSyncController,
   ],
   exports: [MeddraSocService, MeddraPtService, MeddraLLTService],
 })

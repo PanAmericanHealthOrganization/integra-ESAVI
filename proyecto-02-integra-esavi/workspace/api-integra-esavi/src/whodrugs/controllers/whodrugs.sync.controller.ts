@@ -1,5 +1,6 @@
-import { Controller, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { DrugSync } from '../models/drugSync.entity';
 import { WhoDrugsAsAnyService } from '../services/whodrugasany.service';
 import { WhoDrugsSyncService } from '../services/whodrugs-sync.service';
 
@@ -13,6 +14,17 @@ export class WhodrugsSyncController {
     private readonly whoDrugsSincService: WhoDrugsSyncService,
     private readonly whoDrugAsAnyService: WhoDrugsAsAnyService,
   ) {}
+
+  @Get('/list')
+  @ApiOperation({ summary: 'Lista el historial de sincronizaciones de WHODrug' })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'size', required: false })
+  public async listSyncs(
+    @Query('page') page = 0,
+    @Query('size') size = 10,
+  ): Promise<{ data: DrugSync[]; total: number }> {
+    return this.whoDrugsSincService.listSyncs(+page, +size);
+  }
 
   /**
    *
