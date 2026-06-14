@@ -2,11 +2,19 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import MedicationIcon from "@mui/icons-material/Medication"
 import SyncIcon from "@mui/icons-material/Sync"
 import {
+  Alert,
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   Paper,
+  Snackbar,
   Stack,
   Table,
   TableBody,
@@ -15,6 +23,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material"
 import { ReactNode, useEffect, useState } from "react"
@@ -60,6 +69,7 @@ const SyncTable = ({
   total,
   page,
   onPageChange,
+  action,
 }: {
   title: string
   icon: ReactNode
@@ -69,13 +79,17 @@ const SyncTable = ({
   total: number
   page: number
   onPageChange: (p: number) => void
+  action?: ReactNode
 }) => (
   <Paper elevation={2} sx={{ p: 2 }}>
-    <Stack direction="row" alignItems="center" spacing={1} mb={2}>
-      {icon}
-      <Typography variant="h6" fontWeight={600}>
-        {title}
-      </Typography>
+    <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        {icon}
+        <Typography variant="h6" fontWeight={600}>
+          {title}
+        </Typography>
+      </Stack>
+      {action}
     </Stack>
     <TableContainer>
       <Table size="small">
@@ -133,11 +147,33 @@ export const SincronizacionesPage = () => {
   const [meddraTotal, setMeddraTotal] = useState(0)
   const [meddraPage, setMeddraPage] = useState(0)
   const [meddraLoading, setMeddraLoading] = useState(false)
+  const [meddraRefresh, setMeddraRefresh] = useState(0)
 
   const [whodData, setWhodData] = useState<DrugSync[]>([])
   const [whodTotal, setWhodTotal] = useState(0)
   const [whodPage, setWhodPage] = useState(0)
   const [whodLoading, setWhodLoading] = useState(false)
+  const [whodRefresh, setWhodRefresh] = useState(0)
+
+  // MedDRA sync dialog
+  const [meddraDialogOpen, setMeddraDialogOpen] = useState(false)
+  const [meddraVersion, setMeddraVersion] = useState("")
+  const [meddraLang, setMeddraLang] = useState("")
+  const [meddraSyncing, setMeddraSyncing] = useState(false)
+
+  // WHODrug confirm dialog
+  const [whodConfirmOpen, setWhodConfirmOpen] = useState(false)
+  const [whodSyncing, setWhodSyncing] = useState(false)
+
+  // Snackbar feedback
+  const [snack, setSnack] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
+    open: false,
+    message: "",
+    severity: "success",
+  })
+
+  const showSnack = (message: string, severity: "success" | "error") =>
+    setSnack({ open: true, message, severity })
 
   useEffect(() => {
     setMeddraLoading(true)
@@ -149,7 +185,7 @@ export const SincronizacionesPage = () => {
       })
       .catch(() => setMeddraData([]))
       .finally(() => setMeddraLoading(false))
-  }, [meddraPage])
+  }, [meddraPage, meddraRefresh])
 
   useEffect(() => {
     setWhodLoading(true)
@@ -161,7 +197,44 @@ export const SincronizacionesPage = () => {
       })
       .catch(() => setWhodData([]))
       .finally(() => setWhodLoading(false))
-  }, [whodPage])
+  }, [whodPage, whodRefresh])
+
+  const handleMeddraSync = async () => {
+    if (!meddraVersion.trim() || !meddraLang.trim()) return
+    setMeddraSyncing(true)
+    try {
+      await intESAVIClient.post("/meddra/version/process", {
+        version: meddraVersion.trim(),
+        lang: meddraLang.trim(),
+      })
+      showSnack("Sincronización MedDRA iniciada correctamente.", "success")
+      setMeddraDialogOpen(false)
+      setMeddraVersion("")
+      setMeddraLang("")
+      setMeddraRefresh((n) => n + 1)
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? e?.message ?? "Error al sincronizar MedDRA."
+      showSnack(msg, "error")
+    } finally {
+      setMeddraSyncing(false)
+    }
+  }
+
+  const handleWhodSync = async () => {
+    setWhodSyncing(true)
+    try {
+      await intESAVIClient.post("/whodrug/sync")
+      showSnack("Sincronización WHODrug iniciada correctamente.", "success")
+      setWhodConfirmOpen(false)
+      setWhodRefresh((n) => n + 1)
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? e?.message ?? "Error al sincronizar WHODrug."
+      showSnack(msg, "error")
+      setWhodConfirmOpen(false)
+    } finally {
+      setWhodSyncing(false)
+    }
+  }
 
   const meddraRows = meddraData.map((s) => [
     <Typography variant="body2" fontWeight={500}>{s.meddraVersion}</Typography>,
@@ -210,6 +283,16 @@ export const SincronizacionesPage = () => {
             total={meddraTotal}
             page={meddraPage}
             onPageChange={setMeddraPage}
+            action={
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<SyncIcon />}
+                onClick={() => setMeddraDialogOpen(true)}
+              >
+                Sincronizar MedDRA
+              </Button>
+            }
           />
         </Grid>
 
@@ -223,9 +306,114 @@ export const SincronizacionesPage = () => {
             total={whodTotal}
             page={whodPage}
             onPageChange={setWhodPage}
+            action={
+              <Button
+                variant="contained"
+                size="small"
+                color="secondary"
+                startIcon={<SyncIcon />}
+                onClick={() => setWhodConfirmOpen(true)}
+              >
+                Sincronizar WHODrug
+              </Button>
+            }
           />
         </Grid>
       </Grid>
+
+      {/* Diálogo MedDRA */}
+      <Dialog
+        open={meddraDialogOpen}
+        onClose={() => !meddraSyncing && setMeddraDialogOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Sincronizar MedDRA</DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ mb: 2 }}>
+            Ingresa la versión y el idioma de los archivos MedDRA ya cargados en el servidor
+            (ruta: <code>upload_files/meddra/&lt;versión&gt;/&lt;idioma&gt;/</code>).
+          </DialogContentText>
+          <TextField
+            label="Versión"
+            placeholder="Ej: 27_1"
+            value={meddraVersion}
+            onChange={(e) => setMeddraVersion(e.target.value)}
+            fullWidth
+            size="small"
+            sx={{ mb: 2 }}
+            disabled={meddraSyncing}
+          />
+          <TextField
+            label="Idioma"
+            placeholder="Ej: es"
+            value={meddraLang}
+            onChange={(e) => setMeddraLang(e.target.value)}
+            fullWidth
+            size="small"
+            disabled={meddraSyncing}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setMeddraDialogOpen(false)} disabled={meddraSyncing}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleMeddraSync}
+            disabled={meddraSyncing || !meddraVersion.trim() || !meddraLang.trim()}
+            startIcon={meddraSyncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}
+          >
+            {meddraSyncing ? "Procesando…" : "Sincronizar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Diálogo confirmación WHODrug */}
+      <Dialog
+        open={whodConfirmOpen}
+        onClose={() => !whodSyncing && setWhodConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Sincronizar WHODrug</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Este proceso descarga y actualiza el diccionario WHODrug completo. Puede tomar varios
+            minutos. ¿Deseas continuar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setWhodConfirmOpen(false)} disabled={whodSyncing}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={handleWhodSync}
+            disabled={whodSyncing}
+            startIcon={whodSyncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}
+          >
+            {whodSyncing ? "Iniciando…" : "Confirmar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar feedback */}
+      <Snackbar
+        open={snack.open}
+        autoHideDuration={5000}
+        onClose={() => setSnack((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity={snack.severity}
+          onClose={() => setSnack((s) => ({ ...s, open: false }))}
+          variant="filled"
+        >
+          {snack.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }
