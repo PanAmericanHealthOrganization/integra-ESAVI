@@ -8,10 +8,12 @@ import { CustomFooter } from './CustomFooter';
 export const FOOTER_HEIGHT = 40;
 
 /*
- * Ancla toda la cadena html → body → #root → .RaLayout-root al 100 % del
- * viewport y elimina el scroll del documento. El único nodo scrolleable es
- * .RaLayout-content (el área de página seleccionada).
- * El footer queda fijo en el borde inferior, siempre visible.
+ * Ancla la cadena html→body→#root→.RaLayout-root al 100% del viewport.
+ * Solo .RaDatagrid-tableWrapper scrollea (las filas de la tabla).
+ * Toolbar de acciones y paginación permanecen siempre visibles.
+ * El footer queda fijo en el borde inferior.
+ *
+ * 240px = AppBar(64) + toolbar-acciones(48) + paginación(52) + footer(40) + márgenes(36)
  */
 const globalLayoutFix = `
   html, body, #root {
@@ -19,7 +21,6 @@ const globalLayoutFix = `
     overflow: hidden;
   }
 
-  /* RA usa min-height:100vh; lo sobreescribimos para que no supere el viewport */
   .RaLayout-root {
     height: 100% !important;
     min-height: unset !important;
@@ -30,22 +31,45 @@ const globalLayoutFix = `
 
   /* Contenedor horizontal: sidebar + content */
   .RaLayout-appFrame {
-    flex: 1;
-    min-height: unset !important;
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
     overflow: hidden;
+    display: flex !important;
   }
 
-  /* Solo el área de contenido scrollea verticalmente, sin barra visible */
+  /* Área de contenido: scrollable como fallback */
   .RaLayout-content {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     padding-bottom: ${FOOTER_HEIGHT}px !important;
-    scrollbar-width: none !important;        /* Firefox */
-    -ms-overflow-style: none !important;     /* IE / Edge legacy */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
   .RaLayout-content::-webkit-scrollbar {
-    display: none !important;                /* Chrome / Safari / Edge */
+    display: none !important;
+  }
+
+  /* Encabezados de columna pegajosos al scrollear las filas */
+  .RaDatagrid-tableWrapper thead th {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 2 !important;
+  }
+
+  /* El contenedor de filas scrollea internamente;
+     la altura deja espacio para toolbar + paginación + footer */
+  .RaDatagrid-tableWrapper {
+    max-height: calc(100vh - 240px) !important;
+    overflow-y: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .RaDatagrid-tableWrapper::-webkit-scrollbar {
+    display: none !important;
   }
 `;
 
