@@ -1,25 +1,27 @@
-import { lazy, useContext } from "react"
-import { Admin, Resource } from "react-admin"
-import { AuthenticationContext } from "./contexts/AuthContext "
-import { dataProvider } from "./dataProviders/dataProvider"
+import {keycloakAuthProvider} from "ra-keycloak"
+import {lazy,useContext} from "react"
+import {Admin,Resource} from "react-admin"
+import {AuthenticationContext} from "./contexts/AuthContext "
+import {dataProvider} from "./dataProviders/dataProvider"
 import keycloak from "./keycloak"
-import { CustomLayout } from "./layout/CustomLayout"
-import { CustomLoginPage } from "./layout/CustomLogin"
-import { keycloakAuthProvider } from "ra-keycloak"
+import {CustomLayout} from "./layout/CustomLayout"
+import {CustomLoginPage} from "./layout/CustomLogin"
 import analisis from "./pages/analisis"
 import catalogos from "./pages/catalogos"
 import dashboard from "./pages/dashboard"
-import { EsaviDashboardList } from "./pages/esavi-dashboard/esavi-dashboard"
+import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
 import gaceta from "./pages/gaceta"
 import parametros from "./pages/parametros"
-import reportes from "./pages/reportes"
 import syncs from "./pages/syncs"
 import vacunometro from "./pages/vacunometro"
 
 import configuraciones from "./configuraciones"
-import { XlsxList2 as XlsxList } from "./pages/xlsx/XlsxList2"
-import { theme } from "./theme"
+import homologators from "./pages/homologators"
+import {MeddraPage} from "./pages/estandares/MeddraPage"
+import {WhodrugPage} from "./pages/estandares/WhodrugPage"
+import {SincronizacionesPage} from "./pages/estandares/SincronizacionesPage"
+import {theme} from "./theme"
 //import { createHashHistory } from 'history';
 
 // Dynamic import para el dashboard de calidad
@@ -55,23 +57,12 @@ const App = () => {
       layout={CustomLayout}
       loginPage={CustomLoginPage}
       theme={theme}>
-      {/* Recurso XLSX como Resource usando dataProvider híbrido */}
-      <Resource
-        name="xlsx"
-        options={{ label: "Datos de Campo de BDD ESAVI" }}
-        list={XlsxList}
-      />
       <Resource
         name="dashboard"
         options={{ label: "Dashboard" }}
         list={dashboard.list}
       />
       <Resource name="esavis" list={esavis.list} />
-      <Resource
-        name="reportes"
-        options={{ label: "Reportes" }}
-        list={reportes.list}
-      />
       <Resource name="analisis" list={analisis.list} />
       <Resource name="vacunometro" {...vacunometro} />
       <Resource name="configuraciones" {...configuraciones} />
@@ -81,6 +72,11 @@ const App = () => {
       <Resource name="catalogos" {...catalogos} />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
+      <Resource name="homologators" list={homologators.list} />
+      <Resource name="homologations" />
+      <Resource name="meddra" options={{ label: "MedDRA" }} list={MeddraPage} />
+      <Resource name="whodrug" options={{ label: "WHODrug" }} list={WhodrugPage} />
+      <Resource name="estandar-syncs" options={{ label: "Sincronizaciones" }} list={SincronizacionesPage} />
     </Admin>
   )
 }
