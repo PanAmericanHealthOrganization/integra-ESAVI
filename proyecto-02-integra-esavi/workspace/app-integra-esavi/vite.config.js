@@ -1,11 +1,11 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     plugins: [react()],
     server: {
         port: 5173,
-        open: true,
+        open: command === 'serve', // solo abre el navegador en modo desarrollo
     },
     build: {
         outDir: 'dist',

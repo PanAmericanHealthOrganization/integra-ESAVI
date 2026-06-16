@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import 'reflect-metadata';
 import { Dhis2IntegratorModule } from './dhis2-integrator/dhis2-integrator.module';
+import { HealthModule } from './health/health.module';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { DataqualityModule } from './dataquality/dataquality.module';
@@ -16,6 +17,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
       envFilePath: '.env',
     }),
     IntegratorModule,
+    HealthModule,
     Dhis2IntegratorModule,
     //VacunacionIntegratorModule, // Temporarily disabled. Enable when update the ORACLE DATABASE credentials.
     VigiflowIntegratorModule,
