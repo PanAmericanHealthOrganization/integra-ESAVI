@@ -11,6 +11,7 @@ export * from './dato-vacunacion.entity';
 export * from './desenlace-esavi.entity';
 export * from './embarazo-esavi.entity';
 export * from './gaceta.entity';
+export * from './genero.entity';
 export * from './gravedad-esavi.entity';
 export * from './grupo-etario.entity';
 export * from './medicamento.entity';

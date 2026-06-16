@@ -19,9 +19,9 @@ export default defineConfig(({ command }) => ({
             // (type: module) lo importa con interop estilo Node y los iconos llegan
             // como {default: Componente} => "Element type is invalid ... got: object".
             // Se fuerza la build ESM de los iconos para evitar la interop CJS.
-            { find: /^@mui\/icons-material$/, replacement: '@mui/icons-material/esm/index.js' },
-            { find: /^@mui\/icons-material\/(?!esm\/)(.+)$/, replacement: '@mui/icons-material/esm/$1.js' },
+            { find: new RegExp('^@mui/icons-material$'), replacement: '@mui/icons-material/esm/index.js' },
+            { find: new RegExp('^@mui/icons-material/(?!esm/)(.+)$'), replacement: '@mui/icons-material/esm/$1.js' },
             { find: '@', replacement: '/src' },
         ],
     },
-});
+})); // <-- CORREGIDO AQUÍ: Añadido el paréntesis de cierre que faltaba

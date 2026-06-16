@@ -8,6 +8,7 @@ import { AntecedenteMedicoController } from './controller/antecedente-medico.con
 import { AntecedentePreexistenciaController } from './controller/antecedente-preexistencia.controller';
 import { DatoEsaviController } from './controller/dato-esavi.controller';
 import { DesenlaceEsaviController } from './controller/desenlace-esavi.controller';
+import { GeneroController } from './controller/genero.controller';
 import { GrupoEtarioController } from './controller/grupo-etario.controller';
 import { IntegradorController } from './controller/integrador.controller';
 import { InvestigacionController } from './controller/investigacion.controller';
@@ -33,6 +34,7 @@ import {
   DesenlaceEsavi,
   EmbarazoEsavi,
   Gaceta,
+  Genero,
   GravedadEsavi,
   GrupoEtario,
   Medicamento,
@@ -69,6 +71,7 @@ import {
   DesenlaceEsaviService,
   EmbarazoEsaviService,
   GacetaService,
+  GeneroService,
   GravedadEsaviService,
   GrupoEtarioService,
   MedicamentoService,
@@ -130,6 +133,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         DatoVacunacion,
         DesenlaceEsavi,
         EmbarazoEsavi,
+        Genero,
         GravedadEsavi,
         GrupoEtario,
         Investigacion,
@@ -168,6 +172,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEmbarazoController,
     SeedController,
     VacunometroController,
+    GeneroController,
     GrupoEtarioController,
     SyncController,
     InvestigacionController,
@@ -188,6 +193,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DatoVacunacionService,
     DesenlaceEsaviService,
     EmbarazoEsaviService,
+    GeneroService,
     GravedadEsaviService,
     GrupoEtarioService,
     MedicamentoService,

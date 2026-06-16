@@ -10,6 +10,7 @@ export * from './dato-vacunacion.service';
 export * from './desenlace-esavi.service';
 export * from './embarazo-esavi.service';
 export * from './gaceta.service';
+export * from './genero.service';
 export * from './gravedad-esavi.service';
 export * from './grupo-etario.service';
 export * from './medicamento.service';
