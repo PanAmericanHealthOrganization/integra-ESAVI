@@ -28,4 +28,8 @@ export class CreatePacienteDto {
   @IsUUID()
   @IsOptional()
   generoId?: string;
+
+  @IsUUID()
+  @IsOptional()
+  etniaId?: string;
 }

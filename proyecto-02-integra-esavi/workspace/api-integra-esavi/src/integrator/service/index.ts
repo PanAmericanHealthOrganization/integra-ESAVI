@@ -9,6 +9,7 @@ export * from './dato-vacuna.service';
 export * from './dato-vacunacion.service';
 export * from './desenlace-esavi.service';
 export * from './embarazo-esavi.service';
+export * from './etnia.service';
 export * from './gaceta.service';
 export * from './genero.service';
 export * from './gravedad-esavi.service';
