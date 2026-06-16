@@ -10,7 +10,7 @@ import { VigiflowIntegradorService } from './service/vigiflow-integrador.service
 @Module({
   imports: [
     HttpModule.register({
-      timeout: 1000000000,
+      timeout: 300000, // 5 minutos
       maxRedirects: 5,
     }),
     IntegratorModule,

@@ -12,6 +12,17 @@ export class MeddraLLTService {
 
   private readonly logger = new Logger(MeddraLLTService.name);
 
+  async listLLTs(ptCode: string, page: number, size: number): Promise<{ data: LLT[]; total: number }> {
+    const [data, total] = await this.lltRepository
+      .createQueryBuilder('llt')
+      .where('llt.ptCode = :ptCode', { ptCode })
+      .orderBy('llt.name', 'ASC')
+      .skip(page * size)
+      .take(size)
+      .getManyAndCount();
+    return { data, total };
+  }
+
   /**
    *
    * @param term

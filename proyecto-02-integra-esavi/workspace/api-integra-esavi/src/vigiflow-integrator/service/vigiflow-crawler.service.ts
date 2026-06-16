@@ -28,14 +28,15 @@ export class VigiflowCrawlerService {
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
     const puppeteerPath = this.configService.get<string>('PATH_BROWSER_PUPPETEER');
 
+    const queryUserUrl = new URL('/query/user', base).href;
+
     const browser = await puppeteer.launch({
       headless: 'new',
-      executablePath: puppeteerPath, // Ruta al ejecutable de Chrome
+      executablePath: puppeteerPath,
     });
 
     const page = await browser.newPage();
     await page.setRequestInterception(true);
-    //Avoid loading the images
     page.on('request', (request) => {
       if (request.resourceType() === 'image') {
         request.abort();
@@ -43,7 +44,7 @@ export class VigiflowCrawlerService {
         request.continue();
       }
     });
-    page.setDefaultTimeout(0);
+    page.setDefaultTimeout(60000);
     await page.goto(base, { waitUntil: 'networkidle0' });
     try {
       await page.type('input[id=email]', username);
@@ -55,14 +56,19 @@ export class VigiflowCrawlerService {
 
       const responses = await page.waitForResponse(
         (response) =>
-          response.url() === 'https://vigiflow.who-umc.org/query/user' &&
+          response.url() === queryUserUrl &&
           response.request().method() === 'POST',
         { timeout: 15000 },
       );
       const bearer = responses.request().headers().authorization;
       this._jwtToken = bearer?.substring(7) ?? '';
+
+      if (!this._jwtToken) {
+        throw new Error('VigiFlow no devolvió un token de autorización en la respuesta de login');
+      }
     } catch (e) {
-      this.logger.log('Error al obtener el token JWT:', e);
+      this.logger.error('Error al obtener el token JWT de VigiFlow:', e?.message ?? e);
+      throw new Error(`Autenticación VigiFlow fallida: ${e?.message ?? e}`);
     } finally {
       await browser.close();
     }
@@ -77,10 +83,10 @@ export class VigiflowCrawlerService {
    * @param codigoATC
    * @returns
    */
-  async retrieveExcelReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
+  async retrieveExcelReport(fechaInicio: string, fechaFin: string, codigoATC: string, token?: string) {
     try {
       this.logger.log('Iniciando la generación del reporte de Excel...');
-      const token = await this.retrieveJWT();
+      const jwt = token ?? (await this.retrieveJWT()).jwt;
       const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_EXCEL_URL');
       const payload = this.getPayload(
         'renderaefiicsrlinelistingexcel',
@@ -94,14 +100,17 @@ export class VigiflowCrawlerService {
         this.httpService
           .post(url, payload, {
             headers: {
-              Authorization: `Bearer ${token.jwt}`,
+              Authorization: `Bearer ${jwt}`,
               'Content-Type': 'application/json',
             },
           })
           .pipe(
             catchError((e: AxiosError) => {
-              this.logger.error(JSON.stringify(e));
-              throw new HttpException(e.response.data, e.response.status);
+              this.logger.error('Error al obtener reporte Excel de VigiFlow:', e.message);
+              if (e.response) {
+                throw new HttpException(e.response.data, e.response.status);
+              }
+              throw new HttpException('Error de red al conectar con VigiFlow (Excel)', 503);
             }),
           ),
       );
@@ -119,8 +128,8 @@ export class VigiflowCrawlerService {
    * @param codigoATC
    * @returns
    */
-  async retrieveJsonReport(fechaInicio: string, fechaFin: string, codigoATC: string) {
-    const token = await this.retrieveJWT();
+  async retrieveJsonReport(fechaInicio: string, fechaFin: string, codigoATC: string, token?: string) {
+    const jwt = token ?? (await this.retrieveJWT()).jwt;
     const url = this.configService.get<string>('VIGIFLOW_RENDER_AEFI_JSON_URL');
     const payload = this.getPayload('rendericsrlistingexcel', fechaInicio, fechaFin, codigoATC);
 
@@ -128,14 +137,17 @@ export class VigiflowCrawlerService {
       this.httpService
         .post(url, payload, {
           headers: {
-            Authorization: `Bearer ${token.jwt}`,
+            Authorization: `Bearer ${jwt}`,
             'Content-Type': 'application/json',
           },
         })
         .pipe(
           catchError((e: AxiosError) => {
-            this.logger.error(e);
-            throw new HttpException(e.response.data, e.response.status);
+            this.logger.error('Error al obtener reporte JSON de VigiFlow:', e.message);
+            if (e.response) {
+              throw new HttpException(e.response.data, e.response.status);
+            }
+            throw new HttpException('Error de red al conectar con VigiFlow (JSON)', 503);
           }),
         ),
     );

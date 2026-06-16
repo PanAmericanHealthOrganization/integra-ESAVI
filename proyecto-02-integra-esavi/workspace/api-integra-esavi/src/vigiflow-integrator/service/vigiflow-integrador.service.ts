@@ -2,12 +2,11 @@ import { HttpService } from '@nestjs/axios';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import * as fs from 'fs/promises';import * as fsappend from 'fs';
+import * as fs from 'fs/promises';
 import * as moment from 'moment/moment';
 import * as countries from 'i18n-iso-countries';
 import * as enLocale from 'i18n-iso-countries/langs/en.json';
 import * as esLocale from 'i18n-iso-countries/langs/es.json';
-import { throwError } from 'rxjs';
 import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
 import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
 import { UpdateAntecedenteEmbarazoDto } from 'src/integrator/dto/update-antecedente-embarazo.dto';
@@ -88,12 +87,14 @@ export class VigiflowIntegradorService {
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
     private readonly meddraSocService: MeddraSocService,
-  ) {}
+  ) {
+    const fechaInicioStr = this.configService.get<string>('VIGIFLOW_FECHA_INICIO_CRON', '2024-11-01');
+    this.originalFechaInicio = new Date(`${fechaInicioStr}T00:00:00.000Z`);
+    this.fechaInicio = this.originalFechaInicio;
+  }
 
-  // private originalFechaInicio: Date = new Date('2017-01-01T00:00:00.000Z'); // Fecha de inicio original
-  private originalFechaInicio: Date = new Date('2024-11-01T00:00:00.000Z'); // Fecha de inicio original
-
-  private fechaInicio: Date = this.originalFechaInicio; // Fecha de inicio actual
+  private originalFechaInicio: Date;
+  private fechaInicio: Date;
 
   // @Cron(CronExpression.EVERY_MINUTE)
   // 0 23 L * * -- Ejecución fin de mes
@@ -131,15 +132,18 @@ export class VigiflowIntegradorService {
     const fechaInicioFmrt = moment.utc(fechaInicio).format('YYYYMMDD');
     const fechaFinFmrt = moment.utc(fechaFin).format('YYYYMMDD');
 
+    const { jwt } = await this.vigiflowCrawlerService.retrieveJWT();
+
     //This method allows us to persiste the information the first time.
     //Retrieve excel to persist elements
     const reportOne = await this.vigiflowCrawlerService.retrieveExcelReport(
       fechaInicioFmrt,
       fechaFinFmrt,
       codigoATC, // (J07BX=Covid-19)
+      jwt,
     );
     //Retrieve excel to update elements
-    const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC);
+    const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC, jwt);
    
     await this.extractedFromExcelToPersist(reportOne);
     await this.sleep(8000);
@@ -162,11 +166,10 @@ export class VigiflowIntegradorService {
     // const reportTwo = read(archivo2);
     // Procesamos el primer reporte
   public async createInBulkFromFile() {
-    // Leer los archivos desde files_meddra
-    const reportOne = read(
-      await fs.readFile('./upload_files/files_meddra/borrar.fuente-VigiFlow_AEFILinelisting_20082025_092447.xlsx'),
-    );
-    const reportTwo = read(await fs.readFile('./upload_files/files_meddra/borrar.VigiFlow_Excel_22082025_111315.xlsx'));
+    const aefiFilePath = this.configService.get<string>('VIGIFLOW_FILE_AEFI', './upload_files/files_meddra/aefi.xlsx');
+    const reportFilePath = this.configService.get<string>('VIGIFLOW_FILE_REPORT', './upload_files/files_meddra/report.xlsx');
+    const reportOne = read(await fs.readFile(aefiFilePath));
+    const reportTwo = read(await fs.readFile(reportFilePath));
 
     this.logger.log('extractedFromExcelToPersist..................');
     await this.extractedFromExcelToPersist(reportOne);
@@ -189,13 +192,11 @@ export class VigiflowIntegradorService {
   private async extractedFromExcelToPersist(workBook: WorkBook) {
     //Convert file to json
     const ws = await workBook.Sheets[workBook.SheetNames[0]];
-    const importRange = 'A2:AS2990';
     const headers = 'A';
     const reports = utils.sheet_to_json(ws, {
-      range: importRange,
       header: headers,
-      raw: true, // 👈 fuerza a no convertir tipos
-      defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
+      raw: true,
+      defval: '',
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
     // Usar for...of para esperar que cada operación asíncrona termine
@@ -240,7 +241,7 @@ export class VigiflowIntegradorService {
         // Si la edad no es válida, se asigna null. TODO: edad = fechaNotificacion - fechaNacimiento [AÑOS], similar a dhis2
         notificacion.edad = null;
         notificacion.unidadEdadPaciente = null;
-        throwError(`Edad o unidad de edad, no válida para el paciente con código Vigiflow: ${paciente.codigoVigiflow}`);
+        this.logger.warn(`Edad o unidad de edad no válida para paciente con código Vigiflow: ${paciente.codigoVigiflow}`);
         //el cálculo a partir de esas dos fechas, se realiza en el servicio de notificación VigiFlow.
       }
       const fechaNotificacion = this.analizarCadenaFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
@@ -351,18 +352,19 @@ export class VigiflowIntegradorService {
   async extractedFromJsonReportToUpdate(workbook2: WorkBook) {
     //Convert file to json
     const ws2 = await workbook2.Sheets[workbook2.SheetNames[1]];
-    const importRange2 = 'A2:AX2915';
     const headers2 = 'A';
     const toUpdate = utils.sheet_to_json(ws2, {
-      range: importRange2,
       header: headers2,
-      raw: true, // 👈 fuerza a no convertir tipos
-      defval: '', // 👈 opcional: asigna valor por defecto si la celda está vacía, con esto se muestran todas las columnas, incluso si etán vacías.
+      raw: true,
+      defval: '',
     });
+
+    const allPatients = await this.pacienteVigiflowService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
 
     // Usar for...of para esperar que cada operación asíncrona termine
     for (const reg of toUpdate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['G']);
+      const paciente = patientMap.get(reg['G']?.toString().trim()) ?? null;
 
       if (paciente && paciente.id) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
@@ -484,11 +486,10 @@ export class VigiflowIntegradorService {
     const country = 'ECU';
 
     const ws2 = await workbook2.Sheets[workbook2.SheetNames[2]];
-    const importRange2 = 'A2:AX2915';
     const headers2 = 'A';
     const toUpdate = utils.sheet_to_json(ws2, {
-      range: importRange2,
       header: headers2,
+      defval: '',
     });
 
     const auditoria: Auditoria = {
@@ -502,11 +503,14 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
+    const allPatients = await this.pacienteVigiflowService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
+
     // Iterar con for...of, para esperar que cada operación asíncrona termine.
     // "toUpdate" es un arreglo de objetos JSON, cada uno de esos objetos representa una fila de la hoja "Medicamentos".
     for (const reg of toUpdate) {
-      const medNumIdUnicoMundial = reg['A'] && reg['A'] ? reg['A'].toString().trim():null; 
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode( medNumIdUnicoMundial ); // No es .findByVigiflowCode(reg['B']); porque ya se comparó los valores con la hoja AEFI, y en realidad su equivalente es la columna 'A' en "Medicamentos".
+      const medNumIdUnicoMundial = reg['A'] && reg['A'] ? reg['A'].toString().trim():null;
+      const paciente = patientMap.get(medNumIdUnicoMundial) ?? null;
       if (paciente) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
         const notificacionMed = notificacionList.at(0);//TODO: Iterar por todas las notificaciones asociadas al paciente, o lo que es lo mismo, a su código vigiflow. RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07. Y finalmente, un J07 no siempre aparece en la primera ocurrencia o posiciión del array notificacionList.
@@ -569,14 +573,12 @@ export class VigiflowIntegradorService {
 
             //----------------------------------------------------------------------------------------------------------------//
             //----------------------------------------------------------------------------------------------------------------//
-            const utilizarSoloDiccionarioWhodrugGlobalUmc = false; // cambiar a true para usar solo catálogos Excel provisionales o temporales, mientras concluye el proceso de actulización del diccionario oficial.
+            const utilizarSoloDiccionarioWhodrugGlobalUmc = this.configService.get<boolean>('VIGIFLOW_USE_WHODRUG_GLOBAL', false);
 
             if( utilizarSoloDiccionarioWhodrugGlobalUmc ){
               //----INICIO estandarización utilizando el diccionario oficial de WHODrug Global de Uppsala Monitoring Centre.----
               const drugName = nombreVacPatenteWHODrugVigiFlow;//updateDatoVacuna.nombreVacPatenteWHODrug;
               const whodrug: any[] = (await this.drugService.getDrugsOnly(drugName, country)).length > 0? await this.drugService.getDrugsOnly(drugName, country) : [];
-              // escribir en txt los logs, del número elementos del vector resultante de la búsqueda con "nombreVacPatenteWHODrug"
-              //fsappend.appendFileSync('C:/logsNumElementosDrugName.txt', `${whodrug.length}|${drugName}|${JSON.stringify(whodrug)}\n`);
               if (whodrug.length > 0) {
                 updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
                 updateDatoVacuna.drugName = whodrug[0]?.drugName;
@@ -799,7 +801,6 @@ export class VigiflowIntegradorService {
               //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
               //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
             }
-            break; // Salir del bucle una vez que se ha actualizado el datoVacuna
           }
         }
       } else {
@@ -813,11 +814,10 @@ export class VigiflowIntegradorService {
   async extractedFromJsonReportToCreateReaccion(workbook2: WorkBook) {
     //Convert file to json
     const ws3 = await workbook2.Sheets[workbook2.SheetNames[3]];
-    const importRange2 = 'A2:AX2915';
     const headers2 = 'A';
     const toCreate = utils.sheet_to_json(ws3, {
-      range: importRange2,
       header: headers2,
+      defval: '',
     });
 
     const auditoria: Auditoria = {
@@ -831,9 +831,12 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
+    const allPatients = await this.pacienteVigiflowService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
+
     // toCreate.map(async (reg) => {
     for (const reg of toCreate) {
-      const paciente = await this.pacienteVigiflowService.findByVigiflowCode(reg['A']);
+      const paciente = patientMap.get(reg['A']?.toString().trim()) ?? null;
 
       if (paciente) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
@@ -933,77 +936,6 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
 
   return regex.test(valor.trim()) ? 'Desconocido' : valor;
 }
-
-
-  /**
-   *
-   * @param input
-   * @returns
-   */
-  private txCompletaLoteVacuna(input: string): string | null { // transformación completa del Lote de Vacuna, en 4 literales(abcd) con regex.
-    if (!input) return null;
-
-    let valor = input.trim();
-
-    // a. Eliminar prefijos/sufijos no deseados
-    valor = valor.replace(
-      /^(LOT:|LOTE|Reg sa:|R\.S\.|Reg\.San\.No\.:|; RG:|Reg\. San\.:|Registro:|RS:|Lote No. |BOPV lote: |DPT: |OPV: |LOTE:)\s*(.*)\s*$/i,
-      '$2',
-    );
-
-    // b. Reemplazar palabras clave por "Desconocido"
-    if (
-      /\b(SE DESCONOCE|DESCONOCE|DESCONOCIDO|N\/R|Ni idea|no aplica|no reporta|NO SE DISPONE|NO DISPONIBLE|NO REGISTRA|Asked But Unknown|NO INDICA|SE DESCONOCE EL LOTE )\b/i.test(
-        valor,
-      )
-    ) {
-      return 'Desconocido';
-    }
-
-    // c. Detectar cantidades/unidades de masa/volumen y asignar NULL
-    if (/\d+\s*(mg|ml|g|kg|oz|l|mL|cc)\s*(\/\s*\d+\s*(mg|ml|g|kg|oz|l|mL|cc))?/i.test(valor)) {
-      return null;
-    }
-
-    // d. Eliminar espacios dentro del número de lote
-    valor = valor.replace(/\s*(\w+)\s*(\d+)\s*/g, '$1$2');
-
-    // Normalizar espacios finales/iniciales
-    valor = valor.trim();
-
-    return valor || null;
-  }
-
-  /**
-   * Degrada un término español correcto al formato roto del catálogo histórico.
-   * Reglas clave:
-   *   í → m     (Neumonía → Neumonma)
-   *   é → i     (Afonía → Afonma)
-   *   ó → s     (Intoxicación → Intoxicacisn)
-   *   ú → z     (úlcera → zlcera)
-   *   á → a     (sin tilde, ejemplo Fármaco → Farmaco)
-   * Ejemplos:
-   *   "Síndrome"      → "Smndrome"
-   *   "Clínica"       → "Clmnica"
-   *   "Antibiótico"   → "Antibistico"
-   *   "Intoxicación"  → "Intoxicacisn"
-   *   "Vacunación"    → "Vacunacisn"
-   *   "Fármaco"       → "Farmaco"
-   *   "Paciente"      → "Paciente" (sin cambios)
-   */
-  private degradarParaCatalogoRoto = (texto: string): string =>
-    texto
-      .normalize('NFD') // Separa letras de sus acentos
-      .replace(/i\u0301/g, 'm') // í → m  (Neumonía → Neumonma)
-      .replace(/I\u0301/g, 'M') // Í → M
-      .replace(/e\u0301/g, 'i') // é → i  (Afonía → Afonma)
-      .replace(/E\u0301/g, 'I') // É → I
-      .replace(/o\u0301/g, 's') // ó → s  (Tóxico → Tsxico)
-      .replace(/O\u0301/g, 'S') // Ó → S
-      .replace(/u\u0301/g, 'z') // ú → z  (úlcera → zlcera)
-      .replace(/U\u0301/g, 'Z') // Ú → Z
-      .replace(/[\u0300-\u036f]/g, ''); // Quita todos los demás acentos (á, ú, etc.)
-
   formatoFecha(valor: string) {
     if (valor && valor.length > 0 && valor != '') {
       return moment.utc(valor, 'YYYYMMDD').toDate(); //return moment(valor, 'YYYYMMDD)').toDate();

@@ -24,4 +24,4 @@ export default defineConfig(({ command }) => ({
             { find: '@', replacement: '/src' },
         ],
     },
-});
+}));

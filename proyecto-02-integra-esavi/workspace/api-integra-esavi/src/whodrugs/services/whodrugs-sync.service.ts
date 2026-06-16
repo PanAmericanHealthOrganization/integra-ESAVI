@@ -53,6 +53,15 @@ export class WhoDrugsSyncService {
 
   private readonly logger = new Logger(WhoDrugsSyncService.name);
 
+  async listSyncs(page: number, size: number): Promise<{ data: DrugSync[]; total: number }> {
+    const [data, total] = await this.drugSyncRepository.findAndCount({
+      order: { startSyncDate: 'DESC' },
+      skip: page * size,
+      take: size,
+    });
+    return { data, total };
+  }
+
   /**
    * Este método se encarga de sincronizar el json proporcionado por whodrug en la base de datos postgres
    * @returns
