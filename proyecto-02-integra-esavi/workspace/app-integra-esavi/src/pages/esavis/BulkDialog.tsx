@@ -40,11 +40,10 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
             // Llamada al servicio de Vigiflow con las fechas formateadas
             respuesta = await integradorDataProvider.importDataVigiflow(startDateFormatted, endDateFormatted);
             console.log('respuesta:: ', respuesta);
-            if (respuesta.msg === 'OK') {
-                // Si es necesario manejar la respuesta, puedes procesarla aquí
+            if (respuesta.status === 'OK') {
                 setResponse(`${respuesta.msg}`);
             } else {
-                setResponse(`${respuesta.status}`);
+                setResponse(`Error: ${respuesta.msg}`);
             }
         }
 
