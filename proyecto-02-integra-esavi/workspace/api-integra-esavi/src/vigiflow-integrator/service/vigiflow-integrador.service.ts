@@ -42,6 +42,8 @@ import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
 import { WhodrugVacsTempService } from 'src/integrator/service/whodrug-vacstemp.service';
 import { WhodrugHomologaVacsService } from 'src/integrator/service/whodrug-homologavacs.service';
 import { WhodrugHomologaVacs } from 'src/integrator/entity/whodrug-homologavacs.entity';
+import { SyncService } from 'src/integrator/service/sync.service';
+import { SyncStatus } from 'src/integrator/entity';
 
 // import { archivoAefi2 } from './excelAefiDescargado2';
 // import { archivo2 } from './excelDescargado2';
@@ -83,6 +85,8 @@ export class VigiflowIntegradorService {
     private readonly activeIngredentService: ActiveIngredientsService,
     private readonly whodrugVacsTempService: WhodrugVacsTempService,
     private readonly whodrugHomologaVacsService: WhodrugHomologaVacsService,
+
+    private readonly syncService: SyncService,
 
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
@@ -132,34 +136,68 @@ export class VigiflowIntegradorService {
     const fechaInicioFmrt = moment.utc(fechaInicio).format('YYYYMMDD');
     const fechaFinFmrt = moment.utc(fechaFin).format('YYYYMMDD');
 
-    const { jwt } = await this.vigiflowCrawlerService.retrieveJWT();
+    const syncRecord = await this.syncService.createSyncProcess({
+      name: 'VIGIFLOW_BULK',
+      status: SyncStatus.RUNNING,
+      startTime: new Date(),
+      endTime: null,
+      dataStartDate: fechaInicio,
+      dataEndDate: fechaFin,
+      message: null,
+      errorMessage: null,
+      errorStack: null,
+      errorTrace: null,
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: new Date(),
+      updatedBy: 'System',
+      deletedAt: null,
+      deletedBy: null,
+      isEnabled: true,
+      isActive: true,
+    });
 
-    //This method allows us to persiste the information the first time.
-    //Retrieve excel to persist elements
-    const reportOne = await this.vigiflowCrawlerService.retrieveExcelReport(
-      fechaInicioFmrt,
-      fechaFinFmrt,
-      codigoATC, // (J07BX=Covid-19)
-      jwt,
-    );
-    //Retrieve excel to update elements
-    const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC, jwt);
-   
-    await this.extractedFromExcelToPersist(reportOne);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToUpdate..................');
-    // Procesamos el segundo reporte
-    await this.extractedFromJsonReportToUpdate(reportTwo);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToCreateMedicamento..................');
-    // Procesamos el reporte para crear medicamentos
-    await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToCreateReaccion..................');
-    // Procesamos el reporte para crear reacciones
-    await this.extractedFromJsonReportToCreateReaccion(reportTwo);
-    await this.sleep(3000);
-    this.logger.log('Fin Proceso..................');
+    try {
+      const { jwt } = await this.vigiflowCrawlerService.retrieveJWT();
+
+      //This method allows us to persiste the information the first time.
+      //Retrieve excel to persist elements
+      const reportOne = await this.vigiflowCrawlerService.retrieveExcelReport(
+        fechaInicioFmrt,
+        fechaFinFmrt,
+        codigoATC, // (J07BX=Covid-19)
+        jwt,
+      );
+      //Retrieve excel to update elements
+      const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC, jwt);
+
+      await this.extractedFromExcelToPersist(reportOne);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToUpdate..................');
+      await this.extractedFromJsonReportToUpdate(reportTwo);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToCreateMedicamento..................');
+      await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToCreateReaccion..................');
+      await this.extractedFromJsonReportToCreateReaccion(reportTwo);
+      await this.sleep(3000);
+      this.logger.log('Fin Proceso..................');
+
+      await this.syncService.update(syncRecord.id, {
+        status: SyncStatus.COMPLETED,
+        endTime: new Date(),
+        message: `Importación VigiFlow completada: ${fechaInicioFmrt} – ${fechaFinFmrt}`,
+      });
+    } catch (error) {
+      await this.syncService.update(syncRecord.id, {
+        status: SyncStatus.FAILED,
+        endTime: new Date(),
+        errorMessage: error?.message ?? String(error),
+        errorStack: error?.stack ?? null,
+      });
+      throw error;
+    }
   }
 
    // *** ARCHIVOS LOCALES

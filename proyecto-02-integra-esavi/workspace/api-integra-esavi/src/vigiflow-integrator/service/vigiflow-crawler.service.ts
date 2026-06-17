@@ -44,22 +44,39 @@ export class VigiflowCrawlerService {
         request.continue();
       }
     });
-    page.setDefaultTimeout(60000);
-    await page.goto(base, { waitUntil: 'networkidle0' });
-    try {
-      await page.type('input[id=email]', username);
-      await page.type('input[id=password]', password);
-      await Promise.all([
-        page.waitForNavigation({ waitUntil: 'networkidle2' }),
-        page.click('button[type="submit"]'),
-      ]);
+    page.setDefaultTimeout(120000);
 
-      const responses = await page.waitForResponse(
+    // domcontentloaded termina en cuanto el DOM inicial carga (antes de que
+    // MSAL.js ejecute su redirect a B2C). waitForSelector('#email') se encarga
+    // de esperar hasta que la página B2C esté lista después de la redirección.
+    await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 60000 });
+
+    try {
+      // Esperar a que MSAL.js complete el redirect a B2C y el formulario aparezca.
+      await page.waitForSelector('#email', { visible: true, timeout: 90000 });
+      await page.type('#email', username);
+      await page.type('#password', password);
+
+      // Registrar el listener ANTES del click para no perder la respuesta POST a
+      // /query/user que VigiFlow hace tras el callback OAuth (MSAL procesa el código).
+      // .catch(() => {}) suprime el unhandled rejection si el browser cierra primero.
+      const responsePromise = page.waitForResponse(
         (response) =>
           response.url() === queryUserUrl &&
           response.request().method() === 'POST',
-        { timeout: 15000 },
+        { timeout: 90000 },
       );
+      responsePromise.catch(() => {});
+
+      // JS click evita errores "not clickable" de Puppeteer con elementos B2C
+      await page.waitForSelector('#next', { visible: true, timeout: 30000 });
+      await page.evaluate(() => {
+        const btn = document.querySelector('#next') as HTMLElement;
+        if (btn) btn.click();
+      });
+
+      // Esperar el POST a /query/user con el JWT en el header Authorization
+      const responses = await responsePromise;
       const bearer = responses.request().headers().authorization;
       this._jwtToken = bearer?.substring(7) ?? '';
 

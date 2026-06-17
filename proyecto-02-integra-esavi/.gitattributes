@@ -1,0 +1,24 @@
+# Normalizar todos los archivos de texto a LF en el repositorio.
+# En Windows, Git convierte LF→CRLF al hacer checkout si core.autocrlf=true.
+# En Mac/Linux los archivos quedan con LF directamente.
+* text=auto eol=lf
+
+# Archivos binarios: nunca modificar line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+*.jar binary
+*.wasm binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.xlsx binary
+*.xls binary
