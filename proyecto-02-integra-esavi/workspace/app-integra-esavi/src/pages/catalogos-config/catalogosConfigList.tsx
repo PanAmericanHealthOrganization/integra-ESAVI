@@ -1,5 +1,3 @@
-import Diversity3Icon from "@mui/icons-material/Diversity3"
-import WcIcon from "@mui/icons-material/Wc"
 import {
   Box,
   Paper,
@@ -16,29 +14,14 @@ import { Title } from "react-admin"
 import { CatalogoCrudPanel } from "./CatalogoCrudPanel"
 
 interface CatalogoTipo {
-  resource: "genero" | "etnia"
+  resource: string
   label: string
   description: string
   createLabel: string
   icon: ReactNode
 }
 
-const CATALOGOS: CatalogoTipo[] = [
-  {
-    resource: "genero",
-    label: "Género",
-    description: "Catálogo de géneros",
-    createLabel: "Nuevo Género",
-    icon: <WcIcon fontSize="small" color="primary" />,
-  },
-  {
-    resource: "etnia",
-    label: "Etnia",
-    description: "Catálogo de etnias",
-    createLabel: "Nueva Etnia",
-    icon: <Diversity3Icon fontSize="small" color="primary" />,
-  },
-]
+const CATALOGOS: CatalogoTipo[] = []
 
 export const CatalogosConfigList = () => {
   const [selected, setSelected] = useState<CatalogoTipo | null>(null)

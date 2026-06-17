@@ -12,9 +12,7 @@ import catalogosConfig from "./pages/catalogos-config"
 import dashboard from "./pages/dashboard"
 import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
-import etnia from "./pages/etnia"
 import gaceta from "./pages/gaceta"
-import genero from "./pages/genero"
 import parametros from "./pages/parametros"
 import syncs from "./pages/syncs"
 import vacunometro from "./pages/vacunometro"
@@ -74,8 +72,6 @@ const App = () => {
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
       <Resource name="catalogos-config" {...catalogosConfig} />
-      <Resource name="genero" {...genero} />
-      <Resource name="etnia" {...etnia} />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={homologators.list} />

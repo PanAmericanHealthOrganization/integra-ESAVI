@@ -35,7 +35,7 @@ interface CatalogoRecord {
 }
 
 interface CatalogoCrudPanelProps {
-  resource: "genero" | "etnia"
+  resource: string
   label: string
   createLabel: string
 }

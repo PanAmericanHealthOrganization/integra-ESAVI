@@ -2,8 +2,6 @@ import * as moment from 'moment/moment';
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, TableInheritance } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
-import { Etnia } from './etnia.entity';
-import { Genero } from './genero.entity';
 
 /**
  *
@@ -80,20 +78,6 @@ export class Paciente extends Auditoria {
     comment: 'Indica si el registro ha sido sincronizado con sistemas externos',
   })
   registroSincronizado: boolean;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Genero, { nullable: true, eager: false })
-  @JoinColumn({ name: 'GENERO_ID' })
-  genero: Genero;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Etnia, { nullable: true, eager: false })
-  @JoinColumn({ name: 'ETNIA_ID' })
-  etnia: Etnia;
 
   /**
    *

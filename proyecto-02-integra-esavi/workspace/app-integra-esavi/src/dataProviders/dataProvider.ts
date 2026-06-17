@@ -2,9 +2,7 @@ import { combineDataProviders } from "react-admin"
 import { calidadDataProvider } from "./calidad.dataprovider"
 import { dashboardDataProvider } from "./dashboard.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
-import { etniaDataProvider } from "./etnia.dataprovider"
 import { gacetaDataProvider } from "./gaceta.dataprovider"
-import { generoDataProvider } from "./genero.dataprovider"
 import { grupoEtarioDataProvider } from "./grupoEtario.provider"
 import { homologationDataProvider } from "./homologation.dataprovider"
 import { homologatorDataProvider } from "./homologator.dataprovider"
@@ -31,10 +29,6 @@ export const dataProvider = combineDataProviders((resource) => {
       return vacunasDataProvider
     case "gaceta":
       return gacetaDataProvider
-    case "genero":
-      return generoDataProvider
-    case "etnia":
-      return etniaDataProvider
     case "dataquality":
     case "parametros":
       return calidadDataProvider
