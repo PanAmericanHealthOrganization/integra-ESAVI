@@ -2,6 +2,7 @@ import { Controller, Get, Logger, Query, Res, UseFilters } from '@nestjs/common'
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
+import * as xlsx from 'xlsx';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { AefiQuery } from '../query/aefi-query';
 import { VigiflowCrawlerService } from '../service/vigiflow-crawler.service';
@@ -33,11 +34,12 @@ export class VigiflowIntegradorController {
 
   @Get('/download')
   async downloadExcelFile(@Res() res: Response, @Query() query: AefiQuery) {
-    const excelBuffer = await this.vigiflowCrawlerService.retrieveExcelReport(
+    const workbook = await this.vigiflowCrawlerService.retrieveExcelReport(
       query.fechaInicio,
       query.fechaFin,
       query.codigoATC,
     );
+    const excelBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
     res.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': 'attachment; filename=myfile.xlsx',
