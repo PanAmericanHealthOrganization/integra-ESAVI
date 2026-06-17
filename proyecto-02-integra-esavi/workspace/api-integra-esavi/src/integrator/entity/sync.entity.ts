@@ -98,6 +98,22 @@ export class SyncProcess extends Auditoria implements ISync {
     comment: 'Traza detallada del error para depuración',
   })
   errorTrace: string;
+
+  @Column({
+    name: 'DATA_START_DATE',
+    type: 'date',
+    nullable: true,
+    comment: 'Fecha de inicio del rango de datos importados',
+  })
+  dataStartDate: Date;
+
+  @Column({
+    name: 'DATA_END_DATE',
+    type: 'date',
+    nullable: true,
+    comment: 'Fecha de fin del rango de datos importados',
+  })
+  dataEndDate: Date;
 }
 
 export enum SyncStatus {

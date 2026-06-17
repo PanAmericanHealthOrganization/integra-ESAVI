@@ -42,6 +42,14 @@ export interface ISync extends IAuditoria {
    * Trace del error del proceso de sincronización
    */
   errorTrace: string;
+  /**
+   * Fecha de inicio del rango de datos importados
+   */
+  dataStartDate?: Date;
+  /**
+   * Fecha de fin del rango de datos importados
+   */
+  dataEndDate?: Date;
 }
 /*export enum SyncStatus {
   PENDING = 'PENDING',
@@ -60,6 +68,8 @@ export class SyncDto {
   errorMessage: string;
   errorStack: string;
   errorTrace: string;
+  dataStartDate?: Date;
+  dataEndDate?: Date;
 }
 
 export class CreateSyncDto extends OmitType(SyncDto, ['id'] as const) {}
