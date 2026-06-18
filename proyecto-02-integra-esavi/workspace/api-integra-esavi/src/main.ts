@@ -20,7 +20,7 @@ async function bootstrap() {
     cors: {
       origin: allowedOrigins,
       methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-API-KEY', 'X-Username'],
       credentials: true,
     },
   });

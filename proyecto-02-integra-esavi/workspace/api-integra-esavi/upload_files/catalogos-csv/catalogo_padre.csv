@@ -1,0 +1,14 @@
+codigo,codigo_padre,descripcion,codigo_homologado
+GENERO,,Sexo,
+MASCULINO,GENERO,Masculino,1
+HOMBRE,GENERO,Hombre,1
+FEMENINO,GENERO,Femenino,2
+MUJER,GENERO,Mujer,2
+OTRO,GENERO,Otro,3
+ETNIA,,Etnia,
+MESTIZO,ETNIA,Mestizo,1
+INDIGENA,ETNIA,Indígena,2
+AFROECUATORIANO,ETNIA,Afroecuatoriano,3
+MONTUBIO,ETNIA,Montubio,4
+BLANCO,ETNIA,Blanco,5
+OTRO_ETNIA,ETNIA,Otro,6

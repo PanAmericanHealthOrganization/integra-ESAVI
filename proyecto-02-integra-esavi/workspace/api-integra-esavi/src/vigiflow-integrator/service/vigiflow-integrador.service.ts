@@ -238,7 +238,7 @@ export class VigiflowIntegradorService {
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
     // Usar for...of para esperar que cada operación asíncrona termine
-    for (const reg of reports) {
+    for (const reg of reports.slice(1)) {
       // TODO: colocar auditoria correcta
       const auditoria: IAuditoria = {
         createdAt: new Date(),

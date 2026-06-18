@@ -1,35 +1,35 @@
 import { Body, Controller, Delete, Get, Headers, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateParametroDto } from '../dto/create-parametro.dto';
-import { UpdateParametroDto } from '../dto/update-parametro.dto';
-import { ParametroService } from '../service/parametro.service';
+import { CreateCatalogoPadreDto } from '../dto/create-catalogo-padre.dto';
+import { UpdateCatalogoPadreDto } from '../dto/update-catalogo-padre.dto';
+import { CatalogoPadreService } from '../service/catalogo-padre.service';
 
-@ApiTags('Parametros')
-@Controller({ path: 'integrator/parametros', version: '1' })
-export class ParametroController {
-  constructor(private parametroService: ParametroService) {}
+@ApiTags('CatalogoPadre')
+@Controller({ path: 'integrator/catalogo-padre', version: '1' })
+export class CatalogoPadreController {
+  constructor(private catalogoPadreService: CatalogoPadreService) {}
 
   @Get('/findAll')
   @ApiResponse({ status: 200, description: 'The records have been successfully retrieved.' })
   findAll() {
-    return this.parametroService.findAll();
+    return this.catalogoPadreService.findAll();
   }
 
   @Get(':uuid')
   @ApiResponse({ status: 200, description: 'The record has been successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'The record has not been found.' })
-  findOne(@Param('uuid') uuid: string) {
-    return this.parametroService.findOne(uuid);
+  findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return this.catalogoPadreService.findOne(uuid);
   }
 
   @Post('/create')
   @ApiResponse({ status: 201, description: 'The record has been successfully created.' })
   @ApiResponse({ status: 400, description: 'The record has not been successfully created.' })
   create(
-    @Body() body: CreateParametroDto,
+    @Body() body: CreateCatalogoPadreDto,
     @Headers('x-username') username: string,
   ) {
-    return this.parametroService.create(body, username);
+    return this.catalogoPadreService.create(body, username);
   }
 
   @Put(':uuid')
@@ -37,10 +37,10 @@ export class ParametroController {
   @ApiResponse({ status: 400, description: 'The record has not been successfully updated.' })
   update(
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
-    @Body() body: UpdateParametroDto,
+    @Body() body: UpdateCatalogoPadreDto,
     @Headers('x-username') username: string,
   ) {
-    return this.parametroService.update(uuid, body, username);
+    return this.catalogoPadreService.update(uuid, body, username);
   }
 
   @Delete(':uuid')
@@ -50,6 +50,6 @@ export class ParametroController {
     @Param('uuid', new ParseUUIDPipe()) uuid: string,
     @Headers('x-username') username: string,
   ) {
-    return this.parametroService.delete(uuid, username);
+    return this.catalogoPadreService.delete(uuid, username);
   }
 }

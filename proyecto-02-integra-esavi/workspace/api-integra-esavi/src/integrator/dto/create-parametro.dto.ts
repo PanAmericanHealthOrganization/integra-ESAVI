@@ -1,7 +1,16 @@
-import { IntegrationGroup } from '../entity/parametro.entity';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateParametroDto {
+  @IsString()
+  @MaxLength(32)
   clave: string;
+
+  @IsString()
+  @IsOptional()
   valor: string;
-  createdBy: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(512)
+  descripcion: string;
 }

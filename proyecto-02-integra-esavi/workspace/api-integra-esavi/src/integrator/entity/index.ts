@@ -1,4 +1,5 @@
 export * from './antecedente-embarazo.entity';
+export * from './catalogo-padre.entity';
 export * from './antecedente-evento.entity';
 export * from './antecedente-medico.entity';
 export * from './antecedente-preexistencia.entity';

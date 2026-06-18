@@ -7,6 +7,8 @@ import { Parametro } from '../entity/parametro.entity';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
 
+const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
+
 @Injectable()
 export class ParametroService {
   private readonly logger = new Logger(ParametroService.name);
@@ -16,42 +18,50 @@ export class ParametroService {
     private readonly parametroRepository: Repository<Parametro>,
   ) {}
 
-  async create(createDto: CreateParametroDto): Promise<Parametro> {
+  async create(createDto: CreateParametroDto, currentUser: string = FALLBACK_USER): Promise<Parametro> {
     try {
-      let parametro = await this.findByKey(createDto.clave);
-      if (parametro) {
-        throw new Error('');
+      const existing = await this.findByKey(createDto.clave);
+      if (existing) {
+        throw new Error(`Ya existe un parámetro con la clave: ${createDto.clave}`);
       }
-      parametro = plainToClass(Parametro, createDto);
+      const parametro = plainToClass(Parametro, createDto);
+      parametro.createdBy = currentUser;
+      parametro.updatedBy = currentUser;
       return this.parametroRepository.save(parametro);
     } catch (e) {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(`Patient has been created: ${JSON.stringify(createDto)}`);
+      this.logger.log(`Parametro creado: ${JSON.stringify(createDto)} por ${currentUser}`);
     }
   }
 
-  delete(uuid: string): Promise<Parametro> {
-    return Promise.resolve(undefined);
+  async delete(uuid: string, currentUser: string = FALLBACK_USER): Promise<Parametro> {
+    const parametro = await this.findOne(uuid);
+    parametro.isEnabled = false;
+    parametro.deletedAt = new Date();
+    parametro.deletedBy = currentUser;
+    return this.parametroRepository.save(parametro);
   }
 
   findAll(): Promise<Parametro[]> {
-    return this.parametroRepository.find();
+    return this.parametroRepository.find({ where: { isEnabled: true } });
   }
 
   findOne(uuid: string): Promise<Parametro> {
-    const parametro = this.parametroRepository.findOne({ where: { id: uuid } });
+    const parametro = this.parametroRepository.findOne({ where: { id: uuid, isEnabled: true } });
     if (parametro) {
       return parametro;
     }
-    throw Error('');
+    throw Error('Parámetro no encontrado');
   }
 
-  async update(uuid: string, updateParametroDto: UpdateParametroDto): Promise<Parametro> {
+  async update(uuid: string, updateParametroDto: UpdateParametroDto, currentUser: string = FALLBACK_USER): Promise<Parametro> {
     const parametro = await this.findOne(uuid);
     if (parametro) {
       this.parametroRepository.merge(parametro, updateParametroDto);
+      parametro.updatedBy = currentUser;
+      parametro.updatedAt = new Date();
       return this.parametroRepository.save(parametro);
     }
   }
@@ -61,12 +71,4 @@ export class ParametroService {
       where: { clave: key },
     });
   }
-
-  // findByIntegrationGroup(group: IntegrationGroup) {
-  //   return this.parametroRepository.find({
-  //     where: {
-  //       grupo: group,
-  //     },
-  //   });
-  // }
 }

@@ -72,6 +72,7 @@ const App = () => {
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
       <Resource name="catalogos-config" {...catalogosConfig} />
+      <Resource name="catalogo-padre" />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={homologators.list} />
