@@ -1,5 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { IsNumber, IsString } from 'class-validator';
+import {PartialType} from "@nestjs/swagger";
+import {IsNumber,IsString} from 'class-validator';
 
 export class CreateGrupoEtarioDto {
   @IsNumber()
