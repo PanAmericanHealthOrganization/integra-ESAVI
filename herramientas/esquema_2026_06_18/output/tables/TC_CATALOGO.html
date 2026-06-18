@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>TC_CATALOGO - dhi_esavi.dhi_esavi</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="../schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="../bower/html5shiv/html5shiv.min.js"></script>
+        <script src="../bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="../index.html" class="navbar-brand"><b>dhi_esavi</b></a><span class="navbar-brand" style="padding-left: 0">.dhi_esavi</span>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="../index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="../columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="../constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="../relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="../orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="../anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="../routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>TC_CATALOGO</h1><p><span id="recordNumber">1783</span> rows</p><br />
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-file-text-o"></i>
+                            <h3 id="Description" class="box-title">Description</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div><!-- /.box-header -->
+                        <div class="box-body clearfix">
+                            <p>Catálogo de valores de homologaciones de Vigiflow a DHIS2</p>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 id="Columns" class="box-title">Columns</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="standard_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th title='Are nulls allowed?'>Nulls</th>
+                                    <th title='Is column automatically updated?'>Auto</th>
+                                    <th title='Default value'>Default</th>
+                                    <th title='Columns in tables that reference this column'>Children</th>
+                                    <th title='Columns in tables that are referenced by this column'>Parents</th>
+                                    <th title='Comments' class="toggle"><span>Comments</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><span id="AUD_FECHA_CREACION">AUD_FECHA_CREACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de creación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_CREACION">AUD_USUARIO_CREACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que creó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ACTUALIZACION">AUD_FECHA_ACTUALIZACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de actualización</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ACTUALIZACION">AUD_USUARIO_ACTUALIZACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>&#39;SYSTEM&#39;::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que actualizó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ELIMINACION">AUD_FECHA_ELIMINACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de eliminación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ELIMINACION">AUD_USUARIO_ELIMINACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que eliminó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_HABILITADO">AUD_HABILITADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está habilitado</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_ESTADO">AUD_ESTADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está activo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="ID">ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>uuid_generate_v4()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TC_CATALOGO.CATALOGO_ID_PADRE references TC_CATALOGO.ID via FK_c34f17176fddbdb527c704cca60"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.CATALOGO_ID_PADRE</span></td>
+                                                <td class="constraint detail">FK_c34f17176fddbdb527c704cca60</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.CTLLTMEDDRA_ID references TC_CATALOGO.ID via FK_efa13a960b9cacbd2c3640af1c8"><a href='TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html'>TR_ANTECEDENTES_ENFERMEDADES_PREVIAS</a><span class='relatedKey'>.CTLLTMEDDRA_ID</span></td>
+                                                <td class="constraint detail">FK_efa13a960b9cacbd2c3640af1c8</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EVENTO_ADVERSO.CT_ALERGIA_ALIMENTO_ID references TC_CATALOGO.ID via FK_a3a78ddd0002fd65475e77b3d2e"><a href='TR_ANTECEDENTES_EVENTO_ADVERSO.html'>TR_ANTECEDENTES_EVENTO_ADVERSO</a><span class='relatedKey'>.CT_ALERGIA_ALIMENTO_ID</span></td>
+                                                <td class="constraint detail">FK_a3a78ddd0002fd65475e77b3d2e</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EVENTO_ADVERSO.CT_ALERGIA_INSECTO_ID references TC_CATALOGO.ID via FK_7983c8b5eddff97a62d5a98da53"><a href='TR_ANTECEDENTES_EVENTO_ADVERSO.html'>TR_ANTECEDENTES_EVENTO_ADVERSO</a><span class='relatedKey'>.CT_ALERGIA_INSECTO_ID</span></td>
+                                                <td class="constraint detail">FK_7983c8b5eddff97a62d5a98da53</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EVENTO_ADVERSO.CT_ALERGIA_MEDICAMENTO_ID references TC_CATALOGO.ID via FK_60de72aaa0e8f05f0d96d581a05"><a href='TR_ANTECEDENTES_EVENTO_ADVERSO.html'>TR_ANTECEDENTES_EVENTO_ADVERSO</a><span class='relatedKey'>.CT_ALERGIA_MEDICAMENTO_ID</span></td>
+                                                <td class="constraint detail">FK_60de72aaa0e8f05f0d96d581a05</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EVENTO_ADVERSO.CT_ALERGIA_POLVO_ID references TC_CATALOGO.ID via FK_fa278687ee1952df77dc34ffb14"><a href='TR_ANTECEDENTES_EVENTO_ADVERSO.html'>TR_ANTECEDENTES_EVENTO_ADVERSO</a><span class='relatedKey'>.CT_ALERGIA_POLVO_ID</span></td>
+                                                <td class="constraint detail">FK_fa278687ee1952df77dc34ffb14</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNA.CT_ROL_VACUNA_ID references TC_CATALOGO.ID via FK_6ec7aeced291375f4c59f5eca31"><a href='TR_DATO_VACUNA.html'>TR_DATO_VACUNA</a><span class='relatedKey'>.CT_ROL_VACUNA_ID</span></td>
+                                                <td class="constraint detail">FK_6ec7aeced291375f4c59f5eca31</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.CT_CANTON_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_d0a82456684c3ecc4b5ba782100"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.CT_CANTON_NOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_d0a82456684c3ecc4b5ba782100</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.CT_CANTON_VACUNATORIO_ID references TC_CATALOGO.ID via FK_0a071b03e3d35e34e4e42390e62"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.CT_CANTON_VACUNATORIO_ID</span></td>
+                                                <td class="constraint detail">FK_0a071b03e3d35e34e4e42390e62</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.CT_PARROQUIA_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_1bf153ad8c6e63fae048511dfa5"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.CT_PARROQUIA_NOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_1bf153ad8c6e63fae048511dfa5</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.CT_PARROQUIA_VACUNATORIO_ID references TC_CATALOGO.ID via FK_bff1a6d987f4b9be2029e94c206"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.CT_PARROQUIA_VACUNATORIO_ID</span></td>
+                                                <td class="constraint detail">FK_bff1a6d987f4b9be2029e94c206</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.CT_PROVINCIA_VACUNATORIO_ID references TC_CATALOGO.ID via FK_7f6ed10fc8cb50a070aebec0032"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.CT_PROVINCIA_VACUNATORIO_ID</span></td>
+                                                <td class="constraint detail">FK_7f6ed10fc8cb50a070aebec0032</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DESENLACE_ESAVI.CAUSALIDADESAVI_ID references TC_CATALOGO.ID via FK_2ea6c3837ce18dc0c91514c6f2a"><a href='TR_DESENLACE_ESAVI.html'>TR_DESENLACE_ESAVI</a><span class='relatedKey'>.CAUSALIDADESAVI_ID</span></td>
+                                                <td class="constraint detail">FK_2ea6c3837ce18dc0c91514c6f2a</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_CANTON_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_476c77cfa7eac246753cf49796a"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CT_CANTON_NOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_476c77cfa7eac246753cf49796a</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_ESTADO_REGISTRO_ID references TC_CATALOGO.ID via FK_a1acd5196f12ff1b7cb0081ef28"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CT_ESTADO_REGISTRO_ID</span></td>
+                                                <td class="constraint detail">FK_a1acd5196f12ff1b7cb0081ef28</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_PARROQUIA_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_80403944874e5fd64bd7692cef3"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CT_PARROQUIA_NOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_80403944874e5fd64bd7692cef3</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_PROVINCIA_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_09404250bf2870d57dc4bee9326"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CT_PROVINCIA_NOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_09404250bf2870d57dc4bee9326</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTCANTORESIDENCIA_ID references TC_CATALOGO.ID via FK_39fe0a33d7998014c2fc3d2683e"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CTCANTORESIDENCIA_ID</span></td>
+                                                <td class="constraint detail">FK_39fe0a33d7998014c2fc3d2683e</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPARROQUIARESIDENCIA_ID references TC_CATALOGO.ID via FK_5329e8f623d5f056caa2e3a9b91"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CTPARROQUIARESIDENCIA_ID</span></td>
+                                                <td class="constraint detail">FK_5329e8f623d5f056caa2e3a9b91</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPROFESIONNOTIFICADOR_ID references TC_CATALOGO.ID via FK_b29facf202418dbf9f700dbaea5"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CTPROFESIONNOTIFICADOR_ID</span></td>
+                                                <td class="constraint detail">FK_b29facf202418dbf9f700dbaea5</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPROVINCIARESIDENCIA_ID references TC_CATALOGO.ID via FK_d7dd997fc4d774829559e77b743"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CTPROVINCIARESIDENCIA_ID</span></td>
+                                                <td class="constraint detail">FK_d7dd997fc4d774829559e77b743</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTUNIDADEDAD_ID references TC_CATALOGO.ID via FK_58b5a9015c537bd067a78c83c27"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.CTUNIDADEDAD_ID</span></td>
+                                                <td class="constraint detail">FK_58b5a9015c537bd067a78c83c27</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_PACIENTE.CT_AUTO_IDENTIFICACION_ETNICA_ID references TC_CATALOGO.ID via FK_9cbc56ad3f9d5c4121332c6051e"><a href='TR_PACIENTE.html'>TR_PACIENTE</a><span class='relatedKey'>.CT_AUTO_IDENTIFICACION_ETNICA_ID</span></td>
+                                                <td class="constraint detail">FK_9cbc56ad3f9d5c4121332c6051e</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_PACIENTE.CT_SEXO_ID references TC_CATALOGO.ID via FK_21477babb159d2e7fafd2ad67d6"><a href='TR_PACIENTE.html'>TR_PACIENTE</a><span class='relatedKey'>.CT_SEXO_ID</span></td>
+                                                <td class="constraint detail">FK_21477babb159d2e7fafd2ad67d6</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DESCRIPCION_VIGIFLOW">DESCRIPCION_VIGIFLOW</span></td>
+                                    <td>varchar</td>
+                                    <td>255</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Descripción en Vigiflow</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DESCRIPCION_DHIS2">DESCRIPCION_DHIS2</span></td>
+                                    <td>varchar</td>
+                                    <td>255</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Descripción en DHIS2</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DESCRIPCION_HOMOLOGADA">DESCRIPCION_HOMOLOGADA</span></td>
+                                    <td>varchar</td>
+                                    <td>255</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Descripción homologada</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CATALOGO_ID_PADRE">CATALOGO_ID_PADRE</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TC_CATALOGO.CATALOGO_ID_PADRE references TC_CATALOGO.ID via FK_c34f17176fddbdb527c704cca60"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_c34f17176fddbdb527c704cca60</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTTIPOCATALOGO_ID">CTTIPOCATALOGO_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TC_CATALOGO.CTTIPOCATALOGO_ID references TC_TIPO_CATALOGO.ID via FK_15e4eb5374076c9758e8cac7dfd"><a href='TC_TIPO_CATALOGO.html'>TC_TIPO_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_15e4eb5374076c9758e8cac7dfd</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador único de la tabla TC_TIPO_CATALOGO</p></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 id="Indexes" class="box-title">Indexes</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="indexes_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Type</th>
+                                    <th>Sort</th>
+                                    <th>Column(s)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> PK_3adef02e7f01196ef9d9a8ca11c</td>
+                                    <td>Primary key</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>ID</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 id="Relationships" class="box-title">Relationships</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom"><!-- Tabs within a box -->
+                                <h5>Close relationships within degrees of separation</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
+                                    <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
+                                    <li class=""><a href="#oneimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">One implied</a></li>
+                                    <li class=""><a href="#twoimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="377,569,864,1049">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,953,333,1071">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1777,5,2265,181">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1333,576,1733,1045">
+<area shape="rect" id="node9" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="908,565,1289,829">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1810,199,2233,463">
+<area shape="rect" id="node6" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1811,484,2231,689">
+<area shape="rect" id="node7" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1817,973,2225,1267">
+<area shape="rect" id="node8" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1857,1284,2185,1460">
+</map>
+                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/TC_CATALOGO.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="377,381,864,861">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,765,333,882">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1536,330,1894,418">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1196,624,1427,712">
+<area shape="rect" id="node17" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="908,384,1152,472">
+<area shape="rect" id="node18" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="933,489,1127,577">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1471,225,1959,313">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1504,1314,1927,1402">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1552,436,1878,524">
+<area shape="rect" id="node8" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2003,1136,2285,1224">
+<area shape="rect" id="node9" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="1601,752,1829,840">
+<area shape="rect" id="node10" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1596,1209,1835,1297">
+<area shape="rect" id="node11" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1574,14,1856,102">
+<area shape="rect" id="node12" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1578,120,1852,208">
+<area shape="rect" id="node13" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1534,541,1896,629">
+<area shape="rect" id="node14" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1582,646,1849,734">
+<area shape="rect" id="node15" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1594,857,1837,945">
+<area shape="rect" id="node16" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1597,962,1833,1050">
+<area shape="rect" id="node19" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1552,1068,1879,1156">
+</map>
+                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/TC_CATALOGO.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="377,569,864,1049">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,953,333,1071">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1777,5,2265,181">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1333,576,1733,1045">
+<area shape="rect" id="node9" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="908,565,1289,829">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1810,199,2233,463">
+<area shape="rect" id="node6" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1811,484,2231,689">
+<area shape="rect" id="node7" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1817,973,2225,1267">
+<area shape="rect" id="node8" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1857,1284,2185,1460">
+</map>
+                                        <a name='diagram'><img id="oneimpliedDegreeImg" src="../diagrams/tables/TC_CATALOGO.implied1degrees.png" usemap="#oneDegreeRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="377,257,864,737">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,641,333,759">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1536,851,1894,939">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1196,500,1427,588">
+<area shape="rect" id="node17" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="908,365,1152,453">
+<area shape="rect" id="node18" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="933,635,1127,723">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1471,1061,1959,1149">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1504,1167,1927,1255">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1552,956,1878,1044">
+<area shape="rect" id="node8" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2286,252,2568,340">
+<area shape="rect" id="node9" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2009,252,2237,340">
+<area shape="rect" id="node10" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2003,357,2242,445">
+<area shape="rect" id="node11" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1534,324,1896,412">
+<area shape="rect" id="node12" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1574,5,1856,93">
+<area shape="rect" id="node13" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1578,111,1852,199">
+<area shape="rect" id="node14" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1582,429,1849,517">
+<area shape="rect" id="node15" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1594,535,1837,623">
+<area shape="rect" id="node16" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1597,640,1833,728">
+<area shape="rect" id="node19" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1552,745,1879,833">
+</map>
+                                        <a name='diagram'><img id="twoimpliedDegreeImg" src="../diagrams/tables/TC_CATALOGO.implied2degrees.png" usemap="#twoDegreesRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <script>
+                    var config = {
+                        pagination: true
+                    }
+                </script>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 7.0.2</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="../bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="../bower/pdfmake/pdfmake.min.js"></script>
+        <script src="../bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="../bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="../bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="../bower/codemirror/codemirror.js"></script>
+        <script src="../bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="table.js"></script>
+        <script src="../schemaSpy.js"></script>
+    </body>
+</html>
