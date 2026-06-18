@@ -1,8 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreatePacienteDto } from '../dto/create-paciente.dto';
-import { UpdatePacienteDto } from '../dto/update-paciente.dto';
+import { CreatePacienteDto, UpdatePacienteDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 

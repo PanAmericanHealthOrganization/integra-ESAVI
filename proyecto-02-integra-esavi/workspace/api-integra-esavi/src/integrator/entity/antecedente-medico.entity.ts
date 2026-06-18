@@ -1,6 +1,5 @@
 import { BeforeInsert, Column, Entity } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
-import * as moment from 'moment/moment';
 
 @Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_MEDICO', comment: 'Tabla de antecedentes médicos' })
 export class AntecedenteMedico extends Antecedente {
@@ -202,6 +201,6 @@ export class AntecedenteMedico extends Antecedente {
 
   @BeforeInsert()
   beforeInsert() {
-    this.createdAt = moment().toDate();
+    this.createdAt = new Date();
   }
 }

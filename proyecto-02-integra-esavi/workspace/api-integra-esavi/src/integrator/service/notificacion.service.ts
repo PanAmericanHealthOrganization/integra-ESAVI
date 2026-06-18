@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
-import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
+import { CreateNotificacionDto } from '../dto';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';

@@ -1,7 +1,7 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { Dhis2ProgramService } from './dhis2-program.service';
 import { Dhis2OptionsService } from './dhis2-options.service';
-import { Event } from '../dto/events.interface';
+import { Event } from '../dto';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';

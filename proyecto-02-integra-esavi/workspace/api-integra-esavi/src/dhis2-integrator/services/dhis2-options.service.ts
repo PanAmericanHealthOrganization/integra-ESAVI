@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { Option } from '../dto/options.interface';
+import { Option } from '../dto';
 
 @Injectable()
 export class Dhis2OptionsService {

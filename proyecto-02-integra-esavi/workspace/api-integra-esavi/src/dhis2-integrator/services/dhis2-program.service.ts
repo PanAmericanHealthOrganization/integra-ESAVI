@@ -1,10 +1,9 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { ProgramTrackedEntityAttribute } from '../dto/programTrackedEntityAttribute.interface';
+import { ProgramTrackedEntityAttribute, Attribute } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { Attribute } from '../dto/attribute.interface';
 
 @Injectable()
 export class Dhis2ProgramService {

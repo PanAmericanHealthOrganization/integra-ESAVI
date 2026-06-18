@@ -1,4 +1,3 @@
-import * as moment from 'moment/moment';
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 
@@ -45,6 +44,6 @@ export class CatalogoPadre extends Auditoria {
 
   @BeforeInsert()
   beforeInsert() {
-    this.createdAt = moment().toDate();
+    this.createdAt = new Date();
   }
 }

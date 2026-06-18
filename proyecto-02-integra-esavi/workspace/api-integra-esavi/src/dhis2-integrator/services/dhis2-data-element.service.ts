@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { DataElement } from '../dto/dataElemen.interface';
+import { DataElement } from '../dto';
 
 @Injectable()
 export class Dhis2DataElementService {

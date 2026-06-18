@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePacienteVigiflowDto } from '../dto/create-paciente-vigiflow.dto';
-import { UpdatePacienteDto } from '../dto/update-paciente.dto';
+import { CreatePacienteVigiflowDto } from '../dto';
+import { UpdatePacienteDto } from '../dto';
 import { PacienteVigiflowService } from '../service/paciente-vigiflow.service';
 
 @ApiTags('Paciente')

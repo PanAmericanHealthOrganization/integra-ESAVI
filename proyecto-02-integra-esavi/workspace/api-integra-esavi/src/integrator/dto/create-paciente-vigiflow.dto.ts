@@ -1,4 +1,4 @@
-import { CreatePacienteDto } from './create-paciente.dto';
+import { CreatePacienteDto } from './paciente.dto';
 
 export class CreatePacienteVigiflowDto extends CreatePacienteDto {
   codigoVigiflow: string;

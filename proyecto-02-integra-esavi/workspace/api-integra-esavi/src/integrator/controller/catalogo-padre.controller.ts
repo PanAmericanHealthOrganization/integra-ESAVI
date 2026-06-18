@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateCatalogoPadreDto } from '../dto/create-catalogo-padre.dto';
-import { UpdateCatalogoPadreDto } from '../dto/update-catalogo-padre.dto';
+import { CreateCatalogoPadreDto, UpdateCatalogoPadreDto } from '../dto';
 import { CatalogoPadreService } from '../service/catalogo-padre.service';
 
 @ApiTags('CatalogoPadre')

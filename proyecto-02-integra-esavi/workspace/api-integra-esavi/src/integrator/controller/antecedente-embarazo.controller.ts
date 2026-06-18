@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateAntecedenteEmbarazoDto } from '../dto/create-antecedente-embarazo.dto';
-import { UpdateAntecedenteEmbarazoDto } from '../dto/update-antecedente-embarazo.dto';
+import { CreateAntecedenteEmbarazoDto, UpdateAntecedenteEmbarazoDto } from '../dto';
 import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
 
 @ApiTags('Antecedente Embarazo')

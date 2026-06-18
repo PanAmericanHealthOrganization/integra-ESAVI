@@ -2,8 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
-import { CreateHomologationDto } from '../dto/create-homologation.dto';
-import { UpdateHomologationDto } from '../dto/update-homologation.dto';
+import { CreateHomologationDto, UpdateHomologationDto } from '../dto';
 import { HomologationService } from '../service/homologation.service';
 
 @ApiTags('Homologation')

@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateParametroDto } from '../dto/create-parametro.dto';
-import { UpdateParametroDto } from '../dto/update-parametro.dto';
+import { CreateParametroDto, UpdateParametroDto } from '../dto';
 import { Parametro } from '../entity/parametro.entity';
 
 import { plainToClass } from 'class-transformer';

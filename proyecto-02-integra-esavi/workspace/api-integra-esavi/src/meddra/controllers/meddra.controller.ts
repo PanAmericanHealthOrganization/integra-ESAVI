@@ -2,7 +2,7 @@ import { Body, Controller, Get, Logger, Param, Post, Query, StreamableFile } fro
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { createReadStream } from 'fs';
 import { join } from 'path';
-import { IMeddraResponse, MeddraQueryRequestDto } from '../models/dto/meddra.query';
+import { IMeddraResponse, MeddraQueryRequestDto } from '../models/dto';
 import { MeddraClientService } from '../services/meddra-client.service';
 import { MeddraStandarService } from '../services/meddra-standar.service';
 

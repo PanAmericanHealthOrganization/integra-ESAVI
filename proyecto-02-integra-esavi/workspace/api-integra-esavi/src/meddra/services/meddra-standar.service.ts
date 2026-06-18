@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
-import { MeddraStandarDto } from '../models/dto/meddraStandar.dto';
+import { MeddraStandarDto } from '../models/dto';
 import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
 import { CIE10ES } from '../models/standar/cie_10_meddra.entity';
 import { LLT } from '../models/standar/llt.entity';

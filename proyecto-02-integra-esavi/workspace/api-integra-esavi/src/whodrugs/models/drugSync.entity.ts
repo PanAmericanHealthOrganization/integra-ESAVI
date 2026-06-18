@@ -1,7 +1,7 @@
 import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity } from 'typeorm';
 import { SyncStateEnum } from '../utils/sycnstate.enum';
-import { IDrugSync } from './dtos/drugSync.dto';
+import { IDrugSync } from './dtos';
 
 @Entity({ name: 'drug_sync', schema: 'who_drug' })
 export class DrugSync extends Auditoria implements IDrugSync {

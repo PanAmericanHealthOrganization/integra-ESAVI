@@ -5,7 +5,7 @@ import {
   DIMENSION_CALIDAD,
   DimensionCalidadDatosDto,
   SUB_DIMENSION_CALIDAD,
-} from '../controllers/dto/quality.dto';
+} from '../controllers/dto';
 import { DataQualityUtils } from './utils/dataquality.utils';
 
 export class DimExactitudService {

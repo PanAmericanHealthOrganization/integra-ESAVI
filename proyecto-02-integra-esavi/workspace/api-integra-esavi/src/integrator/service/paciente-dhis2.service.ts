@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { CreatePacienteDhis2Dto } from '../dto/create-paciente-dhis2.dto';
-import { UpdatePacienteDto } from '../dto/update-paciente.dto';
+import { CreatePacienteDhis2Dto } from '../dto';
+import { UpdatePacienteDto } from '../dto';
 import { PacienteDhis2 } from '../entity/paciente-dhis2.entity';
 import { CatalogoService } from './catalogo.service';
 

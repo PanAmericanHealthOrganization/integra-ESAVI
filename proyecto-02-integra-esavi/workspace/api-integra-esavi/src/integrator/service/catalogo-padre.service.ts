@@ -1,8 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateCatalogoPadreDto } from '../dto/create-catalogo-padre.dto';
-import { UpdateCatalogoPadreDto } from '../dto/update-catalogo-padre.dto';
+import { CreateCatalogoPadreDto, UpdateCatalogoPadreDto } from '../dto';
 import { CatalogoPadre } from '../entity/catalogo-padre.entity';
 
 const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';

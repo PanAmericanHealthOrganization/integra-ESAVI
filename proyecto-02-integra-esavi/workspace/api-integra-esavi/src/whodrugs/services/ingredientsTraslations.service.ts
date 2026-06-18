@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IngredientTranslation } from '../models/ingredientTranslation.entity';
-import { IIngredientTranslation } from '../models/dtos/drug.dto';
+import { IIngredientTranslation } from '../models/dtos';
 import { ActiveIngredient } from '../models/activeIngredient.entity';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 

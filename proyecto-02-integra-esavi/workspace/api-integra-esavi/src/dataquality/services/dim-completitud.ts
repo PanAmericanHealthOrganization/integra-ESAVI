@@ -5,7 +5,7 @@ import {
   CalidadDatosResultadoWhitMetadataDto,
   DIMENSION_CALIDAD,
   DimensionCalidadDatosDto,
-} from '../controllers/dto/quality.dto';
+} from '../controllers/dto';
 import { DataQualityUtils } from './utils/dataquality.utils';
 
 export class DimCompletitudService {

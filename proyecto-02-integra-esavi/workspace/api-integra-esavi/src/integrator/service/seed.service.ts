@@ -1526,7 +1526,6 @@ export class SeedService implements OnApplicationBootstrap {
         for (const row of rows.filter((r) => !r.codigo_padre)) {
           const existing = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo } });
           if (existing) {
-            console.log(`ℹ️ Catálogo [${row.codigo}] ya existe en TC_CATALOGO_PADRE, se omite la carga.`);
             omitidos++;
           } else {
             await this.catalogoPadreRepository.save({
@@ -1544,7 +1543,6 @@ export class SeedService implements OnApplicationBootstrap {
         for (const row of rows.filter((r) => r.codigo_padre)) {
           const existing = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo } });
           if (existing) {
-            console.log(`ℹ️ Catálogo [${row.codigo}] ya existe en TC_CATALOGO_PADRE, se omite la carga.`);
             omitidos++;
           } else {
             const padre = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo_padre } });
@@ -1559,7 +1557,10 @@ export class SeedService implements OnApplicationBootstrap {
           }
         }
 
-        console.log(`✅ TC_CATALOGO_PADRE procesado: ${insertados} insertado(s), ${omitidos} ya existía(n) y no se volvió a cargar.`);
+        if (omitidos > 0) {
+          console.log(`ℹ️ TC_CATALOGO_PADRE: ${omitidos} registro(s) ya estaban cargados y se omitieron.`);
+        }
+        console.log(`✅ TC_CATALOGO_PADRE procesado: ${insertados} insertado(s), ${omitidos} omitido(s).`);
       } catch (error) {
         console.error('❌ Error al cargar TC_CATALOGO_PADRE desde CSV:', error);
       }

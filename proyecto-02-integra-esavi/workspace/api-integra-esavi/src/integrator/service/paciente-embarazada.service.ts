@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { CreatePacienteEmbarazadaDto } from '../dto/create-paciente-embarazada.dto';
+import { CreatePacienteEmbarazadaDto } from '../dto';
 import { Notificacion } from '../entity/notificacion.entity';
 import { PacienteEmbarazada } from '../entity/paciente-embarazada.entity';
 

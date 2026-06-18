@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateCompleteDto } from '../dto/create-complete.dto';
+import { CreateCompleteDto } from '../dto';
 import { IntegradorService } from '../facade/integrador.service';
 
 @ApiTags('Integrador')

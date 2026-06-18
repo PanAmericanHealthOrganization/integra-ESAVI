@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
-import { UpdateCatalogoDto } from '../dto/update-catalogo.dto';
+import { CreateCatalogoDto, UpdateCatalogoDto } from '../dto';
 import { CatalogoService } from '../service/catalogo.service';
 
 @ApiTags(' Catálogos ')

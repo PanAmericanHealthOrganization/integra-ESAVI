@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CountryOfSale } from '../models/countryOfSale.entity';
 import { Drug } from '../models/drug.entity';
-import { ICountryOfSale } from '../models/dtos/drug.dto';
+import { ICountryOfSale } from '../models/dtos';
 import { MaholderService } from './maholder.service';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 

@@ -1,4 +1,3 @@
-import * as moment from 'moment';
 import {
   BeforeInsert,
   BeforeUpdate,
@@ -442,7 +441,7 @@ export class Notificacion extends Auditoria {
    */
   @BeforeInsert()
   beforeInsert() {
-    this.createdAt = moment().toDate();
+    this.createdAt = new Date();
   }
 
   /**
@@ -450,6 +449,6 @@ export class Notificacion extends Auditoria {
    */
   @BeforeUpdate()
   beforeUpdate() {
-    this.updatedAt = moment().toDate();
+    this.updatedAt = new Date();
   }
 }

@@ -1,7 +1,7 @@
 import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Drug } from './drug.entity';
-import { IActiveIngredient } from './dtos/drug.dto';
+import { IActiveIngredient } from './dtos';
 /**
  *
  */

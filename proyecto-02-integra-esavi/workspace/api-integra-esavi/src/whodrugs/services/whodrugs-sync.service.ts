@@ -8,7 +8,7 @@ import { DrugSchemaAdapter } from '../models/builders/drug.build';
 import { CountryOfSale } from '../models/countryOfSale.entity';
 import { Drug } from '../models/drug.entity';
 import { DrugSync, DrugSyncBuilder } from '../models/drugSync.entity';
-import { IDrugResponse } from '../models/dtos/drug.dto';
+import { IDrugResponse } from '../models/dtos';
 import { IngredientTranslation } from '../models/ingredientTranslation.entity';
 import { Maholder } from '../models/maholder.entity';
 import { SyncStateEnum } from '../utils/sycnstate.enum';

@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateGrupoEtarioDto } from '../dto/create-grupo-etario.dto';
-import { UpdateGrupoEtarioDto } from '../dto/update-grupo-etario.dto';
+import { CreateGrupoEtarioDto, UpdateGrupoEtarioDto } from '../dto';
 import { GrupoEtarioService } from '../service/grupo-etario.service';
 
 @ApiTags('Integrador')

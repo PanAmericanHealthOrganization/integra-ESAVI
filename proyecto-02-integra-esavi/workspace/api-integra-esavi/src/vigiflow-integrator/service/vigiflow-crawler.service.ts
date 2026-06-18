@@ -2,7 +2,8 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
-import * as moment from 'moment/moment';
+import * as fs from 'fs';
+import * as os from 'os';
 import * as puppeteer from 'puppeteer';
 import { catchError, firstValueFrom } from 'rxjs';
 import { read } from 'xlsx';
@@ -22,17 +23,52 @@ export class VigiflowCrawlerService {
    *
    * @returns
    */
+  private resolveChromePath(): string | undefined {
+    const configured = this.configService.get<string>('PATH_BROWSER_PUPPETEER');
+    if (configured && fs.existsSync(configured)) {
+      return configured;
+    }
+    if (configured) {
+      this.logger.warn(`PATH_BROWSER_PUPPETEER apunta a una ruta inexistente: "${configured}". Buscando Chrome automáticamente.`);
+    }
+    const fallbacks: Record<string, string[]> = {
+      win32: [
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        process.env.LOCALAPPDATA + '\\Google\\Chrome\\Application\\chrome.exe',
+      ],
+      darwin: [
+        '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+        '/Applications/Chromium.app/Contents/MacOS/Chromium',
+      ],
+      linux: [
+        '/usr/bin/google-chrome',
+        '/usr/bin/google-chrome-stable',
+        '/usr/bin/chromium-browser',
+        '/usr/bin/chromium',
+      ],
+    };
+    const paths = fallbacks[os.platform()] ?? [];
+    const found = paths.find((p) => fs.existsSync(p));
+    if (found) {
+      this.logger.log(`Chrome encontrado en: ${found}`);
+    } else {
+      this.logger.warn('No se encontró Chrome en rutas estándar. Puppeteer usará su Chromium integrado.');
+    }
+    return found;
+  }
+
   async retrieveJWT(): Promise<any> {
     const base = this.configService.get<string>('VIGIFLOW_URL');
     const username = this.configService.get<string>('VIGIFLOW_USERNAME');
     const password = this.configService.get<string>('VIGIFLOW_PASSWD');
-    const puppeteerPath = this.configService.get<string>('PATH_BROWSER_PUPPETEER');
+    const chromePath = this.resolveChromePath();
 
     const queryUserUrl = new URL('/query/user', base).href;
 
     const browser = await puppeteer.launch({
       headless: 'new',
-      executablePath: puppeteerPath,
+      ...(chromePath && { executablePath: chromePath }),
     });
 
     const page = await browser.newPage();
@@ -220,7 +256,7 @@ export class VigiflowCrawlerService {
       userSearchIcsrsParameters: [],
       enumSearchIcsrsParameters: [],
       // printDate: '2022-12-02T11:57:03.904Z',
-      printDate: moment().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]'),
+      printDate: new Date().toISOString(),
     });
   }
 

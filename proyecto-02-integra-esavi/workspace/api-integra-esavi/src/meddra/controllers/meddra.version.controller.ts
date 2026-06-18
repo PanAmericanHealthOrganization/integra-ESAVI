@@ -10,7 +10,7 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ProcessVersionReqDTO } from '../models/dto/meddra.query';
+import { ProcessVersionReqDTO } from '../models/dto';
 import { MeddraProcessFilesService } from '../services/meddra-process.service';
 /**
  * Controlador para procesar los archivos de meddra

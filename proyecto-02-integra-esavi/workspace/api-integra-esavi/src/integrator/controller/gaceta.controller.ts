@@ -14,9 +14,7 @@ import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/
 import { Response } from 'express';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
-import { CreateGacetaDto } from '../dto/create-gaceta.dto';
-import { GacetaDto } from '../dto/gaceta.dto';
-import { UpdateGacetaDto } from '../dto/update-gaceta.dto';
+import { CreateGacetaDto, GacetaDto, UpdateGacetaDto } from '../dto';
 import { ESTADO_GACETA } from '../entity/interfaces/gaceta.interface';
 import { GacetaService } from '../service/gaceta.service';
 

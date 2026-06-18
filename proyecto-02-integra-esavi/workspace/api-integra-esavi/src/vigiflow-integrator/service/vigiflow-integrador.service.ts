@@ -3,13 +3,25 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import * as fs from 'fs/promises';
-import * as moment from 'moment/moment';
 import * as countries from 'i18n-iso-countries';
 import * as enLocale from 'i18n-iso-countries/langs/en.json';
 import * as esLocale from 'i18n-iso-countries/langs/es.json';
-import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
-import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
-import { UpdateAntecedenteEmbarazoDto } from 'src/integrator/dto/update-antecedente-embarazo.dto';
+import {
+  CreatePacienteEmbarazadaDto,
+  UbicacionDto,
+  UpdateAntecedenteEmbarazoDto,
+  CreateCompleteDto,
+  CreateDatoEsaviDto,
+  CreateDatoVacunaDto,
+  CreateDatoVacunacionDto,
+  CreateDesenlaceEsaviDto,
+  CreateGravedadEsaviDto,
+  CreateMedicamentoDto,
+  CreateNotificacionDto,
+  CreatePacienteVigiflowDto,
+  UpdateNotificacionDto,
+  UpdateDatoVacunaDto,
+} from '../../integrator/dto';
 import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { AntecedenteEmbarazoService } from 'src/integrator/service/antecedente-embarazo.service';
 import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
@@ -20,17 +32,6 @@ import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredient
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import { read, utils, WorkBook } from 'xlsx';
-import { CreateCompleteDto } from '../../integrator/dto/create-complete.dto';
-import { CreateDatoEsaviDto } from '../../integrator/dto/create-dato-esavi.dto';
-import { CreateDatoVacunaDto } from '../../integrator/dto/create-dato-vacuna.dto';
-import { CreateDatoVacunacionDto } from '../../integrator/dto/create-dato-vacunacion.dto';
-import { CreateDesenlaceEsaviDto } from '../../integrator/dto/create-desenlace-esavi.dto';
-import { CreateGravedadEsaviDto } from '../../integrator/dto/create-gravedad-esavi.dto';
-import { CreateMedicamentoDto } from '../../integrator/dto/create-medicamento.dto';
-import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
-import { CreatePacienteVigiflowDto } from '../../integrator/dto/create-paciente-vigiflow.dto';
-import { UpdateNotificacionDto } from '../../integrator/dto/update-notificacion.dto';
-import { UpdateDatoVacunaDto } from '../../integrator/dto/update-dato-vacuna.dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
@@ -109,16 +110,24 @@ export class VigiflowIntegradorService {
 
     // Procesar mientras fechaInicio sea menor que la fecha actual
     while (this.fechaInicio < now) {
-      // Calcular la fecha de fin como el último día del mes de fechaInicio
-      const fechaFin = moment.utc(this.fechaInicio).endOf('month').toDate();
+      // Calcular la fecha de fin como el último día del mes de fechaInicio (UTC)
+      const fechaFin = new Date(Date.UTC(
+        this.fechaInicio.getUTCFullYear(),
+        this.fechaInicio.getUTCMonth() + 1,
+        0, 23, 59, 59, 999,
+      ));
       // Llamar a la función de procesamiento
       await this.createInBulk(this.fechaInicio, fechaFin);
 
-      // Avanzar fechaInicio al primer día del siguiente mes
+      // Avanzar fechaInicio al primer día del siguiente mes (UTC)
       this.logger.log(
-        `Procesado desde ${moment.utc(this.fechaInicio).toISOString()} hasta ${moment.utc(fechaFin).toISOString()}`,
+        `Procesado desde ${this.fechaInicio.toISOString()} hasta ${fechaFin.toISOString()}`,
       );
-      this.fechaInicio = moment.utc(this.fechaInicio).add(1, 'month').startOf('month').toDate();
+      this.fechaInicio = new Date(Date.UTC(
+        this.fechaInicio.getUTCFullYear(),
+        this.fechaInicio.getUTCMonth() + 1,
+        1, 0, 0, 0, 0,
+      ));
     }
 
     // Si hemos alcanzado la fecha actual, reiniciar fechaInicio
@@ -133,8 +142,9 @@ export class VigiflowIntegradorService {
       throw new BadRequestException();
     }
     //Date params should be sent with this format: 20230113
-    const fechaInicioFmrt = moment.utc(fechaInicio).format('YYYYMMDD');
-    const fechaFinFmrt = moment.utc(fechaFin).format('YYYYMMDD');
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const fechaInicioFmrt = `${fechaInicio.getUTCFullYear()}${pad(fechaInicio.getUTCMonth() + 1)}${pad(fechaInicio.getUTCDate())}`;
+    const fechaFinFmrt = `${fechaFin.getUTCFullYear()}${pad(fechaFin.getUTCMonth() + 1)}${pad(fechaFin.getUTCDate())}`;
 
     const syncRecord = await this.syncService.createSyncProcess({
       name: 'VIGIFLOW_BULK',
@@ -835,7 +845,7 @@ export class VigiflowIntegradorService {
                * notificación, utilizando el método "create" del servicio datoVacunaService.
                * "create" utiliza filtros internos de TypeORM para evitar duplicados.
                * */
-              await this.datoVacunaService.create(notificacion, updateDatoVacuna); //Existe otra forma, utilizando la actualización propia que tiene este método create.
+              await this.datoVacunaService.create(notificacion, updateDatoVacuna as CreateDatoVacunaDto); //Existe otra forma, utilizando la actualización propia que tiene este método create.
               //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
               //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
             }
@@ -974,16 +984,16 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
 
   return regex.test(valor.trim()) ? 'Desconocido' : valor;
 }
-  formatoFecha(valor: string) {
-    if (valor && valor.length > 0 && valor != '') {
-      return moment.utc(valor, 'YYYYMMDD').toDate(); //return moment(valor, 'YYYYMMDD)').toDate();
+  formatoFecha(valor: string): Date | null {
+    if (valor && valor.length > 0 && valor !== '') {
+      const year = parseInt(valor.substring(0, 4), 10);
+      const month = parseInt(valor.substring(4, 6), 10);
+      const day = parseInt(valor.substring(6, 8), 10);
+      const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      return isNaN(date.getTime()) ? null : date;
     }
     return null;
-  }//Se comprobó que cuando la fecha viene con la parte de la hora y zona horaria, este método no devuelve ajustado a cero horas, minutos, segundos y milisegundos. En vigiflow no es probable que vengan con la parte de la hora, pero, en DHIS2 si puede venir con la parte de la hora y zona horaria.
-  // Actualización: se elimina el paréntesis de cierre del formato de fecha.
-  // La definición de la columna en la entidad 'timestamp with time zone': convierte automáticamente a UTC al persistir.
-  // Para forzar a UTC, se utiliza 'moment.utc'.
-  // Comprobar qué sucese cuando se concatena con la hora cuando los campos diponen este valor en otro Elemento de Datos.
+  }
 
   analizarCadenaFecha(dateStr: string): Date | null {
     if (!/^\d{8}$/.test(dateStr)) {// Verifica que la cadena tenga exactamente 8 dígitos

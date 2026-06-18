@@ -2,9 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
-import { CreateHomologatorDto } from '../dto/create-homologator.dto';
-import { UpdateHomologatorDto } from '../dto/update-homologator.dto';
-import { ResolveRequestDto } from '../dto/resolve-request.dto';
+import { CreateHomologatorDto, UpdateHomologatorDto, ResolveRequestDto } from '../dto';
 import { HomologatorService } from '../service/homologator.service';
 import { ResolverService } from '../service/resolver.service';
 

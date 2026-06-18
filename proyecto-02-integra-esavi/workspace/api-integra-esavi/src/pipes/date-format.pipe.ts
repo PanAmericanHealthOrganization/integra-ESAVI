@@ -1,15 +1,20 @@
 import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
-import * as moment from 'moment';
+import { parse, isValid } from 'date-fns';
 
 @Injectable()
 export class DateFormatPipe implements PipeTransform<string, Date> {
   transform(value: string): Date {
-    const formattedDate = moment(value, 'YYYY-MM-DD', true);
-    if (!formattedDate.isValid()) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
       throw new BadRequestException(
         'Invalid date format. Please provide the date in YYYY-MM-DD format.',
       );
     }
-    return formattedDate.toDate();
+    const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+    if (!isValid(parsedDate)) {
+      throw new BadRequestException(
+        'Invalid date format. Please provide the date in YYYY-MM-DD format.',
+      );
+    }
+    return parsedDate;
   }
 }

@@ -1,4 +1,3 @@
-import * as moment from 'moment/moment';
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, TableInheritance } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 import { Catalogo } from './catalogo.entity';
@@ -84,6 +83,6 @@ export class Paciente extends Auditoria {
    */
   @BeforeInsert()
   beforeInsert() {
-    this.createdAt = moment().toDate();
+    this.createdAt = new Date();
   }
 }

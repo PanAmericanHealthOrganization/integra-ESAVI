@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CreateCompleteDto } from '../dto/create-complete.dto';
+import { CreateCompleteDto } from '../dto';
 import { Notificacion } from '../entity/notificacion.entity';
 import { SourceEnum } from '../enum/source-enum';
 import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';

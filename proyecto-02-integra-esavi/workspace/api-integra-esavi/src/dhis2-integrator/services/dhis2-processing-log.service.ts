@@ -5,7 +5,7 @@ import {
   LogType,
   ProcessingStatus,
   ProcessingSummaryDto,
-} from '../dto/dhis2-processing-log.dto';
+} from '../dto';
 
 @Injectable()
 export class Dhis2ProcessingLogService {

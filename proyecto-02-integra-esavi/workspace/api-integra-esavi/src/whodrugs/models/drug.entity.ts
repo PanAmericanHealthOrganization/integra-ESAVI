@@ -4,7 +4,7 @@ import { encriptionTransformer } from '../utils/whodrug.encript';
 import { AnatomicalTherapeuticChemical } from './atomicTerapeutalChemical.entity';
 import { CountryOfSale } from './countryOfSale.entity';
 import { DrugSync } from './drugSync.entity';
-import { IDrug } from './dtos/drug.dto';
+import { IDrug } from './dtos';
 
 /**
  *

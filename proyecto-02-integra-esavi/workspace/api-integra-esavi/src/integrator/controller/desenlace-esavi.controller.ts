@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateDesenlaceEsaviDto } from '../dto/update-desenlace-esavi.dto';
+import { UpdateDesenlaceEsaviDto } from '../dto';
 import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 
 @ApiTags('Esavi')

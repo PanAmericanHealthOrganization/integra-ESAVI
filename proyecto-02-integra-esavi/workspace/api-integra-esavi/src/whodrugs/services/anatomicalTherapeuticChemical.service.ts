@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AnatomicalTherapeuticChemical } from '../models/atomicTerapeutalChemical.entity';
 import { Repository } from 'typeorm';
-import { IATC } from '../models/dtos/drug.dto';
+import { IATC } from '../models/dtos';
 import { Drug } from '../models/drug.entity';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 

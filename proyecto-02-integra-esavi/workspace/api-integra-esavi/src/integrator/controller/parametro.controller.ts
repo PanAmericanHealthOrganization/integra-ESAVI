@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Headers, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateParametroDto } from '../dto/create-parametro.dto';
-import { UpdateParametroDto } from '../dto/update-parametro.dto';
+import { CreateParametroDto, UpdateParametroDto } from '../dto';
 import { ParametroService } from '../service/parametro.service';
 
 @ApiTags('Parametros')
