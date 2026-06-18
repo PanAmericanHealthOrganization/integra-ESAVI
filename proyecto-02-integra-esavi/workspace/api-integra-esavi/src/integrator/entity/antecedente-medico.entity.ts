@@ -1,7 +1,7 @@
 import { BeforeInsert, Column, Entity } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_MEDICO', comment: 'Tabla de antecedentes médicos' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_ANTECEDENTES_MEDICO', comment: 'Tabla de antecedentes médicos' })
 export class AntecedenteMedico extends Antecedente {
   @Column({
     name: 'ENSAYO_CLINICO_COVID19',

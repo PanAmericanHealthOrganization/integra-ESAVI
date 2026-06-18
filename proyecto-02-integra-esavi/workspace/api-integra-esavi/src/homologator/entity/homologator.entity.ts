@@ -4,7 +4,7 @@ import { DataType } from '../enum/data-type.enum';
 import { Homologation } from './homologation.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_HOMOLOGATOR',
   comment: 'Definición de campos homologables entre sistemas externos e integra-ESAVI',
 })

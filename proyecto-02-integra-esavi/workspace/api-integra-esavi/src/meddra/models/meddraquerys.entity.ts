@@ -1,6 +1,6 @@
 import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ schema: 'meddra', name: 'med_request_history' })
+@Entity({ schema: 'MEDDRA', name: 'med_request_history' })
 @Index(['searchterm'])
 export class MeddraQuery extends BaseEntity {
   @PrimaryGeneratedColumn({ name: 'id' })

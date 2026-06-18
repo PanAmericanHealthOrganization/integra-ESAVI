@@ -6,7 +6,7 @@ import { Auditoria } from 'src/integrator/entity';
 
 @Entity({
   name: 'med_sync',
-  schema: 'meddra',
+  schema: 'MEDDRA',
 })
 export class MeddraSync extends Auditoria {
   constructor(meddraVersion: string, lang: string = 'ES', description: string) {

@@ -6,7 +6,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_ICD10_MEDDRA',
   comment: 'Tabla de mapeo entre codigos ICD10 y MedDRA',
 })

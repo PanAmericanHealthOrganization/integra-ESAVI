@@ -2,7 +2,7 @@ import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedCo
 import { Auditoria } from './auditoria.entity';
 import { Notificacion } from './notificacion.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_DATOS_ESAVI', comment: 'Tabla de datos del ESAVI' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_DATOS_ESAVI', comment: 'Tabla de datos del ESAVI' })
 export class DatoEsavi extends Auditoria {
   /**
    *

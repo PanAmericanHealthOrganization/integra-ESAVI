@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 /**
  *
  */
-@Entity({ name: 'CIE10_TO_MEDDRA', schema: 'meddra' })
+@Entity({ name: 'CIE10_TO_MEDDRA', schema: 'MEDDRA' })
 export class CIE10ES extends Auditoria {
   /**
    *

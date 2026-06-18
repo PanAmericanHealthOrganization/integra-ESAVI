@@ -9,7 +9,7 @@ import { IDrug } from './dtos';
 /**
  *
  */
-@Entity({ name: 'drug', schema: 'who_drug' })
+@Entity({ name: 'drug', schema: 'WHO_DRUG' })
 export class Drug extends Auditoria implements IDrug {
   /**
    *

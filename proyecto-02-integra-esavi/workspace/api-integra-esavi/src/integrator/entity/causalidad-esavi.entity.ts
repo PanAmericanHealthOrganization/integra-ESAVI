@@ -4,7 +4,7 @@ import { DatoEsavi } from './dato-esavi.entity';
 import { DatoVacuna } from './dato-vacuna.entity';
 import { Notificacion } from './notificacion.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_CAUSALIDAD_ESAVI', comment: 'Tabla de causalidad del ESAVI' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_CAUSALIDAD_ESAVI', comment: 'Tabla de causalidad del ESAVI' })
 export class CausalidadEsavi extends Auditoria {
   /**
    *

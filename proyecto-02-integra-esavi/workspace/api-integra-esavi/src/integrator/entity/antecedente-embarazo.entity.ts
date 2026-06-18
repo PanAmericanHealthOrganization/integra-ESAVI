@@ -1,7 +1,7 @@
 import { Antecedente } from './antecedente.entity';
 import { BeforeInsert, Column, Entity } from 'typeorm';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_EMBARAZO', comment: 'Tabla de antecedentes de embarazo' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_ANTECEDENTES_EMBARAZO', comment: 'Tabla de antecedentes de embarazo' })
 export class AntecedenteEmbarazo extends Antecedente {
   /**
    *

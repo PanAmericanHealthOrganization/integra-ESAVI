@@ -5,7 +5,7 @@ import { IActiveIngredient } from './dtos';
 /**
  *
  */
-@Entity({ schema: 'who_drug', name: 'active_ingredients' })
+@Entity({ schema: 'WHO_DRUG', name: 'active_ingredients' })
 export class ActiveIngredient extends Auditoria implements IActiveIngredient {
   constructor() {
     super();

@@ -4,7 +4,7 @@ import { Catalogo } from './catalogo.entity';
 import { Notificacion } from './notificacion.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_DATO_VACUNA',
   comment: 'Tabla de datos de vacuna aplicada',
 })
