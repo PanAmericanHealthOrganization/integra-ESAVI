@@ -1,24 +1,19 @@
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  TableInheritance,
 } from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
-import { GrupoEtario } from './grupo-etario.entity';
-import { Paciente } from './paciente.entity';
+import {Auditoria} from './auditoria.entity';
+import {Catalogo} from './catalogo.entity';
+import {Paciente} from './paciente.entity';
 
 @Entity({
   schema: 'dhi_esavi',
   name: 'TR_NOTIFICACION',
   comment: 'Tabla de notificaciones',
 })
-@TableInheritance({ column: { type: 'varchar', name: 'TIPO_NOTIFICACION' } })
 export class Notificacion extends Auditoria {
   /**
    * Primary generated column of notificacion
@@ -36,51 +31,18 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @Column({
-    nullable: true,
-    comment: 'Provincia de residencia del paciente. FK a catálogo de provincias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
-  })
-  CTPROVINCIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
-  @ManyToOne(() => Catalogo,{nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
-  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID'})
+  @ManyToOne(() => Catalogo, { nullable: true })
+  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID' })
   provinciaResidencia: Catalogo;
 
-  /**
-   *
-   */
-  @Column({
-    nullable: true,
-    comment: 'Cantón de residencia del paciente. FK a catálogo de cantones. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
-  })
-  CTCANTORESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
-  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
+  @ManyToOne(() => Catalogo, { nullable: true })
   @JoinColumn({ name: 'CTCANTORESIDENCIA_ID' })
   cantonResidencia: Catalogo;
 
-  /**
-   *
-   */
-  @Column({
-    nullable: true,
-    comment: 'Parroquia de residencia del paciente. FK a catálogo de parroquias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador',
-  })
-  CTPARROQUIARESIDENCIA_ID: string; //Se utiliza @JoinColumn con columna explícita para registrar el comentario en la columna de la FK.
-  @ManyToOne(() => Catalogo, {nullable: true}) //Se agrega ",{nullable: true}" para permitir valores nulos en la relación.
+  @ManyToOne(() => Catalogo, { nullable: true })
   @JoinColumn({ name: 'CTPARROQUIARESIDENCIA_ID' })
   parroquiaResidencia: Catalogo;
 
-  //-- Cuando la columna de la relación no tiene comentario explícito, su propiedad comentario hereda el comentario de la tabla foránea (de la principal a la cual tiene relación).
-
-  /**
-   *
-   */
-  @Column({
-    name: 'OTRAPARROQUIARESIDENCIA',
-    nullable: true,
-    comment: 'Otra parroquia de residencia del paciente no contemplada en catálogo',
-  })
-  otraParroquiaResidencia: string;
-//--------------------------------------------------------------------------------------------------------------
   /**
    *
    */
@@ -105,17 +67,6 @@ export class Notificacion extends Auditoria {
    *
    */
   @Column({
-    name: 'FECHA_NACIMIENTO',
-    type: 'timestamptz',
-    nullable: true,
-    comment: 'Fecha de nacimiento del paciente',
-  })
-  fechaNacimiento: Date;
-
-  /**
-   *
-   */
-  @Column({
     name: 'EDAD',
     nullable: true,
     comment: 'Edad del paciente al momento de la notificación',
@@ -125,26 +76,10 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @Column({
-    name: 'LACTANDO',
-    nullable: true,
-    comment: 'Indica si la paciente se encuentra lactando. Variable propia de VigiFLow no existente en DHIS2.',
-  })
-  lactando: string; //boolean; //Variable propia de VigiFLow no existente en DHIS2.
-
-  /**
-   *
-   */
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CTUNIDADEDAD_ID' })
   unidadEdad: Catalogo;
 
-  /**
-   *
-   */
-  @ManyToOne(() => GrupoEtario)
-  @JoinColumn({ name: 'CTGRUPOETARIO_ID' })
-  grupoEtario: GrupoEtario;
 
   /**
    *
@@ -153,25 +88,7 @@ export class Notificacion extends Auditoria {
   @JoinColumn({ name: 'CTPROFESIONNOTIFICADOR_ID' })
   profesionNotificador: Catalogo;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'TITULO_NOTIFICADOR',
-    nullable: true,
-    comment: 'Título profesional del notificador. Campo exclusivo de VigiFlow.',
-  })
-  tituloNotificador: string; //El Título aparece únicamente en VigiFlow. La columna que sí tiene en común con DHIS2 es la Profesión, y está integrada mediante FK.
-
-  /**
-   *
-   */
-  @Column({
-    name: 'ORGANIZACION_NOTIFICADOR',
-    nullable: true,
-    comment: 'Organización o institución del notificador',
-  })
-  organizacionNotificador: string;
+ 
 
   /**
    *
@@ -183,76 +100,6 @@ export class Notificacion extends Auditoria {
   })
   organizacionUnitCode: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'ORGANIZACION_UNIT',
-    nullable: true,
-    comment: 'Nombre de la unidad organizacional',
-  })
-  organizacionUnit: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'NOMBRE_NOTIFICADOR',
-    nullable: true,
-    comment: 'Nombre completo del profesional notificador',
-  })
-  nombreNotificador: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'IDENTIFICACION_NOTIFICADOR',
-    nullable: true,
-    comment: 'Número de identificación del notificador',
-  })
-  identificacionNotificador: string;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PROVINCIA_NOTIFICADOR_ID' })
-  provinciaNotificador: Catalogo;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_CANTON_NOTIFICADOR_ID' })
-  cantonNotificador: Catalogo;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PARROQUIA_NOTIFICADOR_ID' })
-  parroquiaNotificador: Catalogo;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'OTRA_PARROQUIA_NOTIFICADOR',
-    nullable: true,
-    comment: 'Otra parroquia del notificador no contemplada en catálogo',
-  })
-  otraParroquia: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'COMENTARIO_NOTIFICADOR',
-    nullable: true,
-    comment: 'Comentarios adicionales del notificador',
-  })
-  comentarioNotificador: string;
 
   /**
    *
@@ -309,53 +156,6 @@ export class Notificacion extends Auditoria {
    *
    */
   @Column({
-    name: 'ORGANIZACION_EMISOR',
-    nullable: true,
-    comment: 'Organización emisora del reporte',
-  })
-  organizacionEmisor: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'DELEGADO_ORGANIZACION',
-    nullable: true,
-    comment: 'Delegado de la organización emisora',
-  })
-  delegadoOrganizacion: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'NOMBRE_EMISOR',
-    nullable: true,
-    comment: 'Nombre del emisor del reporte',
-  })
-  nombreEmisor: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'ULTIMA_EDICION_REGISTRADA',
-    nullable: true,
-    comment: 'Fecha y hora de la última edición registrada',
-  })
-  ultimaEdicionRegistrada: string;
-
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_ESTADO_REGISTRO_ID' })
-  estadoRegistro: Catalogo;
-
-  /**
-   *
-   */
-  @Column({
     name: 'FECHA_NOTIFICACION',
     type: 'timestamptz',
     nullable: true,
@@ -396,59 +196,11 @@ export class Notificacion extends Auditoria {
   })
   fechaAtencion: Date; // Variable propia de DHIS2 no existente en VigiFlow.
 
-  /**
-   *
-   */
   @Column({
-    name: 'ANTECEDENTE_EVENTO_PREVIO',
+    name: 'CODIGO_ORIGEN_NOTIFICACION',
     nullable: true,
-    comment: 'Número de antecedentes de eventos adversos previos',
+    comment: 'Código único de la notificación en el sistema origen (VigiFlow o DHIS2)',
   })
-  antecedenteEventoPrevio: number;
+  codigoOrigenNotificacion: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'ANTECEDENTE_VACUNAL',
-    nullable: true,
-    comment: 'Número de antecedentes vacunales del paciente',
-  })
-  antecedenteVacunal: number;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'UNICO_CODIGO_UNIDAD_SALUD',
-    nullable: true,
-    comment: 'Código único de la unidad de salud',
-  })
-  codigoUnidadSalud: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'MONITOREO_ESTABLECIMIENTO_SALUD',
-    nullable: true,
-    comment: 'Indicador de monitoreo del establecimiento de salud',
-  })
-  monitorioEstablecimientoSalud: number;
-
-  /**
-   *
-   */
-  @BeforeInsert()
-  beforeInsert() {
-    this.createdAt = new Date();
-  }
-
-  /**
-   *
-   */
-  @BeforeUpdate()
-  beforeUpdate() {
-    this.updatedAt = new Date();
-  }
 }

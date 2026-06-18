@@ -1,34 +1,30 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
-import { Repository } from 'typeorm';
-import { CreateNotificacionDto, UpdateNotificacionDto } from '../dto';
-import { NotificacionVigiflow } from '../entity/notificacion-vigiflow.entity';
-import { PacienteVigiflow } from '../entity/paciente-vigiflow.entity';
-import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { CatalogoService } from './catalogo.service';
-import { GrupoEtarioService } from './grupo-etario.service';
-import { PacienteVigiflowService } from './paciente-vigiflow.service';
+import {Injectable,Logger} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {plainToClass} from 'class-transformer';
+import {Repository} from 'typeorm';
+import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
+import {Notificacion} from '../entity/notificacion.entity';
+import {Paciente} from '../entity/paciente.entity';
+import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoService} from './catalogo.service';
 
 @Injectable()
 export class NotificacionVigiflowService {
   private readonly logger = new Logger(NotificacionVigiflowService.name);
 
   constructor(
-    @InjectRepository(NotificacionVigiflow, 'POSTGRES_INTEGRATOR_DS')
-    private readonly notificacionRepository: Repository<NotificacionVigiflow>,
-    private readonly pacienteService: PacienteVigiflowService,
+    @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
+    private readonly notificacionRepository: Repository<Notificacion>,
     private readonly catalogoService: CatalogoService,
-    private readonly grupoEtarioService: GrupoEtarioService,
   ) {}
 
-  async create(createDto: CreateNotificacionDto, pacienteUUID: PacienteVigiflow): Promise<NotificacionVigiflow> {
+  async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente): Promise<Notificacion> {
     if (pacienteUUID) {
-      const notificacion = await this.findByVigiflowCode(createDto.codigoVigiflow);
+      const notificacion = await this.findByCodigoOrigen(createDto.codigoVigiflow);
       if (notificacion) {
         return notificacion;
       } else {
-        const notificacion = plainToClass(NotificacionVigiflow, createDto);
+        const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
         notificacion.paciente = pacienteUUID;
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.provincia)) {
           try {
@@ -57,34 +53,6 @@ export class NotificacionVigiflowService {
             console.log('Parroquia no encontrada');
           }
         }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.provincia)) {
-          try {
-            notificacion.provinciaNotificador = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.provincia,
-            );
-          } catch (error) {
-            console.log(`Provincia "${createDto.residenciaNotificador.provincia}" notificador no encontrada`);
-          }
-        }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.canton)) {
-          try {
-            notificacion.cantonNotificador = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.canton,
-            );
-          } catch (error) {
-            console.log(`Canton "${createDto.residenciaNotificador.canton}" notificador no encontrado`);
-          }
-        }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaNotificador.parroquia)) {
-          try {
-            notificacion.parroquiaNotificador = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaNotificador.parroquia,
-            );
-          } catch (error) {
-            console.log(`Parroquia "${createDto.residenciaNotificador.parroquia}" notificador no encontrado`);
-          }
-        }
-
         if (!this.isNullOrUndefinedOrEmpty(createDto.unidadEdadPaciente)) {
           try {
             notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(
@@ -94,26 +62,7 @@ export class NotificacionVigiflowService {
             console.log('Unidad Edad paciente no encontrada');
           }
         }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.grupoEtarioPaciente)) {
-          console.log('EsteGrupoEtario:::', createDto.grupoEtarioPaciente);
-
-          try {
-            notificacion.grupoEtario = await this.grupoEtarioService.findOne(createDto.grupoEtarioPaciente);
-          } catch (error) {
-            console.log('Grupo etario no encontrado');
-          }
-        }
-        //Grupo etario
-        // if (createDto.edad) {
-        //   try {
-        //     const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(createDto.edad);
-        //     notificacion.grupoEtario = grupoEtarioPaciente;
-        //   } catch (error) {
-        //     console.error(`Error al buscar grupo etario para la edad ${createDto.edad}: ${error.message}`);
-        //   }
-        // }
-
-        /* calculo de la edad, udidad de edad y el grupo etario */
+        /* calculo de la edad, unidad de edad */
         if( (createDto.fechaNotificacion && createDto.fechaNacimiento) && 
         (createDto.fechaNotificacion >= createDto.fechaNacimiento) ){
           try{          
@@ -121,11 +70,6 @@ export class NotificacionVigiflowService {
             let resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);           
             notificacion.edad = resultadoUnidadYedad.edadCalculada;
             notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada);
-            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
-              resultadoUnidadYedad.edadCalculada,
-              resultadoUnidadYedad.unidadEdadCalculada,
-            );
-            notificacion.grupoEtario = grupoEtarioPaciente;            
             /**
              * Para el cálculo del grupo etario, según el catálogo del Ministerio de Salud Pública,
              * está bien utilizar la unidad de edad en años y meses solamente. Pero, para edades
@@ -135,9 +79,9 @@ export class NotificacionVigiflowService {
               notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow('DÍAS'); //Aquí ya se homologa la unidad de dad, con los valores numéricos (FK) del catálogo.
               // como el grupo etario se calcula con meses y años, no es necesario recalcularlo,
               // ahora se calcula el valor numérico de la edad en días
-              const msPorDia = 1000 * 60 * 60 * 24; // cálculo del número de milisegundos en un día.
-              const edadDias = Math.floor((notificacion.fechaNotificacion.getTime() - notificacion.fechaNacimiento.getTime()) / msPorDia);
-              notificacion.edad = edadDias;            
+              const msPorDia = 1000 * 60 * 60 * 24;
+              const edadDias = Math.floor((notificacion.fechaNotificacion.getTime() - createDto.fechaNacimiento.getTime()) / msPorDia);
+              notificacion.edad = edadDias;
             }
 
           }catch(error){
@@ -207,15 +151,12 @@ export class NotificacionVigiflowService {
                 unidadEdad = 'AÑOS';
               }
 
-              // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edadFinal, unidadEdad);
-              notificacion.grupoEtario = grupoEtarioPaciente;
             } catch (error) {
               console.error(
-                `Error al calcular grupo etario para la edad "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
+                `Error al calcular edad para "${createDto.edad}", unidad: "${createDto.unidadEdadPaciente}": ${error.message}`,
               );
             }
-          }// fin de cálculo del grupo etario----------****---------
+          }
         }
 
         notificacion.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -267,7 +208,7 @@ export class NotificacionVigiflowService {
     
   }//;
 
-  async update(notificacion: NotificacionVigiflow, updateNotificacion: UpdateNotificacionDto) {
+  async update(notificacion: Notificacion, updateNotificacion: UpdateNotificacionDto) {
     try {
       if (updateNotificacion.profesionNotificadorParam) {
         try {
@@ -281,55 +222,10 @@ export class NotificacionVigiflowService {
       }
 
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
-      notificacion.comentarioNotificador = updateNotificacion.comentarioNotificador;
       notificacion.tipoReporte = updateNotificacion.tipoReporte;
-      notificacion.identificacionNotificador = updateNotificacion.identificacionNotificador;
-      notificacion.delegadoOrganizacion = updateNotificacion.delegadoOrganizacion;
-      notificacion.ultimaEdicionRegistrada = updateNotificacion.ultimaEdicionRegistrada;
-      notificacion.lactando = updateNotificacion.lactando;
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
-      notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;//se actualiza por recomendación del personal funcional.
-
-      notificacion.organizacionNotificador = updateNotificacion.organizacionNotificador; //Se actualiza por recomendación del personal funcional.
-      notificacion.organizacionEmisor = updateNotificacion.organizacionEmisor; //Se actualiza por recomendación del personal funcional.
-      notificacion.tipoEmisor = updateNotificacion.tipoEmisor; //Se actualiza por recomendación del personal funcional.
-      //-------------------------------------actualización de la edad y unidad de edad-------------------------------------//
-      /* calculo de la edad, udidad de edad y el grupo etario */
-      updateNotificacion.fechaNacimiento = typeof notificacion.fechaNacimiento === 'string'
-      ? this.analizarCadenaFechaGuionMedio(notificacion.fechaNacimiento)
-      : notificacion.fechaNacimiento;// Al recuperar el valor desde el DTO, TypeScript devulve un string, por lo que es necesario volver a converitir a Date.
-      notificacion.fechaNacimiento = updateNotificacion.fechaNacimiento;
-      //notificacion.fechaNacimiento?console.log(notificacion.fechaNacimiento.toISOString().split("T")[0]):console.log('valor de fecha inválido'); // Si las dos fechas no tienen el mismo tipo, nunca serán iguales, y no entrará en la condición del if.
-      if( (updateNotificacion.fechaNotificacion && updateNotificacion.fechaNacimiento) && (updateNotificacion.fechaNotificacion >= updateNotificacion.fechaNacimiento) ){
-        try{
-
-          let resultadoUnidadYedad = this.calcularEdad(updateNotificacion.fechaNotificacion, notificacion.fechaNacimiento);           
-          notificacion.edad = resultadoUnidadYedad.edadCalculada;
-          notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada); //Aquí ya se homologa con los valores numéricos (FK) del catálogo.
-          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
-            resultadoUnidadYedad.edadCalculada,
-            resultadoUnidadYedad.unidadEdadCalculada,
-          );
-          notificacion.grupoEtario = grupoEtarioPaciente;
-
-          /**
-           * Para el cálculo del grupo etario, según el catálogo del Ministerio de Salud Pública,
-           * está bien utilizar la unidad de edad en años y meses solamente. Pero, para edades
-           * inferiores a un mes, se debe almacenar en la tabla, la unidad en días.
-           */
-          if(resultadoUnidadYedad.edadCalculada === 0 && resultadoUnidadYedad.unidadEdadCalculada === 'MESES'){// El método calcularEdad devuelve  las unidades en PLURAL.
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow('DÍAS'); //Aquí ya se homologa la unidad de dad, con los valores numéricos (FK) del catálogo.
-            // como el grupo etario se calcula con meses y años, no es necesario recalcularlo,
-            // ahora se calcula el valor numérico de la edad en días
-            const msPorDia = 1000 * 60 * 60 * 24; // cálculo del número de milisegundos en un día.
-            const edadDias = Math.floor((notificacion.fechaNotificacion.getTime() - notificacion.fechaNacimiento.getTime()) / msPorDia);
-            notificacion.edad = edadDias;            
-          }
-
-        }catch(error){
-          console.log('No se puede calcular edad');
-        }
-      }
+      notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;
+      notificacion.tipoEmisor = updateNotificacion.tipoEmisor;
 
 
       await this.notificacionRepository.update(notificacion.id, notificacion);
@@ -339,11 +235,11 @@ export class NotificacionVigiflowService {
     }
   }
 
-  delete(uuid: string): Promise<NotificacionVigiflow> {
+  delete(uuid: string): Promise<Notificacion> {
     return Promise.resolve(undefined);
   }
 
-  findAll(): Promise<NotificacionVigiflow[]> {
+  findAll(): Promise<Notificacion[]> {
     return this.notificacionRepository.find();
   }
 
@@ -357,24 +253,24 @@ export class NotificacionVigiflowService {
     });
   }
 
-  async findOne(uuid: string): Promise<NotificacionVigiflow> {
+  async findOne(uuid: string): Promise<Notificacion> {
     const notificacion = await this.notificacionRepository.findOne({
       where: { id: uuid },
     });
     if (notificacion) {
       return notificacion;
     }
-    throw new EntityNotFoundException('NotificacionVigiflow', uuid);
+    throw new EntityNotFoundException('Notificacion', uuid);
   }
 
   private isNullOrUndefinedOrEmpty(field: string): boolean {
     return typeof field === 'undefined' || field === null || field.length === 0;
   }
 
-  async findByVigiflowCode(code: string) {
+  async findByCodigoOrigen(code: string) {
     const notificacion = await this.notificacionRepository.findOne({
       where: {
-        codigoVigiflow: code,
+        codigoOrigenNotificacion: code,
       },
     });
     if (notificacion) {

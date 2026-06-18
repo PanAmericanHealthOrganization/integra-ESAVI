@@ -37,7 +37,7 @@ import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
-import { PacienteVigiflowService } from '../../integrator/service/paciente-vigiflow.service';
+import { PacienteService } from '../../integrator/service/paciente.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
 import { WhodrugVacsTempService } from 'src/integrator/service/whodrug-vacstemp.service';
@@ -75,7 +75,7 @@ export class VigiflowIntegradorService {
     private readonly vigiflowCrawlerService: VigiflowCrawlerService,
     private readonly configService: ConfigService,
     private readonly integradorService: IntegradorService,
-    private readonly pacienteVigiflowService: PacienteVigiflowService,
+    private readonly pacienteService: PacienteService,
     private readonly notificacionVigiflowService: NotificacionVigiflowService,
     private readonly medicamentoService: MedicamentoService,
     private readonly datoVacunaService: DatoVacunaService,
@@ -407,8 +407,8 @@ export class VigiflowIntegradorService {
       defval: '',
     });
 
-    const allPatients = await this.pacienteVigiflowService.findAll();
-    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
+    const allPatients = await this.pacienteService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
     // Usar for...of para esperar que cada operación asíncrona termine
     for (const reg of toUpdate) {
@@ -422,32 +422,12 @@ export class VigiflowIntegradorService {
         if (notificacion) {
           const updateNotificacion = new UpdateNotificacionDto();
           updateNotificacion.id = notificacion.id;
-          // updateNotificacion.peso = this.formatoInteger(reg['AA']);
-          // updateNotificacion.altura = this.formatoFloat(reg['AB']);
           updateNotificacion.casoNarrativo = reg['AC'];
-          updateNotificacion.comentarioNotificador = reg['AD'];
-          // updateNotificacion.profesionNotificadorParam = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);;
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
-          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones); //TODO: En dhis2 y figiflow ya está integrado con FK, solo está pendiente la equivalencia de valores numéricos.
+          updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones);
           updateNotificacion.tipoReporte = reg['N'];
-
-          updateNotificacion.organizacionNotificador = reg['AS']; //Se actualiza por recomendación del personal funcional.
-          updateNotificacion.organizacionEmisor = reg['AS'];//reg['D']; //Se actualiza por recomendación del personal funcional.
-          updateNotificacion.identificacionNotificador = reg['R'];
-          updateNotificacion.delegadoOrganizacion = reg['C'];
-          updateNotificacion.ultimaEdicionRegistrada = reg['A'];
-          updateNotificacion.lactando = reg['Z'] && this.transformarTipoSiNo(reg['Z']);//reg['Z'] && this.esAfirmativo(reg['Z']);
-          // Se actualiza la fecha de notificación asignándola, la
-          // "fecha de recepción inicial", si esta no existe se la deja con la fecha de notificacion.
-          //updateNotificacion.fechaNotificacion = reg['J'] && this.formatoFecha(reg['J'] && reg['J'].toString());
-          updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['J'] && this.analizarCadenaFecha(reg['J'] && reg['J'].toString());
-          
-          //Por recomendación de PAHO (personal funcional), se actualiza la fecha de reporte nacional con la "fecha de recepción inicial"
-          //Recordar que para que surta efecto el nuevo valor asignado, se debe también actualizar en el servicio "notificacion-vigiflow.service.ts", en el método "update".
-          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);//reg['K'] && this.analizarCadenaFecha(reg['K'] && reg['K'].toString());
-          updateNotificacion.tituloNotificador = reg['AR']; // VER SI ES RELEVANTE
-          updateNotificacion.residenciaNotificador.canton = reg['AU']; //Distrito/Municipio
-          updateNotificacion.residenciaNotificador.parroquia = reg['AT']; //Ciudad (sub-distrito)
+          updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
+          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
           updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
 
           //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
@@ -551,8 +531,8 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
-    const allPatients = await this.pacienteVigiflowService.findAll();
-    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
+    const allPatients = await this.pacienteService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
     // Iterar con for...of, para esperar que cada operación asíncrona termine.
     // "toUpdate" es un arreglo de objetos JSON, cada uno de esos objetos representa una fila de la hoja "Medicamentos".
@@ -879,8 +859,8 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
-    const allPatients = await this.pacienteVigiflowService.findAll();
-    const patientMap = new Map(allPatients.map(p => [p.codigoVigiflow?.trim(), p]));
+    const allPatients = await this.pacienteService.findAll();
+    const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
     // toCreate.map(async (reg) => {
     for (const reg of toCreate) {
@@ -935,7 +915,7 @@ export class VigiflowIntegradorService {
         datoEsavi.codigoSOC = meddraSOC && meddraSOC.id ? meddraSOC.code : null;
 
         //
-        datoEsavi.codigoCaso = notificacion.codigoVigiflow;
+        datoEsavi.codigoCaso = notificacion.codigoOrigenNotificacion;
         await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
       }
     }

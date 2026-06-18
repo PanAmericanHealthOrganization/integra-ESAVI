@@ -15,7 +15,6 @@ import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
 import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
 import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
-import { CreateGrupoEtarioDto, GrupoEtario } from '../entity/grupo-etario.entity';
 import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
@@ -42,8 +41,6 @@ export class SeedService implements OnApplicationBootstrap {
     private whodrugHomologaVacsRepository: Repository<WhodrugHomologaVacs>,
     @InjectRepository(WhodrugVacsTemp, 'POSTGRES_INTEGRATOR_DS')
     private whodrugVacsTempRepository: Repository<WhodrugVacsTemp>,
-    @InjectRepository(GrupoEtario, 'POSTGRES_INTEGRATOR_DS')
-    private grupoEtarioRepository: Repository<GrupoEtario>,
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private pacienteRepository: Repository<Paciente>,
     @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
@@ -116,8 +113,6 @@ export class SeedService implements OnApplicationBootstrap {
       //2.7. Cargar WHODrug Homologación de Vacunas VigiFlow desde Excel
       await this.loadWhodrugHomologacionVfFromExcel();
 
-      // 3. Crear grupos etarios
-      await this.seedGruposEtarios();
       //----fin catalogos / registros para homologación---------------------------------------------------------------------------------------------------------
       // 4. Crear pacientes
       /*await this.seedPacientes();
@@ -180,7 +175,6 @@ export class SeedService implements OnApplicationBootstrap {
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;');
       await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TC_GRUPO_ETARIO" CASCADE;');
       /*
       * 
       await queryRunner.query(
@@ -955,43 +949,6 @@ export class SeedService implements OnApplicationBootstrap {
             ...catalogo,
             ...auditoriaCatalogoHomologacionDto,
           } as Catalogo);
-        }
-      }
-    });
-  }
-
-  //----carga de catálogo de grupos etarios---------------------------------------------------------------------------------------------------------------------------------
-  private async seedGruposEtarios() {
-    await this.runSyncProcess('Carga de catálogo de Grupos Etarios según el Ministerio...', async () => {
-      console.log('👥 Creando grupos etarios...');
-
-      const auditoriaDto: IAuditoria = {
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: '',
-        deletedAt: undefined,
-        deletedBy: '',
-        isEnabled: true,
-        isActive: true,
-      };
-      const gruposEtarios: CreateGrupoEtarioDto[] = [
-        { inicioEdad: 0, finEdad: 11, unidadEdad: 'MESES', descripcion: 'Menor 1 año', ...auditoriaDto },
-        { inicioEdad: 1, finEdad: 4, unidadEdad: 'AÑOS', descripcion: '1 A 4 Años', ...auditoriaDto },
-        { inicioEdad: 5, finEdad: 9, unidadEdad: 'AÑOS', descripcion: '5 A 9 Años', ...auditoriaDto },
-        { inicioEdad: 10, finEdad: 14, unidadEdad: 'AÑOS', descripcion: '10 A 14 Años', ...auditoriaDto },
-        { inicioEdad: 15, finEdad: 19, unidadEdad: 'AÑOS', descripcion: '15 A 19 Años', ...auditoriaDto },
-        { inicioEdad: 20, finEdad: 64, unidadEdad: 'AÑOS', descripcion: '20 A 64 Años', ...auditoriaDto },
-        { inicioEdad: 65, finEdad: 120, unidadEdad: 'AÑOS', descripcion: '65 Años y más', ...auditoriaDto },
-      ];
-
-      for (const grupo of gruposEtarios) {
-        const existing = await this.grupoEtarioRepository.findOne({ // findOne devuelve todo el objeto o "registro con todas sus columnas" que coincide con la condición de where.
-          where: { descripcion: grupo.descripcion },
-        });
-
-        if (!existing) {
-          await this.grupoEtarioRepository.save({ ...grupo, ...auditoriaDto } as GrupoEtario);
         }
       }
     });

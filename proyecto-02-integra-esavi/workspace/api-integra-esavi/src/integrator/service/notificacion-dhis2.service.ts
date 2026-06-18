@@ -3,29 +3,24 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
 import { CreateNotificacionDto } from '../dto';
-import { NotificacionDhis2 } from '../entity/notificacion-dhis2.entity';
 import { Notificacion } from '../entity/notificacion.entity';
-import { PacienteDhis2 } from '../entity/paciente-dhis2.entity';
+import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 import { CatalogoService } from './catalogo.service';
-import { GrupoEtarioService } from './grupo-etario.service';
-import { PacienteDhis2Service } from './paciente-dhis2.service';
 
 @Injectable()
 export class NotificacionDhis2Service {
   private readonly logger = new Logger(NotificacionDhis2Service.name);
 
   constructor(
-    @InjectRepository(NotificacionDhis2, 'POSTGRES_INTEGRATOR_DS')
-    private readonly notificacionRepository: Repository<NotificacionDhis2>,
-    private readonly pacienteService: PacienteDhis2Service,
+    @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
+    private readonly notificacionRepository: Repository<Notificacion>,
     private readonly catalogoService: CatalogoService,
-    private readonly grupoEtarioService: GrupoEtarioService,
   ) {}
 
   // async create(
   //   createDto: CreateNotificacionDto,
-  //   pacienteUUID: PacienteDhis2,
+  //   pacienteUUID: Paciente,
   // ): Promise<NotificacionDhis2> {
   //   console.log("NotificacionDatos:::" , createDto);
   //   console.log("NotificacionDatosPaciente:::" , pacienteUUID);
@@ -97,7 +92,7 @@ export class NotificacionDhis2Service {
   //   throw new Error('pacienteUUID is a mandatory field to notification-dhis2');
   // }
 
-  async create(createDto: CreateNotificacionDto, pacienteUUID: PacienteDhis2): Promise<NotificacionDhis2> {
+  async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente): Promise<Notificacion> {
     try {
       // Verificamos si ya existe una notificación con el mismo códigoDhis2Evento
       const notificacionExistente = await this.findByCodeDhis2(createDto.codigoDhis2Evento);
@@ -110,7 +105,7 @@ export class NotificacionDhis2Service {
         }
       } else {
         // Si no existe, creamos una nueva notificación
-        const notificacion = plainToClass(NotificacionDhis2, createDto);
+        const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoDhis2Evento }) as Notificacion;
 
         // Asignamos las propiedades de la notificación
         if (createDto.unidadEdadPaciente) {
@@ -161,32 +156,13 @@ export class NotificacionDhis2Service {
         //   }
         // }
 
-        if (createDto.edad && createDto.unidadEdadPaciente) {
-          try {
-            let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(
-              createDto.edad,
-              createDto.unidadEdadPaciente,
-            );
-            // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-            const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
-              resultadoUnidadEdad.edadCalculada,
-              resultadoUnidadEdad.unidadEdadCalculada,
-            );
-            notificacion.grupoEtario = grupoEtarioPaciente;
-          } catch (error) {
-            console.error(
-              `Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`,
-            );
-          }
-        } else {
+        if (!(createDto.edad && createDto.unidadEdadPaciente)) {
           try {
             if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
               const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-              const unidad = 'AÑOS'; //createDto.unidadEdadPaciente;
+              const unidad = 'AÑOS';
               notificacion.edad = edad;
               notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
-              const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
-              notificacion.grupoEtario = grupoEtarioPaciente;
             }
           } catch (error) {
             console.log('No se puede calcular edad');
@@ -219,28 +195,28 @@ export class NotificacionDhis2Service {
     }
   }
 
-  delete(uuid: string): Promise<NotificacionDhis2> {
+  delete(uuid: string): Promise<Notificacion> {
     return Promise.resolve(undefined);
   }
 
-  findAll(): Promise<NotificacionDhis2[]> {
+  findAll(): Promise<Notificacion[]> {
     return this.notificacionRepository.find();
   }
 
-  async findOne(uuid: string): Promise<NotificacionDhis2> {
+  async findOne(uuid: string): Promise<Notificacion> {
     const notificacion = await this.notificacionRepository.findOne({
       where: { id: uuid },
     });
     if (notificacion) {
       return notificacion;
     }
-    throw new EntityNotFoundException('NotificacionDhis2', uuid);
+    throw new EntityNotFoundException('Notificacion', uuid);
   }
 
   async findByCodeDhis2(code: string) {
     const notificacion = await this.notificacionRepository.findOne({
       where: {
-        codigoDhis2Evento: code,
+        codigoOrigenNotificacion: code,
       },
     });
     if (notificacion) {
@@ -299,7 +275,7 @@ export class NotificacionDhis2Service {
     return this.notificacionRepository.save(notificacionExistente);
   }
 
-  async update(notificacionExistente: Notificacion, createDto: CreateNotificacionDto, pacienteUUID: PacienteDhis2) {
+  async update(notificacionExistente: Notificacion, createDto: CreateNotificacionDto, pacienteUUID: Paciente) {
     // Si la notificación existe, la actualizamos con los nuevos datos
     console.log('Notificación ya existe, actualizando...');
 
@@ -353,29 +329,13 @@ export class NotificacionDhis2Service {
     //     console.error(`Error al buscar grupo etario para la edad ${createDto.edad}: ${error.message}`);
     //   }
     // }
-    if (createDto.edad && createDto.unidadEdadPaciente) {
-      try {
-        let resultadoUnidadEdad = this.calcularEdadUnidadParaGrupoEtario(createDto.edad, createDto.unidadEdadPaciente);
-        // Ahora que tenemos la edadFinal calculada, buscamos el grupo etario
-        const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(
-          resultadoUnidadEdad.edadCalculada,
-          resultadoUnidadEdad.unidadEdadCalculada,
-        );
-        notificacionExistente.grupoEtario = grupoEtarioPaciente;
-      } catch (error) {
-        console.error(
-          `Error al calcular grupo etario para la edad ${createDto.edad} ${createDto.unidadEdadPaciente}: ${error.message}`,
-        );
-      }
-    } else {
+    if (!(createDto.edad && createDto.unidadEdadPaciente)) {
       try {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
           const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-          const unidad = 'AÑOS'; //createDto.unidadEdadPaciente;S
+          const unidad = 'AÑOS';
           notificacionExistente.edad = edad;
           notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
-          const grupoEtarioPaciente = await this.grupoEtarioService.findGrupoEtarioByAge(edad, unidad);
-          notificacionExistente.grupoEtario = grupoEtarioPaciente;
         }
       } catch (error) {
         console.log('No se puede calcular edad');
@@ -395,16 +355,12 @@ export class NotificacionDhis2Service {
     // Actualizamos el paciente y quién creó la notificación
     notificacionExistente.paciente = pacienteUUID;
     notificacionExistente.createdBy = 'system';
-    notificacionExistente.antecedenteVacunal = createDto.antecedenteVacunal;
-    notificacionExistente.antecedenteEventoPrevio = createDto.antecedenteEventoPrevio;
     notificacionExistente.fechaAtencion = createDto.fechaAtencion;
     notificacionExistente.fechaNotificacion = createDto.fechaNotificacion;
-    notificacionExistente.fechaNacimiento = createDto.fechaNacimiento;
     notificacionExistente.edad = createDto.edad;
-    notificacionExistente.organizacionNotificador = createDto.organizacionNotificador;
     notificacionExistente.casoNarrativo = createDto.casoNarrativo;
     notificacionExistente.fechaLlenadoFicha = createDto.fechaLlenadoFicha;
-    notificacionExistente.beforeUpdate();
+    notificacionExistente.codigoOrigenNotificacion = createDto.codigoDhis2Evento;
 
     // Guardamos la notificación actualizada
     this.logger.log(`NotificaciónDHIS2 ha sido actualizada: ${JSON.stringify(createDto)}`);
