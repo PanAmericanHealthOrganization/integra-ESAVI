@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>TR_NOTIFICACION - dhi_esavi.dhi_esavi</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="../schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="../bower/html5shiv/html5shiv.min.js"></script>
+        <script src="../bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="../index.html" class="navbar-brand"><b>dhi_esavi</b></a><span class="navbar-brand" style="padding-left: 0">.dhi_esavi</span>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="../index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="../columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="../constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="../relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="../orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="../anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="../routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>TR_NOTIFICACION</h1><p><span id="recordNumber">464</span> rows</p><br />
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-file-text-o"></i>
+                            <h3 id="Description" class="box-title">Description</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div><!-- /.box-header -->
+                        <div class="box-body clearfix">
+                            <p>Tabla de notificaciones</p>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 id="Columns" class="box-title">Columns</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="standard_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th title='Are nulls allowed?'>Nulls</th>
+                                    <th title='Is column automatically updated?'>Auto</th>
+                                    <th title='Default value'>Default</th>
+                                    <th title='Columns in tables that reference this column'>Children</th>
+                                    <th title='Columns in tables that are referenced by this column'>Parents</th>
+                                    <th title='Comments' class="toggle"><span>Comments</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><span id="AUD_FECHA_CREACION">AUD_FECHA_CREACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de creación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_CREACION">AUD_USUARIO_CREACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que creó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ACTUALIZACION">AUD_FECHA_ACTUALIZACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de actualización</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ACTUALIZACION">AUD_USUARIO_ACTUALIZACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>&#39;SYSTEM&#39;::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que actualizó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ELIMINACION">AUD_FECHA_ELIMINACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de eliminación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ELIMINACION">AUD_USUARIO_ELIMINACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que eliminó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_HABILITADO">AUD_HABILITADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está habilitado</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_ESTADO">AUD_ESTADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está activo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="ID">ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>uuid_generate_v4()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EMBARAZO.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_00b597a00d3800775f37f915fb3"><a href='TR_ANTECEDENTES_EMBARAZO.html'>TR_ANTECEDENTES_EMBARAZO</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_00b597a00d3800775f37f915fb3</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_9f0af21a79cf1e9fd07d547091c"><a href='TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html'>TR_ANTECEDENTES_ENFERMEDADES_PREVIAS</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_9f0af21a79cf1e9fd07d547091c</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_EVENTO_ADVERSO.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_7c41e9e441b43c13307868491a3"><a href='TR_ANTECEDENTES_EVENTO_ADVERSO.html'>TR_ANTECEDENTES_EVENTO_ADVERSO</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_7c41e9e441b43c13307868491a3</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ANTECEDENTES_MEDICO.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_77bcb1f63f52132b948dfd94849"><a href='TR_ANTECEDENTES_MEDICO.html'>TR_ANTECEDENTES_MEDICO</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_77bcb1f63f52132b948dfd94849</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_CAUSALIDAD_ESAVI.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_770b0d4d23dad76d2293174adbd"><a href='TR_CAUSALIDAD_ESAVI.html'>TR_CAUSALIDAD_ESAVI</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_770b0d4d23dad76d2293174adbd</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNA.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_f624dc3e33b3dcffe2935aef898"><a href='TR_DATO_VACUNA.html'>TR_DATO_VACUNA</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_f624dc3e33b3dcffe2935aef898</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNACION.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_9d432650d9b72a50ed2778760fe"><a href='TR_DATO_VACUNACION.html'>TR_DATO_VACUNACION</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_9d432650d9b72a50ed2778760fe</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DATOS_ESAVI.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_cb2c8bb4e8b7f881b59934bcce1"><a href='TR_DATOS_ESAVI.html'>TR_DATOS_ESAVI</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_cb2c8bb4e8b7f881b59934bcce1</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_DESENLACE_ESAVI.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_6c8b23675f320cdd7baa79b47ca"><a href='TR_DESENLACE_ESAVI.html'>TR_DESENLACE_ESAVI</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_6c8b23675f320cdd7baa79b47ca</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_ESAVI_DURANTE_EMBARAZO.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_2e732ab88291e44201540d90618"><a href='TR_ESAVI_DURANTE_EMBARAZO.html'>TR_ESAVI_DURANTE_EMBARAZO</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_2e732ab88291e44201540d90618</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_GRAVEDAD_ESAVI.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_829c783f9a38d828a49d0bdd0e5"><a href='TR_GRAVEDAD_ESAVI.html'>TR_GRAVEDAD_ESAVI</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_829c783f9a38d828a49d0bdd0e5</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_INVESTIGACION.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_5686b3a55506da355baea2e1de9"><a href='TR_INVESTIGACION.html'>TR_INVESTIGACION</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_5686b3a55506da355baea2e1de9</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_MEDICAMENTO.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_64554398b835f22e2a3fab9d5b9"><a href='TR_MEDICAMENTO.html'>TR_MEDICAMENTO</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_64554398b835f22e2a3fab9d5b9</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td title="TR_PACIENTE_EMBARAZADA.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_13eed07923f7ad03b3d111683dd"><a href='TR_PACIENTE_EMBARAZADA.html'>TR_PACIENTE_EMBARAZADA</a><span class='relatedKey'>.NOTIFICACION_ID</span></td>
+                                                <td class="constraint detail">FK_13eed07923f7ad03b3d111683dd</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador único de la notificación</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTPROVINCIARESIDENCIA_ID">CTPROVINCIARESIDENCIA_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPROVINCIARESIDENCIA_ID references TC_CATALOGO.ID via FK_d7dd997fc4d774829559e77b743"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_d7dd997fc4d774829559e77b743</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Provincia de residencia del paciente. FK a catálogo de provincias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTCANTORESIDENCIA_ID">CTCANTORESIDENCIA_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTCANTORESIDENCIA_ID references TC_CATALOGO.ID via FK_39fe0a33d7998014c2fc3d2683e"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_39fe0a33d7998014c2fc3d2683e</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Cantón de residencia del paciente. FK a catálogo de cantones. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTPARROQUIARESIDENCIA_ID">CTPARROQUIARESIDENCIA_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPARROQUIARESIDENCIA_ID references TC_CATALOGO.ID via FK_5329e8f623d5f056caa2e3a9b91"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_5329e8f623d5f056caa2e3a9b91</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Parroquia de residencia del paciente. FK a catálogo de parroquias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="OTRAPARROQUIARESIDENCIA">OTRAPARROQUIARESIDENCIA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Otra parroquia de residencia del paciente no contemplada en catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="PESO">PESO</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Peso del paciente en kilogramos</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ALTURA">ALTURA</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Altura del paciente en centímetros</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_NACIMIENTO">FECHA_NACIMIENTO</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de nacimiento del paciente</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="EDAD">EDAD</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Edad del paciente al momento de la notificación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="LACTANDO">LACTANDO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si la paciente se encuentra lactando. Variable propia de VigiFLow no existente en DHIS2.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="TITULO_NOTIFICADOR">TITULO_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Título profesional del notificador. Campo exclusivo de VigiFlow.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ORGANIZACION_NOTIFICADOR">ORGANIZACION_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Organización o institución del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ORGANIZACION_UNIT_CODIGO">ORGANIZACION_UNIT_CODIGO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código de la unidad organizacional en DHIS2</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ORGANIZACION_UNIT">ORGANIZACION_UNIT</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre de la unidad organizacional</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_NOTIFICADOR">NOMBRE_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre completo del profesional notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="IDENTIFICACION_NOTIFICADOR">IDENTIFICACION_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Número de identificación del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="OTRA_PARROQUIA_NOTIFICADOR">OTRA_PARROQUIA_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Otra parroquia del notificador no contemplada en catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="COMENTARIO_NOTIFICADOR">COMENTARIO_NOTIFICADOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Comentarios adicionales del notificador</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CASO_NARRATIVO">CASO_NARRATIVO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Descripción narrativa del caso clínico</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="TITULO_REPORTE">TITULO_REPORTE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Título del reporte de ESAVI</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="TIPO_REPORTE">TIPO_REPORTE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Tipo de reporte (inicial, seguimiento, final)</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="MEDIO_NOTIFICACION">MEDIO_NOTIFICACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>&#39;Medio electrónico&#39;::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Medio por el cual se realizó la notificación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="TIPO_EMISOR">TIPO_EMISOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Tipo de emisor del reporte. 1 = Profesional de la salud, 2 = Paciente / consumidor, 3 = Laboratorio farmacéutico, 4 = Centro regional de farmacovigilancia, 5 = Otro. Para DHIS2 el vlor predeterminado es &ldquo;1&rdquo; (Profesional de la salud).</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ORGANIZACION_EMISOR">ORGANIZACION_EMISOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Organización emisora del reporte</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DELEGADO_ORGANIZACION">DELEGADO_ORGANIZACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Delegado de la organización emisora</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_EMISOR">NOMBRE_EMISOR</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre del emisor del reporte</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ULTIMA_EDICION_REGISTRADA">ULTIMA_EDICION_REGISTRADA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha y hora de la última edición registrada</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_NOTIFICACION">FECHA_NOTIFICACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha en que se realizó la notificación. Se asigna para el caso de VigiFlow, desde la columna &ldquo;Fecha de recepción inicial&rdquo;</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_REPORTE_NACIONAL">FECHA_REPORTE_NACIONAL</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha del reporte a nivel nacional</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_LLENADO_FICHA">FECHA_LLENADO_FICHA</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha en que se llenó la ficha de notificación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_ATENCION">FECHA_ATENCION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de atención médica del paciente</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ANTECEDENTE_EVENTO_PREVIO">ANTECEDENTE_EVENTO_PREVIO</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Número de antecedentes de eventos adversos previos</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ANTECEDENTE_VACUNAL">ANTECEDENTE_VACUNAL</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Número de antecedentes vacunales del paciente</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="UNICO_CODIGO_UNIDAD_SALUD">UNICO_CODIGO_UNIDAD_SALUD</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código único de la unidad de salud</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="MONITOREO_ESTABLECIMIENTO_SALUD">MONITOREO_ESTABLECIMIENTO_SALUD</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indicador de monitoreo del establecimiento de salud</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CODIGO_DHIS2_EVENTO">CODIGO_DHIS2_EVENTO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código del evento de notificación en el sistema DHIS2</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CODIGO_VIGIFLOW">CODIGO_VIGIFLOW</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código de la notificación en el sistema Vigiflow</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="TIPO_NOTIFICACION">TIPO_NOTIFICACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="PACIENTE_ID">PACIENTE_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.PACIENTE_ID references TR_PACIENTE.ID via FK_31dd86a89addccc76e5f21a44f2"><a href='TR_PACIENTE.html'>TR_PACIENTE</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_31dd86a89addccc76e5f21a44f2</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador único PK de la tabla TR_PACIENTE</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTUNIDADEDAD_ID">CTUNIDADEDAD_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTUNIDADEDAD_ID references TC_CATALOGO.ID via FK_58b5a9015c537bd067a78c83c27"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_58b5a9015c537bd067a78c83c27</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTGRUPOETARIO_ID">CTGRUPOETARIO_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTGRUPOETARIO_ID references TC_GRUPO_ETARIO.ID via FK_d26760563f97d5ec0733a434f8b"><a href='TC_GRUPO_ETARIO.html'>TC_GRUPO_ETARIO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_d26760563f97d5ec0733a434f8b</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador único pk de la tabla TC_GRUPO_ETARIO</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CTPROFESIONNOTIFICADOR_ID">CTPROFESIONNOTIFICADOR_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CTPROFESIONNOTIFICADOR_ID references TC_CATALOGO.ID via FK_b29facf202418dbf9f700dbaea5"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_b29facf202418dbf9f700dbaea5</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CT_PROVINCIA_NOTIFICADOR_ID">CT_PROVINCIA_NOTIFICADOR_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_PROVINCIA_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_09404250bf2870d57dc4bee9326"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_09404250bf2870d57dc4bee9326</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CT_CANTON_NOTIFICADOR_ID">CT_CANTON_NOTIFICADOR_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_CANTON_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_476c77cfa7eac246753cf49796a"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_476c77cfa7eac246753cf49796a</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CT_PARROQUIA_NOTIFICADOR_ID">CT_PARROQUIA_NOTIFICADOR_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_PARROQUIA_NOTIFICADOR_ID references TC_CATALOGO.ID via FK_80403944874e5fd64bd7692cef3"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_80403944874e5fd64bd7692cef3</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CT_ESTADO_REGISTRO_ID">CT_ESTADO_REGISTRO_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_NOTIFICACION.CT_ESTADO_REGISTRO_ID references TC_CATALOGO.ID via FK_a1acd5196f12ff1b7cb0081ef28"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_a1acd5196f12ff1b7cb0081ef28</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 id="Indexes" class="box-title">Indexes</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="indexes_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Type</th>
+                                    <th>Sort</th>
+                                    <th>Column(s)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> PK_7ce655bbfa60ec3f62a55e8f1a5</td>
+                                    <td>Primary key</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>ID</td>
+                                </tr>
+                                <tr>
+                                    <td title='Indexed'>IDX_5ff7e0d082ac1ca275d3db9e6b</td>
+                                    <td>Performance</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>TIPO_NOTIFICACION</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 id="Relationships" class="box-title">Relationships</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom"><!-- Tabs within a box -->
+                                <h5>Close relationships within degrees of separation</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
+                                    <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
+                                    <li class=""><a href="#oneimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">One implied</a></li>
+                                    <li class=""><a href="#twoimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1562,1277,1920,1424">
+<area shape="rect" id="node2" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="803,541,1385,2195">
+<area shape="rect" id="node4" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="5,2100,333,2276">
+<area shape="rect" id="node16" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="404,1897,732,2015">
+<area shape="rect" id="node17" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="377,1580,759,1844">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1497,1808,1985,1984">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1529,2039,1952,2303">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1429,1441,2053,1588">
+<area shape="rect" id="node7" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2097,304,2541,509">
+<area shape="rect" id="node8" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="1570,199,1912,345">
+<area shape="rect" id="node9" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1531,363,1951,568">
+<area shape="rect" id="node10" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1537,2320,1945,2613">
+<area shape="rect" id="node11" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1577,5,1905,181">
+<area shape="rect" id="node12" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1500,1605,1982,1752">
+<area shape="rect" id="node13" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1566,585,1916,732">
+<area shape="rect" id="node14" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1481,749,2001,896">
+<area shape="rect" id="node15" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1538,913,1944,1060">
+<area shape="rect" id="node18" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1562,1113,1920,1260">
+</map>
+                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/TR_NOTIFICACION.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="304,1443,509,1531">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,1441,260,1529">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1684,363,2042,510">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="925,259,1507,1913">
+<area shape="rect" id="node17" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="553,1585,881,1702">
+<area shape="rect" id="node18" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="620,1443,814,1531">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1619,258,2107,346">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1651,1955,2074,2043">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1551,527,2175,674">
+<area shape="rect" id="node8" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2219,1582,2500,1670">
+<area shape="rect" id="node9" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="1749,1019,1977,1107">
+<area shape="rect" id="node10" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1743,1653,1982,1741">
+<area shape="rect" id="node11" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1722,47,2004,135">
+<area shape="rect" id="node12" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1726,153,2000,241">
+<area shape="rect" id="node13" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1622,691,2104,838">
+<area shape="rect" id="node14" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1688,855,2038,1002">
+<area shape="rect" id="node15" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1603,1125,2123,1271">
+<area shape="rect" id="node16" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1660,1289,2066,1435">
+<area shape="rect" id="node19" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1684,1453,2042,1599">
+</map>
+                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/TR_NOTIFICACION.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1562,1335,1920,1481">
+<area shape="rect" id="node2" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="803,435,1385,2088">
+<area shape="rect" id="node4" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="5,1993,333,2169">
+<area shape="rect" id="node16" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="404,1791,732,1908">
+<area shape="rect" id="node17" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="377,1473,759,1737">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1497,1637,1985,1813">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1529,1932,1952,2196">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1429,315,2053,461">
+<area shape="rect" id="node7" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2561,555,3005,760">
+<area shape="rect" id="node8" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2136,329,2478,476">
+<area shape="rect" id="node9" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2097,613,2517,819">
+<area shape="rect" id="node10" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1500,643,1982,789">
+<area shape="rect" id="node11" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1537,2213,1945,2507">
+<area shape="rect" id="node12" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1577,85,1905,261">
+<area shape="rect" id="node13" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1566,479,1916,625">
+<area shape="rect" id="node14" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1481,843,2001,989">
+<area shape="rect" id="node15" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1538,1007,1944,1153">
+<area shape="rect" id="node18" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1562,1171,1920,1317">
+</map>
+                                        <a name='diagram'><img id="oneimpliedDegreeImg" src="../diagrams/tables/TR_NOTIFICACION.implied1degrees.png" usemap="#oneDegreeRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="304,1437,509,1525">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,1434,260,1522">
+<area shape="rect" id="node3" href="TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="2219,645,2534,733">
+<area shape="rect" id="node4" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1682,648,2044,736">
+<area shape="rect" id="node6" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="925,176,1507,1829">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1684,320,2042,466">
+<area shape="rect" id="node18" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="553,1508,881,1625">
+<area shape="rect" id="node19" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="620,1366,814,1454">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1619,1802,2107,1890">
+<area shape="rect" id="node8" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1651,1908,2074,1996">
+<area shape="rect" id="node9" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1551,484,2175,630">
+<area shape="rect" id="node10" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2578,284,2860,372">
+<area shape="rect" id="node11" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2262,284,2490,372">
+<area shape="rect" id="node12" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2257,1062,2496,1150">
+<area shape="rect" id="node13" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1722,37,2004,125">
+<area shape="rect" id="node14" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1726,142,2000,230">
+<area shape="rect" id="node15" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1688,753,2038,900">
+<area shape="rect" id="node16" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1603,917,2123,1064">
+<area shape="rect" id="node17" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1660,1081,2066,1228">
+<area shape="rect" id="node20" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1684,1245,2042,1392">
+</map>
+                                        <a name='diagram'><img id="twoimpliedDegreeImg" src="../diagrams/tables/TR_NOTIFICACION.implied2degrees.png" usemap="#twoDegreesRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <script>
+                    var config = {
+                        pagination: true
+                    }
+                </script>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 7.0.2</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="../bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="../bower/pdfmake/pdfmake.min.js"></script>
+        <script src="../bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="../bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="../bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="../bower/codemirror/codemirror.js"></script>
+        <script src="../bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="table.js"></script>
+        <script src="../schemaSpy.js"></script>
+    </body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>dhi_esavi.dhi_esavi</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="bower/html5shiv/html5shiv.min.js"></script>
+        <script src="bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="index.html" class="navbar-brand"><b>dhi_esavi</b></a><span class="navbar-brand" style="padding-left: 0">.dhi_esavi</span>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>All Relationships</h1>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 class="box-title">Diagrams</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom">
+                                <!-- Tabs within a box -->
+                                <h5>By default only columns that are primary keys, foreign keys or indexes are shown.</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#compactDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact</a></li>
+                                    <li class=""><a href="#largeDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large</a></li>
+                                    <li class=""><a href="#compactimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Compact Implied</a></li>
+                                    <li class=""><a href="#largeimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Large Implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="compactDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="compactRelationshipsDiagram" name="compactRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="2020,1487,2378,1633">
+<area shape="rect" id="node6" href="tables/TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1443,1880,1843,2349">
+<area shape="rect" id="node2" href="tables/TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1887,1323,2511,1469">
+<area shape="rect" id="node3" href="tables/TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="2035,579,2363,755">
+<area shape="rect" id="node17" href="tables/TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="645,2473,973,2649">
+<area shape="rect" id="node4" href="tables/TG_GACETA.html" target="_top" title="TG_GACETA" alt="" coords="2507,152,2903,269">
+<area shape="rect" id="node5" href="tables/TR_ESTABLECIMIENTO.html" target="_top" title="TR_ESTABLECIMIENTO" alt="" coords="3221,1641,3549,1788">
+<area shape="rect" id="node10" href="tables/TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="1017,1953,1399,2217">
+<area shape="rect" id="node12" href="tables/TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="1044,2271,1372,2388">
+<area shape="rect" id="node7" href="tables/TR_HOMOLOGATION.html" target="_top" title="TR_HOMOLOGATION" alt="" coords="377,64,705,211">
+<area shape="rect" id="node16" href="tables/TR_HOMOLOGATOR.html" target="_top" title="TR_HOMOLOGATOR" alt="" coords="5,93,333,269">
+<area shape="rect" id="node8" href="tables/TC_ICD10_MEDDRA.html" target="_top" title="TC_ICD10_MEDDRA" alt="" coords="3221,420,3549,537">
+<area shape="rect" id="node9" href="tables/TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="2020,1159,2377,1305">
+<area shape="rect" id="node11" href="tables/TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1995,2817,2403,3111">
+<area shape="rect" id="node13" href="tables/TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1989,936,2409,1141">
+<area shape="rect" id="node14" href="tables/TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2027,772,2370,919">
+<area shape="rect" id="node15" href="tables/TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1987,2536,2410,2800">
+<area shape="rect" id="node21" href="tables/TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="273,2532,601,2649">
+<area shape="rect" id="node18" href="tables/TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="899,5,1239,269">
+<area shape="rect" id="node19" href="tables/TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="2023,2179,2374,2325">
+<area shape="rect" id="node20" href="tables/TC_WHODRUG_HOMOLOGA_VACS.html" target="_top" title="TC_WHODRUG_HOMOLOGA_VACS" alt="" coords="1971,152,2342,269">
+<area shape="rect" id="node22" href="tables/TC_SYMPTOM_TO_LLT.html" target="_top" title="TC_SYMPTOM_TO_LLT" alt="" coords="3132,152,3460,269">
+<area shape="rect" id="node23" href="tables/TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1954,2343,2443,2519">
+<area shape="rect" id="node24" href="tables/TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1957,2015,2440,2161">
+<area shape="rect" id="node25" href="tables/DQ_DIMENSION.html" target="_top" title="DQ_DIMENSION" alt="" coords="3221,1313,3549,1431">
+<area shape="rect" id="node26" href="tables/TC_PARAMETRO.html" target="_top" title="TC_PARAMETRO" alt="" coords="3221,748,3549,895">
+<area shape="rect" id="node27" href="tables/TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1939,1851,2459,1997">
+<area shape="rect" id="node28" href="tables/TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1996,1687,2401,1833">
+<area shape="rect" id="node29" href="tables/TR_SYNC_PROCESS.html" target="_top" title="TR_SYNC_PROCESS" alt="" coords="3221,1045,3549,1163">
+<area shape="rect" id="node30" href="tables/TR_VACUNOMETRO.html" target="_top" title="TR_VACUNOMETRO" alt="" coords="1435,5,1763,269">
+<area shape="rect" id="node31" href="tables/TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2555,877,2999,1083">
+</map>
+                                        <a name='diagram'><img id="compactDegreeImg" src="diagrams/summary/relationships.real.compact.png" usemap="#compactRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="largeDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="largeRelationshipsDiagram" name="largeRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="2941,4783,3299,5228">
+<area shape="rect" id="node6" href="tables/TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="2364,6825,2764,8473">
+<area shape="rect" id="node2" href="tables/TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="2808,3763,3432,4765">
+<area shape="rect" id="node3" href="tables/TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="2956,5,3284,685">
+<area shape="rect" id="node17" href="tables/TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="1567,8295,1895,8769">
+<area shape="rect" id="node4" href="tables/TG_GACETA.html" target="_top" title="TG_GACETA" alt="" coords="4197,4313,4593,5257">
+<area shape="rect" id="node5" href="tables/TR_ESTABLECIMIENTO.html" target="_top" title="TR_ESTABLECIMIENTO" alt="" coords="4197,5653,4525,6480">
+<area shape="rect" id="node10" href="tables/TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="1939,7324,2320,7945">
+<area shape="rect" id="node12" href="tables/TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="1965,7999,2293,8444">
+<area shape="rect" id="node7" href="tables/TR_HOMOLOGATION.html" target="_top" title="TR_HOMOLOGATION" alt="" coords="4569,3472,4897,4035">
+<area shape="rect" id="node16" href="tables/TR_HOMOLOGATOR.html" target="_top" title="TR_HOMOLOGATOR" alt="" coords="4197,3501,4525,3947">
+<area shape="rect" id="node8" href="tables/TC_ICD10_MEDDRA.html" target="_top" title="TC_ICD10_MEDDRA" alt="" coords="180,3443,508,4035">
+<area shape="rect" id="node9" href="tables/TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="2941,3329,3299,3745">
+<area shape="rect" id="node11" href="tables/TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="2916,8908,3324,9764">
+<area shape="rect" id="node13" href="tables/TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2910,1869,3330,3312">
+<area shape="rect" id="node14" href="tables/TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2949,703,3291,1852">
+<area shape="rect" id="node15" href="tables/TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="2908,8357,3332,8891">
+<area shape="rect" id="node21" href="tables/TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="1195,8441,1523,8828">
+<area shape="rect" id="node18" href="tables/TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="4197,2247,4537,3161">
+<area shape="rect" id="node19" href="tables/TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="2945,7168,3295,7877">
+<area shape="rect" id="node20" href="tables/TC_WHODRUG_HOMOLOGA_VACS.html" target="_top" title="TC_WHODRUG_HOMOLOGA_VACS" alt="" coords="180,2745,551,3161">
+<area shape="rect" id="node22" href="tables/TC_SYMPTOM_TO_LLT.html" target="_top" title="TC_SYMPTOM_TO_LLT" alt="" coords="180,5656,508,6131">
+<area shape="rect" id="node23" href="tables/TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="2876,7895,3364,8340">
+<area shape="rect" id="node24" href="tables/TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="2879,6559,3361,7151">
+<area shape="rect" id="node25" href="tables/DQ_DIMENSION.html" target="_top" title="DQ_DIMENSION" alt="" coords="5,2047,333,2463">
+<area shape="rect" id="node26" href="tables/TC_PARAMETRO.html" target="_top" title="TC_PARAMETRO" alt="" coords="4721,6763,5049,7179">
+<area shape="rect" id="node27" href="tables/TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="2860,5979,3380,6541">
+<area shape="rect" id="node28" href="tables/TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="2917,5281,3323,5961">
+<area shape="rect" id="node29" href="tables/TR_SYNC_PROCESS.html" target="_top" title="TR_SYNC_PROCESS" alt="" coords="180,6557,508,7179">
+<area shape="rect" id="node30" href="tables/TR_VACUNOMETRO.html" target="_top" title="TR_VACUNOMETRO" alt="" coords="180,4375,508,4908">
+<area shape="rect" id="node31" href="tables/TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="3476,1400,3920,2227">
+</map>
+                                        <a name='diagram'><img id="largeDegreeImg" src="diagrams/summary/relationships.real.large.png" usemap="#largeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="compactimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="compactImpliedRelationshipsDiagram" name="compactImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1752,1015,2110,1161">
+<area shape="rect" id="node6" href="tables/TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1175,1583,1575,2052">
+<area shape="rect" id="node2" href="tables/TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1619,1835,2243,1981">
+<area shape="rect" id="node3" href="tables/TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1767,428,2095,604">
+<area shape="rect" id="node17" href="tables/TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="377,2037,705,2213">
+<area shape="rect" id="node4" href="tables/TG_GACETA.html" target="_top" title="TG_GACETA" alt="" coords="2245,152,2641,269">
+<area shape="rect" id="node5" href="tables/TR_ESTABLECIMIENTO.html" target="_top" title="TR_ESTABLECIMIENTO" alt="" coords="1592,3109,1920,3256">
+<area shape="rect" id="node10" href="tables/TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="749,1517,1131,1781">
+<area shape="rect" id="node12" href="tables/TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="776,1835,1104,1952">
+<area shape="rect" id="node7" href="tables/TR_HOMOLOGATION.html" target="_top" title="TR_HOMOLOGATION" alt="" coords="564,64,892,211">
+<area shape="rect" id="node16" href="tables/TR_HOMOLOGATOR.html" target="_top" title="TR_HOMOLOGATOR" alt="" coords="192,93,520,269">
+<area shape="rect" id="node8" href="tables/TC_ICD10_MEDDRA.html" target="_top" title="TC_ICD10_MEDDRA" alt="" coords="2525,3045,2853,3163">
+<area shape="rect" id="node9" href="tables/TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1752,1671,2109,1817">
+<area shape="rect" id="node11" href="tables/TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1727,2388,2135,2681">
+<area shape="rect" id="node13" href="tables/TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2287,1848,2707,2053">
+<area shape="rect" id="node24" href="tables/TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1689,851,2172,997">
+<area shape="rect" id="node14" href="tables/TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2325,628,2668,775">
+<area shape="rect" id="node15" href="tables/TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1719,2107,2142,2371">
+<area shape="rect" id="node21" href="tables/TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,2096,333,2213">
+<area shape="rect" id="node18" href="tables/TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="2327,792,2667,1056">
+<area shape="rect" id="node19" href="tables/TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1755,1507,2106,1653">
+<area shape="rect" id="node20" href="tables/TC_WHODRUG_HOMOLOGA_VACS.html" target="_top" title="TC_WHODRUG_HOMOLOGA_VACS" alt="" coords="1685,152,2056,269">
+<area shape="rect" id="node22" href="tables/TC_SYMPTOM_TO_LLT.html" target="_top" title="TC_SYMPTOM_TO_LLT" alt="" coords="2805,152,3133,269">
+<area shape="rect" id="node23" href="tables/TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1687,621,2175,797">
+<area shape="rect" id="node25" href="tables/DQ_DIMENSION.html" target="_top" title="DQ_DIMENSION" alt="" coords="3085,3045,3413,3163">
+<area shape="rect" id="node26" href="tables/TC_PARAMETRO.html" target="_top" title="TC_PARAMETRO" alt="" coords="1032,3109,1360,3256">
+<area shape="rect" id="node27" href="tables/TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1671,1343,2191,1489">
+<area shape="rect" id="node28" href="tables/TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1728,1179,2133,1325">
+<area shape="rect" id="node29" href="tables/TR_SYNC_PROCESS.html" target="_top" title="TR_SYNC_PROCESS" alt="" coords="472,3045,800,3163">
+<area shape="rect" id="node30" href="tables/TR_VACUNOMETRO.html" target="_top" title="TR_VACUNOMETRO" alt="" coords="1125,5,1453,269">
+<area shape="rect" id="node31" href="tables/TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2751,1789,3195,1995">
+</map>
+                                        <a name='diagram'><img id="compactimpliedDegreeImg" src="diagrams/summary/relationships.implied.compact.png" usemap="#compactImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="largeimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="largeImpliedRelationshipsDiagram" name="largeImpliedRelationshipsDiagram">
+<area shape="rect" id="node1" href="tables/TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="2413,2104,2771,2549">
+<area shape="rect" id="node6" href="tables/TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="1836,4659,2236,6307">
+<area shape="rect" id="node2" href="tables/TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="2280,5004,2904,6007">
+<area shape="rect" id="node3" href="tables/TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="2428,299,2756,979">
+<area shape="rect" id="node17" href="tables/TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="1039,6037,1367,6512">
+<area shape="rect" id="node4" href="tables/TG_GACETA.html" target="_top" title="TG_GACETA" alt="" coords="4139,1007,4535,1951">
+<area shape="rect" id="node5" href="tables/TR_ESTABLECIMIENTO.html" target="_top" title="TR_ESTABLECIMIENTO" alt="" coords="4139,2281,4467,3108">
+<area shape="rect" id="node10" href="tables/TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="1411,5067,1792,5688">
+<area shape="rect" id="node12" href="tables/TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="1437,5741,1765,6187">
+<area shape="rect" id="node7" href="tables/TR_HOMOLOGATION.html" target="_top" title="TR_HOMOLOGATION" alt="" coords="4511,3372,4839,3935">
+<area shape="rect" id="node16" href="tables/TR_HOMOLOGATOR.html" target="_top" title="TR_HOMOLOGATOR" alt="" coords="4139,3401,4467,3847">
+<area shape="rect" id="node8" href="tables/TC_ICD10_MEDDRA.html" target="_top" title="TC_ICD10_MEDDRA" alt="" coords="4304,5161,4632,5753">
+<area shape="rect" id="node9" href="tables/TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="2413,4571,2771,4987">
+<area shape="rect" id="node11" href="tables/TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="2388,6683,2796,7539">
+<area shape="rect" id="node13" href="tables/TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="2948,4636,3368,6079">
+<area shape="rect" id="node24" href="tables/TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="2351,1495,2833,2087">
+<area shape="rect" id="node14" href="tables/TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="2987,5,3329,1155">
+<area shape="rect" id="node15" href="tables/TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="2380,6132,2804,6665">
+<area shape="rect" id="node21" href="tables/TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="667,6184,995,6571">
+<area shape="rect" id="node18" href="tables/TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="2988,1172,3328,2087">
+<area shape="rect" id="node19" href="tables/TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="2417,3844,2767,4553">
+<area shape="rect" id="node20" href="tables/TC_WHODRUG_HOMOLOGA_VACS.html" target="_top" title="TC_WHODRUG_HOMOLOGA_VACS" alt="" coords="5,5668,376,6084">
+<area shape="rect" id="node22" href="tables/TC_SYMPTOM_TO_LLT.html" target="_top" title="TC_SYMPTOM_TO_LLT" alt="" coords="5,4783,333,5257">
+<area shape="rect" id="node23" href="tables/TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="2348,996,2836,1441">
+<area shape="rect" id="node25" href="tables/DQ_DIMENSION.html" target="_top" title="DQ_DIMENSION" alt="" coords="5,2361,333,2777">
+<area shape="rect" id="node26" href="tables/TC_PARAMETRO.html" target="_top" title="TC_PARAMETRO" alt="" coords="5,1535,333,1951">
+<area shape="rect" id="node27" href="tables/TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="2332,3264,2852,3827">
+<area shape="rect" id="node28" href="tables/TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="2389,2567,2795,3247">
+<area shape="rect" id="node29" href="tables/TR_SYNC_PROCESS.html" target="_top" title="TR_SYNC_PROCESS" alt="" coords="5,3148,333,3769">
+<area shape="rect" id="node30" href="tables/TR_VACUNOMETRO.html" target="_top" title="TR_VACUNOMETRO" alt="" coords="4139,4228,4467,4761">
+<area shape="rect" id="node31" href="tables/TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="3412,4167,3856,4993">
+</map>
+                                        <a name='diagram'><img id="largeimpliedDegreeImg" src="diagrams/summary/relationships.implied.large.png" usemap="#largeImpliedRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 7.0.2</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="bower/pdfmake/pdfmake.min.js"></script>
+        <script src="bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="bower/codemirror/codemirror.js"></script>
+        <script src="bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="relationships.js"></script>
+        <script src="schemaSpy.js"></script>
+    </body>
+</html>
