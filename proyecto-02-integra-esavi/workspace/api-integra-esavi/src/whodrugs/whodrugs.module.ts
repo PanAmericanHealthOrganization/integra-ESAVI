@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsModule } from 'src/settings/settings.module';
+import { dataSourceFactory } from 'src/utils/ensure-schemas.util';
 import { AutoEncryptSubscriber } from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
 import { ActiveIngredientController } from './controllers/activeingredents.controller';
 import { MaholderController } from './controllers/maholder.controller';
@@ -42,12 +43,13 @@ export const WHODRUGS_DS = 'who_drug';
         username: configService.get('WHD_DB_USER'),
         password: configService.get('WHD_DB_PASS'),
         database: configService.get('WHD_DB_NAME'),
-        schema: WHODRUGS_DS, // a
+        schema: 'WHO_DRUG',
         entities: ['dist/**/models/*.entity{.ts,.js}'],
         synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
+      dataSourceFactory: dataSourceFactory(['WHO_DRUG']),
       imports: [ConfigModule],
       inject: [ConfigService],
     }),

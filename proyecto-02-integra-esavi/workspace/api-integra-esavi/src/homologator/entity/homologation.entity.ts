@@ -4,7 +4,7 @@ import { ComparisonType } from '../enum/comparison-type.enum';
 import { Homologator } from './homologator.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_HOMOLOGATION',
   comment: 'Regla de transformación asociada a un homologador',
 })

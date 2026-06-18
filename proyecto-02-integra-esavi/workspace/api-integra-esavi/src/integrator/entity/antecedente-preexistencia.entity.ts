@@ -4,7 +4,7 @@ import { Catalogo } from './catalogo.entity';
 import { Notificacion } from './notificacion.entity';
 
 //TODO: ralopez, aplicar clean-code a nombre de modelo ER
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_ENFERMEDADES_PREVIAS', comment: 'Tabla de antecedentes de enfermedades previas' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_ANTECEDENTES_ENFERMEDADES_PREVIAS', comment: 'Tabla de antecedentes de enfermedades previas' })
 export class AntecedentePreexistencia extends Antecedente {
   @Column({
     name: 'DESCRIPCION_ENF_PREVIAS',

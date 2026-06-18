@@ -2,11 +2,11 @@ import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { MeddraSync } from './meddraSync.entity';
 
-@Entity({ name: 'med_soc', schema: 'meddra' })
+@Entity({ name: 'MED_SOC', schema: 'MEDDRA' })
 export class SOC extends Auditoria {
   // PK
   @PrimaryGeneratedColumn({
-    name: 'id',
+    name: 'ID',
     comment: 'Identificador único del registro en base de datos ',
   })
   id: number;
@@ -15,7 +15,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'code',
+    name: 'CODE',
     comment: 'Código único del soc perteneciente al estandar meddra',
     length: 1024,
     type: 'varchar',
@@ -27,7 +27,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'name',
+    name: 'NAME',
     comment: 'Nombre del soc',
     length: 1024,
     type: 'varchar',
@@ -39,7 +39,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'abbrev',
+    name: 'ABBREV',
     comment: 'Abreviatura',
     length: 1024,
     type: 'varchar',
@@ -51,7 +51,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'whoart_code',
+    name: 'WHOART_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -63,7 +63,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'harts_code',
+    name: 'HARTS_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -75,7 +75,7 @@ export class SOC extends Auditoria {
   *
    */
   @Column({
-    name: 'costart_sym',
+    name: 'COSTART_SYM',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -87,7 +87,7 @@ export class SOC extends Auditoria {
   *
    */
   @Column({
-    name: 'icd9_code',
+    name: 'ICD9_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -99,7 +99,7 @@ export class SOC extends Auditoria {
   *
    */
   @Column({
-    name: 'icd9cm_code',
+    name: 'ICD9CM_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -111,7 +111,7 @@ export class SOC extends Auditoria {
   *
    */
   @Column({
-    name: 'icd10_code',
+    name: 'ICD10_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -122,7 +122,7 @@ export class SOC extends Auditoria {
    *
    */
   @Column({
-    name: 'jart_code',
+    name: 'JART_CODE',
     comment: '',
     length: 1024,
     type: 'varchar',
@@ -134,6 +134,6 @@ export class SOC extends Auditoria {
    *
    */
   @ManyToOne(() => MeddraSync)
-  @JoinColumn({ name: 'sync_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'SYNC_ID', referencedColumnName: 'id' })
   meddraSync: MeddraSync;
 }

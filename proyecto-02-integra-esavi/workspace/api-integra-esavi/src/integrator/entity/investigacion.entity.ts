@@ -22,7 +22,7 @@ import { Notificacion } from './notificacion.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_INVESTIGACION',
   comment: 'Tabla que registr la investigación de los casos de ESAVI',
 })

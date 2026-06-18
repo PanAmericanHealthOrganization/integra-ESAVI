@@ -5,89 +5,89 @@ import { Auditoria } from 'src/integrator/entity';
 /**
  *
  */
-@Entity({ name: 'med_llt', schema: 'meddra' })
+@Entity({ name: 'MED_LLT', schema: 'MEDDRA' })
 export class LLT extends Auditoria {
   /**
    *
    */
-  @PrimaryGeneratedColumn({ name: 'id', comment: 'Identificador de la tabla' })
+  @PrimaryGeneratedColumn({ name: 'ID', comment: 'Identificador de la tabla' })
   id: number;
 
   /**
    *
    */
-  @Column({ name: 'code', nullable: true, comment: 'Código de la LLT' })
+  @Column({ name: 'CODE', nullable: true, comment: 'Código de la LLT' })
   code: string;
 
   /**
    *
    */
-  @Column({ name: 'name', nullable: true, comment: 'Nombre de la LLT' })
+  @Column({ name: 'NAME', nullable: true, comment: 'Nombre de la LLT' })
   name: string;
 
   /**
    *
    */
-  @Column({ name: 'pt_code', nullable: true, comment: 'Código de la PT' })
+  @Column({ name: 'PT_CODE', nullable: true, comment: 'Código de la PT' })
   ptCode: string;
 
   /**
    *
    */
-  @Column({ name: 'whoart_code', nullable: true })
+  @Column({ name: 'WHOART_CODE', nullable: true })
   whoartCode: string;
 
   /**
    *
    */
-  @Column({ name: 'harts_code', nullable: true })
+  @Column({ name: 'HARTS_CODE', nullable: true })
   hartsCode: string;
 
   /**
    *
    */
-  @Column({ name: 'harts_code2', nullable: true })
+  @Column({ name: 'HARTS_CODE2', nullable: true })
   hartsCode2: string;
 
   /**
    *
    */
-  @Column({ name: 'costart_sym', nullable: true })
+  @Column({ name: 'COSTART_SYM', nullable: true })
   costartSym: string;
 
   /**
    *
    */
-  @Column({ name: 'icd9_code', nullable: true })
+  @Column({ name: 'ICD9_CODE', nullable: true })
   icd9Code: string;
 
   /**
    *
    */
-  @Column({ name: 'icd9cm_code', nullable: true })
+  @Column({ name: 'ICD9CM_CODE', nullable: true })
   icd9cmCode: string;
 
   /**
    *
    */
-  @Column({ name: 'icd10_code', nullable: true })
+  @Column({ name: 'ICD10_CODE', nullable: true })
   icd10Code: string;
 
   /**
    *
    */
-  @Column({ name: 'currency', nullable: true })
+  @Column({ name: 'CURRENCY', nullable: true })
   currency: string;
 
   /**
    *
    */
-  @Column({ name: 'jart_code', nullable: true })
+  @Column({ name: 'JART_CODE', nullable: true })
   jartCode: string;
   /**
    *
    */
   @ManyToOne(() => PT)
-  @JoinColumn({ name: 'id_pt_code', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'ID_PT_CODE', referencedColumnName: 'id' })
   pt: PT;
 }

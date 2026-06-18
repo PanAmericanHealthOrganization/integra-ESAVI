@@ -9,7 +9,7 @@ import { Auditoria, IAuditoria } from './auditoria.entity';
 @Index('IDX_VACUNOMETRO_UNICODIGO_FECHA', ['unicodigo', 'fechaAplicacion'])
 @Index('IDX_VACUNOMETRO_CREATED_AT', ['createdAt'])
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_VACUNOMETRO',
   comment: 'Conteo de vacunas para el analisis de los datos',
 })

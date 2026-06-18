@@ -5,7 +5,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_TIPO_CATALOGO',
   comment: 'Tabla de tipos de catálogo',
 })

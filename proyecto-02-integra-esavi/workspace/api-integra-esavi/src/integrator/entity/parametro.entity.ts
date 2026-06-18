@@ -11,7 +11,7 @@ export enum IntegrationGroup {
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_PARAMETRO',
   comment: 'Tabla de parámetros de configuración',
 })

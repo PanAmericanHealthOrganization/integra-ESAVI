@@ -6,7 +6,7 @@ import {Catalogo} from './catalogo.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_PACIENTE',
   comment: 'Tabla de pacientes',
 })
@@ -87,7 +87,7 @@ export class Paciente extends Auditoria {
 
   @Column(
     {
-      name:'FECHA_SINCRONIZACION',
+      name: 'FECHA_SINCRONIZACION',
       nullable: true,
     }
   )

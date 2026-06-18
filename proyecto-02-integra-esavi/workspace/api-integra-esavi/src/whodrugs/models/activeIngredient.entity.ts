@@ -5,7 +5,7 @@ import { IActiveIngredient } from './dtos';
 /**
  *
  */
-@Entity({ schema: 'who_drug', name: 'active_ingredients' })
+@Entity({ schema: 'WHO_DRUG', name: 'ACTIVE_INGREDIENTS' })
 export class ActiveIngredient extends Auditoria implements IActiveIngredient {
   constructor() {
     super();
@@ -17,7 +17,7 @@ export class ActiveIngredient extends Auditoria implements IActiveIngredient {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -27,14 +27,14 @@ export class ActiveIngredient extends Auditoria implements IActiveIngredient {
   /**
    *
    */
-  @Column({ name: 'aci_ingredient', nullable: true })
+  @Column({ name: 'ACI_INGREDIENT', nullable: true })
   ingredient: string;
 
   /**
    *
    */
   @ManyToOne(() => Drug)
-  @JoinColumn({ name: 'dru_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'DRU_ID', referencedColumnName: 'id' })
   drug: Drug;
 }
 

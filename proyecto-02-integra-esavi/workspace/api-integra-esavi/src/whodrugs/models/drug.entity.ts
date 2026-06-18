@@ -9,7 +9,7 @@ import { IDrug } from './dtos';
 /**
  *
  */
-@Entity({ name: 'drug', schema: 'who_drug' })
+@Entity({ name: 'DRUG', schema: 'WHO_DRUG' })
 export class Drug extends Auditoria implements IDrug {
   /**
    *
@@ -17,7 +17,7 @@ export class Drug extends Auditoria implements IDrug {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -28,7 +28,7 @@ export class Drug extends Auditoria implements IDrug {
    *
    */
   @Column({
-    name: 'dru_name',
+    name: 'DRU_NAME',
     transformer: encriptionTransformer,
   })
   drugName: string;
@@ -37,7 +37,7 @@ export class Drug extends Auditoria implements IDrug {
    *
    */
   @Column({
-    name: 'dru_code',
+    name: 'DRU_CODE',
     transformer: encriptionTransformer,
   })
   drugCode: string;
@@ -45,26 +45,26 @@ export class Drug extends Auditoria implements IDrug {
   /**
    *
    */
-  @Column({ name: 'dru_medicinal_product_id' })
+  @Column({ name: 'DRU_MEDICINAL_PRODUCT_ID' })
   medicinalProductID: number;
 
   /**
    *
    */
-  @Column({ name: 'dru_is_generic' })
+  @Column({ name: 'DRU_IS_GENERIC' })
   isGeneric: boolean;
 
   /**
    *
    */
-  @Column({ name: 'dru_is_preferred' })
+  @Column({ name: 'DRU_IS_PREFERRED' })
   isPreferred: boolean;
 
   /**
    *
    */
   @ManyToOne(() => DrugSync)
-  @JoinColumn({ name: 'drs_id', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'DRS_ID', referencedColumnName: 'id' })
   drugSync: DrugSync;
 
   /**

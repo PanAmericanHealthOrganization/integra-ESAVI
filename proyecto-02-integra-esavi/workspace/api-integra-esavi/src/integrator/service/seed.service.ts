@@ -165,23 +165,23 @@ export class SeedService implements OnApplicationBootstrap {
       await queryRunner.query('SET session_replication_role = replica;');
 
       // Limpiar todas las tablas usando TRUNCATE (más rápido que DELETE)
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNACION" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATO_VACUNA" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_DATO_VACUNACION" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_DATO_VACUNA" CASCADE;');
 
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DESENLACE_ESAVI" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_GRAVEDAD_ESAVI" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_CAUSALIDAD_ESAVI" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_MEDICAMENTO" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_DATOS_ESAVI" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_NOTIFICACION" CASCADE;');
-      await queryRunner.query('TRUNCATE TABLE "dhi_esavi"."TR_PACIENTE" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_DESENLACE_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_CAUSALIDAD_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_MEDICAMENTO" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_DATOS_ESAVI" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_PACIENTE" CASCADE;');
       /*
-      * 
+      *
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TC_CATALOGO" CASCADE;',
+        'TRUNCATE TABLE "DHI_ESAVI"."TC_CATALOGO" CASCADE;',
       );
       await queryRunner.query(
-        'TRUNCATE TABLE "dhi_esavi"."TC_TIPOCATALOGO" CASCADE;',
+        'TRUNCATE TABLE "DHI_ESAVI"."TC_TIPOCATALOGO" CASCADE;',
       );
       */
 
@@ -1538,7 +1538,7 @@ export class SeedService implements OnApplicationBootstrap {
       const tablesResult = await queryRunner.query(`
         SELECT table_name 
         FROM information_schema.tables 
-        WHERE table_schema = 'dhi_esavi' 
+        WHERE table_schema = 'DHI_ESAVI'
         AND table_name LIKE 'TR_%'
         ORDER BY table_name;
       `);
@@ -1560,7 +1560,7 @@ export class SeedService implements OnApplicationBootstrap {
         console.log(`🧹 Limpiando contenido de tabla: ${tableName}`);
 
         try {
-          await queryRunner.query(`TRUNCATE TABLE "dhi_esavi"."${tableName}" CASCADE;`);
+          await queryRunner.query(`TRUNCATE TABLE "DHI_ESAVI"."${tableName}" CASCADE;`);
           console.log(`✅ Tabla ${tableName} limpiada exitosamente`);
         } catch (tableError) {
           console.error(`❌ Error al limpiar tabla ${tableName}:`, tableError);

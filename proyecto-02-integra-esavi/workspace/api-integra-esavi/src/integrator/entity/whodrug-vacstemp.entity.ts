@@ -6,7 +6,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_WHODRUG_VACS_TEMP',
   comment: 'Tabla de mapeo WHODrug para los datos del origen VigiFLow. Este catálogo se utilizará de forma provisional hasta que concluya el proceso de actualización del catálogo oficial de la Uppsala Monitorig Centre. Este catálogo fue elaborado manualmente por los epidemiólogos.',
 })
