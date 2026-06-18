@@ -1,5 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {PartialType} from "@nestjs/swagger";
+import {IsOptional,IsString,IsUUID,MaxLength} from 'class-validator';
 
 export class CreateCatalogoPadreDto {
   @IsString()

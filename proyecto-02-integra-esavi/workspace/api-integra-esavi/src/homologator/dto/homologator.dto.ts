@@ -1,6 +1,6 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
-import { DataType } from '../enum/data-type.enum';
+import {PartialType} from "@nestjs/swagger";
+import {IsEnum,IsNotEmpty,IsOptional,IsString,MaxLength} from 'class-validator';
+import {DataType} from '../enum/data-type.enum';
 
 export class CreateHomologatorDto {
   @IsString()

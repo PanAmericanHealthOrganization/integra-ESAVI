@@ -1,6 +1,6 @@
-import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
-import { PartialType } from '@nestjs/mapped-types';
-import { ComparisonType } from '../enum/comparison-type.enum';
+import {PartialType} from "@nestjs/swagger";
+import {IsBoolean,IsEnum,IsNotEmpty,IsNumber,IsOptional,IsString,IsUUID,MaxLength,Min} from 'class-validator';
+import {ComparisonType} from '../enum/comparison-type.enum';
 
 export class CreateHomologationDto {
   @IsUUID()

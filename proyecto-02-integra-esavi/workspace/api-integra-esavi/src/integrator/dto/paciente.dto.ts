@@ -1,5 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import {PartialType} from "@nestjs/swagger";
+import {IsDateString,IsOptional,IsString} from 'class-validator';
 
 export class CreatePacienteDto {
   @IsString()

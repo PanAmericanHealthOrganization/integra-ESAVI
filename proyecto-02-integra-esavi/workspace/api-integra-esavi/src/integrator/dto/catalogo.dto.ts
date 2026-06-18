@@ -1,5 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
+import {PartialType} from "@nestjs/swagger";
+import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
 
 export class CreateCatalogoDto {
   padre: CreateCatalogoDto;
