@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
-import { SyncRangeDto } from '../dto/vacunacion-consolidada.dto';
+import { SyncRangeDto } from '../dto';
 import { VacunacionNominalService } from '../service/vacunacion-nominal.service';
 
 interface JobStatus {

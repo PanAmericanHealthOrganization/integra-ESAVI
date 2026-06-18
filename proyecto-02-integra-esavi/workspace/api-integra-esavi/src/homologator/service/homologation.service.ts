@@ -3,8 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, In, Repository } from 'typeorm';
 import { Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { CreateHomologationDto } from '../dto/create-homologation.dto';
-import { UpdateHomologationDto } from '../dto/update-homologation.dto';
+import { CreateHomologationDto, UpdateHomologationDto } from '../dto';
 import { Homologation } from '../entity/homologation.entity';
 
 @Injectable()

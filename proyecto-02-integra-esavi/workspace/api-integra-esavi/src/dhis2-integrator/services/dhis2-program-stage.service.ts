@@ -1,11 +1,10 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { ProgramStage } from '../dto/interfaceprogramStages';
+import { ProgramStage, DataElement } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { Dhis2DataElementService } from './dhis2-data-element.service';
-import { DataElement } from '../dto/dataElemen.interface';
 
 @Injectable()
 export class Dhis2ProgramStageService {

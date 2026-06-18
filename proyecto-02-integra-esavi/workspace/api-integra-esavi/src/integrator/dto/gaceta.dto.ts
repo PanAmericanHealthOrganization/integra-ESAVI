@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsOptional, IsString } from 'class-validator';
 import { ESTADO_GACETA, IGaceta } from '../entity/interfaces/gaceta.interface';
 
@@ -249,3 +249,17 @@ export class GacetaFilterDto {
   @IsDateString()
   fechaPublicacionHasta?: string;
 }
+
+export class CreateGacetaDto extends PickType(GacetaDto, ['desde', 'hasta', 'numeroGaceta'] as const) {}
+
+export class UpdateGacetaDto extends OmitType(PartialType(GacetaDto), [
+  'fechaPublicacion',
+  'graficoAnalisisPoblacion',
+  'graficoAnalisisDistribucionGeografica',
+  'graficoAnalisisDistribucionTipoEvento',
+  'graficoAnalisisDistribucionVacunas',
+  'graficoAnalisisPorGravedad',
+  'graficoAnalisisTemporal',
+  'desde',
+  'hasta',
+] as const) {}

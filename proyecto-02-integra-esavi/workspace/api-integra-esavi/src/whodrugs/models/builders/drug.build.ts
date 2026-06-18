@@ -2,14 +2,7 @@ import { uuidGenerator } from 'src/whodrugs/utils/utils';
 import { ActiveIngredient } from '../activeIngredient.entity';
 import { Drug } from '../drug.entity';
 import { DrugSync } from '../drugSync.entity';
-import {
-  IATC,
-  IActiveIngredient,
-  ICountryOfSale,
-  IDrugResponse,
-  IIngredientTranslation,
-  IMaHolder,
-} from '../dtos/drug.dto';
+import { IATC, IActiveIngredient, ICountryOfSale, IDrugResponse, IIngredientTranslation, IMaHolder } from '../dtos';
 import { IngredientTranslation } from '../ingredientTranslation.entity';
 import { CountryOfSale } from '../countryOfSale.entity';
 import { Maholder } from '../maholder.entity';

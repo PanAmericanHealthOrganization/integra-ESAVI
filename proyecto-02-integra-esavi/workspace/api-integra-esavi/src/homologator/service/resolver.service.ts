@@ -5,7 +5,7 @@ import { DataType } from '../enum/data-type.enum';
 import { ComparisonType } from '../enum/comparison-type.enum';
 import { Homologation } from '../entity/homologation.entity';
 import { Homologator } from '../entity/homologator.entity';
-import { ResolveRequestDto } from '../dto/resolve-request.dto';
+import { ResolveRequestDto } from '../dto';
 
 export interface ResolveResult {
   matched: boolean;

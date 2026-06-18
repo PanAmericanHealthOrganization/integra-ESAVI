@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { Repository } from 'typeorm';
-import { CreateNotificacionDto } from '../dto/create-notificacion.dto';
+import { CreateNotificacionDto } from '../dto';
 import { NotificacionDhis2 } from '../entity/notificacion-dhis2.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { PacienteDhis2 } from '../entity/paciente-dhis2.entity';

@@ -1,4 +1,5 @@
 export * from './antecedente-embarazo.service';
+export * from './catalogo-padre.service';
 export * from './antecedente-evento.service';
 export * from './antecedente-medico.service';
 export * from './antecedente-preexistencia.service';

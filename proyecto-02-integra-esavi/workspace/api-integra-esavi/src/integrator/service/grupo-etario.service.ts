@@ -4,8 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { plainToClass } from 'class-transformer';
 import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
-import { CreateGrupoEtarioDto } from '../dto/create-grupo-etario.dto';
-import { UpdateGrupoEtarioDto } from '../dto/update-grupo-etario.dto';
+import { CreateGrupoEtarioDto, UpdateGrupoEtarioDto } from '../dto';
 import { GrupoEtario } from '../entity/grupo-etario.entity';
 
 @Injectable()

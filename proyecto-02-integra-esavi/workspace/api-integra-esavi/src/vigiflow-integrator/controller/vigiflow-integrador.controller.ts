@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import * as xlsx from 'xlsx';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AefiQuery } from '../query/aefi-query';
+import { AefiQuery } from '../dto';
 import { VigiflowCrawlerService } from '../service/vigiflow-crawler.service';
 import { VigiflowIntegradorService } from '../service/vigiflow-integrador.service';
 

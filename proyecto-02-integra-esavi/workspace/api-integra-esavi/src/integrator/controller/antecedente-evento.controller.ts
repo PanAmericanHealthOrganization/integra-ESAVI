@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateAntecedenteEventoDto } from '../dto/update-antecedente-evento.dto';
+import { UpdateAntecedenteEventoDto } from '../dto';
 import { AntecedenteEventoService } from '../service/antecedente-evento.service';
 
 @ApiTags('Antecedente Evento')

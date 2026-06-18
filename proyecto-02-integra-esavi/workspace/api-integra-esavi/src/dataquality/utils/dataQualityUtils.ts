@@ -1,5 +1,4 @@
-import { HistoryQualityDto, SumaryDataQualityDto } from '../controllers/dto/historyQuality.dto';
-import { DimensionCalidadDatosDto } from '../controllers/dto/quality.dto';
+import { HistoryQualityDto, SumaryDataQualityDto, DimensionCalidadDatosDto } from '../controllers/dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 
 /**

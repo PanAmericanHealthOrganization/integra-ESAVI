@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Logger, Param, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { AefiQuery } from 'src/vigiflow-integrator/query/aefi-query';
+import { AefiQuery } from 'src/vigiflow-integrator/dto';
 import {
   DuplicateConfirmationDto,
   DuplicateHandlingConfigDto,
-} from '../dto/duplicate-handling.dto';
+} from '../dto';
 import { Dhis2DuplicateHandlerService } from '../services/dhis2-duplicate-handler.service';
 import { Dhis2IntegratorService } from '../services/dhis2-integrator.service';
 import { Dhis2ProcessingLogService } from '../services/dhis2-processing-log.service';

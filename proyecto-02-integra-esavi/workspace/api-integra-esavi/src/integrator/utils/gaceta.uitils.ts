@@ -1,6 +1,5 @@
 import {format} from 'date-fns';
-import {CreateGacetaDto} from '../dto/create-gaceta.dto';
-import {GacetaDto} from '../dto/gaceta.dto';
+import { CreateGacetaDto, GacetaDto } from '../dto';
 import {ESTADO_GACETA} from '../entity/interfaces/gaceta.interface';
 
 /**

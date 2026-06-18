@@ -1,14 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { 
-  DuplicateAction, 
-  DuplicateRecordDto, 
-  DuplicateConfirmationDto, 
+import {
+  DuplicateAction,
+  DuplicateRecordDto,
+  DuplicateConfirmationDto,
   DuplicateHandlingConfigDto,
-  DuplicateHandlingResultDto 
-} from '../dto/duplicate-handling.dto';
+  DuplicateHandlingResultDto,
+} from '../dto';
 import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
-import { CreateCompleteDto } from '../../integrator/dto/create-complete.dto';
+import { CreateCompleteDto } from '../../integrator/dto';
 
 @Injectable()
 export class Dhis2DuplicateHandlerService {

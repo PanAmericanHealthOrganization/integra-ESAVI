@@ -24,6 +24,7 @@ import { CreateCtIcd10meddraDto, CtIcd10meddra } from '../entity/ct-icd10meddra.
 import { CreateCtSymptom2lltDto, CtSymptom2llt } from '../entity/ct-symptom2llt.entity';
 import { CreateWhodrugHomologaVacsDto, WhodrugHomologaVacs } from '../entity/whodrug-homologavacs.entity';
 import { CreateWhodrugVacsTempDto, WhodrugVacsTemp } from '../entity/whodrug-vacstemp.entity';
+import { CatalogoPadre } from '../entity/catalogo-padre.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -63,6 +64,8 @@ export class SeedService implements OnApplicationBootstrap {
     private datoVacunacionRepository: Repository<DatoVacunacion>,
     @InjectRepository(SyncProcess, 'POSTGRES_INTEGRATOR_DS')
     private syncProcessRepository: Repository<SyncProcess>,
+    @InjectRepository(CatalogoPadre, 'POSTGRES_INTEGRATOR_DS')
+    private catalogoPadreRepository: Repository<CatalogoPadre>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -72,6 +75,9 @@ export class SeedService implements OnApplicationBootstrap {
   async seedData() {
     //console.log('🌱 Iniciando carga de datos de ejemplo...'); // Cuando se cargaban datos fake para pruebas.
     console.log('🌱 Iniciando carga de valores en catálogo de homolgación...');
+
+    // Carga independiente de TC_CATALOGO_PADRE desde CSV (siempre corre, con su propio control de duplicados)
+    await this.loadCatalogoPadreFromCSV();
 
     const existingCount = await this.tipoCatalogoRepository.count();
     if (existingCount > 0) {
@@ -1485,6 +1491,81 @@ export class SeedService implements OnApplicationBootstrap {
   }
   //--fin de carga catálogo Excel WHODRUG HOMOLOGACIÓN VACUNAS VigiFlow ------------------------------------------------------------------------------------------------------
 
+
+  // ── Seed TC_CATALOGO_PADRE: Género ──────────────────────────────────────────
+  private async loadCatalogoPadreFromCSV() {
+    await this.runSyncProcess('Carga de TC_CATALOGO_PADRE desde CSV...', async () => {
+      console.log('📂 Cargando TC_CATALOGO_PADRE desde catalogo_padre.csv...');
+
+      try {
+        const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'catalogo_padre.csv');
+        const csvContent = fs.readFileSync(csvPath, 'utf-8');
+        const lines = csvContent.split('\n').filter((line) => line.trim());
+
+        const auditoria: IAuditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: 'System',
+          deletedAt: undefined,
+          deletedBy: '',
+          isEnabled: true,
+          isActive: true,
+        };
+
+        // Parsear filas omitiendo el encabezado
+        const rows = lines.slice(1).map((line) => {
+          const [codigo, codigo_padre, descripcion, codigo_homologado] = line.split(',').map((col) => col.trim());
+          return { codigo, codigo_padre, descripcion, codigo_homologado };
+        }).filter((row) => row.codigo);
+
+        let insertados = 0;
+        let omitidos = 0;
+
+        // Primera pasada: registros sin padre (top-level)
+        for (const row of rows.filter((r) => !r.codigo_padre)) {
+          const existing = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo } });
+          if (existing) {
+            omitidos++;
+          } else {
+            await this.catalogoPadreRepository.save({
+              codigo: row.codigo,
+              nombre: row.descripcion,
+              descripcion: row.codigo_homologado || null,
+              padre: null,
+              ...auditoria,
+            } as CatalogoPadre);
+            insertados++;
+          }
+        }
+
+        // Segunda pasada: registros con padre (hijos)
+        for (const row of rows.filter((r) => r.codigo_padre)) {
+          const existing = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo } });
+          if (existing) {
+            omitidos++;
+          } else {
+            const padre = await this.catalogoPadreRepository.findOne({ where: { codigo: row.codigo_padre } });
+            await this.catalogoPadreRepository.save({
+              codigo: row.codigo,
+              nombre: row.descripcion,
+              descripcion: row.codigo_homologado || null,
+              padre: padre || null,
+              ...auditoria,
+            } as CatalogoPadre);
+            insertados++;
+          }
+        }
+
+        if (omitidos > 0) {
+          console.log(`ℹ️ TC_CATALOGO_PADRE: ${omitidos} registro(s) ya estaban cargados y se omitieron.`);
+        }
+        console.log(`✅ TC_CATALOGO_PADRE procesado: ${insertados} insertado(s), ${omitidos} omitido(s).`);
+      } catch (error) {
+        console.error('❌ Error al cargar TC_CATALOGO_PADRE desde CSV:', error);
+      }
+    });
+  }
 
   /**
    * Método para limpiar el contenido de todas las tablas que inician con "TR"

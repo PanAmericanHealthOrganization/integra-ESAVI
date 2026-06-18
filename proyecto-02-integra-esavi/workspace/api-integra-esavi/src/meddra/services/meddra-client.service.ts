@@ -4,11 +4,7 @@ import { lastValueFrom } from 'rxjs';
 
 import { ConfigService } from '@nestjs/config';
 import { MeddraHistoryService } from './meddra-history.service';
-import {
-  IMeddraJWTResponse,
-  IMeddraQueryRequest,
-  IMeddraResponse,
-} from '../models/dto/meddra.query';
+import { IMeddraJWTResponse, IMeddraQueryRequest, IMeddraResponse } from '../models/dto';
 import { MeddraQuery } from '../models/meddraquerys.entity';
 
 @Injectable()

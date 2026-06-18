@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import { ActiveIngredient } from '../models/activeIngredient.entity';
 import { Drug } from '../models/drug.entity';
-import { IActiveIngredient, IDrugResponse } from '../models/dtos/drug.dto';
+import { IActiveIngredient, IDrugResponse } from '../models/dtos';
 import { IngredientTranslationService } from './ingredientsTraslations.service';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 

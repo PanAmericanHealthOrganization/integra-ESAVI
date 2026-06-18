@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Maholder } from '../models/maholder.entity';
 import { Repository } from 'typeorm';
-import { IMaHolder } from '../models/dtos/drug.dto';
+import { IMaHolder } from '../models/dtos';
 import { CountryOfSale } from '../models/countryOfSale.entity';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
 

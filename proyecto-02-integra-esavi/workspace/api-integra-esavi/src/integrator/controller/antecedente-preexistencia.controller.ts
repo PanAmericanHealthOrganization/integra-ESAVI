@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { UpdateAntecedentePreexistenciaDto } from '../dto/update-antecedente-preexistencia.dto';
+import { UpdateAntecedentePreexistenciaDto } from '../dto';
 import { AntecedentePreexistenciaService } from '../service/antecedente-preexistencia.service';
 
 @ApiTags('Antecedente Pre-existencia')

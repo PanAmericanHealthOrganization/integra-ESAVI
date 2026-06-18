@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { GacetaController } from './controller';
 import { AntecedenteEmbarazoController } from './controller/antecedente-embarazo.controller';
+import { CatalogoPadreController } from './controller/catalogo-padre.controller';
 import { AntecedenteEventoController } from './controller/antecedente-evento.controller';
 import { AntecedenteMedicoController } from './controller/antecedente-medico.controller';
 import { AntecedentePreexistenciaController } from './controller/antecedente-preexistencia.controller';
@@ -16,6 +17,7 @@ import { PacienteDhis2Controller } from './controller/paciente-dhis2.controller'
 import { PacienteEmbarazadaController } from './controller/paciente-embarazada.controller';
 import { PacienteVigiflowController } from './controller/paciente-vigiflow.controller';
 import { PacienteController } from './controller/paciente.controller';
+import { ParametroController } from './controller/parametro.controller';
 import { ReporteController } from './controller/reporte.controller';
 import { SeedController } from './controller/seed.controller';
 import { SyncController } from './controller/sync.controller';
@@ -26,6 +28,7 @@ import {
   AntecedenteMedico,
   AntecedentePreexistencia,
   Catalogo,
+  CatalogoPadre,
   CausalidadEsavi,
   DatoEsavi,
   DatoVacuna,
@@ -62,6 +65,7 @@ import {
   AntecedenteMedicoService,
   AntecedentePreexistenciaService,
   CatalogoService,
+  CatalogoPadreService,
   CausalidadEsaviService,
   DatoEsaviService,
   DatoVacunaService,
@@ -118,6 +122,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         AntecedenteEvento,
         AntecedenteMedico,
         AntecedentePreexistencia,
+        CatalogoPadre,
         Establecimiento,
         Catalogo,
         CausalidadEsavi,
@@ -154,6 +159,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
   controllers: [
     AntecedenteEmbarazoController,
     AntecedenteEventoController,
+    CatalogoPadreController,
     AntecedenteMedicoController,
     AntecedentePreexistenciaController,
     DatoEsaviController,
@@ -172,10 +178,12 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SyncController,
     InvestigacionController,
     PacienteController,
+    ParametroController,
     GacetaController,
   ],
   providers: [
     SyncService,
+    CatalogoPadreService,
     AntecedenteEmbarazoService,
     AntecedenteEventoService,
     AntecedenteMedicoService,

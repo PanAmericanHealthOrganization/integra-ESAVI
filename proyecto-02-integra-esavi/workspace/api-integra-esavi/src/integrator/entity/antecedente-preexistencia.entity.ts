@@ -1,7 +1,6 @@
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
 import { Catalogo } from './catalogo.entity';
-import * as moment from 'moment/moment';
 import { Notificacion } from './notificacion.entity';
 
 //TODO: ralopez, aplicar clean-code a nombre de modelo ER
@@ -31,6 +30,6 @@ export class AntecedentePreexistencia extends Antecedente {
 
   @BeforeInsert()
   beforeInsert() {
-    this.createdAt = moment().toDate();
+    this.createdAt = new Date();
   }
 }

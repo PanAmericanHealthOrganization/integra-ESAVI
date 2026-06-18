@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UpdatePacienteDto } from '../dto/update-paciente.dto';
+import { UpdatePacienteDto } from '../dto';
 import { PacienteVigiflow } from '../entity/paciente-vigiflow.entity';
 import { plainToClass } from 'class-transformer';
 import { CatalogoService } from './catalogo.service';
-import { CreatePacienteVigiflowDto } from '../dto/create-paciente-vigiflow.dto';
+import { CreatePacienteVigiflowDto } from '../dto';
 
 @Injectable()
 export class PacienteVigiflowService {

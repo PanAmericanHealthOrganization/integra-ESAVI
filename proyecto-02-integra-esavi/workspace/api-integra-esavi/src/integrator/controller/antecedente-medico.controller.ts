@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseFilters } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { UpdateAntecedenteMedicoDto } from '../dto/update-antecedente-medico.dto';
+import { UpdateAntecedenteMedicoDto } from '../dto';
 import { AntecedenteMedicoService } from '../service/antecedente-medico.service';
 
 @ApiTags('Antecedente Medico')

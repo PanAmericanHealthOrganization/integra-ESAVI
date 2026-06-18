@@ -8,6 +8,7 @@ import {CustomLayout} from "./layout/CustomLayout"
 import {CustomLoginPage} from "./layout/CustomLogin"
 import analisis from "./pages/analisis"
 import catalogos from "./pages/catalogos"
+import catalogosConfig from "./pages/catalogos-config"
 import dashboard from "./pages/dashboard"
 import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
@@ -70,6 +71,8 @@ const App = () => {
       <Resource name="calidad" list={CalidadDashList} />
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
+      <Resource name="catalogos-config" {...catalogosConfig} />
+      <Resource name="catalogo-padre" />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={homologators.list} />

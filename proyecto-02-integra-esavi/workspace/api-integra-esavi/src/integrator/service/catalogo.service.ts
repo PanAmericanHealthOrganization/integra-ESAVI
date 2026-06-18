@@ -2,8 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { ILike, Repository } from 'typeorm';
-import { CreateCatalogoDto } from '../dto/create-catalogo.dto';
-import { UpdateCatalogoDto } from '../dto/update-catalogo.dto';
+import { CreateCatalogoDto, UpdateCatalogoDto } from '../dto';
 import { Catalogo } from '../entity/catalogo.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ILike, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IMeddraQueryRequest, IMeddraResponse } from '../models/dto/meddra.query';
+import { IMeddraQueryRequest, IMeddraResponse } from '../models/dto';
 import { MeddraQuery } from '../models/meddraquerys.entity';
 
 @Injectable()

@@ -4,8 +4,7 @@ import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { Notificacion } from '../entity/notificacion.entity';
 import { EmbarazoEsavi } from '../entity/embarazo-esavi.entity';
-import { CreateEmbarazoEsaviDto } from '../dto/create-embarazo-esavi.dto';
-import { UpdateEmbarazoEsaviDto } from '../dto/update-embarazo-esavi.dto';
+import { CreateEmbarazoEsaviDto, UpdateEmbarazoEsaviDto } from '../dto';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
 @Injectable()

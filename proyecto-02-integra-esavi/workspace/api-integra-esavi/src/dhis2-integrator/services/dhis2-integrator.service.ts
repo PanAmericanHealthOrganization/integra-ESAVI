@@ -3,30 +3,36 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Worksheet } from 'exceljs';
 import * as fs from 'fs';
-import * as moment from 'moment';
 import * as path from 'path';
-import { CreateAntecedenteEmbarazoDto } from 'src/integrator/dto/create-antecedente-embarazo.dto';
-import { CreateAntecedenteEventoDto } from 'src/integrator/dto/create-antecedente-evento.dto';
-import { CreateAntecedenteMedicoDto } from 'src/integrator/dto/create-antecedente-medico.dto';
-import { CreateAntecedentePreexistenciaDto } from 'src/integrator/dto/create-antecedente-preexistencia.dto';
-import { CreateDatoEsaviDto } from 'src/integrator/dto/create-dato-esavi.dto';
-import { CreateDatoVacunaDto } from 'src/integrator/dto/create-dato-vacuna.dto';
-import { CreateDatoVacunacionDto } from 'src/integrator/dto/create-dato-vacunacion.dto';
-import { CreatePacienteEmbarazadaDto } from 'src/integrator/dto/create-paciente-embarazada.dto';
-import { InvestigacionCreateDto } from 'src/integrator/dto/investigacion.dto';
-import { UbicacionDto } from 'src/integrator/dto/ubicacion.dto';
-import { CreateCompleteDto } from '../../integrator/dto/create-complete.dto';
-import { CreateDesenlaceEsaviDto } from '../../integrator/dto/create-desenlace-esavi.dto';
-import { CreateGravedadEsaviDto } from '../../integrator/dto/create-gravedad-esavi.dto';
-import { CreateNotificacionDto } from '../../integrator/dto/create-notificacion.dto';
-import { CreatePacienteDhis2Dto } from '../../integrator/dto/create-paciente-dhis2.dto';
+import {
+  CreateAntecedenteEmbarazoDto,
+  CreateAntecedenteEventoDto,
+  CreateAntecedenteMedicoDto,
+  CreateAntecedentePreexistenciaDto,
+  CreateCausalidadEsaviDto,
+  CreateDatoEsaviDto,
+  CreateDatoVacunaDto,
+  CreateDatoVacunacionDto,
+  CreatePacienteEmbarazadaDto,
+  InvestigacionCreateDto,
+  UbicacionDto,
+  CreateCompleteDto,
+  CreateDesenlaceEsaviDto,
+  CreateGravedadEsaviDto,
+  CreateNotificacionDto,
+  CreatePacienteDhis2Dto,
+} from '../../integrator/dto';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
-import { ProcessingStatus } from '../dto/dhis2-processing-log.dto';
-import { DuplicateAction, DuplicateHandlingConfigDto } from '../dto/duplicate-handling.dto';
-import { ProgramStage } from '../dto/interfaceprogramStages';
-import { ProgramTrackedEntityAttribute } from '../dto/programTrackedEntityAttribute.interface';
-import { IData, IHeader } from '../dto/report.interface';
+import {
+  ProcessingStatus,
+  DuplicateAction,
+  DuplicateHandlingConfigDto,
+  ProgramStage,
+  ProgramTrackedEntityAttribute,
+  IData,
+  IHeader,
+} from '../dto';
 import { Dhis2AnalyticsService } from './dhis2-analytics.service';
 import { Dhis2DuplicateHandlerService } from './dhis2-duplicate-handler.service';
 import { Dhis2EventsService } from './dhis2-events.service';
@@ -35,7 +41,6 @@ import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
 import { CtSymptom2lltService } from 'src/integrator/service/ct-symptom2llt.service';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
-import { CreateCausalidadEsaviDto } from 'src/integrator/dto/create-causalidad-esavi.dto';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { CtIcd10meddra } from 'src/integrator/entity/ct-icd10meddra.entity';
@@ -59,16 +64,16 @@ export class Dhis2IntegratorService {
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
   ) {}
 
-  formatoFecha(valor: string) {
-    if (valor && valor.length > 0 && valor != '') {
-      return moment.utc(valor, 'YYYYMMDD').toDate(); //moment(valor, 'YYYYMMDD)').toDate();
+  formatoFecha(valor: string): Date | null {
+    if (valor && valor.length > 0 && valor !== '') {
+      const year = parseInt(valor.substring(0, 4), 10);
+      const month = parseInt(valor.substring(4, 6), 10);
+      const day = parseInt(valor.substring(6, 8), 10);
+      const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+      return isNaN(date.getTime()) ? null : date;
     }
     return null;
-  }//Se comprobó que no devuelve la fecha ajustada la hora en  UTC 00:00:00.000Z. Preguntar al personal funcional si es necesario ajustar la hora.
-  // Actualización: se elimina el paréntesis de cierre del formato de fecha.
-  // La definición de la columna en la entidad 'timestamp with time zone': convierte automáticamente a UTC al persistir.
-  // Para forzar a UTC, se utiliza 'moment.utc'.
-  // Comprobar qué sucese cuando se concatena con la hora cuando los campos diponen este valor en otro Elemento de Datos.
+  }
 
   formatoInteger = (valor: string) => {
     let resultado = 0;

@@ -1,4 +1,4 @@
-import { CalidadDatosResultadoDto, TotalesCalidDatosDto } from 'src/dataquality/controllers/dto/quality.dto';
+import { CalidadDatosResultadoDto, TotalesCalidDatosDto } from 'src/dataquality/controllers/dto';
 
 /**
  *

@@ -1,4 +1,5 @@
 import axios from "axios"
+import keycloak from "../keycloak"
 import ENV_CONFIG from "../utils/env_utils"
 
 // Crear una instancia de axios
@@ -13,6 +14,10 @@ const intESAVIClient = axios.create({
 // Interceptor de solicitud (request)
 intESAVIClient.interceptors.request.use(
   function (config) {
+    const username = keycloak.tokenParsed?.preferred_username
+    if (username) {
+      config.headers["X-Username"] = username
+    }
     return config
   },
   function (error) {

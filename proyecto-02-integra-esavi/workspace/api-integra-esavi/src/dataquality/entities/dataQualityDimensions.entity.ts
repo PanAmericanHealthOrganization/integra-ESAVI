@@ -1,6 +1,6 @@
 import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IDataQualityDimensions } from '../controllers/dto/quality.dto';
+import { IDataQualityDimensions } from '../controllers/dto';
 
 @Entity({
   schema: 'dhi_esavi',

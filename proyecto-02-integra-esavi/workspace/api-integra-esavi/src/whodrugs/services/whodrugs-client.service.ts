@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import { IDrug } from '../models/dtos/drug.dto';
+import { IDrug } from '../models/dtos';
 //import { readFile } from 'fs/promises';
 /**
  * @description Clase que sentraliza los servicios de la API de whodrugs

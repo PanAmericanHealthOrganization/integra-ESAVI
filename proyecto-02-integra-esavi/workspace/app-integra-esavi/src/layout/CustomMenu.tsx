@@ -16,6 +16,7 @@ import Authorize from "../authorization.utils"
 import SubMenu from "./SubMenu"
 export const CustomMenu = () => {
   const [estandaresOpen, setEstandaresOpen] = useState(false)
+  const [configuracionesOpen, setConfiguracionesOpen] = useState(false)
 
   return (
     <>
@@ -48,11 +49,6 @@ export const CustomMenu = () => {
         <Menu.Item to="/esavis" primaryText="ESAVIS" leftIcon={<SickIcon />} />
 
         <Menu.Item
-          to="/parametros"
-          primaryText="Parametros"
-          leftIcon={<SettingsIcon />}
-        />
-        <Menu.Item
           to="/gaceta"
           primaryText="Gaceta"
           leftIcon={<AutoStoriesIcon />}
@@ -68,11 +64,24 @@ export const CustomMenu = () => {
           leftIcon={<FlakyIcon />}
         />
 
-        <Menu.Item
-          to="/configuraciones"
-          primaryText="Configuraciones"
-          leftIcon={<SettingsIcon />}
-        />
+        {/* Configuraciones */}
+        <SubMenu
+          dense={false}
+          handleToggle={() => setConfiguracionesOpen((v) => !v)}
+          icon={<SettingsIcon />}
+          isOpen={configuracionesOpen}
+          name="Configuraciones">
+          <Menu.Item
+            to="/parametros"
+            primaryText="Parametros"
+            leftIcon={<SettingsIcon />}
+          />
+          <Menu.Item
+            to="/catalogos-config"
+            primaryText="Catálogos"
+            leftIcon={<SegmentIcon />}
+          />
+        </SubMenu>
         <Menu.Item
           to="/vacunometro"
           primaryText="Vacunometro"

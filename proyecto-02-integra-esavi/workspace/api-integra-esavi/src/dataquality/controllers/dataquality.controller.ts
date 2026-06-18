@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Post, Query } from '@nestjs
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { GeneralService } from '../services/general.service';
-import { QualityDto } from './dto/quality.dto';
+import { QualityDto } from './dto';
 
 @Controller({ path: 'dataquality', version: '1' })
 export class DataqualityController implements IController<QualityDto, QualityDto, QualityDto> {
