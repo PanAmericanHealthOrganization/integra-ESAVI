@@ -5,7 +5,7 @@ import { Auditoria } from 'src/integrator/entity';
 //comment: 'Tabla para la gestión de meddra',
 
 @Entity({
-  name: 'med_sync',
+  name: 'MED_SYNC',
   schema: 'MEDDRA',
 })
 export class MeddraSync extends Auditoria {
@@ -20,7 +20,7 @@ export class MeddraSync extends Auditoria {
    * Description:
    */
   @PrimaryGeneratedColumn({
-    name: 'id',
+    name: 'ID',
     comment: 'Identificador único del registro',
   })
   id: number;
@@ -29,7 +29,7 @@ export class MeddraSync extends Auditoria {
    *
    */
   @Column({
-    name: 'syn_med_version',
+    name: 'SYN_MED_VERSION',
     length: 11,
     nullable: false,
     comment: 'Versión de meddra',
@@ -40,7 +40,7 @@ export class MeddraSync extends Auditoria {
    *
    */
   @Column({
-    name: 'syn_med_lang',
+    name: 'SYN_MED_LANG',
     length: 6,
     nullable: false,
     comment: 'Versión de meddra',
@@ -50,7 +50,7 @@ export class MeddraSync extends Auditoria {
    *
    */
   @Column({
-    name: 'syn_med_description',
+    name: 'SYN_MED_DESCRIPTION',
     length: 1024,
     nullable: false,
     comment: 'Descripción de la versión de meddra',
@@ -61,14 +61,14 @@ export class MeddraSync extends Auditoria {
    *
    * Description:
    */
-  @Column({ name: 'drs_start_load_date', nullable: true })
+  @Column({ name: 'DRS_START_LOAD_DATE', nullable: true })
   startSyncDate: Date;
 
   /**
    *
    * Description:
    */
-  @Column({ name: 'drs_end_load_date', nullable: true })
+  @Column({ name: 'DRS_END_LOAD_DATE', nullable: true })
   endSyncDate: Date;
 
   /**
@@ -76,7 +76,7 @@ export class MeddraSync extends Auditoria {
    * Description:
    */
   @Column({
-    name: 'drs_load_status',
+    name: 'DRS_LOAD_STATUS',
     type: 'enum',
     enum: SyncStateEnum,
     default: SyncStateEnum.STARTED,

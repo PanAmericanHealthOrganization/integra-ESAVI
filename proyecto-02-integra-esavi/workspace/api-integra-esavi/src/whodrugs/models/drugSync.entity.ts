@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { SyncStateEnum } from '../utils/sycnstate.enum';
 import { IDrugSync } from './dtos';
 
-@Entity({ name: 'drug_sync', schema: 'WHO_DRUG' })
+@Entity({ name: 'DRUG_SYNC', schema: 'WHO_DRUG' })
 export class DrugSync extends Auditoria implements IDrugSync {
   /**
    *
@@ -12,7 +12,7 @@ export class DrugSync extends Auditoria implements IDrugSync {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -22,14 +22,14 @@ export class DrugSync extends Auditoria implements IDrugSync {
   /**
    *
    */
-  @Column({ name: 'drs_procces_id', length: 11, nullable: false })
+  @Column({ name: 'DRS_PROCCES_ID', length: 11, nullable: false })
   proccesId: string;
 
   /**
    *
    */
   @Column({
-    name: 'drs_sha_256',
+    name: 'DRS_SHA_256',
     nullable: false,
     comment: 'SHA-256 hash del archivo',
     length: 258,
@@ -40,14 +40,14 @@ export class DrugSync extends Auditoria implements IDrugSync {
    *
    * Description:
    */
-  @Column({ name: 'drs_start_sync_date' })
+  @Column({ name: 'DRS_START_SYNC_DATE' })
   startSyncDate: Date;
 
   /**
    *
    * Description:
    */
-  @Column({ name: 'drs_end_sync_date', nullable: true })
+  @Column({ name: 'DRS_END_SYNC_DATE', nullable: true })
   endSyncDate: Date;
 
   /**
@@ -55,7 +55,7 @@ export class DrugSync extends Auditoria implements IDrugSync {
    * Description:
    */
   @Column({
-    name: 'drs_sync_status',
+    name: 'DRS_SYNC_STATUS',
     type: 'enum',
     enum: SyncStateEnum,
     default: SyncStateEnum.STARTED,

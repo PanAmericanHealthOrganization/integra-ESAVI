@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { dataSourceFactory } from 'src/utils/ensure-schemas.util';
 import { DataqualityMaintenanceController } from './controllers/dataquality-maintenance.controller';
 import { DataqualityController } from './controllers/dataquality.controller';
 import { DataQualityDimensions } from './entities/dataQualityDimensions.entity';
@@ -25,11 +26,12 @@ const DATAQUALITY_DS = 'DATAQUALITY_DS';
         username: configService.get('USER_DATABASE'),
         password: configService.get('PASS_DATABASE'),
         database: configService.get('NAME_DATABASE'),
-        schema: 'dhi_esavi',
+        schema: 'DHI_ESAVI',
         autoLoadEntities: true,
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         poolSize: 15,
       }),
+      dataSourceFactory: dataSourceFactory(['DHI_ESAVI']),
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([DataQualityDimensions], DATAQUALITY_DS),

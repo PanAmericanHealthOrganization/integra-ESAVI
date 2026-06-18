@@ -7,7 +7,7 @@ import { Drug } from './drug.entity';
  */
 @Entity({
   schema: 'WHO_DRUG',
-  name: 'atomic_therapeutic_chemicals',
+  name: 'ATOMIC_THERAPEUTIC_CHEMICALS',
 })
 export class AnatomicalTherapeuticChemical extends Auditoria {
   /**
@@ -16,7 +16,7 @@ export class AnatomicalTherapeuticChemical extends Auditoria {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -26,19 +26,19 @@ export class AnatomicalTherapeuticChemical extends Auditoria {
   /**
    *
    */
-  @Column({ name: 'code', comment: 'Código el elemento' })
+  @Column({ name: 'CODE', comment: 'Código el elemento' })
   code: string;
 
   /**
    *
    */
-  @Column({ name: 'text' })
+  @Column({ name: 'TEXT' })
   text: string;
 
   /**
    *
    */
-  @Column({ name: 'officialFlag' })
+  @Column({ name: 'OFFICIALFLAG' })
   officialFlag: string;
 
   /**
@@ -46,7 +46,7 @@ export class AnatomicalTherapeuticChemical extends Auditoria {
    */
   @ManyToOne(() => Drug)
   @JoinColumn({
-    name: 'dru_id',
+    name: 'DRU_ID',
     referencedColumnName: 'id',
     foreignKeyConstraintName: 'FK_drug__anatomical_therapeutic_chemical',
   })

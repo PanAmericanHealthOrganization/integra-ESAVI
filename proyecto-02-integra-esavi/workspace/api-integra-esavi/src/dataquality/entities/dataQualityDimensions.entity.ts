@@ -21,7 +21,7 @@ export class DataQualityDimensions extends Auditoria implements IDataQualityDime
    * Column  of data quality dimensions
    */
   @Column({
-    name: 'anio',
+    name: 'ANIO',
     type: 'int',
     nullable: false,
     comment: 'Año de evaluación',
@@ -32,7 +32,7 @@ export class DataQualityDimensions extends Auditoria implements IDataQualityDime
    * Column  of data quality dimensions
    */
   @Column({
-    name: 'mes',
+    name: 'MES',
     type: 'int',
     nullable: false,
     comment: 'Mes de evaluación',
@@ -40,7 +40,7 @@ export class DataQualityDimensions extends Auditoria implements IDataQualityDime
   mes: number;
 
   @Column({
-    name: 'json_quali',
+    name: 'JSON_QUALI',
     type: 'jsonb',
     nullable: false,
     comment: 'Resultado de la evaluación',
