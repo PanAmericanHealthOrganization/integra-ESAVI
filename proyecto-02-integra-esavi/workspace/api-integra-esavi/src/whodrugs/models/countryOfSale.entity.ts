@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Drug } from './drug.entity';
 import { Maholder } from './maholder.entity';
 
-@Entity({ name: 'country_sales', schema: 'WHO_DRUG' })
+@Entity({ name: 'COUNTRY_SALES', schema: 'WHO_DRUG' })
 export class CountryOfSale extends Auditoria {
   constructor() {
     super();
@@ -14,7 +14,7 @@ export class CountryOfSale extends Auditoria {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -24,20 +24,20 @@ export class CountryOfSale extends Auditoria {
   /**
    *
    */
-  @Column({ name: 'cos_country', comment: 'Pais en formato ISO iso3Code' })
+  @Column({ name: 'COS_COUNTRY', comment: 'Pais en formato ISO iso3Code' })
   iso3Code: string;
 
   /**
    *
    */
-  @Column({ name: 'cos_sale', nullable: true, comment: 'Porcentaje de venta' })
+  @Column({ name: 'COS_SALE', nullable: true, comment: 'Porcentaje de venta' })
   sale: number;
 
   /**
    *
    */
   @Column({
-    name: 'cos_medicinal_product_id',
+    name: 'COS_MEDICINAL_PRODUCT_ID',
     comment: 'Identificador del producto medico en el pais',
   })
   medicinalProductID: number;
@@ -47,7 +47,7 @@ export class CountryOfSale extends Auditoria {
    */
   @ManyToOne(() => Drug)
   @JoinColumn({
-    name: 'dru_id',
+    name: 'DRU_ID',
     referencedColumnName: 'id',
     foreignKeyConstraintName: 'FK_drug__anatomical_therapeutic_chemical',
   })

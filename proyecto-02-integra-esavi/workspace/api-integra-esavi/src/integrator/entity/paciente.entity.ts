@@ -87,7 +87,7 @@ export class Paciente extends Auditoria {
 
   @Column(
     {
-      name:'FECHA_SINCRONIZACION',
+      name: 'FECHA_SINCRONIZACION',
       nullable: true,
     }
   )

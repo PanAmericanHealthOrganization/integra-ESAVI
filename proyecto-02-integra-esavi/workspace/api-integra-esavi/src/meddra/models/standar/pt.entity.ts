@@ -5,76 +5,76 @@ import { SOC } from './soc.entity';
 /**
  *
  */
-@Entity({ name: 'med_pt', schema: 'MEDDRA' })
+@Entity({ name: 'MED_PT', schema: 'MEDDRA' })
 export class PT extends Auditoria {
   /**
    *
    */
-  @PrimaryGeneratedColumn({ name: 'id', comment: 'Identificador de la tabla' })
+  @PrimaryGeneratedColumn({ name: 'ID', comment: 'Identificador de la tabla' })
   id: number;
 
   /**
    *
    */
-  @Column({ name: 'code', nullable: true, comment: 'Código de la PT' })
+  @Column({ name: 'CODE', nullable: true, comment: 'Código de la PT' })
   code: string;
   /**
    *
    */
-  @Column({ name: 'name', nullable: true, comment: 'Nombre de la PT' })
+  @Column({ name: 'NAME', nullable: true, comment: 'Nombre de la PT' })
   name: string;
   /**
    *
    */
-  @Column({ name: 'field', nullable: true, comment: 'Campo' })
+  @Column({ name: 'FIELD', nullable: true, comment: 'Campo' })
   field: string;
   /**
    *
    */
-  @Column({ name: 'soc_code', nullable: true, comment: 'Código del SOC' })
+  @Column({ name: 'SOC_CODE', nullable: true, comment: 'Código del SOC' })
   socCode: string;
 
   /**
    *
    */
   @ManyToOne(() => SOC)
-  @JoinColumn({ name: 'id_soc_code', referencedColumnName: 'id' })
+  @JoinColumn({ name: 'ID_SOC_CODE', referencedColumnName: 'id' })
   soc: SOC;
 
   /**
    *
    */
-  @Column({ name: 'whoart_code', nullable: true, comment: 'Código de la PT en la tabla WHOART' })
+  @Column({ name: 'WHOART_CODE', nullable: true, comment: 'Código de la PT en la tabla WHOART' })
   whoArtCode: string;
 
   /**
    *
    */
-  @Column({ name: 'harts_code', nullable: true, comment: 'Código de la PT en la tabla HARTS' })
+  @Column({ name: 'HARTS_CODE', nullable: true, comment: 'Código de la PT en la tabla HARTS' })
   hartsCode: string;
   /**
    *
    */
-  @Column({ name: 'costart_sym', nullable: true, comment: 'Símbolo de la PT en la tabla COSTART' })
+  @Column({ name: 'COSTART_SYM', nullable: true, comment: 'Símbolo de la PT en la tabla COSTART' })
   costartSym: string;
   /**
    *
    */
-  @Column({ name: 'icd9_code', nullable: true, comment: 'Código de la PT en la tabla ICD9' })
+  @Column({ name: 'ICD9_CODE', nullable: true, comment: 'Código de la PT en la tabla ICD9' })
   icd9Code: string;
   /**
    *
    */
-  @Column({ name: 'icd9cm_code', nullable: true, comment: 'Código de la PT en la tabla ICD9CM' })
+  @Column({ name: 'ICD9CM_CODE', nullable: true, comment: 'Código de la PT en la tabla ICD9CM' })
   icd9cmCode: string;
   /**
    *
    */
-  @Column({ name: 'icd10_code', nullable: true, comment: 'Código de la PT en la tabla ICD10' })
+  @Column({ name: 'ICD10_CODE', nullable: true, comment: 'Código de la PT en la tabla ICD10' })
   icd10Code: string;
   /**
    *
    */
-  @Column({ name: 'jart_code', nullable: true, comment: 'Código de la PT en la tabla JART' })
+  @Column({ name: 'JART_CODE', nullable: true, comment: 'Código de la PT en la tabla JART' })
   jartCod: string;
 }

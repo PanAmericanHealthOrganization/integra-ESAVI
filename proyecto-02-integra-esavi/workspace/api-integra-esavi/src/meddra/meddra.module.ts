@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SettingsModule } from 'src/settings/settings.module';
+import { dataSourceFactory } from 'src/utils/ensure-schemas.util';
 import { AutoEncryptSubscriber } from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
 import { MeddraController } from './controllers/meddra.controller';
 import { MeddraLltController } from './controllers/meddra.llt.controller';
@@ -47,11 +48,12 @@ export const MEDDRA_DS = 'meddra';
           'dist/**/models/mapping/*.entity{.ts,.js}',
           'dist/**/models/standar/*.entity{.ts,.js}',
         ],
-        schema: MEDDRA_DS,
+        schema: 'MEDDRA',
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
+      dataSourceFactory: dataSourceFactory(['MEDDRA']),
       imports: [ConfigModule],
       inject: [ConfigService],
     }),

@@ -8,7 +8,7 @@ import { IIngredientTranslation } from './dtos';
  */
 @Entity({
   schema: 'WHO_DRUG',
-  name: 'ingredient_translation',
+  name: 'INGREDIENT_TRANSLATION',
 })
 export class IngredientTranslation extends Auditoria implements IIngredientTranslation {
   constructor() {
@@ -22,7 +22,7 @@ export class IngredientTranslation extends Auditoria implements IIngredientTrans
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -32,13 +32,13 @@ export class IngredientTranslation extends Auditoria implements IIngredientTrans
   /**
    *
    */
-  @Column({ name: 'int_languageCode' })
+  @Column({ name: 'INT_LANGUAGECODE' })
   languageCode: string;
 
   /**
    *
    */
-  @Column({ name: 'int_ingredient' })
+  @Column({ name: 'INT_INGREDIENT' })
   ingredient: string;
 
   /**
@@ -46,7 +46,7 @@ export class IngredientTranslation extends Auditoria implements IIngredientTrans
    */
   @ManyToOne(() => ActiveIngredient)
   @JoinColumn({
-    name: 'aci_id',
+    name: 'ACI_ID',
     referencedColumnName: 'id',
     foreignKeyConstraintName: 'FK_active_Ingredient__maholder',
   })

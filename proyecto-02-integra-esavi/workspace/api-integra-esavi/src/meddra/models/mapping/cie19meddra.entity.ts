@@ -4,65 +4,65 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
  *
  */
 //comment: 'Tabla de homologación CIE10-MEDDRA'
-@Entity({ name: 'med_cie10_to_med' })
+@Entity({ name: 'MED_CIE10_TO_MED' })
 export class cie10Meddra extends Auditoria {
   /**
    *
    */
-  @PrimaryGeneratedColumn({ name: 'id', comment: 'Identificador único de la tabla' })
+  @PrimaryGeneratedColumn({ name: 'ID', comment: 'Identificador único de la tabla' })
   id: string;
 
   /**
    *
    */
-  @Column({ name: 'icd10_charper_number', comment: 'Número de capitulo de la CIE10' })
+  @Column({ name: 'ICD10_CHARPER_NUMBER', comment: 'Número de capitulo de la CIE10' })
   icd10_charper_number: string;
 
   /**
    *
    */
-  @Column({ name: 'icd10_charper', comment: 'Capitulo de la CIE10' })
+  @Column({ name: 'ICD10_CHARPER', comment: 'Capitulo de la CIE10' })
   icd10_charper: string;
 
   /**
    *
    */
-  @Column({ name: 'icd10_code', comment: 'Código de la CIE10' })
+  @Column({ name: 'ICD10_CODE', comment: 'Código de la CIE10' })
   icd10_code: string;
 
   /**
    *
    */
-  @Column({ name: 'icd10_term', comment: 'Término de la CIE10' })
+  @Column({ name: 'ICD10_TERM', comment: 'Término de la CIE10' })
   icd10_term: string;
 
   /**
    *
    */
-  @Column({ name: 'meddra_llt_name', comment: 'Nombre de la LLT' })
+  @Column({ name: 'MEDDRA_LLT_NAME', comment: 'Nombre de la LLT' })
   meddra_llt_name: string;
 
   /**
    *
    */
-  @Column({ name: 'meddra_llt_code', comment: 'Código de la LLT' })
+  @Column({ name: 'MEDDRA_LLT_CODE', comment: 'Código de la LLT' })
   meddra_llt_code: string;
 
   /**
    *
    */
-  @Column({ name: 'equivalence', comment: 'Equivalencia de la CIE10-MEDDRA' })
+  @Column({ name: 'EQUIVALENCE', comment: 'Equivalencia de la CIE10-MEDDRA' })
   equivalence: string;
 
   /**
    *
    */
-  @Column({ name: 'meddra_pt_name', comment: 'Nombre de la PT' })
+  @Column({ name: 'MEDDRA_PT_NAME', comment: 'Nombre de la PT' })
   meddra_pt_name: string;
 
   /**
    *
    */
-  @Column({ name: 'meddra_pt_code', comment: 'Código de la PT' })
+  @Column({ name: 'MEDDRA_PT_CODE', comment: 'Código de la PT' })
   meddra_pt_code: string;
 }

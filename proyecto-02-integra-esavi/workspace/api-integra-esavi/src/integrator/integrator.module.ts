@@ -1,6 +1,7 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule,ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
 import {AntecedenteEventoController} from './controller/antecedente-evento.controller';
@@ -103,6 +104,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         poolSize: 5,
       }),
+      dataSourceFactory: dataSourceFactory(['DHI_ESAVI']),
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
