@@ -1,9 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreatePacienteDto, UpdatePacienteDto } from '../dto';
+import { plainToClass } from 'class-transformer';
+import { CreatePacienteDhis2Dto, CreatePacienteVigiflowDto, UpdatePacienteDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
+import { CatalogoService } from './catalogo.service';
 
 @Injectable()
 export class PacienteService {
@@ -12,59 +14,93 @@ export class PacienteService {
   constructor(
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacientRepository: Repository<Paciente>,
+    private readonly catalogoService: CatalogoService,
   ) {}
 
-  async create(createPersonaDto: CreatePacienteDto): Promise<Paciente> {
-    throw new Error('No soportado');
+  async createFromVigiflow(createDto: CreatePacienteVigiflowDto): Promise<Paciente> {
+    const codigo = createDto.codigoVigiflow?.trim();
+    if (!codigo) throw new Error('Vigiflow code is a mandatory field');
+
+    const existing = await this.findByCodigoOrigen(codigo);
+    if (existing) return existing;
+
+    const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
+    if (createDto.sexoPaciente) {
+      paciente.sexo = await this.catalogoService.findByDescriptionToVigiflow(createDto.sexoPaciente);
+    }
+    if (createDto.autoIdentificacionPaciente) {
+      paciente.autoIdentificacion = await this.catalogoService.findByDescriptionToVigiflow(
+        createDto.autoIdentificacionPaciente,
+      );
+    }
+    paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
+    try {
+      return await this.pacientRepository.save(paciente);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError?.code === '23505' ||
+          error.driverError?.constraint === 'UQ_4ff577c8ff2c90720f455400a92')
+      ) {
+        this.logger.warn(`Registro duplicado para CODIGO_ORIGEN ${codigo}, reutilizando paciente existente`);
+        const retried = await this.findByCodigoOrigen(codigo);
+        if (retried) return retried;
+      }
+      throw error;
+    }
+  }
+
+  async createFromDhis2(createDto: CreatePacienteDhis2Dto): Promise<Paciente> {
+    try {
+      const codigo = createDto.codigoDhis2?.trim();
+      const existing = await this.findByCodigoOrigen(codigo);
+      if (existing) {
+        await this.update(existing.id, createDto);
+        return existing;
+      }
+
+      const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
+      if (createDto.sexoPaciente) {
+        paciente.sexo = await this.catalogoService.findByDescriptionToDhis2(createDto.sexoPaciente);
+      }
+      if (createDto.autoIdentificacionPaciente) {
+        const autoId = createDto.autoIdentificacionPaciente.toUpperCase().replace('Í', 'I');
+        paciente.autoIdentificacion = await this.catalogoService.findByDescriptionToDhis2(autoId);
+      }
+      paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
+      return await this.pacientRepository.save(paciente);
+    } catch (error) {
+      console.error('Error en la creación o actualización del paciente:', error);
+      throw new Error('Hubo un problema al crear o actualizar el paciente');
+    }
+  }
+
+  async findByCodigoOrigen(code: string): Promise<Paciente | null> {
+    return (await this.pacientRepository.findOne({ where: { codigoOrigen: code?.trim() } })) ?? null;
   }
 
   delete(uuid: string): Promise<Paciente> {
-    throw new Error('No soportado');
+    return Promise.resolve(undefined);
   }
 
-  /*findAll(): Promise<Paciente[]> {
-    return this.pacientRepository.find({
-      where: {
-        isActive: true,
-      },
-    });
-  }*/
-
   async findAll(): Promise<Paciente[]> {
-    const pacientes = await this.pacientRepository.createQueryBuilder('paciente')
-      /*.leftJoinAndSelect('paciente.sexo', 'sexo') // con esto se obtiene el objeto completo, en donde está el valor y no solo el id.
-      //.leftJoinAndSelect('paciente.autoIdentificacion', 'autoIdentificacion')
-      .addSelect('paciente.codigoVigiflow')  // Incluye el campo 'codigoVigiflow' si es de la subclase 'PacienteVigiFlow'
-      .addSelect('paciente.codigoDhis2')    // Incluye el campo 'codigoDhis2' si es de la subclase 'PacienteDhis2'
-      .addSelect('paciente."ORIGEN"', 'origen')*/
-      .where('paciente.isActive = :isActive', { isActive: true })
-      .getRawMany();
-
-  // Se puede acceder al campo como paciente.origen gracias al getter
-  pacientes.forEach(p => {
-    this.logger.debug(`Paciente completo: ${JSON.stringify(p)}`);
-  });
-  
-    return pacientes;
+    return this.pacientRepository.find({ where: { isActive: true } });
   }
 
   async findOne(uuid: string): Promise<Paciente> {
     const patient = await this.pacientRepository.findOne({
-      where: {
-        isActive: true,
-        id: uuid,
-      },
+      where: { isActive: true, id: uuid },
     });
-    if (patient) {
-      return patient;
-    }
+    if (patient) return patient;
     throw new EntityNotFoundException('Paciente', uuid);
   }
 
-  async update(
-    uuid: string,
-    updatePersonaDto: UpdatePacienteDto,
-  ): Promise<Paciente> {
-    throw new Error('No soportado');
+  async update(uuid: string, updatePersonaDto: UpdatePacienteDto): Promise<Paciente> {
+    const paciente = await this.findOne(uuid);
+    if (updatePersonaDto.sexoPaciente) {
+      paciente.sexo = await this.catalogoService.findByDescriptionToDhis2(updatePersonaDto.sexoPaciente);
+    }
+    this.pacientRepository.merge(paciente, updatePersonaDto);
+    return this.pacientRepository.save(paciente);
   }
 }
