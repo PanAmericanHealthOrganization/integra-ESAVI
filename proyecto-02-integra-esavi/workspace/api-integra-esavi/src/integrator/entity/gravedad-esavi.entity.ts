@@ -5,7 +5,7 @@ import { Notificacion } from './notificacion.entity';
 /**
  *
  */
-@Entity({ schema: 'dhi_esavi', name: 'TR_GRAVEDAD_ESAVI', comment: 'Tabla de gravedad del ESAVI' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_GRAVEDAD_ESAVI', comment: 'Tabla de gravedad del ESAVI' })
 export class GravedadEsavi extends Auditoria {
   /**
    * Primary generated column of gravedad esavi

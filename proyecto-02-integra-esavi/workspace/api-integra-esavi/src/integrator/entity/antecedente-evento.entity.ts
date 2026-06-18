@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
 import { Catalogo } from './catalogo.entity';
 
-@Entity({ schema: 'dhi_esavi', name: 'TR_ANTECEDENTES_EVENTO_ADVERSO', comment: 'Tabla de antecedentes de eventos adversos' })
+@Entity({ schema: 'DHI_ESAVI', name: 'TR_ANTECEDENTES_EVENTO_ADVERSO', comment: 'Tabla de antecedentes de eventos adversos' })
 export class AntecedenteEvento extends Antecedente {
   @Column({
     name: 'ANTECEDENTES_ADVSIMILAR',

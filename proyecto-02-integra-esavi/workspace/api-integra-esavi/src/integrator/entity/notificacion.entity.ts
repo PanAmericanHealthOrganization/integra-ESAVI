@@ -10,7 +10,7 @@ import {Catalogo} from './catalogo.entity';
 import {Paciente} from './paciente.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_NOTIFICACION',
   comment: 'Tabla de notificaciones',
 })

@@ -5,7 +5,7 @@ import { Auditoria } from 'src/integrator/entity';
 /**
  *
  */
-@Entity({ name: 'med_llt', schema: 'meddra' })
+@Entity({ name: 'med_llt', schema: 'MEDDRA' })
 export class LLT extends Auditoria {
   /**
    *

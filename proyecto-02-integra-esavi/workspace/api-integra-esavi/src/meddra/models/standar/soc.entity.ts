@@ -2,7 +2,7 @@ import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { MeddraSync } from './meddraSync.entity';
 
-@Entity({ name: 'med_soc', schema: 'meddra' })
+@Entity({ name: 'med_soc', schema: 'MEDDRA' })
 export class SOC extends Auditoria {
   // PK
   @PrimaryGeneratedColumn({

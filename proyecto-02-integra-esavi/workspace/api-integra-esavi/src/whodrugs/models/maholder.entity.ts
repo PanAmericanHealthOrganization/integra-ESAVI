@@ -4,7 +4,7 @@ import { CountryOfSale } from './countryOfSale.entity';
 /**
  *
  */
-@Entity({ name: 'maholder', schema: 'who_drug' })
+@Entity({ name: 'maholder', schema: 'WHO_DRUG' })
 export class Maholder extends Auditoria {
   /**
    *

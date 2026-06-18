@@ -3,7 +3,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Drug } from './drug.entity';
 import { Maholder } from './maholder.entity';
 
-@Entity({ name: 'country_sales', schema: 'who_drug' })
+@Entity({ name: 'country_sales', schema: 'WHO_DRUG' })
 export class CountryOfSale extends Auditoria {
   constructor() {
     super();

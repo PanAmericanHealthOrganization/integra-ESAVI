@@ -8,7 +8,7 @@ import { Notificacion } from './notificacion.entity';
  * Entity for vacunacion
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_DATO_VACUNACION',
   comment: 'Tabla de datos de vacunación',
 })

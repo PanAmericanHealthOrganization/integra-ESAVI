@@ -6,7 +6,7 @@ import { Drug } from './drug.entity';
  *
  */
 @Entity({
-  schema: 'who_drug',
+  schema: 'WHO_DRUG',
   name: 'atomic_therapeutic_chemicals',
 })
 export class AnatomicalTherapeuticChemical extends Auditoria {

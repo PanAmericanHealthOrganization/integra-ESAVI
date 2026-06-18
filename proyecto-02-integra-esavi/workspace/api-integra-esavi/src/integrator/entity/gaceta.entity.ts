@@ -6,7 +6,7 @@ import { ESTADO_GACETA, IGaceta } from './interfaces/gaceta.interface';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TG_GACETA',
   comment: 'contiene las partes configurables de la generación de la gaceta',
 })

@@ -3,7 +3,7 @@ import { Column, Entity } from 'typeorm';
 import { SyncStateEnum } from '../utils/sycnstate.enum';
 import { IDrugSync } from './dtos';
 
-@Entity({ name: 'drug_sync', schema: 'who_drug' })
+@Entity({ name: 'drug_sync', schema: 'WHO_DRUG' })
 export class DrugSync extends Auditoria implements IDrugSync {
   /**
    *

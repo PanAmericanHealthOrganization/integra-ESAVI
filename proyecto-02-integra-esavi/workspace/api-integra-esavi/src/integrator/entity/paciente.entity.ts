@@ -6,7 +6,7 @@ import {Catalogo} from './catalogo.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_PACIENTE',
   comment: 'Tabla de pacientes',
 })

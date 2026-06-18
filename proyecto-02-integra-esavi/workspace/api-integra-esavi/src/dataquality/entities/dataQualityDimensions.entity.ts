@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { IDataQualityDimensions } from '../controllers/dto';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'DQ_DIMENSION',
   comment: 'Tabla de dimensiones de calidad de los datos',
 })

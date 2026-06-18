@@ -7,7 +7,7 @@ import { IIngredientTranslation } from './dtos';
  *
  */
 @Entity({
-  schema: 'who_drug',
+  schema: 'WHO_DRUG',
   name: 'ingredient_translation',
 })
 export class IngredientTranslation extends Auditoria implements IIngredientTranslation {

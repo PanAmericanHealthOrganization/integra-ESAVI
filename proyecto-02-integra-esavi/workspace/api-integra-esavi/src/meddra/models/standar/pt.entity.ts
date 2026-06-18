@@ -5,7 +5,7 @@ import { SOC } from './soc.entity';
 /**
  *
  */
-@Entity({ name: 'med_pt', schema: 'meddra' })
+@Entity({ name: 'med_pt', schema: 'MEDDRA' })
 export class PT extends Auditoria {
   /**
    *
