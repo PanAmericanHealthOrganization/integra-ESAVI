@@ -11,8 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import { TreeItem } from "@mui/x-tree-view/TreeItem"
-import { TreeView } from "@mui/x-tree-view/TreeView"
+import { TreeItem, TreeView } from "@mui/x-tree-view"
 import { useEffect, useRef, useState } from "react"
 import { Title } from "react-admin"
 import intESAVIClient from "../../dataProviders/axios.client"
