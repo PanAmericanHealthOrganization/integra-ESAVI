@@ -5,7 +5,10 @@ export default defineConfig(({ command }) => ({
     plugins: [react()],
     server: {
         port: 5173,
-        open: command === 'serve', // solo abre el navegador en modo desarrollo
+        open: command === 'serve',
+        watch: {
+            ignored: ['**/.pnpm-store/**', '**/node_modules/.pnpm/**']
+        }
     },
     build: {
         outDir: 'dist',
@@ -24,4 +27,4 @@ export default defineConfig(({ command }) => ({
             { find: '@', replacement: '/src' },
         ],
     },
-})); // <-- CORREGIDO AQUÍ: Añadido el paréntesis de cierre que faltaba
+})); 
