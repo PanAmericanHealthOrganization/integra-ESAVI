@@ -17,7 +17,7 @@ import { DimExactitudService } from './dim-exactitud.service';
  */
 @Injectable()
 export class GeneralService {
-  private readonly schemaName = 'dhi_esavi';
+  private readonly schemaName = 'DHI_ESAVI';
 
   constructor(
     @InjectDataSource('DATAQUALITY_DS')
@@ -170,9 +170,9 @@ export class GeneralService {
       tp."NOMBRE",
       tp."IDENTIFICACION"
       FROM
-      dhi_esavi."TR_NOTIFICACION" tn
+      DHI_ESAVI."TR_NOTIFICACION" tn
       INNER JOIN 
-      dhi_esavi."TR_PACIENTE" tp 
+      DHI_ESAVI."TR_PACIENTE" tp 
       ON
       tp."ID" = tn."PACIENTE_ID"
       WHERE

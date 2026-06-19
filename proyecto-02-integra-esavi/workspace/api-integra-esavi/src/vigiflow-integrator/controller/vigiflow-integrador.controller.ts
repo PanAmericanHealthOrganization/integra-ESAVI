@@ -1,12 +1,12 @@
-import { Controller, Get, Logger, Query, Res, UseFilters } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
-import { MaholderService } from 'src/whodrugs/services/maholder.service';
+import {Controller,Get,Logger,Query,Res,UseFilters} from '@nestjs/common';
+import {ApiResponse,ApiTags} from '@nestjs/swagger';
+import {Response} from 'express';
+import {MaholderService} from 'src/whodrugs/services/maholder.service';
 import * as xlsx from 'xlsx';
-import { HttpExceptionFilter } from '../../providers/http-exception.filter';
-import { AefiQuery } from '../dto';
-import { VigiflowCrawlerService } from '../service/vigiflow-crawler.service';
-import { VigiflowIntegradorService } from '../service/vigiflow-integrador.service';
+import {HttpExceptionFilter} from '../../providers/http-exception.filter';
+import {AefiQuery} from '../dto';
+import {VigiflowCrawlerService} from '../service/vigiflow-crawler.service';
+import {VigiflowIntegradorService} from '../service/vigiflow-integrador.service';
 
 @ApiTags('Vigiflow')
 @Controller('integrator/vigiflow')

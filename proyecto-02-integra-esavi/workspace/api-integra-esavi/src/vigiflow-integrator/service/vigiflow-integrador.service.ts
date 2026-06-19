@@ -37,6 +37,7 @@ import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
+import { NotificadorService } from '../../integrator/service/notificador.service';
 import { PacienteService } from '../../integrator/service/paciente.service';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 import { WhodrugVacsTemp } from 'src/integrator/entity/whodrug-vacstemp.entity';
@@ -77,6 +78,7 @@ export class VigiflowIntegradorService {
     private readonly integradorService: IntegradorService,
     private readonly pacienteService: PacienteService,
     private readonly notificacionVigiflowService: NotificacionVigiflowService,
+    private readonly notificadorService: NotificadorService,
     private readonly medicamentoService: MedicamentoService,
     private readonly datoVacunaService: DatoVacunaService,
     private readonly datoEsaviService: DatoEsaviService,
@@ -218,20 +220,66 @@ export class VigiflowIntegradorService {
     const reportFilePath = this.configService.get<string>('VIGIFLOW_FILE_REPORT', './upload_files/files_meddra/report.xlsx');
     const reportOne = read(await fs.readFile(aefiFilePath));
     const reportTwo = read(await fs.readFile(reportFilePath));
+    await this._processBulkWorkbooks(reportOne, reportTwo, 'VIGIFLOW_BULK_FILE');
+  }
 
-    this.logger.log('extractedFromExcelToPersist..................');
-    await this.extractedFromExcelToPersist(reportOne);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToUpdate..................');
-    await this.extractedFromJsonReportToUpdate(reportTwo);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToCreateMedicamento..................');
-    await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
-    await this.sleep(8000);
-    this.logger.log('extractedFromJsonReportToCreateReaccion..................');
-    await this.extractedFromJsonReportToCreateReaccion(reportTwo);
-    await this.sleep(3000);
-    this.logger.log('Fin Proceso..................');
+  public async createInBulkFromUploadedFiles(aefiBuffer: Buffer, reportBuffer: Buffer) {
+    const reportOne = read(aefiBuffer);
+    const reportTwo = read(reportBuffer);
+    await this._processBulkWorkbooks(reportOne, reportTwo, 'VIGIFLOW_BULK_UPLOAD');
+  }
+
+  private async _processBulkWorkbooks(reportOne: WorkBook, reportTwo: WorkBook, syncName: string) {
+    const syncRecord = await this.syncService.createSyncProcess({
+      name: syncName,
+      status: SyncStatus.RUNNING,
+      startTime: new Date(),
+      endTime: null,
+      dataStartDate: null,
+      dataEndDate: null,
+      message: null,
+      errorMessage: null,
+      errorStack: null,
+      errorTrace: null,
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: new Date(),
+      updatedBy: 'System',
+      deletedAt: null,
+      deletedBy: null,
+      isEnabled: true,
+      isActive: true,
+    });
+
+    try {
+      this.logger.log('extractedFromExcelToPersist..................');
+      await this.extractedFromExcelToPersist(reportOne);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToUpdate..................');
+      await this.extractedFromJsonReportToUpdate(reportTwo);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToCreateMedicamento..................');
+      await this.extractedFromJsonReportToCreateMedicamento(reportTwo);
+      await this.sleep(8000);
+      this.logger.log('extractedFromJsonReportToCreateReaccion..................');
+      await this.extractedFromJsonReportToCreateReaccion(reportTwo);
+      await this.sleep(3000);
+      this.logger.log('Fin Proceso..................');
+
+      await this.syncService.update(syncRecord.id, {
+        status: SyncStatus.COMPLETED,
+        endTime: new Date(),
+        message: `Importación VigiFlow desde archivo completada`,
+      });
+    } catch (error) {
+      await this.syncService.update(syncRecord.id, {
+        status: SyncStatus.FAILED,
+        endTime: new Date(),
+        errorMessage: error?.message ?? String(error),
+        errorStack: error?.stack ?? null,
+      });
+      throw error;
+    }
   }
 
   //Extracción de los datos de la hoja [0], del libro
@@ -430,9 +478,17 @@ export class VigiflowIntegradorService {
           updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
           updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
 
-          //Cuando el paciente es infante hay una variable de si esta lactando que se coloca en la notificacion
-
           await this.notificacionVigiflowService.update(notificacion, updateNotificacion);
+
+          // Crear/actualizar notificador desde columna R (identificación especialista) y AQ (profesión)
+          const especialistaId = reg['R']?.toString().trim();
+          if (especialistaId) {
+            try {
+              await this.notificadorService.createOrUpdateFromVigiflow(especialistaId, profesionNotificador);
+            } catch (error) {
+              this.logger.warn(`No se pudo registrar notificador ${especialistaId}: ${error.message}`);
+            }
+          }
 
           const antecedenteEmbarazo = new UpdateAntecedenteEmbarazoDto();
           antecedenteEmbarazo.edadGestacional = reg['V'] && Number(reg['V']);

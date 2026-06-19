@@ -5,6 +5,7 @@ import {Repository} from 'typeorm';
 import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
+import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoService} from './catalogo.service';
 
@@ -25,6 +26,7 @@ export class NotificacionVigiflowService {
         return notificacion;
       } else {
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
+        notificacion.origen = SourceEnum.VIGIFLOW;
         notificacion.paciente = pacienteUUID;
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.provincia)) {
           try {
