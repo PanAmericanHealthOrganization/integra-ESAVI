@@ -4,7 +4,7 @@ import { Auditoria } from './auditoria.entity';
 import { TipoCatalogo } from './tipo-catalogo.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_CATALOGO',
   comment: 'Catálogo de valores de homologaciones de Vigiflow a DHIS2',
 })

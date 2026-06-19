@@ -3,7 +3,7 @@ import { Auditoria } from './auditoria.entity';
 import { Notificacion } from './notificacion.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_PACIENTE_EMBARAZADA',
   comment: 'Tabla de pacientes embarazadas',
 })

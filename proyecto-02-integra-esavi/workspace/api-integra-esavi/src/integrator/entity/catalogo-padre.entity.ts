@@ -2,7 +2,7 @@ import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedCo
 import { Auditoria } from './auditoria.entity';
 
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_CATALOGO_PADRE',
   comment: 'Catálogo padre con estructura jerárquica para valores de configuración',
 })

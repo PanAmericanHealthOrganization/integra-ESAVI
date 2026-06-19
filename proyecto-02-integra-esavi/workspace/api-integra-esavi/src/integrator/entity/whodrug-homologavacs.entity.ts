@@ -6,7 +6,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_WHODRUG_HOMOLOGA_VACS',
   comment: 'Tabla de catálogo que contiene los valores del campo Patente WHODrug, de VigiFLow que no tienen coincidencia al comparar contra el catálogo provisional Excel. Se utiliza como auxilir para realizar la homologación de nombres de vacunas manualmente.',
 })

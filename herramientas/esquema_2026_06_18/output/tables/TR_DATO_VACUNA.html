@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>TR_DATO_VACUNA - dhi_esavi.dhi_esavi</title>
+        <!-- Tell the browser to be responsive to screen width -->
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+        <link rel="icon" type="image/png" sizes="16x16" href="../favicon.png">
+        <!-- Bootstrap 3.3.5 -->
+        <link rel="stylesheet" href="../bower/admin-lte/bootstrap/css/bootstrap.min.css">
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="../bower/font-awesome/css/font-awesome.min.css">
+        <!-- Ionicons -->
+        <link rel="stylesheet" href="../bower/ionicons/css/ionicons.min.css">
+        <!-- DataTables -->
+        <link rel="stylesheet" href="../bower/datatables.net-bs/css/dataTables.bootstrap.min.css">
+        <link rel="stylesheet" href="../bower/datatables.net-buttons-bs/css/buttons.bootstrap.min.css">
+        <!-- Code Mirror -->
+        <link rel="stylesheet" href="../bower/codemirror/codemirror.css">
+        <!-- Fonts -->
+        <link href='../fonts/indieflower/indie-flower.css' rel='stylesheet' type='text/css'>
+        <link href='../fonts/source-sans-pro/source-sans-pro.css' rel='stylesheet' type='text/css'>
+
+        <!-- Theme style -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/AdminLTE.min.css">
+        <!-- Salvattore -->
+        <link rel="stylesheet" href="../bower/salvattore/salvattore.css">
+        <!-- AdminLTE Skins. Choose a skin from the css/skins
+           folder instead of downloading all of them to reduce the load. -->
+        <link rel="stylesheet" href="../bower/admin-lte/dist/css/skins/_all-skins.min.css">
+        <!-- SchemaSpy -->
+        <link rel="stylesheet" href="../schemaSpy.css">
+
+        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+        <!--[if lt IE 9]>
+        <script src="../bower/html5shiv/html5shiv.min.js"></script>
+        <script src="../bower/respond/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <!-- ADD THE CLASS layout-top-nav TO REMOVE THE SIDEBAR. -->
+    <body class="hold-transition skin-blue layout-top-nav">
+        <div class="wrapper">
+            <header class="main-header">
+                <nav class="navbar navbar-static-top">
+                    <div class="container">
+                        <div class="navbar-header">
+                            <a href="../index.html" class="navbar-brand"><b>dhi_esavi</b></a><span class="navbar-brand" style="padding-left: 0">.dhi_esavi</span>
+                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse"><i class="fa fa-bars"></i></button>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                            <ul class="nav navbar-nav">
+                                <li><a href="../index.html">Tables <span class="sr-only">(current)</span></a></li>
+                                <li><a href="../columns.html" title="All of the columns in the schema">Columns</a></li>
+                                <li><a href="../constraints.html" title="Useful for diagnosing error messages that just give constraint name or number">Constraints</a></li>
+                                <li><a href="../relationships.html" title="Diagram of table relationships">Relationships</a></li>
+                                <li><a href="../orphans.html" title="View of tables with neither parents nor children">Orphan&nbsp;Tables</a></li>
+                                <li><a href="../anomalies.html" title="Things that might not be quite right">Anomalies</a></li>
+                                <li><a href="../routines.html" title="Procedures and functions">Routines</a></li>
+                            </ul>
+                        </div>
+                        <!-- /.navbar-collapse -->
+                        <!-- Navbar Right Menu -->
+                    </div>
+                    <!-- /.container-fluid -->
+                </nav>
+            </header>
+            <!-- Main content -->
+            <!-- Full Width Column -->
+            <div class="content-wrapper">
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>TR_DATO_VACUNA</h1><p><span id="recordNumber">514</span> rows</p><br />
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-file-text-o"></i>
+                            <h3 id="Description" class="box-title">Description</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div><!-- /.box-header -->
+                        <div class="box-body clearfix">
+                            <p>Tabla de datos de vacuna aplicada</p>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <!-- Main content -->
+                <section class="content">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+                            <h3 id="Columns" class="box-title">Columns</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="standard_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead align='left'>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Type</th>
+                                    <th>Size</th>
+                                    <th title='Are nulls allowed?'>Nulls</th>
+                                    <th title='Is column automatically updated?'>Auto</th>
+                                    <th title='Default value'>Default</th>
+                                    <th title='Columns in tables that reference this column'>Children</th>
+                                    <th title='Columns in tables that are referenced by this column'>Parents</th>
+                                    <th title='Comments' class="toggle"><span>Comments</span></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td><span id="AUD_FECHA_CREACION">AUD_FECHA_CREACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de creación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_CREACION">AUD_USUARIO_CREACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que creó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ACTUALIZACION">AUD_FECHA_ACTUALIZACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>now()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de actualización</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ACTUALIZACION">AUD_USUARIO_ACTUALIZACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>&#39;SYSTEM&#39;::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que actualizó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_FECHA_ELIMINACION">AUD_FECHA_ELIMINACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de eliminación</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_USUARIO_ELIMINACION">AUD_USUARIO_ELIMINACION</span></td>
+                                    <td>varchar</td>
+                                    <td>60</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Usuario que eliminó el registro</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_HABILITADO">AUD_HABILITADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está habilitado</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AUD_ESTADO">AUD_ESTADO</span></td>
+                                    <td>bool</td>
+                                    <td>1</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>true</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indica si el registro está activo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="ID">ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title=''></td>
+                                    <td title=''></td>
+                                    <td>uuid_generate_v4()</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_CAUSALIDAD_ESAVI.DATOVACUNA_ID references TR_DATO_VACUNA.ID via FK_eb99623e008c7596f5a5244dfff"><a href='TR_CAUSALIDAD_ESAVI.html'>TR_CAUSALIDAD_ESAVI</a><span class='relatedKey'>.DATOVACUNA_ID</span></td>
+                                                <td class="constraint detail">FK_eb99623e008c7596f5a5244dfff</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador PK de la tabla TR_DATO_VACUNA</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CODIGOATC">CODIGOATC</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código ATC (Anatomical Therapeutic Chemical) de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="SISTEMA_DE_CODIFICACION">SISTEMA_DE_CODIFICACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>&#39;WHODrug&#39;::character varying</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Sistema de codificación utilizado (WHODrug, ATC, etc.)</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_VAC_PATENTE_WHODRUG">NOMBRE_VAC_PATENTE_WHODRUG</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre de la vacuna según la patente del estándar WHODrug</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DRUG_NAME">DRUG_NAME</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre de la vacuna administrada, según el diccionario WHODrug Global de Uppsala Monitoring Centre.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DRUG_CODE">DRUG_CODE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código del medicamento en WHO Drug</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="RID_MEDICINAL_PRODUCT_ID">RID_MEDICINAL_PRODUCT_ID</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNA.RID_MEDICINAL_PRODUCT_ID&#39;s name implies that it&#39;s a child of TR_ESAVI_DURANTE_EMBARAZO.ID, but it doesn&#39;t reference that column."><a href='TR_ESAVI_DURANTE_EMBARAZO.html'>TR_ESAVI_DURANTE_EMBARAZO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">Implied Constraint</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identifica de forma única el producto medicinal según los estándares de la EMA (Agencia Europea de Medicamentos) o la OMS. En WHODrug Global, el MPID (Medicinal Product Identifier) y el RID (Record Identifier) se consideran equivalentes o intercambiables al codificar porque ambos apuntan al nivel más alto y específico de un producto farmacéutico.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ES_GENERICO">ES_GENERICO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Marcador de registro Generico en WHODrug. Indica si la vacuna es genérica.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="MAHOLDER_JSONB">MAHOLDER_JSONB</span></td>
+                                    <td>jsonb</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Datos JSONB de los titulares de autorización de comercialización. MAH (Marketing Authorization Holder / Titular de la autorización de comercialización).</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ACTIVE_INGREDIENT_JSON">ACTIVE_INGREDIENT_JSON</span></td>
+                                    <td>json</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Datos JSON de los ingredientes activos de la vacuna. Campo &ldquo;ingredient&rdquo; de WHODrug</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="AC_INGREDIENT_TRANSLATION_JSON">AC_INGREDIENT_TRANSLATION_JSON</span></td>
+                                    <td>json</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Datos en formato JSON de la traducción al idioma español (&ldquo;es-ES&rdquo;) de los ingredientes activos de la vacuna. Campo &ldquo;ingredientTranslations&rdquo; de WHODrug</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CODIGO_VACUNA_OTRO">CODIGO_VACUNA_OTRO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Otro código alternativo de identificación de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_FABRICANTE">NOMBRE_FABRICANTE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre del fabricante de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_FABRICANTE_WHO_DRUG">NOMBRE_FABRICANTE_WHO_DRUG</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre del fabricante según WHODrug</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="CODIGO_FABRICANTE_WHO_DRUG">CODIGO_FABRICANTE_WHO_DRUG</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Código del fabricante según WHODrug</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NUMERO_DOSIS_VACUNA">NUMERO_DOSIS_VACUNA</span></td>
+                                    <td>int4</td>
+                                    <td>10</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Número de dosis de la vacuna administrada</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DOSIS">DOSIS</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Dosis administrada de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DOSIS_1">DOSIS_1</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Primera dosis administrada</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INTERVALO_DOSIFICACION">INTERVALO_DOSIFICACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Intervalo entre dosis de vacunación. Variable utilizada solo por VigiFlow.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NUMERO_LOTE">NUMERO_LOTE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Número de lote de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_VENCIMIENTO_VACUNA">FECHA_VENCIMIENTO_VACUNA</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de vencimiento de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="NOMBRE_DILUYENTE_VACUNA">NOMBRE_DILUYENTE_VACUNA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Nombre del diluyente utilizado para la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FECHA_VENCIMIENTO_DILUYENTE">FECHA_VENCIMIENTO_DILUYENTE</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha de vencimiento del diluyente</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="PAIS_AUTORIZACION_ISO3CODE">PAIS_AUTORIZACION_ISO3CODE</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>País que autorizó la comercialización de la vacuna. Identifica de forma única el país donde se comercializa o registra el medicamento. Utiliza el código ISO 3166-1 alfa-3 de tres letras para representar el país.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="STRENGTH_POTENCIA">STRENGTH_POTENCIA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>En WHODrug, el campo Strength o Potencia describe la cantidad del ingrediente activo por unidad de presentación, no siempre una concentración. Ejemplo, formas líquidas multidosis: Amoxicillin 250 mg/5 mL suspension, la concentración real sería 50 mg/mL. En WHODrug, la concentración se deduce, no se almacena como tal.</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INGREDIENTE_SOSPECHOSO">INGREDIENTE_SOSPECHOSO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Ingrediente sospechoso de causar el evento adverso</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="ACCION_TOMADA">ACCION_TOMADA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Acción tomada con respecto a la vacuna tras el evento</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INFORMACION_ADICIONAL_MEDICAMENTO">INFORMACION_ADICIONAL_MEDICAMENTO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Información adicional sobre el medicamento/vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INDICACION_MEDDRA">INDICACION_MEDDRA</span></td>
+                                    <td>text</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indicación de la vacuna codificada en MedDRA</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INDICACION_NOTIFICADOR_PRIMARIO">INDICACION_NOTIFICADOR_PRIMARIO</span></td>
+                                    <td>text</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Indicación de la vacuna según el notificador primario</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="DURACION_TRATAMIENTO">DURACION_TRATAMIENTO</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Duración del tratamiento con la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="INICIO_ADMINISTRACION">INICIO_ADMINISTRACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha y hora de inicio de administración de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FIN_ADMINISTRACION">FIN_ADMINISTRACION</span></td>
+                                    <td>timestamptz</td>
+                                    <td>35,6</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Fecha y hora de fin de administración de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FORMA_FARMACEUTICA">FORMA_FARMACEUTICA</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Forma farmacéutica de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="FORMA_FARMACEUTICA_EDQM">FORMA_FARMACEUTICA_EDQM</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Forma farmacéutica según estándares EDQM</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="VIA_ADMINISTRACION">VIA_ADMINISTRACION</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Vía de administración de la vacuna</p></td>
+                                </tr>
+                                <tr>
+                                    <td><span id="VIA_ADMINISTRACION_EDQM">VIA_ADMINISTRACION_EDQM</span></td>
+                                    <td>varchar</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td><p>Vía de administración según estándares EDQM</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="CT_ROL_VACUNA_ID">CT_ROL_VACUNA_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNA.CT_ROL_VACUNA_ID references TC_CATALOGO.ID via FK_6ec7aeced291375f4c59f5eca31"><a href='TC_CATALOGO.html'>TC_CATALOGO</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_6ec7aeced291375f4c59f5eca31</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador del catálogo</p></td>
+                                </tr>
+                                <tr>
+                                    <td class='foreignKey' title='Foreign Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="NOTIFICACION_ID">NOTIFICACION_ID</span></td>
+                                    <td>uuid</td>
+                                    <td>2147483647</td>
+                                    <td title='nullable'>√</td>
+                                    <td title=''></td>
+                                    <td>null</td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table border='0' cellspacing='0' cellpadding='0'>
+                                            <tr>
+                                                <td title="TR_DATO_VACUNA.NOTIFICACION_ID references TR_NOTIFICACION.ID via FK_f624dc3e33b3dcffe2935aef898"><a href='TR_NOTIFICACION.html'>TR_NOTIFICACION</a><span class='relatedKey'>.ID</span></td>
+                                                <td class="constraint detail">FK_f624dc3e33b3dcffe2935aef898</td>
+                                                <td class="constraint detail"><span title='Restrict delete:&#10;Parent cannot be deleted if children exist'>R</span></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                    <td><p>Identificador único de la notificación</p></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 id="Indexes" class="box-title">Indexes</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <table
+                                    id="indexes_table"
+                                    class="table table-bordered table-striped dataTable"
+                                    role="grid"
+                                    data-paging="true"
+                                    data-page-length="10"
+                                    data-length-change="false">
+                                <thead>
+                                <tr>
+                                    <th>Constraint Name</th>
+                                    <th>Type</th>
+                                    <th>Sort</th>
+                                    <th>Column(s)</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> PK_e911d68c356ed75d0992eec0a92</td>
+                                    <td>Primary key</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>ID</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div><!-- /.box-body -->
+                    </div>
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <i class="fa fa-code-fork"></i>
+                            <h3 id="Relationships" class="box-title">Relationships</h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom"><!-- Tabs within a box -->
+                                <h5>Close relationships within degrees of separation</h5>
+                                <ul class="nav nav-tabs pull-left ui-sortable-handle">
+                                    <li class="active"><a href="#oneDegreeImg-chart" data-toggle="tab" aria-expanded="true">One</a></li>
+                                    <li class=""><a href="#twodegreesDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two degrees</a></li>
+                                    <li class=""><a href="#oneimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">One implied</a></li>
+                                    <li class=""><a href="#twoimpliedDegreeImg-chart" data-toggle="tab" aria-expanded="true">Two implied</a></li>
+                                </ul>
+                                <div class="tab-content no-padding">
+                                    <div class="chart tab-pane active" id="oneDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagram" name="oneDegreeRelationshipsDiagram">
+<area shape="rect" id="node1" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="1472,764,1916,969">
+<area shape="rect" id="node2" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="821,5,1428,1453">
+<area shape="rect" id="node3" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="377,1404,777,1873">
+<area shape="rect" id="node4" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="5,1609,333,1785">
+</map>
+                                        <a name='diagram'><img id="oneDegreeImg" src="../diagrams/tables/TR_DATO_VACUNA.1degree.png" usemap="#oneDegreeRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twodegreesDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagram" name="twoDegreesRelationshipsDiagram">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="304,615,509,703">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,612,260,700">
+<area shape="rect" id="node3" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1240,321,1598,409">
+<area shape="rect" id="node4" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="841,615,1072,703">
+<area shape="rect" id="node17" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="553,375,797,463">
+<area shape="rect" id="node18" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="578,480,772,568">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1175,216,1663,304">
+<area shape="rect" id="node6" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1208,2665,1631,2753">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1256,427,1582,515">
+<area shape="rect" id="node8" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="1766,1129,2048,1217">
+<area shape="rect" id="node9" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="1305,743,1533,831">
+<area shape="rect" id="node10" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1116,1200,1722,2648">
+<area shape="rect" id="node11" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1278,5,1560,93">
+<area shape="rect" id="node12" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1282,111,1556,199">
+<area shape="rect" id="node13" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1238,532,1600,620">
+<area shape="rect" id="node14" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1286,637,1553,725">
+<area shape="rect" id="node15" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1298,848,1541,936">
+<area shape="rect" id="node16" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1301,953,1537,1041">
+<area shape="rect" id="node19" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1256,1059,1583,1147">
+</map>
+                                        <a name='diagram'><img id="twodegreesDegreeImg" src="../diagrams/tables/TR_DATO_VACUNA.2degrees.png" usemap="#twoDegreesRelationshipsDiagram" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="oneimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="oneDegreeRelationshipsDiagramImplied" name="oneDegreeRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="1998,764,2442,969">
+<area shape="rect" id="node2" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1348,5,1954,1453">
+<area shape="rect" id="node3" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="377,1392,777,1861">
+<area shape="rect" id="node4" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="5,1597,333,1773">
+<area shape="rect" id="node5" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="821,800,1304,947">
+</map>
+                                        <a name='diagram'><img id="oneimpliedDegreeImg" src="../diagrams/tables/TR_DATO_VACUNA.implied1degrees.png" usemap="#oneDegreeRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                    <div class="chart tab-pane " id="twoimpliedDegreeImg-chart" style="position: relative; overflow-x:auto;">
+                                        <map id="twoDegreesRelationshipsDiagramImplied" name="twoDegreesRelationshipsDiagramImplied">
+<area shape="rect" id="node1" href="TC_CATALOGO.html" target="_top" title="TC_CATALOGO" alt="" coords="304,553,509,641">
+<area shape="rect" id="node2" href="TC_TIPO_CATALOGO.html" target="_top" title="TC_TIPO_CATALOGO" alt="" coords="5,551,260,639">
+<area shape="rect" id="node3" href="TC_WHODRUG_VACS_TEMP.html" target="_top" title="TC_WHODRUG_VACS_TEMP" alt="" coords="1794,496,2109,584">
+<area shape="rect" id="node4" href="TR_ESAVI_DURANTE_EMBARAZO.html" target="_top" title="TR_ESAVI_DURANTE_EMBARAZO" alt="" coords="1179,499,1541,587">
+<area shape="rect" id="node6" href="TR_NOTIFICACION.html" target="_top" title="TR_NOTIFICACION" alt="" coords="841,553,1072,641">
+<area shape="rect" id="node5" href="TR_ANTECEDENTES_EMBARAZO.html" target="_top" title="TR_ANTECEDENTES_EMBARAZO" alt="" coords="1181,288,1539,376">
+<area shape="rect" id="node18" href="TC_GRUPO_ETARIO.html" target="_top" title="TC_GRUPO_ETARIO" alt="" coords="553,793,797,881">
+<area shape="rect" id="node19" href="TR_PACIENTE.html" target="_top" title="TR_PACIENTE" alt="" coords="578,688,772,776">
+<area shape="rect" id="node7" href="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS.html" target="_top" title="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" alt="" coords="1116,1097,1604,1185">
+<area shape="rect" id="node8" href="TR_ANTECEDENTES_EVENTO_ADVERSO.html" target="_top" title="TR_ANTECEDENTES_EVENTO_ADVERSO" alt="" coords="1149,1203,1572,1291">
+<area shape="rect" id="node9" href="TR_ANTECEDENTES_MEDICO.html" target="_top" title="TR_ANTECEDENTES_MEDICO" alt="" coords="1197,393,1523,481">
+<area shape="rect" id="node10" href="TR_CAUSALIDAD_ESAVI.html" target="_top" title="TR_CAUSALIDAD_ESAVI" alt="" coords="2298,217,2580,305">
+<area shape="rect" id="node11" href="TR_DATOS_ESAVI.html" target="_top" title="TR_DATOS_ESAVI" alt="" coords="1837,147,2066,235">
+<area shape="rect" id="node12" href="TR_DATO_VACUNA.html" target="_top" title="TR_DATO_VACUNA" alt="" coords="1648,601,2254,2049">
+<area shape="rect" id="node13" href="TR_DATO_VACUNACION.html" target="_top" title="TR_DATO_VACUNACION" alt="" coords="1219,5,1501,93">
+<area shape="rect" id="node14" href="TR_DESENLACE_ESAVI.html" target="_top" title="TR_DESENLACE_ESAVI" alt="" coords="1223,111,1497,199">
+<area shape="rect" id="node15" href="TR_GRAVEDAD_ESAVI.html" target="_top" title="TR_GRAVEDAD_ESAVI" alt="" coords="1227,604,1494,692">
+<area shape="rect" id="node16" href="TR_INVESTIGACION.html" target="_top" title="TR_INVESTIGACION" alt="" coords="1239,709,1482,797">
+<area shape="rect" id="node17" href="TR_MEDICAMENTO.html" target="_top" title="TR_MEDICAMENTO" alt="" coords="1242,815,1478,903">
+<area shape="rect" id="node20" href="TR_PACIENTE_EMBARAZADA.html" target="_top" title="TR_PACIENTE_EMBARAZADA" alt="" coords="1197,920,1524,1008">
+</map>
+                                        <a name='diagram'><img id="twoimpliedDegreeImg" src="../diagrams/tables/TR_DATO_VACUNA.implied2degrees.png" usemap="#twoDegreesRelationshipsDiagramImplied" class="diagram" border="0" align="left"></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- /.box-body -->
+                    </div>
+                </section>
+                <script>
+                    var config = {
+                        pagination: true
+                    }
+                </script>
+            </div>
+            <!-- /.content-wrapper -->
+            <footer class="main-footer">
+                <div>
+                    <div class="pull-right hidden-xs">
+                        <a href="https://github.com/schemaspy/schemaspy" title="GitHub for SchemaSpy"><i class="fa fa-github-square fa-2x"></i></a>
+                        <a href="http://stackoverflow.com/questions/tagged/schemaspy" title="StackOverflow for SchemaSpy"><i class="fa fa-stack-overflow fa-2x"></i></a>
+                    </div>
+                    <strong>Generated by <a href="http://schemaspy.org/" class="logo-text"><i class="fa fa-database"></i> SchemaSpy 7.0.2</a></strong>
+                </div>
+                <!-- /.container -->
+            </footer>
+        </div>
+        <!-- ./wrapper -->
+
+        <!-- jQuery 2.2.3 -->
+        <script src="../bower/admin-lte/plugins/jQuery/jquery-2.2.3.min.js"></script>
+        <script src="../bower/admin-lte/plugins/jQueryUI/jquery-ui.min.js"></script>
+        <!-- Bootstrap 3.3.5 -->
+        <script src="../bower/admin-lte/bootstrap/js/bootstrap.min.js"></script>
+        <!-- DataTables -->
+        <script src="../bower/datatables.net/jquery.dataTables.min.js"></script>
+        <script src="../bower/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/dataTables.buttons.min.js"></script>
+        <script src="../bower/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.html5.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.print.min.js"></script>
+        <script src="../bower/datatables.net-buttons/buttons.colVis.min.js"></script>
+        <!-- SheetJS -->
+        <script src="../bower/js-xlsx/xlsx.full.min.js"></script>
+        <!-- pdfmake -->
+        <script src="../bower/pdfmake/pdfmake.min.js"></script>
+        <script src="../bower/pdfmake/vfs_fonts.js"></script>
+        <!-- SlimScroll -->
+        <script src="../bower/admin-lte/plugins/slimScroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="../bower/admin-lte/plugins/fastclick/fastclick.js"></script>
+        <!-- Salvattore -->
+        <script src="../bower/salvattore/salvattore.min.js"></script>
+        <!-- AnchorJS -->
+        <script src="../bower/anchor-js/anchor.min.js"></script>
+        <!-- CodeMirror -->
+        <script src="../bower/codemirror/codemirror.js"></script>
+        <script src="../bower/codemirror/sql.js"></script>
+        <!-- AdminLTE App -->
+        <script src="../bower/admin-lte/dist/js/app.min.js"></script>
+        <script src="table.js"></script>
+        <script src="../schemaSpy.js"></script>
+    </body>
+</html>

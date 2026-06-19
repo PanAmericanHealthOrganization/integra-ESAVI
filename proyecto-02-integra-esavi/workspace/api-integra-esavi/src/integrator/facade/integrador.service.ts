@@ -17,18 +17,15 @@ import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { MedicamentoService } from '../service/medicamento.service';
 import { NotificacionDhis2Service } from '../service/notificacion-dhis2.service';
 import { NotificacionVigiflowService } from '../service/notificacion-vigiflow.service';
-import { PacienteDhis2Service } from '../service/paciente-dhis2.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
-import { PacienteVigiflowService } from '../service/paciente-vigiflow.service';
-//import { Investigacion, InvestigacionCreateDto } from '../entity/investigacion.entity';
+import { PacienteService } from '../service/paciente.service';
 import { InvestigacionService } from '../service/investigacion.service';
 
 @Injectable()
 export class IntegradorService {
   private readonly logger = new Logger(IntegradorService.name);
   constructor(
-    private readonly pacienteDhis2Service: PacienteDhis2Service,
-    private readonly pacienteVigiflowService: PacienteVigiflowService,
+    private readonly pacienteService: PacienteService,
     private readonly notificacionDhis2Service: NotificacionDhis2Service,
     private readonly notificacionVigiflowService: NotificacionVigiflowService,
     private readonly medicamentoService: MedicamentoService,
@@ -52,14 +49,14 @@ export class IntegradorService {
     let notificacion: Notificacion;
 
     if (SourceEnum.DHIS2 == createDto.source) {
-      const pacienteDhis2 = await this.pacienteDhis2Service.create(createDto.pacienteDhis2);
+      const paciente = await this.pacienteService.createFromDhis2(createDto.pacienteDhis2);
 
-      if (pacienteDhis2) {
-        notificacion = await this.notificacionDhis2Service.create(createDto.notificacion, pacienteDhis2);
+      if (paciente) {
+        notificacion = await this.notificacionDhis2Service.create(createDto.notificacion, paciente);
       }
     } else {
-      const pacienteVigiflow = await this.pacienteVigiflowService.create(createDto.pacienteVigiflow);
-      notificacion = await this.notificacionVigiflowService.create(createDto.notificacion, pacienteVigiflow);
+      const paciente = await this.pacienteService.createFromVigiflow(createDto.pacienteVigiflow);
+      notificacion = await this.notificacionVigiflowService.create(createDto.notificacion, paciente);
     }
     if (notificacion) {
       if (createDto.medicamento && createDto.medicamento.length > 0) {

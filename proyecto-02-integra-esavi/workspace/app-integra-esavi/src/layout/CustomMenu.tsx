@@ -1,10 +1,8 @@
-import AutoStoriesIcon from "@mui/icons-material/AutoStories"
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import MedicationIcon from "@mui/icons-material/Medication"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
-import PieChartIcon from "@mui/icons-material/PieChart"
 import SegmentIcon from "@mui/icons-material/Segment"
 import SettingsIcon from "@mui/icons-material/Settings"
 import SickIcon from "@mui/icons-material/Sick"
@@ -25,38 +23,7 @@ export const CustomMenu = () => {
   return (
     <>
       <Menu>
-        {/* Dashboard: visible para todos */}
-        <Authorize
-          allowedRoles={[
-            "Administrador",
-            "Analista de Información",
-            "Visualizador",
-            "Invitado",
-          ]}
-          deniedRoles={[""]}>
-          <Menu.Item
-            to="/dashboard"
-            primaryText="Dashboard"
-            leftIcon={<PieChartIcon />}
-          />
-        </Authorize>
-        <Menu.Item
-          to="/dashboard"
-          primaryText="Dashboard"
-          leftIcon={<PieChartIcon />}
-        />
-
-        <Authorize
-          allowedRoles={["Administrador", "Analista de Información"]}
-          deniedRoles={[""]}></Authorize>
-
         <Menu.Item to="/esavis" primaryText="ESAVIS" leftIcon={<SickIcon />} />
-
-        <Menu.Item
-          to="/gaceta"
-          primaryText="Gaceta"
-          leftIcon={<AutoStoriesIcon />}
-        />
         <Menu.Item
           to="/calidad"
           primaryText="Calidad de Datos"
@@ -85,6 +52,13 @@ export const CustomMenu = () => {
             primaryText="Catálogos"
             leftIcon={<SegmentIcon />}
           />
+          <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+            <Menu.Item
+              to="/homologators"
+              primaryText="Homologación"
+              leftIcon={<CompareArrowsIcon />}
+            />
+          </Authorize>
         </SubMenu>
         <Menu.Item
           to="/vacunometro"
@@ -101,14 +75,6 @@ export const CustomMenu = () => {
           primaryText="Catálogos"
           leftIcon={<SegmentIcon />}
         />
-        <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
-          <Menu.Item
-            to="/homologators"
-            primaryText="Homologación"
-            leftIcon={<CompareArrowsIcon />}
-          />
-        </Authorize>
-
         {/* Estándares */}
         <SubMenu
           dense={false}

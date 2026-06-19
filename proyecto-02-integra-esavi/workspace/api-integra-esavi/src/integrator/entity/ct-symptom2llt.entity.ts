@@ -6,7 +6,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TC_SYMPTOM_TO_LLT',
   comment: 'Tabla de mapeo entre síntomas en el origen DHIS2 y términos de bajo nivel (LLT) de MedDRA. Este catálogo fue elaborado manualmente por los epidemiólogos.',
 })

@@ -4,40 +4,40 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
 //comment: 'Definición y descripción del Mapeo',
 
 @Entity({
-  name: 'mapping_definition',
+  name: 'MAPPING_DEFINITION',
 })
 export class MappingDefinition extends Auditoria {
   /**
    *
    */
-  @PrimaryColumn({ name: 'id' })
+  @PrimaryColumn({ name: 'ID' })
   id: string;
 
   /**
    *
    */
-  @Column({ name: 'mpd_description', comment: '' })
+  @Column({ name: 'MPD_DESCRIPTION', comment: '' })
   description: string;
   /**
    *
    */
-  @Column({ name: 'mpd_source', comment: '' })
+  @Column({ name: 'MPD_SOURCE', comment: '' })
   source: string;
 
   /**
    *
    */
-  @Column({ name: 'mpd_description_source', comment: '' })
+  @Column({ name: 'MPD_DESCRIPTION_SOURCE', comment: '' })
   descriptionSource: string;
 
   /**
    *
    */
-  @Column({ name: 'mpd_target', comment: '' })
+  @Column({ name: 'MPD_TARGET', comment: '' })
   target: string;
   /**
    *
    */
-  @Column({ name: 'mpd_description_target', comment: '' })
+  @Column({ name: 'MPD_DESCRIPTION_TARGET', comment: '' })
   descriptionTarget: string;
 }

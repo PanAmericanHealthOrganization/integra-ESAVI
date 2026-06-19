@@ -203,7 +203,7 @@ export class Dhis2DuplicateHandlerService {
       let updatedCount = 0;
       for (const record of similarRecords) {
         await this.integradorService.updateByCodigoDhis2Evento(
-          record.codigoDhis2Evento,
+          record.codigoOrigenNotificacion,
           newRecord
         );
         updatedCount++;

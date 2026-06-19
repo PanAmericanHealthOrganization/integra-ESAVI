@@ -6,7 +6,7 @@ import { Auditoria } from './auditoria.entity';
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_SYNC_PROCESS',
   comment: 'Registra los procesos de sincronización con las diferentes fuentes de datos',
 })

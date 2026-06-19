@@ -1,9 +1,8 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsDate } from 'class-validator';
-import { SourceEnum } from '../enum/source-enum';
-import { UbicacionDto } from './ubicacion.dto';
+import {ApiProperty,PartialType} from "@nestjs/swagger";
+import {Type} from 'class-transformer';
+import {IsDate} from 'class-validator';
+import {SourceEnum} from '../enum/source-enum';
+import {UbicacionDto} from './ubicacion.dto';
 
 export class CreateNotificacionDto {
   residenciaPaciente: UbicacionDto;

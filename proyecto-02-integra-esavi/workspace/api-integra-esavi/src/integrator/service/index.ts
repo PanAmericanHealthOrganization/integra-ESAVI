@@ -1,8 +1,8 @@
 export * from './antecedente-embarazo.service';
-export * from './catalogo-padre.service';
 export * from './antecedente-evento.service';
 export * from './antecedente-medico.service';
 export * from './antecedente-preexistencia.service';
+export * from './catalogo-padre.service';
 export * from './catalogo.service';
 export * from './causalidad-esavi.service';
 export * from './dato-esavi.service';
@@ -12,16 +12,14 @@ export * from './desenlace-esavi.service';
 export * from './embarazo-esavi.service';
 export * from './gaceta.service';
 export * from './gravedad-esavi.service';
-export * from './grupo-etario.service';
 export * from './medicamento.service';
 export * from './notificacion-dhis2.service';
 export * from './notificacion-vigiflow.service';
 export * from './notificacion.service';
-export * from './paciente-dhis2.service';
 export * from './paciente-embarazada.service';
-export * from './paciente-vigiflow.service';
 export * from './parametro.service';
 export * from './reporte.service';
 export * from './seed.service';
 export * from './sync.service';
 export * from './vacunometro.service';
+

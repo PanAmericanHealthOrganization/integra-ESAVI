@@ -1,16 +1,15 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, TableInheritance } from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
+import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
+import {Auditoria} from './auditoria.entity';
+import {Catalogo} from './catalogo.entity';
 
 /**
  *
  */
 @Entity({
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   name: 'TR_PACIENTE',
   comment: 'Tabla de pacientes',
 })
-@TableInheritance({ column: { type: 'varchar', name: 'ORIGEN' } })
 export class Paciente extends Auditoria {
   /**
    *
@@ -27,6 +26,16 @@ export class Paciente extends Auditoria {
     comment: 'Nombre completo del paciente. Disponible en DHIS2.',
   })
   nombre: string;
+
+    /**
+   *
+   */
+  @Column({
+    name: 'APELLIDOS',
+    nullable: true,
+    comment: 'Apellidos del paciente.',
+  })
+  apellidos: string;
   /**
    *
    */
@@ -54,9 +63,7 @@ export class Paciente extends Auditoria {
   @JoinColumn({ name: 'CT_SEXO_ID' })
   sexo: Catalogo;
 
-  /**
-   *
-   */
+
   @ManyToOne(() => Catalogo)
   @JoinColumn({ name: 'CT_AUTO_IDENTIFICACION_ETNICA_ID' })
   autoIdentificacion: Catalogo;
@@ -78,11 +85,20 @@ export class Paciente extends Auditoria {
   })
   registroSincronizado: boolean;
 
-  /**
-   *
-   */
-  @BeforeInsert()
-  beforeInsert() {
-    this.createdAt = new Date();
-  }
+  @Column(
+    {
+      name: 'FECHA_SINCRONIZACION',
+      nullable: true,
+    }
+  )
+  fechaSincronizacion: Date;
+
+  @Column({
+    name: 'CODIGO_ORIGEN',
+    nullable: true,
+    unique: true,
+    comment: 'Código único del registro en el sistema origen (VigiFlow o DHIS2)',
+  })
+  codigoOrigen: string;
+
 }

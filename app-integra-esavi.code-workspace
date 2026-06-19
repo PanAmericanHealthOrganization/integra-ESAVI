@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "proyecto-02-integra-esavi/workspace/app-integra-esavi"
+		},
+		{
+			"path": "proyecto-02-integra-esavi/workspace/api-integra-esavi"
+		},
+		{
+			"path": "proyecto-03-analitica/workspace/dash-integra-esavi"
+		},
+		{
+			"path": "herramientas"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "herramientas"
+	}
+}

@@ -1,27 +1,26 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { GacetaController } from './controller';
-import { AntecedenteEmbarazoController } from './controller/antecedente-embarazo.controller';
-import { CatalogoPadreController } from './controller/catalogo-padre.controller';
-import { AntecedenteEventoController } from './controller/antecedente-evento.controller';
-import { AntecedenteMedicoController } from './controller/antecedente-medico.controller';
-import { AntecedentePreexistenciaController } from './controller/antecedente-preexistencia.controller';
-import { DatoEsaviController } from './controller/dato-esavi.controller';
-import { DesenlaceEsaviController } from './controller/desenlace-esavi.controller';
-import { GrupoEtarioController } from './controller/grupo-etario.controller';
-import { IntegradorController } from './controller/integrador.controller';
-import { InvestigacionController } from './controller/investigacion.controller';
-import { NotificacionController } from './controller/notificacion.controller';
-import { PacienteDhis2Controller } from './controller/paciente-dhis2.controller';
-import { PacienteEmbarazadaController } from './controller/paciente-embarazada.controller';
-import { PacienteVigiflowController } from './controller/paciente-vigiflow.controller';
-import { PacienteController } from './controller/paciente.controller';
-import { ParametroController } from './controller/parametro.controller';
-import { ReporteController } from './controller/reporte.controller';
-import { SeedController } from './controller/seed.controller';
-import { SyncController } from './controller/sync.controller';
-import { VacunometroController } from './controller/vacunometro.controller';
+import {Module} from '@nestjs/common';
+import {ConfigModule,ConfigService} from '@nestjs/config';
+import {TypeOrmModule} from '@nestjs/typeorm';
+import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
+import {GacetaController} from './controller';
+import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
+import {AntecedenteEventoController} from './controller/antecedente-evento.controller';
+import {AntecedenteMedicoController} from './controller/antecedente-medico.controller';
+import {AntecedentePreexistenciaController} from './controller/antecedente-preexistencia.controller';
+import {CatalogoPadreController} from './controller/catalogo-padre.controller';
+import {DatoEsaviController} from './controller/dato-esavi.controller';
+import {DesenlaceEsaviController} from './controller/desenlace-esavi.controller';
+import {IntegradorController} from './controller/integrador.controller';
+import {InvestigacionController} from './controller/investigacion.controller';
+import {NotificacionController} from './controller/notificacion.controller';
+import {PacienteEmbarazadaController} from './controller/paciente-embarazada.controller';
+import {PacienteVigiflowController} from './controller/paciente-vigiflow.controller';
+import {PacienteController} from './controller/paciente.controller';
+import {ParametroController} from './controller/parametro.controller';
+import {ReporteController} from './controller/reporte.controller';
+import {SeedController} from './controller/seed.controller';
+import {SyncController} from './controller/sync.controller';
+import {VacunometroController} from './controller/vacunometro.controller';
 import {
   AntecedenteEmbarazo,
   AntecedenteEvento,
@@ -37,35 +36,30 @@ import {
   EmbarazoEsavi,
   Gaceta,
   GravedadEsavi,
-  GrupoEtario,
   Medicamento,
   Notificacion,
-  NotificacionDhis2,
-  NotificacionVigiflow,
   Paciente,
-  PacienteDhis2,
   PacienteEmbarazada,
-  PacienteVigiflow,
   Parametro,
   SyncProcess,
   TipoCatalogo,
   Vacunacion,
   Vacunometro,
 } from './entity';
-import { CtIcd10meddra } from './entity/ct-icd10meddra.entity';
-import { CtSymptom2llt } from './entity/ct-symptom2llt.entity';
-import { WhodrugHomologaVacs } from './entity/whodrug-homologavacs.entity';
-import { WhodrugVacsTemp } from './entity/whodrug-vacstemp.entity';
-import { Establecimiento } from './entity/establecimiento.entity';
-import { Investigacion } from './entity/investigacion.entity';
-import { IntegradorService } from './facade/integrador.service';
+import {CtIcd10meddra} from './entity/ct-icd10meddra.entity';
+import {CtSymptom2llt} from './entity/ct-symptom2llt.entity';
+import {Establecimiento} from './entity/establecimiento.entity';
+import {Investigacion} from './entity/investigacion.entity';
+import {WhodrugHomologaVacs} from './entity/whodrug-homologavacs.entity';
+import {WhodrugVacsTemp} from './entity/whodrug-vacstemp.entity';
+import {IntegradorService} from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
   AntecedenteEventoService,
   AntecedenteMedicoService,
   AntecedentePreexistenciaService,
-  CatalogoService,
   CatalogoPadreService,
+  CatalogoService,
   CausalidadEsaviService,
   DatoEsaviService,
   DatoVacunaService,
@@ -74,27 +68,24 @@ import {
   EmbarazoEsaviService,
   GacetaService,
   GravedadEsaviService,
-  GrupoEtarioService,
   MedicamentoService,
   NotificacionDhis2Service,
   NotificacionService,
   NotificacionVigiflowService,
-  PacienteDhis2Service,
   PacienteEmbarazadaServive,
-  PacienteVigiflowService,
   ParametroService,
   ReporteService,
   SeedService,
 } from './service';
-import { EstablecimientosService } from './service/establecimientos.service';
-import { InvestigacionService } from './service/investigacion.service';
-import { CtSymptom2lltService } from './service/ct-symptom2llt.service';
-import { CtIcd10meddraService } from './service/ct-icd10meddra.service';
-import { WhodrugVacsTempService } from './service/whodrug-vacstemp.service';
-import { WhodrugHomologaVacsService } from './service/whodrug-homologavacs.service';
-import { PacienteService } from './service/paciente.service';
-import { SyncService } from './service/sync.service';
-import { VacunometroService } from './service/vacunometro.service';
+import {CtIcd10meddraService} from './service/ct-icd10meddra.service';
+import {CtSymptom2lltService} from './service/ct-symptom2llt.service';
+import {EstablecimientosService} from './service/establecimientos.service';
+import {InvestigacionService} from './service/investigacion.service';
+import {PacienteService} from './service/paciente.service';
+import {SyncService} from './service/sync.service';
+import {VacunometroService} from './service/vacunometro.service';
+import {WhodrugHomologaVacsService} from './service/whodrug-homologavacs.service';
+import {WhodrugVacsTempService} from './service/whodrug-vacstemp.service';
 
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
@@ -113,6 +104,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         poolSize: 5,
       }),
+      dataSourceFactory: dataSourceFactory(['DHI_ESAVI']),
       imports: [ConfigModule],
       inject: [ConfigService],
     }),
@@ -136,15 +128,10 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         DesenlaceEsavi,
         EmbarazoEsavi,
         GravedadEsavi,
-        GrupoEtario,
         Investigacion,
         Medicamento,
         Notificacion,
-        NotificacionVigiflow,
-        NotificacionDhis2,
         Paciente,
-        PacienteVigiflow,
-        PacienteDhis2,
         PacienteEmbarazada,
         Parametro,
         TipoCatalogo,
@@ -166,7 +153,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DesenlaceEsaviController,
     IntegradorController,
     PacienteVigiflowController,
-    PacienteDhis2Controller,
     NotificacionController,
     ReporteController,
     PacienteEmbarazadaController,
@@ -174,7 +160,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEmbarazoController,
     SeedController,
     VacunometroController,
-    GrupoEtarioController,
     SyncController,
     InvestigacionController,
     PacienteController,
@@ -197,13 +182,10 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DesenlaceEsaviService,
     EmbarazoEsaviService,
     GravedadEsaviService,
-    GrupoEtarioService,
     MedicamentoService,
     NotificacionService,
     NotificacionDhis2Service,
     NotificacionVigiflowService,
-    PacienteDhis2Service,
-    PacienteVigiflowService,
     PacienteService,
     ParametroService,
     IntegradorService,
@@ -227,8 +209,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     CtSymptom2lltService,
     WhodrugVacsTempService,
     WhodrugHomologaVacsService,
-    PacienteVigiflowService,
-    PacienteDhis2Service,
+    PacienteService,
     MedicamentoService,
     NotificacionVigiflowService,
     DatoVacunaService,

@@ -2,59 +2,37 @@ import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePacienteVigiflowDto } from '../dto';
 import { UpdatePacienteDto } from '../dto';
-import { PacienteVigiflowService } from '../service/paciente-vigiflow.service';
+import { PacienteService } from '../service/paciente.service';
 
 @ApiTags('Paciente')
 @Controller({ path: 'integrator/paciente/vigiflow', version: '1' })
 export class PacienteVigiflowController {
-  constructor(private pacienteVigiflowService: PacienteVigiflowService) {}
+  constructor(private pacienteService: PacienteService) {}
 
-  //BUSCAR TODOS LOS ITEMS
   @Get('/findAll')
-  @ApiResponse({
-    status: 200,
-    description: 'The records have been successfully retrieved.',
-  })
+  @ApiResponse({ status: 200, description: 'The records have been successfully retrieved.' })
   findAll() {
-    return this.pacienteVigiflowService.findAll();
+    return this.pacienteService.findAll();
   }
 
-  //BUSCA UN ITEM ESPECIFICO POR ID
   @Get(':uuid')
-  @ApiResponse({
-    status: 200,
-    description: 'The record has been successfully retrieved.',
-  })
+  @ApiResponse({ status: 200, description: 'The record has been successfully retrieved.' })
   @ApiResponse({ status: 404, description: 'The record has not been found.' })
   findOne(@Param('uuid') uuid: string) {
-    return this.pacienteVigiflowService.findOne(uuid);
+    return this.pacienteService.findOne(uuid);
   }
 
-  //INSERTAR DATOS
   @Post('/create')
-  @ApiResponse({
-    status: 201,
-    description: 'The record has been successfully created.',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'The record has not been successfully created.',
-  })
+  @ApiResponse({ status: 201, description: 'The record has been successfully created.' })
+  @ApiResponse({ status: 400, description: 'The record has not been successfully created.' })
   create(@Body() body: CreatePacienteVigiflowDto) {
-    return this.pacienteVigiflowService.create(body);
+    return this.pacienteService.createFromVigiflow(body);
   }
 
-  //ACTUALIZAR DATOS
   @Put(':uuid')
-  @ApiResponse({
-    status: 200,
-    description: 'The record has been successfully updated.',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'The record has not been successfully updated.',
-  })
+  @ApiResponse({ status: 200, description: 'The record has been successfully updated.' })
+  @ApiResponse({ status: 400, description: 'The record has not been successfully updated.' })
   update(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Body() body: UpdatePacienteDto) {
-    return this.pacienteVigiflowService.update(uuid, body);
+    return this.pacienteService.update(uuid, body);
   }
 }

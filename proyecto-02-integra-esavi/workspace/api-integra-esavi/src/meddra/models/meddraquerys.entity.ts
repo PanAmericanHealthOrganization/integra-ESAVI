@@ -1,16 +1,16 @@
 import { BaseEntity, Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ schema: 'meddra', name: 'med_request_history' })
+@Entity({ schema: 'MEDDRA', name: 'MED_REQUEST_HISTORY' })
 @Index(['searchterm'])
 export class MeddraQuery extends BaseEntity {
-  @PrimaryGeneratedColumn({ name: 'id' })
+  @PrimaryGeneratedColumn({ name: 'ID' })
   id!: number;
 
-  @Column({ name: 'searchterms', unique: true })
+  @Column({ name: 'SEARCHTERMS', unique: true })
   searchterm: string;
 
   @Column({
-    name: 'response',
+    name: 'RESPONSE',
     // transformer: new EncryptionTransformer({
     //   key: process.env.MDD_TRANSFORM_KEY,
     //   algorithm: 'aes-256-cbc',
@@ -20,6 +20,6 @@ export class MeddraQuery extends BaseEntity {
   })
   response: string;
 
-  @Column({ name: 'date' })
+  @Column({ name: 'DATE' })
   date: Date;
 }

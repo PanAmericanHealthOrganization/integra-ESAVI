@@ -3,7 +3,7 @@ import { Auditoria } from './auditoria.entity';
 import { IEstablecimiento } from './interfaces/establecimiento.interface';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
-  schema: 'dhi_esavi',
+  schema: 'DHI_ESAVI',
   comment: 'Tabla de establecimientos de salud gestionados por el ministerio de salud publica',
 })
 export class Establecimiento extends Auditoria implements IEstablecimiento {

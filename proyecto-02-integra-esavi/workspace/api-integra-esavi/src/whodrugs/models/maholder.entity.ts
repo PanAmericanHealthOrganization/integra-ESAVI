@@ -4,7 +4,7 @@ import { CountryOfSale } from './countryOfSale.entity';
 /**
  *
  */
-@Entity({ name: 'maholder', schema: 'who_drug' })
+@Entity({ name: 'MAHOLDER', schema: 'WHO_DRUG' })
 export class Maholder extends Auditoria {
   /**
    *
@@ -12,7 +12,7 @@ export class Maholder extends Auditoria {
   @Column({
     primary: true,
     unique: true,
-    name: 'id',
+    name: 'ID',
     type: 'char',
     length: 11,
     comment: 'Identificador único del registro',
@@ -23,7 +23,7 @@ export class Maholder extends Auditoria {
    *
    */
   @Column({
-    name: 'name',
+    name: 'NAME',
     comment: 'Nombre del titular del registro',
     length: 512,
   })
@@ -33,7 +33,7 @@ export class Maholder extends Auditoria {
    *
    */
   @Column({
-    name: 'medicinal_product_id',
+    name: 'MEDICINAL_PRODUCT_ID',
     nullable: true,
     comment: 'Código del producto',
   })
@@ -44,7 +44,7 @@ export class Maholder extends Auditoria {
    */
   @ManyToOne(() => CountryOfSale)
   @JoinColumn({
-    name: 'cos_id',
+    name: 'COS_ID',
     referencedColumnName: 'id',
     foreignKeyConstraintName: 'FK_countrySale__maholder',
   })

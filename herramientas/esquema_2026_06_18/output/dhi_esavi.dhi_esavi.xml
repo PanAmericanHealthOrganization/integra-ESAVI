@@ -1,0 +1,1049 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<database name="dhi_esavi" schema="dhi_esavi" type="PostgreSQL - 15.18 (Debian 15.18-1.pgdg13+1)">
+   <tables>
+      <table catalog="dhi_esavi" name="DQ_DIMENSION" numRows="6" remarks="Tabla de dimensiones de calidad de los datos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único de la dimensión de calidad" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="anio" nullable="false" remarks="Año de evaluación" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="mes" nullable="false" remarks="Mes de evaluación" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="json_quali" nullable="false" remarks="Resultado de la evaluación" size="2147483647" type="jsonb" typeCode="1111"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_aaf9f64fe95479a14efe5d6cf1a" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_CATALOGO" numRows="1783" remarks="Catálogo de valores de homologaciones de Vigiflow a DHIS2" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="CATALOGO_ID_PADRE" foreignKey="FK_c34f17176fddbdb527c704cca60" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+            <child catalog="dhi_esavi" column="CTLLTMEDDRA_ID" foreignKey="FK_efa13a960b9cacbd2c3640af1c8" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS"/>
+            <child catalog="dhi_esavi" column="CT_ALERGIA_ALIMENTO_ID" foreignKey="FK_a3a78ddd0002fd65475e77b3d2e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EVENTO_ADVERSO"/>
+            <child catalog="dhi_esavi" column="CT_ALERGIA_INSECTO_ID" foreignKey="FK_7983c8b5eddff97a62d5a98da53" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EVENTO_ADVERSO"/>
+            <child catalog="dhi_esavi" column="CT_ALERGIA_MEDICAMENTO_ID" foreignKey="FK_60de72aaa0e8f05f0d96d581a05" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EVENTO_ADVERSO"/>
+            <child catalog="dhi_esavi" column="CT_ALERGIA_POLVO_ID" foreignKey="FK_fa278687ee1952df77dc34ffb14" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EVENTO_ADVERSO"/>
+            <child catalog="dhi_esavi" column="CT_ROL_VACUNA_ID" foreignKey="FK_6ec7aeced291375f4c59f5eca31" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNA"/>
+            <child catalog="dhi_esavi" column="CT_CANTON_NOTIFICADOR_ID" foreignKey="FK_d0a82456684c3ecc4b5ba782100" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="CT_CANTON_VACUNATORIO_ID" foreignKey="FK_0a071b03e3d35e34e4e42390e62" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="CT_PARROQUIA_NOTIFICADOR_ID" foreignKey="FK_1bf153ad8c6e63fae048511dfa5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="CT_PARROQUIA_VACUNATORIO_ID" foreignKey="FK_bff1a6d987f4b9be2029e94c206" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="CT_PROVINCIA_VACUNATORIO_ID" foreignKey="FK_7f6ed10fc8cb50a070aebec0032" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="CAUSALIDADESAVI_ID" foreignKey="FK_2ea6c3837ce18dc0c91514c6f2a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DESENLACE_ESAVI"/>
+            <child catalog="dhi_esavi" column="CT_CANTON_NOTIFICADOR_ID" foreignKey="FK_476c77cfa7eac246753cf49796a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CT_ESTADO_REGISTRO_ID" foreignKey="FK_a1acd5196f12ff1b7cb0081ef28" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CT_PARROQUIA_NOTIFICADOR_ID" foreignKey="FK_80403944874e5fd64bd7692cef3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CT_PROVINCIA_NOTIFICADOR_ID" foreignKey="FK_09404250bf2870d57dc4bee9326" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CTCANTORESIDENCIA_ID" foreignKey="FK_39fe0a33d7998014c2fc3d2683e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CTPARROQUIARESIDENCIA_ID" foreignKey="FK_5329e8f623d5f056caa2e3a9b91" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CTPROFESIONNOTIFICADOR_ID" foreignKey="FK_b29facf202418dbf9f700dbaea5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CTPROVINCIARESIDENCIA_ID" foreignKey="FK_d7dd997fc4d774829559e77b743" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CTUNIDADEDAD_ID" foreignKey="FK_58b5a9015c537bd067a78c83c27" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+            <child catalog="dhi_esavi" column="CT_AUTO_IDENTIFICACION_ETNICA_ID" foreignKey="FK_9cbc56ad3f9d5c4121332c6051e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_PACIENTE"/>
+            <child catalog="dhi_esavi" column="CT_SEXO_ID" foreignKey="FK_21477babb159d2e7fafd2ad67d6" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_PACIENTE"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="DESCRIPCION_VIGIFLOW" nullable="true" remarks="Descripción en Vigiflow" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="DESCRIPCION_DHIS2" nullable="true" remarks="Descripción en DHIS2" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="DESCRIPCION_HOMOLOGADA" nullable="false" remarks="Descripción homologada" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CATALOGO_ID_PADRE" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_c34f17176fddbdb527c704cca60" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="CTTIPOCATALOGO_ID" nullable="true" remarks="Identificador único de la tabla TC_TIPO_CATALOGO" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_15e4eb5374076c9758e8cac7dfd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_TIPO_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_3adef02e7f01196ef9d9a8ca11c" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_GRUPO_ETARIO" numRows="7" remarks="Tabla de grupos etarios MSP" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único pk de la tabla TC_GRUPO_ETARIO" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="CTGRUPOETARIO_ID" foreignKey="FK_d26760563f97d5ec0733a434f8b" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="INICIO_EDAD" nullable="false" remarks="Edad de inicio del grupo etario en años" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="FIN_EDAD" nullable="false" remarks="Edad de fin del grupo etario en años" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="UNIDAD_EDAD" nullable="false" remarks="Unidad de medida de la edad (Años, Meses)" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="DESCRIPCION_RANGO" nullable="false" remarks="Descripción del rango etario según el MSP" size="100" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_95606e57cc76bbf554bd999c00b" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_ICD10_MEDDRA" numRows="11193" remarks="Tabla de mapeo entre codigos ICD10 y MedDRA" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único pk de la tabla TC_ICD10_MEDDRA" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ICD10_CHAPTER_NUMBER" nullable="true" remarks="Número del capítulo ICD10" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="ICD10_CHAPTER_TITLE" nullable="true" remarks="Título del capítulo ICD10" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="ICD10_CODE" nullable="true" remarks="Código ICD10" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="ICD10_TERM" nullable="true" remarks="Término asociado al código ICD10" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="MEDDRA_LLT" nullable="true" remarks="Término de bajo nivel MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="MEDDRA_LLT_CODE" nullable="true" remarks="Código del término de bajo nivel MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="MAP_ATTRIBUTE" nullable="true" remarks="Atributo de mapeo entre ICD10 y MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="MEDDRA_PT" nullable="true" remarks="Término preferido MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="MEDDRA_PT_CODE" nullable="true" remarks="Código del término preferido MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_768ae8532aa5049668493d49739" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_PARAMETRO" numRows="0" remarks="Tabla de parámetros de configuración" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TC_PARAMETRO" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CLAVE" nullable="false" remarks="Clave única del parámetro de configuración" size="32" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="VALOR" nullable="true" remarks="Valor asociado al parámetro de configuración" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="DESCRIPCION" nullable="true" remarks="Descripción detallada del parámetro" size="512" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_a5b0dc771ded8c85dfe2cd83c8e" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="UQ_5e5a75df4b91d35b2c509578550" unique="true">
+            <column ascending="true" name="CLAVE"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_SYMPTOM_TO_LLT" numRows="67" remarks="Tabla de mapeo entre síntomas en el origen DHIS2 y términos de bajo nivel (LLT) de MedDRA. Este catálogo fue elaborado manualmente por los epidemiólogos." schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único pk de la tabla TC_SYMPTOM_TO_LLT" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ITEM" nullable="true" remarks="Enumeración del síntoma en el sistema DHIS2" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="SYMPTOM" nullable="true" remarks="Nombre del síntoma en el origen DHIS2" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="LLT_NAME" nullable="true" remarks="Nombre del término de bajo nivel (LLT) de MedDRA asociado al síntoma" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="LLT_CODE" nullable="true" remarks="Código del término de bajo nivel (LLT) de MedDRA asociado al síntoma" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="OBSERVATION" nullable="true" remarks="Campo para observaciones adicionales sobre el mapeo" size="2147483647" type="text" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_370d5eedee5805621bd2db7badb" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_TIPO_CATALOGO" numRows="12" remarks="Tabla de tipos de catálogo" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único de la tabla TC_TIPO_CATALOGO" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="CTTIPOCATALOGO_ID" foreignKey="FK_15e4eb5374076c9758e8cac7dfd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CODIGO" nullable="false" remarks="Código único del tipo de catálogo" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="DESCRIPCION_TIPO_CATALOGO" nullable="true" remarks="Descripción del tipo de catálogo" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_8297cfb83d4d3a9cd3a246d8a8a" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_WHODRUG_HOMOLOGA_VACS" numRows="35" remarks="Tabla de catálogo que contiene los valores del campo Patente WHODrug, de VigiFLow que no tienen coincidencia al comparar contra el catálogo provisional Excel. Se utiliza como auxilir para realizar la homologación de nombres de vacunas manualmente." schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único pk de la tabla TC_WHODRUG_HOMOLOGA_VACS" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="PATENTE_WHODRUG_VIGIFLOW" nullable="true" remarks="Nombre de la patente WHODrug registrada en VigiFlow" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="DRUGNAME_WHODRUG" nullable="true" remarks="Nombre del medicamento según el catálogo WHODrug de Uppsla Monitoring Centre" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="MPID_WHODRUG" nullable="true" remarks="Identificador único del medicamento en el catálogo WHODrug. Medicinal Product ID" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_acddbf1d774a66487194865f926" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TC_WHODRUG_VACS_TEMP" numRows="317" remarks="Tabla de mapeo WHODrug para los datos del origen VigiFLow. Este catálogo se utilizará de forma provisional hasta que concluya el proceso de actualización del catálogo oficial de la Uppsala Monitorig Centre. Este catálogo fue elaborado manualmente por los epidemiólogos." schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único pk de la tabla TC_WHODRUG_VACS_TEMP" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ITEM" nullable="true" remarks="Número secuencial del registro" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="DRUG_CODE" nullable="true" remarks="Código WHODrug de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="DRUG_NAME" nullable="true" remarks="Nombre WHODrug de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="MEDICINAL_PRODUCT_ID" nullable="true" remarks="Identificador del producto medicinal asociado a la vacuna" size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="ATC_CODE" nullable="true" remarks="Código Anatomical Therapeutic Chemical, asociado a la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="ABBREVIATION" nullable="true" remarks="Abreviatura del nombre WHODrug de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="ACTIVE_INGREDIENT" nullable="true" remarks="Ingrediente activo de la vacuna según WHODrug" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="ACTI_INGREDIENT_TRANSLATION" nullable="true" remarks="Traducción del ingrediente activo de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="LANGUAGE_CODE" nullable="true" remarks="Código del idioma utilizado en la traducción" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="COUNTRY_ISO3CODE" nullable="true" remarks="Código ISO3 del país asociado a la traducción" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="COUNTRY_MEDI_PROD_ID" nullable="true" remarks="Identificador del producto medicinal asociado al país" size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="MA_HOLDER" nullable="true" remarks="Titular del medicamento. MAH (Marketing Authorization Holder / Titular de la autorización de comercialización). Titular de registro sanitario" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="MA_HOLDER_MEDI_PROD_ID" nullable="true" remarks="Identificador del producto medicinal, asociado titular del medicamento" size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="PHARMACEUTICAL_FORM" nullable="true" remarks="Forma farmacéutica de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="PHAR_FORM_TRANSLATION" nullable="true" remarks="Traducción de la forma farmacéutica de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="PHAR_FORM_MEDI_PROD_ID" nullable="true" remarks="Identificador de el producto medicinal, asociado a la forma farmacéutica" size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="STRENGTH" nullable="true" remarks="Concentración de la vacuna. &quot;Potencia&quot;, fuerza, concentración" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="STRENGTH_MEDI_PROD_ID" nullable="true" remarks="Identificador del producto medicinal, asociado a la potencia o concentración" size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="IS_GENERIC" nullable="true" remarks="Indica si es un medicamento genérico" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="28" name="IS_PREFERRED" nullable="true" remarks="Indica si es el medicamento preferido" size="2147483647" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_995a12510ac459b28c60fc0ce5a" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TG_GACETA" numRows="0" remarks="contiene las partes configurables de la generación de la gaceta" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único de la gaceta" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="FECHA_PUBLICACION" nullable="false" remarks="Fecha de publicación de la gaceta" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="NUMERO_GACETA" nullable="false" remarks="Número de la gaceta" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="VOLUMEN" nullable="false" remarks="Volumen de la gaceta" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="DESDE" nullable="false" remarks="Fecha desde de la gaceta" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="HASTA" nullable="false" remarks="Fecha hasta de la gaceta" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="URL_GACETA" nullable="false" remarks="URL de la gaceta" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'PENDIENTE'::dhi_esavi.&quot;TG_GACETA_estado_enum&quot;" digits="0" id="15" name="ESTADO" nullable="false" remarks="Estado actual de la gaceta" size="2147483647" type="&quot;dhi_esavi&quot;.&quot;TG_GACETA_estado_enum&quot;" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="AUTOR" nullable="false" remarks="Autor de la gaceta" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="CARGO" nullable="false" remarks="Cargo del autor" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="AUTOR_SECUNDARIO" nullable="false" remarks="Autor secundario de la gaceta" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="CARGO_SECUNDARIO" nullable="false" remarks="Cargo del autor secundario" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'Gaceta'::character varying" digits="0" id="20" name="TITULO" nullable="false" remarks="Título de la gaceta" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="21" name="ANALISIS_POBLACION" nullable="false" remarks="Análisis de población" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="22" name="ANALISIS_DISTRIBUCION_GEOGRAFICA" nullable="false" remarks="Análisis de distribución geográfica" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="23" name="ANALISIS_DISTRIBUCION_TIPO_EVENTO" nullable="false" remarks="Análisis de distribución de tipo de evento" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="24" name="ANALISIS_DISTRIBUCION_VACUNAS" nullable="false" remarks="Análisis de distribución de vacunas" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="25" name="ANALISIS_POR_GRAVEDAD" nullable="false" remarks="Análisis por gravedad" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="''::text" digits="0" id="26" name="ANALISIS_TEMPORAL" nullable="false" remarks="Análisis temporal" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="RESUMEN_CONTENIDO" nullable="false" remarks="Resumen del contenido de la gaceta (soporta HTML/texto enriquecido)" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="28" name="CONCLUSIONES" nullable="false" remarks="Conclusiones de la gaceta (soporta HTML/texto enriquecido)" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="29" name="RECOMENDACIONES" nullable="false" remarks="Recomendaciones de la gaceta (soporta HTML/texto enriquecido)" size="2147483647" type="text" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_c32e0268c17d94bd3172bb27b4f" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ANTECEDENTES_EMBARAZO" numRows="0" remarks="Tabla de antecedentes de embarazo" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador de la notificación asociada al antecedente" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="FECHA_ULTIMA_MENSTRUACION" nullable="true" remarks="Fecha de la última menstruación de la paciente" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="FECHA_PARTO" nullable="true" remarks="Fecha probable o real del parto" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="EDAD_GESTACIONAL" nullable="true" remarks="Edad gestacional de la paciente en semanas" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_00b597a00d3800775f37f915fb3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_b045ff97ffcaddcbdb5b4b11a44" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS" numRows="0" remarks="Tabla de antecedentes de enfermedades previas" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador de la notificación asociada al antecedente" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="DESCRIPCION_ENF_PREVIAS" nullable="false" remarks="Descripción de la enfermedad previa del paciente" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="CODIGO_ESAVI_CIE10" nullable="false" remarks="Código CIE-10 de la enfermedad previa" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_9f0af21a79cf1e9fd07d547091c" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CTLLTMEDDRA_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_efa13a960b9cacbd2c3640af1c8" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_020c11550de52058a25adc09e7b" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ANTECEDENTES_EVENTO_ADVERSO" numRows="0" remarks="Tabla de antecedentes de eventos adversos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador de la notificación asociada al antecedente" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ANTECEDENTES_ADVSIMILAR" nullable="true" remarks="Número de antecedentes de eventos adversos similares" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="OTRAS_ALERGIAS" nullable="true" remarks="Descripción de otras alergias no contempladas anteriormente" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_7c41e9e441b43c13307868491a3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CT_ALERGIA_MEDICAMENTO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_60de72aaa0e8f05f0d96d581a05" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="CT_ALERGIA_ALIMENTO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_a3a78ddd0002fd65475e77b3d2e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="CT_ALERGIA_INSECTO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_7983c8b5eddff97a62d5a98da53" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="CT_ALERGIA_POLVO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_fa278687ee1952df77dc34ffb14" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_0dc71bd26dc9ab94650fead8ffa" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ANTECEDENTES_MEDICO" numRows="0" remarks="Tabla de antecedentes médicos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador de la notificación asociada al antecedente" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ENSAYO_CLINICO_COVID19" nullable="true" remarks="Indica si el paciente participó en ensayos clínicos de COVID-19. En el origen es tipo BOOLEANO, dhis2 ya entrega de forma preestablecida true=1, false=0 (valores numéricos en tipo texto). Si no está marcada ninguna opción entrega NULL." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="COMORBILIDAD_PRINCIPAL" nullable="true" remarks="Descripción de la comorbilidad principal del paciente" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="COMORBILIDAD_PRINCIPAL_CIE10" nullable="true" remarks="Código CIE-10 de la comorbilidad principal" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="COMORBILIDAD_DOS" nullable="true" remarks="Descripción de la segunda comorbilidad del paciente" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="COMORBILIDAD_DOS_CIE10" nullable="true" remarks="Código CIE-10 de la segunda comorbilidad" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="COMORBILIDAD_TRES" nullable="true" remarks="Descripción de la tercera comorbilidad del paciente" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="COMORBILIDAD_TRES_CIE10" nullable="true" remarks="Código CIE-10 de la tercera comorbilidad" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="COD_MEDDRALLT_COMORBILIDAD_UNO" nullable="true" remarks="Códido MedDRA LLT de la comorbilidad principal." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="COD_CIE10_PATOLOGICO_AGUDO" nullable="true" remarks="Código CIE-10 del antecedente patológico agudo. Código CIE-10 de DNVE ESAVI TRK - Antecedente patológico agudo previo a las 72 horas de ocurrido el evento 1 - 3" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="COD_MEDDRALLT_PATOLOGICO_AGUDO" nullable="true" remarks="Código LLT MedDRA del antecedente patológico agudo. Código MedDRA LLT de DNVE ESAVI TRK - Antecedente patológico agudo previo a las 72 horas de ocurrido el evento 1 - 3" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="COD_CIE10_FAMILIAR" nullable="true" remarks="Código CIE-10 del antecedente familiar." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="COD_MEDDRALLT_FAMILIAR" nullable="true" remarks="Código MedDRA LLT del antecedente familiar." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="ANTECEDENTE_QUIRURGICO_CIE10" nullable="true" remarks="Código CIE-10 del antecedente quirúrgico." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="ANTECEDENTE_QUIRURGICO_MEDDRA_LLT" nullable="true" remarks="Código MedDRA LLT del antecedente quirúrgico." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="ANTECEDENTE_FARMACOLOGICO_WHODRUG" nullable="true" remarks="Código WHODRUG del antecedente farmacológico." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="ANTECEDENTE_FARMACOLOGICO_PREVIO_SINTOMAS_WHODRUG" nullable="true" remarks="Código WHODrug del antecedente farmacológico reciente, previo al inicio de síntomas." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="ANTECEDENTE_DIAGNOSTICO_COVID19" nullable="true" remarks="Antecedente de diagnóstico de infección por SARS-CoV-2 antes de la vacunación." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="SINTOMAS_COVID19" nullable="true" remarks="Presencia de síntomas de COVID-19." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="FECHA_SINTOMAS_COVID19" nullable="true" remarks="Fecha de inicio de los síntomas de COVID-19. En caso de presentar síntomas coloque la fecha que presentó los síntomas." size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="28" name="METODO_DIAGNOSTICO_COVID19" nullable="true" remarks="Corresponde al método mediante el cual se confirmó el diagnóstico de COVID-19." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="29" name="CODIGO_ENF_PREVIAS_CIE10" nullable="true" remarks="Código CIE-10 de la enfermedad previa." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="30" name="CODIGO_ENF_PREVIAS_MEDDRA_LLT" nullable="true" remarks="Código MedDRA LLT de la enfermedad previa." size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="31" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_77bcb1f63f52132b948dfd94849" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_ca4f9b82654b656f0f88017c693" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_CAUSALIDAD_ESAVI" numRows="0" remarks="Tabla de causalidad del ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="FECHA_CAUSALIDAD_ESAVI" nullable="true" remarks="Fecha de evaluación de la causalidad del ESAVI" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="SISTEMA_CLASF_CAUSALIDAD" nullable="true" remarks="Sistema de clasificación de causalidad utilizado" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="OTRO_SISTEMA_CLASF_CAUSALIDAD" nullable="true" remarks="Otro sistema de clasificación de causalidad no contemplado" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CLASIFICACION_CAUSA_ESAVI" nullable="true" remarks="Variable booleana que almacena la respuesta a la pregunta: ¿Caso analizado por comité ESAVI?" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="CLASIFICACION_DE_CAUSALIDAD_WHO_AEFI" nullable="true" remarks="Clasificación de causalidad según WHO-AEFI" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="CLASIFICACION_DE_CAUSALIDAD_WHO_UMC" nullable="true" remarks="Clasificación de causalidad según WHO-UMC" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="REFERENCIA_IDENTIFICADOR_VACUNA" nullable="true" remarks="Referencia al identificador de la vacuna evaluada" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="CLASIFICACION_DE_CAUSALIDAD_NARANJO" nullable="true" remarks="Clasificación de causalidad según escala de Naranjo" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="CODIGO_CIE10_DXFINAL_1" nullable="true" remarks="Código CIE-10 del diagnóstico final 1." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="COD_MEDDRA_LLT_DXFINAL_1" nullable="true" remarks="Código LLT MedDRA del diagnóstico final." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="CODIGO_CIE10_DXFINAL_2" nullable="true" remarks="Código CIE-10 del diagnóstico final 2." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="COD_MEDDRA_LLT_DXFINAL_2" nullable="true" remarks="Código LLT MedDRA del diagnóstico final 2." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="CODIGO_CIE10_DXFINAL_3" nullable="true" remarks="Código CIE-10 del diagnóstico final 3." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="COD_MEDDRA_LLT_DXFINAL_3" nullable="true" remarks="Código LLT MedDRA del diagnóstico final 3." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="DATOSESAVI_ID" nullable="true" remarks="Identificador PK de la tabla TR_DATOS_ESAVI" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_370be8c652a5911ffe54edae49a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATOS_ESAVI"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="DATOVACUNA_ID" nullable="true" remarks="Identificador PK de la tabla TR_DATO_VACUNA" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_eb99623e008c7596f5a5244dfff" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNA"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_770b0d4d23dad76d2293174adbd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_4e1556831e04af9f573e23de25e" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_DATO_VACUNA" numRows="514" remarks="Tabla de datos de vacuna aplicada" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador PK de la tabla TR_DATO_VACUNA" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="DATOVACUNA_ID" foreignKey="FK_eb99623e008c7596f5a5244dfff" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_CAUSALIDAD_ESAVI"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CODIGOATC" nullable="true" remarks="Código ATC (Anatomical Therapeutic Chemical) de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'WHODrug'::character varying" digits="0" id="10" name="SISTEMA_DE_CODIFICACION" nullable="true" remarks="Sistema de codificación utilizado (WHODrug, ATC, etc.)" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="NOMBRE_VAC_PATENTE_WHODRUG" nullable="true" remarks="Nombre de la vacuna según la patente del estándar WHODrug" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="DRUG_NAME" nullable="true" remarks="Nombre de la vacuna administrada, según el diccionario WHODrug Global de Uppsala Monitoring Centre." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="DRUG_CODE" nullable="true" remarks="Código del medicamento en WHO Drug" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="RID_MEDICINAL_PRODUCT_ID" nullable="true" remarks="Identifica de forma única el producto medicinal según los estándares de la EMA (Agencia Europea de Medicamentos) o la OMS. En WHODrug Global, el MPID (Medicinal Product Identifier) y el RID (Record Identifier) se consideran equivalentes o intercambiables al codificar porque ambos apuntan al nivel más alto y específico de un producto farmacéutico." size="2147483647" type="varchar" typeCode="12">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="ES_GENERICO" nullable="true" remarks="Marcador de registro Generico en WHODrug. Indica si la vacuna es genérica." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="MAHOLDER_JSONB" nullable="true" remarks="Datos JSONB de los titulares de autorización de comercialización. MAH (Marketing Authorization Holder / Titular de la autorización de comercialización)." size="2147483647" type="jsonb" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="ACTIVE_INGREDIENT_JSON" nullable="true" remarks="Datos JSON de los ingredientes activos de la vacuna. Campo &quot;ingredient&quot; de WHODrug" size="2147483647" type="json" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="AC_INGREDIENT_TRANSLATION_JSON" nullable="true" remarks="Datos en formato JSON de la traducción al idioma español (&quot;es-ES&quot;) de los ingredientes activos de la vacuna. Campo &quot;ingredientTranslations&quot; de WHODrug" size="2147483647" type="json" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="CODIGO_VACUNA_OTRO" nullable="true" remarks="Otro código alternativo de identificación de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="NOMBRE_FABRICANTE" nullable="true" remarks="Nombre del fabricante de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="NOMBRE_FABRICANTE_WHO_DRUG" nullable="true" remarks="Nombre del fabricante según WHODrug" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="CODIGO_FABRICANTE_WHO_DRUG" nullable="true" remarks="Código del fabricante según WHODrug" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="NUMERO_DOSIS_VACUNA" nullable="true" remarks="Número de dosis de la vacuna administrada" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="DOSIS" nullable="true" remarks="Dosis administrada de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="DOSIS_1" nullable="true" remarks="Primera dosis administrada" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="INTERVALO_DOSIFICACION" nullable="true" remarks="Intervalo entre dosis de vacunación. Variable utilizada solo por VigiFlow." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="NUMERO_LOTE" nullable="true" remarks="Número de lote de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="28" name="FECHA_VENCIMIENTO_VACUNA" nullable="true" remarks="Fecha de vencimiento de la vacuna" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="29" name="NOMBRE_DILUYENTE_VACUNA" nullable="true" remarks="Nombre del diluyente utilizado para la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="30" name="FECHA_VENCIMIENTO_DILUYENTE" nullable="true" remarks="Fecha de vencimiento del diluyente" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="31" name="PAIS_AUTORIZACION_ISO3CODE" nullable="true" remarks="País que autorizó la comercialización de la vacuna. Identifica de forma única el país donde se comercializa o registra el medicamento. Utiliza el código ISO 3166-1 alfa-3 de tres letras para representar el país." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="32" name="STRENGTH_POTENCIA" nullable="true" remarks="En WHODrug, el campo Strength o Potencia describe la cantidad del ingrediente activo por unidad de presentación, no siempre una concentración. Ejemplo, formas líquidas multidosis: Amoxicillin 250 mg/5 mL suspension, la concentración real sería 50 mg/mL. En WHODrug, la concentración se deduce, no se almacena como tal." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="33" name="INGREDIENTE_SOSPECHOSO" nullable="true" remarks="Ingrediente sospechoso de causar el evento adverso" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="34" name="ACCION_TOMADA" nullable="true" remarks="Acción tomada con respecto a la vacuna tras el evento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="35" name="INFORMACION_ADICIONAL_MEDICAMENTO" nullable="true" remarks="Información adicional sobre el medicamento/vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="36" name="INDICACION_MEDDRA" nullable="true" remarks="Indicación de la vacuna codificada en MedDRA" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="37" name="INDICACION_NOTIFICADOR_PRIMARIO" nullable="true" remarks="Indicación de la vacuna según el notificador primario" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="38" name="DURACION_TRATAMIENTO" nullable="true" remarks="Duración del tratamiento con la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="39" name="INICIO_ADMINISTRACION" nullable="true" remarks="Fecha y hora de inicio de administración de la vacuna" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="40" name="FIN_ADMINISTRACION" nullable="true" remarks="Fecha y hora de fin de administración de la vacuna" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="41" name="FORMA_FARMACEUTICA" nullable="true" remarks="Forma farmacéutica de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="42" name="FORMA_FARMACEUTICA_EDQM" nullable="true" remarks="Forma farmacéutica según estándares EDQM" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="43" name="VIA_ADMINISTRACION" nullable="true" remarks="Vía de administración de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="44" name="VIA_ADMINISTRACION_EDQM" nullable="true" remarks="Vía de administración según estándares EDQM" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="CT_ROL_VACUNA_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_6ec7aeced291375f4c59f5eca31" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_f624dc3e33b3dcffe2935aef898" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_e911d68c356ed75d0992eec0a92" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_DATO_VACUNACION" numRows="464" remarks="Tabla de datos de vacunación" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único de la vacunación" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="FECHA_VACUNACION" nullable="true" remarks="Fecha de vacunación" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="HORA_VACUNACION" nullable="true" remarks="Hora de vacunación" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="CT_PROVINCIA_VACUNATORIO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_7f6ed10fc8cb50a070aebec0032" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_9d432650d9b72a50ed2778760fe" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="NOMBRE_VACUNATORIO" nullable="true" remarks="Nombre del establecimiento donde se aplicó la vacuna" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="OTRAPARROQUIANOTIFICADOR" nullable="true" remarks="Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="DIRECCIONVACUNATORIO" nullable="true" remarks="Dirección completa del vacunatorio" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="CODIGOMECANISMOVERIFICACION" nullable="true" remarks="Código del mecanismo utilizado para verificar la vacunación" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="NOMBREOTROMECANISMOVERIFICACION" nullable="true" remarks="Nombre de otro mecanismo de verificación no contemplado" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="18" name="FECHARECONSTITUCIONVACUNA" nullable="true" remarks="Fecha de reconstitución de la vacuna" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="19" name="HORARECONSTITUCIONVACUNA" nullable="true" remarks="Hora de reconstitución de la vacuna" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="CT_CANTON_NOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_d0a82456684c3ecc4b5ba782100" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="CT_PARROQUIA_NOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_1bf153ad8c6e63fae048511dfa5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="22" name="FECHA_RECONSTITUCION_VACUNA" nullable="true" remarks="Fecha de reconstitución o dilución de la vacuna" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="23" name="HORA_RECONSTITUCION_VACUNA" nullable="true" remarks="Hora de reconstitución o dilución de la vacuna" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="DIRECCION_VACUNATORIO" nullable="true" remarks="Dirección del vacunatorio" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="CT_CANTON_VACUNATORIO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_0a071b03e3d35e34e4e42390e62" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="CT_PARROQUIA_VACUNATORIO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_bff1a6d987f4b9be2029e94c206" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_32dc547e9e4acff061a27e6665d" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_DATOS_ESAVI" numRows="1256" remarks="Tabla de datos del ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador PK de la tabla TR_DATOS_ESAVI" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="DATOSESAVI_ID" foreignKey="FK_370be8c652a5911ffe54edae49a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_CAUSALIDAD_ESAVI"/>
+         </column>
+         <column autoUpdated="false" defaultValue="'MedDRA'::character varying" digits="0" id="9" name="SISTEMA_DE_CODIFICACION" nullable="true" remarks="Sistema de codificación utilizado para el ESAVI (ej: MedDRA, CIE-10)" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="NOMBRE_ESAVI" nullable="true" remarks="Nombre del evento supuestamente atribuido a la vacunación o inmunización" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="DESCRIPCION" nullable="true" remarks="Descripción detallada de la complicación o evento adverso" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="NOMBRE_ESAVI_REPORTADO" nullable="true" remarks="Nombre del ESAVI tal como fue reportado inicialmente" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="CT_LLT_MEDDRA_ID" nullable="true" remarks="ID del catálogo LLT (Lowest Level Term) de MedDRA" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="CODIGO_LLT" nullable="true" remarks="Código del término de nivel más bajo (LLT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="NAME_LLT" nullable="true" remarks="Nombre del término de nivel más bajo (LLT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="CT_PT_MEDDRA_ID" nullable="true" remarks="ID del catálogo PT (Preferred Term) de MedDRA" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="CODIGO_PT" nullable="true" remarks="Código del término preferido (PT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="NAME_PT" nullable="true" remarks="Nombre del término preferido (PT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="CODIGO_HLT" nullable="true" remarks="Código del término de alto nivel (HLT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="NAME_HLT" nullable="true" remarks="Nombre del término de alto nivel (HLT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="CODIGO_HLGT" nullable="true" remarks="Código del grupo de términos de alto nivel (HLGT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="NAME_HLGT" nullable="true" remarks="Nombre del grupo de términos de alto nivel (HLGT) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="CT_HLT_MEDDRA_ID" nullable="true" remarks="ID del catálogo HLT (High Level Term) de MedDRA" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="CT_HLGT_MEDDRA_ID" nullable="true" remarks="ID del catálogo HLGT (High Level Group Term) de MedDRA" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="CT_SOC_MEDDRA_ID" nullable="true" remarks="ID del catálogo SOC (System Organ Class) de MedDRA" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="CODIGO_SOC" nullable="true" remarks="Código de la clase de sistema orgánico (SOC) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="NAME_SOC" nullable="true" remarks="Nombre de la clase de sistema orgánico (SOC) en MedDRA" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="28" name="CODIGO_ESAVI_CIE10" nullable="true" remarks="Código del ESAVI según clasificación CIE-10" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="29" name="FECHA_ESAVI" nullable="true" remarks="Fecha de inicio del evento supuestamente atribuido a la vacunación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="30" name="FECHA_FINALIZACION" nullable="true" remarks="Fecha de finalización o resolución del ESAVI" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="31" name="DURACION_EVENTO" nullable="true" remarks="Duración del evento adverso" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="32" name="RESULTADO_EVENTO" nullable="true" remarks="Resultado o desenlace del evento adverso" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="33" name="COGIDOCASO" nullable="true" remarks="Código único del caso reportado" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="34" name="CODIGO_DXINICIAL_CIE10" nullable="true" remarks="Código CIE-10 del diagnóstico inicial. Etapa de notificación DHIS2." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="35" name="CODIGO_DXINICIAL_MEDDRA_LLT" nullable="true" remarks="Código LLT MedDRA del diagnóstico inicial" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="36" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_cb2c8bb4e8b7f881b59934bcce1" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_82ef06a261b73ac49594fecea30" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_DESENLACE_ESAVI" numRows="464" remarks="Tabla de desenlace del ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CODDESENLACEESAVI" nullable="true" remarks="Código del desenlace del ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="FECHAMUERTE" nullable="true" remarks="Fecha de fallecimiento del paciente" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="AUTOPSIA" nullable="true" remarks="Indica si se realizó autopsia (si=1, no=0, [no sabe | ignorado | desconoce] = 2, &quot;configuración por defecto para otras opciones no contempladas&quot; = 2)" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="12" name="FECHANOTIFICAMUERTE" nullable="true" remarks="Fecha de notificación del fallecimiento" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="13" name="FECHANOTIFICAMUERTEFETAL" nullable="true" remarks="Fecha de notificación de muerte fetal" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="COMENTARIO_RESULTADO" nullable="true" remarks="Comentarios adicionales sobre el desenlace. Campo utilizado por VigiFlow, en el origen se lo puede localizar en la hoja AEFI en la columna &quot;Resultado&quot;" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="15" name="FECHAINICIOINVESTIGACION" nullable="true" remarks="Fecha de inicio de la investigación del caso" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="CLASIFICACIONFINALCASO" nullable="true" remarks="Clasificación final del caso" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="CLASIFICACIONFINALCASOA" nullable="true" remarks="Clasificación final del caso - Opción A" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="CLASIFICACIONFINALCASOB" nullable="true" remarks="Clasificación final del caso - Opción B" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_6c8b23675f320cdd7baa79b47ca" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="CAUSALIDADESAVI_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_2ea6c3837ce18dc0c91514c6f2a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_3841ebc86e553ac640d1d9c5419" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ESAVI_DURANTE_EMBARAZO" numRows="0" remarks="Tabla de ESAVI durante el embarazo" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TR_ESAVI_DURANTE_EMBARAZO" size="2147483647" type="varchar" typeCode="12">
+            <child catalog="dhi_esavi" column="COUNTRY_MEDI_PROD_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TC_WHODRUG_VACS_TEMP"/>
+            <child catalog="dhi_esavi" column="MA_HOLDER_MEDI_PROD_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TC_WHODRUG_VACS_TEMP"/>
+            <child catalog="dhi_esavi" column="MEDICINAL_PRODUCT_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TC_WHODRUG_VACS_TEMP"/>
+            <child catalog="dhi_esavi" column="PHAR_FORM_MEDI_PROD_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TC_WHODRUG_VACS_TEMP"/>
+            <child catalog="dhi_esavi" column="STRENGTH_MEDI_PROD_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TC_WHODRUG_VACS_TEMP"/>
+            <child catalog="dhi_esavi" column="RID_MEDICINAL_PRODUCT_ID" foreignKey="Implied Constraint" implied="true" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNA"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CODIGOEMBARAZODURANTEESAVI" nullable="false" remarks="Código del embarazo durante el ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="FECHAULTIMAMENSTRUACIONESAVI" nullable="false" remarks="Fecha de la última menstruación durante el ESAVI" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="11" name="FECHAPARTOESAVI" nullable="true" remarks="Fecha del parto relacionado con el ESAVI" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CODIGOMONITOREOPOSTERIORVACUNAESAVI" nullable="false" remarks="Código de monitoreo posterior a la vacuna durante el ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="13" name="CODIGOTIPOCOMPLICACIONESAVI" nullable="false" remarks="Código del tipo de complicación durante el ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="NOMBRECOMPLICACIONEMBARAZOESAVI" nullable="false" remarks="Nombre de la complicación del embarazo durante el ESAVI" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="CODIGOMEDDRACOMPLICACIONEMBARAZOESAVI" nullable="true" remarks="Código MedDRA de la complicación del embarazo durante el ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="OTROSCODIGOSCOMPLICACIONEMBARAZOESAVI" nullable="true" remarks="Otros códigos de complicación del embarazo durante el ESAVI" size="16" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_2e732ab88291e44201540d90618" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_0d672a606d9549f872efc3daeb5" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_ESTABLECIMIENTO" numRows="0" remarks="Tabla de establecimientos de salud gestionados por el ministerio de salud publica" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único del establecimiento" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="UNI_CODIGO" nullable="false" remarks="Código único del establecimiento" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="UNI_NOMBRE" nullable="false" remarks="Nombre del establecimiento" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="PRV_CODIGO" nullable="false" remarks="Código del la provincia en la que está ubicado el establecimiento" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="PRV_DESCRIPCION" nullable="false" remarks="Descripción de la provincia en la que está ubicado el establecimiento" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="CAN_CODIGO" nullable="false" remarks="Código de la canton en la que está ubicado el establecimiento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="CAN_DESCRIPCION" nullable="false" remarks="Descripción de la canton en la que está ubicado el establecimiento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="PAR_CODIGO" nullable="false" remarks="Código de la parroquia en la que está ubicado el establecimiento" size="12" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="PAR_DESCRIPCION" nullable="false" remarks="Descripción de la parroquia en la que está ubicado el establecimiento" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="ZON_CODIGO" nullable="false" remarks="Código de la zona en la que está ubicado el establecimiento" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="ZON_DESCRIPCION" nullable="false" remarks="Descripción de la zona en la que está ubicado el establecimiento" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="DIS_CODIGO" nullable="false" remarks="Código del distrito en la que está ubicado el establecimiento" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="DIS_DESCRIPCION" nullable="false" remarks="Descripción del distrito en la que está ubicado el establecimiento" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="CIR_CODIGO" nullable="false" remarks="Código de la circunscripción en la que está ubicado el establecimiento" size="10" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="TIPO_ENTIDAD" nullable="false" remarks="Tipo de entidad del establecimiento" size="50" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="17" id="23" name="LONGPS" nullable="false" remarks="Longitud del establecimiento" size="17" type="float8" typeCode="8"/>
+         <column autoUpdated="false" defaultValue="null" digits="17" id="24" name="LATGPS" nullable="false" remarks="Latitud del establecimiento" size="17" type="float8" typeCode="8"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="MAIL" nullable="false" remarks="Correo electrónico del establecimiento" size="100" type="varchar" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_ddbf1733807c817e824252ea54f" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="UQ_68d6c8cf2d34a2889b2d498eb99" unique="true">
+            <column ascending="true" name="UNI_CODIGO"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_GRAVEDAD_ESAVI" numRows="464" remarks="Tabla de gravedad del ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TR_GRAVEDAD_ESAVI" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="TIPO_GRAVEDAD" nullable="false" remarks="Tipo de gravedad del ESAVI" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="MUERTE" nullable="true" remarks="Indica si el ESAVI resultó en muerte" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="RIESGO_VIDA" nullable="true" remarks="Indica si el ESAVI puso en riesgo la vida del paciente. En el origen se lo puede localizar con el término &quot;Amenaza a la vida&quot;" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="DISCAPACIDAD" nullable="true" remarks="Indica si el ESAVI resultó en discapacidad" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="HOSPITALIZACION" nullable="true" remarks="Indica si el ESAVI requirió hospitalización" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="ANOMALIA_CONGENITA" nullable="true" remarks="Indica si el ESAVI causó anomalía congénita" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="ABORTO" nullable="true" remarks="Indica si el ESAVI resultó en aborto" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="MUERTE_FETAL" nullable="true" remarks="Indica si el ESAVI resultó en muerte fetal" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="PARTE_EVENTOS_PREOCUPACION" nullable="true" remarks="Indica si forma parte de eventos de especial preocupación" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="SON_EVENTOS_NUEVOS" nullable="true" remarks="Indica si es un evento nuevo no reportado anteriormente" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="DESCRI_EVENTOS_NUEVOS" nullable="true" remarks="Descripción del evento nuevo no reportado anteriormente" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="CONDICION_EGRESO" nullable="true" remarks="Descripción de la condición del paciente al egreso" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_829c783f9a38d828a49d0bdd0e5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_e4b1ab9ea5d0e491403922ba77d" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_HOMOLOGATION" numRows="0" remarks="Regla de transformación asociada a un homologador" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador de la regla" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="HOMOLOGATOR_ID" nullable="false" remarks="FK hacia el homologador" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_89075742a92b5ac905fc816e145" implied="false" onDeleteCascade="true" schema="dhi_esavi" table="TR_HOMOLOGATOR"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="SOURCE_SYSTEM" nullable="false" remarks="Sistema origen (ej. DHIS2, VIGIFLOW)" size="50" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="SOURCE_FIELD" nullable="false" remarks="Nombre del campo en el sistema origen" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="SOURCE_VALUE" nullable="false" remarks="Valor de origen a comparar" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="TARGET_VALUE" nullable="false" remarks="Valor destino (siempre almacenado como string)" size="255" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'EQUALS'::dhi_esavi.&quot;TR_HOMOLOGATION_comparison_type_enum&quot;" digits="0" id="14" name="COMPARISON_TYPE" nullable="false" remarks="Tipo de comparación para evaluar la regla" size="2147483647" type="&quot;dhi_esavi&quot;.&quot;TR_HOMOLOGATION_comparison_type_enum&quot;" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="15" name="CASE_SENSITIVE" nullable="false" remarks="Si la comparación distingue mayúsculas y minúsculas" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="0" digits="0" id="16" name="PRIORITY" nullable="false" remarks="Orden de evaluación (menor número = mayor prioridad)" size="10" type="int4" typeCode="4"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_d76ef19e8c573d788780c048c2e" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_HOMOLOGATOR" numRows="0" remarks="Definición de campos homologables entre sistemas externos e integra-ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador del homologador" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="HOMOLOGATOR_ID" foreignKey="FK_89075742a92b5ac905fc816e145" implied="false" onDeleteCascade="true" schema="dhi_esavi" table="TR_HOMOLOGATION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ENTITY" nullable="false" remarks="Entidad destino (ej. Persona)" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="FIELD" nullable="false" remarks="Campo destino (ej. sexo)" size="100" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="DESCRIPTION" nullable="true" remarks="Descripción del propósito del homologador" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'STRING'::dhi_esavi.&quot;TR_HOMOLOGATOR_target_type_enum&quot;" digits="0" id="12" name="TARGET_TYPE" nullable="false" remarks="Tipo de dato al que se casteará el valor destino en runtime" size="2147483647" type="&quot;dhi_esavi&quot;.&quot;TR_HOMOLOGATOR_target_type_enum&quot;" typeCode="12"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_db27cec7e46aeea5dc6463908a2" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="UQ_055bcfb81f745fb0a41c9174211" unique="true">
+            <column ascending="true" name="ENTITY"/>
+            <column ascending="true" name="FIELD"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_INVESTIGACION" numRows="0" remarks="Tabla que registr la investigación de los casos de ESAVI" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="9" name="FECHA_INVESTIGACION" nullable="true" remarks="Fecha en que se termina la investigación. Variable de la etapa de Clasificación Final en DHIS2" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="VACUNATORIO_CALIDAD" nullable="true" remarks="El vacunatorio cumple con los estándares de calidad" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="PERSONAL_CAPACITADO" nullable="true" remarks="El personal de salud está capacitado en inmunizaciones" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="PROBLEMA_BIOLOGICO" nullable="true" remarks="Evidenció algún problema en el biológico" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="BUSQUEDA_CASOS_SINTOMATOLOGIA_CON_VACUNA" nullable="true" remarks="Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="BUSQUEDA_CASOS_SINTOMATOLOGIA_SIN_VACUNA" nullable="true" remarks="Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="MUESTRA_LABORATORIO" nullable="true" remarks="Muestra de Laboratorio" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_5686b3a55506da355baea2e1de9" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_2c3b3492cc606b07e26c1c091f7" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="REL_5686b3a55506da355baea2e1de" unique="true">
+            <column ascending="true" name="NOTIFICACION_ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_MEDICAMENTO" numRows="579" remarks="Tabla de medicamentos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TR_MEDICAMENTO" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="ROL_MEDICAMENTO" nullable="true" remarks="Rol del medicamento en el evento (sospechoso, concomitante, etc.)" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="CODIGO_ATC" nullable="true" remarks="Código ATC (Anatomical Therapeutic Chemical) del medicamento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="SISTEMA_DE_CODIFICACION" nullable="true" remarks="Sistema de codificación utilizado para el medicamento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="CODIGO_MEDICAMENTO" nullable="true" remarks="Código identificador del medicamento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="NOMBRE_MEDICAMENTO" nullable="true" remarks="Nombre comercial del medicamento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="NOMBRE_MED_PATENTE_WHODRUG" nullable="true" remarks="Nombre del medicamento según la patente del estándar WHODrug. Aquí se registran todos los medicamentos, es decir, para todos los ATC, no solo para J07." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="NOMBRE_NORMALIZADO_MEDICAMENTO" nullable="true" remarks="Nombre normalizado del medicamento" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="CODIGO_FORMA_FARMACEUTICA" nullable="true" remarks="Código de la forma farmacéutica" size="64" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="NOMBRE_FORMA_FARMACEUTICA" nullable="true" remarks="Nombre de la forma farmacéutica (tableta, jarabe, etc.)" size="128" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="CODIGO_VIA_ADMINISTRACION" nullable="true" remarks="Código de la vía de administración" size="64" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="NOMBRE_VIA_ADMINISTRACION" nullable="true" remarks="Nombre de la vía de administración (oral, intravenosa, etc.)" size="64" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_64554398b835f22e2a3fab9d5b9" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_e7ddb0e180482c2e0a3fef5ea50" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_NOTIFICACION" numRows="464" remarks="Tabla de notificaciones" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_00b597a00d3800775f37f915fb3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EMBARAZO"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_9f0af21a79cf1e9fd07d547091c" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_ENFERMEDADES_PREVIAS"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_7c41e9e441b43c13307868491a3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_EVENTO_ADVERSO"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_77bcb1f63f52132b948dfd94849" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ANTECEDENTES_MEDICO"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_770b0d4d23dad76d2293174adbd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_CAUSALIDAD_ESAVI"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_f624dc3e33b3dcffe2935aef898" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNA"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_9d432650d9b72a50ed2778760fe" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATO_VACUNACION"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_cb2c8bb4e8b7f881b59934bcce1" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DATOS_ESAVI"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_6c8b23675f320cdd7baa79b47ca" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_DESENLACE_ESAVI"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_2e732ab88291e44201540d90618" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_ESAVI_DURANTE_EMBARAZO"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_829c783f9a38d828a49d0bdd0e5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_GRAVEDAD_ESAVI"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_5686b3a55506da355baea2e1de9" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_INVESTIGACION"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_64554398b835f22e2a3fab9d5b9" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_MEDICAMENTO"/>
+            <child catalog="dhi_esavi" column="NOTIFICACION_ID" foreignKey="FK_13eed07923f7ad03b3d111683dd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_PACIENTE_EMBARAZADA"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="CTPROVINCIARESIDENCIA_ID" nullable="true" remarks="Provincia de residencia del paciente. FK a catálogo de provincias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_d7dd997fc4d774829559e77b743" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="CTCANTORESIDENCIA_ID" nullable="true" remarks="Cantón de residencia del paciente. FK a catálogo de cantones. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_39fe0a33d7998014c2fc3d2683e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="CTPARROQUIARESIDENCIA_ID" nullable="true" remarks="Parroquia de residencia del paciente. FK a catálogo de parroquias. En DHIS2 solo hay ubicación geográfica del paciente, no del notificador" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_5329e8f623d5f056caa2e3a9b91" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="OTRAPARROQUIARESIDENCIA" nullable="true" remarks="Otra parroquia de residencia del paciente no contemplada en catálogo" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="PESO" nullable="true" remarks="Peso del paciente en kilogramos" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="ALTURA" nullable="true" remarks="Altura del paciente en centímetros" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="15" name="FECHA_NACIMIENTO" nullable="true" remarks="Fecha de nacimiento del paciente" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="EDAD" nullable="true" remarks="Edad del paciente al momento de la notificación" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="LACTANDO" nullable="true" remarks="Indica si la paciente se encuentra lactando. Variable propia de VigiFLow no existente en DHIS2." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="TITULO_NOTIFICADOR" nullable="true" remarks="Título profesional del notificador. Campo exclusivo de VigiFlow." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="19" name="ORGANIZACION_NOTIFICADOR" nullable="true" remarks="Organización o institución del notificador" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="20" name="ORGANIZACION_UNIT_CODIGO" nullable="true" remarks="Código de la unidad organizacional en DHIS2" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="21" name="ORGANIZACION_UNIT" nullable="true" remarks="Nombre de la unidad organizacional" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="22" name="NOMBRE_NOTIFICADOR" nullable="true" remarks="Nombre completo del profesional notificador" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="23" name="IDENTIFICACION_NOTIFICADOR" nullable="true" remarks="Número de identificación del notificador" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="24" name="OTRA_PARROQUIA_NOTIFICADOR" nullable="true" remarks="Otra parroquia del notificador no contemplada en catálogo" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="25" name="COMENTARIO_NOTIFICADOR" nullable="true" remarks="Comentarios adicionales del notificador" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="26" name="CASO_NARRATIVO" nullable="true" remarks="Descripción narrativa del caso clínico" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="27" name="TITULO_REPORTE" nullable="true" remarks="Título del reporte de ESAVI" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="28" name="TIPO_REPORTE" nullable="true" remarks="Tipo de reporte (inicial, seguimiento, final)" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="'Medio electrónico'::character varying" digits="0" id="29" name="MEDIO_NOTIFICACION" nullable="true" remarks="Medio por el cual se realizó la notificación" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="30" name="TIPO_EMISOR" nullable="true" remarks="Tipo de emisor del reporte. 1 = Profesional de la salud, 2 = Paciente / consumidor, 3 = Laboratorio farmacéutico, 4 = Centro regional de farmacovigilancia, 5 = Otro. Para DHIS2 el vlor predeterminado es &quot;1&quot; (Profesional de la salud)." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="31" name="ORGANIZACION_EMISOR" nullable="true" remarks="Organización emisora del reporte" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="32" name="DELEGADO_ORGANIZACION" nullable="true" remarks="Delegado de la organización emisora" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="33" name="NOMBRE_EMISOR" nullable="true" remarks="Nombre del emisor del reporte" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="34" name="ULTIMA_EDICION_REGISTRADA" nullable="true" remarks="Fecha y hora de la última edición registrada" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="35" name="FECHA_NOTIFICACION" nullable="true" remarks="Fecha en que se realizó la notificación. Se asigna para el caso de VigiFlow, desde la columna &quot;Fecha de recepción inicial&quot;" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="36" name="FECHA_REPORTE_NACIONAL" nullable="true" remarks="Fecha del reporte a nivel nacional" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="37" name="FECHA_LLENADO_FICHA" nullable="true" remarks="Fecha en que se llenó la ficha de notificación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="38" name="FECHA_ATENCION" nullable="true" remarks="Fecha de atención médica del paciente" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="39" name="ANTECEDENTE_EVENTO_PREVIO" nullable="true" remarks="Número de antecedentes de eventos adversos previos" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="40" name="ANTECEDENTE_VACUNAL" nullable="true" remarks="Número de antecedentes vacunales del paciente" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="41" name="UNICO_CODIGO_UNIDAD_SALUD" nullable="true" remarks="Código único de la unidad de salud" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="42" name="MONITOREO_ESTABLECIMIENTO_SALUD" nullable="true" remarks="Indicador de monitoreo del establecimiento de salud" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="43" name="CODIGO_DHIS2_EVENTO" nullable="true" remarks="Código del evento de notificación en el sistema DHIS2" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="44" name="CODIGO_VIGIFLOW" nullable="true" remarks="Código de la notificación en el sistema Vigiflow" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="45" name="TIPO_NOTIFICACION" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="46" name="PACIENTE_ID" nullable="true" remarks="Identificador único PK de la tabla TR_PACIENTE" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_31dd86a89addccc76e5f21a44f2" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_PACIENTE"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="47" name="CTUNIDADEDAD_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_58b5a9015c537bd067a78c83c27" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="48" name="CTGRUPOETARIO_ID" nullable="true" remarks="Identificador único pk de la tabla TC_GRUPO_ETARIO" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_d26760563f97d5ec0733a434f8b" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_GRUPO_ETARIO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="49" name="CTPROFESIONNOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_b29facf202418dbf9f700dbaea5" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="50" name="CT_PROVINCIA_NOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_09404250bf2870d57dc4bee9326" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="51" name="CT_CANTON_NOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_476c77cfa7eac246753cf49796a" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="52" name="CT_PARROQUIA_NOTIFICADOR_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_80403944874e5fd64bd7692cef3" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="53" name="CT_ESTADO_REGISTRO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_a1acd5196f12ff1b7cb0081ef28" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_7ce655bbfa60ec3f62a55e8f1a5" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="IDX_5ff7e0d082ac1ca275d3db9e6b" unique="false">
+            <column ascending="true" name="TIPO_NOTIFICACION"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_PACIENTE" numRows="464" remarks="Tabla de pacientes" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TR_PACIENTE" size="2147483647" type="uuid" typeCode="1111">
+            <child catalog="dhi_esavi" column="PACIENTE_ID" foreignKey="FK_31dd86a89addccc76e5f21a44f2" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="NOMBRE" nullable="true" remarks="Nombre completo del paciente. Disponible en DHIS2." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="INICIALES_NOMBRE" nullable="true" remarks="Iniciales del nombre del paciente. Disponible en VigiFlow." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="IDENTIFICACION" nullable="true" remarks="Número de identificación del paciente" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="FECHA_NACIMIENTO" nullable="true" remarks="Fecha de nacimiento del paciente" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="13" name="REGISTRO_SINCRONIZADO" nullable="true" remarks="Indica si el registro ha sido sincronizado con sistemas externos" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="CODIGO_DHIS2_ENTIDAD" nullable="true" remarks="Código único del paciente en el sistema DHIS2" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="CODIGO_VIGIFLOW" nullable="true" remarks="Código único del paciente en el sistema Vigiflow" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="ORIGEN" nullable="false" remarks="" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="CT_SEXO_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_21477babb159d2e7fafd2ad67d6" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="CT_AUTO_IDENTIFICACION_ETNICA_ID" nullable="true" remarks="Identificador del catálogo" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_9cbc56ad3f9d5c4121332c6051e" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TC_CATALOGO"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_1f08f4f0d7a61f8878ff89e7adb" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="IDX_05c25b100828c5f7d34d51b348" unique="false">
+            <column ascending="true" name="ORIGEN"/>
+         </index>
+         <index name="UQ_4ff577c8ff2c90720f455400a92" unique="true">
+            <column ascending="true" name="CODIGO_VIGIFLOW"/>
+         </index>
+         <index name="UQ_fa49909d8a3969f9d3500af6019" unique="true">
+            <column ascending="true" name="CODIGO_DHIS2_ENTIDAD"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_PACIENTE_EMBARAZADA" numRows="464" remarks="Tabla de pacientes embarazadas" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único PK de la tabla TR_PACIENTE_EMBARAZADA" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="EMBARAZADA_MOMENTO_VACUNA" nullable="true" remarks="Indica si la paciente estaba embarazada al momento de la vacunación. Variable de tipo booleana, es parte de proceso de enriquecimiento de datos, su valor se obtiene comprobando si la variable &quot;DNVE ESAVI TRK - Semanas gestación al recibir la vacuna&quot; tiene o no valor. Valores esperados: true=&quot;1&quot;, false=&quot;0&quot;" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="false" digits="0" id="10" name="EMBARAZADA_MOMENTO_ESAVI" nullable="false" remarks="Indica si la paciente estaba embarazada al momento del ESAVI. DHIS2 entrega este valor booleano como texto, donde true=&quot;1&quot; y false=&quot;0&quot;." size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="NOTIFICACION_ID" nullable="true" remarks="Identificador único de la notificación" size="2147483647" type="uuid" typeCode="1111">
+            <parent catalog="dhi_esavi" column="ID" foreignKey="FK_13eed07923f7ad03b3d111683dd" implied="false" onDeleteCascade="false" schema="dhi_esavi" table="TR_NOTIFICACION"/>
+         </column>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_560f093612c0a8ddd8e10decef9" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_SYNC_PROCESS" numRows="26" remarks="Registra los procesos de sincronización con las diferentes fuentes de datos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único del proceso de sincronización" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="NAME" nullable="false" remarks="Nombre del proceso de sincronización" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="10" name="STATUS" nullable="false" remarks="Estado actual del proceso (pendiente, en progreso, completado, error)" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="11" name="START_TIME" nullable="true" remarks="Fecha y hora de inicio del proceso de sincronización" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="12" name="END_TIME" nullable="true" remarks="Fecha y hora de finalización del proceso de sincronización" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="MESSAGE" nullable="true" remarks="Mensaje de éxito del proceso de sincronización" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="ERROR_MESSAGE" nullable="true" remarks="Mensaje de error en caso de fallo del proceso" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="ERROR_STACK" nullable="true" remarks="Stack trace del error ocurrido durante la sincronización" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="16" name="ERROR_TRACE" nullable="true" remarks="Traza detallada del error para depuración" size="2147483647" type="text" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="17" name="DATA_START_DATE" nullable="true" remarks="Fecha de inicio del rango de datos importados" size="13" type="date" typeCode="91"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="18" name="DATA_END_DATE" nullable="true" remarks="Fecha de fin del rango de datos importados" size="13" type="date" typeCode="91"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_a99f2a1c1835bac9dfca7c69c44" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+      </table>
+      <table catalog="dhi_esavi" name="TR_VACUNOMETRO" numRows="0" remarks="Conteo de vacunas para el analisis de los datos" schema="dhi_esavi" type="TABLE">
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="0" name="AUD_FECHA_CREACION" nullable="false" remarks="Fecha de creación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="1" name="AUD_USUARIO_CREACION" nullable="false" remarks="Usuario que creó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="now()" digits="6" id="2" name="AUD_FECHA_ACTUALIZACION" nullable="true" remarks="Fecha de actualización" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="'SYSTEM'::character varying" digits="0" id="3" name="AUD_USUARIO_ACTUALIZACION" nullable="true" remarks="Usuario que actualizó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="4" name="AUD_FECHA_ELIMINACION" nullable="true" remarks="Fecha de eliminación" size="35" type="timestamptz" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="5" name="AUD_USUARIO_ELIMINACION" nullable="true" remarks="Usuario que eliminó el registro" size="60" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="6" name="AUD_HABILITADO" nullable="false" remarks="Indica si el registro está habilitado" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="true" digits="0" id="7" name="AUD_ESTADO" nullable="false" remarks="Indica si el registro está activo" size="1" type="bool" typeCode="-7"/>
+         <column autoUpdated="false" defaultValue="uuid_generate_v4()" digits="0" id="8" name="ID" nullable="false" remarks="Identificador único del registro de vacunómetro" size="2147483647" type="uuid" typeCode="1111"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="9" name="UNICODE" nullable="false" remarks="Código único del establecimiento de salud" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="6" id="10" name="FECHA_APLICACION" nullable="false" remarks="Fecha de aplicación" size="29" type="timestamp" typeCode="93"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="11" name="GRUPO_ETARIO" nullable="false" remarks="Grupo etario de las personas vacunada" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="12" name="NOMBRE_VACUNA" nullable="false" remarks="Nombre de la vacuna" size="2147483647" type="varchar" typeCode="12"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="13" name="TOTAL_HOMBRES" nullable="false" remarks="Sexo de la persona vacunada" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="14" name="TOTAL_MUJERES" nullable="false" remarks="Sexo de la persona vacunada" size="10" type="int4" typeCode="4"/>
+         <column autoUpdated="false" defaultValue="null" digits="0" id="15" name="TOTAL_VACUNADOS" nullable="false" remarks="Cantidad de vacunas aplicadas" size="10" type="int4" typeCode="4"/>
+         <primaryKey column="ID" sequenceNumberInPK="1"/>
+         <index name="PK_c42031a586f750ef0ea3271a0b9" unique="true">
+            <column ascending="true" name="ID"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_CREATED_AT" unique="false">
+            <column ascending="true" name="AUD_FECHA_CREACION"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_FECHA_APLICACION" unique="false">
+            <column ascending="true" name="FECHA_APLICACION"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_FECHA_NOMBRE" unique="false">
+            <column ascending="true" name="FECHA_APLICACION"/>
+            <column ascending="true" name="NOMBRE_VACUNA"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_GRUPO_ETARIO" unique="false">
+            <column ascending="true" name="GRUPO_ETARIO"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_NOMBRE_VACUNA" unique="false">
+            <column ascending="true" name="NOMBRE_VACUNA"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_UNICODIGO" unique="false">
+            <column ascending="true" name="UNICODE"/>
+         </index>
+         <index name="IDX_VACUNOMETRO_UNICODIGO_FECHA" unique="false">
+            <column ascending="true" name="UNICODE"/>
+            <column ascending="true" name="FECHA_APLICACION"/>
+         </index>
+      </table>
+   </tables>
+</database>
