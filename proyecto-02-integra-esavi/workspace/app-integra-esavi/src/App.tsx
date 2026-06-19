@@ -63,7 +63,7 @@ const App = () => {
         options={{ label: "Dashboard" }}
         list={dashboard.list}
       />
-      <Resource name="esavis" list={esavis.list} />
+      <Resource name="esavis" list={esavis.list} show={esavis.show} />
       <Resource name="analisis" list={analisis.list} />
       <Resource name="vacunometro" {...vacunometro} />
       <Resource name="configuraciones" {...configuraciones} />

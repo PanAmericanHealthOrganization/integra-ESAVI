@@ -63,7 +63,7 @@ export const ESAVISList = () => {
   return (
     <Card variant="outlined" sx={{ padding: '10px' }}>
       <List actions={<ListActions />} empty={false}>
-        <Datagrid bulkActionButtons={false}>
+        <Datagrid bulkActionButtons={false} rowClick="show">
           <FunctionField
             label="Id"
             source="id"
