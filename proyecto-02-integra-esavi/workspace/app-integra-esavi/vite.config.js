@@ -6,6 +6,7 @@ export default defineConfig(({ command }) => ({
     server: {
         port: 5173,
         open: command === 'serve',
+        allowedHosts: ['esaviecu.kuyacode.com', 'localhost'],
         watch: {
             ignored: ['**/.pnpm-store/**', '**/node_modules/.pnpm/**']
         }
