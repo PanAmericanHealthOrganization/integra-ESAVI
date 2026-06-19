@@ -4,9 +4,9 @@ set -e
 PSQL="psql -h postgres -U dhis"
 
 echo "==> Creando esquemas en dhi_esavi..."
-$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS dhi_esavi;"
-$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS who_drug;"
-$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS meddra;"
+$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS DHI_ESAVO;"
+$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS WHO_DRUG;"
+$PSQL -d dhi_esavi -c "CREATE SCHEMA IF NOT EXISTS MEDDRA;"
 $PSQL -d dhi_esavi -c 'CREATE SCHEMA IF NOT EXISTS "POSTGRES_INTEGRATOR_DS";'
 $PSQL -d dhi_esavi -c 'CREATE SCHEMA IF NOT EXISTS "DATAQUALITY_DS";'
 
