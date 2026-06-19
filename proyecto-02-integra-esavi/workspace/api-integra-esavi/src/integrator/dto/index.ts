@@ -14,6 +14,7 @@ export { CreateGacetaDto, UpdateGacetaDto, GacetaDto, GacetaFilterDto } from './
 export { CreateGrupoEtarioDto, UpdateGrupoEtarioDto } from './grupo-etario.dto';
 export { CreateMedicamentoDto, UpdateMedicamentoDto } from './medicamento.dto';
 export { CreateNotificacionDto, UpdateNotificacionDto } from './notificacion.dto';
+export { CreateNotificadorDto, UpdateNotificadorDto } from './notificador.dto';
 export { CreatePacienteDto, UpdatePacienteDto } from './paciente.dto';
 export { CreateParametroDto, UpdateParametroDto } from './parametro.dto';
 export { CreateCausalidadEsaviDto, UpdateCausalidadEsaviDto } from './causalidad-esavi.dto';

@@ -8,6 +8,7 @@ import {
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
 import {Paciente} from './paciente.entity';
+import {SourceEnum} from '../enum/source-enum';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -202,5 +203,14 @@ export class Notificacion extends Auditoria {
     comment: 'Código único de la notificación en el sistema origen (VigiFlow o DHIS2)',
   })
   codigoOrigenNotificacion: string;
+
+  @Column({
+    name: 'ORIGEN',
+    type: 'enum',
+    enum: SourceEnum,
+    nullable: true,
+    comment: 'Sistema de origen de la notificación: VIGIFLOW o DHIS2',
+  })
+  origen: SourceEnum;
 
 }

@@ -117,10 +117,10 @@ export class ReporteService {
   async casosEsaviPorSexoGrave(): Promise<string> {
     const query = ` select COALESCE(tc."DESCRIPCION_HOMOLOGADA", 'NO REGISTRA')  AS "sexo",
     count(*) AS "cantidad"
-   from dhi_esavi."TR_PACIENTE" tp inner join
-      dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
-      dhi_esavi."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
-      dhi_esavi."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
+   from DHI_ESAVI."TR_PACIENTE" tp inner join
+      DHI_ESAVI."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
+      DHI_ESAVI."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
+      DHI_ESAVI."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
    group by tc."DESCRIPCION_HOMOLOGADA"`;
 
     try {
@@ -135,10 +135,10 @@ export class ReporteService {
     const query = `
      select COALESCE(tc."DESCRIPCION_HOMOLOGADA", 'NO REGISTRA')  AS "sexo",
     count(*) AS "cantidad"
-   from dhi_esavi."TR_PACIENTE" tp inner join
-      dhi_esavi."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
-      dhi_esavi."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
-      dhi_esavi."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
+   from DHI_ESAVI."TR_PACIENTE" tp inner join
+      DHI_ESAVI."TR_NOTIFICACION" tn on tp."PACIENTE_ID" = tn."PACIENTE_ID" inner join 
+      DHI_ESAVI."TR_GRAVEDAD_ESAVI" tg on tn."ID" = tg."NOTIFICACION_ID" and tg."TIPO_GRAVEDAD" = 'GRAVE' inner join
+      DHI_ESAVI."TC_CATALOGO" tc on tp."CT_SEXO_ID" = tc."CATALOGO_ID" 	 
    group by tc."DESCRIPCION_HOMOLOGADA"
     `;
 
@@ -158,10 +158,10 @@ export class ReporteService {
     count(*) as cantidad, 
     count(tg4."NOTIFICACION_ID") as grave, 
     count(*) - count(tg4."NOTIFICACION_ID") as nograve
-from dhi_esavi."TR_PACIENTE" tp inner join 
-dhi_esavi."TR_NOTIFICACION" tn on tp."ID" = tn."PACIENTE_ID"  inner join 
-dhi_esavi."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."ID" left join  
-(select tg1."NOTIFICACION_ID" from  dhi_esavi."TR_GRAVEDADESAVI" tg1 where (tg1."TIPOGRAVEDAD" = 'GRAVE')) as tg4 on tg4."NOTIFICACION_ID" = tn."NOTIFICACION_ID"
+from DHI_ESAVI."TR_PACIENTE" tp inner join 
+DHI_ESAVI."TR_NOTIFICACION" tn on tp."ID" = tn."PACIENTE_ID"  inner join 
+DHI_ESAVI."TC_CATALOGO" tc on tp."CTSEXO_ID" = tc."ID" left join  
+(select tg1."NOTIFICACION_ID" from  DHI_ESAVI."TR_GRAVEDADESAVI" tg1 where (tg1."TIPOGRAVEDAD" = 'GRAVE')) as tg4 on tg4."NOTIFICACION_ID" = tn."NOTIFICACION_ID"
 where 	 to_char(tn."FECHAREPORTENACIONAL", 'yyyy') = '2021'
 group by to_char(tn."FECHAREPORTENACIONAL", 'yyyymm'),  to_char(tn."FECHAREPORTENACIONAL", 'yyyy'), to_char(tn."FECHAREPORTENACIONAL", 'MM'), to_char(tn."FECHAREPORTENACIONAL", 'TMMonth'), tp."ORIGEN"
 order by 1;`;
@@ -183,7 +183,7 @@ order by 1;`;
     COUNT(CASE WHEN "CTLLTMEDDRA_ID" IS NOT NULL THEN 1 END) AS "total_llt",
     COUNT(CASE WHEN "CTPTMEDDRA_ID" IS NOT NULL THEN 1 END) AS "total_pt",
     COUNT(CASE WHEN "CTSOCMEDDRA_ID" IS NOT NULL THEN 1 END) AS "total_soc"
-    FROM dhi_esavi."TR_DATOSESAVI" td `;
+    FROM DHI_ESAVI."TR_DATOSESAVI" td `;
 
     try {
       const results = await this.pacientRepository.query(query);
@@ -202,7 +202,7 @@ order by 1;`;
     COUNT(CASE WHEN "CTLLTMEDDRA_ID" IS  NULL THEN 1 END) AS "total_llt",
     COUNT(CASE WHEN "CTPTMEDDRA_ID" IS  NULL THEN 1 END) AS "total_pt",
     COUNT(CASE WHEN "CTSOCMEDDRA_ID" IS  NULL THEN 1 END) AS "total_soc"
-    FROM dhi_esavi."TR_DATOSESAVI" td `;
+    FROM DHI_ESAVI."TR_DATOSESAVI" td `;
 
     try {
       const results = await this.pacientRepository.query(query);
@@ -220,7 +220,7 @@ order by 1;`;
     COUNT(*) AS "total_registros",
     COUNT(CASE WHEN "DRUGCODE"  IS not  NULL THEN 1 END) AS "total_whudrug",
     COUNT(CASE WHEN "DRUGCODE"  IS NULL THEN 1 END) AS "total_no_whudrug"
-    FROM dhi_esavi."TR_DATOVACUNA" td
+    FROM DHI_ESAVI."TR_DATOVACUNA" td
     where "NOTIFICACION_ID" is null `;
 
     try {

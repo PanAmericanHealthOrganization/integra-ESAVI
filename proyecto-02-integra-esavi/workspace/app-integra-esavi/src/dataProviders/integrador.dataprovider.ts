@@ -41,6 +41,18 @@ export const integradorDataProvider: DataProvider = {
     const data = await response.json()
     return data
   },
+  importDataVigiflowFromFile: async () => {
+    const response = await fetch(
+      `${INT_ESAV_API}/integrator/vigiflow/bulk-from-file`,
+      {
+        headers: {
+          "X-API-KEY": INT_API_KEY || "",
+        },
+      }
+    )
+    const data = await response.json()
+    return data
+  },
   importDataDHIS2: async (startDate: string, endDate: string) => {
     const response = await fetch(
       `${INT_ESAV_API}/integrator/dhis2/bulk?codigoATC=''&fechaInicio=${startDate}&fechaFin=${endDate}`,

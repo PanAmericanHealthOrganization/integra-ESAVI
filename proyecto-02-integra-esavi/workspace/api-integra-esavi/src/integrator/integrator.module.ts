@@ -13,6 +13,7 @@ import {DesenlaceEsaviController} from './controller/desenlace-esavi.controller'
 import {IntegradorController} from './controller/integrador.controller';
 import {InvestigacionController} from './controller/investigacion.controller';
 import {NotificacionController} from './controller/notificacion.controller';
+import {NotificadorController} from './controller/notificador.controller';
 import {PacienteEmbarazadaController} from './controller/paciente-embarazada.controller';
 import {PacienteVigiflowController} from './controller/paciente-vigiflow.controller';
 import {PacienteController} from './controller/paciente.controller';
@@ -38,6 +39,7 @@ import {
   GravedadEsavi,
   Medicamento,
   Notificacion,
+  Notificador,
   Paciente,
   PacienteEmbarazada,
   Parametro,
@@ -78,6 +80,7 @@ import {
   SeedService,
 } from './service';
 import {CtIcd10meddraService} from './service/ct-icd10meddra.service';
+import {NotificadorService} from './service/notificador.service';
 import {CtSymptom2lltService} from './service/ct-symptom2llt.service';
 import {EstablecimientosService} from './service/establecimientos.service';
 import {InvestigacionService} from './service/investigacion.service';
@@ -131,6 +134,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Investigacion,
         Medicamento,
         Notificacion,
+        Notificador,
         Paciente,
         PacienteEmbarazada,
         Parametro,
@@ -165,6 +169,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     PacienteController,
     ParametroController,
     GacetaController,
+    NotificadorController,
   ],
   providers: [
     SyncService,
@@ -201,6 +206,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     WhodrugVacsTempService,
     WhodrugHomologaVacsService,
     GacetaService,
+    NotificadorService,
   ],
   exports: [
     SyncService,
@@ -218,6 +224,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DatoEsaviService,
     AntecedenteEmbarazoService,
     VacunometroService,
+    NotificadorService,
   ],
 })
 export class IntegratorModule {}

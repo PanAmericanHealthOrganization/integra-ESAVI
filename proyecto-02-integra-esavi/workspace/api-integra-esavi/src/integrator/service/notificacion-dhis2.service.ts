@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateNotificacionDto } from '../dto';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Paciente } from '../entity/paciente.entity';
+import { SourceEnum } from '../enum/source-enum';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 import { CatalogoService } from './catalogo.service';
 
@@ -106,6 +107,7 @@ export class NotificacionDhis2Service {
       } else {
         // Si no existe, creamos una nueva notificación
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoDhis2Evento }) as Notificacion;
+        notificacion.origen = SourceEnum.DHIS2;
 
         // Asignamos las propiedades de la notificación
         if (createDto.unidadEdadPaciente) {
@@ -355,6 +357,7 @@ export class NotificacionDhis2Service {
     // Actualizamos el paciente y quién creó la notificación
     notificacionExistente.paciente = pacienteUUID;
     notificacionExistente.createdBy = 'system';
+    notificacionExistente.origen = SourceEnum.DHIS2;
     notificacionExistente.fechaAtencion = createDto.fechaAtencion;
     notificacionExistente.fechaNotificacion = createDto.fechaNotificacion;
     notificacionExistente.edad = createDto.edad;

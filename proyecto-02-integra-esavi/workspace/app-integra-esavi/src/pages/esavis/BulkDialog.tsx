@@ -47,6 +47,16 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
             }
         }
 
+        if (selectedOption === 'vigiflow-file') {
+            respuesta = await integradorDataProvider.importDataVigiflowFromFile();
+            console.log('respuesta:: ', respuesta);
+            if (respuesta.status === 'OK') {
+                setResponse(`${respuesta.msg}`);
+            } else {
+                setResponse(`Error: ${respuesta.msg}`);
+            }
+        }
+
         if (selectedOption === 'dhis2') {
             // Llamada al servicio de DHIS2 con las fechas formateadas
             respuesta = await integradorDataProvider.importDataDHIS2(startDateFormatted, endDateFormatted);
@@ -62,8 +72,8 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
         setLoading(false);
     };
 
-    // Lógica para habilitar el botón de "Importar" solo si las fechas están completas
-    const isButtonDisabled = !selectedOption || (startDate === '' || endDate === '');
+    const needsDates = selectedOption === 'vigiflow' || selectedOption === 'dhis2';
+    const isButtonDisabled = !selectedOption || (needsDates && (startDate === '' || endDate === ''));
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -85,6 +95,15 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
                     <FormControlLabel
                         control={
                             <Checkbox
+                                checked={selectedOption === 'vigiflow-file'}
+                                onChange={() => handleCheckboxChange('vigiflow-file')}
+                            />
+                        }
+                        label="Vigiflow (desde archivo)"
+                    />
+                    <FormControlLabel
+                        control={
+                            <Checkbox
                                 checked={selectedOption === 'dhis2'}
                                 onChange={() => handleCheckboxChange('dhis2')}
                             />
@@ -93,7 +112,7 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
                     />
                 </div>
 
-                {(selectedOption === 'vigiflow' || selectedOption === 'dhis2') && (
+                {needsDates && (
                     <div style={{ marginTop: 20 }}>
                         <TextField
                             label="Fecha de Inicio"

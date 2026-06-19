@@ -99,21 +99,12 @@ export const ESAVISList = () => {
             )}
           />
           <FunctionField
-            label="Código Origen"
-            render={(record: any) => {
-              return record.codigoVigiflow && record.codigoVigiflow !== ""
-                ? "VIGIFLOW"
-                : "DHIS2"
-            }}
+            label="Origen"
+            render={(record: any) => record.origen ?? "--"}
           />
           <FunctionField
             label="Código Origen"
-            render={(record: any) => {
-              // Si codigoVigiflow tiene un valor válido (no es null, undefined ni vacío), se muestra, si no se muestra codigoDhis2Evento
-              return record.codigoVigiflow && record.codigoVigiflow !== ""
-                ? record.codigoVigiflow
-                : (record.codigoDhis2Evento ?? "--") // Si codigoDhis2Evento no está disponible, muestra '--'
-            }}
+            render={(record: any) => record.codigoOrigenNotificacion ?? "--"}
           />
           {/* <TextField label="Fecha Notificación" source="fechaNotificacion" /> */}
           <FunctionField
