@@ -1,11 +1,11 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Drug } from '../models/drug.entity';
-import { uuidGenerator } from '../utils/utils';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {Drug} from '../models/drug.entity';
+import {uuidGenerator} from '../utils/utils';
 
 export class WhoDrugsAsAnyService {
   constructor(
-    @InjectRepository(Drug, 'who_drug')
+    @InjectRepository(Drug, 'WHO_DRUG')
     private readonly drug: Repository<Drug>,
   ) {}
 

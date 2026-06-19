@@ -1,25 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
-import { MeddraStandarDto } from '../models/dto';
-import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
-import { CIE10ES } from '../models/standar/cie_10_meddra.entity';
-import { LLT } from '../models/standar/llt.entity';
-import { PT } from '../models/standar/pt.entity';
-import { SOC } from '../models/standar/soc.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {ILike,Repository} from 'typeorm';
+import {MeddraStandarDto} from '../models/dto';
+import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
+import {CIE10ES} from '../models/standar/cie_10_meddra.entity';
+import {LLT} from '../models/standar/llt.entity';
+import {PT} from '../models/standar/pt.entity';
+import {SOC} from '../models/standar/soc.entity';
 
 @Injectable()
 export class MeddraStandarService {
   constructor(
-    @InjectRepository(LLT, 'meddra')
+    @InjectRepository(LLT, 'MEDDRA')
     private readonly lltRepository: Repository<LLT>,
-    @InjectRepository(PT, 'meddra')
+    @InjectRepository(PT, 'MEDDRA')
     private readonly ptRepository: Repository<PT>,
-    @InjectRepository(SOC, 'meddra')
+    @InjectRepository(SOC, 'MEDDRA')
     private readonly socRepository: Repository<SOC>,
-    @InjectRepository(cie10Meddra, 'meddra')
+    @InjectRepository(cie10Meddra, 'MEDDRA')
     private readonly cie10MeddraRepository: Repository<cie10Meddra>,
-    @InjectRepository(CIE10ES, 'meddra')
+    @InjectRepository(CIE10ES, 'MEDDRA')
     private readonly CIE10ESRepository: Repository<CIE10ES>,
   ) {}
 

@@ -144,6 +144,14 @@ export class DatoVacunaService {
    * @param createDto
    * @returns
    */
+  async findByNotificacionId(notificacionId: string): Promise<DatoVacuna[]> {
+    return this.datoVacunaRepository.find({
+      where: { notificacion: { id: notificacionId } },
+      relations: ['rolVacuna'],
+      order: { createdAt: 'ASC' },
+    });
+  }
+
   async findByNotifIdDtoMinimo(uuidNotificacion: string): Promise<DatoVacuna[]> {
     try {
       const datosVacuna = await this.datoVacunaRepository.find({

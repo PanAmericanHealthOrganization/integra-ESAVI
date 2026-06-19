@@ -212,7 +212,7 @@ export class DimConsistenciaService {
         count(tp."${columna}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION") "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tp."${idColumn}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION"), '[]') as "idNotificacionesNoValidos"
         from
-          DHI_ESAVI."${evalItem.tabla}" tp
+          "DHI_ESAVI"."${evalItem.tabla}" tp
         where tp."AUD_FECHA_CREACION" <= '${day.toISOString()}';`;
         const result = await this.dataSource.query(query);
         //
@@ -252,8 +252,8 @@ export class DimConsistenciaService {
         ), '[]'
       ) as "idNotificacionesNoValidos"
       from
-      DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
       where
       tn."FECHA_NOTIFICACION" is not null
       and tp."FECHA_NACIMIENTO" is not null
@@ -289,8 +289,8 @@ export class DimConsistenciaService {
       count(*) filter (where tn."EDAD" < 0) as "totalRegistrosNoValidos",
       coalesce(json_agg(DISTINCT tn."ID") filter (where tn."EDAD" < 0), '[]') as "idNotificacionesNoValidos"
       from 
-      DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
       where
       tn."EDAD" is not null AND
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
@@ -323,7 +323,7 @@ export class DimConsistenciaService {
       count(*) filter (where tn."FECHA_NOTIFICACION" is null) as "totalRegistrosNoValidos",
       coalesce(json_agg(DISTINCT tn."ID") filter (where tn."FECHA_NOTIFICACION" is null), '[]') as "idNotificacionesNoValidos"
       from 
-      DHI_ESAVI."TR_NOTIFICACION" tn
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
       where
       tn."FECHA_NOTIFICACION" is not null
       and
@@ -357,8 +357,8 @@ export class DimConsistenciaService {
       count(*) filter (where tde."NAME_LLT" is null) as "totalRegistrosNoValidos",
       coalesce(json_agg(DISTINCT tn."ID") filter (where tde."NAME_LLT" is null), '[]') as "idNotificacionesNoValidos"
       from
-      DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_DATOS_ESAVI" tde on
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
       tde."NOTIFICACION_ID" = tn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
@@ -419,12 +419,12 @@ export class DimConsistenciaService {
         ) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (where tp."FECHA_NACIMIENTO" >= tdv."FECHA_VACUNACION" or tp."FECHA_NACIMIENTO" >= tde."FECHA_ESAVI" or tp."FECHA_NACIMIENTO" >= tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
         tn."PACIENTE_ID"= tp."ID" 
-      inner join DHI_ESAVI."TR_DATOS_ESAVI" tde on
+      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
         tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
       where
         tn."FECHA_NOTIFICACION" is not null
@@ -469,10 +469,10 @@ export class DimConsistenciaService {
         or tdv."DRUG_NAME" is null) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."DRUG_NAME" is null), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdvn on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdvn on
         tdvn."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNA" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNA" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
@@ -515,12 +515,12 @@ export class DimConsistenciaService {
         ) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (where tdv."FECHA_VACUNACION" < tp."FECHA_NACIMIENTO" or tdv."FECHA_VACUNACION" > tde."FECHA_ESAVI" or tdv."FECHA_VACUNACION" > tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
         tn."PACIENTE_ID" = tp."ID" 
-      inner join DHI_ESAVI."TR_DATOS_ESAVI" tde on
+      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
         tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
       where
         tn."FECHA_NOTIFICACION" is not null
@@ -567,12 +567,12 @@ export class DimConsistenciaService {
         ) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (where tde."FECHA_ESAVI" < tp."FECHA_NACIMIENTO" or tde."FECHA_ESAVI" > tdv."FECHA_VACUNACION" or tde."FECHA_ESAVI" > tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
         tp."ID" = tn."PACIENTE_ID"
-      inner join DHI_ESAVI."TR_DATOS_ESAVI" tde on
+      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
         tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
       where
         tn."FECHA_NOTIFICACION" is not null
@@ -627,12 +627,12 @@ export class DimConsistenciaService {
       ), '[]'
       ) as "idNotificacionesNoValidos"
       from
-      DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
       tp."ID" = tn."PACIENTE_ID"
-      inner join DHI_ESAVI."TR_DATOS_ESAVI" tde on
+      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
       tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
       tdv."NOTIFICACION_ID" = tn."ID"
       where
       tn."FECHA_NOTIFICACION" is not null
@@ -698,16 +698,16 @@ export class DimConsistenciaService {
             or tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
         ), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
         tp."ID" = tn."PACIENTE_ID"
-      inner join DHI_ESAVI."TR_DESENLACE_ESAVI" tde on
+      inner join "DHI_ESAVI"."TR_DESENLACE_ESAVI" tde on
         tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DATO_VACUNACION" tdv on
+      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
         tdv."NOTIFICACION_ID" = tn."ID"
-      left join DHI_ESAVI."TR_DATOS_ESAVI" tde2 on
+      left join "DHI_ESAVI"."TR_DATOS_ESAVI" tde2 on
         tde2."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_GRAVEDAD_ESAVI" tge on
+      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tge on
         tge."NOTIFICACION_ID" = tn."ID"
       where
         tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
@@ -782,8 +782,8 @@ export class DimConsistenciaService {
       ), '[]') as "idNotificacionesNoValidos"
       
       from
-      DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_GRAVEDAD_ESAVI" tde on
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tde on
       tde."NOTIFICACION_ID" = tn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${date.toISOString()}'
@@ -847,10 +847,10 @@ export class DimConsistenciaService {
             )
         ), '[]') as "idNotificacionesNoValidos" 
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_GRAVEDAD_ESAVI" tde on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tde on
         tde."NOTIFICACION_ID" = tn."ID"
-      inner join DHI_ESAVI."TR_DESENLACE_ESAVI" tde2 on
+      inner join "DHI_ESAVI"."TR_DESENLACE_ESAVI" tde2 on
         tde2."NOTIFICACION_ID" = tn."ID"
       where
         tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
@@ -891,12 +891,12 @@ export class DimConsistenciaService {
             and upper(tc."DESCRIPCION_HOMOLOGADA") != 'MUJER'
         ), '[]') as "idNotificacionesNoValidos"
       from
-        DHI_ESAVI."TR_NOTIFICACION" tn
-      inner join DHI_ESAVI."TR_PACIENTE" tp on
+        "DHI_ESAVI"."TR_NOTIFICACION" tn
+      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
         tp."ID" = tn."PACIENTE_ID"
-      inner join DHI_ESAVI."TR_PACIENTE_EMBARAZADA" tpe on
+      inner join "DHI_ESAVI"."TR_PACIENTE_EMBARAZADA" tpe on
         tpe."NOTIFICACION_ID" = tn."ID"
-      left join DHI_ESAVI."TC_CATALOGO" tc on
+      left join "DHI_ESAVI"."TC_CATALOGO" tc on
         tc."ID" = tp."CT_SEXO_ID"
       where
         tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'

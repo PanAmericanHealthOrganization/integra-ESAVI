@@ -170,9 +170,9 @@ export class GeneralService {
       tp."NOMBRE",
       tp."IDENTIFICACION"
       FROM
-      DHI_ESAVI."TR_NOTIFICACION" tn
+      "DHI_ESAVI"."TR_NOTIFICACION" tn
       INNER JOIN 
-      DHI_ESAVI."TR_PACIENTE" tp 
+      "DHI_ESAVI"."TR_PACIENTE" tp 
       ON
       tp."ID" = tn."PACIENTE_ID"
       WHERE

@@ -4,6 +4,7 @@ import {plainToClass} from 'class-transformer';
 import {Repository} from 'typeorm';
 import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
 import {Notificacion} from '../entity/notificacion.entity';
+import {Notificador} from '../entity/notificador.entity';
 import {Paciente} from '../entity/paciente.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
@@ -210,7 +211,7 @@ export class NotificacionVigiflowService {
     
   }//;
 
-  async update(notificacion: Notificacion, updateNotificacion: UpdateNotificacionDto) {
+  async update(notificacion: Notificacion, updateNotificacion: UpdateNotificacionDto, notificador?: Notificador) {
     try {
       if (updateNotificacion.profesionNotificadorParam) {
         try {
@@ -229,10 +230,13 @@ export class NotificacionVigiflowService {
       notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;
       notificacion.tipoEmisor = updateNotificacion.tipoEmisor;
 
+      if (notificador) {
+        notificacion.notificador = notificador;
+      }
 
-      await this.notificacionRepository.update(notificacion.id, notificacion);
+      await this.notificacionRepository.save(notificacion);
     } catch (error) {
-      console.error('Error al actualizar el paciente:', error);
+      console.error('Error al actualizar la notificacion:', error);
       throw error;
     }
   }

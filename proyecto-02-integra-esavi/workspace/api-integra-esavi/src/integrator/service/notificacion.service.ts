@@ -114,15 +114,21 @@ export class NotificacionService {
     if (params.filter && typeof params.filter === 'object') {
       Object.entries(params.filter).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          // Puedes personalizar aquí para filtros especiales como rangos de fechas, etc.
           if (key === 'fechaDesde') {
-            query.andWhere('notificacion.fechaNotificacion >= :fechaDesde', {
-              fechaDesde: value,
-            });
+            query.andWhere('notificacion.fechaNotificacion >= :fechaDesde', { fechaDesde: value });
           } else if (key === 'fechaHasta') {
-            query.andWhere('notificacion.fechaNotificacion <= :fechaHasta', {
-              fechaHasta: value,
+            query.andWhere('notificacion.fechaNotificacion <= :fechaHasta', { fechaHasta: value });
+          } else if (key === 'identificacion') {
+            query.leftJoin('notificacion.paciente', 'paciente')
+                 .andWhere('UPPER(paciente.identificacion) LIKE UPPER(:identificacion)', {
+                   identificacion: `%${value}%`,
+                 });
+          } else if (key === 'codigoOrigenNotificacion') {
+            query.andWhere('UPPER(notificacion.codigoOrigenNotificacion) LIKE UPPER(:codigoOrigenNotificacion)', {
+              codigoOrigenNotificacion: `%${value}%`,
             });
+          } else if (key === 'origen') {
+            query.andWhere('notificacion.origen = :origen', { origen: value });
           } else {
             query.andWhere(`notificacion.${key} = :${key}`, { [key]: value });
           }

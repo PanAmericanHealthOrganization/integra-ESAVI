@@ -200,6 +200,13 @@ export class DatoEsaviService {
     throw new EntityNotFoundException('DatoEsavi', uuid);
   }
 
+  async findByNotificacionId(notificacionId: string): Promise<DatoEsavi[]> {
+    return this.datoEsaviRepository.find({
+      where: { notificacion: { id: notificacionId } },
+      order: { fechaEsavi: 'ASC' },
+    });
+  }
+
   async update(uuid: string, updateDatoEsaviDto: UpdateDatoEsaviDto): Promise<DatoEsavi> {
     const datoVacuna = await this.findOne(uuid);
     this.datoEsaviRepository.merge(datoVacuna, updateDatoEsaviDto);

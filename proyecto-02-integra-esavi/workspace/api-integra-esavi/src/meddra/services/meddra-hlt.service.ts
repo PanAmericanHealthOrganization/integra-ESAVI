@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { LLT } from '../models/standar/llt.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {LLT} from '../models/standar/llt.entity';
 
 @Injectable()
 export class MeddraLLTService {
   constructor(
-    @InjectRepository(LLT, 'meddra')
+    @InjectRepository(LLT, 'MEDDRA')
     private readonly lltRepository: Repository<LLT>,
   ) {}
 

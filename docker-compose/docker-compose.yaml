@@ -5,14 +5,14 @@ services:
     environment:
       POSTGRES_USER: dhis
       POSTGRES_PASSWORD: dhis
-      POSTGRES_DB: dhi_esavi
+      POSTGRES_DB: DHI_ESAVI
       TZ: America/Guayaquil
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dhis -d dhi_esavi"]
+      test: ["CMD-SHELL", "pg_isready -U dhis -d DHI_ESAVI"]
       interval: 10s
       timeout: 5s
       retries: 5

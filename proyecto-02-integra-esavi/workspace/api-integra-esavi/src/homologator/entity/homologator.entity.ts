@@ -5,7 +5,7 @@ import { Homologation } from './homologation.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
-  name: 'TR_HOMOLOGATOR',
+  name: 'TR_HOMOLOGADOR',
   comment: 'Definición de campos homologables entre sistemas externos e integra-ESAVI',
 })
 @Unique(['entity', 'field'])

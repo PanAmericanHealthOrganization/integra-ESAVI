@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
+import {Notificador} from './notificador.entity';
 import {Paciente} from './paciente.entity';
 import {SourceEnum} from '../enum/source-enum';
 
@@ -85,9 +86,13 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @ManyToOne(() => Catalogo, { nullable: true })
   @JoinColumn({ name: 'CTPROFESIONNOTIFICADOR_ID' })
   profesionNotificador: Catalogo;
+
+  @ManyToOne(() => Notificador, { nullable: true, eager: false })
+  @JoinColumn({ name: 'NOTIFICADOR_ID', referencedColumnName: 'identificacion' })
+  notificador: Notificador;
 
  
 

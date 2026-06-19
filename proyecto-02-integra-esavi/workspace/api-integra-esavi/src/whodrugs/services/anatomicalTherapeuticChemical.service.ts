@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AnatomicalTherapeuticChemical } from '../models/atomicTerapeutalChemical.entity';
-import { Repository } from 'typeorm';
-import { IATC } from '../models/dtos';
-import { Drug } from '../models/drug.entity';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {Repository} from 'typeorm';
+import {AnatomicalTherapeuticChemical} from '../models/atomicTerapeutalChemical.entity';
+import {Drug} from '../models/drug.entity';
+import {IATC} from '../models/dtos';
 
 @Injectable()
 export class AnatomicalTherapeuticChemicalService {
   constructor(
-    @InjectRepository(AnatomicalTherapeuticChemical, 'who_drug')
+    @InjectRepository(AnatomicalTherapeuticChemical, 'WHO_DRUG')
     private readonly drugRepository: Repository<AnatomicalTherapeuticChemical>,
   ) {}
 

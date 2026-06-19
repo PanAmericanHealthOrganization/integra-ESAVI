@@ -6,14 +6,28 @@ import {
   ExportButton,
   FunctionField,
   List,
+  SelectInput,
   TextInput,
   TopToolbar,
 } from "react-admin"
 import BulkDialog from "./BulkDialog"
 
+const origenChoices = [
+  { id: "VIGIFLOW", name: "VigiFlow" },
+  { id: "DHIS2", name: "DHIS2" },
+]
+
 const postFilters = [
-  <TextInput label="Origen" source="origen" alwaysOn />,
+  <SelectInput
+    label="Origen"
+    source="origen"
+    choices={origenChoices}
+    alwaysOn
+    emptyText="Todos"
+    emptyValue=""
+  />,
   <TextInput label="Identificación" source="identificacion" alwaysOn />,
+  <TextInput label="Código Origen" source="codigoOrigenNotificacion" alwaysOn />,
 ]
 
 const ListActions = () => {
@@ -62,7 +76,7 @@ export const ESAVISList = () => {
 
   return (
     <Card variant="outlined" sx={{ padding: '10px' }}>
-      <List actions={<ListActions />} empty={false}>
+      <List actions={<ListActions />} filters={postFilters} empty={false}>
         <Datagrid bulkActionButtons={false} rowClick="show">
           <FunctionField
             label="Id"

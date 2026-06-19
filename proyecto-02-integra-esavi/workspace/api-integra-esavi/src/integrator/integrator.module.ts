@@ -52,8 +52,6 @@ import {CtIcd10meddra} from './entity/ct-icd10meddra.entity';
 import {CtSymptom2llt} from './entity/ct-symptom2llt.entity';
 import {Establecimiento} from './entity/establecimiento.entity';
 import {Investigacion} from './entity/investigacion.entity';
-import {WhodrugHomologaVacs} from './entity/whodrug-homologavacs.entity';
-import {WhodrugVacsTemp} from './entity/whodrug-vacstemp.entity';
 import {IntegradorService} from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
@@ -87,8 +85,6 @@ import {InvestigacionService} from './service/investigacion.service';
 import {PacienteService} from './service/paciente.service';
 import {SyncService} from './service/sync.service';
 import {VacunometroService} from './service/vacunometro.service';
-import {WhodrugHomologaVacsService} from './service/whodrug-homologavacs.service';
-import {WhodrugVacsTempService} from './service/whodrug-vacstemp.service';
 
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
@@ -123,8 +119,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         CausalidadEsavi,
         CtIcd10meddra,
         CtSymptom2llt,
-        WhodrugHomologaVacs,
-        WhodrugVacsTemp,
         DatoEsavi,
         DatoVacuna,
         DatoVacunacion,
@@ -203,8 +197,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     InvestigacionService,
     CtSymptom2lltService,
     CtIcd10meddraService,
-    WhodrugVacsTempService,
-    WhodrugHomologaVacsService,
     GacetaService,
     NotificadorService,
   ],
@@ -213,8 +205,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     IntegradorService,
     CtIcd10meddraService,
     CtSymptom2lltService,
-    WhodrugVacsTempService,
-    WhodrugHomologaVacsService,
     PacienteService,
     MedicamentoService,
     NotificacionVigiflowService,

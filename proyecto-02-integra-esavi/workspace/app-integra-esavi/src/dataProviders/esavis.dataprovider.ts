@@ -68,7 +68,7 @@ export const esaviDataProvider: DataProvider = {
 
     try {
       const response = await intESAVIClient.get(
-        `${ENDPOINTS.NOTIFICACIONES}/${id}`
+        `${ENDPOINTS.NOTIFICACIONES}/${id}?r=notificador,notificador.profesion`
       )
 
       return {

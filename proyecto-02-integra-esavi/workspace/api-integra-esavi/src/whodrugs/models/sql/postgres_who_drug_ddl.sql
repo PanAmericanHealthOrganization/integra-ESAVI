@@ -1,23 +1,23 @@
--- DROP SCHEMA who_drug;
-CREATE SCHEMA who_drug AUTHORIZATION dhis;
+-- DROP SCHEMA WHO_DRUG;
+CREATE SCHEMA WHO_DRUG AUTHORIZATION dhis;
 
--- DROP TYPE who_drug.active_ingredients_audit_action_enum;
-CREATE TYPE who_drug.active_ingredients_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.active_ingredients_audit_action_enum;
+CREATE TYPE WHO_DRUG.active_ingredients_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.atomic_therapeutic_chemicals_audit_action_enum;
-CREATE TYPE who_drug.atomic_therapeutic_chemicals_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.atomic_therapeutic_chemicals_audit_action_enum;
+CREATE TYPE WHO_DRUG.atomic_therapeutic_chemicals_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.country_sales_audit_action_enum;
-CREATE TYPE who_drug.country_sales_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.country_sales_audit_action_enum;
+CREATE TYPE WHO_DRUG.country_sales_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.drug_audit_action_enum;
-CREATE TYPE who_drug.drug_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.drug_audit_action_enum;
+CREATE TYPE WHO_DRUG.drug_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.drug_sync_audit_action_enum;
-CREATE TYPE who_drug.drug_sync_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.drug_sync_audit_action_enum;
+CREATE TYPE WHO_DRUG.drug_sync_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.drug_sync_drs_sync_status_enum;
-CREATE TYPE who_drug.drug_sync_drs_sync_status_enum AS ENUM (
+-- DROP TYPE WHO_DRUG.drug_sync_drs_sync_status_enum;
+CREATE TYPE WHO_DRUG.drug_sync_drs_sync_status_enum AS ENUM (
     'STARTED',
     'SYNCHRONIZING',
     'FINISHED',
@@ -25,21 +25,21 @@ CREATE TYPE who_drug.drug_sync_drs_sync_status_enum AS ENUM (
     'FAILDED'
 );
 
--- DROP TYPE who_drug.ingredient_translation_audit_action_enum;
-CREATE TYPE who_drug.ingredient_translation_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.ingredient_translation_audit_action_enum;
+CREATE TYPE WHO_DRUG.ingredient_translation_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- DROP TYPE who_drug.maholder_audit_action_enum;
-CREATE TYPE who_drug.maholder_audit_action_enum AS ENUM ('0', '1', '2', '3');
+-- DROP TYPE WHO_DRUG.maholder_audit_action_enum;
+CREATE TYPE WHO_DRUG.maholder_audit_action_enum AS ENUM ('0', '1', '2', '3');
 
--- who_drug.drug_sync definition
+-- WHO_DRUG.drug_sync definition
 -- Drop table
--- DROP TABLE who_drug.drug_sync;
-CREATE TABLE who_drug.drug_sync (
+-- DROP TABLE WHO_DRUG.drug_sync;
+CREATE TABLE WHO_DRUG.drug_sync (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.drug_sync_audit_action_enum DEFAULT '0' :: who_drug.drug_sync_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.drug_sync_audit_action_enum DEFAULT '0' :: WHO_DRUG.drug_sync_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -52,7 +52,7 @@ CREATE TABLE who_drug.drug_sync (
     -- SHA-256 hash del archivo
     drs_start_sync_date timestamp NOT NULL,
     drs_end_sync_date timestamp NULL,
-    drs_sync_status who_drug.drug_sync_drs_sync_status_enum DEFAULT 'STARTED' :: who_drug.drug_sync_drs_sync_status_enum NOT NULL,
+    drs_sync_status WHO_DRUG.drug_sync_drs_sync_status_enum DEFAULT 'STARTED' :: WHO_DRUG.drug_sync_drs_sync_status_enum NOT NULL,
     audit_action_by varchar NULL,
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_ee106e8e477b55b042054549a55" PRIMARY KEY (id),
@@ -60,26 +60,26 @@ CREATE TABLE who_drug.drug_sync (
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.drug_sync.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.drug_sync.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.drug_sync.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.drug_sync.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.drug_sync.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.drug_sync.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.drug_sync.drs_sha_256 IS 'SHA-256 hash del archivo';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.drs_sha_256 IS 'SHA-256 hash del archivo';
 
-COMMENT ON COLUMN who_drug.drug_sync.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.drug_sync.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.med_llt definition
+-- WHO_DRUG.med_llt definition
 -- Drop table
--- DROP TABLE who_drug.med_llt;
-CREATE TABLE who_drug.med_llt (
+-- DROP TABLE WHO_DRUG.med_llt;
+CREATE TABLE WHO_DRUG.med_llt (
     id varchar NOT NULL,
     llt_code varchar NOT NULL,
     llt_name varchar NOT NULL,
@@ -96,10 +96,10 @@ CREATE TABLE who_drug.med_llt (
     CONSTRAINT "PK_0e4d1924a2aff5e38a9ad49f3dd" PRIMARY KEY (id)
 );
 
--- who_drug.med_pt definition
+-- WHO_DRUG.med_pt definition
 -- Drop table
--- DROP TABLE who_drug.med_pt;
-CREATE TABLE who_drug.med_pt (
+-- DROP TABLE WHO_DRUG.med_pt;
+CREATE TABLE WHO_DRUG.med_pt (
     id varchar NOT NULL,
     pt_code varchar NOT NULL,
     pt_name varchar NOT NULL,
@@ -115,15 +115,15 @@ CREATE TABLE who_drug.med_pt (
     CONSTRAINT "PK_947d85de21828abcf1aa243fbd8" PRIMARY KEY (id)
 );
 
--- who_drug.drug definition
+-- WHO_DRUG.drug definition
 -- Drop table
--- DROP TABLE who_drug.drug;
-CREATE TABLE who_drug.drug (
+-- DROP TABLE WHO_DRUG.drug;
+CREATE TABLE WHO_DRUG.drug (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.drug_audit_action_enum DEFAULT '0' :: who_drug.drug_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.drug_audit_action_enum DEFAULT '0' :: WHO_DRUG.drug_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -142,35 +142,35 @@ CREATE TABLE who_drug.drug (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_84d53e7c3b5e562421850eb9723" PRIMARY KEY (id),
     CONSTRAINT "UQ_84d53e7c3b5e562421850eb9723" UNIQUE (id),
-    CONSTRAINT "FK_4218e02f645245ef75ca09dfd15" FOREIGN KEY (drs_id) REFERENCES who_drug.drug_sync(id)
+    CONSTRAINT "FK_4218e02f645245ef75ca09dfd15" FOREIGN KEY (drs_id) REFERENCES WHO_DRUG.drug_sync(id)
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.drug.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.drug.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.drug.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.drug.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.drug.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.drug.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.drug.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.drug.drs_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.drug.drs_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.drug.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.drug.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.active_ingredients definition
+-- WHO_DRUG.active_ingredients definition
 -- Drop table
--- DROP TABLE who_drug.active_ingredients;
-CREATE TABLE who_drug.active_ingredients (
+-- DROP TABLE WHO_DRUG.active_ingredients;
+CREATE TABLE WHO_DRUG.active_ingredients (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.active_ingredients_audit_action_enum DEFAULT '0' :: who_drug.active_ingredients_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.active_ingredients_audit_action_enum DEFAULT '0' :: WHO_DRUG.active_ingredients_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -185,35 +185,35 @@ CREATE TABLE who_drug.active_ingredients (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_ef688d782747982b5c52709d183" PRIMARY KEY (id),
     CONSTRAINT "UQ_ef688d782747982b5c52709d183" UNIQUE (id),
-    CONSTRAINT "FK_fb22a7bb1a7e1a250377c844fde" FOREIGN KEY (dru_id) REFERENCES who_drug.drug(id)
+    CONSTRAINT "FK_fb22a7bb1a7e1a250377c844fde" FOREIGN KEY (dru_id) REFERENCES WHO_DRUG.drug(id)
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.active_ingredients.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.active_ingredients.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.active_ingredients.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.active_ingredients.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.active_ingredients.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.active_ingredients.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.active_ingredients.dru_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.dru_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.active_ingredients.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.active_ingredients.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.atomic_therapeutic_chemicals definition
+-- WHO_DRUG.atomic_therapeutic_chemicals definition
 -- Drop table
--- DROP TABLE who_drug.atomic_therapeutic_chemicals;
-CREATE TABLE who_drug.atomic_therapeutic_chemicals (
+-- DROP TABLE WHO_DRUG.atomic_therapeutic_chemicals;
+CREATE TABLE WHO_DRUG.atomic_therapeutic_chemicals (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.atomic_therapeutic_chemicals_audit_action_enum DEFAULT '0' :: who_drug.atomic_therapeutic_chemicals_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.atomic_therapeutic_chemicals_audit_action_enum DEFAULT '0' :: WHO_DRUG.atomic_therapeutic_chemicals_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -231,39 +231,39 @@ CREATE TABLE who_drug.atomic_therapeutic_chemicals (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_2cc251f5b56aefaa1cdec2498cc" PRIMARY KEY (id),
     CONSTRAINT "UQ_2cc251f5b56aefaa1cdec2498cc" UNIQUE (id),
-    CONSTRAINT "FK_drug__anatomical_therapeutic_chemical" FOREIGN KEY (dru_id) REFERENCES who_drug.drug(id)
+    CONSTRAINT "FK_drug__anatomical_therapeutic_chemical" FOREIGN KEY (dru_id) REFERENCES WHO_DRUG.drug(id)
 );
 
-COMMENT ON TABLE who_drug.atomic_therapeutic_chemicals IS 'Elementos terapeuticos atómicos';
+COMMENT ON TABLE WHO_DRUG.atomic_therapeutic_chemicals IS 'Elementos terapeuticos atómicos';
 
 -- Column comments
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.code IS 'Código el elemento';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.code IS 'Código el elemento';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.dru_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.dru_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.atomic_therapeutic_chemicals.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.atomic_therapeutic_chemicals.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.country_sales definition
+-- WHO_DRUG.country_sales definition
 -- Drop table
--- DROP TABLE who_drug.country_sales;
-CREATE TABLE who_drug.country_sales (
+-- DROP TABLE WHO_DRUG.country_sales;
+CREATE TABLE WHO_DRUG.country_sales (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.country_sales_audit_action_enum DEFAULT '0' :: who_drug.country_sales_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.country_sales_audit_action_enum DEFAULT '0' :: WHO_DRUG.country_sales_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -283,41 +283,41 @@ CREATE TABLE who_drug.country_sales (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_5df0f20e39d68550d201003fc8b" PRIMARY KEY (id),
     CONSTRAINT "UQ_5df0f20e39d68550d201003fc8b" UNIQUE (id),
-    CONSTRAINT "FK_drug__anatomical_therapeutic_chemical" FOREIGN KEY (dru_id) REFERENCES who_drug.drug(id)
+    CONSTRAINT "FK_drug__anatomical_therapeutic_chemical" FOREIGN KEY (dru_id) REFERENCES WHO_DRUG.drug(id)
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.country_sales.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.country_sales.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.country_sales.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.country_sales.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.country_sales.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.country_sales.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.country_sales.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.country_sales.cos_country IS 'Pais en formato ISO iso3Code';
+COMMENT ON COLUMN WHO_DRUG.country_sales.cos_country IS 'Pais en formato ISO iso3Code';
 
-COMMENT ON COLUMN who_drug.country_sales.cos_sale IS 'Porcentaje de venta';
+COMMENT ON COLUMN WHO_DRUG.country_sales.cos_sale IS 'Porcentaje de venta';
 
-COMMENT ON COLUMN who_drug.country_sales.cos_medicinal_product_id IS 'Identificador del producto medico en el pais';
+COMMENT ON COLUMN WHO_DRUG.country_sales.cos_medicinal_product_id IS 'Identificador del producto medico en el pais';
 
-COMMENT ON COLUMN who_drug.country_sales.dru_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.country_sales.dru_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.country_sales.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.country_sales.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.ingredient_translation definition
+-- WHO_DRUG.ingredient_translation definition
 -- Drop table
--- DROP TABLE who_drug.ingredient_translation;
-CREATE TABLE who_drug.ingredient_translation (
+-- DROP TABLE WHO_DRUG.ingredient_translation;
+CREATE TABLE WHO_DRUG.ingredient_translation (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.ingredient_translation_audit_action_enum DEFAULT '0' :: who_drug.ingredient_translation_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.ingredient_translation_audit_action_enum DEFAULT '0' :: WHO_DRUG.ingredient_translation_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -333,35 +333,35 @@ CREATE TABLE who_drug.ingredient_translation (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_fdac73d244bac393491a32dc52a" PRIMARY KEY (id),
     CONSTRAINT "UQ_fdac73d244bac393491a32dc52a" UNIQUE (id),
-    CONSTRAINT "FK_active_Ingredient__maholder" FOREIGN KEY (aci_id) REFERENCES who_drug.active_ingredients(id)
+    CONSTRAINT "FK_active_Ingredient__maholder" FOREIGN KEY (aci_id) REFERENCES WHO_DRUG.active_ingredients(id)
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.aci_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.aci_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.ingredient_translation.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.ingredient_translation.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
 
--- who_drug.maholder definition
+-- WHO_DRUG.maholder definition
 -- Drop table
--- DROP TABLE who_drug.maholder;
-CREATE TABLE who_drug.maholder (
+-- DROP TABLE WHO_DRUG.maholder;
+CREATE TABLE WHO_DRUG.maholder (
     audit_enabled bool DEFAULT true NOT NULL,
     -- Registro habilitado para la cunsulta
     audit_state bool DEFAULT true NOT NULL,
     -- Eliminado lógico, 1 activo, 0 eliminado
-    audit_action who_drug.maholder_audit_action_enum DEFAULT '0' :: who_drug.maholder_audit_action_enum NOT NULL,
+    audit_action WHO_DRUG.maholder_audit_action_enum DEFAULT '0' :: WHO_DRUG.maholder_audit_action_enum NOT NULL,
     -- Última accion CRUD realizada sobre el registro
     audit_created_at timestamp DEFAULT now() NOT NULL,
     -- Fecha de creación del registro
@@ -379,26 +379,26 @@ CREATE TABLE who_drug.maholder (
     -- Identificación del usuario o proceso que realiza la acción
     CONSTRAINT "PK_5b5f3796ede65c9fb66d636f74c" PRIMARY KEY (id),
     CONSTRAINT "UQ_5b5f3796ede65c9fb66d636f74c" UNIQUE (id),
-    CONSTRAINT "FK_countrySale__maholder" FOREIGN KEY (cos_id) REFERENCES who_drug.country_sales(id)
+    CONSTRAINT "FK_countrySale__maholder" FOREIGN KEY (cos_id) REFERENCES WHO_DRUG.country_sales(id)
 );
 
 -- Column comments
-COMMENT ON COLUMN who_drug.maholder.audit_enabled IS 'Registro habilitado para la cunsulta';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_enabled IS 'Registro habilitado para la cunsulta';
 
-COMMENT ON COLUMN who_drug.maholder.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_state IS 'Eliminado lógico, 1 activo, 0 eliminado';
 
-COMMENT ON COLUMN who_drug.maholder.audit_action IS 'Última accion CRUD realizada sobre el registro';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_action IS 'Última accion CRUD realizada sobre el registro';
 
-COMMENT ON COLUMN who_drug.maholder.audit_created_at IS 'Fecha de creación del registro';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_created_at IS 'Fecha de creación del registro';
 
-COMMENT ON COLUMN who_drug.maholder.audit_updated_at IS 'Fecha de actualización del registro';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_updated_at IS 'Fecha de actualización del registro';
 
-COMMENT ON COLUMN who_drug.maholder.id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.maholder.id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.maholder."name" IS 'Nombre del titular del registro';
+COMMENT ON COLUMN WHO_DRUG.maholder."name" IS 'Nombre del titular del registro';
 
-COMMENT ON COLUMN who_drug.maholder.medicinal_product_id IS 'Código del producto';
+COMMENT ON COLUMN WHO_DRUG.maholder.medicinal_product_id IS 'Código del producto';
 
-COMMENT ON COLUMN who_drug.maholder.cos_id IS 'Identificador único del registro';
+COMMENT ON COLUMN WHO_DRUG.maholder.cos_id IS 'Identificador único del registro';
 
-COMMENT ON COLUMN who_drug.maholder.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';
+COMMENT ON COLUMN WHO_DRUG.maholder.audit_action_by IS 'Identificación del usuario o proceso que realiza la acción';

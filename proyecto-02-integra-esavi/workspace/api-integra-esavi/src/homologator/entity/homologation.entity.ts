@@ -5,7 +5,7 @@ import { Homologator } from './homologator.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
-  name: 'TR_HOMOLOGATION',
+  name: 'TR_REGLA_HOMOLOGACION',
   comment: 'Regla de transformación asociada a un homologador',
 })
 export class Homologation extends Auditoria {

@@ -1,8 +1,12 @@
 import AssignmentIcon from "@mui/icons-material/Assignment"
+import HistoryIcon from "@mui/icons-material/History"
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import PersonIcon from "@mui/icons-material/Person"
+import VaccinesIcon from "@mui/icons-material/Vaccines"
 import {
   Box,
   Chip,
+  CircularProgress,
   Divider,
   Grid,
   Paper,
@@ -10,8 +14,9 @@ import {
   Tabs,
   Typography,
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Show, useShowContext } from "react-admin"
+import intESAVIClient from "../../dataProviders/axios.client"
 
 // ─── TabPanel ─────────────────────────────────────────────────────────────────
 
@@ -66,6 +71,17 @@ const FieldRow = ({ label, value }: FieldRowProps) => (
       {label}
     </Typography>
     <Typography variant="body1">{val(value)}</Typography>
+  </Box>
+)
+
+const FieldCell = ({ label, value }: FieldRowProps) => (
+  <Box sx={{ minWidth: 0, flex: 1 }}>
+    <Typography variant="caption" color="text.secondary" noWrap display="block">
+      {label}
+    </Typography>
+    <Typography variant="body2" noWrap title={val(value)}>
+      {val(value)}
+    </Typography>
   </Box>
 )
 
@@ -186,13 +202,45 @@ const TabNotificacion = () => {
   )
 }
 
-// ─── Tab Persona ──────────────────────────────────────────────────────────────
+// ─── Tab Paciente ─────────────────────────────────────────────────────────────
 
-const TabPersona = () => {
+const esFemenino = (sexo: any): boolean => {
+  if (!sexo) return false
+  const coincide = (s?: string) => {
+    const u = s?.toUpperCase() ?? ""
+    return u.includes("FEM") || u === "F"
+  }
+  return coincide(sexo.homologada) || coincide(sexo.vigiflow) || coincide(sexo.dhis2)
+}
+
+const TabPaciente = () => {
   const { record } = useShowContext()
-  if (!record) return null
+  const [embarazada, setEmbarazada] = useState<any>(null)
+  const [antecedente, setAntecedente] = useState<any>(null)
+  const [loadingEmb, setLoadingEmb] = useState(false)
 
-  const paciente = record.paciente ?? {}
+  const paciente = record?.paciente ?? {}
+  const mujer = esFemenino(paciente.sexo)
+
+  useEffect(() => {
+    if (!record?.id || !mujer) return
+    setLoadingEmb(true)
+    Promise.all([
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/paciente-embarazada`),
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-embarazo`),
+    ])
+      .then(([resEmb, resAnt]) => {
+        setEmbarazada(resEmb.data ?? null)
+        setAntecedente(resAnt.data ?? null)
+      })
+      .catch(() => {
+        setEmbarazada(null)
+        setAntecedente(null)
+      })
+      .finally(() => setLoadingEmb(false))
+  }, [record?.id, mujer])
+
+  if (!record) return null
 
   return (
     <Grid container spacing={3}>
@@ -220,16 +268,16 @@ const TabPersona = () => {
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Sexo"
-              value={paciente.sexo?.nombre ?? paciente.sexo?.descripcion ?? paciente.sexo}
+              value={paciente.sexo?.homologada ?? paciente.sexo?.vigiflow ?? paciente.sexo?.dhis2}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Auto-identificación Étnica"
               value={
-                paciente.autoIdentificacion?.nombre ??
-                paciente.autoIdentificacion?.descripcion ??
-                paciente.autoIdentificacion
+                paciente.autoIdentificacion?.homologada ??
+                paciente.autoIdentificacion?.vigiflow ??
+                paciente.autoIdentificacion?.dhis2
               }
             />
           </Grid>
@@ -250,7 +298,7 @@ const TabPersona = () => {
               label="Edad"
               value={
                 record.edad != null
-                  ? `${record.edad} ${record.unidadEdad?.nombre ?? record.unidadEdad?.descripcion ?? ""}`
+                  ? `${record.edad} ${record.unidadEdad?.homologada ?? record.unidadEdad?.vigiflow ?? ""}`
                   : undefined
               }
             />
@@ -274,9 +322,9 @@ const TabPersona = () => {
             <FieldRow
               label="Provincia"
               value={
-                record.provinciaResidencia?.nombre ??
-                record.provinciaResidencia?.descripcion ??
-                record.provinciaResidencia
+                record.provinciaResidencia?.homologada ??
+                record.provinciaResidencia?.vigiflow ??
+                record.provinciaResidencia?.dhis2
               }
             />
           </Grid>
@@ -284,9 +332,9 @@ const TabPersona = () => {
             <FieldRow
               label="Cantón"
               value={
-                record.cantonResidencia?.nombre ??
-                record.cantonResidencia?.descripcion ??
-                record.cantonResidencia
+                record.cantonResidencia?.homologada ??
+                record.cantonResidencia?.vigiflow ??
+                record.cantonResidencia?.dhis2
               }
             />
           </Grid>
@@ -294,15 +342,493 @@ const TabPersona = () => {
             <FieldRow
               label="Parroquia"
               value={
-                record.parroquiaResidencia?.nombre ??
-                record.parroquiaResidencia?.descripcion ??
-                record.parroquiaResidencia
+                record.parroquiaResidencia?.homologada ??
+                record.parroquiaResidencia?.vigiflow ??
+                record.parroquiaResidencia?.dhis2
               }
             />
           </Grid>
         </Grid>
       </Grid>
+
+      {mujer && (
+        <Grid item xs={12}>
+          <Typography variant="h6" gutterBottom>
+            Embarazo
+          </Typography>
+          <Divider sx={{ mb: 2 }} />
+          {loadingEmb ? (
+            <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          ) : (
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <FieldRow
+                  label="Embarazada al momento de la vacuna"
+                  value={embarazada?.momentoVacuna === "1" ? "Sí" : embarazada?.momentoVacuna === "0" ? "No" : "—"}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FieldRow
+                  label="Embarazada al momento del ESAVI"
+                  value={embarazada?.momentoEsavi === "1" ? "Sí" : embarazada?.momentoEsavi === "0" ? "No" : "—"}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FieldRow
+                  label="Edad gestacional (semanas)"
+                  value={antecedente?.edadGestacional}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FieldRow
+                  label="Fecha última menstruación"
+                  value={formatDate(antecedente?.fechaUltimaMenstruacion)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FieldRow
+                  label="Fecha probable de parto"
+                  value={formatDate(antecedente?.fechaParto)}
+                />
+              </Grid>
+            </Grid>
+          )}
+        </Grid>
+      )}
     </Grid>
+  )
+}
+
+// ─── Tab Vacunación ───────────────────────────────────────────────────────────
+
+const TabVacunacion = () => {
+  const { record } = useShowContext()
+  const [vacunacion, setVacunacion] = useState<any>(null)
+  const [vacunas, setVacunas] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!record?.id) return
+    setLoading(true)
+    Promise.all([
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/dato-vacunacion`),
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/dato-vacuna`),
+    ])
+      .then(([resVacunacion, resVacunas]) => {
+        setVacunacion(resVacunacion.data ?? null)
+        setVacunas(Array.isArray(resVacunas.data) ? resVacunas.data : [])
+      })
+      .catch(() => {
+        setVacunacion(null)
+        setVacunas([])
+      })
+      .finally(() => setLoading(false))
+  }, [record?.id])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+        <CircularProgress size={32} />
+      </Box>
+    )
+  }
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      {/* ── Evento de vacunación ── */}
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Evento de Vacunación
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        {vacunacion ? (
+          <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
+            <FieldCell label="Vacunatorio" value={vacunacion.establecimiento?.uniNombre ?? vacunacion.nombreVacunatorio} />
+            <FieldCell label="Fecha de Vacunación" value={formatDate(vacunacion.fechaVacunacion)} />
+            <FieldCell label="Provincia" value={vacunacion.establecimiento?.provinciaDescripcion} />
+            <FieldCell label="Cantón" value={vacunacion.establecimiento?.cantonDescripcion} />
+            <FieldCell label="Parroquia" value={vacunacion.establecimiento?.parroquiaDescripcion} />
+            <FieldCell label="Otra Dirección" value={vacunacion.otraDireccion} />
+          </Box>
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            Sin datos de vacunación registrados.
+          </Typography>
+        )}
+      </Box>
+
+      {/* ── Vacunas aplicadas ── */}
+      <Box>
+        <Typography variant="h6" gutterBottom>
+          Vacuna{vacunas.length !== 1 ? "s" : ""} Aplicada{vacunas.length !== 1 ? "s" : ""}
+          {vacunas.length > 0 && (
+            <Chip label={vacunas.length} size="small" sx={{ ml: 1 }} />
+          )}
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        {vacunas.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">
+            Sin vacunas registradas.
+          </Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {vacunas.map((v, idx) => (
+              <Paper variant="outlined" sx={{ p: 2 }} key={v.id ?? idx}>
+                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                  Vacuna {idx + 1}{v.drugName ? ` — ${v.drugName}` : ""}
+                </Typography>
+                <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
+                  <FieldCell label="Nombre (WHODrug)" value={v.nombreVacPatenteWHODrug ?? v.drugName} />
+                  <FieldCell label="Fabricante" value={v.nombreFabricante ?? v.nombreFabricanteWhoDrug} />
+                  <FieldCell label="N° Lote" value={v.numeroLote} />
+                  <FieldCell label="N° Dosis" value={v.numeroDosisVacuna} />
+                  <FieldCell label="Código ATC" value={v.codigoAtc} />
+                  <FieldCell label="Vía Administración" value={v.viaAdministracion} />
+                  <FieldCell label="Inicio Administración" value={formatDate(v.inicioAdministracion)} />
+                  <FieldCell label="Vencimiento" value={formatDate(v.fechaVencimientoVacuna)} />
+                  {v.rolVacuna && (
+                    <FieldCell
+                      label="Rol Vacuna"
+                      value={v.rolVacuna?.nombre ?? v.rolVacuna?.descripcion}
+                    />
+                  )}
+                  {v.accionTomada && (
+                    <FieldCell label="Acción Tomada" value={v.accionTomada} />
+                  )}
+                </Box>
+              </Paper>
+            ))}
+          </Box>
+        )}
+      </Box>
+    </Box>
+  )
+}
+
+// ─── Tab ESAVI ────────────────────────────────────────────────────────────────
+
+const TabEsavi = () => {
+  const { record } = useShowContext()
+  const [esavis, setEsavis] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!record?.id) return
+    setLoading(true)
+    intESAVIClient
+      .get(`/integrator/notificacion/${record.id}/dato-esavi`)
+      .then((res) => setEsavis(Array.isArray(res.data) ? res.data : []))
+      .catch(() => setEsavis([]))
+      .finally(() => setLoading(false))
+  }, [record?.id])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+        <CircularProgress size={32} />
+      </Box>
+    )
+  }
+
+  if (esavis.length === 0) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Sin eventos ESAVI registrados.
+      </Typography>
+    )
+  }
+
+  return (
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+        <Typography variant="h6">Eventos ESAVI</Typography>
+        <Chip label={esavis.length} size="small" />
+      </Box>
+
+      {esavis.map((e, idx) => (
+        <Paper variant="outlined" sx={{ p: 2 }} key={e.id ?? idx}>
+          {/* ── Encabezado del evento ── */}
+          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
+            {e.nombre ?? e.nombreReportado ?? `Evento ${idx + 1}`}
+          </Typography>
+          {e.nombreReportado && e.nombreReportado !== e.nombre && (
+            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+              Reportado como: {e.nombreReportado}
+            </Typography>
+          )}
+          {e.descripcion && (
+            <Typography variant="body2" sx={{ mb: 2, whiteSpace: "pre-wrap" }}>
+              {e.descripcion}
+            </Typography>
+          )}
+
+          {/* ── Línea temporal ── */}
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
+            <FieldCell label="Fecha inicio" value={formatDate(e.fechaEsavi)} />
+            <FieldCell label="Fecha fin" value={formatDate(e.fechaFinalizacion)} />
+            <FieldCell label="Duración" value={e.duracion} />
+            <FieldCell label="Resultado" value={e.resultado} />
+            <FieldCell label="Código caso" value={e.codigoCaso} />
+            <FieldCell label="Sistema codificación" value={e.sistemaCodififacion} />
+          </Box>
+
+          {/* ── Jerarquía MedDRA ── */}
+          {(e.nameLLT || e.namePT || e.nameHLT || e.nameHLGT || e.nameSOC) && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1 }}>
+                MedDRA
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                {e.nameLLT && (
+                  <FieldCell label={`LLT ${e.codigoLLT ? `(${e.codigoLLT})` : ""}`} value={e.nameLLT} />
+                )}
+                {e.namePT && (
+                  <FieldCell label={`PT ${e.codigoPT ? `(${e.codigoPT})` : ""}`} value={e.namePT} />
+                )}
+                {e.nameHLT && (
+                  <FieldCell label={`HLT ${e.codigoHLT ? `(${e.codigoHLT})` : ""}`} value={e.nameHLT} />
+                )}
+                {e.nameHLGT && (
+                  <FieldCell label={`HLGT ${e.codigoHLGT ? `(${e.codigoHLGT})` : ""}`} value={e.nameHLGT} />
+                )}
+                {e.nameSOC && (
+                  <FieldCell label={`SOC ${e.codigoSOC ? `(${e.codigoSOC})` : ""}`} value={e.nameSOC} />
+                )}
+              </Box>
+            </>
+          )}
+
+          {/* ── CIE-10 ── */}
+          {(e.codigoEsaviCie10 || e.codigoDxInicialCie10) && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1 }}>
+                CIE-10
+              </Typography>
+              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+                <FieldCell label="Código ESAVI" value={e.codigoEsaviCie10} />
+                <FieldCell label="Diagnóstico inicial" value={e.codigoDxInicialCie10} />
+              </Box>
+            </>
+          )}
+        </Paper>
+      ))}
+    </Box>
+  )
+}
+
+// ─── Tab Antecedentes ─────────────────────────────────────────────────────────
+
+const TabAntecedentes = () => {
+  const { record } = useShowContext()
+  const [subTab, setSubTab] = useState(0)
+  const [embarazo, setEmbarazo] = useState<any>(null)
+  const [preexistencias, setPreexistencias] = useState<any[]>([])
+  const [evento, setEvento] = useState<any>(null)
+  const [medico, setMedico] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!record?.id) return
+    setLoading(true)
+    Promise.all([
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-embarazo`),
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-preexistencia`),
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-evento`),
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-medico`),
+    ])
+      .then(([resEmb, resPre, resEv, resMed]) => {
+        const embArr = Array.isArray(resEmb.data) ? resEmb.data : resEmb.data ? [resEmb.data] : []
+        setEmbarazo(embArr[0] ?? null)
+        setPreexistencias(Array.isArray(resPre.data) ? resPre.data : resPre.data ? [resPre.data] : [])
+        const evArr = Array.isArray(resEv.data) ? resEv.data : resEv.data ? [resEv.data] : []
+        setEvento(evArr[0] ?? null)
+        const medArr = Array.isArray(resMed.data) ? resMed.data : resMed.data ? [resMed.data] : []
+        setMedico(medArr[0] ?? null)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [record?.id])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+        <CircularProgress size={32} />
+      </Box>
+    )
+  }
+
+  return (
+    <Box>
+      <Tabs value={subTab} onChange={(_e, v) => setSubTab(v)} sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+        <Tab label="Embarazo" />
+        <Tab label="Enfermedades Previas" />
+        <Tab label="Evento Adverso" />
+        <Tab label="Médico" />
+      </Tabs>
+
+      {/* ── Sub-tab: Embarazo ── */}
+      {subTab === 0 && (
+        embarazo ? (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Edad gestacional (semanas)" value={embarazo.edadGestacional} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Fecha última menstruación" value={formatDate(embarazo.fechaUltimaMenstruacion)} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Fecha probable de parto" value={formatDate(embarazo.fechaParto)} />
+            </Grid>
+          </Grid>
+        ) : (
+          <Typography variant="body2" color="text.secondary">Sin antecedentes de embarazo registrados.</Typography>
+        )
+      )}
+
+      {/* ── Sub-tab: Enfermedades Previas ── */}
+      {subTab === 1 && (
+        preexistencias.length === 0 ? (
+          <Typography variant="body2" color="text.secondary">Sin enfermedades previas registradas.</Typography>
+        ) : (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {preexistencias.map((p, idx) => (
+              <Paper variant="outlined" sx={{ p: 2 }} key={p.id ?? idx}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={8}>
+                    <FieldRow label="Descripción" value={p.descripcion} />
+                  </Grid>
+                  <Grid item xs={12} sm={4}>
+                    <FieldRow label="Código CIE-10" value={p.codigoEsaviCIE10} />
+                  </Grid>
+                </Grid>
+              </Paper>
+            ))}
+          </Box>
+        )
+      )}
+
+      {/* ── Sub-tab: Evento Adverso ── */}
+      {subTab === 2 && (
+        evento ? (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Antecedentes adversos similares" value={evento.antecedente} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow
+                label="Alergia a medicamentos"
+                value={evento.alergiaMedicamento?.nombre ?? evento.alergiaMedicamento?.descripcion}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow
+                label="Alergia a alimentos"
+                value={evento.alergiaAlimentos?.nombre ?? evento.alergiaAlimentos?.descripcion}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow
+                label="Alergia a insectos"
+                value={evento.alergiaInsectos?.nombre ?? evento.alergiaInsectos?.descripcion}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow
+                label="Alergia al polvo"
+                value={evento.alergiaPolvo?.nombre ?? evento.alergiaPolvo?.descripcion}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FieldRow label="Otras alergias" value={evento.otrasAlergias} />
+            </Grid>
+          </Grid>
+        ) : (
+          <Typography variant="body2" color="text.secondary">Sin antecedentes de evento adverso registrados.</Typography>
+        )
+      )}
+
+      {/* ── Sub-tab: Médico ── */}
+      {subTab === 3 && (
+        medico ? (
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Ensayo clínico COVID-19" value={medico.ensayoClinicoCovid19 === "1" ? "Sí" : medico.ensayoClinicoCovid19 === "0" ? "No" : medico.ensayoClinicoCovid19} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Diagnóstico COVID-19 previo" value={medico.antecedenteDiagnosticoCovid19} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Síntomas COVID-19" value={medico.sintomasCovid19} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Fecha síntomas COVID-19" value={formatDate(medico.fechaSintomasCovid19)} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Método diagnóstico COVID-19" value={medico.metodoDiagnosticoCovid19} />
+            </Grid>
+            <Divider sx={{ width: "100%", mt: 1, mb: 1 }} />
+            <Grid item xs={12} sm={6}>
+              <FieldRow label="Comorbilidad principal" value={medico.descripcionPrincipal} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="CIE-10 comorbilidad principal" value={medico.comorbilidadPrincipalCIE10} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="MedDRA LLT comorbilidad principal" value={medico.codMeddraLltComorbilidadPrincipal} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FieldRow label="Comorbilidad 2" value={medico.descripcionDos} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="CIE-10 comorbilidad 2" value={medico.comorbilidadDosCIE10} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FieldRow label="Comorbilidad 3" value={medico.descripcionTres} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="CIE-10 comorbilidad 3" value={medico.comorbilidadTresCIE10} />
+            </Grid>
+            <Divider sx={{ width: "100%", mt: 1, mb: 1 }} />
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. patológico agudo (CIE-10)" value={medico.codCie10PatologicoAgudo} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. patológico agudo (MedDRA)" value={medico.codMeddraLltPatologicoAgudo} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. familiar (CIE-10)" value={medico.codCie10Familiar} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. familiar (MedDRA)" value={medico.codMeddraLltFamiliar} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. quirúrgico (CIE-10)" value={medico.antecedenteQuirurgicoCIE10} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Ant. quirúrgico (MedDRA)" value={medico.antecedenteQuirurgicoMeddraLlt} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Ant. farmacológico (WHODrug)" value={medico.antecedenteFarmacologicoWhodrug} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="Ant. farmacológico previo a síntomas (WHODrug)" value={medico.antecedenteFarmacologicoPrevioSintomasWhodrug} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Enf. previas (CIE-10)" value={medico.codigoEnfPreviasCIE10} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={3}>
+              <FieldRow label="Enf. previas (MedDRA)" value={medico.codigoEnfPreviasMeddraLlt} />
+            </Grid>
+          </Grid>
+        ) : (
+          <Typography variant="body2" color="text.secondary">Sin antecedentes médicos registrados.</Typography>
+        )
+      )}
+    </Box>
   )
 }
 
@@ -343,8 +869,26 @@ const ESAVISShowContent = () => {
             <Tab
               icon={<PersonIcon />}
               iconPosition="start"
-              label="Persona"
+              label="Paciente"
               {...a11yProps(1)}
+            />
+            <Tab
+              icon={<VaccinesIcon />}
+              iconPosition="start"
+              label="Vacunación"
+              {...a11yProps(2)}
+            />
+            <Tab
+              icon={<LocalHospitalIcon />}
+              iconPosition="start"
+              label="ESAVI"
+              {...a11yProps(3)}
+            />
+            <Tab
+              icon={<HistoryIcon />}
+              iconPosition="start"
+              label="Antecedentes"
+              {...a11yProps(4)}
             />
           </Tabs>
         </Box>
@@ -353,7 +897,16 @@ const ESAVISShowContent = () => {
           <TabNotificacion />
         </TabPanel>
         <TabPanel value={currentTab} index={1}>
-          <TabPersona />
+          <TabPaciente />
+        </TabPanel>
+        <TabPanel value={currentTab} index={2}>
+          <TabVacunacion />
+        </TabPanel>
+        <TabPanel value={currentTab} index={3}>
+          <TabEsavi />
+        </TabPanel>
+        <TabPanel value={currentTab} index={4}>
+          <TabAntecedentes />
         </TabPanel>
       </Paper>
     </Box>
