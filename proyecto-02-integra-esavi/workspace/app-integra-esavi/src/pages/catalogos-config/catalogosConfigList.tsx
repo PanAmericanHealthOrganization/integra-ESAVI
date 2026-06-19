@@ -174,21 +174,15 @@ export const CatalogosConfigList = () => {
       <Title title="Catálogos" />
       <Box display="flex" gap={2} alignItems="flex-start">
         {/* ── Panel: Categorías ── */}
-        <Paper elevation={2} sx={{ width: 320, flexShrink: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="subtitle1" fontWeight={700}>
+        <Paper elevation={2} sx={{ flex: 2, minWidth: 0 }}>
+          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
               Categorías
             </Typography>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
-              Nuevo
-            </Button>
-          </Box>
-          <Divider />
-          <Box px={2} py={1.5}>
             <TextField
-              placeholder="Buscar por código o nombre"
+              placeholder="Buscar categoría…"
               size="small"
-              fullWidth
+              sx={{ flex: 1 }}
               value={searchCategoria}
               onChange={(e) => setSearchCategoria(e.target.value)}
               InputProps={{
@@ -199,6 +193,9 @@ export const CatalogosConfigList = () => {
                 ),
               }}
             />
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
+              Nuevo
+            </Button>
           </Box>
           <Divider />
           <TableContainer>
@@ -277,9 +274,9 @@ export const CatalogosConfigList = () => {
         </Paper>
 
         {/* ── Panel: Subcategorías ── */}
-        <Paper elevation={2} sx={{ flex: 1, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="center" gap={1}>
+        <Paper elevation={2} sx={{ flex: 3, minWidth: 0 }}>
+          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ whiteSpace: "nowrap" }}>
               <Typography variant="subtitle1" fontWeight={700}>
                 Subcategorías
               </Typography>
@@ -287,6 +284,21 @@ export const CatalogosConfigList = () => {
                 <Chip label={selectedCategoria.nombre} size="small" color="primary" variant="outlined" />
               )}
             </Box>
+            <TextField
+              placeholder="Buscar subcategoría…"
+              size="small"
+              sx={{ flex: 1 }}
+              disabled={!selectedCategoria}
+              value={searchSubcategoria}
+              onChange={(e) => setSearchSubcategoria(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
             <Tooltip
               title={!selectedCategoria ? "Selecciona una categoría primero" : ""}
               placement="left">
@@ -301,24 +313,6 @@ export const CatalogosConfigList = () => {
                 </Button>
               </span>
             </Tooltip>
-          </Box>
-          <Divider />
-          <Box px={2} py={1.5}>
-            <TextField
-              placeholder="Buscar por código, nombre o descripción"
-              size="small"
-              fullWidth
-              disabled={!selectedCategoria}
-              value={searchSubcategoria}
-              onChange={(e) => setSearchSubcategoria(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
           </Box>
           <Divider />
           <TableContainer>

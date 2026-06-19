@@ -110,18 +110,11 @@ export const ParametrosList = () => {
     <Box p={2}>
       <Title title="Parámetros" />
       <Paper elevation={2}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="subtitle1" fontWeight={700}>Parámetros</Typography>
-          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-            Nuevo
-          </Button>
-        </Box>
-        <Divider />
-        <Box px={2} py={1.5}>
+        <Box px={2} py={1.5} display="flex" alignItems="center" gap={2}>
           <TextField
             placeholder="Buscar por clave, valor o descripción"
             size="small"
-            fullWidth
+            sx={{ flex: 1 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -132,6 +125,9 @@ export const ParametrosList = () => {
               ),
             }}
           />
+          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
+            Nuevo
+          </Button>
         </Box>
         <Divider />
         <TableContainer>

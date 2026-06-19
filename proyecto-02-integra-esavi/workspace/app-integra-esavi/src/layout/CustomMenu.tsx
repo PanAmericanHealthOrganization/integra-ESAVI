@@ -18,6 +18,10 @@ export const CustomMenu = () => {
   const [estandaresOpen, setEstandaresOpen] = useState(false)
   const [configuracionesOpen, setConfiguracionesOpen] = useState(false)
 
+  const isConfiguracionesActive =
+    window.location.pathname.startsWith("/parametros") ||
+    window.location.pathname.startsWith("/catalogos-config")
+
   return (
     <>
       <Menu>
@@ -69,7 +73,7 @@ export const CustomMenu = () => {
           dense={false}
           handleToggle={() => setConfiguracionesOpen((v) => !v)}
           icon={<SettingsIcon />}
-          isOpen={configuracionesOpen}
+          isOpen={configuracionesOpen || isConfiguracionesActive}
           name="Configuraciones">
           <Menu.Item
             to="/parametros"
