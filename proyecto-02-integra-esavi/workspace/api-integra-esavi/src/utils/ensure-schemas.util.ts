@@ -7,7 +7,12 @@ export function dataSourceFactory(schemas: string[]) {
     const tempDs = new DataSource({ type: 'postgres', host, port, username, password, database });
     await tempDs.initialize();
     for (const schema of schemas) {
-      await tempDs.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+      try {
+        await tempDs.query(`CREATE SCHEMA IF NOT EXISTS "${schema}"`);
+      } catch (e: any) {
+        // race condition: two connections both checked "not exists" at the same time
+        if (e?.code !== '23505') throw e;
+      }
     }
     await tempDs.destroy();
 

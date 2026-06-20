@@ -1,5 +1,6 @@
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import FlakyIcon from "@mui/icons-material/Flaky"
+import LocationCityIcon from "@mui/icons-material/LocationCity"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import MedicationIcon from "@mui/icons-material/Medication"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
@@ -18,7 +19,8 @@ export const CustomMenu = () => {
 
   const isConfiguracionesActive =
     window.location.pathname.startsWith("/parametros") ||
-    window.location.pathname.startsWith("/catalogos-config")
+    window.location.pathname.startsWith("/catalogos-config") ||
+    window.location.pathname.startsWith("/dpa")
 
   return (
     <>
@@ -59,6 +61,11 @@ export const CustomMenu = () => {
               leftIcon={<CompareArrowsIcon />}
             />
           </Authorize>
+          <Menu.Item
+            to="/dpa"
+            primaryText="DPA"
+            leftIcon={<LocationCityIcon />}
+          />
         </SubMenu>
         <Menu.Item
           to="/vacunometro"

@@ -4,6 +4,9 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
+import {CantonController} from './controller/canton.controller';
+import {ParroquiaController} from './controller/parroquia.controller';
+import {ProvinciaController} from './controller/provincia.controller';
 import {AntecedenteEventoController} from './controller/antecedente-evento.controller';
 import {AntecedenteMedicoController} from './controller/antecedente-medico.controller';
 import {AntecedentePreexistenciaController} from './controller/antecedente-preexistencia.controller';
@@ -21,6 +24,12 @@ import {ReporteController} from './controller/reporte.controller';
 import {SeedController} from './controller/seed.controller';
 import {SyncController} from './controller/sync.controller';
 import {VacunometroController} from './controller/vacunometro.controller';
+import {Canton} from './entity/canton.entity';
+import {Parroquia} from './entity/parroquia.entity';
+import {Provincia} from './entity/provincia.entity';
+import {CantonService} from './service/canton.service';
+import {ParroquiaService} from './service/parroquia.service';
+import {ProvinciaService} from './service/provincia.service';
 import {
   AntecedenteEmbarazo,
   AntecedenteEvento,
@@ -114,9 +123,12 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         AntecedenteEvento,
         AntecedenteMedico,
         AntecedentePreexistencia,
+        Canton,
         CatalogoPadre,
         Establecimiento,
         Catalogo,
+        Parroquia,
+        Provincia,
         CausalidadEsavi,
         CtIcd10meddra,
         CtSymptom2llt,
@@ -146,7 +158,10 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
   controllers: [
     AntecedenteEmbarazoController,
     AntecedenteEventoController,
+    CantonController,
     CatalogoPadreController,
+    ParroquiaController,
+    ProvinciaController,
     AntecedenteMedicoController,
     AntecedentePreexistenciaController,
     DatoEsaviController,
@@ -168,7 +183,10 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
   ],
   providers: [
     SyncService,
+    CantonService,
     CatalogoPadreService,
+    ParroquiaService,
+    ProvinciaService,
     AntecedenteEmbarazoService,
     AntecedenteEventoService,
     AntecedenteMedicoService,

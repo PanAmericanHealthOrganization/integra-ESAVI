@@ -18,6 +18,7 @@ import syncs from "./pages/syncs"
 import vacunometro from "./pages/vacunometro"
 
 import configuraciones from "./configuraciones"
+import dpa from "./pages/dpa"
 import homologators from "./pages/homologators"
 import {MeddraPage} from "./pages/estandares/MeddraPage"
 import {WhodrugPage} from "./pages/estandares/WhodrugPage"
@@ -73,6 +74,10 @@ const App = () => {
       <Resource name="catalogos" {...catalogos} />
       <Resource name="catalogos-config" {...catalogosConfig} />
       <Resource name="catalogo-padre" />
+      <Resource name="dpa" list={dpa.list} />
+      <Resource name="provincias" />
+      <Resource name="cantones" />
+      <Resource name="parroquias" />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={homologators.list} />
