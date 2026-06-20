@@ -1,27 +1,25 @@
-import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {Injectable,Logger,OnApplicationBootstrap} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Repository } from 'typeorm';
-import { read, utils, WorkBook } from 'xlsx';
+import {Repository} from 'typeorm';
+import {read,utils} from 'xlsx';
 
 // Entidades
-import { ISync } from '../dto/sync.dto';
-import { IAuditoria, SyncProcess, SyncStatus } from '../entity';
-import { Catalogo } from '../entity/catalogo.entity';
-import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
-import { DatoEsavi } from '../entity/dato-esavi.entity';
-import { DatoVacuna } from '../entity/dato-vacuna.entity';
-import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
-import { DesenlaceEsavi } from '../entity/desenlace-esavi.entity';
-import { GravedadEsavi } from '../entity/gravedad-esavi.entity';
-import { Medicamento } from '../entity/medicamento.entity';
-import { Notificacion } from '../entity/notificacion.entity';
-import { Paciente } from '../entity/paciente.entity';
-import { TipoCatalogo } from '../entity/tipo-catalogo.entity';
-import { CreateCtIcd10meddraDto, CtIcd10meddra } from '../entity/ct-icd10meddra.entity';
-import { CreateCtSymptom2lltDto, CtSymptom2llt } from '../entity/ct-symptom2llt.entity';
-import { CatalogoPadre } from '../entity/catalogo-padre.entity';
+import {ISync} from '../dto/sync.dto';
+import {IAuditoria,SyncProcess,SyncStatus} from '../entity';
+import {CatalogoPadre} from '../entity/catalogo-padre.entity';
+import {Catalogo} from '../entity/catalogo.entity';
+import {CausalidadEsavi} from '../entity/causalidad-esavi.entity';
+import {DatoEsavi} from '../entity/dato-esavi.entity';
+import {DatoVacuna} from '../entity/dato-vacuna.entity';
+import {DatoVacunacion} from '../entity/dato-vacunacion.entity';
+import {DesenlaceEsavi} from '../entity/desenlace-esavi.entity';
+import {GravedadEsavi} from '../entity/gravedad-esavi.entity';
+import {Medicamento} from '../entity/medicamento.entity';
+import {Notificacion} from '../entity/notificacion.entity';
+import {Paciente} from '../entity/paciente.entity';
+import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -31,10 +29,6 @@ export class SeedService implements OnApplicationBootstrap {
     private tipoCatalogoRepository: Repository<TipoCatalogo>,
     @InjectRepository(Catalogo, 'POSTGRES_INTEGRATOR_DS')
     private catalogoRepository: Repository<Catalogo>,
-    @InjectRepository(CtIcd10meddra, 'POSTGRES_INTEGRATOR_DS')
-    private ctIcd10meddraRepository: Repository<CtIcd10meddra>,
-    @InjectRepository(CtSymptom2llt, 'POSTGRES_INTEGRATOR_DS')
-    private ctSymptom2lltRepository: Repository<CtSymptom2llt>,
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private pacienteRepository: Repository<Paciente>,
     @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
@@ -1170,40 +1164,7 @@ export class SeedService implements OnApplicationBootstrap {
             isEnabled: true,
             isActive: true,
           };     
-    
-          // Create CtICD10MedDRADto object
-          const ctIcd10meddra = new CreateCtIcd10meddraDto();
-          ctIcd10meddra.icd10ChapterNumber = col['A'];
-          ctIcd10meddra.icd10ChapterTitle = col['B'];
-          ctIcd10meddra.icd10Code = col['C'];
-          ctIcd10meddra.icd10Term = col['D'];
-          ctIcd10meddra.meddraLlt = col['E'];
-          ctIcd10meddra.meddraLltCode = col['F'];
-          ctIcd10meddra.mapAttribute = col['G'];
-          ctIcd10meddra.meddraPt = col['H'];
-          ctIcd10meddra.meddraPtCode = col['I'];
-
-          const existing =  await this.ctIcd10meddraRepository.findOne({
-            where: {
-              //icd10ChapterNumber: col['A'],
-              //icd10ChapterTitle: col['B'],
-              icd10Code: col['C'], //ctIcd10meddra.icd10Code,
-              //icd10Term: col['D'],
-              //meddraLlt: col['E'],
-              meddraLltCode: col['F'], //ctIcd10meddra.meddraLltCode,
-              //mapAttribute: col['G'],
-              //meddraPt: col['H'],
-              //meddraPtCode: col['I'],
-            }
-          });
-          if(!existing){
-            await this.ctIcd10meddraRepository.save({ ...ctIcd10meddra, ...auditoria } as CtIcd10meddra);
-          }        
-
-        } //--fin del for...of
-        const total = await this.ctIcd10meddraRepository.count();
-        console.log(`✅ Total de registros ICD-10 MedDRA en la base de datos: ${total}`);
-        console.log('✅ Registros ICD-10 MedDRA cargados desde Excel');
+        } 
       }catch(error){
         console.error('❌ Error al cargar ICD-10 MedDRA desde Excel:', error);
       }    
@@ -1241,28 +1202,7 @@ export class SeedService implements OnApplicationBootstrap {
             isActive: true,
           };     
     
-          // Create CtSymtom2llt object
-          const ctSymptom2llt = new CreateCtSymptom2lltDto();
-          ctSymptom2llt.item = col['A'] && col['A'] ? col['A'] : null;
-          ctSymptom2llt.symptom = col['B'] && col['B'] ? col['B'] : null; //col['B'] && col['B'] ? col['B'] : null;
-          ctSymptom2llt.lltName = col['C'] && col['C'] ? col['C'] : null;
-          ctSymptom2llt.lltCode = col['D'] && col['D'] ? col['D'] : null;
-          ctSymptom2llt.observation = col['E'] && col['E'] ? col['E'] : null;
-
-          const existing =  await this.ctSymptom2lltRepository.findOne({
-            where: {
-              symptom: ctSymptom2llt.symptom,
-              lltCode: ctSymptom2llt.lltCode,
-            }
-          });
-          if(!existing){
-            await this.ctSymptom2lltRepository.save({ ...ctSymptom2llt, ...auditoria } as CtSymptom2llt);
-          }        
-
-        } //--fin del for...of
-        const total = await this.ctSymptom2lltRepository.count();
-        console.log(`✅ Total de registros SÍNTOMAS DHIS2 en la base de datos: ${total}`);
-        console.log('✅ Registros SÍNTOMAS DHIS2 cargados desde Excel');
+        }
       }catch(error){
         console.error('❌ Error al cargar SÍNTOMAS DHIS2 desde Excel:', error);
       }    

@@ -1,61 +1,53 @@
-import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Worksheet } from 'exceljs';
+import {HttpService} from '@nestjs/axios';
+import {Injectable} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
+import {CausalidadEsavi} from 'src/integrator/entity';
+import {IAuditoria} from 'src/integrator/entity/auditoria.entity';
+import {MeddraLLTService} from 'src/meddra/services/meddra-lt.service';
+import {MeddraPtService} from 'src/meddra/services/meddra-pt.service';
 import {
   CreateAntecedenteEmbarazoDto,
   CreateAntecedenteEventoDto,
   CreateAntecedenteMedicoDto,
   CreateAntecedentePreexistenciaDto,
   CreateCausalidadEsaviDto,
+  CreateCompleteDto,
   CreateDatoEsaviDto,
   CreateDatoVacunaDto,
   CreateDatoVacunacionDto,
-  CreatePacienteEmbarazadaDto,
-  InvestigacionCreateDto,
-  UbicacionDto,
-  CreateCompleteDto,
   CreateDesenlaceEsaviDto,
   CreateGravedadEsaviDto,
   CreateNotificacionDto,
   CreatePacienteDhis2Dto,
+  CreatePacienteEmbarazadaDto,
+  InvestigacionCreateDto,
+  UbicacionDto,
 } from '../../integrator/dto';
-import { SourceEnum } from '../../integrator/enum/source-enum';
-import { IntegradorService } from '../../integrator/facade/integrador.service';
+import {SourceEnum} from '../../integrator/enum/source-enum';
+import {IntegradorService} from '../../integrator/facade/integrador.service';
 import {
-  ProcessingStatus,
   DuplicateAction,
   DuplicateHandlingConfigDto,
-  ProgramStage,
-  ProgramTrackedEntityAttribute,
   IData,
   IHeader,
+  ProcessingStatus
 } from '../dto';
-import { Dhis2AnalyticsService } from './dhis2-analytics.service';
-import { Dhis2DuplicateHandlerService } from './dhis2-duplicate-handler.service';
-import { Dhis2EventsService } from './dhis2-events.service';
-import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
-import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
-import { Dhis2ProgramService } from './dhis2-program.service';
-import { CtSymptom2lltService } from 'src/integrator/service/ct-symptom2llt.service';
-import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
-import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
-import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
-import { CtIcd10meddra } from 'src/integrator/entity/ct-icd10meddra.entity';
-import { CtIcd10meddraService } from 'src/integrator/service/ct-icd10meddra.service';
-import { CausalidadEsavi } from 'src/integrator/entity';
+import {Dhis2AnalyticsService} from './dhis2-analytics.service';
+import {Dhis2DuplicateHandlerService} from './dhis2-duplicate-handler.service';
+import {Dhis2EventsService} from './dhis2-events.service';
+import {Dhis2ProcessingLogService} from './dhis2-processing-log.service';
+import {Dhis2ProgramStageService} from './dhis2-program-stage.service';
+import {Dhis2ProgramService} from './dhis2-program.service';
 @Injectable()
 export class Dhis2IntegratorService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly integradorService: IntegradorService,
-    private readonly ctSymptom2lltService: CtSymptom2lltService,
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
-    private readonly icd10MeddraService: CtIcd10meddraService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
@@ -83,7 +75,7 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) {}
+    } catch (error:any) {}
     return resultado;
   };
 
@@ -94,7 +86,7 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) {}
+    } catch (error:any) {}
     return resultado;
   };
 
@@ -199,7 +191,7 @@ export class Dhis2IntegratorService {
         finalSummary.duracionProcesamiento = this.calculateProcessingDuration(summary.fechaInicio);
         this.processingLogService.logImportEnd(loteId, finalSummary, 'SYSTEM');
       }
-    } catch (error) {
+    } catch (error:any) {
       this.processingLogService.logError(
         loteId,
         'Error durante la importación masiva',
@@ -294,7 +286,7 @@ export class Dhis2IntegratorService {
           descripcion: texto.trim(), // El texto completo como descripción
         };
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error('Error al procesar el texto:', error);
       return { codigo: '', descripcion: '' }; // En caso de error, devolvemos valores vacíos
     }
@@ -447,7 +439,7 @@ export class Dhis2IntegratorService {
             'Registro procesado exitosamente',
           );
         }
-      } catch (error) {
+      } catch (error:any) {
         registrosConError++;
         this.processingLogService.logError(
           loteId,
@@ -701,12 +693,7 @@ export class Dhis2IntegratorService {
       }*/
      
      if(  diagnosticoFinal.codigo && diagnosticoFinal.descripcion ){//Si ambos valores están presentes, se asigna el código.){
-      causalidadEsavi[`codigoCie10DxFinal${i}` as keyof CausalidadEsavi] = diagnosticoFinal.codigo; //Usando indexación de tipo para asignar dinámicamente. //El keyof no es "CreateCausalidadEsaviDto" pero, es para evitar error de TS.
-      // Mapeo a MEDDRA llt a partir del código CIE10
-      const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(diagnosticoFinal.codigo);
-      if(  icd10meddra  && icd10meddra.meddraLltCode){
-        causalidadEsavi[ `codMeddraLltDxFinal${i}` as keyof CausalidadEsavi ] = icd10meddra.meddraLltCode;
-      }
+      causalidadEsavi[`codigoCie10DxFinal${i}` as keyof CausalidadEsavi] = diagnosticoFinal.codigo; //Usando indexación de tipo para asignar dinámicamente. //El keyof no es "CreateCausalidadEsaviDto" pero, es para 
      }
     }
 
@@ -857,7 +844,6 @@ export class Dhis2IntegratorService {
     if(grave.muerteFetal){
       desenlaceEsavi.fechaNotififacionMuerteFetal =
         notificacion.fechaNotificacion ? notificacion.fechaNotificacion : null; //'FECHANOTIFICAMUERTEFETAL';
-
     }
     desenlaceEsavi.fechaInicioInvestigacion = this.formatoFecha(
       row[
@@ -920,21 +906,6 @@ export class Dhis2IntegratorService {
         datoEsaviInicial.fechaEsavi = fechaEsavi;
         datoEsaviInicial.descripcion = `Diagnóstico inicial DHIS2 ${i}`;
         datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
-
-        //Mapeo a MEDDRA llt a partir del código CIE10
-        const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(dato.codigo);
-        if(icd10meddra && icd10meddra.meddraLltCode){
-          datoEsaviInicial.codigoLLT = icd10meddra.meddraLltCode;
-
-          const meddraLlt = await this.meddraLltService.searchLltByCode(icd10meddra.meddraLltCode);
-          datoEsaviInicial.nameLLT = meddraLlt && meddraLlt.name ? meddraLlt.name : null;
-          datoEsaviInicial.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
-
-          datoEsaviInicial.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
-          const meddraPt = await this.meddraPtService.searchPtByCode(meddraLlt.ptCode);
-          datoEsaviInicial.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
-          datoEsaviInicial.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
-        }
         datoEsavis.push(datoEsaviInicial);
       }
     }
@@ -972,20 +943,6 @@ export class Dhis2IntegratorService {
           datoEsaviFinal.descripcion = `Diagnóstico final DHIS2 ${i}`;
           datoEsaviFinal.codigoCaso = notificacion.codigoDhis2Evento;
   
-          //Mapeo a MEDDRA llt a partir del código CIE10
-          const icd10meddra = await this.icd10MeddraService.mapIcd10ToLltByCode(dato.codigo);
-          if(icd10meddra && icd10meddra.meddraLltCode){
-            datoEsaviFinal.codigoLLT = icd10meddra.meddraLltCode;
-  
-            const meddraLlt = await this.meddraLltService.searchLltByCode(icd10meddra.meddraLltCode);
-            datoEsaviFinal.nameLLT = meddraLlt && meddraLlt.name ? meddraLlt.name : null;
-            datoEsaviFinal.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
-  
-            datoEsaviFinal.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
-            const meddraPt = await this.meddraPtService.searchPtByCode(meddraLlt.ptCode);
-            datoEsaviFinal.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
-            datoEsaviFinal.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
-          }
           datoEsavis.push(datoEsaviFinal);
         }
     }
@@ -1006,27 +963,6 @@ export class Dhis2IntegratorService {
       if (setOpciones) {
         const datoEsaviSintomatologiai = new CreateDatoEsaviDto();
         datoEsaviSintomatologiai.nombreReportado = setOpciones;
-        
-        //Estandrización de sintomatología a LLT a partir de CT_SYMPTOM_TO_LLT
-        const catalogoSymptom2llt = await this.ctSymptom2lltService.mapSymptomToLlt(setOpciones);
-        datoEsaviSintomatologiai.codigoLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltCode ? catalogoSymptom2llt.lltCode : null;
-        datoEsaviSintomatologiai.nameLLT = catalogoSymptom2llt && catalogoSymptom2llt.lltName ? catalogoSymptom2llt.lltName : null;
-
-        //Estandarización de sintomatología, utilizando el diccionario MEDDRA. También se utiliza el anexo o complemento ICD-10 MedDRA.
-        if(catalogoSymptom2llt.lltCode){//Recordar que el valor de 'name' está en idioma inglés, y la base de datos MEDDRA versión 28 está en ESPAÑOL.
-          const meddraLlt = await this.meddraLltService.searchLltByCode(catalogoSymptom2llt.lltCode);
-          datoEsaviSintomatologiai.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
-          datoEsaviSintomatologiai.codigoPT = meddraLlt && meddraLlt.ptCode ? meddraLlt.ptCode : null;
-          //datoEsaviSintomatologiai.namePT = meddraLlt && meddraLlt.ptName ? meddraLlt.ptName : null;
-          //datoEsaviSintomatologiai.codigoEsaviCie10 = meddraLlt && meddraLlt.icd10Code ? meddraLlt.icd10Code : null; //como no se tiene cargada la relación ICD10-LLT, se omite este campo. Si se coloca de todas formas, entregará solo el valor 'Y' de yes y 'N' de no.
-
-          const meddraPt = await this.meddraPtService.searchPtByCode(datoEsaviSintomatologiai.codigoPT);
-          datoEsaviSintomatologiai.namePT = meddraPt && meddraPt.name ? meddraPt.name : null;
-          datoEsaviSintomatologiai.CTPTMEDDRA_ID = meddraPt && meddraPt.id ? meddraPt.id : null;
-
-          const icd10meddra = await this.icd10MeddraService.mapLltToIcd10ByCode(catalogoSymptom2llt.lltCode);
-          datoEsaviSintomatologiai.codigoEsaviCie10 = icd10meddra && icd10meddra.icd10Code ? icd10meddra.icd10Code : null;
-        }
         
         datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
           row[
@@ -1957,7 +1893,7 @@ export class Dhis2IntegratorService {
         if (notificacion.codigoDhis2Evento) {
           await this.integradorService.create(create);
         }
-      } catch (error) {
+      } catch (error:any) {
         console.log(error);
       }
     }
