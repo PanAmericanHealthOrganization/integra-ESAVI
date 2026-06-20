@@ -30,6 +30,17 @@ services:
       - ./scripts/init-db.sh:/init-db.sh
     entrypoint: ["/bin/bash", "/init-db.sh"]
 
+  app-web:
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/app-integra-esavi
+      dockerfile: Dockerfile
+    container_name: app_integra_esavi
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    depends_on:
+      - keycloak
+
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
     container_name: keycloak_server
