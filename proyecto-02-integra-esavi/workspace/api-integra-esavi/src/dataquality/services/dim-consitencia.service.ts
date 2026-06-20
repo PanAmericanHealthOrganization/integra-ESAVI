@@ -353,9 +353,9 @@ export class DimConsistenciaService {
     const query = `
       select
       count(*) as "totalRegistros",
-      count(*) filter (where tde."NAME_LLT" is not null) as "totalRegistrosValidos",
-      count(*) filter (where tde."NAME_LLT" is null) as "totalRegistrosNoValidos",
-      coalesce(json_agg(DISTINCT tn."ID") filter (where tde."NAME_LLT" is null), '[]') as "idNotificacionesNoValidos"
+      count(*) filter (where tde."NOMBRE_ESAVI" is not null) as "totalRegistrosValidos",
+      count(*) filter (where tde."NOMBRE_ESAVI" is null) as "totalRegistrosNoValidos",
+      coalesce(json_agg(DISTINCT tn."ID") filter (where tde."NOMBRE_ESAVI" is null), '[]') as "idNotificacionesNoValidos"
       from
       "DHI_ESAVI"."TR_NOTIFICACION" tn
       inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on

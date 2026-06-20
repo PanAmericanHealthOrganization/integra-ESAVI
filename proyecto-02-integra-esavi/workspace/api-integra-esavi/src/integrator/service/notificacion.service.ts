@@ -102,13 +102,10 @@ export class NotificacionService {
     const limit = params.pagination.perPage ? parseInt(params.pagination.perPage as any, 10) : 10;
     const skip = (page - 1) * limit;
 
-    const query = this.notificacionRepository.createQueryBuilder('notificacion');
-
-    // Selección de campos específicos si se solicita
-    if (params.meta && Array.isArray(params.meta) && params.meta.length > 0) {
-      const selectFields = params.meta?.fields?.map((field) => `notificacion.${field}`);
-      query.select(selectFields);
-    }
+    const query = this.notificacionRepository.createQueryBuilder('notificacion')
+      .leftJoinAndSelect('notificacion.paciente', 'paciente')
+      .leftJoinAndSelect('paciente.sexo', 'sexoPaciente')
+      .leftJoinAndSelect('notificacion.gravedadEsavi', 'gravedad');
 
     // Aplicar filtros dinámicos
     if (params.filter && typeof params.filter === 'object') {

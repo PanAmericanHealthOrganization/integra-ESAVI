@@ -50,6 +50,8 @@ import {
 } from './entity';
 import {Establecimiento} from './entity/establecimiento.entity';
 import {Investigacion} from './entity/investigacion.entity';
+import {Homologation} from 'src/homologator/entity/homologation.entity';
+import {Homologator} from 'src/homologator/entity/homologator.entity';
 import {IntegradorService} from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
@@ -131,6 +133,8 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Vacunometro,
         SyncProcess,
         Gaceta,
+        Homologator,
+        Homologation,
       ],
       POSTGRES_INTEGRATOR_DS,
     ),

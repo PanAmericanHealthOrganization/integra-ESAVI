@@ -19,6 +19,7 @@ import vacunometro from "./pages/vacunometro"
 
 import configuraciones from "./configuraciones"
 import homologators from "./pages/homologators"
+import {AdminPage} from "./pages/admin/AdminPage"
 import {MeddraPage} from "./pages/estandares/MeddraPage"
 import {WhodrugPage} from "./pages/estandares/WhodrugPage"
 import {SincronizacionesPage} from "./pages/estandares/SincronizacionesPage"
@@ -77,6 +78,7 @@ const App = () => {
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={homologators.list} />
       <Resource name="homologations" />
+      <Resource name="admin" options={{ label: "Administración" }} list={AdminPage} />
       <Resource name="meddra" options={{ label: "MedDRA" }} list={MeddraPage} />
       <Resource name="whodrug" options={{ label: "WHODrug" }} list={WhodrugPage} />
       <Resource name="estandar-syncs" options={{ label: "Sincronizaciones" }} list={SincronizacionesPage} />

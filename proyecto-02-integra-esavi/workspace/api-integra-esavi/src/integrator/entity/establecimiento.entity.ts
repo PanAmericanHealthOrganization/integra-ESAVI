@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { IEstablecimiento } from './interfaces/establecimiento.interface';
+import {Column,Entity,PrimaryGeneratedColumn} from 'typeorm';
+import {Auditoria} from './auditoria.entity';
+import {IEstablecimiento} from './interfaces/establecimiento.interface';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
   schema: 'DHI_ESAVI',

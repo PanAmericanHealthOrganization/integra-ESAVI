@@ -304,13 +304,24 @@ export class VigiflowIntegradorService {
 
       // Create Paciente Vigiflow
       const paciente = new CreatePacienteVigiflowDto();
-      paciente.identificacion = reg['E'];
+      paciente.identificacion = reg['E'] ? reg['E'].toString().trim() : null;
       paciente.sexoPaciente = reg['F'];
       paciente.codigoVigiflow = reg['B'] && reg['B'] ? reg['B'].toString().trim():null; // Viene desde la hoja AEFI columna B
-      paciente.inicialesNombre = reg['C'];
+      paciente.inicialesNombre = reg['C'] ? reg['C'].toString().trim().toUpperCase() : null;
+
+      const origenOriginal = {
+        iniciales: reg['C'] ?? null,
+        identificacion: reg['E'] ?? null,
+        sexo: reg['F'] ?? null,
+        fechaNacimiento: reg['G'] ?? null,
+        edad: reg['H'] ?? null,
+        unidadEdad: reg['I'] ?? null,
+      };
+      paciente.origenOriginal = origenOriginal;
 
       // Create Notificacion
       const notificacion = new CreateNotificacionDto();
+      notificacion.origenOriginal = origenOriginal;
       const fechaNacimiento = this.analizarCadenaFecha(reg['G'] ? reg['G'].toString() : reg['G']);
       if (fechaNacimiento) {
         notificacion.fechaNacimiento = fechaNacimiento;
@@ -726,6 +737,7 @@ export class VigiflowIntegradorService {
 
   //Extracción de los datos de la hoja [3] de nombre 'Reacciones', del libro
   //de Excel 'VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx'.
+  // Cada celda puede contener múltiples valores separados por \n (un valor por evento ESAVI).
   async extractedFromJsonReportToCreateReaccion(workbook2: WorkBook) {
     //Convert file to json
     const ws3 = await workbook2.Sheets[workbook2.SheetNames[3]];
@@ -746,66 +758,95 @@ export class VigiflowIntegradorService {
       isActive: true,
     };
 
+    // Se cargan todos los pacientes (sin filtro isActive) para no perder ninguna reacción
     const allPatients = await this.pacienteService.findAll();
     const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
-    // toCreate.map(async (reg) => {
-    for (const reg of toCreate) {
-      const paciente = patientMap.get(reg['A']?.toString().trim()) ?? null;
+    // La primera fila de la hoja es el encabezado; se omite explícitamente
+    for (const reg of toCreate.slice(1)) {
+      const caseCode = reg['A']?.toString().trim();
+      if (!caseCode) continue;
 
-      if (paciente) {
-        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
-        const notificacion = notificacionList.at(0);
+      const paciente = patientMap.get(caseCode) ?? null;
+      if (!paciente) {
+        this.logger.warn(`[Reacciones] Paciente no encontrado para código: "${caseCode}" — se omite la fila`);
+        continue;
+      }
 
-        let datoEsavi = new CreateDatoEsaviDto();
-        datoEsavi = { ...datoEsavi, ...auditoria };
+      const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
+      const notificacion = notificacionList.at(0);
 
-        datoEsavi.nombre = reg['D'] && reg['D'].toUpperCase();
-        //datoEsavi.nombreReportado = reg['C'] && reg['C'].toUpperCase();
-        const nombreEsaviReportadoMayusculas = reg['C'] && reg['C'].toUpperCase();
-        datoEsavi.nombreReportado = reg['C'] && this.eliminarSaltoLinea(nombreEsaviReportadoMayusculas);
-        datoEsavi.fechaEsavi = this.formatoFecha(reg['I'] ? reg['I'].toString() : reg['I']);
-        datoEsavi.fechaFinalizacion = this.formatoFecha(reg['J'] ? reg['J'].toString() : reg['J']);
-        datoEsavi.duracion = reg['K'];
-        datoEsavi.resultado = reg['N'];
-        datoEsavi.nameLLT = reg['D'] && reg['D'].toUpperCase();
-        datoEsavi.namePT = reg['E'] && reg['E'].toUpperCase();
-        datoEsavi.nameHLT = reg['F'] && reg['F'].toUpperCase();
-        datoEsavi.nameHLGT = reg['G'] && reg['G'].toUpperCase();
-        datoEsavi.nameSOC = reg['H'] && reg['H'].toUpperCase();
+      if (!notificacion) {
+        this.logger.warn(`[Reacciones] Notificación no encontrada para paciente ${paciente.codigoOrigen} — se omite la fila`);
+        continue;
+      }
 
-        //TODO: Crear la interfaz para meddra LLT - PT - SOC
-        const meddraLlt = await this.meddraLltService.searchLLT(reg['D']);
-        const meddraPT = await this.meddraPtService.searchPT(reg['E']);
+      // Cada celda puede tener múltiples valores separados por \n (un evento ESAVI por línea)
+      const nombresLLT        = this.splitLineas(reg['D']?.toString() ?? '');
+      const nombresReportados = this.splitLineas(reg['C']?.toString() ?? '');
+      const nombresPT         = this.splitLineas(reg['E']?.toString() ?? '');
+      const nombresHLT        = this.splitLineas(reg['F']?.toString() ?? '');
+      const nombresHLGT       = this.splitLineas(reg['G']?.toString() ?? '');
+      const nombresSOC        = this.splitLineas(reg['H']?.toString() ?? '');
+      const fechasInicio      = this.splitLineas(reg['I']?.toString() ?? '');
+      const fechasFin         = this.splitLineas(reg['J']?.toString() ?? '');
+      const duraciones        = this.splitLineas(reg['K']?.toString() ?? '');
+      const resultados        = this.splitLineas(reg['N']?.toString() ?? '');
 
-        // TODO: HLT y HLGT no se encuentran implementados en los servicios de meddra
-        // const meddraHLT : any = reg['F'] && await this.meddra.searchPT(reg['F']);
-        // const meddraHLGT : any = reg['G'] && await this.meddra.searchPT(reg['G']);
+      const totalEventos = nombresLLT.length;
+      if (totalEventos === 0) {
+        this.logger.warn(`[Reacciones] Fila sin eventos LLT para notificación ${notificacion.codigoOrigenNotificacion}`);
+        continue;
+      }
 
-        // busque de SOC
-        const meddraSOC = await this.meddraSocService.searchSOC(reg['H']);
+      for (let i = 0; i < totalEventos; i++) {
+        const nombreLLT = nombresLLT[i]?.trim() ?? '';
+        if (!nombreLLT) continue;
 
-        datoEsavi.CTLLTMEDDRA_ID = meddraLlt && meddraLlt.id ? meddraLlt.id : null;
-        datoEsavi.CTPTMEDDRA_ID = meddraPT && meddraPT.id ? meddraPT.id : null;
+        try {
+          let datoEsavi = new CreateDatoEsaviDto();
+          datoEsavi = { ...datoEsavi, ...auditoria };
 
-        // TODO: HLT y HLGT no se encuentran implementados en los servicios de meddra
-        // datoEsavi.CTHLTMEDDRA_ID = meddraHLT && meddraHLT?.length > 0  ? meddraHLT[0].id : null ;
-        // datoEsavi.CTHLGTMEDDRA_ID = meddraHLGT && meddraHLGT?.length > 0  ? meddraHLGT[0].id : null ;
-        datoEsavi.CTSOCMEDDRA_ID = meddraSOC && meddraSOC?.id > 0 ? meddraSOC.id : null;
+          datoEsavi.nombre = nombreLLT.toUpperCase();
+          const nombreReportadoRaw = (nombresReportados[i] ?? nombreLLT).toUpperCase();
+          datoEsavi.nombreReportado = this.eliminarSaltoLinea(nombreReportadoRaw);
+          datoEsavi.fechaEsavi = this.formatoFecha(fechasInicio[i] ?? '');
+          datoEsavi.fechaFinalizacion = this.formatoFecha(fechasFin[i] ?? '');
+          datoEsavi.duracion = duraciones[i] ?? null;
+          datoEsavi.resultado = resultados[i] ?? null;
+          datoEsavi.nameLLT = nombreLLT.toUpperCase();
+          datoEsavi.namePT = (nombresPT[i] ?? '').toUpperCase() || null;
+          datoEsavi.nameHLT = (nombresHLT[i] ?? '').toUpperCase() || null;
+          datoEsavi.nameHLGT = (nombresHLGT[i] ?? '').toUpperCase() || null;
+          datoEsavi.nameSOC = (nombresSOC[i] ?? '').toUpperCase() || null;
 
-        datoEsavi.codigoLLT = meddraLlt && meddraLlt.id ? meddraLlt.code : null;
-        datoEsavi.codigoPT = meddraPT && meddraPT.id ? meddraPT.code : null;
+          const meddraLlt = await this.meddraLltService.searchLLT(nombreLLT);
+          const meddraPT  = await this.meddraPtService.searchPT(nombresPT[i] ?? '');
+          const meddraSOC = await this.meddraSocService.searchSOC(nombresSOC[i] ?? '');
 
-        // TODO: HLT y HLGT no se encuentran implementados en los servicios de meddra
-        // datoEsavi.codigoHLT = meddraHLT && meddraHLT?.length > 0 ? meddraHLT[0].code : null ;
-        // datoEsavi.codigoHLGT = meddraHLGT && meddraHLGT?.length > 0 ? meddraHLGT[0].code : null ;
-        datoEsavi.codigoSOC = meddraSOC && meddraSOC.id ? meddraSOC.code : null;
+          datoEsavi.CTLLTMEDDRA_ID = meddraLlt?.id ?? null;
+          datoEsavi.CTPTMEDDRA_ID  = meddraPT?.id  ?? null;
+          datoEsavi.CTSOCMEDDRA_ID = meddraSOC?.id ?? null;
 
-        //
-        datoEsavi.codigoCaso = notificacion.codigoOrigenNotificacion;
-        await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
+          datoEsavi.codigoLLT = meddraLlt?.code ?? null;
+          datoEsavi.codigoPT  = meddraPT?.code  ?? null;
+          datoEsavi.codigoSOC = meddraSOC?.code ?? null;
+
+          datoEsavi.codigoCaso = notificacion.codigoOrigenNotificacion;
+          await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
+        } catch (err) {
+          this.logger.error(
+            `[Reacciones] Error procesando evento "${nombreLLT}" [i=${i}] para notificación ${notificacion.codigoOrigenNotificacion}: ${err.message}`,
+          );
+          // Continúa con el siguiente evento sin detener el procesamiento
+        }
       }
     }
+  }
+
+  private splitLineas(valor: string): string[] {
+    if (!valor) return [];
+    return valor.split(/\r?\n/).map(s => s.trim()).filter(s => s !== '');
   }
 
   /**
@@ -852,10 +893,12 @@ private transformarLoteVacuna(valor: string): string {// regex dinámica.
   return regex.test(valor.trim()) ? 'Desconocido' : valor;
 }
   formatoFecha(valor: string): Date | null {
-    if (valor && valor.length > 0 && valor !== '') {
+    if (valor && valor.length >= 6 && valor !== '') {
       const year = parseInt(valor.substring(0, 4), 10);
       const month = parseInt(valor.substring(4, 6), 10);
-      const day = parseInt(valor.substring(6, 8), 10);
+      // Cuando la fecha solo tiene YYYYMM (sin día), se usa el 15 como día por defecto
+      const dayStr = valor.substring(6, 8);
+      const day = dayStr ? (parseInt(dayStr, 10) || 15) : 15;
       const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
       return isNaN(date.getTime()) ? null : date;
     }

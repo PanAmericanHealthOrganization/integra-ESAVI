@@ -1,3 +1,4 @@
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
@@ -53,6 +54,13 @@ export const CustomMenu = () => {
               to="/homologators"
               primaryText="Homologación"
               leftIcon={<CompareArrowsIcon />}
+            />
+          </Authorize>
+          <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+            <Menu.Item
+              to="/admin"
+              primaryText="Administración"
+              leftIcon={<AdminPanelSettingsIcon />}
             />
           </Authorize>
         </SubMenu>

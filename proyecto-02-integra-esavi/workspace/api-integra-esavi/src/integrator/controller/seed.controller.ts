@@ -48,4 +48,17 @@ export class SeedController {
       timestamp: new Date().toISOString(),
     };
   }
+
+  @Delete('truncate-notificacion')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Truncar TR_NOTIFICACION y todas sus tablas dependientes en cascada' })
+  @ApiResponse({ status: 200, description: 'TR_NOTIFICACION truncada en cascada exitosamente' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  async truncateNotificacion() {
+    await this.seedService.truncateNotificacion();
+    return {
+      message: 'TR_NOTIFICACION truncada en cascada exitosamente',
+      timestamp: new Date().toISOString(),
+    };
+  }
 }

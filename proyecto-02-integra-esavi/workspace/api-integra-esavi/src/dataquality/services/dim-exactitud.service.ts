@@ -86,19 +86,13 @@ export class DimExactitudService {
    * @returns
    */
   private async _nombreVacunaDominio(day: Date): Promise<CalidadDatosResultadoDto> {
-    const listaVacunas = ['COVID 19', 'HB ADULTO', 'PENTAVALENTE']; // Ejemplo de dominio de vacunas
+    // Valida que el código ATC registrado corresponda a una vacuna (prefijo J07)
     const query = `
     select
-    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" is not null) as "totalRegistros",
-    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" in (${listaVacunas
-      .map((v) => `'${v}'`)
-      .join(', ')})) "totalRegistrosValidos",
-    count(tn."DRUG_NAME") filter (where tn."DRUG_NAME" not in (${listaVacunas
-      .map((v) => `'${v}'`)
-      .join(', ')})) "totalRegistrosNoValidos"
-    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."DRUG_NAME" not in (${listaVacunas
-      .map((v) => `'${v}'`)
-      .join(', ')})), '[]') as "idNotificacionesNoValidos"
+    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" is not null) as "totalRegistros",
+    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" like 'J07%') "totalRegistrosValidos",
+    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" not like 'J07%') "totalRegistrosNoValidos"
+    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."CODIGO_ATC" not like 'J07%'), '[]') as "idNotificacionesNoValidos"
     from
       "DHI_ESAVI"."TR_DATO_VACUNA" tn
     where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'

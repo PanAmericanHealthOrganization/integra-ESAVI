@@ -101,4 +101,12 @@ export class Paciente extends Auditoria {
   })
   codigoOrigen: string;
 
+  @Column({
+    name: 'ORIGEN_ORIGINAL',
+    type: 'jsonb',
+    nullable: true,
+    comment: 'Registro original en formato JSON de la fuente de datos (campos procesados)',
+  })
+  origenOriginal: Record<string, any>;
+
 }

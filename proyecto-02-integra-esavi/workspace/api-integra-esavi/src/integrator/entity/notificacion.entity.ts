@@ -3,11 +3,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import {SourceEnum} from '../enum/source-enum';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
+import {GravedadEsavi} from './gravedad-esavi.entity';
 import {Notificador} from './notificador.entity';
 import {Paciente} from './paciente.entity';
 
@@ -88,6 +90,9 @@ export class Notificacion extends Auditoria {
   @ManyToOne(() => Notificador, { nullable: true, eager: false })
   @JoinColumn({ name: 'NOTIFICADOR_ID', referencedColumnName: 'identificacion' })
   notificador: Notificador;
+
+  @OneToMany(() => GravedadEsavi, (g) => g.notificacion, { eager: false })
+  gravedadEsavi: GravedadEsavi[];
 
  
 
@@ -208,7 +213,7 @@ export class Notificacion extends Auditoria {
   codigoOrigenNotificacion: string;
 
   /**
-   * 
+   *
    */
   @Column({
     name: 'ORIGEN',
@@ -218,5 +223,13 @@ export class Notificacion extends Auditoria {
     comment: 'Sistema de origen de la notificación: VIGIFLOW o DHIS2',
   })
   origen: SourceEnum;
+
+  @Column({
+    name: 'ORIGEN_ORIGINAL',
+    type: 'jsonb',
+    nullable: true,
+    comment: 'Registro original en formato JSON de la fuente de datos (campos procesados)',
+  })
+  origenOriginal: Record<string, any>;
 
 }
