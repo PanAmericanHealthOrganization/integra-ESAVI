@@ -213,16 +213,7 @@ export class NotificacionVigiflowService {
 
   async update(notificacion: Notificacion, updateNotificacion: UpdateNotificacionDto, notificador?: Notificador) {
     try {
-      if (updateNotificacion.profesionNotificadorParam) {
-        try {
-          const profesionNotificador = await this.catalogoService.findByDescriptionToVigiflow(
-            updateNotificacion.profesionNotificadorParam,
-          );
-          notificacion.profesionNotificador = profesionNotificador;
-        } catch (error) {
-          console.log('Profesion no encontrada');
-        }
-      }
+      
 
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
       notificacion.tipoReporte = updateNotificacion.tipoReporte;
