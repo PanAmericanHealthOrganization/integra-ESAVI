@@ -11,9 +11,12 @@
 		},
 		{
 			"path": "herramientas"
+		},
+		{
+			"path": "docker-compose"
 		}
 	],
 	"settings": {
-		"liveServer.settings.multiRootWorkspaceName": "herramientas"
+		"liveServer.settings.multiRootWorkspaceName": "api-integra-esavi"
 	}
 }

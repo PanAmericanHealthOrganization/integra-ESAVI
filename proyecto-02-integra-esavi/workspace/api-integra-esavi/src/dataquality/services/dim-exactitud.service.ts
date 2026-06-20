@@ -62,8 +62,8 @@ export class DimExactitudService {
         count(tn."EDAD") filter (where tn."EDAD" is null) "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (where tn."EDAD" is null), '[]') as "idNotificacionesNoValidos"
         from
-          dhi_esavi."TR_NOTIFICACION" tn
-        inner join dhi_esavi."TR_PACIENTE" tp on tn."PACIENTE_ID" = tp."ID"
+          "DHI_ESAVI"."TR_NOTIFICACION" tn
+        inner join "DHI_ESAVI"."TR_PACIENTE" tp on tn."PACIENTE_ID" = tp."ID"
         where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
         ;
     `;
@@ -100,7 +100,7 @@ export class DimExactitudService {
       .map((v) => `'${v}'`)
       .join(', ')})), '[]') as "idNotificacionesNoValidos"
     from
-      dhi_esavi."TR_DATO_VACUNA" tn
+      "DHI_ESAVI"."TR_DATO_VACUNA" tn
     where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
     `;
     const result = await this.dataSource.query(query);
@@ -138,7 +138,7 @@ export class DimExactitudService {
         item.campo
       }" > ${item.maxValor}), '[]') as "idNotificacionesNoValidos"
         from
-          dhi_esavi."${item.tabla}" tn
+          "DHI_ESAVI"."${item.tabla}" tn
         where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
         ;
     `;

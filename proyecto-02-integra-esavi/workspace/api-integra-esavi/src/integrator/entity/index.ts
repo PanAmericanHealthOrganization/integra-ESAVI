@@ -18,6 +18,7 @@ export * from './gaceta.entity';
 export * from './gravedad-esavi.entity';
 export * from './medicamento.entity';
 export * from './notificacion.entity';
+export * from './notificador.entity';
 export * from './paciente-embarazada.entity';
 export * from './paciente.entity';
 export * from './parametro.entity';

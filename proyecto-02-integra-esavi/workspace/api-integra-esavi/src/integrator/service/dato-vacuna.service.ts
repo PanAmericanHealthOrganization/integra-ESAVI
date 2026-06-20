@@ -1,12 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { plainToClass } from 'class-transformer';
-import { IsNull, Repository } from 'typeorm';
-import { CreateDatoVacunaDto, UpdateDatoVacunaDto } from '../dto';
-import { DatoVacuna } from '../entity/dato-vacuna.entity';
-import { Notificacion } from '../entity/notificacion.entity';
-import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { CatalogoService } from './catalogo.service';
+import {Injectable,Logger} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {plainToClass} from 'class-transformer';
+import {IsNull,Repository} from 'typeorm';
+import {CreateDatoVacunaDto,UpdateDatoVacunaDto} from '../dto';
+import {DatoVacuna} from '../entity/dato-vacuna.entity';
+import {Notificacion} from '../entity/notificacion.entity';
+import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoService} from './catalogo.service';
 
 @Injectable()
 export class DatoVacunaService {
@@ -33,7 +33,6 @@ export class DatoVacunaService {
       // 1. Buscar si ya existe un DatoVacuna con los mismos valores (nombreVacuna, codigoAtc, numeroLote, notificacion)
       const existingDatoVacuna = await this.datoVacunaRepository.findOne({
         where: {
-          drugName: createDto.drugName,
           codigoAtc: createDto.codigoAtc,
           numeroLote: createDto.numeroLote,
           notificacion: notificacion, // Asociamos la notificación al buscar
@@ -98,12 +97,7 @@ export class DatoVacunaService {
         const existingDatoVacuna = await this.datoVacunaRepository.findOne({
           where: {
             notificacion: { id: notificacion.id },
-            drugName: dto.drugName, // Buscar por nombreVacuna además de la notificación
-            drugCode: dto.drugCode,
             codigoAtc: dto.codigoAtc,
-            medicinalProductId: dto.medicinalProductId,
-            //activeIngredientJson: dto.activeIngredientJson,
-            //acIngredientTranslationJson: dto.acIngredientTranslationJson,
           },
         });
 
@@ -144,15 +138,21 @@ export class DatoVacunaService {
    * @param createDto
    * @returns
    */
+  async findByNotificacionId(notificacionId: string): Promise<DatoVacuna[]> {
+    return this.datoVacunaRepository.find({
+      where: { notificacion: { id: notificacionId } },
+      relations: ['rolVacuna'],
+      order: { createdAt: 'ASC' },
+    });
+  }
+
   async findByNotifIdDtoMinimo(uuidNotificacion: string): Promise<DatoVacuna[]> {
     try {
       const datosVacuna = await this.datoVacunaRepository.find({
         where: {
           notificacion: { id: uuidNotificacion }, // Buscar por el id de la notificación
-          drugName: IsNull(),
           rolVacuna: IsNull(),
           numeroLote: IsNull(),
-          nombreVacPatenteWHODrug: IsNull(),
           codigoAtc: IsNull(),
           indicacionMeddra: IsNull(),
         },
@@ -208,8 +208,6 @@ export class DatoVacunaService {
       where: { 
         isActive: true, 
         id: uuid, 
-        drugName: IsNull(), 
-        nombreVacPatenteWHODrug: IsNull(), 
         numeroLote: IsNull(), 
         codigoAtc: IsNull(), 
         indicacionMeddra: IsNull(), 
@@ -234,10 +232,6 @@ export class DatoVacunaService {
     if (rolVacuna) {
       datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
     }
-    if (vacunaDto.nombreVacPatenteWHODrug) {
-       datoVacuna.nombreVacPatenteWHODrug = vacunaDto.nombreVacPatenteWHODrug; 
-    }
-    
     Object.assign(datoVacuna, otherFields);
     const savedDatoVacuna = await this.datoVacunaRepository.save(datoVacuna);
     return savedDatoVacuna;

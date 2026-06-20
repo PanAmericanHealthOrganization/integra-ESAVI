@@ -6,14 +6,28 @@ import {
   ExportButton,
   FunctionField,
   List,
+  SelectInput,
   TextInput,
   TopToolbar,
 } from "react-admin"
 import BulkDialog from "./BulkDialog"
 
+const origenChoices = [
+  { id: "VIGIFLOW", name: "VigiFlow" },
+  { id: "DHIS2", name: "DHIS2" },
+]
+
 const postFilters = [
-  <TextInput label="Origen" source="origen" alwaysOn />,
+  <SelectInput
+    label="Origen"
+    source="origen"
+    choices={origenChoices}
+    alwaysOn
+    emptyText="Todos"
+    emptyValue=""
+  />,
   <TextInput label="Identificación" source="identificacion" alwaysOn />,
+  <TextInput label="Código Origen" source="codigoOrigenNotificacion" alwaysOn />,
 ]
 
 const ListActions = () => {
@@ -62,8 +76,8 @@ export const ESAVISList = () => {
 
   return (
     <Card variant="outlined" sx={{ padding: '10px' }}>
-      <List actions={<ListActions />} empty={false}>
-        <Datagrid bulkActionButtons={false}>
+      <List actions={<ListActions />} filters={postFilters} empty={false}>
+        <Datagrid bulkActionButtons={false} rowClick="show">
           <FunctionField
             label="Id"
             source="id"
@@ -99,21 +113,12 @@ export const ESAVISList = () => {
             )}
           />
           <FunctionField
-            label="Código Origen"
-            render={(record: any) => {
-              return record.codigoVigiflow && record.codigoVigiflow !== ""
-                ? "VIGIFLOW"
-                : "DHIS2"
-            }}
+            label="Origen"
+            render={(record: any) => record.origen ?? "--"}
           />
           <FunctionField
             label="Código Origen"
-            render={(record: any) => {
-              // Si codigoVigiflow tiene un valor válido (no es null, undefined ni vacío), se muestra, si no se muestra codigoDhis2Evento
-              return record.codigoVigiflow && record.codigoVigiflow !== ""
-                ? record.codigoVigiflow
-                : (record.codigoDhis2Evento ?? "--") // Si codigoDhis2Evento no está disponible, muestra '--'
-            }}
+            render={(record: any) => record.codigoOrigenNotificacion ?? "--"}
           />
           {/* <TextField label="Fecha Notificación" source="fechaNotificacion" /> */}
           <FunctionField

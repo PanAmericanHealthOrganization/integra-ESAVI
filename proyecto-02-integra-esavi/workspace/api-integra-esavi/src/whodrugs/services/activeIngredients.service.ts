@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
-import { ActiveIngredient } from '../models/activeIngredient.entity';
-import { Drug } from '../models/drug.entity';
-import { IActiveIngredient, IDrugResponse } from '../models/dtos';
-import { IngredientTranslationService } from './ingredientsTraslations.service';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {Repository,UpdateResult} from 'typeorm';
+import {ActiveIngredient} from '../models/activeIngredient.entity';
+import {Drug} from '../models/drug.entity';
+import {IActiveIngredient,IDrugResponse} from '../models/dtos';
+import {IngredientTranslationService} from './ingredientsTraslations.service';
 
 @Injectable()
 export class ActiveIngredientsService {
   constructor(
     public readonly ingredientTranslationService: IngredientTranslationService,
 
-    @InjectRepository(ActiveIngredient, 'who_drug')
+    @InjectRepository(ActiveIngredient, 'WHO_DRUG')
     private readonly activeIngredientsRepository: Repository<ActiveIngredient>,
   ) {}
 

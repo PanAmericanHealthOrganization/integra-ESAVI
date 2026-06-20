@@ -5,14 +5,14 @@ services:
     environment:
       POSTGRES_USER: dhis
       POSTGRES_PASSWORD: dhis
-      POSTGRES_DB: dhi_esavi
+      POSTGRES_DB: DHI_ESAVI
       TZ: America/Guayaquil
     ports:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dhis -d dhi_esavi"]
+      test: ["CMD-SHELL", "pg_isready -U dhis -d DHI_ESAVI"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,6 +29,17 @@ services:
     volumes:
       - ./scripts/init-db.sh:/init-db.sh
     entrypoint: ["/bin/bash", "/init-db.sh"]
+
+  app-web:
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/app-integra-esavi
+      dockerfile: Dockerfile
+    container_name: app_integra_esavi
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    depends_on:
+      - keycloak
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3

@@ -1,7 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { SOC } from '../models/standar/soc.entity';
+import {Injectable,Logger} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {SOC} from '../models/standar/soc.entity';
 
 /**
  *
@@ -10,7 +10,7 @@ import { SOC } from '../models/standar/soc.entity';
 export class MeddraSocService {
   //
   constructor(
-    @InjectRepository(SOC, 'meddra')
+    @InjectRepository(SOC, 'MEDDRA')
     private readonly socRepository: Repository<SOC>,
   ) {}
   //

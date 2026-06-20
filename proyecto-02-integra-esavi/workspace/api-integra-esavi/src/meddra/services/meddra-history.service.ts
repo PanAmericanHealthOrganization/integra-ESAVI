@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { ILike, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IMeddraQueryRequest, IMeddraResponse } from '../models/dto';
-import { MeddraQuery } from '../models/meddraquerys.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {ILike,Repository} from 'typeorm';
+import {IMeddraQueryRequest,IMeddraResponse} from '../models/dto';
+import {MeddraQuery} from '../models/meddraquerys.entity';
 
 @Injectable()
 export class MeddraHistoryService {
   constructor(
-    @InjectRepository(MeddraQuery, 'meddra')
+    @InjectRepository(MeddraQuery, 'MEDDRA')
     private readonly medraRepository: Repository<MeddraQuery>,
   ) {}
 

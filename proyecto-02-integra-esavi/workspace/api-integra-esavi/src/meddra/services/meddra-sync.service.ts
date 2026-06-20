@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { MeddraSync } from '../models/standar/meddraSync.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {Repository} from 'typeorm';
+import {MeddraSync} from '../models/standar/meddraSync.entity';
 
 @Injectable()
 export class MeddraSyncService {
   constructor(
-    @InjectRepository(MeddraSync, 'meddra')
+    @InjectRepository(MeddraSync, 'MEDDRA')
     private readonly meddraSyncRepository: Repository<MeddraSync>,
   ) {}
 

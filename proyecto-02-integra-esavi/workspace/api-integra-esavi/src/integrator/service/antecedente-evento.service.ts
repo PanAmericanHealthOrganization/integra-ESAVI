@@ -99,11 +99,8 @@ export class AntecedenteEventoService {
 
   async findAntecedenteEventoByNotificacionUUID(uuidNotificacion: string) {
     return this.antecedenteEventoRepository.find({
-      where: {
-        notificacion: {
-          id: uuidNotificacion,
-        },
-      },
+      where: { notificacion: { id: uuidNotificacion } },
+      relations: ['alergiaMedicamento', 'alergiaAlimentos', 'alergiaInsectos', 'alergiaPolvo'],
     });
   }
 }

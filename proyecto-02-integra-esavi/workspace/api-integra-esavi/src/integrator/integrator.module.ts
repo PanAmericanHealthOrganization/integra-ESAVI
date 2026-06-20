@@ -16,6 +16,7 @@ import {DesenlaceEsaviController} from './controller/desenlace-esavi.controller'
 import {IntegradorController} from './controller/integrador.controller';
 import {InvestigacionController} from './controller/investigacion.controller';
 import {NotificacionController} from './controller/notificacion.controller';
+import {NotificadorController} from './controller/notificador.controller';
 import {PacienteEmbarazadaController} from './controller/paciente-embarazada.controller';
 import {PacienteVigiflowController} from './controller/paciente-vigiflow.controller';
 import {PacienteController} from './controller/paciente.controller';
@@ -47,6 +48,7 @@ import {
   GravedadEsavi,
   Medicamento,
   Notificacion,
+  Notificador,
   Paciente,
   PacienteEmbarazada,
   Parametro,
@@ -55,12 +57,8 @@ import {
   Vacunacion,
   Vacunometro,
 } from './entity';
-import {CtIcd10meddra} from './entity/ct-icd10meddra.entity';
-import {CtSymptom2llt} from './entity/ct-symptom2llt.entity';
 import {Establecimiento} from './entity/establecimiento.entity';
 import {Investigacion} from './entity/investigacion.entity';
-import {WhodrugHomologaVacs} from './entity/whodrug-homologavacs.entity';
-import {WhodrugVacsTemp} from './entity/whodrug-vacstemp.entity';
 import {IntegradorService} from './facade/integrador.service';
 import {
   AntecedenteEmbarazoService,
@@ -86,15 +84,12 @@ import {
   ReporteService,
   SeedService,
 } from './service';
-import {CtIcd10meddraService} from './service/ct-icd10meddra.service';
-import {CtSymptom2lltService} from './service/ct-symptom2llt.service';
 import {EstablecimientosService} from './service/establecimientos.service';
 import {InvestigacionService} from './service/investigacion.service';
+import {NotificadorService} from './service/notificador.service';
 import {PacienteService} from './service/paciente.service';
 import {SyncService} from './service/sync.service';
 import {VacunometroService} from './service/vacunometro.service';
-import {WhodrugHomologaVacsService} from './service/whodrug-homologavacs.service';
-import {WhodrugVacsTempService} from './service/whodrug-vacstemp.service';
 
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
@@ -130,10 +125,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Parroquia,
         Provincia,
         CausalidadEsavi,
-        CtIcd10meddra,
-        CtSymptom2llt,
-        WhodrugHomologaVacs,
-        WhodrugVacsTemp,
         DatoEsavi,
         DatoVacuna,
         DatoVacunacion,
@@ -143,6 +134,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Investigacion,
         Medicamento,
         Notificacion,
+        Notificador,
         Paciente,
         PacienteEmbarazada,
         Parametro,
@@ -180,6 +172,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     PacienteController,
     ParametroController,
     GacetaController,
+    NotificadorController,
   ],
   providers: [
     SyncService,
@@ -214,19 +207,12 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     SeedService,
     VacunometroService,
     InvestigacionService,
-    CtSymptom2lltService,
-    CtIcd10meddraService,
-    WhodrugVacsTempService,
-    WhodrugHomologaVacsService,
     GacetaService,
+    NotificadorService,
   ],
   exports: [
     SyncService,
     IntegradorService,
-    CtIcd10meddraService,
-    CtSymptom2lltService,
-    WhodrugVacsTempService,
-    WhodrugHomologaVacsService,
     PacienteService,
     MedicamentoService,
     NotificacionVigiflowService,
@@ -236,6 +222,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DatoEsaviService,
     AntecedenteEmbarazoService,
     VacunometroService,
+    NotificadorService,
   ],
 })
 export class IntegratorModule {}

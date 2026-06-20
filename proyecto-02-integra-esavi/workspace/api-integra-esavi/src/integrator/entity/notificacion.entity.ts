@@ -5,8 +5,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import {SourceEnum} from '../enum/source-enum';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
+import {Notificador} from './notificador.entity';
 import {Paciente} from './paciente.entity';
 
 @Entity({
@@ -80,13 +82,12 @@ export class Notificacion extends Auditoria {
   @JoinColumn({ name: 'CTUNIDADEDAD_ID' })
   unidadEdad: Catalogo;
 
-
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTPROFESIONNOTIFICADOR_ID' })
-  profesionNotificador: Catalogo;
+/**
+ * 
+ */
+  @ManyToOne(() => Notificador, { nullable: true, eager: false })
+  @JoinColumn({ name: 'NOTIFICADOR_ID', referencedColumnName: 'identificacion' })
+  notificador: Notificador;
 
  
 
@@ -196,11 +197,26 @@ export class Notificacion extends Auditoria {
   })
   fechaAtencion: Date; // Variable propia de DHIS2 no existente en VigiFlow.
 
+  /**
+   * 
+   */
   @Column({
     name: 'CODIGO_ORIGEN_NOTIFICACION',
     nullable: true,
     comment: 'Código único de la notificación en el sistema origen (VigiFlow o DHIS2)',
   })
   codigoOrigenNotificacion: string;
+
+  /**
+   * 
+   */
+  @Column({
+    name: 'ORIGEN',
+    type: 'enum',
+    enum: SourceEnum,
+    nullable: true,
+    comment: 'Sistema de origen de la notificación: VIGIFLOW o DHIS2',
+  })
+  origen: SourceEnum;
 
 }

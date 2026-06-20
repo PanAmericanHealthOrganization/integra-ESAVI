@@ -1,6 +1,6 @@
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
+import { Establecimiento } from './establecimiento.entity';
 import { Notificacion } from './notificacion.entity';
 
 @Entity({
@@ -45,47 +45,24 @@ export class DatoVacunacion extends Auditoria {
   horaVacunacion: Date;
 
   /**
-   * Many to one of dato vacunacion
+   * Establecimiento donde se administró la vacuna (referenciado por unicodigo).
+   * Cuando el vacunatorio no está en el catálogo de establecimientos, usar otraDireccion.
    */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PROVINCIA_VACUNATORIO_ID' })
-  provincia: Catalogo;
-
-  /**
-   * Many to one of dato vacunacion
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_CANTON_NOTIFICADOR_ID' })
-  canton: Catalogo;
-
-  /**
-   * Many to one of dato vacunacion
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PARROQUIA_NOTIFICADOR_ID' })
-  parroquia: Catalogo;
+  @ManyToOne(() => Establecimiento, { nullable: true, eager: false })
+  @JoinColumn({ name: 'ESTABLECIMIENTO_UNI_CODIGO', referencedColumnName: 'uniCodigo' })
+  establecimiento: Establecimiento;
 
   /**
    *
    */
   @Column({
-    name: 'OTRAPARROQUIANOTIFICADOR',
-    length: 128,
+    name: 'OTRA_DIRECCION_VACUNATORIO',
+    type: 'varchar',
+    length: 1200,
     nullable: true,
-    comment: 'Otra parroquia no contemplada en catálogo donde se ubica el vacunatorio',
+    comment: 'Dirección del vacunatorio cuando no está registrado como establecimiento',
   })
-  otraParroquia: string;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'DIRECCIONVACUNATORIO',
-    length: 128,
-    nullable: true,
-    comment: 'Dirección completa del vacunatorio',
-  })
-  direccion: string;
+  otraDireccion: string;
 
   /**
    *

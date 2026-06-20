@@ -85,6 +85,13 @@ export class DatoVacunacionService {
     throw new EntityNotFoundException('DatoVacunacion', uuid);
   }
 
+  async findByNotificacionId(notificacionId: string): Promise<DatoVacunacion | null> {
+    return this.datoVacunacionRepository.findOne({
+      where: { notificacion: { id: notificacionId } },
+      relations: ['establecimiento'],
+    });
+  }
+
   async update(uuid: string, vacunaDto: UpdateDatoVacunacionDto) {
     const datoVacuna = await this.findOne(uuid);
   }

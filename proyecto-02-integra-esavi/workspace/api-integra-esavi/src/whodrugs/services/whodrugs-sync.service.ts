@@ -1,23 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { createHash } from 'node:crypto';
-import { Repository } from 'typeorm';
-import { ActiveIngredient } from '../models/activeIngredient.entity';
-import { AnatomicalTherapeuticChemical } from '../models/atomicTerapeutalChemical.entity';
-import { DrugSchemaAdapter } from '../models/builders/drug.build';
-import { CountryOfSale } from '../models/countryOfSale.entity';
-import { Drug } from '../models/drug.entity';
-import { DrugSync, DrugSyncBuilder } from '../models/drugSync.entity';
-import { IDrugResponse } from '../models/dtos';
-import { IngredientTranslation } from '../models/ingredientTranslation.entity';
-import { Maholder } from '../models/maholder.entity';
-import { SyncStateEnum } from '../utils/sycnstate.enum';
-import { uuidGenerator } from '../utils/utils';
-import { WhoDrugsClientService } from './whodrugs-client.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { formatDate } from 'date-fns';
-import { Auditoria } from 'src/integrator/entity';
-import { withAuditOnCreate, withAuditOnUpdate } from 'src/common/utils/audit.util';
+import {Injectable,Logger} from '@nestjs/common';
+import {Cron,CronExpression} from '@nestjs/schedule';
+import {InjectRepository} from '@nestjs/typeorm';
+import {formatDate} from 'date-fns';
+import {createHash} from 'node:crypto';
+import {withAuditOnCreate,withAuditOnUpdate} from 'src/common/utils/audit.util';
+import {Auditoria} from 'src/integrator/entity';
+import {Repository} from 'typeorm';
+import {ActiveIngredient} from '../models/activeIngredient.entity';
+import {AnatomicalTherapeuticChemical} from '../models/atomicTerapeutalChemical.entity';
+import {DrugSchemaAdapter} from '../models/builders/drug.build';
+import {CountryOfSale} from '../models/countryOfSale.entity';
+import {Drug} from '../models/drug.entity';
+import {DrugSync,DrugSyncBuilder} from '../models/drugSync.entity';
+import {IDrugResponse} from '../models/dtos';
+import {IngredientTranslation} from '../models/ingredientTranslation.entity';
+import {Maholder} from '../models/maholder.entity';
+import {SyncStateEnum} from '../utils/sycnstate.enum';
+import {uuidGenerator} from '../utils/utils';
+import {WhoDrugsClientService} from './whodrugs-client.service';
 
 const cliProgress = require('cli-progress');
 
@@ -29,25 +29,25 @@ export class WhoDrugsSyncService {
   constructor(
     private readonly whoDrugsClientService: WhoDrugsClientService,
 
-    @InjectRepository(Drug, 'who_drug')
+    @InjectRepository(Drug, 'WHO_DRUG')
     private readonly drugRepository: Repository<Drug>,
 
-    @InjectRepository(DrugSync, 'who_drug')
+    @InjectRepository(DrugSync, 'WHO_DRUG')
     private readonly drugSyncRepository: Repository<DrugSync>,
 
-    @InjectRepository(ActiveIngredient, 'who_drug')
+    @InjectRepository(ActiveIngredient, 'WHO_DRUG')
     private readonly activeIngredientsRepository: Repository<ActiveIngredient>,
 
-    @InjectRepository(IngredientTranslation, 'who_drug')
+    @InjectRepository(IngredientTranslation, 'WHO_DRUG')
     private readonly ingredientTranslationRepository: Repository<IngredientTranslation>,
 
-    @InjectRepository(CountryOfSale, 'who_drug')
+    @InjectRepository(CountryOfSale, 'WHO_DRUG')
     private readonly countrySaleRepository: Repository<CountryOfSale>,
 
-    @InjectRepository(AnatomicalTherapeuticChemical, 'who_drug')
+    @InjectRepository(AnatomicalTherapeuticChemical, 'WHO_DRUG')
     private readonly anatomicalTherapeuticChemicalRepository: Repository<AnatomicalTherapeuticChemical>,
 
-    @InjectRepository(Maholder, 'who_drug')
+    @InjectRepository(Maholder, 'WHO_DRUG')
     private readonly maholderRepository: Repository<Maholder>,
   ) {}
 

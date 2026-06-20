@@ -84,8 +84,8 @@ export class DimCompletitudService {
               evalItem.joinColumn
             }") filter (where tp."${columna}" is null), '[]') as "idNotificacionesNoValidos"
             from
-              dhi_esavi."${evalItem.tabla}" tp inner 
-              join dhi_esavi."TR_NOTIFICACION" tn
+              "DHI_ESAVI"."${evalItem.tabla}" tp inner 
+              join "DHI_ESAVI"."TR_NOTIFICACION" tn
               on tn."${evalItem.fkColumn}" = tp."${evalItem.joinColumn}"
             where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}';`;
         const result = await this.dataSource.query(query);

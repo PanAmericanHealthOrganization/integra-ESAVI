@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { join } from 'path';
+import {join} from 'path';
 import * as readline from 'readline';
 
 /**

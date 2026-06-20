@@ -1,39 +1,39 @@
-import { DataSource, In, InsertResult, Repository } from 'typeorm';
-import { LLT } from '../models/standar/llt.entity';
+import {DataSource,In,InsertResult,Repository} from 'typeorm';
+import {LLT} from '../models/standar/llt.entity';
 
-import { Logger } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import {Logger} from '@nestjs/common';
+import {InjectDataSource,InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
-import { join } from 'path';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import {join} from 'path';
+import {withAuditOnCreate} from 'src/common/utils/audit.util';
 import * as XLSX from 'xlsx';
-import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
-import { MeddraSync } from '../models/standar/meddraSync.entity';
-import { PT } from '../models/standar/pt.entity';
-import { SOC } from '../models/standar/soc.entity';
-import { MeddraUtils } from '../utils/meddra.utils';
+import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
+import {MeddraSync} from '../models/standar/meddraSync.entity';
+import {PT} from '../models/standar/pt.entity';
+import {SOC} from '../models/standar/soc.entity';
+import {MeddraUtils} from '../utils/meddra.utils';
 /**
  * Permite procesar los archivos de meddra
  */
 export class MeddraProcessFilesService {
   meddraVersionFilePath = null;
   constructor(
-    @InjectRepository(SOC, 'meddra')
+    @InjectRepository(SOC, 'MEDDRA')
     private readonly socRepository: Repository<SOC>,
 
-    @InjectRepository(PT, 'meddra')
+    @InjectRepository(PT, 'MEDDRA')
     private readonly ptRepository: Repository<PT>,
 
-    @InjectRepository(LLT, 'meddra')
+    @InjectRepository(LLT, 'MEDDRA')
     private readonly lltRepository: Repository<LLT>,
 
-    @InjectRepository(MeddraSync, 'meddra')
+    @InjectRepository(MeddraSync, 'MEDDRA')
     private readonly meddraSuncRepository: Repository<MeddraSync>,
 
-    @InjectRepository(cie10Meddra, 'meddra')
+    @InjectRepository(cie10Meddra, 'MEDDRA')
     private readonly cie10MeddraRepository: Repository<cie10Meddra>,
 
-    @InjectDataSource('meddra')
+    @InjectDataSource('MEDDRA')
     private dataSource: DataSource,
   ) {
     this.meddraVersionFilePath = '';
@@ -188,7 +188,7 @@ export class MeddraProcessFilesService {
   async processCIE10Meddra(version: string, lang: string): Promise<boolean> {
     console.log(`Procesando CIE10Meddra${version}${lang}`);
     const fileName = `ICD_10_TO_MEDDRA_${lang}_${version}.xlsx`;
-    const filePath = join(process.cwd(), 'upload_files', 'meddra', version, lang, fileName);
+    const filePath = join(process.cwd(), 'upload_files', 'MEDDRA', version, lang, fileName);
 
     if (!fs.existsSync(filePath)) {
       this.logger.error(`El archivo ${filePath} no existe`);
@@ -206,16 +206,6 @@ export class MeddraProcessFilesService {
       if (row.length === 0) continue;
 
       const entity = new cie10Meddra();
-      // Mapping based on column index from inspection
-      // 0: ICD-10 Chapter Number
-      // 1: ICD-10 Chapter
-      // 2: ICD-10 Code
-      // 3: ICD-10 Term
-      // 4: Mapped MedDRA LLT
-      // 5: Mapped MedDRA LLT Code
-      // 6: Map Attribute
-      // 7: MedDRA PT
-      // 8: MedDRA PT Code
 
       entity.icd10_charper_number = String(row[0] || '');
       entity.icd10_charper = String(row[1] || '');

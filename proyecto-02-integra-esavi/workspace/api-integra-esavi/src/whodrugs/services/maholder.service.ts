@@ -1,15 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Maholder } from '../models/maholder.entity';
-import { Repository } from 'typeorm';
-import { IMaHolder } from '../models/dtos';
-import { CountryOfSale } from '../models/countryOfSale.entity';
-import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {Repository} from 'typeorm';
+import {CountryOfSale} from '../models/countryOfSale.entity';
+import {IMaHolder} from '../models/dtos';
+import {Maholder} from '../models/maholder.entity';
 
 @Injectable()
 export class MaholderService {
   constructor(
-    @InjectRepository(Maholder, 'who_drug')
+    @InjectRepository(Maholder, 'WHO_DRUG')
     private readonly maholder: Repository<Maholder>,
   ) {}
 

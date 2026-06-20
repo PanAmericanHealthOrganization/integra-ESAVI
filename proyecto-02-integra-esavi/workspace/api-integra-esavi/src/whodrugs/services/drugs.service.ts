@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { IPaginationRequest, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { Repository } from 'typeorm';
-import { Drug } from '../models/drug.entity';
+import {Injectable} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {IPaginationRequest,IPaginationResponse} from 'src/utils/interfaces/pagination';
+import {Repository} from 'typeorm';
+import {Drug} from '../models/drug.entity';
 
 @Injectable()
 export class DrugService {
   constructor(
-    @InjectRepository(Drug, 'who_drug')
+    @InjectRepository(Drug, 'WHO_DRUG')
     private readonly drugRepository: Repository<Drug>,
   ) {}
 

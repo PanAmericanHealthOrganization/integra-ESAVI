@@ -1,7 +1,7 @@
 import { OmitType } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
+import { Establecimiento } from './establecimiento.entity';
 import { Notificacion } from './notificacion.entity';
 
 /**
@@ -60,31 +60,24 @@ export class Vacunacion extends Auditoria implements IVacunacion {
   horaReconstitucion: Date;
 
   /**
-   * Column  of vacunacion
+   * Establecimiento donde se administró la vacuna (referenciado por unicodigo).
+   * Cuando el vacunatorio no está en el catálogo de establecimientos, usar otraDireccion.
    */
-  @Column({ nullable: true, name: 'DIRECCION_VACUNATORIO', comment: 'Dirección del vacunatorio' })
-  direccionVacunatorio: string;
+  @ManyToOne(() => Establecimiento, { nullable: true, eager: false })
+  @JoinColumn({ name: 'ESTABLECIMIENTO_UNI_CODIGO', referencedColumnName: 'uniCodigo' })
+  establecimiento: Establecimiento;
 
   /**
-   * Many to one of vacunacion
+   * Dirección libre del vacunatorio cuando no corresponde a un establecimiento registrado
    */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PROVINCIA_VACUNATORIO_ID' })
-  provincia: Catalogo;
-
-  /**
-   * Many to one of vacunacion
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_CANTON_VACUNATORIO_ID' })
-  canton: Catalogo;
-
-  /**
-   * Many to one of vacunacion
-   */
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CT_PARROQUIA_VACUNATORIO_ID' })
-  parroquia: Catalogo;
+  @Column({
+    name: 'OTRA_DIRECCION_VACUNATORIO',
+    type: 'varchar',
+    length: 1200,
+    nullable: true,
+    comment: 'Dirección del vacunatorio cuando no está registrado como establecimiento',
+  })
+  otraDireccion: string;
 
   /**
    * Many to one of vacunacion
@@ -103,10 +96,8 @@ export interface IVacunacion {
   horaVacunacion: Date;
   fechaReconstitucion: Date;
   horaReconstitucion: Date;
-  direccionVacunatorio: string;
-  provincia: Catalogo;
-  canton: Catalogo;
-  parroquia: Catalogo;
+  establecimiento: Establecimiento;
+  otraDireccion: string;
   notificacion: Notificacion;
 }
 
@@ -119,10 +110,8 @@ export class VacunacionDto implements IVacunacion {
   horaVacunacion: Date;
   fechaReconstitucion: Date;
   horaReconstitucion: Date;
-  direccionVacunatorio: string;
-  provincia: Catalogo;
-  canton: Catalogo;
-  parroquia: Catalogo;
+  establecimiento: Establecimiento;
+  otraDireccion: string;
   notificacion: Notificacion;
 }
 

@@ -4,11 +4,8 @@ export class CreateDatoVacunacionDto {
   nombreVacunatorio: string;
   fechaVacunacion: Date;
   horaVacunacion: Date;
-  provincia: string;
-  canton: string;
-  parroquia: string;
-  otraParroquia: string;
-  direccion: string;
+  establecimientoUniCodigo: string;
+  otraDireccion: string;
   codigoMecanismoVerificacion: string;
   nombreOtroMecanismo: string;
   fechaReconstitucion: Date;
