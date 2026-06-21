@@ -1,6 +1,7 @@
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import FlakyIcon from "@mui/icons-material/Flaky"
+import LocationCityIcon from "@mui/icons-material/LocationCity"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import MedicationIcon from "@mui/icons-material/Medication"
 import MenuBookIcon from "@mui/icons-material/MenuBook"
@@ -16,6 +17,12 @@ import SubMenu from "./SubMenu"
 export const CustomMenu = () => {
   const [estandaresOpen, setEstandaresOpen] = useState(false)
   const [configuracionesOpen, setConfiguracionesOpen] = useState(false)
+
+  const isConfiguracionesActive =
+    window.location.pathname.startsWith("/parametros") ||
+    window.location.pathname.startsWith("/catalogos-config") ||
+    window.location.pathname.startsWith("/dpa") ||
+    window.location.pathname.startsWith("/establecimientos")
 
   return (
     <>
@@ -37,7 +44,7 @@ export const CustomMenu = () => {
           dense={false}
           handleToggle={() => setConfiguracionesOpen((v) => !v)}
           icon={<SettingsIcon />}
-          isOpen={configuracionesOpen}
+          isOpen={configuracionesOpen || isConfiguracionesActive}
           name="Configuraciones">
           <Menu.Item
             to="/parametros"
@@ -56,6 +63,16 @@ export const CustomMenu = () => {
               leftIcon={<CompareArrowsIcon />}
             />
           </Authorize>
+          <Menu.Item
+            to="/dpa"
+            primaryText="DPA"
+            leftIcon={<LocationCityIcon />}
+          />
+          <Menu.Item
+            to="/establecimientos"
+            primaryText="Establecimientos"
+            leftIcon={<LocalHospitalIcon />}
+          />
           <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
             <Menu.Item
               to="/admin"

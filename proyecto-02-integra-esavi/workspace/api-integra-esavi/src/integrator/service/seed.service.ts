@@ -24,6 +24,9 @@ import {Medicamento} from '../entity/medicamento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
+import { Canton } from '../entity/canton.entity';
+import { Parroquia } from '../entity/parroquia.entity';
+import { Provincia } from '../entity/provincia.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -55,6 +58,12 @@ export class SeedService implements OnApplicationBootstrap {
     private syncProcessRepository: Repository<SyncProcess>,
     @InjectRepository(CatalogoPadre, 'POSTGRES_INTEGRATOR_DS')
     private catalogoPadreRepository: Repository<CatalogoPadre>,
+    @InjectRepository(Provincia, 'POSTGRES_INTEGRATOR_DS')
+    private provinciaRepository: Repository<Provincia>,
+    @InjectRepository(Canton, 'POSTGRES_INTEGRATOR_DS')
+    private cantonRepository: Repository<Canton>,
+    @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
+    private parroquiaRepository: Repository<Parroquia>,
     @InjectRepository(Homologator, 'POSTGRES_INTEGRATOR_DS')
     private homologatorRepository: Repository<Homologator>,
     @InjectRepository(Homologation, 'POSTGRES_INTEGRATOR_DS')
@@ -63,6 +72,7 @@ export class SeedService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     await this.seedData();
+    await this.seedUbicaciones();
   }
 
   async seedData() {
@@ -299,13 +309,14 @@ export class SeedService implements OnApplicationBootstrap {
         startTime,
       );
     } catch (error) {
+      const err = error as Error;
       // Registrar fallo con auditoría
       await this.createSyncProcess(
         name,
         SyncStatus.FAILED,
         null,
-        error.message,
-        error.stack,
+        err.message,
+        err.stack,
         JSON.stringify(error),
         createdBy,
         startTime,
@@ -1294,6 +1305,172 @@ export class SeedService implements OnApplicationBootstrap {
       }
     });
   }
+
+  // ── Carga de TC_PROVINCIA, TC_CANTON, TC_PARROQUIA ──────────────────────────
+
+  async seedUbicaciones() {
+    await this.seedProvincias();
+    await this.seedCantones();
+    await this.seedParroquias();
+  }
+
+  private extractCodigoFromParenthesis(text: string): string | null {
+    const match = text.match(/\((\d+)\)/);
+    return match ? match[1] : null;
+  }
+
+  private extractNombreFromParenthesis(text: string): string {
+    return text.replace(/\s*\(\d+\)\s*$/, '').replace(/^\*/, '').trim();
+  }
+
+  private async seedProvincias() {
+    const count = await this.provinciaRepository.count();
+    if (count > 0) {
+      console.log(`ℹ️ TC_PROVINCIA ya cargada (${count} registros). Se omite.`);
+      return;
+    }
+
+    console.log('🗺️ Cargando TC_PROVINCIA desde CSV...');
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
+      const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
+
+      const auditoria: IAuditoria = {
+        createdAt: new Date(), createdBy: 'System',
+        updatedAt: undefined, updatedBy: 'System',
+        deletedAt: undefined, deletedBy: '',
+        isEnabled: true, isActive: true,
+      };
+
+      let insertados = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const raw = lines[i].split(',')[0].trim().replace(/"/g, '');
+        const codigo = this.extractCodigoFromParenthesis(raw);
+        const nombre = this.extractNombreFromParenthesis(raw);
+        if (!codigo || !nombre) continue;
+
+        const existing = await this.provinciaRepository.findOne({ where: { codigo } });
+        if (!existing) {
+          await this.provinciaRepository.save({ codigo, nombre, ...auditoria } as Provincia);
+          insertados++;
+        }
+      }
+      console.log(`✅ TC_PROVINCIA: ${insertados} provincia(s) insertada(s).`);
+    } catch (error) {
+      console.error('❌ Error al cargar TC_PROVINCIA:', error);
+    }
+  }
+
+  private async seedCantones() {
+    const count = await this.cantonRepository.count();
+    if (count > 0) {
+      console.log(`ℹ️ TC_CANTON ya cargada (${count} registros). Se omite.`);
+      return;
+    }
+
+    console.log('🗺️ Cargando TC_CANTON desde CSV...');
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
+      const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
+
+      const auditoria: IAuditoria = {
+        createdAt: new Date(), createdBy: 'System',
+        updatedAt: undefined, updatedBy: 'System',
+        deletedAt: undefined, deletedBy: '',
+        isEnabled: true, isActive: true,
+      };
+
+      let insertados = 0;
+      let omitidos = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const raw = lines[i].split(',')[0].trim().replace(/^[﻿"]+|["]+$/g, '');
+        const codigo = this.extractCodigoFromParenthesis(raw);
+        const nombre = this.extractNombreFromParenthesis(raw);
+        if (!codigo || !nombre || codigo.length !== 4) continue;
+
+        const provinciaCodigo = codigo.substring(0, 2);
+        const provincia = await this.provinciaRepository.findOne({ where: { codigo: provinciaCodigo } });
+        if (!provincia) {
+          omitidos++;
+          continue;
+        }
+
+        const existing = await this.cantonRepository.findOne({ where: { codigo } });
+        if (!existing) {
+          await this.cantonRepository.save({ codigo, nombre, provincia, ...auditoria } as Canton);
+          insertados++;
+        }
+      }
+      console.log(`✅ TC_CANTON: ${insertados} cantón(es) insertado(s), ${omitidos} omitido(s) por provincia no encontrada.`);
+    } catch (error) {
+      console.error('❌ Error al cargar TC_CANTON:', error);
+    }
+  }
+
+  private async seedParroquias() {
+    const count = await this.parroquiaRepository.count();
+    if (count > 0) {
+      console.log(`ℹ️ TC_PARROQUIA ya cargada (${count} registros). Se omite.`);
+      return;
+    }
+
+    console.log('🗺️ Cargando TC_PARROQUIA desde CSV...');
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
+      const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
+
+      const auditoria: IAuditoria = {
+        createdAt: new Date(), createdBy: 'System',
+        updatedAt: undefined, updatedBy: 'System',
+        deletedAt: undefined, deletedBy: '',
+        isEnabled: true, isActive: true,
+      };
+
+      let insertados = 0;
+      let omitidos = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const raw = lines[i].split(',')[0].trim().replace(/^[﻿"]+|["]+$/g, '');
+        const codigo = this.extractCodigoFromParenthesis(raw);
+        const nombre = this.extractNombreFromParenthesis(raw);
+        if (!codigo || !nombre || codigo.length !== 6) continue;
+
+        const cantonCodigo = codigo.substring(0, 4);
+        const canton = await this.cantonRepository.findOne({ where: { codigo: cantonCodigo } });
+        if (!canton) {
+          omitidos++;
+          continue;
+        }
+
+        const existing = await this.parroquiaRepository.findOne({ where: { codigo } });
+        if (!existing) {
+          await this.parroquiaRepository.save({ codigo, nombre, canton, ...auditoria } as Parroquia);
+          insertados++;
+        }
+      }
+      console.log(`✅ TC_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
+
+      // Insertar una parroquia "Desconocido-{canton}" por cada cantón
+      const todosLosCantones = await this.cantonRepository.find();
+      let insertadosDesconocido = 0;
+      for (const canton of todosLosCantones) {
+        const codigoDesconocido = `${canton.codigo}99`;
+        const existing = await this.parroquiaRepository.findOne({ where: { codigo: codigoDesconocido } });
+        if (!existing) {
+          await this.parroquiaRepository.save({
+            codigo: codigoDesconocido,
+            nombre: `DESCONOCIDO-${canton.nombre}`,
+            canton,
+            ...auditoria,
+          } as Parroquia);
+          insertadosDesconocido++;
+        }
+      }
+      console.log(`✅ TC_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
+    } catch (error) {
+      console.error('❌ Error al cargar TC_PARROQUIA:', error);
+    }
+    };
+  
 
   private async loadHomologadorSexoVigiflow() {
     await this.runSyncProcess('Carga de homologador Sexo (origen VigiFlow)...', async () => {

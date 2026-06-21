@@ -3,7 +3,7 @@ import {IsOptional,IsString,IsUUID,MaxLength} from 'class-validator';
 
 export class CreateCatalogoPadreDto {
   @IsString()
-  @MaxLength(20)
+  @MaxLength(50)
   codigo: string;
 
   @IsString()

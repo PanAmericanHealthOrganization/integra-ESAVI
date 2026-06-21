@@ -1,34 +1,118 @@
-import { AuditoriaDto } from '../entity/auditoria.entity';
-import { IEstablecimiento } from '../entity/interfaces/establecimiento.interface';
+import { IsEmail, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class EstablecimientoDto extends AuditoriaDto implements IEstablecimiento {
-  id: string;
+export class CreateEstablecimientoDto {
+  @IsString()
+  @MaxLength(10)
   uniCodigo: string;
+
+  @IsString()
+  @MaxLength(100)
   uniNombre: string;
-  provinciaCodigo: string;
-  provinciaDescripcion: string;
-  cantonCodigo: string;
-  cantonDescripcion: string;
-  parroquiaCodigo: string;
-  parroquiaDescripcion: string;
-  zonaCodigo: string;
-  zonaDescripcion: string;
-  distritoCodigo: string;
-  distritoDescripcion: string;
-  circuitoCodigo: string;
-  tipoEntidad: string;
-  longitudGps: number;
-  latitudGps: number;
-  mail: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(6)
+  parroquiaCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  zonaCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  zonaDescripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  distritoCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  distritoDescripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  circuitoCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  tipoEntidad?: string;
+
+  @IsOptional()
+  @IsNumber()
+  longitudGps?: number;
+
+  @IsOptional()
+  @IsNumber()
+  latitudGps?: number;
+
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(100)
+  mail?: string;
 }
 
-export class EstablecimientoCreateDto implements Partial<IEstablecimiento> {
-  id: string;
-  uniCodigo: string;
-  uniNombre: string;
-  provinciaCodigo: string;
+export class UpdateEstablecimientoDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  uniNombre?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(6)
+  parroquiaCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  zonaCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  zonaDescripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  distritoCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  distritoDescripcion?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(10)
+  circuitoCodigo?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  tipoEntidad?: string;
+
+  @IsOptional()
+  @IsNumber()
+  longitudGps?: number;
+
+  @IsOptional()
+  @IsNumber()
+  latitudGps?: number;
+
+  @IsOptional()
+  @IsEmail()
+  @MaxLength(100)
+  mail?: string;
 }
 
-export class EstablecimientoUpdateDto implements Partial<IEstablecimiento> {
-  uniCodigo: string;
+export class EstablecimientoDto extends CreateEstablecimientoDto {
+  id: string;
 }

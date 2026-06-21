@@ -19,7 +19,7 @@ export class CatalogoPadre extends Auditoria {
 
   @Column({
     name: 'CODIGO',
-    length: 20,
+    length: 50,
     nullable: false,
     unique: true,
     comment: 'Código único del registro del catálogo',

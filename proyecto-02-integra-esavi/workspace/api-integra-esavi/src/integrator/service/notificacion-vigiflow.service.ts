@@ -6,6 +6,7 @@ import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Notificador} from '../entity/notificador.entity';
 import {Paciente} from '../entity/paciente.entity';
+import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoService} from './catalogo.service';
@@ -17,6 +18,8 @@ export class NotificacionVigiflowService {
   constructor(
     @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly notificacionRepository: Repository<Notificacion>,
+    @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
+    private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
   ) {}
 
@@ -29,27 +32,9 @@ export class NotificacionVigiflowService {
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
         notificacion.origen = SourceEnum.VIGIFLOW;
         notificacion.paciente = pacienteUUID;
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.provincia)) {
-          try {
-            notificacion.provinciaResidencia = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaPaciente.provincia,
-            );
-          } catch (error) {
-            console.log(`Provincia "${createDto.residenciaPaciente.provincia}" paciente vf no encontrada`);
-          }
-        }
-        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.canton)) {
-          try {
-            notificacion.cantonResidencia = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.residenciaPaciente.canton,
-            );
-          } catch (error) {
-            console.log('Canton no encontrada');
-          }
-        }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.parroquia)) {
           try {
-            notificacion.parroquiaResidencia = await this.catalogoService.findByDescriptionToVigiflow(
+            notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
               createDto.residenciaPaciente.parroquia,
             );
           } catch (error) {
@@ -262,6 +247,14 @@ export class NotificacionVigiflowService {
 
   private isNullOrUndefinedOrEmpty(field: string): boolean {
     return typeof field === 'undefined' || field === null || field.length === 0;
+  }
+
+  private async findParroquiaByCodigo(description: string): Promise<Parroquia | null> {
+    const match = description.match(/\((\d{6})\)/);
+    if (match) {
+      return this.parroquiaRepository.findOne({ where: { codigo: match[1] } });
+    }
+    return this.parroquiaRepository.findOne({ where: { nombre: description.trim() } });
   }
 
   async findByCodigoOrigen(code: string) {

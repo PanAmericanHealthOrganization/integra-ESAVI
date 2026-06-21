@@ -1,9 +1,11 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import SearchIcon from "@mui/icons-material/Search"
 import {
   Box,
   Button,
+  Chip,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -12,6 +14,7 @@ import {
   DialogTitle,
   Divider,
   IconButton,
+  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -46,6 +49,8 @@ export const CatalogosConfigList = () => {
   const [deleteOne, { isPending: deleting }] = useDelete()
 
   const [selectedCategoria, setSelectedCategoria] = useState<CatalogoPadreRecord | null>(null)
+  const [searchCategoria, setSearchCategoria] = useState("")
+  const [searchSubcategoria, setSearchSubcategoria] = useState("")
 
   const [dialog, setDialog] = useState<{
     open: boolean
@@ -71,6 +76,23 @@ export const CatalogosConfigList = () => {
   const subcategorias = selectedCategoria
     ? (todos ?? []).filter((r) => r.padre?.id === selectedCategoria.id)
     : []
+
+  const filteredCategorias = searchCategoria
+    ? categorias.filter(
+        (c) =>
+          c.codigo.toLowerCase().includes(searchCategoria.toLowerCase()) ||
+          c.nombre.toLowerCase().includes(searchCategoria.toLowerCase())
+      )
+    : categorias
+
+  const filteredSubcategorias = searchSubcategoria
+    ? subcategorias.filter(
+        (s) =>
+          s.codigo.toLowerCase().includes(searchSubcategoria.toLowerCase()) ||
+          s.nombre.toLowerCase().includes(searchSubcategoria.toLowerCase()) ||
+          (s.descripcion ?? "").toLowerCase().includes(searchSubcategoria.toLowerCase())
+      )
+    : subcategorias
 
   const openNuevaCategoria = () => {
     setForm({ ...DEFAULT_FORM })
@@ -150,27 +172,29 @@ export const CatalogosConfigList = () => {
   return (
     <Box p={2}>
       <Title title="Catálogos" />
-      <Typography variant="h5" gutterBottom>
-        Catálogos
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Primero crea las categorías (izquierda), luego selecciona una y agrega sus subcategorías
-        (derecha).
-      </Typography>
-
       <Box display="flex" gap={2} alignItems="flex-start">
-        {/* ─────────── Panel izquierdo: Categorías ─────────── */}
-        <Paper elevation={2} sx={{ width: 320, flexShrink: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="subtitle1" fontWeight={700}>
+        {/* ── Panel: Categorías ── */}
+        <Paper elevation={2} sx={{ flex: 2, minWidth: 0 }}>
+          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
               Categorías
             </Typography>
-            <Button
-              variant="contained"
+            <TextField
+              placeholder="Buscar categoría…"
               size="small"
-              startIcon={<AddIcon />}
-              onClick={openNuevaCategoria}>
-              Nueva
+              sx={{ flex: 1 }}
+              value={searchCategoria}
+              onChange={(e) => setSearchCategoria(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
+              Nuevo
             </Button>
           </Box>
           <Divider />
@@ -192,15 +216,18 @@ export const CatalogosConfigList = () => {
                   </TableRow>
                 ) : !categorias.length ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      align="center"
-                      sx={{ py: 5, color: "text.secondary", fontSize: 13 }}>
+                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 13 }}>
                       Sin categorías. Crea la primera.
                     </TableCell>
                   </TableRow>
+                ) : !filteredCategorias.length ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 13 }}>
+                      Sin resultados para "{searchCategoria}"
+                    </TableCell>
+                  </TableRow>
                 ) : (
-                  categorias.map((cat) => {
+                  filteredCategorias.map((cat) => {
                     const isSelected = selectedCategoria?.id === cat.id
                     return (
                       <TableRow
@@ -208,7 +235,7 @@ export const CatalogosConfigList = () => {
                         hover
                         selected={isSelected}
                         sx={{ cursor: "pointer" }}
-                        onClick={() => setSelectedCategoria(cat)}>
+                        onClick={() => { setSelectedCategoria(cat); setSearchSubcategoria("") }}>
                         <TableCell>
                           <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                             {cat.codigo}
@@ -246,24 +273,32 @@ export const CatalogosConfigList = () => {
           </TableContainer>
         </Paper>
 
-        {/* ─────────── Panel derecho: Subcategorías ─────────── */}
-        <Paper elevation={2} sx={{ flex: 1, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="subtitle1" fontWeight={700} component="span">
+        {/* ── Panel: Subcategorías ── */}
+        <Paper elevation={2} sx={{ flex: 3, minWidth: 0 }}>
+          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
+            <Box display="flex" alignItems="center" gap={1} sx={{ whiteSpace: "nowrap" }}>
+              <Typography variant="subtitle1" fontWeight={700}>
                 Subcategorías
               </Typography>
               {selectedCategoria && (
-                <Typography
-                  component="span"
-                  variant="body2"
-                  color="primary.main"
-                  fontWeight={600}
-                  ml={1}>
-                  de: {selectedCategoria.nombre}
-                </Typography>
+                <Chip label={selectedCategoria.nombre} size="small" color="primary" variant="outlined" />
               )}
             </Box>
+            <TextField
+              placeholder="Buscar subcategoría…"
+              size="small"
+              sx={{ flex: 1 }}
+              disabled={!selectedCategoria}
+              value={searchSubcategoria}
+              onChange={(e) => setSearchSubcategoria(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
             <Tooltip
               title={!selectedCategoria ? "Selecciona una categoría primero" : ""}
               placement="left">
@@ -274,7 +309,7 @@ export const CatalogosConfigList = () => {
                   startIcon={<AddIcon />}
                   disabled={!selectedCategoria}
                   onClick={openNuevaSubcategoria}>
-                  Nueva
+                  Nuevo
                 </Button>
               </span>
             </Tooltip>
@@ -293,10 +328,7 @@ export const CatalogosConfigList = () => {
               <TableBody>
                 {!selectedCategoria ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      align="center"
-                      sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
+                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
                       Selecciona una categoría de la izquierda para ver sus subcategorías
                     </TableCell>
                   </TableRow>
@@ -308,15 +340,18 @@ export const CatalogosConfigList = () => {
                   </TableRow>
                 ) : !subcategorias.length ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={4}
-                      align="center"
-                      sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
-                      Sin subcategorías en "{selectedCategoria.nombre}". Usa "Nueva" para agregar.
+                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
+                      Sin subcategorías en "{selectedCategoria.nombre}". Usa "Nuevo" para agregar.
+                    </TableCell>
+                  </TableRow>
+                ) : !filteredSubcategorias.length ? (
+                  <TableRow>
+                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
+                      Sin resultados para "{searchSubcategoria}"
                     </TableCell>
                   </TableRow>
                 ) : (
-                  subcategorias.map((sub) => (
+                  filteredSubcategorias.map((sub) => (
                     <TableRow key={sub.id} hover>
                       <TableCell>
                         <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
@@ -328,12 +363,7 @@ export const CatalogosConfigList = () => {
                         <Typography
                           variant="body2"
                           color="text.secondary"
-                          sx={{
-                            maxWidth: 320,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}>
+                          sx={{ maxWidth: 320, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {sub.descripcion || "—"}
                         </Typography>
                       </TableCell>
@@ -347,9 +377,7 @@ export const CatalogosConfigList = () => {
                           <IconButton
                             size="small"
                             color="error"
-                            onClick={() =>
-                              setDeleteConfirm({ open: true, id: sub.id, label: sub.nombre })
-                            }>
+                            onClick={() => setDeleteConfirm({ open: true, id: sub.id, label: sub.nombre })}>
                             <DeleteOutlineIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>

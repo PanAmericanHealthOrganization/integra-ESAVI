@@ -1,6 +1,8 @@
 import { combineDataProviders } from "react-admin"
 import { calidadDataProvider } from "./calidad.dataprovider"
 import { dashboardDataProvider } from "./dashboard.dataprovider"
+import { dpaDataProvider } from "./dpa.dataprovider"
+import { establecimientoDataProvider } from "./establecimiento.dataprovider"
 import { esaviDataProvider } from "./esavis.dataprovider"
 import { catalogoPadreDataProvider } from "./catalogo-padre.dataprovider"
 import { gacetaDataProvider } from "./gaceta.dataprovider"
@@ -35,6 +37,12 @@ export const dataProvider = combineDataProviders((resource) => {
       return parametroDataProvider
     case "catalogo-padre":
       return catalogoPadreDataProvider
+    case "establecimientos":
+      return establecimientoDataProvider
+    case "provincias":
+    case "cantones":
+    case "parroquias":
+      return dpaDataProvider
     case "dataquality":
       return calidadDataProvider
     case "grupo-etario":

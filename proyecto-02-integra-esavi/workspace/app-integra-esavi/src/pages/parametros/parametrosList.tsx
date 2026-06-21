@@ -1,6 +1,7 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import SearchIcon from "@mui/icons-material/Search"
 import {
   Box,
   Button,
@@ -10,7 +11,9 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   IconButton,
+  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -106,33 +109,27 @@ export const ParametrosList = () => {
   return (
     <Box p={2}>
       <Title title="Parámetros" />
-      <Typography variant="h5" gutterBottom>
-        Parámetros
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>
-        Administra los parámetros de configuración del sistema.
-      </Typography>
-
       <Paper elevation={2}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" fontWeight={600}>
-            Lista de Parámetros
-          </Typography>
-          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-            Nuevo Parámetro
-          </Button>
-        </Box>
-
-        <Box px={2} pb={1.5}>
+        <Box px={2} py={1.5} display="flex" alignItems="center" gap={2}>
           <TextField
-            label="Buscar por clave, valor o descripción"
+            placeholder="Buscar por clave, valor o descripción"
             size="small"
+            sx={{ flex: 1 }}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{ width: 360 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
+                </InputAdornment>
+              ),
+            }}
           />
+          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
+            Nuevo
+          </Button>
         </Box>
-
+        <Divider />
         <TableContainer>
           <Table size="small">
             <TableHead>

@@ -5,6 +5,7 @@ import {Repository} from 'typeorm';
 import {CreateNotificacionDto} from '../dto';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
+import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoService} from './catalogo.service';
@@ -16,6 +17,8 @@ export class NotificacionDhis2Service {
   constructor(
     @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly notificacionRepository: Repository<Notificacion>,
+    @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
+    private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
   ) {}
 
@@ -118,29 +121,9 @@ export class NotificacionDhis2Service {
           }
         }
 
-        if (createDto.residenciaPaciente.provincia) {
-          try {
-            notificacion.provinciaResidencia = await this.catalogoService.findByDescriptionToDhis2(
-              createDto.residenciaPaciente.provincia,
-            );
-          } catch (error:any) {
-            console.error(`Error al buscar provincia: ${error.message}`);
-          }
-        }
-
-        if (createDto.residenciaPaciente.canton) {
-          try {
-            notificacion.cantonResidencia = await this.catalogoService.findByDescriptionToDhis2(
-              createDto.residenciaPaciente.canton,
-            );
-          } catch (error:any) {
-            console.error(`Error al buscar canton: ${error.message}`);
-          }
-        }
-
         if (createDto.residenciaPaciente.parroquia) {
           try {
-            notificacion.parroquiaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+            notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
               createDto.residenciaPaciente.parroquia,
             );
           } catch (error:any) {
@@ -295,29 +278,9 @@ export class NotificacionDhis2Service {
       }
     }
 
-    if (createDto.residenciaPaciente.provincia) {
-      try {
-        notificacionExistente.provinciaResidencia = await this.catalogoService.findByDescriptionToDhis2(
-          createDto.residenciaPaciente.provincia,
-        );
-      } catch (error:any) {
-        console.error(`Error al buscar provincia: ${error.message}`);
-      }
-    }
-
-    if (createDto.residenciaPaciente.canton) {
-      try {
-        notificacionExistente.cantonResidencia = await this.catalogoService.findByDescriptionToDhis2(
-          createDto.residenciaPaciente.canton,
-        );
-      } catch (error:any) {
-        console.error(`Error al buscar canton: ${error.message}`);
-      }
-    }
-
     if (createDto.residenciaPaciente.parroquia) {
       try {
-        notificacionExistente.parroquiaResidencia = await this.catalogoService.findByDescriptionToDhis2(
+        notificacionExistente.parroquiaResidencia = await this.findParroquiaByCodigo(
           createDto.residenciaPaciente.parroquia,
         );
       } catch (error:any) {
@@ -373,6 +336,14 @@ export class NotificacionDhis2Service {
     // await this.notificacionRepository.update(notificacionExistente.id, notificacionExistente);
     // return notificacionExistente
     return this.notificacionRepository.save(notificacionExistente);
+  }
+
+  private async findParroquiaByCodigo(description: string): Promise<Parroquia | null> {
+    const match = description.match(/\((\d{6})\)/);
+    if (match) {
+      return this.parroquiaRepository.findOne({ where: { codigo: match[1] } });
+    }
+    return this.parroquiaRepository.findOne({ where: { nombre: description.trim() } });
   }
 
   calcularEdadUnidadParaGrupoEtario = (edad, unidadEdad): { edadCalculada: number; unidadEdadCalculada: string } => {

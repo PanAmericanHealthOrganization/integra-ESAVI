@@ -1,4 +1,7 @@
 export { CreateAntecedenteEmbarazoDto, UpdateAntecedenteEmbarazoDto } from './antecedente-embarazo.dto';
+export { CreateCantonDto, UpdateCantonDto } from './canton.dto';
+export { CreateParroquiaDto, UpdateParroquiaDto } from './parroquia.dto';
+export { CreateProvinciaDto, UpdateProvinciaDto } from './provincia.dto';
 export { CreateAntecedentePreexistenciaDto, UpdateAntecedentePreexistenciaDto } from './antecedente-preexistencia.dto';
 export { CreateAntecedenteMedicoDto, UpdateAntecedenteMedicoDto } from './antecedente-medico.dto';
 export { CreateAntecedenteEventoDto, UpdateAntecedenteEventoDto } from './antecedente-evento.dto';
@@ -27,7 +30,7 @@ export { CreatePacienteEmbarazadaDto } from './create-paciente-embarazada.dto';
 export { CreatePacienteDhis2Dto } from './create-paciente-dhis2.dto';
 export { CreatePacienteVigiflowDto } from './create-paciente-vigiflow.dto';
 export { UbicacionDto } from './ubicacion.dto';
-export { EstablecimientoDto, EstablecimientoCreateDto, EstablecimientoUpdateDto } from './establecimiento.dto';
+export { EstablecimientoDto, CreateEstablecimientoDto, UpdateEstablecimientoDto } from './establecimiento.dto';
 export { SyncDto, CreateSyncDto, UpdateSyncDto } from './sync.dto';
 export { VacunometroDto, VacunometroCreateDto, VacunometroUpdateDto } from './vacunometro.dto';
 export { InvestigacionDto, InvestigacionCreateDto, InvestigacionUpdateDto } from './investigacion.dto';
