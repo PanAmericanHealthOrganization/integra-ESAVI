@@ -5,8 +5,8 @@ export default defineConfig(({ command }) => ({
     plugins: [react()],
     server: {
         port: 5173,
-        open: command === 'serve' && process.env.NODE_ENV !== 'production',
-        allowedHosts: ['esaviecu.kuyacode.com', 'localhost'],
+        open: false,
+        allowedHosts: ['esaviecu.kuyacode.com', 'localhost', '127.0.0.1'],
         watch: {
             ignored: ['**/.pnpm-store/**', '**/node_modules/.pnpm/**']
         }
