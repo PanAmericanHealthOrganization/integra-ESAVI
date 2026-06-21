@@ -1,86 +1,127 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { log } from 'console';
-import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
-import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { In, Repository } from 'typeorm';
-import {
-  EstablecimientoCreateDto,
-  EstablecimientoDto,
-  EstablecimientoUpdateDto,
-} from '../dto/establecimiento.dto';
+import { Repository } from 'typeorm';
+import { CreateEstablecimientoDto, UpdateEstablecimientoDto } from '../dto/establecimiento.dto';
 import { Establecimiento } from '../entity/establecimiento.entity';
-import { Auditoria } from '../entity';
+import { Parroquia } from '../entity/parroquia.entity';
+
+const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 
 @Injectable()
-export class EstablecimientosService
-  implements IService<EstablecimientoCreateDto, EstablecimientoDto, EstablecimientoUpdateDto>
-{
+export class EstablecimientosService {
+  private readonly logger = new Logger(EstablecimientosService.name);
+
   constructor(
     @InjectRepository(Establecimiento, 'POSTGRES_INTEGRATOR_DS')
     private readonly establecimientoRepository: Repository<Establecimiento>,
+    @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
+    private readonly parroquiaRepository: Repository<Parroquia>,
   ) {}
 
-  private readonly logger = new Logger(EstablecimientosService.name);
-
-  exist(id: number | string): Promise<boolean> {
-    return this.establecimientoRepository.exist({ where: { id: id as string } });
-  }
-
-  public getOne(id: Identificator): Promise<EstablecimientoDto> {
-    return this.establecimientoRepository.findOne({ where: { id: id as string } });
-  }
-
-  public getMany(params: IGetManyParams): Promise<Establecimiento[]> {
-    return this.establecimientoRepository.find({
-      where: { id: In(params.ids as string[]) },
+  async create(dto: CreateEstablecimientoDto, currentUser = FALLBACK_USER): Promise<Establecimiento> {
+    const existing = await this.establecimientoRepository.findOne({
+      where: { uniCodigo: dto.uniCodigo, isEnabled: true },
     });
-  }
-
-  public async getPaginated(
-    paginated: GetListParams,
-  ): Promise<IPaginationResponse<Establecimiento>> {
-    const { pagination, sort } = paginated;
-    const { page, perPage } = pagination;
-    const sortOrder = sort.order === 'ASC' ? 'ASC' : 'DESC';
-    const sortField = sort.field || 'createdAt';
-    const csort = {};
-    csort[sortField] = sortOrder;
-    const [data, total] = await this.establecimientoRepository.findAndCount({
-      skip: (page - 1) * perPage,
-      take: perPage,
-      order: { ...csort },
-    });
-    return { data, total };
-  }
-
-  public async findAll(): Promise<Establecimiento[]> {
-    return this.establecimientoRepository.find();
-  }
-
-  public async create(establecimiento: Establecimiento): Promise<EstablecimientoDto> {
-    return this.establecimientoRepository.save(establecimiento);
-  }
-
-  public async update(
-    id: Identificator,
-    establecimiento: Establecimiento,
-  ): Promise<EstablecimientoDto> {
-    const exist = await this.getOne(id);
-    if (!exist) {
-      throw new Error(`El registro con id ${id} no existe.`);
+    if (existing) {
+      throw new BadRequestException(`Ya existe un establecimiento activo con el código: ${dto.uniCodigo}`);
     }
-    await this.establecimientoRepository.update(id, establecimiento);
-    return this.getOne(id);
+
+    const establecimiento = this.establecimientoRepository.create({
+      uniCodigo: dto.uniCodigo,
+      uniNombre: dto.uniNombre,
+      zonaCodigo: dto.zonaCodigo,
+      zonaDescripcion: dto.zonaDescripcion,
+      distritoCodigo: dto.distritoCodigo,
+      distritoDescripcion: dto.distritoDescripcion,
+      circuitoCodigo: dto.circuitoCodigo,
+      tipoEntidad: dto.tipoEntidad,
+      longitudGps: dto.longitudGps,
+      latitudGps: dto.latitudGps,
+      mail: dto.mail,
+      createdBy: currentUser,
+      updatedBy: currentUser,
+      isActive: true,
+      isEnabled: true,
+    });
+
+    if (dto.parroquiaCodigo) {
+      const parroquia = await this.parroquiaRepository.findOne({ where: { codigo: dto.parroquiaCodigo } });
+      if (!parroquia) {
+        throw new NotFoundException(`Parroquia con código ${dto.parroquiaCodigo} no encontrada`);
+      }
+      establecimiento.parroquiaResidencia = parroquia;
+    }
+
+    try {
+      return await this.establecimientoRepository.save(establecimiento);
+    } catch (err) {
+      this.logger.error('Error al guardar establecimiento', err);
+      throw err;
+    }
   }
 
-  public async delete(id: Identificator, auditoria: Auditoria): Promise<EstablecimientoDto> {
-    await this.establecimientoRepository.update(id, {});
-    log('Deleted establecimiento with id:', id);
-    return this.establecimientoRepository.findOne({ where: { id: id as string } });
+  findAll(): Promise<Establecimiento[]> {
+    return this.establecimientoRepository.find({
+      where: { isEnabled: true },
+      relations: ['parroquiaResidencia', 'parroquiaResidencia.canton', 'parroquiaResidencia.canton.provincia'],
+      order: { uniNombre: 'ASC' },
+    });
   }
 
-  public async createMany(establecimientos: any[]): Promise<Establecimiento[]> {
-    throw new Error('Method not implemented.');
+  async findOne(id: string): Promise<Establecimiento> {
+    const est = await this.establecimientoRepository.findOne({
+      where: { id, isEnabled: true },
+      relations: ['parroquiaResidencia', 'parroquiaResidencia.canton', 'parroquiaResidencia.canton.provincia'],
+    });
+    if (!est) throw new NotFoundException(`Establecimiento con id ${id} no encontrado`);
+    return est;
+  }
+
+  async findByUniCodigo(uniCodigo: string): Promise<Establecimiento> {
+    const est = await this.establecimientoRepository.findOne({
+      where: { uniCodigo, isEnabled: true },
+      relations: ['parroquiaResidencia', 'parroquiaResidencia.canton', 'parroquiaResidencia.canton.provincia'],
+    });
+    if (!est) throw new NotFoundException(`Establecimiento con código ${uniCodigo} no encontrado`);
+    return est;
+  }
+
+  async update(id: string, dto: UpdateEstablecimientoDto, currentUser = FALLBACK_USER): Promise<Establecimiento> {
+    const est = await this.findOne(id);
+
+    if (dto.parroquiaCodigo !== undefined) {
+      if (dto.parroquiaCodigo) {
+        const parroquia = await this.parroquiaRepository.findOne({ where: { codigo: dto.parroquiaCodigo } });
+        if (!parroquia) throw new NotFoundException(`Parroquia con código ${dto.parroquiaCodigo} no encontrada`);
+        est.parroquiaResidencia = parroquia;
+      } else {
+        est.parroquiaResidencia = null;
+      }
+    }
+
+    this.establecimientoRepository.merge(est, {
+      uniNombre: dto.uniNombre ?? est.uniNombre,
+      zonaCodigo: dto.zonaCodigo ?? est.zonaCodigo,
+      zonaDescripcion: dto.zonaDescripcion ?? est.zonaDescripcion,
+      distritoCodigo: dto.distritoCodigo ?? est.distritoCodigo,
+      distritoDescripcion: dto.distritoDescripcion ?? est.distritoDescripcion,
+      circuitoCodigo: dto.circuitoCodigo ?? est.circuitoCodigo,
+      tipoEntidad: dto.tipoEntidad ?? est.tipoEntidad,
+      longitudGps: dto.longitudGps ?? est.longitudGps,
+      latitudGps: dto.latitudGps ?? est.latitudGps,
+      mail: dto.mail ?? est.mail,
+      updatedBy: currentUser,
+      updatedAt: new Date(),
+    });
+
+    return this.establecimientoRepository.save(est);
+  }
+
+  async delete(id: string, currentUser = FALLBACK_USER): Promise<Establecimiento> {
+    const est = await this.findOne(id);
+    est.isEnabled = false;
+    est.deletedAt = new Date();
+    est.deletedBy = currentUser;
+    return this.establecimientoRepository.save(est);
   }
 }

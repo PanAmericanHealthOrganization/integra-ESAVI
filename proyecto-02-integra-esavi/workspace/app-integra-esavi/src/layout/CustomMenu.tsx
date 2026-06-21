@@ -20,7 +20,8 @@ export const CustomMenu = () => {
   const isConfiguracionesActive =
     window.location.pathname.startsWith("/parametros") ||
     window.location.pathname.startsWith("/catalogos-config") ||
-    window.location.pathname.startsWith("/dpa")
+    window.location.pathname.startsWith("/dpa") ||
+    window.location.pathname.startsWith("/establecimientos")
 
   return (
     <>
@@ -65,6 +66,11 @@ export const CustomMenu = () => {
             to="/dpa"
             primaryText="DPA"
             leftIcon={<LocationCityIcon />}
+          />
+          <Menu.Item
+            to="/establecimientos"
+            primaryText="Establecimientos"
+            leftIcon={<LocalHospitalIcon />}
           />
         </SubMenu>
         <Menu.Item

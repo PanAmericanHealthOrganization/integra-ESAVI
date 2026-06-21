@@ -8,8 +8,10 @@ import {
 import {SourceEnum} from '../enum/source-enum';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
+import {Establecimiento} from './establecimiento.entity';
 import {Notificador} from './notificador.entity';
 import {Paciente} from './paciente.entity';
+import {Parroquia} from './parroquia.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -30,20 +32,9 @@ export class Notificacion extends Auditoria {
   @JoinColumn({ name: 'PACIENTE_ID' })
   paciente: Paciente;
 
-  /**
-   *
-   */
-  @ManyToOne(() => Catalogo, { nullable: true })
-  @JoinColumn({ name: 'CTPROVINCIARESIDENCIA_ID' })
-  provinciaResidencia: Catalogo;
-
-  @ManyToOne(() => Catalogo, { nullable: true })
-  @JoinColumn({ name: 'CTCANTORESIDENCIA_ID' })
-  cantonResidencia: Catalogo;
-
-  @ManyToOne(() => Catalogo, { nullable: true })
-  @JoinColumn({ name: 'CTPARROQUIARESIDENCIA_ID' })
-  parroquiaResidencia: Catalogo;
+  @ManyToOne(() => Parroquia, { nullable: true })
+  @JoinColumn({ name: 'CTPARROQUIA_CODIGO', referencedColumnName: 'codigo' })
+  parroquiaResidencia: Parroquia;
 
   /**
    *
@@ -91,16 +82,9 @@ export class Notificacion extends Auditoria {
 
  
 
-  /**
-   *
-   */
-  @Column({
-    name: 'ORGANIZACION_UNIT_CODIGO',
-    nullable: true,
-    comment: 'Código de la unidad organizacional en DHIS2',
-  })
-  organizacionUnitCode: string;
-
+  @ManyToOne(() => Establecimiento, { nullable: true })
+  @JoinColumn({ name: 'ESTABLECIMIENTO_ID' })
+  establecimiento: Establecimiento;
 
   /**
    *

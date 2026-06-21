@@ -1440,6 +1440,24 @@ export class SeedService implements OnApplicationBootstrap {
         }
       }
       console.log(`✅ TC_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
+
+      // Insertar una parroquia "Desconocido-{canton}" por cada cantón
+      const todosLosCantones = await this.cantonRepository.find();
+      let insertadosDesconocido = 0;
+      for (const canton of todosLosCantones) {
+        const codigoDesconocido = `${canton.codigo}99`;
+        const existing = await this.parroquiaRepository.findOne({ where: { codigo: codigoDesconocido } });
+        if (!existing) {
+          await this.parroquiaRepository.save({
+            codigo: codigoDesconocido,
+            nombre: `DESCONOCIDO-${canton.nombre}`,
+            canton,
+            ...auditoria,
+          } as Parroquia);
+          insertadosDesconocido++;
+        }
+      }
+      console.log(`✅ TC_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
     } catch (error) {
       console.error('❌ Error al cargar TC_PARROQUIA:', error);
     }

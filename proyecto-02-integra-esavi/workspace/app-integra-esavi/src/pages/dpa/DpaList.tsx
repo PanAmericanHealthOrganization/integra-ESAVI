@@ -280,13 +280,6 @@ export const DpaList = () => {
   return (
     <Box p={2}>
       <Title title="DPA" />
-      <Typography variant="h6" fontWeight={700} gutterBottom>
-        División Política Administrativa
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={2}>
-        Selecciona una provincia para ver sus cantones; selecciona un cantón para ver sus parroquias.
-      </Typography>
-
       <Box display="flex" gap={2} alignItems="flex-start" sx={{ overflowX: "auto" }}>
         {/* ── Panel Provincias ── */}
         <Paper elevation={2} sx={{ flex: 1, minWidth: 220 }}>

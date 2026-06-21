@@ -1,4 +1,4 @@
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { BadRequestException, Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'reflect-metadata'; //primera línea necesaria para el modo depuración.
@@ -25,12 +25,20 @@ async function bootstrap() {
     },
   });
   const configService = app.get(ConfigService);
+  const validationLogger = new Logger('ValidationPipe');
   app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true,                  // ← Importante: convierte tipos
+      transform: true,
       transformOptions: {
-        enableImplicitConversion: true, // opcional, pero ayuda
+        enableImplicitConversion: true,
+      },
+      exceptionFactory: (errors) => {
+        const messages = errors.map((e) =>
+          Object.values(e.constraints ?? {}).join(', ')
+        );
+        validationLogger.error(`Validation failed: ${JSON.stringify(messages)}`);
+        return new BadRequestException(messages);
       },
     }),
   );

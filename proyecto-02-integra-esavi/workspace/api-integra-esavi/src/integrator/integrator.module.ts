@@ -5,6 +5,7 @@ import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
 import {CantonController} from './controller/canton.controller';
+import {EstablecimientoController} from './controller/establecimiento.controller';
 import {ParroquiaController} from './controller/parroquia.controller';
 import {ProvinciaController} from './controller/provincia.controller';
 import {AntecedenteEventoController} from './controller/antecedente-evento.controller';
@@ -151,6 +152,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEmbarazoController,
     AntecedenteEventoController,
     CantonController,
+    EstablecimientoController,
     CatalogoPadreController,
     ParroquiaController,
     ProvinciaController,

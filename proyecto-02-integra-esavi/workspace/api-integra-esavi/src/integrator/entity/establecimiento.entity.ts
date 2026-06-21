@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
 import { IEstablecimiento } from './interfaces/establecimiento.interface';
+import { Parroquia } from './parroquia.entity';
 @Entity({
   name: 'TR_ESTABLECIMIENTO',
   schema: 'DHI_ESAVI',
@@ -41,73 +42,9 @@ export class Establecimiento extends Auditoria implements IEstablecimiento {
   })
   uniNombre: string;
 
-  /**
-   * Unique code of the establishment
-   *
-   */
-  @Column({
-    name: 'PRV_CODIGO',
-    type: 'varchar',
-    length: 10,
-    comment: 'Código del la provincia en la que está ubicado el establecimiento',
-  })
-  provinciaCodigo: string;
-
-  /**
-   * Unique code of the establishment
-   *
-   */
-  @Column({
-    name: 'PRV_DESCRIPCION',
-    type: 'varchar',
-    length: 100,
-    comment: 'Descripción de la provincia en la que está ubicado el establecimiento',
-  })
-  provinciaDescripcion: string;
-
-  /**
-   * Unique code of the establishment
-   *
-   */
-  @Column({
-    name: 'CAN_CODIGO',
-    comment: 'Código de la canton en la que está ubicado el establecimiento',
-  })
-  cantonCodigo: string;
-
-  /**
-   * Unique code of the establishment
-   *
-   */
-  @Column({
-    name: 'CAN_DESCRIPCION',
-    comment: 'Descripción de la canton en la que está ubicado el establecimiento',
-  })
-  cantonDescripcion: string;
-
-  /**
-   * Unique code of the establishment
-   *
-   */
-  @Column({
-    name: 'PAR_CODIGO',
-    type: 'varchar',
-    length: 12,
-    comment: 'Código de la parroquia en la que está ubicado el establecimiento',
-  })
-  parroquiaCodigo: string;
-
-  /**
-   *
-  Unique code of the establishment
-    */
-  @Column({
-    name: 'PAR_DESCRIPCION',
-    type: 'varchar',
-    length: 100,
-    comment: 'Descripción de la parroquia en la que está ubicado el establecimiento',
-  })
-  parroquiaDescripcion: string;
+  @ManyToOne(() => Parroquia, { nullable: true })
+  @JoinColumn({ name: 'PARROQUIA_CODIGO', referencedColumnName: 'codigo' })
+  parroquiaResidencia: Parroquia;
 
   /**
    *
@@ -117,92 +54,68 @@ export class Establecimiento extends Auditoria implements IEstablecimiento {
     name: 'ZON_CODIGO',
     type: 'varchar',
     length: 10,
+    nullable: true,
     comment: 'Código de la zona en la que está ubicado el establecimiento',
   })
   zonaCodigo: string;
 
-  /**
-   *  Unique code of the establishment
-   */
   @Column({
     name: 'ZON_DESCRIPCION',
     type: 'varchar',
     length: 100,
+    nullable: true,
     comment: 'Descripción de la zona en la que está ubicado el establecimiento',
   })
   zonaDescripcion: string;
 
-  /**
-   *
-  Unique code of the establishment
-    */
   @Column({
     name: 'DIS_CODIGO',
     type: 'varchar',
     length: 10,
+    nullable: true,
     comment: 'Código del distrito en la que está ubicado el establecimiento',
   })
   distritoCodigo: string;
 
-  /**
-   *
-  Unique code of the establishment
-    */
   @Column({
     name: 'DIS_DESCRIPCION',
     type: 'varchar',
     length: 100,
+    nullable: true,
     comment: 'Descripción del distrito en la que está ubicado el establecimiento',
   })
   distritoDescripcion: string;
 
-  /**
-   *
-  Unique code of the establishment
-    */
   @Column({
     name: 'CIR_CODIGO',
     type: 'varchar',
     length: 10,
+    nullable: true,
     comment: 'Código de la circunscripción en la que está ubicado el establecimiento',
   })
   circuitoCodigo: string;
 
-  /**
-   *
-  Unique code of the establishment
-    */
   @Column({
     name: 'TIPO_ENTIDAD',
     comment: 'Tipo de entidad del establecimiento',
     type: 'varchar',
     length: 50,
+    nullable: true,
   })
   tipoEntidad: string;
 
-  /**
-   *
-  Unique code of the establishment
-    */
-  @Column({ name: 'LONGPS', comment: 'Longitud del establecimiento', type: 'float' })
+  @Column({ name: 'LONGPS', comment: 'Longitud del establecimiento', type: 'float', nullable: true })
   longitudGps: number;
 
-  /**
-   *
-  Unique code of the establishment
-    */
-  @Column({ name: 'LATGPS', comment: 'Latitud del establecimiento', type: 'float' })
+  @Column({ name: 'LATGPS', comment: 'Latitud del establecimiento', type: 'float', nullable: true })
   latitudGps: number;
 
-  /**
-   *
-  Unique code of the establishment
-    */
   @Column({
     name: 'MAIL',
     comment: 'Correo electrónico del establecimiento',
     type: 'varchar',
     length: 100,
+    nullable: true,
   })
   mail: string;
 }
