@@ -9,6 +9,7 @@ import {withAuditOnCreate} from 'src/common/utils/audit.util';
 import * as XLSX from 'xlsx';
 import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
 import {MeddraSync} from '../models/standar/meddraSync.entity';
+import {SyncStateEnum} from '../models/enums/sycnstate.enum';
 import {PT} from '../models/standar/pt.entity';
 import {SOC} from '../models/standar/soc.entity';
 import {MeddraUtils} from '../utils/meddra.utils';
@@ -71,12 +72,12 @@ export class MeddraProcessFilesService {
     let socDB = [];
     let ptDB = [];
     let llDB = [];
-    try {
-      // Crear la versión
-      const versionEntity = await this.meddraSuncRepository.save(
-        withAuditOnCreate(new MeddraSync(versionStr, langStr, description)),
-      );
 
+    const syncRecord = withAuditOnCreate(new MeddraSync(versionStr, langStr, description));
+    syncRecord.startSyncDate = new Date();
+    const versionEntity = await this.meddraSuncRepository.save(syncRecord);
+
+    try {
       // Nivel superior
       const soc = await MeddraUtils.readFileContent(versionStr, langStr, 'soc.asc');
       socDB = await this.processSOC(soc, versionEntity);
@@ -88,8 +89,17 @@ export class MeddraProcessFilesService {
       // Nivel inferior, requiere pt por llt
       const lltDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'llt.asc');
       llDB = await this.processLLT(lltDataFile, ptDB);
+
+      await this.meddraSuncRepository.update(versionEntity.id, {
+        syncStatus: SyncStateEnum.FINISHED,
+        endSyncDate: new Date(),
+      });
     } catch (e) {
       await queryRunner.rollbackTransaction();
+      await this.meddraSuncRepository.update(versionEntity.id, {
+        syncStatus: SyncStateEnum.ERROR,
+        endSyncDate: new Date(),
+      });
       throw e;
     } finally {
       await queryRunner.release();

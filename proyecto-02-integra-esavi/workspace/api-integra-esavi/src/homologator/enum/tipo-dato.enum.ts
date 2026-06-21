@@ -1,4 +1,4 @@
-export enum DataType {
+export enum TipoDato {
   STRING = 'STRING',
   NUMBER = 'NUMBER',
   BOOLEAN = 'BOOLEAN',

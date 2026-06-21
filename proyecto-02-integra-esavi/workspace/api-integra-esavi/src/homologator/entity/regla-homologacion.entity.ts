@@ -1,14 +1,14 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
-import { ComparisonType } from '../enum/comparison-type.enum';
-import { Homologator } from './homologator.entity';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TipoComparacion } from '../enum/tipo-comparacion.enum';
+import { Homologador } from './homologador.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
-  name: 'TR_REGLA_HOMOLOGACION',
+  name: 'TR_HOMOLOGACION_REGLA',
   comment: 'Regla de transformación asociada a un homologador',
 })
-export class Homologation extends Auditoria {
+export class ReglaHomologacion extends Auditoria {
   @PrimaryGeneratedColumn('uuid', {
     name: 'ID',
     comment: 'Identificador de la regla',
@@ -21,18 +21,18 @@ export class Homologation extends Auditoria {
     nullable: false,
     comment: 'FK hacia el homologador',
   })
-  homologatorId: string;
+  homologadorId: string;
 
-  @ManyToOne(() => Homologator, (h) => h.homologations, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Homologador, (h) => h.reglasHomologacion, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'HOMOLOGATOR_ID' })
-  homologator: Homologator;
+  homologador: Homologador;
 
   @Column({
     name: 'SOURCE_SYSTEM',
     type: 'varchar',
     length: 50,
     nullable: false,
-    comment: 'Sistema origen (ej. DHIS2, VIGIFLOW)',
+    comment: 'Sistema de origen (ej. VIGIFLOW, DHIS2)',
   })
   sourceSystem: string;
 
@@ -66,12 +66,12 @@ export class Homologation extends Auditoria {
   @Column({
     name: 'COMPARISON_TYPE',
     type: 'enum',
-    enum: ComparisonType,
-    default: ComparisonType.EQUALS,
+    enum: TipoComparacion,
+    default: TipoComparacion.EQUALS,
     nullable: false,
     comment: 'Tipo de comparación para evaluar la regla',
   })
-  comparisonType: ComparisonType;
+  comparisonType: TipoComparacion;
 
   @Column({
     name: 'CASE_SENSITIVE',

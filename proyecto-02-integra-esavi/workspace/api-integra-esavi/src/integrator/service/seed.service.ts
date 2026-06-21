@@ -2,16 +2,17 @@ import {Injectable,Logger,OnApplicationBootstrap} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
+import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
+import {Homologador} from 'src/homologator/entity/homologador.entity';
+import {TipoComparacion} from 'src/homologator/enum/tipo-comparacion.enum';
+import {TipoDato} from 'src/homologator/enum/tipo-dato.enum';
 import {Repository} from 'typeorm';
-import {Homologation} from 'src/homologator/entity/homologation.entity';
-import {Homologator} from 'src/homologator/entity/homologator.entity';
-import {DataType} from 'src/homologator/enum/data-type.enum';
-import {ComparisonType} from 'src/homologator/enum/comparison-type.enum';
 import {read,utils} from 'xlsx';
 
 // Entidades
 import {ISync} from '../dto/sync.dto';
 import {IAuditoria,SyncProcess,SyncStatus} from '../entity';
+import {Canton} from '../entity/canton.entity';
 import {CatalogoPadre} from '../entity/catalogo-padre.entity';
 import {Catalogo} from '../entity/catalogo.entity';
 import {CausalidadEsavi} from '../entity/causalidad-esavi.entity';
@@ -23,10 +24,9 @@ import {GravedadEsavi} from '../entity/gravedad-esavi.entity';
 import {Medicamento} from '../entity/medicamento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
+import {Parroquia} from '../entity/parroquia.entity';
+import {Provincia} from '../entity/provincia.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
-import { Canton } from '../entity/canton.entity';
-import { Parroquia } from '../entity/parroquia.entity';
-import { Provincia } from '../entity/provincia.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -64,10 +64,10 @@ export class SeedService implements OnApplicationBootstrap {
     private cantonRepository: Repository<Canton>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private parroquiaRepository: Repository<Parroquia>,
-    @InjectRepository(Homologator, 'POSTGRES_INTEGRATOR_DS')
-    private homologatorRepository: Repository<Homologator>,
-    @InjectRepository(Homologation, 'POSTGRES_INTEGRATOR_DS')
-    private homologationRepository: Repository<Homologation>,
+    @InjectRepository(Homologador, 'POSTGRES_INTEGRATOR_DS')
+    private homologadorRepository: Repository<Homologador>,
+    @InjectRepository(ReglaHomologacion, 'POSTGRES_INTEGRATOR_DS')
+    private reglaHomologacionRepository: Repository<ReglaHomologacion>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -1488,18 +1488,18 @@ export class SeedService implements OnApplicationBootstrap {
           isActive: true,
         };
 
-        let homologator = await this.homologatorRepository.findOne({
+        let homologador = await this.homologadorRepository.findOne({
           where: { entity: 'Paciente', field: 'sexo' },
         });
 
-        if (!homologator) {
-          homologator = await this.homologatorRepository.save({
+        if (!homologador) {
+          homologador = await this.homologadorRepository.save({
             entity: 'Paciente',
             field: 'sexo',
             description: 'Sexo de persona - origen VigiFlow',
-            targetType: DataType.NUMBER,
+            targetType: TipoDato.NUMBER,
             ...auditoria,
-          } as Homologator);
+          } as Homologador);
           console.log('✅ Homologador Sexo creado');
         } else {
           console.log('ℹ️ Homologador Sexo ya existe, se omite creación');
@@ -1521,9 +1521,9 @@ export class SeedService implements OnApplicationBootstrap {
           const [sourceSystem, sourceField, sourceValue, targetValue, comparisonType, caseSensitiveStr, priorityStr] =
             lines[i].split(',').map((col) => col.trim());
 
-          const existing = await this.homologationRepository.findOne({
+          const existing = await this.reglaHomologacionRepository.findOne({
             where: {
-              homologatorId: homologator.id,
+              homologadorId: homologador.id,
               sourceSystem,
               sourceField,
               sourceValue: sourceValue ?? '',
@@ -1535,17 +1535,17 @@ export class SeedService implements OnApplicationBootstrap {
             continue;
           }
 
-          await this.homologationRepository.save({
-            homologatorId: homologator.id,
+          await this.reglaHomologacionRepository.save({
+            homologadorId: homologador.id,
             sourceSystem,
             sourceField,
             sourceValue: sourceValue ?? '',
             targetValue,
-            comparisonType: comparisonType as ComparisonType,
+            comparisonType: comparisonType as TipoComparacion,
             caseSensitive: caseSensitiveStr === 'true',
             priority: parseInt(priorityStr, 10),
             ...auditoria,
-          } as Homologation);
+          } as unknown as ReglaHomologacion);
           insertados++;
         }
 
@@ -1577,59 +1577,53 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   /**
-   * Método para limpiar el contenido de todas las tablas que inician con "TR"
+   * Trunca todas las tablas de todos los esquemas de la base de datos,
+   * excepto los esquemas del sistema y "public".
    */
   async cleanTRTables() {
-    console.log('🧹 Iniciando limpieza de todas las tablas que inician con "TR"...');
+    console.log('🧹 Iniciando limpieza de todas las tablas (todos los esquemas excepto public)...');
 
+    const ESQUEMAS_EXCLUIDOS = [
+      'public',
+      'pg_catalog',
+      'information_schema',
+      'pg_toast',
+    ];
+
+    const queryRunner = this.datoVacunacionRepository.manager.connection.createQueryRunner();
     try {
-      // Obtener el query runner para ejecutar SQL directo
-      const queryRunner = this.datoVacunacionRepository.manager.connection.createQueryRunner();
-
-      // Obtener todas las tablas del esquema que inician con "TR"
-      const tablesResult = await queryRunner.query(`
-        SELECT table_name 
-        FROM information_schema.tables 
-        WHERE table_schema = 'DHI_ESAVI'
-        AND table_name LIKE 'TR_%'
-        ORDER BY table_name;
+      const tablas: { table_schema: string; table_name: string }[] = await queryRunner.query(`
+        SELECT t.table_schema, t.table_name
+        FROM information_schema.tables t
+        WHERE t.table_type = 'BASE TABLE'
+          AND t.table_schema NOT IN (${ESQUEMAS_EXCLUIDOS.map((s) => `'${s}'`).join(', ')})
+          AND t.table_schema NOT LIKE 'pg_temp_%'
+        ORDER BY t.table_schema, t.table_name;
       `);
 
-      console.log(`📋 Se encontraron ${tablesResult.length} tablas que inician con "TR"`);
-
-      if (tablesResult.length === 0) {
-        console.log('ℹ️ No se encontraron tablas que inician con "TR"');
-        await queryRunner.release();
+      if (tablas.length === 0) {
+        console.log('ℹ️ No se encontraron tablas para truncar');
         return;
       }
 
-      // Deshabilitar temporalmente las restricciones de clave foránea
+      const esquemas = [...new Set(tablas.map((t) => t.table_schema))];
+      console.log(`📋 Esquemas encontrados: ${esquemas.join(', ')}`);
+      console.log(`📋 Total de tablas a truncar: ${tablas.length}`);
+
+      const listaTablas = tablas
+        .map((t) => `"${t.table_schema}"."${t.table_name}"`)
+        .join(', ');
+
       await queryRunner.query('SET session_replication_role = replica;');
-
-      // Limpiar el contenido de cada tabla encontrada
-      for (const table of tablesResult) {
-        const tableName = table.table_name;
-        console.log(`🧹 Limpiando contenido de tabla: ${tableName}`);
-
-        try {
-          await queryRunner.query(`TRUNCATE TABLE "DHI_ESAVI"."${tableName}" CASCADE;`);
-          console.log(`✅ Tabla ${tableName} limpiada exitosamente`);
-        } catch (tableError) {
-          console.error(`❌ Error al limpiar tabla ${tableName}:`, tableError);
-          // Continuamos con las demás tablas aunque falle una
-        }
-      }
-
-      // Restaurar las restricciones de clave foránea
+      await queryRunner.query(`TRUNCATE TABLE ${listaTablas} CASCADE;`);
       await queryRunner.query('SET session_replication_role = DEFAULT;');
 
-      // Liberar el query runner
-      await queryRunner.release();
-
-      console.log('✅ Proceso de limpieza de tablas "TR" completado exitosamente');
+      console.log(`✅ ${tablas.length} tabla(s) truncadas en ${esquemas.length} esquema(s) exitosamente`);
     } catch (error) {
-      console.error('❌ Error al limpiar tablas que inician con "TR":', error);
+      console.error('❌ Error al truncar las tablas:', error);
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 }

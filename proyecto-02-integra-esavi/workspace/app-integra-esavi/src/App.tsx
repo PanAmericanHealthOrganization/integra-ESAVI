@@ -1,6 +1,10 @@
 import {keycloakAuthProvider} from "ra-keycloak"
 import {lazy,useContext} from "react"
-import {Admin,Resource} from "react-admin"
+import {Admin,Notification,Resource} from "react-admin"
+
+const NotificacionPersonalizada = () => (
+  <Notification anchorOrigin={{ vertical: "top", horizontal: "right" }} />
+)
 import {AuthenticationContext} from "./contexts/AuthContext "
 import {dataProvider} from "./dataProviders/dataProvider"
 import keycloak from "./keycloak"
@@ -60,6 +64,7 @@ const App = () => {
       })}
       layout={CustomLayout}
       loginPage={CustomLoginPage}
+      notification={NotificacionPersonalizada}
       theme={theme}>
       <Resource
         name="dashboard"

@@ -1,4 +1,4 @@
-export enum ComparisonType {
+export enum TipoComparacion {
   EQUALS = 'EQUALS',
   STARTS_WITH = 'STARTS_WITH',
   ENDS_WITH = 'ENDS_WITH',
