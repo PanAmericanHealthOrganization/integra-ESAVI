@@ -12,10 +12,11 @@ import {
   Paper,
   Tab,
   Tabs,
+  Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useEffect, useState } from "react"
-import { Show, useShowContext } from "react-admin"
+import React,{useEffect,useState} from "react"
+import {Datagrid,FunctionField,ListContextProvider,Pagination,Show,useList,useShowContext} from "react-admin"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 // ─── TabPanel ─────────────────────────────────────────────────────────────────
@@ -33,7 +34,7 @@ function TabPanel({ children, value, index, ...other }: TabPanelProps) {
       hidden={value !== index}
       id={`esavi-tabpanel-${index}`}
       aria-labelledby={`esavi-tab-${index}`}
-      style={{ overflow: "visible" }}
+      style={{ overflowY: "auto", maxHeight: "calc(100vh - 210px)" }}
       {...other}>
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
@@ -268,7 +269,7 @@ const TabPaciente = () => {
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Sexo"
-              value={paciente.sexo?.homologada ?? paciente.sexo?.vigiflow ?? paciente.sexo?.dhis2}
+              value={paciente.sexo?.vigiflow ?? paciente.sexo?.dhis2 ?? paciente.sexo?.homologada}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -507,11 +508,36 @@ const TabVacunacion = () => {
   )
 }
 
+// ─── MedDRA tree ──────────────────────────────────────────────────────────────
+
+interface MeddraNode {
+  code: string
+  name: string
+  level: "LLT" | "PT" | "SOC"
+}
+
+interface MeddraTreeChipProps {
+  node: MeddraNode
+}
+
+const MeddraTreeChip = ({ node }: MeddraTreeChipProps) => (
+  <Tooltip title={node.code} arrow placement="top">
+    <Chip
+      label={`${node.name} (${node.level})`}
+      size="small"
+      variant="outlined"
+      color={node.level === "LLT" ? "primary" : node.level === "PT" ? "default" : "secondary"}
+      sx={{ maxWidth: 320, ".MuiChip-label": { whiteSpace: "normal", lineHeight: 1.3 } }}
+    />
+  </Tooltip>
+)
+
 // ─── Tab ESAVI ────────────────────────────────────────────────────────────────
 
 const TabEsavi = () => {
   const { record } = useShowContext()
   const [esavis, setEsavis] = useState<any[]>([])
+  const [meddraMap, setMeddraMap] = useState<Record<string, MeddraNode[]>>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -519,10 +545,35 @@ const TabEsavi = () => {
     setLoading(true)
     intESAVIClient
       .get(`/integrator/notificacion/${record.id}/dato-esavi`)
-      .then((res) => setEsavis(Array.isArray(res.data) ? res.data : []))
+      .then(async (res) => {
+        const items: any[] = Array.isArray(res.data) ? res.data : []
+        setEsavis(items)
+
+        const codes = Array.from(new Set(items.map((e) => e.codigoLlt).filter(Boolean)))
+        if (codes.length === 0) return
+
+        const results = await Promise.allSettled(
+          codes.map((code) => intESAVIClient.get(`/meddra/llt/by-code?code=${encodeURIComponent(code)}`))
+        )
+
+        const map: Record<string, MeddraNode[]> = {}
+        codes.forEach((code, i) => {
+          const r = results[i]
+          if (r.status !== "fulfilled" || !r.value?.data) return
+          const llt = r.value.data
+          const nodes: MeddraNode[] = []
+          if (llt.name) nodes.push({ code: llt.code ?? code, name: llt.name, level: "LLT" })
+          if (llt.pt?.name) nodes.push({ code: llt.pt.code ?? "", name: llt.pt.name, level: "PT" })
+          if (llt.pt?.soc?.name) nodes.push({ code: llt.pt.soc.code ?? "", name: llt.pt.soc.name, level: "SOC" })
+          map[code] = nodes
+        })
+        setMeddraMap(map)
+      })
       .catch(() => setEsavis([]))
       .finally(() => setLoading(false))
   }, [record?.id])
+
+  const listContext = useList({ data: esavis, perPage: 10 })
 
   if (loading) {
     return (
@@ -541,82 +592,47 @@ const TabEsavi = () => {
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-        <Typography variant="h6">Eventos ESAVI</Typography>
-        <Chip label={esavis.length} size="small" />
-      </Box>
-
-      {esavis.map((e, idx) => (
-        <Paper variant="outlined" sx={{ p: 2 }} key={e.id ?? idx}>
-          {/* ── Encabezado del evento ── */}
-          <Typography variant="subtitle1" fontWeight={600} gutterBottom>
-            {e.nombre ?? e.nombreReportado ?? `Evento ${idx + 1}`}
-          </Typography>
-          {e.nombreReportado && e.nombreReportado !== e.nombre && (
-            <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
-              Reportado como: {e.nombreReportado}
-            </Typography>
+    <ListContextProvider value={listContext}>
+      <Datagrid bulkActionButtons={false} rowClick={false}>
+        <FunctionField
+          label="Evento adverso"
+          render={(rec: any) => (
+            <Box>
+              <Typography variant="body2" fontWeight={600}>{rec.nombre ?? "—"}</Typography>
+            </Box>
           )}
-          {e.descripcion && (
-            <Typography variant="body2" sx={{ mb: 2, whiteSpace: "pre-wrap" }}>
-              {e.descripcion}
-            </Typography>
+        />
+        <FunctionField
+          label="Fecha inicio"
+          render={(rec: any) => formatDate(rec.fechaEsavi)}
+        />
+        <FunctionField
+          label="Resultado"
+          render={(rec: any) => rec.resultado ?? "—"}
+        />
+        <FunctionField
+          label="Código caso"
+          render={(rec: any) => (
+            <Typography variant="caption" title={rec.codigoCaso}>{rec.codigoCaso ?? "—"}</Typography>
           )}
-
-          {/* ── Línea temporal ── */}
-          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", mb: 2 }}>
-            <FieldCell label="Fecha inicio" value={formatDate(e.fechaEsavi)} />
-            <FieldCell label="Fecha fin" value={formatDate(e.fechaFinalizacion)} />
-            <FieldCell label="Duración" value={e.duracion} />
-            <FieldCell label="Resultado" value={e.resultado} />
-            <FieldCell label="Código caso" value={e.codigoCaso} />
-            <FieldCell label="Sistema codificación" value={e.sistemaCodififacion} />
-          </Box>
-
-          {/* ── Jerarquía MedDRA ── */}
-          {(e.nameLLT || e.namePT || e.nameHLT || e.nameHLGT || e.nameSOC) && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1 }}>
-                MedDRA
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                {e.nameLLT && (
-                  <FieldCell label={`LLT ${e.codigoLLT ? `(${e.codigoLLT})` : ""}`} value={e.nameLLT} />
-                )}
-                {e.namePT && (
-                  <FieldCell label={`PT ${e.codigoPT ? `(${e.codigoPT})` : ""}`} value={e.namePT} />
-                )}
-                {e.nameHLT && (
-                  <FieldCell label={`HLT ${e.codigoHLT ? `(${e.codigoHLT})` : ""}`} value={e.nameHLT} />
-                )}
-                {e.nameHLGT && (
-                  <FieldCell label={`HLGT ${e.codigoHLGT ? `(${e.codigoHLGT})` : ""}`} value={e.nameHLGT} />
-                )}
-                {e.nameSOC && (
-                  <FieldCell label={`SOC ${e.codigoSOC ? `(${e.codigoSOC})` : ""}`} value={e.nameSOC} />
-                )}
+        />
+        <FunctionField
+          label="MedDRA"
+          render={(rec: any) => {
+            const nodes: MeddraNode[] = rec.codigoLlt ? (meddraMap[rec.codigoLlt] ?? []) : []
+            if (nodes.length === 0) return null
+            return (
+              <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", py: 0.5 }}>
+                {nodes.map((node) => (
+                  <MeddraTreeChip key={node.level} node={node} />
+                ))}
               </Box>
-            </>
-          )}
-
-          {/* ── CIE-10 ── */}
-          {(e.codigoEsaviCie10 || e.codigoDxInicialCie10) && (
-            <>
-              <Divider sx={{ my: 1 }} />
-              <Typography variant="caption" color="text.secondary" fontWeight={600} display="block" sx={{ mb: 1 }}>
-                CIE-10
-              </Typography>
-              <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
-                <FieldCell label="Código ESAVI" value={e.codigoEsaviCie10} />
-                <FieldCell label="Diagnóstico inicial" value={e.codigoDxInicialCie10} />
-              </Box>
-            </>
-          )}
-        </Paper>
-      ))}
-    </Box>
+            )
+          }}
+        />
+      </Datagrid>
+      <Pagination rowsPerPageOptions={[10, 25, 50]} />
+    </ListContextProvider>
   )
 }
 

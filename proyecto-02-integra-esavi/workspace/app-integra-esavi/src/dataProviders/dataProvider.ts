@@ -53,6 +53,8 @@ export const dataProvider = combineDataProviders((resource) => {
       return homologatorDataProvider
     case "homologations":
       return homologationDataProvider
+    case "admin":
+      return noopDataProvider
     case "meddra":
     case "whodrug":
     case "estandar-syncs":

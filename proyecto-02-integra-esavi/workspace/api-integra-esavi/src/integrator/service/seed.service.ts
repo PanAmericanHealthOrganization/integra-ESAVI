@@ -3,6 +3,10 @@ import {InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import {Repository} from 'typeorm';
+import {Homologation} from 'src/homologator/entity/homologation.entity';
+import {Homologator} from 'src/homologator/entity/homologator.entity';
+import {DataType} from 'src/homologator/enum/data-type.enum';
+import {ComparisonType} from 'src/homologator/enum/comparison-type.enum';
 import {read,utils} from 'xlsx';
 
 // Entidades
@@ -60,6 +64,10 @@ export class SeedService implements OnApplicationBootstrap {
     private cantonRepository: Repository<Canton>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private parroquiaRepository: Repository<Parroquia>,
+    @InjectRepository(Homologator, 'POSTGRES_INTEGRATOR_DS')
+    private homologatorRepository: Repository<Homologator>,
+    @InjectRepository(Homologation, 'POSTGRES_INTEGRATOR_DS')
+    private homologationRepository: Repository<Homologation>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -73,6 +81,9 @@ export class SeedService implements OnApplicationBootstrap {
 
     // Carga independiente de TC_CATALOGO_PADRE desde CSV (siempre corre, con su propio control de duplicados)
     await this.loadCatalogoPadreFromCSV();
+
+    // Carga independiente de homologador Sexo VigiFlow (siempre corre, con control de duplicados)
+    await this.loadHomologadorSexoVigiflow();
 
     const existingCount = await this.tipoCatalogoRepository.count();
     if (existingCount > 0) {
@@ -99,11 +110,8 @@ export class SeedService implements OnApplicationBootstrap {
       // 2.3. Cargar parroquias desde CSV
       await this.loadParroquiasFromCSV();
 
-      // 2.4. Cargar reacciones, diagnósticos o enfermedades desde Excel
-      await this.loadIcd10meddraFromExcel();
-
-      // 2.5. Cargar síntomas DHIS2 a LLT desde Excel
-      await this.loadSymptomToLltFromExcel();
+      // 2.4. loadIcd10meddraFromExcel — eliminado (archivo no disponible)
+      // 2.5. loadSymptomToLltFromExcel — eliminado (archivo no disponible)
 
       //----fin catalogos / registros para homologación---------------------------------------------------------------------------------------------------------
       // 4. Crear pacientes
@@ -1460,6 +1468,111 @@ export class SeedService implements OnApplicationBootstrap {
       console.log(`✅ TC_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
     } catch (error) {
       console.error('❌ Error al cargar TC_PARROQUIA:', error);
+    }
+    };
+  
+
+  private async loadHomologadorSexoVigiflow() {
+    await this.runSyncProcess('Carga de homologador Sexo (origen VigiFlow)...', async () => {
+      console.log('🔄 Cargando homologador Sexo VigiFlow...');
+
+      try {
+        const auditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: '',
+          deletedAt: undefined,
+          deletedBy: '',
+          isEnabled: true,
+          isActive: true,
+        };
+
+        let homologator = await this.homologatorRepository.findOne({
+          where: { entity: 'Paciente', field: 'sexo' },
+        });
+
+        if (!homologator) {
+          homologator = await this.homologatorRepository.save({
+            entity: 'Paciente',
+            field: 'sexo',
+            description: 'Sexo de persona - origen VigiFlow',
+            targetType: DataType.NUMBER,
+            ...auditoria,
+          } as Homologator);
+          console.log('✅ Homologador Sexo creado');
+        } else {
+          console.log('ℹ️ Homologador Sexo ya existe, se omite creación');
+        }
+
+        const csvPath = path.join(
+          process.cwd(),
+          'upload_files',
+          'catalogos-csv',
+          'homologador-sexo-vigiflow.csv',
+        );
+        const csvContent = fs.readFileSync(csvPath, 'utf-8');
+        const lines = csvContent.split('\n').filter((line) => line.trim());
+
+        let insertados = 0;
+        let omitidos = 0;
+
+        for (let i = 1; i < lines.length; i++) {
+          const [sourceSystem, sourceField, sourceValue, targetValue, comparisonType, caseSensitiveStr, priorityStr] =
+            lines[i].split(',').map((col) => col.trim());
+
+          const existing = await this.homologationRepository.findOne({
+            where: {
+              homologatorId: homologator.id,
+              sourceSystem,
+              sourceField,
+              sourceValue: sourceValue ?? '',
+            },
+          });
+
+          if (existing) {
+            omitidos++;
+            continue;
+          }
+
+          await this.homologationRepository.save({
+            homologatorId: homologator.id,
+            sourceSystem,
+            sourceField,
+            sourceValue: sourceValue ?? '',
+            targetValue,
+            comparisonType: comparisonType as ComparisonType,
+            caseSensitive: caseSensitiveStr === 'true',
+            priority: parseInt(priorityStr, 10),
+            ...auditoria,
+          } as Homologation);
+          insertados++;
+        }
+
+        if (omitidos > 0) {
+          console.log(`ℹ️ Homologaciones Sexo: ${omitidos} regla(s) ya existían y se omitieron.`);
+        }
+        console.log(`✅ Homologaciones Sexo VigiFlow: ${insertados} regla(s) insertada(s).`);
+      } catch (error) {
+        console.error('❌ Error al cargar homologador Sexo VigiFlow:', error);
+        throw error;
+      }
+    });
+  }
+
+  async truncateNotificacion() {
+    console.log('🧹 Truncando TR_NOTIFICACION en cascada...');
+    const queryRunner = this.notificacionRepository.manager.connection.createQueryRunner();
+    try {
+      await queryRunner.query('SET session_replication_role = replica;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
+      await queryRunner.query('SET session_replication_role = DEFAULT;');
+      console.log('✅ TR_NOTIFICACION truncada en cascada exitosamente');
+    } catch (error) {
+      console.error('❌ Error al truncar TR_NOTIFICACION:', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 

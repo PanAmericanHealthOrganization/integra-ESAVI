@@ -28,7 +28,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
-    const response = await intESAVIClient.post(`integrator/${resource}/paginated`, { ...params })
+    const response = await intESAVIClient.post(`integrator/homologator/paginated`, { ...params })
     return {
       data: response.data.data,
       total: response.data.total,
@@ -39,7 +39,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: GetOneParams<RecordType>
   ): Promise<GetOneResult<RecordType>> {
-    const response = await intESAVIClient.get(`/integrator/${resource}/getOne/${params.id}`)
+    const response = await intESAVIClient.get(`/integrator/homologator/getOne/${params.id}`)
     return { data: response.data }
   },
 
@@ -47,7 +47,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: GetManyParams
   ): Promise<GetManyResult<RecordType>> {
-    const response = await intESAVIClient.post(`/integrator/${resource}/getMany`, { ids: params.ids })
+    const response = await intESAVIClient.post(`/integrator/homologator/getMany`, { ids: params.ids })
     return { data: response.data }
   },
 
@@ -55,7 +55,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: GetManyReferenceParams
   ): Promise<GetManyReferenceResult<RecordType>> {
-    const response = await intESAVIClient.post(`integrator/${resource}/paginated`, {
+    const response = await intESAVIClient.post(`integrator/homologator/paginated`, {
       pagination: params.pagination,
       sort: params.sort,
       filter: { [params.target]: params.id, ...params.filter },
@@ -73,7 +73,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: CreateParams
   ): Promise<CreateResult<ResultRecordType>> {
-    const response = await intESAVIClient.post(`integrator/${resource}/create`, params.data)
+    const response = await intESAVIClient.post(`integrator/homologator/create`, params.data)
     return { data: response.data }
   },
 
@@ -81,7 +81,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: UpdateParams
   ): Promise<UpdateResult<RecordType>> {
-    const response = await intESAVIClient.put(`integrator/${resource}/update/${params.id}`, params.data)
+    const response = await intESAVIClient.put(`integrator/homologator/update/${params.id}`, params.data)
     return { data: response.data }
   },
 
@@ -96,7 +96,7 @@ export const homologatorDataProvider: DataProvider = {
     resource: string,
     params: DeleteParams<RecordType>
   ): Promise<DeleteResult<RecordType>> {
-    const response = await intESAVIClient.delete(`integrator/${resource}/${params.id}`)
+    const response = await intESAVIClient.delete(`integrator/homologator/${params.id}`)
     return { data: response.data }
   },
 

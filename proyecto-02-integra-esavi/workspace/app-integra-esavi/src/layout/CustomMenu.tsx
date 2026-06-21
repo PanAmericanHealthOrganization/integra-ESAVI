@@ -1,3 +1,4 @@
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import LocationCityIcon from "@mui/icons-material/LocationCity"
@@ -72,6 +73,13 @@ export const CustomMenu = () => {
             primaryText="Establecimientos"
             leftIcon={<LocalHospitalIcon />}
           />
+          <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+            <Menu.Item
+              to="/admin"
+              primaryText="Administración"
+              leftIcon={<AdminPanelSettingsIcon />}
+            />
+          </Authorize>
         </SubMenu>
         <Menu.Item
           to="/vacunometro"

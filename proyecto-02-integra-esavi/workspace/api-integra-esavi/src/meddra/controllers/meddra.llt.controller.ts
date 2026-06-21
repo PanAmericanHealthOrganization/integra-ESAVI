@@ -24,4 +24,10 @@ export class MeddraLltController {
   async searchLLT(@Query('term') term: string): Promise<LLT> {
     return this.meddraLltService.searchLLT(term);
   }
+
+  @Get('by-code')
+  @ApiQuery({ name: 'code', required: true, description: 'Código LLT MedDRA' })
+  async findByCode(@Query('code') code: string): Promise<LLT> {
+    return this.meddraLltService.searchLltByCode(code);
+  }
 }

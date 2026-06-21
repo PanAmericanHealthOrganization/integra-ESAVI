@@ -25,6 +25,9 @@ export class CreatePacienteDto {
   @IsDateString()
   @IsOptional()
   fechaNacimiento: Date;
+
+  @IsOptional()
+  origenOriginal: Record<string, any>;
 }
 
 export class UpdatePacienteDto extends PartialType(CreatePacienteDto) {}

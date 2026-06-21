@@ -1,6 +1,6 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
-import { Button, Card } from "@mui/material"
-import { useState } from "react"
+import {Box,Button,Card,Chip,Typography} from "@mui/material"
+import {useState} from "react"
 import {
   Datagrid,
   ExportButton,
@@ -32,140 +32,119 @@ const postFilters = [
 
 const ListActions = () => {
   const [open, setOpen] = useState(false)
-
-  const handleClickOpen = () => {
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
   return (
     <TopToolbar>
       <ExportButton label="CSV" />
       <Button
         variant="contained"
         color="primary"
-        onClick={handleClickOpen}
+        onClick={() => setOpen(true)}
         style={{ marginLeft: "10px" }}>
         Importar datos
       </Button>
-      <BulkDialog open={open} onClose={handleClose} />
+      <BulkDialog open={open} onClose={() => setOpen(false)} />
     </TopToolbar>
   )
 }
 
 const ocultarInformacion = (texto: string) => {
-  if (!texto) return "--"
-  const longitud = texto.length
-  const mitad = Math.floor(longitud / 2)
+  if (!texto) return "—"
+  const mitad = Math.floor(texto.length / 2)
   return texto.substring(0, mitad) + "****"
 }
 
+const formatFecha = (valor?: string | null) => {
+  if (!valor) return "—"
+  return new Date(valor).toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  })
+}
+
 export const ESAVISList = () => {
-  const [isHover, setIsHover] = useState(false)
-
-  const handleMouseEnter = () => {
-    setIsHover(true)
-  }
-
-  const handleMouseLeave = () => {
-    setIsHover(false)
-  }
-
   return (
-    <Card variant="outlined" sx={{ padding: '10px' }}>
+    <Card variant="outlined" sx={{ padding: "10px" }}>
       <List actions={<ListActions />} filters={postFilters} empty={false}>
         <Datagrid bulkActionButtons={false} rowClick="show">
+          {/* ── ID ── */}
           <FunctionField
             label="Id"
-            source="id"
             render={(record: any) => (
-              <>
-                {console.log("Record :::", record)}
-                <table>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <div
-                          onClick={() => {
-                            navigator.clipboard.writeText(record.id)
-                          }}>
-                          <ContentCopyIcon
-                            color="primary"
-                            sx={{ fontSize: 15 }}
-                          />
-                        </div>
-                      </td>
-                      <td>
-                        <label
-                          title={`${record.id}`}
-                          onMouseEnter={handleMouseEnter}
-                          onMouseLeave={handleMouseLeave}>
-                          {`${record.id.slice(0, 5)}...`}
-                        </label>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                <ContentCopyIcon
+                  color="primary"
+                  sx={{ fontSize: 14, cursor: "pointer" }}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    navigator.clipboard.writeText(record.id)
+                  }}
+                />
+                <Typography variant="caption" title={record.id}>
+                  {record.id?.slice(0, 8)}…
+                </Typography>
+              </Box>
             )}
           />
+
+          {/* ── Origen + Código ── */}
           <FunctionField
             label="Origen"
-            render={(record: any) => record.origen ?? "--"}
+            render={(record: any) => record.origen ?? "—"}
           />
           <FunctionField
             label="Código Origen"
-            render={(record: any) => record.codigoOrigenNotificacion ?? "--"}
+            render={(record: any) => record.codigoOrigenNotificacion ?? "—"}
           />
-          {/* <TextField label="Fecha Notificación" source="fechaNotificacion" /> */}
+
+          {/* ── Fecha Notificación ── */}
           <FunctionField
             label="Fecha Notificación"
-            render={(record: any) => {
-              // Si fechaNotificacion tiene un valor, mostrarla, si no mostrar '--'
-              const fechaNotificacion = record.fechaNotificacion
-                ? new Date(record.fechaNotificacion).toLocaleDateString(
-                    "es-ES",
-                    {
-                      year: "numeric",
-                      month: "numeric",
-                      day: "numeric",
-                    }
-                  )
-                : "--" // Si no hay valor, mostrar '--'
+            render={(record: any) => formatFecha(record.fechaNotificacion)}
+          />
 
-              return fechaNotificacion
+          {/* ── Paciente (columna combinada) ── */}
+          <FunctionField
+            label="Paciente"
+            render={(record: any) => {
+              const p = record.paciente ?? {}
+              const nombreCompleto =
+                [p.nombre, p.apellidos].filter(Boolean).join(" ") ||
+                p.inicialesNombre ||
+                "—"
+              const identificacion = ocultarInformacion(p.identificacion)
+              const fechaNac = formatFecha(p.fechaNacimiento)
+              const sexo =
+                p.sexo?.vigiflow ?? p.sexo?.dhis2 ?? p.sexo?.homologada ?? "—"
+
+              return (
+                <Box sx={{ lineHeight: 1.6 }}>
+                  <Typography variant="body2" fontWeight={600}>
+                    {nombreCompleto}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" display="block">
+                    {identificacion} · {sexo}
+                  </Typography>
+                </Box>
+              )
             }}
           />
-          s
-          <FunctionField
-            label="Fecha Nacimiento"
-            render={(record: any) => {
-              // Si fechaNacimiento tiene un valor, mostrarlo, de lo contrario, mostrar '--'
-              const fechaNacimiento = record.fechaNacimiento
-                ? new Date(record.fechaNacimiento).toLocaleDateString("es-ES", {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                  })
-                : "--"
 
-              return fechaNacimiento
+          {/* ── Grave ── */}
+          <FunctionField
+            label="Grave"
+            render={(record: any) => {
+              const gravedad = record.gravedadEsavi?.[0]
+              if (!gravedad) return <Typography variant="caption">—</Typography>
+              const esGrave = gravedad.tipo === "1"
+              return (
+                <Chip
+                  label={esGrave ? "Grave" : "No grave"}
+                  size="small"
+                  color={esGrave ? "error" : "default"}
+                />
+              )
             }}
-          />
-          <FunctionField
-            label="Identificación"
-            render={(record: any) =>
-              ocultarInformacion(record.paciente?.identificacion)
-            }
-          />
-          <FunctionField
-            label="Nombres"
-            render={(record: any) =>
-              ocultarInformacion(record.paciente?.nombre)
-            }
           />
         </Datagrid>
       </List>

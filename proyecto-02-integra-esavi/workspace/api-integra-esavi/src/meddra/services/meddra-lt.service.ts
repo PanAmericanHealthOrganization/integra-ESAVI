@@ -57,10 +57,12 @@ export class MeddraLLTService {
       return null;
     }
 
-    code = code.trim();
+    const normalized = code.trim().toLowerCase();
     const t = await this.lltRepository
       .createQueryBuilder('llt')
-      .where('LOWER(llt.code) = :code', { code: (code || '').toLowerCase() }) // Comparar con el nombre normalizado
+      .leftJoinAndSelect('llt.pt', 'pt')
+      .leftJoinAndSelect('pt.soc', 'soc')
+      .where('LOWER(llt.code) = :code', { code: normalized })
       .getOne();
 
     if (!t) {
