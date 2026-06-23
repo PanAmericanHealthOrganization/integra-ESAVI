@@ -1,12 +1,16 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
   Button,
   Chip,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -72,6 +76,11 @@ export const DpaList = () => {
   const [searchProvincia, setSearchProvincia] = useState("")
   const [searchCanton, setSearchCanton] = useState("")
   const [searchParroquia, setSearchParroquia] = useState("")
+
+  // Filter visibility state
+  const [showFilterProv, setShowFilterProv] = useState(false)
+  const [showFilterCanton, setShowFilterCanton] = useState(false)
+  const [showFilterParroquia, setShowFilterParroquia] = useState(false)
 
   // Form state
   const [formProvincia, setFormProvincia] = useState({ ...EMPTY_PROVINCIA })
@@ -186,8 +195,9 @@ export const DpaList = () => {
       }
       setDlgProvincia({ open: false, mode: "create" })
       refetchProvincias()
-    } catch {
-      notify("Error al guardar la provincia", { type: "error" })
+    } catch (err: any) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Error al guardar la provincia"
+      notify(Array.isArray(msg) ? msg.join(", ") : msg, { type: "error" })
     }
   }
 
@@ -218,8 +228,9 @@ export const DpaList = () => {
       }
       setDlgCanton({ open: false, mode: "create" })
       refetchCantones()
-    } catch {
-      notify("Error al guardar el cantón", { type: "error" })
+    } catch (err: any) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Error al guardar el cantón"
+      notify(Array.isArray(msg) ? msg.join(", ") : msg, { type: "error" })
     }
   }
 
@@ -249,8 +260,9 @@ export const DpaList = () => {
       }
       setDlgParroquia({ open: false, mode: "create" })
       refetchParroquias()
-    } catch {
-      notify("Error al guardar la parroquia", { type: "error" })
+    } catch (err: any) {
+      const msg = err?.response?.data?.message ?? err?.message ?? "Error al guardar la parroquia"
+      notify(Array.isArray(msg) ? msg.join(", ") : msg, { type: "error" })
     }
   }
 
@@ -281,30 +293,52 @@ export const DpaList = () => {
     <Box p={2}>
       <Title title="DPA" />
       <Box display="flex" gap={2} alignItems="flex-start" sx={{ overflowX: "auto" }}>
+
         {/* ── Panel Provincias ── */}
         <Paper elevation={2} sx={{ flex: 1, minWidth: 220 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-            <Typography variant="subtitle2" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
-              Provincias
-            </Typography>
-            <TextField
-              placeholder="Buscar…"
-              size="small"
-              sx={{ flex: 1 }}
-              value={searchProvincia}
-              onChange={(e) => setSearchProvincia(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateProvincia}>
-              Nueva
-            </Button>
+          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="baseline" gap={1}>
+              <Typography variant="subtitle2" fontWeight={700}>
+                Provincias
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title={showFilterProv ? "Ocultar filtros" : "Mostrar filtros"}>
+                <IconButton size="small" onClick={() => setShowFilterProv((v) => !v)} color={showFilterProv ? "primary" : "default"}>
+                  <Badge variant="dot" color="primary" invisible={!searchProvincia}>
+                    <FilterListIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+              <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateProvincia}>
+                Nueva
+              </Button>
+            </Stack>
           </Box>
+
+          <Collapse in={showFilterProv}>
+            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              <TextField
+                placeholder="Buscar…"
+                size="small"
+                autoFocus
+                sx={{ width: 180 }}
+                value={searchProvincia}
+                onChange={(e) => setSearchProvincia(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button size="small" onClick={() => setSearchProvincia("")}>
+                Limpiar
+              </Button>
+            </Box>
+          </Collapse>
+
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
@@ -322,10 +356,26 @@ export const DpaList = () => {
                       <CircularProgress size={22} />
                     </TableCell>
                   </TableRow>
+                ) : !(provincias?.length) ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin provincias registradas.
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 ) : !filteredProvincias.length ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 4, color: "text.secondary", fontSize: 12 }}>
-                      {searchProvincia ? `Sin resultados para "${searchProvincia}"` : "Sin provincias"}
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin resultados para "{searchProvincia}"
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -382,43 +432,69 @@ export const DpaList = () => {
 
         {/* ── Panel Cantones ── */}
         <Paper elevation={2} sx={{ flex: 1.2, minWidth: 240 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-            <Box display="flex" alignItems="center" gap={0.75} sx={{ whiteSpace: "nowrap" }}>
-              <Typography variant="subtitle2" fontWeight={700}>
-                Cantones
-              </Typography>
+          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
+              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
+                  Cantones
+                </Typography>
+              </Box>
               {selectedProvincia && (
-                <Chip label={selectedProvincia.nombre} size="small" color="primary" variant="outlined" />
+                <Chip label={selectedProvincia.nombre} size="small" color="primary" variant="outlined" sx={{ maxWidth: 110, overflow: "hidden" }} />
               )}
             </Box>
-            <TextField
-              placeholder="Buscar…"
-              size="small"
-              sx={{ flex: 1 }}
-              disabled={!selectedProvincia}
-              value={searchCanton}
-              onChange={(e) => setSearchCanton(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Tooltip title={!selectedProvincia ? "Selecciona una provincia primero" : ""} placement="left">
-              <span>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  disabled={!selectedProvincia}
-                  onClick={openCreateCanton}>
-                  Nuevo
-                </Button>
-              </span>
-            </Tooltip>
+            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+              <Tooltip title={showFilterCanton ? "Ocultar filtros" : "Mostrar filtros"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowFilterCanton((v) => !v)}
+                    color={showFilterCanton ? "primary" : "default"}
+                    disabled={!selectedProvincia}>
+                    <Badge variant="dot" color="primary" invisible={!searchCanton}>
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={!selectedProvincia ? "Selecciona una provincia primero" : ""} placement="left">
+                <span>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!selectedProvincia}
+                    onClick={openCreateCanton}>
+                    Nuevo
+                  </Button>
+                </span>
+              </Tooltip>
+            </Stack>
           </Box>
+
+          <Collapse in={showFilterCanton && !!selectedProvincia}>
+            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              <TextField
+                placeholder="Buscar…"
+                size="small"
+                autoFocus
+                sx={{ width: 180 }}
+                value={searchCanton}
+                onChange={(e) => setSearchCanton(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button size="small" onClick={() => setSearchCanton("")}>
+                Limpiar
+              </Button>
+            </Box>
+          </Collapse>
+
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
@@ -432,8 +508,13 @@ export const DpaList = () => {
               <TableBody>
                 {!selectedProvincia ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 12 }}>
-                      Selecciona una provincia
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Selecciona una provincia para ver sus cantones
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : loadingCantones ? (
@@ -442,12 +523,26 @@ export const DpaList = () => {
                       <CircularProgress size={22} />
                     </TableCell>
                   </TableRow>
+                ) : !cantonesOfProvincia.length ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin cantones en {selectedProvincia.nombre}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 ) : !filteredCantones.length ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 4, color: "text.secondary", fontSize: 12 }}>
-                      {searchCanton
-                        ? `Sin resultados para "${searchCanton}"`
-                        : `Sin cantones en ${selectedProvincia.nombre}`}
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin resultados para "{searchCanton}"
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -502,43 +597,69 @@ export const DpaList = () => {
 
         {/* ── Panel Parroquias ── */}
         <Paper elevation={2} sx={{ flex: 1.2, minWidth: 240 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-            <Box display="flex" alignItems="center" gap={0.75} sx={{ whiteSpace: "nowrap" }}>
-              <Typography variant="subtitle2" fontWeight={700}>
-                Parroquias
-              </Typography>
+          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
+              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
+                  Parroquias
+                </Typography>
+              </Box>
               {selectedCanton && (
-                <Chip label={selectedCanton.nombre} size="small" color="secondary" variant="outlined" />
+                <Chip label={selectedCanton.nombre} size="small" color="secondary" variant="outlined" sx={{ maxWidth: 110, overflow: "hidden" }} />
               )}
             </Box>
-            <TextField
-              placeholder="Buscar…"
-              size="small"
-              sx={{ flex: 1 }}
-              disabled={!selectedCanton}
-              value={searchParroquia}
-              onChange={(e) => setSearchParroquia(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Tooltip title={!selectedCanton ? "Selecciona un cantón primero" : ""} placement="left">
-              <span>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  disabled={!selectedCanton}
-                  onClick={openCreateParroquia}>
-                  Nueva
-                </Button>
-              </span>
-            </Tooltip>
+            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+              <Tooltip title={showFilterParroquia ? "Ocultar filtros" : "Mostrar filtros"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowFilterParroquia((v) => !v)}
+                    color={showFilterParroquia ? "primary" : "default"}
+                    disabled={!selectedCanton}>
+                    <Badge variant="dot" color="primary" invisible={!searchParroquia}>
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={!selectedCanton ? "Selecciona un cantón primero" : ""} placement="left">
+                <span>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!selectedCanton}
+                    onClick={openCreateParroquia}>
+                    Nueva
+                  </Button>
+                </span>
+              </Tooltip>
+            </Stack>
           </Box>
+
+          <Collapse in={showFilterParroquia && !!selectedCanton}>
+            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              <TextField
+                placeholder="Buscar…"
+                size="small"
+                autoFocus
+                sx={{ width: 180 }}
+                value={searchParroquia}
+                onChange={(e) => setSearchParroquia(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button size="small" onClick={() => setSearchParroquia("")}>
+                Limpiar
+              </Button>
+            </Box>
+          </Collapse>
+
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
@@ -552,8 +673,13 @@ export const DpaList = () => {
               <TableBody>
                 {!selectedCanton ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 12 }}>
-                      Selecciona un cantón
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Selecciona un cantón para ver sus parroquias
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : loadingParroquias ? (
@@ -562,12 +688,26 @@ export const DpaList = () => {
                       <CircularProgress size={22} />
                     </TableCell>
                   </TableRow>
+                ) : !parroquiasOfCanton.length ? (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin parroquias en {selectedCanton.nombre}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
                 ) : !filteredParroquias.length ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 4, color: "text.secondary", fontSize: 12 }}>
-                      {searchParroquia
-                        ? `Sin resultados para "${searchParroquia}"`
-                        : `Sin parroquias en ${selectedCanton.nombre}`}
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin resultados para "{searchParroquia}"
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (

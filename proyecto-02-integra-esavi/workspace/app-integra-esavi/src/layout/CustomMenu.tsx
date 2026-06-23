@@ -39,48 +39,46 @@ export const CustomMenu = () => {
           leftIcon={<FlakyIcon />}
         />
 
-        {/* Configuraciones */}
-        <SubMenu
-          dense={false}
-          handleToggle={() => setConfiguracionesOpen((v) => !v)}
-          icon={<SettingsIcon />}
-          isOpen={configuracionesOpen || isConfiguracionesActive}
-          name="Configuraciones">
-          <Menu.Item
-            to="/parametros"
-            primaryText="Parametros"
-            leftIcon={<SettingsIcon />}
-          />
-          <Menu.Item
-            to="/catalogos-config"
-            primaryText="Catálogos"
-            leftIcon={<SegmentIcon />}
-          />
-          <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+        {/* Configuraciones — solo rol "admin" */}
+        <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+          <SubMenu
+            dense={false}
+            handleToggle={() => setConfiguracionesOpen((v) => !v)}
+            icon={<SettingsIcon />}
+            isOpen={configuracionesOpen || isConfiguracionesActive}
+            name="Configuraciones">
+            <Menu.Item
+              to="/parametros"
+              primaryText="Parametros"
+              leftIcon={<SettingsIcon />}
+            />
+            <Menu.Item
+              to="/catalogos-config"
+              primaryText="Catálogos"
+              leftIcon={<SegmentIcon />}
+            />
             <Menu.Item
               to="/homologators"
               primaryText="Homologación"
               leftIcon={<CompareArrowsIcon />}
             />
-          </Authorize>
-          <Menu.Item
-            to="/dpa"
-            primaryText="DPA"
-            leftIcon={<LocationCityIcon />}
-          />
-          <Menu.Item
-            to="/establecimientos"
-            primaryText="Establecimientos"
-            leftIcon={<LocalHospitalIcon />}
-          />
-          <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
+            <Menu.Item
+              to="/dpa"
+              primaryText="DPA"
+              leftIcon={<LocationCityIcon />}
+            />
+            <Menu.Item
+              to="/establecimientos"
+              primaryText="Establecimientos"
+              leftIcon={<LocalHospitalIcon />}
+            />
             <Menu.Item
               to="/admin"
               primaryText="Administración"
               leftIcon={<AdminPanelSettingsIcon />}
             />
-          </Authorize>
-        </SubMenu>
+          </SubMenu>
+        </Authorize>
         <Menu.Item
           to="/vacunometro"
           primaryText="Vacunometro"

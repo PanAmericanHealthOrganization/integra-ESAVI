@@ -1,11 +1,15 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
   Button,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -48,6 +52,7 @@ export const ParametrosList = () => {
   const [page, setPage] = useState(0)
   const [perPage] = useState(10)
   const [search, setSearch] = useState("")
+  const [showFilter, setShowFilter] = useState(false)
 
   const [dialog, setDialog] = useState<{ open: boolean; mode: "create" | "edit"; id?: string }>({
     open: false,
@@ -106,32 +111,60 @@ export const ParametrosList = () => {
     }
   }
 
+
   return (
     <Box p={2}>
       <Title title="Parámetros" />
       <Paper elevation={2}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" gap={2}>
-          <TextField
-            placeholder="Buscar por clave, valor o descripción"
-            size="small"
-            sx={{ flex: 1 }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-            Nuevo
-          </Button>
+        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography variant="h6" fontWeight={600} lineHeight={1.2}>
+              Parámetros
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+              <IconButton
+                size="small"
+                onClick={() => setShowFilter((v) => !v)}
+                color={showFilter ? "primary" : "default"}>
+                <Badge variant="dot" color="primary" invisible={!search}>
+                  <FilterListIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
+              Nuevo
+            </Button>
+          </Stack>
         </Box>
+
+        <Collapse in={showFilter}>
+          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            <TextField
+              placeholder="Buscar..."
+              size="small"
+              sx={{ width: 300 }}
+              value={search}
+              autoFocus={showFilter}
+              onChange={(e) => { setSearch(e.target.value); setPage(0) }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button size="small" onClick={() => { setSearch(""); setPage(0) }}>
+              Limpiar
+            </Button>
+          </Box>
+        </Collapse>
+
         <Divider />
-        <TableContainer>
-          <Table size="small">
+        <TableContainer sx={{ maxHeight: 480 }}>
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>Clave</TableCell>
@@ -143,14 +176,30 @@ export const ParametrosList = () => {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                    <CircularProgress size={32} />
+                  <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={28} />
+                  </TableCell>
+                </TableRow>
+              ) : !data?.length && search ? (
+                <TableRow>
+                  <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        Sin resultados para "{search}"
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : !data?.length ? (
                 <TableRow>
-                  <TableCell colSpan={4} align="center" sx={{ py: 4, color: "text.secondary" }}>
-                    Sin registros
+                  <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        Sin parámetros registrados. Crea el primero con + Nuevo.
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -169,7 +218,9 @@ export const ParametrosList = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary"
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
                         sx={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {row.descripcion || "—"}
                       </Typography>
