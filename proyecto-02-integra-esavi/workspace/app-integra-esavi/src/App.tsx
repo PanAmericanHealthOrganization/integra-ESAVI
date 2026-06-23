@@ -1,6 +1,7 @@
 import {keycloakAuthProvider} from "ra-keycloak"
-import {lazy,useContext} from "react"
-import {Admin,Resource} from "react-admin"
+import {lazy,useContext,useRef} from "react"
+import {Admin,Resource,usePermissions} from "react-admin"
+import {Navigate} from "react-router-dom"
 import {AuthenticationContext} from "./contexts/AuthContext "
 import {dataProvider} from "./dataProviders/dataProvider"
 import keycloak from "./keycloak"
@@ -8,25 +9,47 @@ import {CustomLayout} from "./layout/CustomLayout"
 import {CustomLoginPage} from "./layout/CustomLogin"
 import analisis from "./pages/analisis"
 import catalogos from "./pages/catalogos"
-import catalogosConfig from "./pages/catalogos-config"
+import {CatalogosConfigList} from "./pages/catalogos-config/catalogosConfigList"
 import dashboard from "./pages/dashboard"
 import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
 import gaceta from "./pages/gaceta"
-import parametros from "./pages/parametros"
+import {ParametrosList} from "./pages/parametros/parametrosList"
 import syncs from "./pages/syncs"
 import vacunometro from "./pages/vacunometro"
 
 import configuraciones from "./configuraciones"
-import dpa from "./pages/dpa"
+import {DpaList} from "./pages/dpa/DpaList"
 import { EstablecimientoList } from "./pages/establecimientos/EstablecimientoList"
-import homologators from "./pages/homologators"
+import {HomologadoresPage} from "./pages/homologators/HomologadoresPage"
 import {AdminPage} from "./pages/admin/AdminPage"
 import {MeddraPage} from "./pages/estandares/MeddraPage"
 import {WhodrugPage} from "./pages/estandares/WhodrugPage"
 import {SincronizacionesPage} from "./pages/estandares/SincronizacionesPage"
 import {theme} from "./theme"
-//import { createHashHistory } from 'history';
+
+const AdminGuard = ({ component: Component }: { component: React.ComponentType }) => {
+  const { permissions, isPending } = usePermissions()
+  const resolvedRef = useRef(false)
+
+  if (!isPending) resolvedRef.current = true
+
+  // Solo bloquear en la carga inicial; durante re-validaciones de token mantener montado
+  if (!resolvedRef.current) return null
+
+  if (!Array.isArray(permissions) || !permissions.includes("admin")) {
+    return <Navigate to="/esavis" replace />
+  }
+  return <Component />
+}
+
+// Referencias estables fuera de App para evitar desmontaje al re-renderizar
+const ParametrosPage      = () => <AdminGuard component={ParametrosList} />
+const CatalogosConfigPage = () => <AdminGuard component={CatalogosConfigList} />
+const DpaPage             = () => <AdminGuard component={DpaList} />
+const EstablecimientosPage= () => <AdminGuard component={EstablecimientoList} />
+const HomologadoresGuarded= () => <AdminGuard component={HomologadoresPage} />
+const AdminGuardedPage    = () => <AdminGuard component={AdminPage} />
 
 // Dynamic import para el dashboard de calidad
 const CalidadDashList = lazy(() =>
@@ -38,10 +61,8 @@ const CalidadDashList = lazy(() =>
 const App = () => {
   const { updateInformationUser, authState } = useContext(AuthenticationContext)
 
-  //const history = createHashHistory();
   return (
     <Admin
-      // history={history}
       dataProvider={dataProvider}
       authProvider={keycloakAuthProvider(keycloak, {
         initOptions: { onLoad: 'login-required', checkLoginIframe: false },
@@ -61,31 +82,27 @@ const App = () => {
       layout={CustomLayout}
       loginPage={CustomLoginPage}
       theme={theme}>
-      <Resource
-        name="dashboard"
-        options={{ label: "Dashboard" }}
-        list={dashboard.list}
-      />
+      <Resource name="dashboard" options={{ label: "Dashboard" }} list={dashboard.list} />
       <Resource name="esavis" list={esavis.list} show={esavis.show} />
       <Resource name="analisis" list={analisis.list} />
       <Resource name="vacunometro" {...vacunometro} />
       <Resource name="configuraciones" {...configuraciones} />
-      <Resource name="parametros" {...parametros} />
+      <Resource name="parametros" list={ParametrosPage} />
       <Resource name="calidad" list={CalidadDashList} />
       <Resource name="syncs" {...syncs} />
       <Resource name="catalogos" {...catalogos} />
-      <Resource name="catalogos-config" {...catalogosConfig} />
+      <Resource name="catalogos-config" list={CatalogosConfigPage} />
       <Resource name="catalogo-padre" />
-      <Resource name="dpa" list={dpa.list} />
-      <Resource name="establecimientos" list={EstablecimientoList} options={{ label: "Establecimientos" }} />
+      <Resource name="dpa" list={DpaPage} />
+      <Resource name="establecimientos" list={EstablecimientosPage} options={{ label: "Establecimientos" }} />
       <Resource name="provincias" />
       <Resource name="cantones" />
       <Resource name="parroquias" />
       <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
-      <Resource name="homologators" list={homologators.list} />
+      <Resource name="homologators" list={HomologadoresGuarded} />
       <Resource name="homologations" />
-      <Resource name="admin" options={{ label: "Administración" }} list={AdminPage} />
+      <Resource name="admin" options={{ label: "Administración" }} list={AdminGuardedPage} />
       <Resource name="meddra" options={{ label: "MedDRA" }} list={MeddraPage} />
       <Resource name="whodrug" options={{ label: "WHODrug" }} list={WhodrugPage} />
       <Resource name="estandar-syncs" options={{ label: "Sincronizaciones" }} list={SincronizacionesPage} />

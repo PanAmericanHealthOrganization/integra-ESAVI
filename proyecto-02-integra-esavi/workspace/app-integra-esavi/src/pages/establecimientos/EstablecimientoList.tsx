@@ -1,12 +1,16 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
   Button,
   Chip,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -78,6 +82,7 @@ export const EstablecimientoList = () => {
   const [deleteOne, { isPending: deleting }] = useDelete()
 
   const [search, setSearch] = useState("")
+  const [showFilter, setShowFilter] = useState(false)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [selectedProvincia, setSelectedProvincia] = useState("")
   const [selectedCanton, setSelectedCanton] = useState("")
@@ -99,7 +104,6 @@ export const EstablecimientoList = () => {
     { pagination: { page: 1, perPage: 9999 }, sort: { field: "nombre", order: "ASC" }, filter: {} }
   )
 
-  // Derivar provincias únicas de las parroquias cargadas
   const provincias = useMemo(() => {
     const map = new Map<string, string>()
     ;(todasParroquias ?? []).forEach((p) => {
@@ -112,7 +116,6 @@ export const EstablecimientoList = () => {
       .sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [todasParroquias])
 
-  // Cantones filtrados por provincia seleccionada
   const cantones = useMemo(() => {
     if (!selectedProvincia) return []
     const map = new Map<string, string>()
@@ -126,7 +129,6 @@ export const EstablecimientoList = () => {
       .sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [todasParroquias, selectedProvincia])
 
-  // Parroquias filtradas por cantón seleccionado
   const parroquiasFiltradas = useMemo(() => {
     if (!selectedCanton) return []
     return (todasParroquias ?? [])
@@ -147,6 +149,7 @@ export const EstablecimientoList = () => {
         (e.parroquiaResidencia?.canton?.nombre ?? "").toLowerCase().includes(q)
     )
   }, [establecimientos, search])
+
 
   const resetLocation = () => {
     setSelectedProvincia("")
@@ -263,60 +266,94 @@ export const EstablecimientoList = () => {
       <Title title="Establecimientos" />
 
       <Paper elevation={2}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-          <TextField
-            placeholder="Buscar por código, nombre, tipo, parroquia o cantón…"
-            size="small"
-            sx={{ flex: 1, maxWidth: 460 }}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-            Nuevo establecimiento
-          </Button>
+        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+          <Box>
+            <Typography variant="h6" fontWeight={600} lineHeight={1.2}>
+              Establecimientos
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+              <IconButton
+                size="small"
+                onClick={() => setShowFilter((v) => !v)}
+                color={showFilter ? "primary" : "default"}>
+                <Badge variant="dot" color="primary" invisible={!search}>
+                  <FilterListIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
+              Nuevo
+            </Button>
+          </Stack>
         </Box>
+
+        <Collapse in={showFilter}>
+          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            <TextField
+              placeholder="Buscar..."
+              size="small"
+              sx={{ width: 300 }}
+              value={search}
+              autoFocus={showFilter}
+              onChange={(e) => setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button size="small" onClick={() => setSearch("")}>
+              Limpiar
+            </Button>
+          </Box>
+        </Collapse>
+
         <Divider />
 
-        <TableContainer sx={{ maxHeight: 560, overflowX: "auto" }}>
-          <Table size="small" stickyHeader sx={{ minWidth: 1100 }}>
+        <TableContainer sx={{ maxHeight: 520 }}>
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ minWidth: 75 }}>Código</TableCell>
-                <TableCell sx={{ minWidth: 160 }}>Nombre</TableCell>
+                <TableCell sx={{ minWidth: 80 }}>Código</TableCell>
+                <TableCell>Nombre</TableCell>
                 <TableCell sx={{ minWidth: 90 }}>Tipo</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Parroquia</TableCell>
-                <TableCell sx={{ minWidth: 100 }}>Cantón</TableCell>
-                <TableCell sx={{ minWidth: 100 }}>Provincia</TableCell>
-                <TableCell sx={{ minWidth: 65 }}>Zona</TableCell>
-                <TableCell sx={{ minWidth: 65 }}>Distrito</TableCell>
-                <TableCell sx={{ minWidth: 65 }}>Circuito</TableCell>
-                <TableCell sx={{ minWidth: 150 }}>Correo</TableCell>
-                <TableCell align="right" sx={{ pr: 1, minWidth: 72 }} />
+                <TableCell sx={{ minWidth: 180 }}>Ubicación</TableCell>
+                <TableCell sx={{ minWidth: 110 }}>Admin.</TableCell>
+                <TableCell sx={{ minWidth: 140 }}>Correo</TableCell>
+                <TableCell align="right" sx={{ pr: 1, width: 72 }} />
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={11} align="center" sx={{ py: 5 }}>
-                    <CircularProgress size={24} />
+                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={28} />
+                  </TableCell>
+                </TableRow>
+              ) : !filtered.length && search ? (
+                <TableRow>
+                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        Sin resultados para "{search}"
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : !filtered.length ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={11}
-                    align="center"
-                    sx={{ py: 5, color: "text.secondary", fontSize: 12 }}>
-                    {search
-                      ? `Sin resultados para "${search}"`
-                      : "No hay establecimientos registrados"}
+                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        No hay establecimientos registrados. Usa + Nuevo para agregar.
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -328,7 +365,7 @@ export const EstablecimientoList = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">{est.uniNombre}</Typography>
+                      <Typography variant="body2" fontWeight={500}>{est.uniNombre}</Typography>
                     </TableCell>
                     <TableCell>
                       {est.tipoEntidad ? (
@@ -341,46 +378,32 @@ export const EstablecimientoList = () => {
                       <Typography variant="body2">
                         {est.parroquiaResidencia?.nombre ?? "—"}
                       </Typography>
+                      {est.parroquiaResidencia?.canton && (
+                        <Typography variant="caption" color="text.secondary" display="block" noWrap>
+                          {est.parroquiaResidencia.canton.nombre}
+                          {est.parroquiaResidencia.canton.provincia
+                            ? ` · ${est.parroquiaResidencia.canton.provincia.nombre}`
+                            : ""}
+                        </Typography>
+                      )}
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">
-                        {est.parroquiaResidencia?.canton?.nombre ?? "—"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {est.parroquiaResidencia?.canton?.provincia?.nombre ?? "—"}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title={est.zonaDescripcion ?? ""} placement="top" disableHoverListener={!est.zonaDescripcion}>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {est.zonaCodigo ?? "—"}
+                      <Tooltip
+                        title={[est.zonaDescripcion, est.distritoDescripcion].filter(Boolean).join(" / ")}
+                        placement="top"
+                        disableHoverListener={!est.zonaDescripcion && !est.distritoDescripcion}>
+                        <Typography variant="caption" fontFamily="monospace" color="text.secondary">
+                          {[est.zonaCodigo, est.distritoCodigo, est.circuitoCodigo]
+                            .filter(Boolean)
+                            .join(" · ") || "—"}
                         </Typography>
                       </Tooltip>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title={est.distritoDescripcion ?? ""} placement="top" disableHoverListener={!est.distritoDescripcion}>
-                        <Typography variant="body2" fontFamily="monospace">
-                          {est.distritoCodigo ?? "—"}
-                        </Typography>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontFamily="monospace">
-                        {est.circuitoCodigo ?? "—"}
-                      </Typography>
                     </TableCell>
                     <TableCell>
                       {est.mail ? (
                         <Typography
                           variant="body2"
-                          sx={{
-                            maxWidth: 180,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}>
+                          sx={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {est.mail}
                         </Typography>
                       ) : (
@@ -419,8 +442,6 @@ export const EstablecimientoList = () => {
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} mt={1}>
-
-            {/* Identificación */}
             <Stack direction="row" spacing={1.5}>
               <TextField
                 label="Código"
@@ -453,14 +474,12 @@ export const EstablecimientoList = () => {
               inputProps={{ maxLength: 100 }}
             />
 
-            {/* ── Cascada de ubicación ── */}
             <Divider textAlign="left">
               <Typography variant="caption" color="text.secondary">
                 Ubicación geográfica
               </Typography>
             </Divider>
 
-            {/* Provincia */}
             <FormControl fullWidth size="small">
               <InputLabel>Provincia</InputLabel>
               <Select
@@ -484,7 +503,6 @@ export const EstablecimientoList = () => {
               </Select>
             </FormControl>
 
-            {/* Cantón — habilitado solo cuando hay provincia */}
             <FormControl fullWidth size="small" disabled={!selectedProvincia}>
               <InputLabel>Cantón</InputLabel>
               <Select
@@ -511,7 +529,6 @@ export const EstablecimientoList = () => {
               )}
             </FormControl>
 
-            {/* Parroquia — habilitada solo cuando hay cantón */}
             <FormControl fullWidth size="small" disabled={!selectedCanton}>
               <InputLabel>Parroquia</InputLabel>
               <Select
@@ -538,7 +555,6 @@ export const EstablecimientoList = () => {
               )}
             </FormControl>
 
-            {/* Zona / Distrito / Circuito */}
             <Divider textAlign="left">
               <Typography variant="caption" color="text.secondary">
                 Información administrativa (opcional)

@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Headers, Param, Post, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
 import { CreateProvinciaDto, UpdateProvinciaDto } from '../dto/provincia.dto';
 import { ProvinciaService } from '../service/provincia.service';
 
 @ApiTags('Provincia')
+@ApiBearerAuth('keycloak-jwt')
 @Controller({ path: 'integrator/provincias', version: '1' })
 export class ProvinciaController {
   constructor(private readonly provinciaService: ProvinciaService) {}
@@ -24,8 +27,8 @@ export class ProvinciaController {
   @Post()
   @ApiResponse({ status: 201, description: 'Provincia creada exitosamente.' })
   @ApiResponse({ status: 400, description: 'Error al crear la provincia.' })
-  create(@Body() body: CreateProvinciaDto, @Headers('x-username') username: string) {
-    return this.provinciaService.create(body, username);
+  create(@Body() body: CreateProvinciaDto, @Req() req: Request) {
+    return this.provinciaService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
   @Put(':codigo')
@@ -34,15 +37,15 @@ export class ProvinciaController {
   update(
     @Param('codigo') codigo: string,
     @Body() body: UpdateProvinciaDto,
-    @Headers('x-username') username: string,
+    @Req() req: Request,
   ) {
-    return this.provinciaService.update(codigo, body, username);
+    return this.provinciaService.update(codigo, body, getUsernameFromJwt(req.headers.authorization));
   }
 
   @Delete(':codigo')
   @ApiResponse({ status: 200, description: 'Provincia eliminada exitosamente.' })
   @ApiResponse({ status: 404, description: 'Provincia no encontrada.' })
-  delete(@Param('codigo') codigo: string, @Headers('x-username') username: string) {
-    return this.provinciaService.delete(codigo, username);
+  delete(@Param('codigo') codigo: string, @Req() req: Request) {
+    return this.provinciaService.delete(codigo, getUsernameFromJwt(req.headers.authorization));
   }
 }

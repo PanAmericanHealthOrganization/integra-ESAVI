@@ -14,9 +14,9 @@ const intESAVIClient = axios.create({
 // Interceptor de solicitud (request)
 intESAVIClient.interceptors.request.use(
   function (config) {
-    const username = keycloak.tokenParsed?.preferred_username
-    if (username) {
-      config.headers["X-Username"] = username
+    const token = keycloak.token
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`
     }
     return config
   },

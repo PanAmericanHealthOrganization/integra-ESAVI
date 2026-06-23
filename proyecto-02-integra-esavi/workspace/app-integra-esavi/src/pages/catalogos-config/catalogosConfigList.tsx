@@ -1,12 +1,16 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
   Button,
   Chip,
   CircularProgress,
+  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -51,6 +55,8 @@ export const CatalogosConfigList = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<CatalogoPadreRecord | null>(null)
   const [searchCategoria, setSearchCategoria] = useState("")
   const [searchSubcategoria, setSearchSubcategoria] = useState("")
+  const [showFilterCat, setShowFilterCat] = useState(false)
+  const [showFilterSub, setShowFilterSub] = useState(false)
 
   const [dialog, setDialog] = useState<{
     open: boolean
@@ -169,37 +175,63 @@ export const CatalogosConfigList = () => {
     "edit-subcategoria": "Editar Subcategoría",
   }
 
+
   return (
     <Box p={2}>
       <Title title="Catálogos" />
       <Box display="flex" gap={2} alignItems="flex-start">
+
         {/* ── Panel: Categorías ── */}
         <Paper elevation={2} sx={{ flex: 2, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-            <Typography variant="subtitle1" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
-              Categorías
-            </Typography>
-            <TextField
-              placeholder="Buscar categoría…"
-              size="small"
-              sx={{ flex: 1 }}
-              value={searchCategoria}
-              onChange={(e) => setSearchCategoria(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
-              Nuevo
-            </Button>
+          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="baseline" gap={1}>
+              <Typography variant="subtitle1" fontWeight={700}>
+                Categorías
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={1}>
+              <Tooltip title={showFilterCat ? "Ocultar filtros" : "Mostrar filtros"}>
+                <IconButton
+                  size="small"
+                  onClick={() => setShowFilterCat((v) => !v)}
+                  color={showFilterCat ? "primary" : "default"}>
+                  <Badge variant="dot" color="primary" invisible={!searchCategoria}>
+                    <FilterListIcon />
+                  </Badge>
+                </IconButton>
+              </Tooltip>
+              <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
+                Nuevo
+              </Button>
+            </Stack>
           </Box>
+
+          <Collapse in={showFilterCat}>
+            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              <TextField
+                placeholder="Buscar..."
+                size="small"
+                autoFocus
+                sx={{ width: 240 }}
+                value={searchCategoria}
+                onChange={(e) => setSearchCategoria(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button size="small" onClick={() => setSearchCategoria("")}>
+                Limpiar
+              </Button>
+            </Box>
+          </Collapse>
+
           <Divider />
-          <TableContainer>
-            <Table size="small">
+          <TableContainer sx={{ maxHeight: 460 }}>
+            <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell>Código</TableCell>
@@ -216,14 +248,24 @@ export const CatalogosConfigList = () => {
                   </TableRow>
                 ) : !categorias.length ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 13 }}>
-                      Sin categorías. Crea la primera.
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin categorías registradas. Crea la primera con + Nuevo.
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : !filteredCategorias.length ? (
                   <TableRow>
-                    <TableCell colSpan={3} align="center" sx={{ py: 5, color: "text.secondary", fontSize: 13 }}>
-                      Sin resultados para "{searchCategoria}"
+                    <TableCell colSpan={3} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin resultados para "{searchCategoria}"
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -275,48 +317,78 @@ export const CatalogosConfigList = () => {
 
         {/* ── Panel: Subcategorías ── */}
         <Paper elevation={2} sx={{ flex: 3, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" gap={1.5}>
-            <Box display="flex" alignItems="center" gap={1} sx={{ whiteSpace: "nowrap" }}>
-              <Typography variant="subtitle1" fontWeight={700}>
-                Subcategorías
-              </Typography>
+          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+            <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
+              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
+                <Typography variant="subtitle1" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
+                  Subcategorías
+                </Typography>
+              </Box>
               {selectedCategoria && (
-                <Chip label={selectedCategoria.nombre} size="small" color="primary" variant="outlined" />
+                <Chip
+                  label={selectedCategoria.nombre}
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ maxWidth: 140, overflow: "hidden" }}
+                />
               )}
             </Box>
-            <TextField
-              placeholder="Buscar subcategoría…"
-              size="small"
-              sx={{ flex: 1 }}
-              disabled={!selectedCategoria}
-              value={searchSubcategoria}
-              onChange={(e) => setSearchSubcategoria(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 18, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Tooltip
-              title={!selectedCategoria ? "Selecciona una categoría primero" : ""}
-              placement="left">
-              <span>
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<AddIcon />}
-                  disabled={!selectedCategoria}
-                  onClick={openNuevaSubcategoria}>
-                  Nuevo
-                </Button>
-              </span>
-            </Tooltip>
+            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+              <Tooltip title={showFilterSub ? "Ocultar filtros" : "Mostrar filtros"}>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={() => setShowFilterSub((v) => !v)}
+                    color={showFilterSub ? "primary" : "default"}
+                    disabled={!selectedCategoria}>
+                    <Badge variant="dot" color="primary" invisible={!searchSubcategoria}>
+                      <FilterListIcon />
+                    </Badge>
+                  </IconButton>
+                </span>
+              </Tooltip>
+              <Tooltip title={!selectedCategoria ? "Selecciona una categoría primero" : ""} placement="left">
+                <span>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!selectedCategoria}
+                    onClick={openNuevaSubcategoria}>
+                    Nuevo
+                  </Button>
+                </span>
+              </Tooltip>
+            </Stack>
           </Box>
+
+          <Collapse in={showFilterSub && !!selectedCategoria}>
+            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              <TextField
+                placeholder="Buscar..."
+                size="small"
+                autoFocus
+                sx={{ width: 240 }}
+                value={searchSubcategoria}
+                onChange={(e) => setSearchSubcategoria(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button size="small" onClick={() => setSearchSubcategoria("")}>
+                Limpiar
+              </Button>
+            </Box>
+          </Collapse>
+
           <Divider />
-          <TableContainer>
-            <Table size="small">
+          <TableContainer sx={{ maxHeight: 460 }}>
+            <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
                   <TableCell>Código</TableCell>
@@ -328,8 +400,13 @@ export const CatalogosConfigList = () => {
               <TableBody>
                 {!selectedCategoria ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
-                      Selecciona una categoría de la izquierda para ver sus subcategorías
+                    <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Selecciona una categoría para ver sus subcategorías
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : isLoading ? (
@@ -340,14 +417,24 @@ export const CatalogosConfigList = () => {
                   </TableRow>
                 ) : !subcategorias.length ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
-                      Sin subcategorías en "{selectedCategoria.nombre}". Usa "Nuevo" para agregar.
+                    <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          "{selectedCategoria.nombre}" no tiene subcategorías. Usa + Nuevo para agregar.
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : !filteredSubcategorias.length ? (
                   <TableRow>
-                    <TableCell colSpan={4} align="center" sx={{ py: 6, color: "text.secondary", fontSize: 13 }}>
-                      Sin resultados para "{searchSubcategoria}"
+                    <TableCell colSpan={4} align="center" sx={{ py: 6 }}>
+                      <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                        <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                        <Typography variant="body2" color="text.secondary">
+                          Sin resultados para "{searchSubcategoria}"
+                        </Typography>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ) : (

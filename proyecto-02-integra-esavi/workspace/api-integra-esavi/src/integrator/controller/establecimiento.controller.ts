@@ -1,9 +1,12 @@
-import { Body, Controller, Delete, Get, Headers, Logger, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
 import { CreateEstablecimientoDto, UpdateEstablecimientoDto } from '../dto/establecimiento.dto';
 import { EstablecimientosService } from '../service/establecimientos.service';
 
 @ApiTags('Establecimiento')
+@ApiBearerAuth('keycloak-jwt')
 @Controller({ path: 'integrator/establecimientos', version: '1' })
 export class EstablecimientoController {
   private readonly logger = new Logger(EstablecimientoController.name);
@@ -26,9 +29,9 @@ export class EstablecimientoController {
 
   @Post()
   @ApiResponse({ status: 201, description: 'Establecimiento creado exitosamente.' })
-  create(@Body() body: CreateEstablecimientoDto, @Headers('x-username') username: string) {
+  create(@Body() body: CreateEstablecimientoDto, @Req() req: Request) {
     this.logger.log(`POST body recibido: ${JSON.stringify(body)}`);
-    return this.establecimientosService.create(body, username);
+    return this.establecimientosService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
   @Put(':id')
@@ -36,15 +39,15 @@ export class EstablecimientoController {
   update(
     @Param('id') id: string,
     @Body() body: UpdateEstablecimientoDto,
-    @Headers('x-username') username: string,
+    @Req() req: Request,
   ) {
     this.logger.log(`PUT /${id} body recibido: ${JSON.stringify(body)}`);
-    return this.establecimientosService.update(id, body, username);
+    return this.establecimientosService.update(id, body, getUsernameFromJwt(req.headers.authorization));
   }
 
   @Delete(':id')
   @ApiResponse({ status: 200, description: 'Establecimiento eliminado exitosamente.' })
-  delete(@Param('id') id: string, @Headers('x-username') username: string) {
-    return this.establecimientosService.delete(id, username);
+  delete(@Param('id') id: string, @Req() req: Request) {
+    return this.establecimientosService.delete(id, getUsernameFromJwt(req.headers.authorization));
   }
 }

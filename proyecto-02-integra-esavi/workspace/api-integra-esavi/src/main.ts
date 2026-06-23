@@ -57,6 +57,15 @@ async function bootstrap() {
       },
       'X-API-KEY',
     )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Token JWT de Keycloak (Bearer)',
+      },
+      'keycloak-jwt',
+    )
     .build();
 
   // Enable API versioning
