@@ -1,19 +1,19 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule,ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
+import {Homologador} from 'src/homologator/entity/homologador.entity';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
-import {CantonController} from './controller/canton.controller';
-import {EstablecimientoController} from './controller/establecimiento.controller';
-import {ParroquiaController} from './controller/parroquia.controller';
-import {ProvinciaController} from './controller/provincia.controller';
 import {AntecedenteEventoController} from './controller/antecedente-evento.controller';
 import {AntecedenteMedicoController} from './controller/antecedente-medico.controller';
 import {AntecedentePreexistenciaController} from './controller/antecedente-preexistencia.controller';
+import {CantonController} from './controller/canton.controller';
 import {CatalogoPadreController} from './controller/catalogo-padre.controller';
 import {DatoEsaviController} from './controller/dato-esavi.controller';
 import {DesenlaceEsaviController} from './controller/desenlace-esavi.controller';
+import {EstablecimientoController} from './controller/establecimiento.controller';
 import {IntegradorController} from './controller/integrador.controller';
 import {InvestigacionController} from './controller/investigacion.controller';
 import {NotificacionController} from './controller/notificacion.controller';
@@ -22,75 +22,75 @@ import {PacienteEmbarazadaController} from './controller/paciente-embarazada.con
 import {PacienteVigiflowController} from './controller/paciente-vigiflow.controller';
 import {PacienteController} from './controller/paciente.controller';
 import {ParametroController} from './controller/parametro.controller';
+import {ParroquiaController} from './controller/parroquia.controller';
+import {ProvinciaController} from './controller/provincia.controller';
 import {ReporteController} from './controller/reporte.controller';
 import {SeedController} from './controller/seed.controller';
 import {SyncController} from './controller/sync.controller';
 import {VacunometroController} from './controller/vacunometro.controller';
-import {Canton} from './entity/canton.entity';
-import {Parroquia} from './entity/parroquia.entity';
-import {Provincia} from './entity/provincia.entity';
-import {CantonService} from './service/canton.service';
-import {ParroquiaService} from './service/parroquia.service';
-import {ProvinciaService} from './service/provincia.service';
 import {
-  AntecedenteEmbarazo,
-  AntecedenteEvento,
-  AntecedenteMedico,
-  AntecedentePreexistencia,
-  Catalogo,
-  CatalogoPadre,
-  CausalidadEsavi,
-  DatoEsavi,
-  DatoVacuna,
-  DatoVacunacion,
-  DesenlaceEsavi,
-  EmbarazoEsavi,
-  Gaceta,
-  GravedadEsavi,
-  Medicamento,
-  Notificacion,
-  Notificador,
-  Paciente,
-  PacienteEmbarazada,
-  Parametro,
-  SyncProcess,
-  TipoCatalogo,
-  Vacunacion,
-  Vacunometro,
+    AntecedenteEmbarazo,
+    AntecedenteEvento,
+    AntecedenteMedico,
+    AntecedentePreexistencia,
+    Catalogo,
+    CatalogoPadre,
+    CausalidadEsavi,
+    DatoEsavi,
+    DatoVacuna,
+    DatoVacunacion,
+    DesenlaceEsavi,
+    EmbarazoEsavi,
+    Gaceta,
+    GravedadEsavi,
+    Medicamento,
+    Notificacion,
+    Notificador,
+    Paciente,
+    PacienteEmbarazada,
+    Parametro,
+    SyncProcess,
+    TipoCatalogo,
+    Vacunacion,
+    Vacunometro,
 } from './entity';
+import {Canton} from './entity/canton.entity';
 import {Establecimiento} from './entity/establecimiento.entity';
 import {Investigacion} from './entity/investigacion.entity';
-import {Homologation} from 'src/homologator/entity/homologation.entity';
-import {Homologator} from 'src/homologator/entity/homologator.entity';
+import {Parroquia} from './entity/parroquia.entity';
+import {Provincia} from './entity/provincia.entity';
 import {IntegradorService} from './facade/integrador.service';
 import {
-  AntecedenteEmbarazoService,
-  AntecedenteEventoService,
-  AntecedenteMedicoService,
-  AntecedentePreexistenciaService,
-  CatalogoPadreService,
-  CatalogoService,
-  CausalidadEsaviService,
-  DatoEsaviService,
-  DatoVacunaService,
-  DatoVacunacionService,
-  DesenlaceEsaviService,
-  EmbarazoEsaviService,
-  GacetaService,
-  GravedadEsaviService,
-  MedicamentoService,
-  NotificacionDhis2Service,
-  NotificacionService,
-  NotificacionVigiflowService,
-  PacienteEmbarazadaServive,
-  ParametroService,
-  ReporteService,
-  SeedService,
+    AntecedenteEmbarazoService,
+    AntecedenteEventoService,
+    AntecedenteMedicoService,
+    AntecedentePreexistenciaService,
+    CatalogoPadreService,
+    CatalogoService,
+    CausalidadEsaviService,
+    DatoEsaviService,
+    DatoVacunaService,
+    DatoVacunacionService,
+    DesenlaceEsaviService,
+    EmbarazoEsaviService,
+    GacetaService,
+    GravedadEsaviService,
+    MedicamentoService,
+    NotificacionDhis2Service,
+    NotificacionService,
+    NotificacionVigiflowService,
+    PacienteEmbarazadaServive,
+    ParametroService,
+    ReporteService,
+    SeedService,
 } from './service';
+import {CantonService} from './service/canton.service';
 import {EstablecimientosService} from './service/establecimientos.service';
 import {InvestigacionService} from './service/investigacion.service';
 import {NotificadorService} from './service/notificador.service';
 import {PacienteService} from './service/paciente.service';
+import {ParroquiaService} from './service/parroquia.service';
+import {ProvinciaService} from './service/provincia.service';
 import {SyncService} from './service/sync.service';
 import {VacunometroService} from './service/vacunometro.service';
 
@@ -146,8 +146,8 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Vacunometro,
         SyncProcess,
         Gaceta,
-        Homologator,
-        Homologation,
+        Homologador,
+        ReglaHomologacion,
       ],
       POSTGRES_INTEGRATOR_DS,
     ),

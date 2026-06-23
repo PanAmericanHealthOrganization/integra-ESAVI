@@ -1,11 +1,11 @@
-import {PartialType} from "@nestjs/swagger";
-import {IsBoolean,IsEnum,IsNotEmpty,IsNumber,IsOptional,IsString,IsUUID,MaxLength,Min} from 'class-validator';
-import {ComparisonType} from '../enum/comparison-type.enum';
+import { PartialType } from '@nestjs/swagger';
+import { IsBoolean, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID, MaxLength, Min } from 'class-validator';
+import { TipoComparacion } from '../enum/tipo-comparacion.enum';
 
-export class CreateHomologationDto {
+export class CrearReglaHomologacionDto {
   @IsUUID()
   @IsNotEmpty()
-  homologatorId: string;
+  homologadorId: string;
 
   @IsString()
   @IsNotEmpty()
@@ -27,9 +27,9 @@ export class CreateHomologationDto {
   @MaxLength(255)
   targetValue: string;
 
-  @IsEnum(ComparisonType)
+  @IsEnum(TipoComparacion)
   @IsOptional()
-  comparisonType?: ComparisonType;
+  comparisonType?: TipoComparacion;
 
   @IsBoolean()
   @IsOptional()
@@ -45,7 +45,7 @@ export class CreateHomologationDto {
   createdBy: string;
 }
 
-export class UpdateHomologationDto extends PartialType(CreateHomologationDto) {
+export class ActualizarReglaHomologacionDto extends PartialType(CrearReglaHomologacionDto) {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

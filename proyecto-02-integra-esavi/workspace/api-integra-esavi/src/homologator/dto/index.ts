@@ -1,3 +1,2 @@
-export { CreateHomologatorDto, UpdateHomologatorDto } from './homologator.dto';
-export { CreateHomologationDto, UpdateHomologationDto } from './homologation.dto';
-export { ResolveRequestDto } from './resolve-request.dto';
+export { CrearHomologadorDto, ActualizarHomologadorDto, SolicitudResolucionDto } from './homologador.dto';
+export { CrearReglaHomologacionDto, ActualizarReglaHomologacionDto } from './regla-homologacion.dto';

@@ -1,7 +1,7 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
-import { DataType } from '../enum/data-type.enum';
-import { Homologation } from './homologation.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { TipoDato } from '../enum/tipo-dato.enum';
+import { ReglaHomologacion } from './regla-homologacion.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -9,7 +9,7 @@ import { Homologation } from './homologation.entity';
   comment: 'Definición de campos homologables entre sistemas externos e integra-ESAVI',
 })
 @Unique(['entity', 'field'])
-export class Homologator extends Auditoria {
+export class Homologador extends Auditoria {
   @PrimaryGeneratedColumn('uuid', {
     name: 'ID',
     comment: 'Identificador del homologador',
@@ -45,13 +45,13 @@ export class Homologator extends Auditoria {
   @Column({
     name: 'TARGET_TYPE',
     type: 'enum',
-    enum: DataType,
-    default: DataType.STRING,
+    enum: TipoDato,
+    default: TipoDato.STRING,
     nullable: false,
     comment: 'Tipo de dato al que se casteará el valor destino en runtime',
   })
-  targetType: DataType;
+  targetType: TipoDato;
 
-  @OneToMany(() => Homologation, (h) => h.homologator)
-  homologations: Homologation[];
+  @OneToMany(() => ReglaHomologacion, (r) => r.homologador)
+  reglasHomologacion: ReglaHomologacion[];
 }

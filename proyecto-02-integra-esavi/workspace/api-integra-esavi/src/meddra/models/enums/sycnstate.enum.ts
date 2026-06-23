@@ -4,4 +4,5 @@ export enum SyncStateEnum {
   FINISHED = 'FINISHED',
   SUCCESS = 'SUCCESS',
   FAILDED = 'FAILDED',
+  ERROR = 'ERROR',
 }
