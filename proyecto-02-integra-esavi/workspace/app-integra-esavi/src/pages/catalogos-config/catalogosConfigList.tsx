@@ -236,7 +236,7 @@ export const CatalogosConfigList = () => {
                 <TableRow>
                   <TableCell>Código</TableCell>
                   <TableCell>Nombre</TableCell>
-                  <TableCell align="right" sx={{ pr: 1 }} />
+                  <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -278,20 +278,22 @@ export const CatalogosConfigList = () => {
                         selected={isSelected}
                         sx={{ cursor: "pointer" }}
                         onClick={() => { setSelectedCategoria(cat); setSearchSubcategoria("") }}>
-                        <TableCell>
-                          <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
-                            {cat.codigo}
-                          </Typography>
+                        <TableCell sx={{ maxWidth: 160 }}>
+                          <Tooltip title={cat.codigo} placement="top">
+                            <Typography variant="body2" fontFamily="monospace" fontWeight={500} noWrap>
+                              {cat.codigo}
+                            </Typography>
+                          </Tooltip>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={isSelected ? 700 : 400}>
+                          <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
                             {cat.nombre}
                           </Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 1 }}>
                           <Tooltip title="Editar">
                             <IconButton size="small" onClick={(e) => openEditCategoria(cat, e)}>
-                              <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                              <EditOutlinedIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Eliminar">
@@ -302,7 +304,7 @@ export const CatalogosConfigList = () => {
                                 e.stopPropagation()
                                 setDeleteConfirm({ open: true, id: cat.id, label: cat.nombre })
                               }}>
-                              <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                              <DeleteOutlineIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -394,7 +396,7 @@ export const CatalogosConfigList = () => {
                   <TableCell>Código</TableCell>
                   <TableCell>Nombre</TableCell>
                   <TableCell>Descripción</TableCell>
-                  <TableCell align="right" sx={{ pr: 1 }} />
+                  <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -440,12 +442,20 @@ export const CatalogosConfigList = () => {
                 ) : (
                   filteredSubcategorias.map((sub) => (
                     <TableRow key={sub.id} hover>
-                      <TableCell>
-                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
-                          {sub.codigo}
-                        </Typography>
+                      <TableCell sx={{ maxWidth: 200 }}>
+                        <Tooltip title={sub.codigo} placement="top">
+                          <Typography
+                            variant="body2"
+                            fontFamily="monospace"
+                            fontWeight={500}
+                            noWrap>
+                            {sub.codigo}
+                          </Typography>
+                        </Tooltip>
                       </TableCell>
-                      <TableCell>{sub.nombre}</TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={500}>{sub.nombre}</Typography>
+                      </TableCell>
                       <TableCell>
                         <Typography
                           variant="body2"
@@ -457,7 +467,7 @@ export const CatalogosConfigList = () => {
                       <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 1 }}>
                         <Tooltip title="Editar">
                           <IconButton size="small" onClick={() => openEditSubcategoria(sub)}>
-                            <EditOutlinedIcon sx={{ fontSize: 16 }} />
+                            <EditOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
@@ -465,7 +475,7 @@ export const CatalogosConfigList = () => {
                             size="small"
                             color="error"
                             onClick={() => setDeleteConfirm({ open: true, id: sub.id, label: sub.nombre })}>
-                            <DeleteOutlineIcon sx={{ fontSize: 16 }} />
+                            <DeleteOutlineIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </TableCell>

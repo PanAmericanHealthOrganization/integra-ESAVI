@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
+import { CatalogoPadre } from './catalogo-padre.entity';
 import { IEstablecimiento } from './interfaces/establecimiento.interface';
 import { Parroquia } from './parroquia.entity';
 @Entity({
@@ -46,63 +47,27 @@ export class Establecimiento extends Auditoria implements IEstablecimiento {
   @JoinColumn({ name: 'PARROQUIA_CODIGO', referencedColumnName: 'codigo' })
   parroquiaResidencia: Parroquia;
 
-  /**
-   *
-  Unique code of the establishment
-    */
-  @Column({
-    name: 'ZON_CODIGO',
-    type: 'varchar',
-    length: 10,
-    nullable: true,
-    comment: 'Código de la zona en la que está ubicado el establecimiento',
-  })
-  zonaCodigo: string;
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
+  @JoinColumn({ name: 'TIPO_ENTIDAD' })
+  tipoEntidad: CatalogoPadre;
 
   @Column({
-    name: 'ZON_DESCRIPCION',
+    name: 'UNI_DIRECCION',
+    comment: 'Dirección del establecimiento',
     type: 'varchar',
-    length: 100,
+    length: 255,
     nullable: true,
-    comment: 'Descripción de la zona en la que está ubicado el establecimiento',
   })
-  zonaDescripcion: string;
+  direccion: string;
 
   @Column({
-    name: 'DIS_CODIGO',
+    name: 'UNI_TELEFONO',
+    comment: 'Teléfono del establecimiento',
     type: 'varchar',
-    length: 10,
-    nullable: true,
-    comment: 'Código del distrito en la que está ubicado el establecimiento',
-  })
-  distritoCodigo: string;
-
-  @Column({
-    name: 'DIS_DESCRIPCION',
-    type: 'varchar',
-    length: 100,
-    nullable: true,
-    comment: 'Descripción del distrito en la que está ubicado el establecimiento',
-  })
-  distritoDescripcion: string;
-
-  @Column({
-    name: 'CIR_CODIGO',
-    type: 'varchar',
-    length: 10,
-    nullable: true,
-    comment: 'Código de la circunscripción en la que está ubicado el establecimiento',
-  })
-  circuitoCodigo: string;
-
-  @Column({
-    name: 'TIPO_ENTIDAD',
-    comment: 'Tipo de entidad del establecimiento',
-    type: 'varchar',
-    length: 50,
+    length: 30,
     nullable: true,
   })
-  tipoEntidad: string;
+  telefono: string;
 
   @Column({ name: 'LONGPS', comment: 'Longitud del establecimiento', type: 'float', nullable: true })
   longitudGps: number;

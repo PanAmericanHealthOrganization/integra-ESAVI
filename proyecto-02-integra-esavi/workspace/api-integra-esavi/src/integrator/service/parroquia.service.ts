@@ -7,6 +7,12 @@ import { Parroquia } from '../entity/parroquia.entity';
 
 const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 
+const toSentenceCase = (text: string): string => {
+  if (!text) return text;
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+};
+
 @Injectable()
 export class ParroquiaService {
   private readonly logger = new Logger(ParroquiaService.name);
@@ -29,7 +35,7 @@ export class ParroquiaService {
     }
     const parroquia = this.parroquiaRepository.create({
       codigo: dto.codigo,
-      nombre: dto.nombre,
+      nombre: toSentenceCase(dto.nombre),
       canton,
       createdBy: currentUser,
       updatedBy: currentUser,
@@ -75,7 +81,7 @@ export class ParroquiaService {
       parroquia.canton = canton;
     }
     this.parroquiaRepository.merge(parroquia, {
-      nombre: dto.nombre ?? parroquia.nombre,
+      nombre: dto.nombre ? toSentenceCase(dto.nombre) : parroquia.nombre,
       updatedBy: currentUser,
       updatedAt: new Date(),
     });
