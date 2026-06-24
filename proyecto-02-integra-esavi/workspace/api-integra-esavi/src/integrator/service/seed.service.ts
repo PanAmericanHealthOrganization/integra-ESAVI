@@ -15,6 +15,7 @@ import {IAuditoria,SyncProcess,SyncStatus} from '../entity';
 import {Canton} from '../entity/canton.entity';
 import {CatalogoPadre} from '../entity/catalogo-padre.entity';
 import {Catalogo} from '../entity/catalogo.entity';
+import {Establecimiento} from '../entity/establecimiento.entity';
 import {CausalidadEsavi} from '../entity/causalidad-esavi.entity';
 import {DatoEsavi} from '../entity/dato-esavi.entity';
 import {DatoVacuna} from '../entity/dato-vacuna.entity';
@@ -64,6 +65,8 @@ export class SeedService implements OnApplicationBootstrap {
     private cantonRepository: Repository<Canton>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private parroquiaRepository: Repository<Parroquia>,
+    @InjectRepository(Establecimiento, 'POSTGRES_INTEGRATOR_DS')
+    private establecimientoRepository: Repository<Establecimiento>,
     @InjectRepository(Homologador, 'POSTGRES_INTEGRATOR_DS')
     private homologadorRepository: Repository<Homologador>,
     @InjectRepository(ReglaHomologacion, 'POSTGRES_INTEGRATOR_DS')
@@ -73,6 +76,8 @@ export class SeedService implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     await this.seedData();
     await this.seedUbicaciones();
+    await this.loadTiposEntidadCatalogoPadre();
+    await this.loadEstablecimientosFromCSV();
   }
 
   async seedData() {
@@ -1233,6 +1238,11 @@ export class SeedService implements OnApplicationBootstrap {
 
   // ── Seed TC_CATALOGO_PADRE: Género ──────────────────────────────────────────
   private async loadCatalogoPadreFromCSV() {
+    const primerRegistro = await this.catalogoPadreRepository.findOne({ where: { codigo: 'GENERO' } });
+    if (primerRegistro) {
+      console.log('ℹ️ TC_CATALOGO_PADRE (catalogo_padre.csv) ya cargado. Se omite.');
+      return;
+    }
     await this.runSyncProcess('Carga de TC_CATALOGO_PADRE desde CSV...', async () => {
       console.log('📂 Cargando TC_CATALOGO_PADRE desde catalogo_padre.csv...');
 
@@ -1319,15 +1329,25 @@ export class SeedService implements OnApplicationBootstrap {
     return match ? match[1] : null;
   }
 
+  private toSentenceCase(text: string): string {
+    if (!text) return text;
+    const lower = text.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
+
   private extractNombreFromParenthesis(text: string): string {
-    return text.replace(/\s*\(\d+\)\s*$/, '').replace(/^\*/, '').trim();
+    const raw = text.replace(/\s*\(\d+\)\s*$/, '').replace(/^\*/, '').trim();
+    return this.toSentenceCase(raw);
   }
 
   private async seedProvincias() {
     const count = await this.provinciaRepository.count();
-    if (count > 0) {
+    if (count >= 20) {
       console.log(`ℹ️ TC_PROVINCIA ya cargada (${count} registros). Se omite.`);
       return;
+    }
+    if (count > 0) {
+      console.log(`⚠️ TC_PROVINCIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
     console.log('🗺️ Cargando TC_PROVINCIA desde CSV...');
@@ -1363,9 +1383,12 @@ export class SeedService implements OnApplicationBootstrap {
 
   private async seedCantones() {
     const count = await this.cantonRepository.count();
-    if (count > 0) {
+    if (count >= 200) {
       console.log(`ℹ️ TC_CANTON ya cargada (${count} registros). Se omite.`);
       return;
+    }
+    if (count > 0) {
+      console.log(`⚠️ TC_CANTON incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
     console.log('🗺️ Cargando TC_CANTON desde CSV...');
@@ -1409,9 +1432,12 @@ export class SeedService implements OnApplicationBootstrap {
 
   private async seedParroquias() {
     const count = await this.parroquiaRepository.count();
-    if (count > 0) {
+    if (count >= 1400) {
       console.log(`ℹ️ TC_PARROQUIA ya cargada (${count} registros). Se omite.`);
       return;
+    }
+    if (count > 0) {
+      console.log(`⚠️ TC_PARROQUIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
     console.log('🗺️ Cargando TC_PARROQUIA desde CSV...');
@@ -1458,7 +1484,7 @@ export class SeedService implements OnApplicationBootstrap {
         if (!existing) {
           await this.parroquiaRepository.save({
             codigo: codigoDesconocido,
-            nombre: `DESCONOCIDO-${canton.nombre}`,
+            nombre: `Desconocido-${canton.nombre}`,
             canton,
             ...auditoria,
           } as Parroquia);
@@ -1473,6 +1499,14 @@ export class SeedService implements OnApplicationBootstrap {
   
 
   private async loadHomologadorSexoVigiflow() {
+    const homologadorExistente = await this.homologadorRepository.findOne({ where: { entity: 'Paciente', field: 'sexo' } });
+    if (homologadorExistente) {
+      const reglaCount = await this.reglaHomologacionRepository.count({ where: { homologadorId: homologadorExistente.id } });
+      if (reglaCount > 0) {
+        console.log(`ℹ️ Homologador Sexo ya cargado (${reglaCount} reglas). Se omite.`);
+        return;
+      }
+    }
     await this.runSyncProcess('Carga de homologador Sexo (origen VigiFlow)...', async () => {
       console.log('🔄 Cargando homologador Sexo VigiFlow...');
 
@@ -1558,6 +1592,152 @@ export class SeedService implements OnApplicationBootstrap {
         throw error;
       }
     });
+  }
+
+  // ── Carga de tipos de entidad (ENTIDAD) en TC_CATALOGO_PADRE ────────────────
+  private async loadTiposEntidadCatalogoPadre() {
+    const padreExistente = await this.catalogoPadreRepository.findOne({ where: { codigo: 'ENTIDAD' } });
+    if (padreExistente) {
+      console.log('ℹ️ Tipos de entidad ya cargados en TC_CATALOGO_PADRE. Se omite.');
+      return;
+    }
+    console.log('🏥 Cargando tipos de entidad en TC_CATALOGO_PADRE...');
+
+    const auditoria: IAuditoria = {
+      createdAt: new Date(), createdBy: 'System',
+      updatedAt: undefined, updatedBy: 'System',
+      deletedAt: undefined, deletedBy: '',
+      isEnabled: true, isActive: true,
+    };
+
+    const CODIGO_PADRE = 'ENTIDAD';
+
+    let padre = await this.catalogoPadreRepository.findOne({ where: { codigo: CODIGO_PADRE } });
+    if (!padre) {
+      padre = await this.catalogoPadreRepository.save({
+        codigo: CODIGO_PADRE,
+        nombre: 'Entidad',
+        descripcion: 'Tipos de entidad de establecimiento de salud',
+        padre: null,
+        ...auditoria,
+      } as CatalogoPadre);
+      console.log('✅ Padre ENTIDAD creado.');
+    }
+
+    const tipos = [
+      'Centro de salud tipo A',
+      'MSP',
+      'Centro de salud tipo B',
+      'Hospital especializado',
+      'Puesto de salud',
+      'Hospital basico',
+      'Hospital general',
+      'Centro de salud tipo C',
+      'Ambulancia de soporte vital avanzado terrestre',
+      'Transporte primario o de atencion prehospitalario-ambulancia de soporte vital basico',
+      'Ambulancia de soporte vital basico terrestre',
+      'Ambulancia de transporte simple terrestre',
+      'Consultorio general',
+      'Unidad movil general',
+      'Transporte secundario-ambulancia de transporte simple',
+      'Unidad movil quirurgica',
+      'Consultorio general de medicina general',
+      'Transporte primario o de atencion prehospitalario-ambulancia de soporte vital avanzado',
+      'Laboratorio de analisis clinico de baja complejidad',
+      'Centros especializados',
+      'Laboratorio de analisis clinico de referencia',
+      'Transporte primario o de atencion prehospitalario-vehiculo de asistencia y evaluacion rapida',
+      'Coordinaciones distritales',
+      'Unidad movil de diagnostico oncologico',
+      'Planta central',
+      'Coordinaciones zonales',
+    ];
+
+    let insertados = 0;
+    let omitidos = 0;
+    for (const nombre of tipos) {
+      const codigo = 'ENTIDAD_' + nombre.toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').substring(0, 40);
+      const existing = await this.catalogoPadreRepository.findOne({ where: { codigo } });
+      if (existing) { omitidos++; continue; }
+      await this.catalogoPadreRepository.save({ codigo, nombre, descripcion: null, padre, ...auditoria } as CatalogoPadre);
+      insertados++;
+    }
+    console.log(`✅ Tipos de entidad: ${insertados} insertado(s), ${omitidos} omitido(s).`);
+  }
+
+  // ── Carga de TR_ESTABLECIMIENTO desde ENTIDAD_202305121541.csv ──────────────
+  private async loadEstablecimientosFromCSV() {
+    const count = await this.establecimientoRepository.count({ where: { isEnabled: true } });
+    if (count > 0) {
+      console.log(`ℹ️ TR_ESTABLECIMIENTO ya cargada (${count} registros). Se omite.`);
+      return;
+    }
+
+    console.log('🏥 Cargando TR_ESTABLECIMIENTO desde ENTIDAD_202305121541.csv...');
+
+    try {
+      const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'ENTIDAD_202305121541.csv');
+      const workbook = read(await fs.promises.readFile(csvPath), { type: 'buffer', raw: false });
+      const ws = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = utils.sheet_to_json<Record<string, string>>(ws, { defval: '' });
+
+      const auditoria: IAuditoria = {
+        createdAt: new Date(), createdBy: 'System',
+        updatedAt: undefined, updatedBy: 'System',
+        deletedAt: undefined, deletedBy: '',
+        isEnabled: true, isActive: true,
+      };
+
+      const tiposCache = new Map<string, CatalogoPadre>();
+      let insertados = 0;
+      let omitidos = 0;
+
+      for (const row of rows) {
+        const uniCodigo = String(row['UNI_CODIGO'] ?? '').trim().replace(/"/g, '');
+        const uniNombre = this.toSentenceCase(String(row['UNI_NOMBRE'] ?? '').trim());
+        const direccion = String(row['UNI_DIRECCION'] ?? '').trim();
+        const telefono = String(row['UNI_TELEFONO'] ?? '').trim();
+        const parCodigo = String(row['PAR_CODIGO'] ?? '').trim();
+        const tipoNombre = String(row['TIPO_ENTIDAD'] ?? '').trim();
+        const mail = String(row['MAIL'] ?? '').trim();
+
+        if (!uniCodigo || !uniNombre) { omitidos++; continue; }
+
+        const existing = await this.establecimientoRepository.findOne({ where: { uniCodigo, isEnabled: true } });
+        if (existing) { omitidos++; continue; }
+
+        const est = this.establecimientoRepository.create({
+          uniCodigo,
+          uniNombre,
+          direccion: direccion || null,
+          telefono: telefono || null,
+          mail: mail || null,
+          ...auditoria,
+        });
+
+        if (parCodigo) {
+          const parroquia = await this.parroquiaRepository.findOne({ where: { codigo: parCodigo } });
+          if (parroquia) est.parroquiaResidencia = parroquia;
+        }
+
+        if (tipoNombre) {
+          if (!tiposCache.has(tipoNombre)) {
+            const codigo = 'ENTIDAD_' + tipoNombre.toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').substring(0, 40);
+            const tipo = await this.catalogoPadreRepository.findOne({ where: { codigo } });
+            if (tipo) tiposCache.set(tipoNombre, tipo);
+          }
+          const tipo = tiposCache.get(tipoNombre);
+          if (tipo) est.tipoEntidad = tipo;
+        }
+
+        await this.establecimientoRepository.save(est);
+        insertados++;
+      }
+
+      console.log(`✅ TR_ESTABLECIMIENTO: ${insertados} insertado(s), ${omitidos} omitido(s).`);
+    } catch (error) {
+      console.error('❌ Error al cargar TR_ESTABLECIMIENTO desde CSV:', error);
+    }
   }
 
   async truncateNotificacion() {

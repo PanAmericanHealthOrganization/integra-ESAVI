@@ -1,3 +1,4 @@
+import { CatalogoPadre } from '../catalogo-padre.entity';
 import { Parroquia } from '../parroquia.entity';
 
 export interface IEstablecimiento {
@@ -5,12 +6,9 @@ export interface IEstablecimiento {
   uniCodigo: string;
   uniNombre: string;
   parroquiaResidencia: Parroquia;
-  zonaCodigo: string;
-  zonaDescripcion: string;
-  distritoCodigo: string;
-  distritoDescripcion: string;
-  circuitoCodigo: string;
-  tipoEntidad: string;
+  tipoEntidad: CatalogoPadre;
+  direccion: string;
+  telefono: string;
   longitudGps: number;
   latitudGps: number;
   mail: string;

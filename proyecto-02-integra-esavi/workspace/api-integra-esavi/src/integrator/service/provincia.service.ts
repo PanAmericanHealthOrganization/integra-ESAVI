@@ -6,6 +6,12 @@ import { Provincia } from '../entity/provincia.entity';
 
 const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 
+const toSentenceCase = (text: string): string => {
+  if (!text) return text;
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+};
+
 @Injectable()
 export class ProvinciaService {
   private readonly logger = new Logger(ProvinciaService.name);
@@ -22,7 +28,7 @@ export class ProvinciaService {
     }
     const provincia = this.provinciaRepository.create({
       codigo: dto.codigo,
-      nombre: dto.nombre,
+      nombre: toSentenceCase(dto.nombre),
       createdBy: currentUser,
       updatedBy: currentUser,
       isActive: true,
@@ -52,7 +58,7 @@ export class ProvinciaService {
   async update(codigo: string, dto: UpdateProvinciaDto, currentUser: string = FALLBACK_USER): Promise<Provincia> {
     const provincia = await this.findOne(codigo);
     this.provinciaRepository.merge(provincia, {
-      nombre: dto.nombre ?? provincia.nombre,
+      nombre: dto.nombre ? toSentenceCase(dto.nombre) : provincia.nombre,
       updatedBy: currentUser,
       updatedAt: new Date(),
     });

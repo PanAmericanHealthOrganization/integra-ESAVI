@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEmail, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateEstablecimientoDto {
   @IsString()
@@ -15,34 +15,18 @@ export class CreateEstablecimientoDto {
   parroquiaCodigo?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  zonaCodigo?: string;
+  @IsUUID()
+  tipoEntidadId?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
-  zonaDescripcion?: string;
+  @MaxLength(255)
+  direccion?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(10)
-  distritoCodigo?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  distritoDescripcion?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  circuitoCodigo?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  tipoEntidad?: string;
+  @MaxLength(30)
+  telefono?: string;
 
   @IsOptional()
   @IsNumber()
@@ -70,34 +54,18 @@ export class UpdateEstablecimientoDto {
   parroquiaCodigo?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  zonaCodigo?: string;
+  @IsUUID()
+  tipoEntidadId?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(100)
-  zonaDescripcion?: string;
+  @MaxLength(255)
+  direccion?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(10)
-  distritoCodigo?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(100)
-  distritoDescripcion?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(10)
-  circuitoCodigo?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  tipoEntidad?: string;
+  @MaxLength(30)
+  telefono?: string;
 
   @IsOptional()
   @IsNumber()

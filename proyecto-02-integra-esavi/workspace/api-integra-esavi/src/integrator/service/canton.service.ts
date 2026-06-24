@@ -7,6 +7,12 @@ import { Provincia } from '../entity/provincia.entity';
 
 const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 
+const toSentenceCase = (text: string): string => {
+  if (!text) return text;
+  const lower = text.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+};
+
 @Injectable()
 export class CantonService {
   private readonly logger = new Logger(CantonService.name);
@@ -29,7 +35,7 @@ export class CantonService {
     }
     const canton = this.cantonRepository.create({
       codigo: dto.codigo,
-      nombre: dto.nombre,
+      nombre: toSentenceCase(dto.nombre),
       provincia,
       createdBy: currentUser,
       updatedBy: currentUser,
@@ -75,7 +81,7 @@ export class CantonService {
       canton.provincia = provincia;
     }
     this.cantonRepository.merge(canton, {
-      nombre: dto.nombre ?? canton.nombre,
+      nombre: dto.nombre ? toSentenceCase(dto.nombre) : canton.nombre,
       updatedBy: currentUser,
       updatedAt: new Date(),
     });

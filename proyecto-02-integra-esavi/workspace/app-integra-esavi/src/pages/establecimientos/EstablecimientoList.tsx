@@ -8,7 +8,6 @@ import {
   Badge,
   Box,
   Button,
-  Chip,
   CircularProgress,
   Collapse,
   Dialog,
@@ -31,12 +30,13 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 interface ParroquiaRecord {
@@ -46,18 +46,20 @@ interface ParroquiaRecord {
   canton?: { codigo: string; nombre: string; provincia?: { codigo: string; nombre: string } }
 }
 
+interface CatalogoPadreRecord {
+  id: string
+  codigo: string
+  nombre: string
+  padre?: { codigo: string; nombre: string }
+}
+
 interface EstablecimientoRecord {
   id: string
   uniCodigo: string
   uniNombre: string
-  tipoEntidad?: string
-  zonaCodigo?: string
-  zonaDescripcion?: string
-  distritoCodigo?: string
-  distritoDescripcion?: string
-  circuitoCodigo?: string
-  longitudGps?: number
-  latitudGps?: number
+  tipoEntidad?: CatalogoPadreRecord
+  direccion?: string
+  telefono?: string
   mail?: string
   parroquiaResidencia?: ParroquiaRecord
 }
@@ -65,12 +67,9 @@ interface EstablecimientoRecord {
 const EMPTY_FORM = {
   uniCodigo: "",
   uniNombre: "",
-  tipoEntidad: "",
-  zonaCodigo: "",
-  zonaDescripcion: "",
-  distritoCodigo: "",
-  distritoDescripcion: "",
-  circuitoCodigo: "",
+  tipoEntidadId: "",
+  direccion: "",
+  telefono: "",
   mail: "",
   parroquiaCodigo: "",
 }
@@ -81,6 +80,8 @@ export const EstablecimientoList = () => {
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
 
+  const [page, setPage] = useState(0)
+  const [perPage] = useState(10)
   const [search, setSearch] = useState("")
   const [showFilter, setShowFilter] = useState(false)
   const [form, setForm] = useState({ ...EMPTY_FORM })
@@ -94,9 +95,21 @@ export const EstablecimientoList = () => {
     open: boolean; id: string; label: string
   } | null>(null)
 
+  useEffect(() => { setPage(0) }, [search])
+
   const { data: establecimientos, isLoading, refetch } = useGetList<EstablecimientoRecord>(
     "establecimientos",
     { pagination: { page: 1, perPage: 9999 }, sort: { field: "uniNombre", order: "ASC" }, filter: {} }
+  )
+
+  const { data: allCatalogoPadre } = useGetList<CatalogoPadreRecord>(
+    "catalogo-padre",
+    { pagination: { page: 1, perPage: 9999 }, sort: { field: "nombre", order: "ASC" }, filter: {} }
+  )
+
+  const tiposEntidad = useMemo(
+    () => (allCatalogoPadre ?? []).filter((c) => c.padre?.codigo === "ENTIDAD"),
+    [allCatalogoPadre]
   )
 
   const { data: todasParroquias } = useGetList<ParroquiaRecord>(
@@ -107,9 +120,7 @@ export const EstablecimientoList = () => {
   const provincias = useMemo(() => {
     const map = new Map<string, string>()
     ;(todasParroquias ?? []).forEach((p) => {
-      if (p.canton?.provincia) {
-        map.set(p.canton.provincia.codigo, p.canton.provincia.nombre)
-      }
+      if (p.canton?.provincia) map.set(p.canton.provincia.codigo, p.canton.provincia.nombre)
     })
     return Array.from(map.entries())
       .map(([codigo, nombre]) => ({ codigo, nombre }))
@@ -120,9 +131,8 @@ export const EstablecimientoList = () => {
     if (!selectedProvincia) return []
     const map = new Map<string, string>()
     ;(todasParroquias ?? []).forEach((p) => {
-      if (p.canton?.provincia?.codigo === selectedProvincia && p.canton) {
+      if (p.canton?.provincia?.codigo === selectedProvincia && p.canton)
         map.set(p.canton.codigo, p.canton.nombre)
-      }
     })
     return Array.from(map.entries())
       .map(([codigo, nombre]) => ({ codigo, nombre }))
@@ -144,12 +154,18 @@ export const EstablecimientoList = () => {
       (e) =>
         e.uniCodigo.toLowerCase().includes(q) ||
         e.uniNombre.toLowerCase().includes(q) ||
-        (e.tipoEntidad ?? "").toLowerCase().includes(q) ||
+        (e.tipoEntidad?.nombre ?? "").toLowerCase().includes(q) ||
         (e.parroquiaResidencia?.nombre ?? "").toLowerCase().includes(q) ||
-        (e.parroquiaResidencia?.canton?.nombre ?? "").toLowerCase().includes(q)
+        (e.parroquiaResidencia?.canton?.nombre ?? "").toLowerCase().includes(q) ||
+        (e.parroquiaResidencia?.canton?.provincia?.nombre ?? "").toLowerCase().includes(q) ||
+        (e.mail ?? "").toLowerCase().includes(q)
     )
   }, [establecimientos, search])
 
+  const paginated = useMemo(
+    () => filtered.slice(page * perPage, page * perPage + perPage),
+    [filtered, page, perPage]
+  )
 
   const resetLocation = () => {
     setSelectedProvincia("")
@@ -171,12 +187,9 @@ export const EstablecimientoList = () => {
     setForm({
       uniCodigo: r.uniCodigo,
       uniNombre: r.uniNombre,
-      tipoEntidad: r.tipoEntidad ?? "",
-      zonaCodigo: r.zonaCodigo ?? "",
-      zonaDescripcion: r.zonaDescripcion ?? "",
-      distritoCodigo: r.distritoCodigo ?? "",
-      distritoDescripcion: r.distritoDescripcion ?? "",
-      circuitoCodigo: r.circuitoCodigo ?? "",
+      tipoEntidadId: r.tipoEntidad?.id ?? "",
+      direccion: r.direccion ?? "",
+      telefono: r.telefono ?? "",
       mail: r.mail ?? "",
       parroquiaCodigo: par?.codigo ?? "",
     })
@@ -200,16 +213,11 @@ export const EstablecimientoList = () => {
   }
 
   const buildPayload = (includeCode: boolean) => {
-    const payload: Record<string, unknown> = {
-      uniNombre: form.uniNombre,
-    }
+    const payload: Record<string, unknown> = { uniNombre: form.uniNombre }
     if (includeCode) payload.uniCodigo = form.uniCodigo
-    if (form.tipoEntidad) payload.tipoEntidad = form.tipoEntidad
-    if (form.zonaCodigo) payload.zonaCodigo = form.zonaCodigo
-    if (form.zonaDescripcion) payload.zonaDescripcion = form.zonaDescripcion
-    if (form.distritoCodigo) payload.distritoCodigo = form.distritoCodigo
-    if (form.distritoDescripcion) payload.distritoDescripcion = form.distritoDescripcion
-    if (form.circuitoCodigo) payload.circuitoCodigo = form.circuitoCodigo
+    if (form.tipoEntidadId) payload.tipoEntidadId = form.tipoEntidadId
+    if (form.direccion) payload.direccion = form.direccion
+    if (form.telefono) payload.telefono = form.telefono
     if (form.mail) payload.mail = form.mail
     if (form.parroquiaCodigo) payload.parroquiaCodigo = form.parroquiaCodigo
     return payload
@@ -218,18 +226,10 @@ export const EstablecimientoList = () => {
   const submit = async () => {
     try {
       if (dlg.mode === "create") {
-        await create(
-          "establecimientos",
-          { data: buildPayload(true) },
-          { returnPromise: true }
-        )
+        await create("establecimientos", { data: buildPayload(true) }, { returnPromise: true })
         notify("Establecimiento creado correctamente", { type: "success" })
       } else {
-        await update(
-          "establecimientos",
-          { id: dlg.id!, data: buildPayload(false) },
-          { returnPromise: true }
-        )
+        await update("establecimientos", { id: dlg.id!, data: buildPayload(false) }, { returnPromise: true })
         notify("Establecimiento actualizado correctamente", { type: "success" })
       }
       closeDialog()
@@ -264,14 +264,12 @@ export const EstablecimientoList = () => {
   return (
     <Box p={2}>
       <Title title="Establecimientos" />
-
       <Paper elevation={2}>
+        {/* ── Cabecera ── */}
         <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography variant="h6" fontWeight={600} lineHeight={1.2}>
-              Establecimientos
-            </Typography>
-          </Box>
+          <Typography variant="h6" fontWeight={600}>
+            Establecimientos
+          </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
               <IconButton
@@ -289,6 +287,7 @@ export const EstablecimientoList = () => {
           </Stack>
         </Box>
 
+        {/* ── Filtro de búsqueda ── */}
         <Collapse in={showFilter}>
           <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
             <TextField
@@ -297,7 +296,7 @@ export const EstablecimientoList = () => {
               sx={{ width: 300 }}
               value={search}
               autoFocus={showFilter}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(0) }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -306,7 +305,7 @@ export const EstablecimientoList = () => {
                 ),
               }}
             />
-            <Button size="small" onClick={() => setSearch("")}>
+            <Button size="small" onClick={() => { setSearch(""); setPage(0) }}>
               Limpiar
             </Button>
           </Box>
@@ -314,29 +313,32 @@ export const EstablecimientoList = () => {
 
         <Divider />
 
-        <TableContainer sx={{ maxHeight: 520 }}>
+        {/* ── Tabla ── */}
+        <TableContainer sx={{ maxHeight: 480 }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ minWidth: 80 }}>Código</TableCell>
                 <TableCell>Nombre</TableCell>
-                <TableCell sx={{ minWidth: 90 }}>Tipo</TableCell>
-                <TableCell sx={{ minWidth: 180 }}>Ubicación</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Admin.</TableCell>
+                <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
+                <TableCell sx={{ minWidth: 110 }}>Provincia</TableCell>
+                <TableCell sx={{ minWidth: 110 }}>Cantón</TableCell>
+                <TableCell sx={{ minWidth: 110 }}>Parroquia</TableCell>
+                <TableCell sx={{ minWidth: 160 }}>Ubicación</TableCell>
                 <TableCell sx={{ minWidth: 140 }}>Correo</TableCell>
-                <TableCell align="right" sx={{ pr: 1, width: 72 }} />
+                <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <CircularProgress size={28} />
                   </TableCell>
                 </TableRow>
               ) : !filtered.length && search ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
                       <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
                       <Typography variant="body2" color="text.secondary">
@@ -347,83 +349,83 @@ export const EstablecimientoList = () => {
                 </TableRow>
               ) : !filtered.length ? (
                 <TableRow>
-                  <TableCell colSpan={7} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
                       <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
                       <Typography variant="body2" color="text.secondary">
-                        No hay establecimientos registrados. Usa + Nuevo para agregar.
+                        Sin establecimientos registrados. Crea el primero con + Nuevo.
                       </Typography>
                     </Box>
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((est) => (
+                paginated.map((est) => (
                   <TableRow key={est.id} hover>
                     <TableCell>
-                      <Typography variant="caption" fontFamily="monospace" fontWeight={600}>
+                      <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                         {est.uniCodigo}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={500}>{est.uniNombre}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      {est.tipoEntidad ? (
-                        <Chip label={est.tipoEntidad} size="small" variant="outlined" />
-                      ) : (
-                        <Typography variant="body2" color="text.disabled">—</Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {est.parroquiaResidencia?.nombre ?? "—"}
+                      <Typography variant="body2" fontWeight={500}>
+                        {est.uniNombre}
                       </Typography>
-                      {est.parroquiaResidencia?.canton && (
-                        <Typography variant="caption" color="text.secondary" display="block" noWrap>
-                          {est.parroquiaResidencia.canton.nombre}
-                          {est.parroquiaResidencia.canton.provincia
-                            ? ` · ${est.parroquiaResidencia.canton.provincia.nombre}`
-                            : ""}
-                        </Typography>
-                      )}
                     </TableCell>
-                    <TableCell>
-                      <Tooltip
-                        title={[est.zonaDescripcion, est.distritoDescripcion].filter(Boolean).join(" / ")}
-                        placement="top"
-                        disableHoverListener={!est.zonaDescripcion && !est.distritoDescripcion}>
-                        <Typography variant="caption" fontFamily="monospace" color="text.secondary">
-                          {[est.zonaCodigo, est.distritoCodigo, est.circuitoCodigo]
-                            .filter(Boolean)
-                            .join(" · ") || "—"}
+                    <TableCell sx={{ maxWidth: 160 }}>
+                      <Tooltip title={est.tipoEntidad?.nombre ?? ""} placement="top" disableHoverListener={!est.tipoEntidad?.nombre}>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {est.tipoEntidad?.nombre || "—"}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 120 }}>
+                      <Tooltip title={est.parroquiaResidencia?.canton?.provincia?.nombre ?? ""} placement="top" disableHoverListener={!est.parroquiaResidencia?.canton?.provincia?.nombre}>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {est.parroquiaResidencia?.canton?.provincia?.nombre || "—"}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 120 }}>
+                      <Tooltip title={est.parroquiaResidencia?.canton?.nombre ?? ""} placement="top" disableHoverListener={!est.parroquiaResidencia?.canton?.nombre}>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {est.parroquiaResidencia?.canton?.nombre || "—"}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 120 }}>
+                      <Tooltip title={est.parroquiaResidencia?.nombre ?? ""} placement="top" disableHoverListener={!est.parroquiaResidencia?.nombre}>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {est.parroquiaResidencia?.nombre || "—"}
+                        </Typography>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell sx={{ maxWidth: 200 }}>
+                      <Tooltip title={est.direccion ?? ""} placement="top" disableHoverListener={!est.direccion}>
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {est.direccion || "—"}
                         </Typography>
                       </Tooltip>
                     </TableCell>
                     <TableCell>
-                      {est.mail ? (
-                        <Typography
-                          variant="body2"
-                          sx={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {est.mail}
-                        </Typography>
-                      ) : (
-                        <Typography variant="body2" color="text.disabled">—</Typography>
-                      )}
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {est.mail || "—"}
+                      </Typography>
                     </TableCell>
                     <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 0.5 }}>
                       <Tooltip title="Editar">
                         <IconButton size="small" onClick={(e) => openEdit(est, e)}>
-                          <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                          <EditOutlinedIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title="Eliminar">
                         <IconButton
                           size="small"
                           color="error"
-                          onClick={() =>
-                            setDeleteConfirm({ open: true, id: est.id, label: est.uniNombre })
-                          }>
-                          <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                          onClick={() => setDeleteConfirm({ open: true, id: est.id, label: est.uniNombre })}>
+                          <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                       </Tooltip>
                     </TableCell>
@@ -433,6 +435,17 @@ export const EstablecimientoList = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* ── Paginación ── */}
+        <TablePagination
+          component="div"
+          count={filtered.length}
+          page={page}
+          rowsPerPage={perPage}
+          rowsPerPageOptions={[10]}
+          onPageChange={(_, p) => setPage(p)}
+          labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
+        />
       </Paper>
 
       {/* ── Diálogo Crear / Editar ── */}
@@ -454,14 +467,21 @@ export const EstablecimientoList = () => {
                 helperText={dlg.mode === "edit" ? "No modificable" : "Código único (ej: AS01)"}
                 sx={{ flex: 1 }}
               />
-              <TextField
-                label="Tipo de entidad"
-                value={form.tipoEntidad}
-                onChange={(e) => setForm((f) => ({ ...f, tipoEntidad: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 50 }}
-                sx={{ flex: 1 }}
-              />
+              <FormControl size="small" sx={{ flex: 1 }}>
+                <InputLabel>Tipo de entidad</InputLabel>
+                <Select
+                  value={form.tipoEntidadId}
+                  label="Tipo de entidad"
+                  onChange={(e) => setForm((f) => ({ ...f, tipoEntidadId: e.target.value }))}
+                  MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}>
+                  <MenuItem value=""><em>Sin seleccionar</em></MenuItem>
+                  {tiposEntidad.map((t) => (
+                    <MenuItem key={t.id} value={t.id}>
+                      <Typography variant="body2">{t.nombre}</Typography>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Stack>
 
             <TextField
@@ -473,6 +493,25 @@ export const EstablecimientoList = () => {
               size="small"
               inputProps={{ maxLength: 100 }}
             />
+
+            <Stack direction="row" spacing={1.5}>
+              <TextField
+                label="Dirección"
+                value={form.direccion}
+                onChange={(e) => setForm((f) => ({ ...f, direccion: e.target.value }))}
+                size="small"
+                inputProps={{ maxLength: 255 }}
+                sx={{ flex: 2 }}
+              />
+              <TextField
+                label="Teléfono"
+                value={form.telefono}
+                onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
+                size="small"
+                inputProps={{ maxLength: 30 }}
+                sx={{ flex: 1 }}
+              />
+            </Stack>
 
             <Divider textAlign="left">
               <Typography variant="caption" color="text.secondary">
@@ -487,9 +526,7 @@ export const EstablecimientoList = () => {
                 label="Provincia"
                 onChange={(e) => handleProvinciaChange(e.target.value)}
                 MenuProps={{ PaperProps: { sx: { maxHeight: 280 } } }}>
-                <MenuItem value="">
-                  <em>Sin seleccionar</em>
-                </MenuItem>
+                <MenuItem value=""><em>Sin seleccionar</em></MenuItem>
                 {provincias.map((prov) => (
                   <MenuItem key={prov.codigo} value={prov.codigo}>
                     <Typography variant="body2">
@@ -555,69 +592,15 @@ export const EstablecimientoList = () => {
               )}
             </FormControl>
 
-            <Divider textAlign="left">
-              <Typography variant="caption" color="text.secondary">
-                Información administrativa (opcional)
-              </Typography>
-            </Divider>
-
-            <Stack direction="row" spacing={1.5}>
-              <TextField
-                label="Zona (código)"
-                value={form.zonaCodigo}
-                onChange={(e) => setForm((f) => ({ ...f, zonaCodigo: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 10 }}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="Zona (descripción)"
-                value={form.zonaDescripcion}
-                onChange={(e) => setForm((f) => ({ ...f, zonaDescripcion: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 100 }}
-                sx={{ flex: 2 }}
-              />
-            </Stack>
-
-            <Stack direction="row" spacing={1.5}>
-              <TextField
-                label="Distrito (código)"
-                value={form.distritoCodigo}
-                onChange={(e) => setForm((f) => ({ ...f, distritoCodigo: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 10 }}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="Distrito (descripción)"
-                value={form.distritoDescripcion}
-                onChange={(e) => setForm((f) => ({ ...f, distritoDescripcion: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 100 }}
-                sx={{ flex: 2 }}
-              />
-            </Stack>
-
-            <Stack direction="row" spacing={1.5}>
-              <TextField
-                label="Circuito"
-                value={form.circuitoCodigo}
-                onChange={(e) => setForm((f) => ({ ...f, circuitoCodigo: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 10 }}
-                sx={{ flex: 1 }}
-              />
-              <TextField
-                label="Correo electrónico"
-                value={form.mail}
-                onChange={(e) => setForm((f) => ({ ...f, mail: e.target.value }))}
-                size="small"
-                inputProps={{ maxLength: 100 }}
-                type="email"
-                sx={{ flex: 2 }}
-              />
-            </Stack>
+            <TextField
+              label="Correo electrónico"
+              value={form.mail}
+              onChange={(e) => setForm((f) => ({ ...f, mail: e.target.value }))}
+              size="small"
+              inputProps={{ maxLength: 100 }}
+              type="email"
+              fullWidth
+            />
           </Stack>
         </DialogContent>
         <DialogActions>
@@ -628,24 +611,14 @@ export const EstablecimientoList = () => {
             variant="contained"
             onClick={submit}
             disabled={isBusy || !form.uniCodigo || !form.uniNombre}>
-            {isBusy ? (
-              <CircularProgress size={18} />
-            ) : dlg.mode === "create" ? (
-              "Crear"
-            ) : (
-              "Guardar"
-            )}
+            {isBusy ? <CircularProgress size={18} /> : dlg.mode === "create" ? "Crear" : "Guardar"}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* ── Confirmar eliminación ── */}
       {deleteConfirm && (
-        <Dialog
-          open={deleteConfirm.open}
-          onClose={() => setDeleteConfirm(null)}
-          maxWidth="xs"
-          fullWidth>
+        <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
           <DialogTitle>Confirmar eliminación</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -656,11 +629,7 @@ export const EstablecimientoList = () => {
             <Button onClick={() => setDeleteConfirm(null)} disabled={deleting}>
               Cancelar
             </Button>
-            <Button
-              color="error"
-              variant="contained"
-              onClick={confirmDelete}
-              disabled={deleting}>
+            <Button color="error" variant="contained" onClick={confirmDelete} disabled={deleting}>
               {deleting ? <CircularProgress size={18} /> : "Eliminar"}
             </Button>
           </DialogActions>

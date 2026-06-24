@@ -346,7 +346,7 @@ export const DpaList = () => {
                 <TableRow>
                   <TableCell>Cód</TableCell>
                   <TableCell>Nombre</TableCell>
-                  <TableCell align="right" sx={{ pr: 1 }} />
+                  <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -394,19 +394,19 @@ export const DpaList = () => {
                           setSearchParroquia("")
                         }}>
                         <TableCell>
-                          <Typography variant="caption" fontFamily="monospace" fontWeight={600}>
+                          <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                             {p.codigo}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={isSelected ? 700 : 400}>
+                          <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
                             {p.nombre}
                           </Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 0.5 }}>
                           <Tooltip title="Editar">
                             <IconButton size="small" onClick={(e) => openEditProvincia(p, e)}>
-                              <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                              <EditOutlinedIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Eliminar">
@@ -417,7 +417,7 @@ export const DpaList = () => {
                                 e.stopPropagation()
                                 setDeleteConfirm({ open: true, id: p.id, label: p.nombre, resource: "provincias" })
                               }}>
-                              <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                              <DeleteOutlineIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -502,7 +502,7 @@ export const DpaList = () => {
                 <TableRow>
                   <TableCell>Cód</TableCell>
                   <TableCell>Nombre</TableCell>
-                  <TableCell align="right" sx={{ pr: 1 }} />
+                  <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -559,19 +559,19 @@ export const DpaList = () => {
                           setSearchParroquia("")
                         }}>
                         <TableCell>
-                          <Typography variant="caption" fontFamily="monospace" fontWeight={600}>
+                          <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                             {c.codigo}
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={isSelected ? 700 : 400}>
+                          <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
                             {c.nombre}
                           </Typography>
                         </TableCell>
                         <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 0.5 }}>
                           <Tooltip title="Editar">
                             <IconButton size="small" onClick={(e) => openEditCanton(c, e)}>
-                              <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                              <EditOutlinedIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Eliminar">
@@ -582,7 +582,7 @@ export const DpaList = () => {
                                 e.stopPropagation()
                                 setDeleteConfirm({ open: true, id: c.id, label: c.nombre, resource: "cantones" })
                               }}>
-                              <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                              <DeleteOutlineIcon fontSize="small" />
                             </IconButton>
                           </Tooltip>
                         </TableCell>
@@ -667,7 +667,7 @@ export const DpaList = () => {
                 <TableRow>
                   <TableCell>Cód</TableCell>
                   <TableCell>Nombre</TableCell>
-                  <TableCell align="right" sx={{ pr: 1 }} />
+                  <TableCell align="right">Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -714,17 +714,17 @@ export const DpaList = () => {
                   filteredParroquias.map((p) => (
                     <TableRow key={p.id} hover>
                       <TableCell>
-                        <Typography variant="caption" fontFamily="monospace" fontWeight={600}>
+                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                           {p.codigo}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">{p.nombre}</Typography>
+                        <Typography variant="body2" fontWeight={500}>{p.nombre}</Typography>
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: "nowrap", pr: 0.5 }}>
                         <Tooltip title="Editar">
                           <IconButton size="small" onClick={() => openEditParroquia(p)}>
-                            <EditOutlinedIcon sx={{ fontSize: 15 }} />
+                            <EditOutlinedIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Eliminar">
@@ -734,7 +734,7 @@ export const DpaList = () => {
                             onClick={() =>
                               setDeleteConfirm({ open: true, id: p.id, label: p.nombre, resource: "parroquias" })
                             }>
-                            <DeleteOutlineIcon sx={{ fontSize: 15 }} />
+                            <DeleteOutlineIcon fontSize="small" />
                           </IconButton>
                         </Tooltip>
                       </TableCell>

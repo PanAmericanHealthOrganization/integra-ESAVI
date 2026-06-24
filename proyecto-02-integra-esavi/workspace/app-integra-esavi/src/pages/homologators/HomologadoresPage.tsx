@@ -582,7 +582,7 @@ export const HomologadoresPage = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontFamily="monospace">
+                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                           {row.field}
                         </Typography>
                       </TableCell>
@@ -658,7 +658,7 @@ export const HomologadoresPage = () => {
               )}
             </Box>
             <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateHon}>
-              Agregar Regla
+              Nuevo
             </Button>
           </Box>
 
