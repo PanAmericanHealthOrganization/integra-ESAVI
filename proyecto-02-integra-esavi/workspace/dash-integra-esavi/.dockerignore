@@ -1,0 +1,40 @@
+# Credenciales y configuración sensible
+.env
+*.env
+.env.*
+tokens_generados.txt
+logs/
+access_log.txt
+
+# Datos (se montan como volumen en runtime)
+datos/
+fuente_de_datos/
+
+# Librerías locales de R (se restauran con renv dentro del contenedor)
+library/
+renv/library/
+renv/staging/
+
+# Git
+.git/
+.gitignore
+
+# RStudio / macOS
+.Rproj.user/
+*.Rproj
+.DS_Store
+.Rhistory
+.RData
+
+# Documentación (no necesaria en el contenedor)
+docs/
+*.md
+*.docx
+*.pptx
+
+# Scripts de desarrollo local
+ejecutar_dashboard.sh
+iniciar_con_auth.sh
+cron.sh
+instalar_dependencias.R
+setup_project.R

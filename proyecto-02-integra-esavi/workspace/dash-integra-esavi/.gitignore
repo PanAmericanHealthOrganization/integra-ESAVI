@@ -1,0 +1,27 @@
+datos
+Fuentes de datos
+fuente_de_datos
+
+
+# Archivos de autenticación y seguridad
+.env
+*.env
+.env.local
+.env.production
+tokens_generados.txt
+access_log.txt
+logs/
+renv
+
+# Archivos temporales de R
+.Rhistory
+.RData
+.Rproj.user
+.Rproj
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

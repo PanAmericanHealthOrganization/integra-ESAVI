@@ -7,13 +7,13 @@
 			"path": "proyecto-02-integra-esavi/workspace/api-integra-esavi"
 		},
 		{
-			"path": "proyecto-03-analitica/workspace/dash-integra-esavi"
-		},
-		{
 			"path": "herramientas"
 		},
 		{
 			"path": "docker-compose"
+		},
+		{
+			"path": "proyecto-02-integra-esavi/workspace/dash-integra-esavi"
 		}
 	],
 	"settings": {

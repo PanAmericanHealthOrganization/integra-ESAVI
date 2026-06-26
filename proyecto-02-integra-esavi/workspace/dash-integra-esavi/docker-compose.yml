@@ -1,0 +1,119 @@
+services:
+
+  # ── Base de datos PostgreSQL ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: esavi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       ${DB_NAME:-dhi_esavi}
+      POSTGRES_USER:     ${DB_USER:-dhis}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dhis} -d ${DB_NAME:-dhi_esavi}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - esavi-internal
+
+  # ── Dashboard Shiny ──────────────────────────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: esavi-dashboard
+    restart: unless-stopped
+    environment:
+      # Base de datos — apunta al servicio postgres del compose
+      DB_HOST:     postgres
+      DB_PORT:     5432
+      DB_NAME:     ${DB_NAME:-dhi_esavi}
+      DB_USER:     ${DB_USER:-dhis}
+      DB_PASS:     ${DB_PASS}
+      # Autenticación
+      DASHBOARD_AUTH_TOKENS: ${DASHBOARD_AUTH_TOKENS}
+      ALLOWED_DOMAINS:       ${ALLOWED_DOMAINS:-}
+      # Logs
+      LOG_ACCESS_ATTEMPTS: ${LOG_ACCESS_ATTEMPTS:-true}
+      LOG_FILE_PATH:       /app/logs/access.log
+    volumes:
+      # Datos procesados — persistidos fuera del contenedor
+      - ./datos:/app/datos
+      - ./fuente_de_datos:/app/fuente_de_datos
+      # Logs de acceso
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - esavi-internal
+      - esavi-public
+
+  # ── Nginx: proxy inverso + terminación TLS ───────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: esavi-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    depends_on:
+      dashboard:
+        condition: service_healthy
+    networks:
+      - esavi-public
+
+  # ── Actualización periódica de datos (perfil opcional) ──────────────────────
+  # Ejecuta preparar_datos.R + procesamiento_datos.R y termina.
+  # Uso: docker compose --profile refresh run --rm data-refresh
+  data-refresh:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: esavi-data-refresh
+    profiles: ["refresh"]
+    environment:
+      DB_HOST:  postgres
+      DB_PORT:  5432
+      DB_NAME:  ${DB_NAME:-dhi_esavi}
+      DB_USER:  ${DB_USER:-dhis}
+      DB_PASS:  ${DB_PASS}
+    volumes:
+      - ./datos:/app/datos
+      - ./fuente_de_datos:/app/fuente_de_datos
+      - ./logs:/app/logs
+    command: >
+      Rscript -e "
+        source('preparar_datos.R');
+        source('scripts/procesamiento_datos.R');
+        cat('Actualización de datos completada.\n')
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - esavi-internal
+
+# ── Volúmenes ──────────────────────────────────────────────────────────────────
+volumes:
+  pgdata:
+    driver: local
+
+# ── Redes ─────────────────────────────────────────────────────────────────────
+networks:
+  esavi-internal:   # postgres ↔ dashboard (sin exposición exterior)
+    internal: true
+  esavi-public:     # dashboard ↔ nginx (con acceso exterior)

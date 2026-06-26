@@ -1,0 +1,190 @@
+<mxfile host="65bd71144e">
+    <diagram name="Arquitectura INTEGRA-ESAVI" id="arquitectura-esavi">
+        <mxGraphModel dx="1825" dy="1140" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="&lt;b&gt;ARQUITECTURA DE INTEGRACIÓN - SISTEMA INTEGRA-ESAVI&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#1A1A1A;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="20" width="800" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF4E6;strokeColor=#D79B00;dashed=1;" parent="1" vertex="1">
+                    <mxGeometry x="1320" y="80" width="240" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-title" value="&lt;b&gt;LEYENDA&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="90" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-ext" value="🌐 Sistemas Externos" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="120" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-msp" value="🏢 Componentes MSP" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="145" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-api" value="→ Integración API" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="170" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-scraping" value="⇢ Web Scraping" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="195" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="leyenda-manual" value="↑ Carga Manual" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="1330" y="220" width="200" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="external-area" value="&lt;b&gt;SISTEMAS EXTERNOS&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#E1F5FE;strokeColor=#01579B;fontSize=14;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="80" width="520" height="510" as="geometry"/>
+                </mxCell>
+                <mxCell id="dhis2" value="&lt;b&gt;DHIS2&lt;/b&gt;&lt;br&gt;Sistema de Información&lt;br&gt;de Salud" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;strokeColor=#2E7D32;fontColor=#FFFFFF;verticalAlign=top;fontSize=12;" parent="external-area" vertex="1">
+                    <mxGeometry x="40" y="60" width="180" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="dhis2-icon" value="📊" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=32;" parent="external-area" vertex="1">
+                    <mxGeometry x="95" y="95" width="70" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="vigiflow" value="&lt;b&gt;VigiFlow&lt;/b&gt;&lt;br&gt;Sistema de&lt;br&gt;Farmacovigilancia" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;strokeColor=#0D47A1;fontColor=#FFFFFF;verticalAlign=top;fontSize=12;" parent="external-area" vertex="1">
+                    <mxGeometry x="280" y="60" width="180" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="meddra" value="&lt;b&gt;MedDRA&lt;/b&gt;&lt;br&gt;Estándar de&lt;br&gt;Terminología Médica" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;strokeColor=#E65100;fontColor=#FFFFFF;verticalAlign=top;fontSize=12;" parent="external-area" vertex="1">
+                    <mxGeometry x="40" y="280" width="180" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="meddra-icon" value="📋" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=32;" parent="external-area" vertex="1">
+                    <mxGeometry x="95" y="315" width="70" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="whodrug" value="&lt;b&gt;WHODrug&lt;/b&gt;&lt;br&gt;Estándar de&lt;br&gt;Clasificación de Medicamentos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9C27B0;strokeColor=#4A148C;fontColor=#FFFFFF;verticalAlign=top;fontSize=12;" parent="external-area" vertex="1">
+                    <mxGeometry x="40" y="390" width="180" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="whodrug-icon" value="💉" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=32;" parent="external-area" vertex="1">
+                    <mxGeometry x="335" y="315" width="70" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="msp-area" value="&lt;b&gt;COMPONENTES MSP - INTEGRA-ESAVI&lt;/b&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#6A1B9A;fontSize=14;startSize=30;" parent="1" vertex="1">
+                    <mxGeometry x="600" y="80" width="680" height="840" as="geometry"/>
+                </mxCell>
+                <mxCell id="app-integra" value="&lt;b&gt;app-integra-esavi&lt;/b&gt;&lt;br&gt;Aplicación Web&lt;br&gt;Frontend (Angular/React)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#1976D2;strokeColor=#0D47A1;fontColor=#FFFFFF;verticalAlign=top;fontSize=11;" parent="msp-area" vertex="1">
+                    <mxGeometry x="40" y="60" width="200" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="api-integra" value="&lt;b&gt;api-integra-esavi&lt;/b&gt;&lt;br&gt;Capa de Servicios (Backend)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00897B;strokeColor=#004D40;fontColor=#FFFFFF;verticalAlign=top;fontSize=11;" parent="msp-area" vertex="1">
+                    <mxGeometry x="280" y="60" width="360" height="440" as="geometry"/>
+                </mxCell>
+                <mxCell id="modulo-dhis2" value="&lt;b&gt;integra-dhis2&lt;/b&gt;&lt;br&gt;Módulo de Integración&lt;br&gt;• API REST Call&lt;br&gt;• Cron Diario&lt;br&gt;• Extracción día anterior" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#81C784;strokeColor=#2E7D32;fontSize=10;align=left;verticalAlign=top;" parent="msp-area" vertex="1">
+                    <mxGeometry x="300" y="100" width="150" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="modulo-vigiflow" value="&lt;b&gt;integra-vigiflow&lt;/b&gt;&lt;br&gt;Módulo de Integración&lt;br&gt;• Web Scraping&lt;br&gt;• Puppeteer&lt;br&gt;• Cron Diario&lt;br&gt;• Extracción día anterior" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#64B5F6;strokeColor=#1565C0;fontSize=10;align=left;verticalAlign=top;" parent="msp-area" vertex="1">
+                    <mxGeometry x="480" y="150" width="150" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="modulo-whodrug" value="&lt;b&gt;integra-whodrug&lt;/b&gt;&lt;br&gt;Módulo de Integración&lt;br&gt;• Servicios WHODrug&lt;br&gt;• Cron Diario&lt;br&gt;• Sincronización automática" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BA68C8;strokeColor=#6A1B9A;fontSize=10;align=left;verticalAlign=top;" parent="msp-area" vertex="1">
+                    <mxGeometry x="300" y="350" width="150" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="modulo-whodrug-icon" value="⚡" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" parent="msp-area" vertex="1">
+                    <mxGeometry x="355" y="420" width="40" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="modulo-meddra-note" value="&lt;b&gt;Gestión MedDRA&lt;/b&gt;&lt;br&gt;• Carga de archivos&lt;br&gt;• Descarga manual&lt;br&gt;• Procesamiento" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFB74D;strokeColor=#E65100;fontSize=10;align=left;verticalAlign=top;" parent="msp-area" vertex="1">
+                    <mxGeometry x="470" y="290" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="db-integra" value="&lt;b&gt;db-integra-esavi&lt;/b&gt;&lt;br&gt;Base de Datos PostgreSQL&lt;br&gt;&lt;br&gt;• Datos sincronizados DHIS2&lt;br&gt;• Datos sincronizados VigiFlow&lt;br&gt;• Estándares MedDRA&lt;br&gt;• Estándares WHODrug" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#455A64;strokeColor=#263238;fontColor=#FFFFFF;fontSize=11;align=center;verticalAlign=top;" parent="msp-area" vertex="1">
+                    <mxGeometry x="200" y="580" width="270" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="dash-integra" value="&lt;b&gt;dash-integra-esavi&lt;/b&gt;&lt;br&gt;Dashboard de Visualización&lt;br&gt;(R Shiny)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#5E35B1;strokeColor=#311B92;fontColor=#FFFFFF;verticalAlign=top;fontSize=11;" parent="msp-area" vertex="1">
+                    <mxGeometry x="40" y="620" width="140" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="script-r" value="&lt;b&gt;preparacion_datos.R&lt;/b&gt;&lt;br&gt;Script de Procesamiento" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#7986CB;strokeColor=#283593;fontColor=#FFFFFF;fontSize=10;" parent="msp-area" vertex="1">
+                    <mxGeometry x="490" y="635" width="140" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="conn-app-db" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#FF9800;endArrow=classic;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=47.5;entryPerimeter=0;" parent="msp-area" source="modulo-meddra-note" target="db-integra" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="545" y="620"/>
+                            <mxPoint x="470" y="620"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="label-app-db" value="Persistencia&lt;br&gt;MedDRA" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#FFF3E0;strokeColor=#E65100;" parent="conn-app-db" vertex="1" connectable="0">
+                    <mxGeometry x="-0.3" y="-1" relative="1" as="geometry">
+                        <mxPoint x="27" y="45" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-dhis2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#4CAF50;endArrow=classic;endFill=1;" parent="1" source="dhis2" target="modulo-dhis2" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="170" y="260"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="label-dhis2" value="API REST&lt;br&gt;Cron Diario" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#E8F5E9;strokeColor=#2E7D32;" parent="conn-dhis2" vertex="1" connectable="0">
+                    <mxGeometry x="-0.15" y="1" relative="1" as="geometry">
+                        <mxPoint x="15" y="-1" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-vigiflow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#2196F3;endArrow=classic;endFill=1;dashed=1;dashPattern=8 8;" parent="1" source="vigiflow" target="modulo-vigiflow" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="410" y="320"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="label-vigiflow" value="Web Scraping&lt;br&gt;Puppeteer&lt;br&gt;Cron Diario" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#E3F2FD;strokeColor=#1565C0;" parent="conn-vigiflow" vertex="1" connectable="0">
+                    <mxGeometry x="0.05" y="1" relative="1" as="geometry">
+                        <mxPoint x="-344" y="-39" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-meddra" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#FF9800;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="meddra" target="app-integra" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label-meddra" value="Descarga Manual&lt;br&gt;Carga de Archivos" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#FFF3E0;strokeColor=#E65100;" parent="conn-meddra" vertex="1" connectable="0">
+                    <mxGeometry x="-0.05" y="-2" relative="1" as="geometry">
+                        <mxPoint x="2" y="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-whodrug" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#9C27B0;endArrow=classic;endFill=1;" parent="1" source="whodrug" target="modulo-whodrug" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label-whodrug" value="API WHODrug&lt;br&gt;Cron Diario" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#F3E5F5;strokeColor=#6A1B9A;" parent="conn-whodrug" vertex="1" connectable="0">
+                    <mxGeometry x="0.05" y="-1" relative="1" as="geometry">
+                        <mxPoint x="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-app-api" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#1976D2;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="app-integra" target="api-integra" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label-app-api" value="HTTP/REST" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;" parent="conn-app-api" vertex="1" connectable="0">
+                    <mxGeometry x="0.1" relative="1" as="geometry">
+                        <mxPoint x="-5" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-api-db" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;strokeColor=#00897B;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="api-integra" target="db-integra" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label-api-db" value="Persistencia de Datos&lt;br&gt;Sincronización" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#E0F2F1;strokeColor=#004D40;" parent="conn-api-db" vertex="1" connectable="0">
+                    <mxGeometry x="-0.15" relative="1" as="geometry">
+                        <mxPoint y="10" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-db-script" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#7986CB;endArrow=classic;endFill=1;" parent="1" source="db-integra" target="script-r" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label-db-script" value="Extracción&lt;br&gt;de Datos" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#E8EAF6;strokeColor=#283593;" parent="conn-db-script" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2" y="1" relative="1" as="geometry">
+                        <mxPoint x="58" y="-9" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="conn-script-dash" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2;strokeColor=#5E35B1;endArrow=classic;endFill=1;" parent="1" source="script-r" target="dash-integra" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1160" y="850"/>
+                            <mxPoint x="710" y="850"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="label-script-dash" value="Datos&lt;br&gt;Procesados" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=9;fontStyle=1;fillColor=#EDE7F6;strokeColor=#311B92;" parent="conn-script-dash" vertex="1" connectable="0">
+                    <mxGeometry x="0.15" relative="1" as="geometry">
+                        <mxPoint x="-70" y="-130" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="note-cron" value="&lt;b&gt;PROCESOS AUTOMATIZADOS&lt;/b&gt;&lt;br&gt;• DHIS2: Cron diario (extracción día anterior)&lt;br&gt;• VigiFlow: Cron diario (extracción día anterior)&lt;br&gt;• WHODrug: Cron diario (sincronización)&lt;br&gt;• Script R: Procesamiento bajo demanda" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFDE7;strokeColor=#F9A825;fontSize=10;align=left;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="600" width="520" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="note-tech" value="&lt;b style=&quot;color: rgb(63, 63, 63); background-color: transparent;&quot;&gt;TECNOLOGÍAS&lt;/b&gt;&lt;div&gt;• Frontend: Angular/React&lt;br&gt;• Backend: Node.js/Java&lt;br&gt;• Base de Datos: PostgreSQL&lt;br&gt;• Web Scraping: Puppeteer&lt;br&gt;• Visualización: R Shiny&lt;br&gt;• Procesamiento: R&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=10;align=left;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="730" width="520" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="note-standards" value="&lt;b&gt;ESTÁNDARES INTERNACIONALES&lt;/b&gt;&lt;br&gt;• MedDRA: Diccionario médico para actividades regulatorias&lt;br&gt;• WHODrug: Clasificación de medicamentos de la OMS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#C2185B;fontSize=10;align=left;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="840" width="520" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
