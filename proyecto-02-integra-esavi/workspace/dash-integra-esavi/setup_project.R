@@ -20,9 +20,9 @@ renv::init(bare = TRUE, force = TRUE, restart = FALSE)
 cat("Activando entorno...\n")
 renv::activate()
 
-# 4. Instalar dependencias usando el script existente
-cat("\n--- Ejecutando instalar_dependencias.R ---\n")
-source("instalar_dependencias.R")
+# 4. Restaurar dependencias desde renv.lock
+cat("\n--- Restaurando dependencias desde renv.lock ---\n")
+renv::restore(prompt = FALSE)
 
 # 5. Generar snapshot para crear renv.lock
 cat("\n--- Generando renv.lock ---\n")

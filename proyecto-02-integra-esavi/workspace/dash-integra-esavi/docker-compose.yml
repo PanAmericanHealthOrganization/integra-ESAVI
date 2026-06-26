@@ -1,54 +1,25 @@
 services:
 
-  # ── Base de datos PostgreSQL ─────────────────────────────────────────────────
-  postgres:
-    image: postgres:16-alpine
-    container_name: esavi-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB:       ${DB_NAME:-dhi_esavi}
-      POSTGRES_USER:     ${DB_USER:-dhis}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dhis} -d ${DB_NAME:-dhi_esavi}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
-    networks:
-      - esavi-internal
-
   # ── Dashboard Shiny ──────────────────────────────────────────────────────────
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile
+    image: dash-integra-esavi:latest
     container_name: esavi-dashboard
     restart: unless-stopped
     environment:
-      # Base de datos — apunta al servicio postgres del compose
-      DB_HOST:     postgres
-      DB_PORT:     5432
-      DB_NAME:     ${DB_NAME:-dhi_esavi}
-      DB_USER:     ${DB_USER:-dhis}
-      DB_PASS:     ${DB_PASS}
-      # Autenticación
-      DASHBOARD_AUTH_TOKENS: ${DASHBOARD_AUTH_TOKENS}
-      ALLOWED_DOMAINS:       ${ALLOWED_DOMAINS:-}
-      # Logs
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dhi_esavi}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
       LOG_ACCESS_ATTEMPTS: ${LOG_ACCESS_ATTEMPTS:-true}
       LOG_FILE_PATH:       /app/logs/access.log
     volumes:
-      # Datos procesados — persistidos fuera del contenedor
       - ./datos:/app/datos
       - ./fuente_de_datos:/app/fuente_de_datos
-      # Logs de acceso
       - ./logs:/app/logs
-    depends_on:
-      postgres:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:80/"]
       interval: 30s
@@ -57,27 +28,41 @@ services:
       start_period: 90s
     networks:
       - esavi-internal
-      - esavi-public
 
-  # ── Nginx: proxy inverso + terminación TLS ───────────────────────────────────
-  nginx:
-    image: nginx:1.27-alpine
-    container_name: esavi-nginx
+  # ── oauth2-proxy: autenticación Keycloak + control de rol ───────────────────
+  # Intercepta toda petición antes de llegar al dashboard.
+  # Sin sesión Keycloak válida → redirige al login.
+  # Sin rol "analitic" → 403.
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    container_name: esavi-oauth2-proxy
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./nginx/certs:/etc/nginx/certs:ro
+      - "8090:4180"
+    command:
+      - --provider=keycloak-oidc
+      - --client-id=${VITE_KEYCLOAK_CLIENT_ID}
+      - --client-secret=${KC_CLIENT_SECRET}
+      - --oidc-issuer-url=${VITE_KEYCLOAK_URL}/realms/${VITE_KEYCLOAK_REALM}
+      - --redirect-url=${APP_URL}/oauth2/callback
+      - --upstream=http://dashboard:80
+      - --http-address=0.0.0.0:4180
+      - --cookie-secret=${OAUTH2_COOKIE_SECRET}
+      - --cookie-secure=false
+      - --cookie-name=_esavi_session
+      - --email-domain=*
+      # Solo usuarios con rol de realm "analitic" tienen acceso
+      - --allowed-role=analitic
+      # Pasar identidad del usuario al dashboard como headers
+      - --set-xauthrequest=true
+      - --pass-user-headers=true
     depends_on:
       dashboard:
         condition: service_healthy
     networks:
-      - esavi-public
+      - esavi-internal
 
   # ── Actualización periódica de datos (perfil opcional) ──────────────────────
-  # Ejecuta preparar_datos.R + procesamiento_datos.R y termina.
   # Uso: docker compose --profile refresh run --rm data-refresh
   data-refresh:
     build:
@@ -86,11 +71,11 @@ services:
     container_name: esavi-data-refresh
     profiles: ["refresh"]
     environment:
-      DB_HOST:  postgres
-      DB_PORT:  5432
-      DB_NAME:  ${DB_NAME:-dhi_esavi}
-      DB_USER:  ${DB_USER:-dhis}
-      DB_PASS:  ${DB_PASS}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dhi_esavi}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
     volumes:
       - ./datos:/app/datos
       - ./fuente_de_datos:/app/fuente_de_datos
@@ -101,19 +86,12 @@ services:
         source('scripts/procesamiento_datos.R');
         cat('Actualización de datos completada.\n')
       "
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - esavi-internal
 
-# ── Volúmenes ──────────────────────────────────────────────────────────────────
-volumes:
-  pgdata:
-    driver: local
-
-# ── Redes ─────────────────────────────────────────────────────────────────────
+# ── Redes ──────────────────────────────────────────────────────────────────────
 networks:
-  esavi-internal:   # postgres ↔ dashboard (sin exposición exterior)
-    internal: true
-  esavi-public:     # dashboard ↔ nginx (con acceso exterior)
+  esavi-internal:
+    # No es internal: true porque oauth2-proxy necesita llegar a Keycloak en internet.
+    # El dashboard queda protegido porque no tiene ports: expuestos.
+    driver: bridge

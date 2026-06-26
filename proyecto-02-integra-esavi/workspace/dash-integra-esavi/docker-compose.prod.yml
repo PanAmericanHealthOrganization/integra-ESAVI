@@ -1,0 +1,19 @@
+services:
+  oauth2-proxy:
+    ports:
+      - "80:4180"      # el proxy inverso externo apunta a este puerto
+    command:
+      - --provider=keycloak-oidc
+      - --client-id=${VITE_KEYCLOAK_CLIENT_ID}
+      - --client-secret=${KC_CLIENT_SECRET}
+      - --oidc-issuer-url=${VITE_KEYCLOAK_URL}/realms/${VITE_KEYCLOAK_REALM}
+      - --redirect-url=${APP_URL}/oauth2/callback
+      - --upstream=http://dashboard:80
+      - --http-address=0.0.0.0:4180
+      - --cookie-secret=${OAUTH2_COOKIE_SECRET}
+      - --cookie-secure=true   # HTTPS lo maneja el proxy inverso externo
+      - --cookie-name=_esavi_session
+      - --email-domain=*
+      - --allowed-role=analitic
+      - --set-xauthrequest=true
+      - --pass-user-headers=true

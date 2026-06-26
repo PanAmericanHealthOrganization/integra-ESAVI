@@ -77,11 +77,6 @@ library(rstudioapi)
 library(shinyjs)
 library(tibble)
 library(htmlwidgets)
-library(digest) # Para generar hashes seguros en autenticación
-
-# 1.2.1 Cargar módulos de autenticación ----
-source("auth_config.R")  # Configuración de seguridad
-source("auth_ui.R")       # UI de autenticación
 
 # if (!requireNamespace("BiocManager", quietly = TRUE))
 #   install.packages("BiocManager")
