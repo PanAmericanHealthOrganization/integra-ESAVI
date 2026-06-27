@@ -1238,11 +1238,6 @@ export class SeedService implements OnApplicationBootstrap {
 
   // ── Seed TC_CATALOGO_PADRE: Género ──────────────────────────────────────────
   private async loadCatalogoPadreFromCSV() {
-    const primerRegistro = await this.catalogoPadreRepository.findOne({ where: { codigo: 'GENERO' } });
-    if (primerRegistro) {
-      console.log('ℹ️ TC_CATALOGO_PADRE (catalogo_padre.csv) ya cargado. Se omite.');
-      return;
-    }
     await this.runSyncProcess('Carga de TC_CATALOGO_PADRE desde CSV...', async () => {
       console.log('📂 Cargando TC_CATALOGO_PADRE desde catalogo_padre.csv...');
 

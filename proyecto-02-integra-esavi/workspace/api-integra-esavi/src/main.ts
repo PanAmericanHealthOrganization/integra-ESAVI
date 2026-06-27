@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import 'reflect-metadata'; //primera línea necesaria para el modo depuración.
 import { AppModule } from './app.module';
+import { HttpExceptionFilter } from './providers/http-exception.filter';
 
 import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
@@ -26,6 +27,7 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   const validationLogger = new Logger('ValidationPipe');
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,

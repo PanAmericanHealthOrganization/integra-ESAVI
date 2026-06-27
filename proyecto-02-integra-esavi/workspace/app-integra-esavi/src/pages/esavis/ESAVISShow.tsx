@@ -110,7 +110,7 @@ const TabNotificacion = () => {
                 <FieldRow label="Sistema Origen" value={record.origen} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <FieldRow label="Unidad Organizacional" value={record.organizacionUnitCode} />
+                <FieldRow label="Unidad Organizacional" value={record.establecimiento?.uniNombre ?? record.organizacionUnitCode} />
               </Grid>
             </Grid>
           </Grid>
@@ -232,7 +232,8 @@ const TabPaciente = () => {
     ])
       .then(([resEmb, resAnt]) => {
         setEmbarazada(resEmb.data ?? null)
-        setAntecedente(resAnt.data ?? null)
+        const antArr = Array.isArray(resAnt.data) ? resAnt.data : resAnt.data ? [resAnt.data] : []
+        setAntecedente(antArr[0] ?? null)
       })
       .catch(() => {
         setEmbarazada(null)
@@ -699,6 +700,16 @@ const TabAntecedentes = () => {
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Fecha probable de parto" value={formatDate(embarazo.fechaParto)} />
             </Grid>
+            {embarazo.descripcionAntecedente && (
+              <Grid item xs={12}>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+                  Descripción del antecedente
+                </Typography>
+                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
+                  {embarazo.descripcionAntecedente}
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         ) : (
           <Typography variant="body2" color="text.secondary">Sin antecedentes de embarazo registrados.</Typography>

@@ -229,6 +229,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteEmbarazoService,
     VacunometroService,
     NotificadorService,
+    EstablecimientosService,
   ],
 })
 export class IntegratorModule {}
