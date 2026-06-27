@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libharfbuzz-dev \
     libfribidi-dev \
     libabsl-dev \
+    libglpk-dev \
     cmake \
     curl \
     && rm -rf /var/lib/apt/lists/*
