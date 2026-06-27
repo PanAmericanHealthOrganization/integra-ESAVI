@@ -1,1 +1,1 @@
-source("renv/activate.R") # Desactivado por falta de directorio renv
+if (file.exists("renv/activate.R")) source("renv/activate.R")

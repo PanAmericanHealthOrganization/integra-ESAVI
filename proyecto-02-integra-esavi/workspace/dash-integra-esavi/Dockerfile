@@ -30,10 +30,9 @@ ENV RENV_CONFIG_PPM_URL=https://packagemanager.posit.co/cran/__linux__/jammy/lat
 # ── Paquetes R (capa cacheada — solo se repite si cambia renv.lock) ───────────
 COPY renv.lock   renv.lock
 COPY .Rprofile   .Rprofile
-COPY renv/activate.R renv/activate.R
 
 RUN sed -i 's|https://cloud.r-project.org|https://packagemanager.posit.co/cran/__linux__/jammy/latest|g' renv.lock && \
-    R -e " \
+    R --no-init-file -e " \
       install.packages('renv', repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest', quiet = TRUE); \
       renv::restore(prompt = FALSE) \
     "
