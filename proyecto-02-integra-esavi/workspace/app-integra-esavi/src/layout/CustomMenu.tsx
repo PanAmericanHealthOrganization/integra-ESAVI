@@ -1,5 +1,6 @@
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
+import DashboardIcon from "@mui/icons-material/Dashboard"
 import FlakyIcon from "@mui/icons-material/Flaky"
 import LocationCityIcon from "@mui/icons-material/LocationCity"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
@@ -10,6 +11,10 @@ import SettingsIcon from "@mui/icons-material/Settings"
 import SickIcon from "@mui/icons-material/Sick"
 import SyncIcon from "@mui/icons-material/Sync"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
+import ListItem from "@mui/material/ListItem"
+import ListItemButton from "@mui/material/ListItemButton"
+import ListItemIcon from "@mui/material/ListItemIcon"
+import ListItemText from "@mui/material/ListItemText"
 import { useState } from "react"
 import { Menu } from "react-admin"
 import Authorize from "../authorization.utils"
@@ -33,11 +38,17 @@ export const CustomMenu = () => {
           primaryText="Calidad de Datos"
           leftIcon={<FlakyIcon />}
         />
-        <Menu.Item
-          to="/esavis-dashboard"
-          primaryText="ESAVIS Dashboard"
-          leftIcon={<FlakyIcon />}
-        />
+        <ListItem disablePadding>
+          <ListItemButton
+            component="a"
+            href={import.meta.env.VITE_DASH_APP}
+sx={{ pl: "16px", minHeight: 48 }}>
+            <ListItemIcon sx={{ minWidth: 40 }}>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText primary="ESAVIS Dashboard" />
+          </ListItemButton>
+        </ListItem>
 
         {/* Configuraciones — solo rol "admin" */}
         <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>

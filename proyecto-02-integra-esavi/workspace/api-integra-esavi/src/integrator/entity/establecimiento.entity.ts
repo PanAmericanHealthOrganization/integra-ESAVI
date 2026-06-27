@@ -39,7 +39,7 @@ export class Establecimiento extends Auditoria implements IEstablecimiento {
     name: 'UNI_NOMBRE',
     comment: 'Nombre del establecimiento',
     type: 'varchar',
-    length: 100,
+    length: 255,
   })
   uniNombre: string;
 

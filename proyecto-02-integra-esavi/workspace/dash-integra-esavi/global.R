@@ -92,6 +92,15 @@ filter <- dplyr::filter
 
 # 1.3 Variables globales ----
 
+integra_app_url <- Sys.getenv("INTEGRA_APP_URL", unset = "http://localhost:8080")
+
+# ── Keycloak ────────────────────────────────────────────────────────────────────
+kc_url      <- Sys.getenv("VITE_KEYCLOAK_URL",      unset = "")
+kc_realm    <- Sys.getenv("VITE_KEYCLOAK_REALM",    unset = "")
+kc_client   <- Sys.getenv("VITE_KEYCLOAK_CLIENT_ID",unset = "")
+kc_role     <- Sys.getenv("KC_REQUIRED_ROLE",       unset = "analitic")
+kc_enabled  <- nzchar(kc_url) && nzchar(kc_realm) && nzchar(kc_client)
+
 f_unidad_tasa <- function(var_unidad_tasa) {
   # Usar switch o un vector nombrado para mapear valores
   tasas <- c(

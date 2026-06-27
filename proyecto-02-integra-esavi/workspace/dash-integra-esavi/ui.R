@@ -75,7 +75,18 @@ ui <- dashboardPage(
 
     leftUi = tagList(
       tags$head(
-        tags$script(src = "js/leaflet-easyPrint.js")
+        tags$script(src = "js/leaflet-easyPrint.js"),
+        if (kc_enabled) tagList(
+          # 1. Configuración de Keycloak (leída desde variables de entorno en R)
+          tags$script(HTML(sprintf(
+            'window.KEYCLOAK_CONFIG={url:"%s",realm:"%s",clientId:"%s",requiredRole:"%s"};',
+            kc_url, kc_realm, kc_client, kc_role
+          ))),
+          # 2. Adapter JS oficial de Keycloak (servido por el propio servidor Keycloak)
+          tags$script(src = paste0(kc_url, "/js/keycloak.js")),
+          # 3. Lógica de autenticación de la app
+          tags$script(src = "js/keycloak-auth.js")
+        )
       ),
       tags$a(
         class = "app_title",
@@ -91,7 +102,7 @@ ui <- dashboardPage(
     minified = TRUE,
     collapsed = TRUE,
     sidebarMenu(
-      menuItem("Ir a Integra App", icon = icon("external-link-alt", class = "menu-icon"), href = "http://localhost:8080", newtab = FALSE),
+      menuItem("Ir a Integra App", icon = icon("external-link-alt", class = "menu-icon"), href = integra_app_url, newtab = TRUE),
       br(),
       menuItem("Inicio", tabName = "home", icon = icon(vIcon_home, class = "menu-icon")),
       menuItem("Introducción", tabName = "intro", icon = icon(vIcon_intr, class = "menu-icon")),

@@ -1,0 +1,18 @@
+# Modo desarrollo con hot-reload.
+# Uso: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# - El código R se monta como volumen: los cambios aplican sin rebuild.
+# - shiny.autoreload detecta cambios en ui.R / server.R y recarga la app (~1s).
+# - global.R también se recarga, pero es lento porque vuelve a leer los RDS.
+services:
+  dashboard:
+    environment:
+      SHINY_AUTORELOAD: "true"
+    volumes:
+      - ./global.R:/app/global.R
+      - ./ui.R:/app/ui.R
+      - ./server.R:/app/server.R
+      - ./run.R:/app/run.R
+      - ./preparar_datos.R:/app/preparar_datos.R
+      - ./scripts:/app/scripts
+      - ./www:/app/www

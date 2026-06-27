@@ -22,10 +22,20 @@
 # -------------------------------------------------------------------------------------------------------------- -
 
   server <- function(input, output, session) {
-    
-    
-  # Observadores iniciales ---------------------------------------------------------------------------------------
-    
+
+  # Autenticación Keycloak ─────────────────────────────────────────────────────
+  # kc_enabled se define en global.R; si es FALSE la app corre sin auth.
+
+  observeEvent(input$kc_authenticated, {
+    if (isTRUE(input$kc_authenticated) && kc_enabled) {
+      user <- input$kc_name %||% input$kc_user %||% "usuario"
+      message(sprintf("[AUTH] Sesión iniciada: %s", user))
+    }
+  }, ignoreNULL = TRUE, once = TRUE)
+
+
+  # Observadores iniciales ─────────────────────────────────────────────────────
+
     datos_mapa <- reactiveVal(NULL)
       
     # observe({

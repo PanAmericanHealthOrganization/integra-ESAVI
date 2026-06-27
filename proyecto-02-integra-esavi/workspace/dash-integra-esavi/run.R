@@ -46,9 +46,10 @@ library(shiny)
 
 # Configurar y ejecutar aplicación
 options(
-    shiny.host = "0.0.0.0",
-    shiny.port = 80,
-    shiny.launch.browser = TRUE
+    shiny.host          = "0.0.0.0",
+    shiny.port          = 80,
+    shiny.launch.browser = FALSE,
+    shiny.autoreload    = identical(Sys.getenv("SHINY_AUTORELOAD"), "true")
 )
 
 cat("Ejecutando aplicación en http://localhost:3838\n")
