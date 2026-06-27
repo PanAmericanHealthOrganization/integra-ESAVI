@@ -176,11 +176,11 @@ ui <- dashboardPage(
           br(),
           h2("Objetivo"),
           br(),
-          h4("Presentar los resultados del análisis exploratorio y el proceso de detección de señales de los datos suministrados por el país a través de la plataforma XXXXXX, para el monitoreo de ESAVI en las regiones del país, desde la introducción de las vacunas contra la COVID-19."),
+          h4("Presentar los resultados del análisis exploratorio y el proceso de detección de señales de los datos suministrados por el país a través de la plataforma Integra-ESAVI, para el monitoreo de ESAVI en las regiones del país, desde la introducción de las vacunas contra la COVID-19."),
           br(),
           h2("Información"),
           br(),
-          h4("La información presentada en esta aplicación es el resultado del procesamiento y análisis avanzado de datos, realizado por el equipo de Vacunación Segura de la OPS, a partir de los casos de ESAVI anonimizados proporcionados por XXXXXXXXX de Ecuador."),
+          h4("La información presentada en esta aplicación es el resultado del procesamiento y análisis avanzado de datos, realizado por el equipo de Vacunación Segura de la OPS, a partir de los casos de ESAVI anonimizados proporcionados por el Ministerio de Salud Pública (MSP) de Ecuador."),
           br(),
           h2("Antecedentes"),
           br(),
@@ -206,7 +206,7 @@ ui <- dashboardPage(
           br(),
           h2("Acuerdos"),
           br(),
-          h4(HTML("Gracias a un <strong>convenio de interoperabilidad</strong> establecido con la <strong>Organización Panamericana de la Salud (OPS)</strong>, es posible acceder a la información sobre los casos de <strong>ESAVI</strong> reportados en la plataforma <strong>XXXXXX</strong>, especialmente aquellos relacionados con la <strong>vacunación contra la COVID-19 a partir del 1 de enero de 2021</strong>.
+          h4(HTML("Gracias a un <strong>convenio de interoperabilidad</strong> establecido con la <strong>Organización Panamericana de la Salud (OPS)</strong>, es posible acceder a la información sobre los casos de <strong>ESAVI</strong> reportados en la plataforma <strong>Integra-ESAVI</strong>, especialmente aquellos relacionados con la <strong>vacunación contra la COVID-19 a partir del 1 de enero de 2021</strong>.
                                 <br><br>
                                 Esta fuente proporciona <strong>datos individuales anonimizados</strong>, que incluyen información detallada sobre las <strong>características del caso</strong>, la <strong>persona vacunada</strong>, la <strong>vacuna administrada</strong>, el <strong>evento adverso reportado</strong>, así como los <strong>diagnósticos y hallazgos del proceso de investigación</strong> asociado al ESAVI.")),
         )
@@ -307,7 +307,7 @@ ui <- dashboardPage(
           h2("Metodología"),
           br(),
           h4(HTML(
-            "El presente tablero integra datos anonimizados de Eventos Supuestamente Atribuibles a la Vacunación o Inmunización (ESAVI) reportados en Ecuador, provenientes de la plataforma XXXXXXX. La información comprende notificaciones realizadas desde el inicio de la campaña de vacunación contra COVID-19, incluyendo datos demográficos, clínicos, características de la vacunación y clasificación de los eventos.
+            "El presente tablero integra datos anonimizados de Eventos Supuestamente Atribuibles a la Vacunación o Inmunización (ESAVI) reportados en Ecuador, provenientes de la plataforma Integra-ESAVI. La información comprende notificaciones realizadas desde el inicio de la campaña de vacunación contra COVID-19, incluyendo datos demográficos, clínicos, características de la vacunación y clasificación de los eventos.
                       <br><br><br>
                       Los datos fueron sometidos a un proceso de normalización, limpieza y estructuración para garantizar la consistencia en el análisis. Se realizó una validación de fechas, eliminación de duplicados e implementación de un sistema de categorización uniforme para variables clave como grupo etario, gravedad de los eventos y clasificación de los términos médicos según el estándar MedDRA (Medical Dictionary for Regulatory Activities)."
           )),

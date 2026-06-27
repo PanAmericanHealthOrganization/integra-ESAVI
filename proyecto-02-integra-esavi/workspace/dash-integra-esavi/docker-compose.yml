@@ -20,6 +20,8 @@ services:
       - ./datos:/app/datos
       - ./fuente_de_datos:/app/fuente_de_datos
       - ./logs:/app/logs
+    ports:
+      - "3838:80"    # perfil local: acceso directo sin oauth2-proxy
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:80/"]
       interval: 30s

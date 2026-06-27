@@ -1,4 +1,7 @@
 services:
+  dashboard:
+    build:
+      platform: linux/amd64   # servidor de producción es amd64
   oauth2-proxy:
     ports:
       - "80:4180"      # el proxy inverso externo apunta a este puerto
