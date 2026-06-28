@@ -6,3 +6,7 @@ dist
 coverage
 upload_files
 data
+docs
+test
+README.md
+pnpm-workspace.yaml

@@ -30,17 +30,6 @@ services:
       - ./scripts/init-db.sh:/init-db.sh
     entrypoint: ["/bin/bash", "/init-db.sh"]
 
-  app-web:
-    build:
-      context: ../proyecto-02-integra-esavi/workspace/app-integra-esavi
-      dockerfile: Dockerfile
-    container_name: app_integra_esavi
-    ports:
-      - "3000:80"
-    restart: unless-stopped
-    depends_on:
-      - keycloak
-
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
     container_name: keycloak_server
@@ -59,9 +48,65 @@ services:
       - "8080:8080"
     volumes:
       - ./scripts/keycloak-realm.json:/opt/keycloak/data/import/realm-export.json
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && grep -q 'UP' <&3"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     depends_on:
       db-init:
         condition: service_completed_successfully
+
+  api:
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/api-integra-esavi
+      dockerfile: Dockerfile
+    container_name: api_integra_esavi
+    restart: unless-stopped
+    environment:
+      HOST_DATABASE: postgres
+      PORT_DATABASE: "5432"
+      NAME_DATABASE: DHI_ESAVI
+      USER_DATABASE: dhis
+      PASS_DATABASE: dhis
+      SCHEMA_DATABASE: DHI_ESAVI
+      MDD_DB_HOST: postgres
+      MDD_DB_PORT: "5432"
+      MDD_DB_NAME: DHI_ESAVI
+      MDD_DB_USER: dhis
+      MDD_DB_PASS: dhis
+      WHD_DB_HOST: postgres
+      WHD_DB_PORT: "5432"
+      WHD_DB_NAME: DHI_ESAVI
+      WHD_DB_USER: dhis
+      WHD_DB_PASS: dhis
+      TZ: America/Guayaquil
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+  app-web:
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/app-integra-esavi
+      dockerfile: Dockerfile
+    container_name: app_integra_esavi
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      api:
+        condition: service_healthy
 
 volumes:
   postgres_data:

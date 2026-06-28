@@ -1,36 +1,40 @@
-# Stage 1: Build the application
-FROM bitnami/node:18 AS build
+# Stage 1: Build
+FROM node:22-bullseye AS build
 LABEL authors="zepolar"
 
 WORKDIR /app
 
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 
-# Copy package.json and package-lock.json (if using npm)
-COPY package*.json ./
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
-# Install dependencies
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
 
-# Copy the rest of the application code
+RUN pnpm install --frozen-lockfile --ignore-workspace
+
 COPY . .
 
-# Build the application
-RUN npm run build
+RUN pnpm run build
 
-# Stage 2: Create a lightweight runtime image
-FROM bitnami/node:18
+# Stage 2: Runtime
+FROM node:22-bullseye-slim
 LABEL authors="zepolar"
-RUN addgroup zepolar && useradd -s /bin/bash -d /home/zepolar -m -g zepolar zepolar
+
+RUN groupadd zepolar && useradd -s /bin/bash -d /home/zepolar -m -g zepolar zepolar
 
 RUN apt-get update && apt-get install -y \
       chromium \
       wget \
-      r-base  \
-      r-base-dev \
       && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
 ENV HOST_DATABASE="db" \
     PORT_DATABASE="5432" \
@@ -38,28 +42,20 @@ ENV HOST_DATABASE="db" \
     PASS_DATABASE="" \
     NAME_DATABASE="" \
     SCHEMA_DATABASE="" \
-    TZ="Europe/Rome" \
-    LANG="en_US.UTF-8" \
-    LANGUAGE="en_US:en" \
-    NODE_ENV=des
+    TZ="America/Guayaquil" \
+    NODE_ENV=des \
+    PUPPETEER_SKIP_DOWNLOAD=true \
+    PATH_BROWSER_PUPPETEER="/usr/bin/chromium"
 
-# Copy only the necessary files from the build stage
-COPY .$NODE_ENV.env .env
-COPY --from=build --chown=zepolar:zepolar  /app/package*.json ./
+# Para producción, inyectar variables con env_file o variables de entorno en docker-compose
+COPY --chown=zepolar:zepolar .env .env
+
+COPY --from=build --chown=zepolar:zepolar /app/package.json /app/pnpm-lock.yaml ./
 COPY --from=build --chown=zepolar:zepolar /app/dist ./dist
 COPY --from=build --chown=zepolar:zepolar /app/node_modules ./node_modules
-COPY --chown=zepolar:zepolar ./quarto.sh ./
-COPY --chown=zepolar:zepolar ./example.qmd ./
-
-RUN chmod +x /app/quarto.sh && sh ./quarto.sh
 
 USER zepolar
 
-# Install production dependencies
-#RUN npm ci --only=production
-
-# Expose the application port (if necessary)
 EXPOSE 3000
 
-# Start the application
 CMD ["node", "./dist/main"]

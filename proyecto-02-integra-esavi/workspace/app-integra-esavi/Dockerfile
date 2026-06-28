@@ -1,17 +1,25 @@
+# ── Stage 1: Build ────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+
+RUN corepack enable && corepack prepare pnpm@9.12.1 --activate
 
 WORKDIR /app
+
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+
+ARG VITE_KEYCLOAK_URL
+ARG VITE_KEYCLOAK_REALM
+ARG VITE_KEYCLOAK_CLIENT_ID
+ARG VITE_INTEGRA_ESAVI_API_URL
+ARG VITE_API_KEY
+ARG VITE_ESAVI_GRAVE
+ARG VITE_ESAVI_DASHBOARD_TOKEN
+
 RUN pnpm build
 
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 5173
+
+CMD ["pnpm", "preview", "--host", "0.0.0.0", "--port", "5173"]
