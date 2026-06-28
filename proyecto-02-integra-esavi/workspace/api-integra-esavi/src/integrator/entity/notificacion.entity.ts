@@ -44,6 +44,9 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'PESO',
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
     nullable: true,
     comment: 'Peso del paciente en kilogramos',
   })
@@ -54,6 +57,9 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'ALTURA',
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
     nullable: true,
     comment: 'Altura del paciente en centímetros',
   })

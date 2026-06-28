@@ -345,6 +345,7 @@ export class VigiflowIntegradorService {
       const fechaNotificacion = this.analizarCadenaFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
         notificacion.fechaNotificacion = fechaNotificacion;
+        notificacion.fechaLlenadoFicha = fechaNotificacion;
       }//esta fecha se actualiza luego al extraer el otro Excel que contiene la hoja "Reportes".
       const fechaReporte = this.analizarCadenaFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
       if (fechaReporte) {
@@ -491,8 +492,10 @@ export class VigiflowIntegradorService {
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
           updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones);
           updateNotificacion.tipoReporte = reg['N'];
-          updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
-          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
+          const fechaRecepcionInicial = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
+          updateNotificacion.fechaNotificacion = fechaRecepcionInicial;
+          updateNotificacion.fechaReporteNacional = fechaRecepcionInicial;
+          updateNotificacion.fechaAtencion = fechaRecepcionInicial;
           updateNotificacion.tipoEmisor = reg['F'] ? reg['F'].toString().trim() : null;
           updateNotificacion.peso = reg['AA'] ? parseFloat(reg['AA'].toString()) : null;
           updateNotificacion.altura = reg['AB'] ? parseFloat(reg['AB'].toString()) : null;

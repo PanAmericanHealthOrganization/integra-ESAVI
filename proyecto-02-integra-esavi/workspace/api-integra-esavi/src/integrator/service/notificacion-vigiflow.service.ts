@@ -223,6 +223,7 @@ export class NotificacionVigiflowService {
       notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', updateNotificacion.tipoEmisor);
       if (updateNotificacion.peso != null) notificacion.peso = updateNotificacion.peso;
       if (updateNotificacion.altura != null) notificacion.altura = updateNotificacion.altura;
+      if (updateNotificacion.fechaAtencion != null) notificacion.fechaAtencion = updateNotificacion.fechaAtencion;
 
       if (notificador) {
         notificacion.notificador = notificador;
