@@ -42,6 +42,29 @@
         "post.logout.redirect.uris": "+",
         "pkce.code.challenge.method": "S256"
       }
+    },
+    {
+      "clientId": "dash-integra-esavi-client",
+      "name": "Integra ESAVI Dashboard",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "CAMBIAR_POR_SECRET_REAL",
+      "redirectUris": [
+        "https://localhost/oauth2/callback",
+        "https://dashboard.dominio.org/oauth2/callback"
+      ],
+      "webOrigins": [
+        "https://localhost",
+        "https://dashboard.dominio.org"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "https://dashboard.dominio.org"
+      }
     }
   ],
   "users": [

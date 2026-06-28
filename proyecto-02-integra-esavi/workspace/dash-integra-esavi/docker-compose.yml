@@ -1,0 +1,69 @@
+services:
+
+  # ── Dashboard Shiny ──────────────────────────────────────────────────────────
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: dash-integra-esavi:latest
+    container_name: esavi-dashboard
+    restart: unless-stopped
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dhi_esavi}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      LOG_ACCESS_ATTEMPTS:       ${LOG_ACCESS_ATTEMPTS:-true}
+      LOG_FILE_PATH:             /app/logs/access.log
+      INTEGRA_APP_URL:           ${INTEGRA_APP_URL:-http://localhost:8080}
+      VITE_KEYCLOAK_URL:         ${VITE_KEYCLOAK_URL:-}
+      VITE_KEYCLOAK_REALM:       ${VITE_KEYCLOAK_REALM:-}
+      VITE_KEYCLOAK_CLIENT_ID:   ${VITE_KEYCLOAK_CLIENT_ID:-}
+      KC_REQUIRED_ROLE:          ${KC_REQUIRED_ROLE:-analitic}
+    ports:
+      - "3838:80"
+    volumes:
+      - ./datos:/app/datos
+      - ./fuente_de_datos:/app/fuente_de_datos
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - esavi-internal
+
+  # ── Actualización periódica de datos (perfil opcional) ──────────────────────
+  # Uso: docker compose --profile refresh run --rm data-refresh
+  data-refresh:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: esavi-data-refresh
+    profiles: ["refresh"]
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-dhi_esavi}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    volumes:
+      - ./datos:/app/datos
+      - ./fuente_de_datos:/app/fuente_de_datos
+      - ./logs:/app/logs
+    command: >
+      Rscript -e "
+        source('preparar_datos.R');
+        source('scripts/procesamiento_datos.R');
+        cat('Actualización de datos completada.\n')
+      "
+    networks:
+      - esavi-internal
+
+# ── Redes ──────────────────────────────────────────────────────────────────────
+networks:
+  esavi-internal:
+    driver: bridge

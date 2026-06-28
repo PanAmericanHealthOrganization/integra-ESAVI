@@ -1,0 +1,301 @@
+.menu {
+  margin-left: 10px;
+  margin-right: 0px;
+  margin-top: 20px;
+  width: 100%;
+}
+
+/* Titulo de la App */
+.app_title {
+  font-size: 30px !important; /* Ajusta el tamaño del texto*/
+  color: #ffffff !important; /* Color del texto */
+  text-align: left !important; /* Alinear al centro */
+  align-items: center !important; /* Alinear verticalmente */
+  margin: 0 !important; /* Eliminar márgenes por defecto */
+  display: flex !important; /* Asegura que ocupe el espacio de forma flexible */
+  justify-content: flex-start !important; /* Para alinear el contenido a la izquierda */
+  margin-right: 5px;
+}
+
+.navbar-brand {
+  font-size: 1px !important; /* Ajusta el tamaño del texto*/
+  color: #ffffff !important; /* Color del texto */
+  text-align: left !important; /* Alinear a la izquierda */
+  margin: 0 !important; /* Eliminar márgenes por defecto */
+  padding: 0 !important;
+  line-height: 1 !important; /* Ajustar la altura de las líneas */
+  display: flex !important; /* Asegura que ocupe el espacio de forma flexible */
+  /*justify-content: flex-start !important; /* Para alinear el contenido a la izquierda */
+  align-items: center !important; /* Alinear verticalmente */
+}
+
+/* Ajustar margen y padding del encabezado */
+.dashboard-header {
+  padding-left: 0 !important; /* Eliminar padding izquierdo */
+  margin-left: 0 !important; /* Eliminar margen izquierdo */
+}
+
+/* Ajustar el margen del contenido del header */
+.dynamic-header {
+  margin-left: 0; /* Asegúrate de que no haya margen izquierdo */
+  padding-left: 0; /* Asegúrate de que no haya padding izquierdo */
+  padding: 0px;
+}
+
+.home-section {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #c8d7da; /* Color de fondo que coincide con la imagen */
+  background-blend-mode: multiply; /* Mezcla la imagen con el color de fondo */
+  width: auto;
+  height: calc(85vh - 5px);
+  margin-bottom: 5px;
+  /*position: relative;*/
+  color:black; /* El texto será blanco por encima de la imagen */
+  padding: 50px !important;
+  /*align-items: center !important; /* Alinear verticalmente */
+  text-align: justify !important; /* Alinear al centro */
+}
+
+.home-text-title {
+  position: relative;
+  color: black;  /* El texto será blanco por encima de la imagen */
+  padding: 20px !important;
+  margin-left: 10px !important;
+  align-items: center !important; /* Alinear verticalmente */
+  text-align: center !important; /* Alinear al centro */
+}
+
+.home-text-title h4 {
+  background-color: rgba(
+    200,
+    215,
+    218,
+    0.5
+  ); /* Fondo negro semitransparente detrás del texto */
+  padding: 50px;
+  border-radius: 10px;
+  width: 65% !important;
+  text-align: justify !important; /* Alinear al centro */
+}
+
+.intro-section {
+  height: auto;
+  width: auto;
+  color: white;
+  text-align: justify !important;
+}
+
+.text-title {
+  position: relative;
+  /*color: white;  /* El texto será blanco por encima de la imagen */
+  padding: 10px !important;
+  margin-left: 60px !important;
+  align-items: center !important; /* Alinear verticalmente */
+  text-align: center !important; /* Alinear al centro */
+}
+
+.text-title h4 {
+  background-color: rgba(
+    200,
+    215,
+    218,
+    0.5
+  ); /* Fondo negro semitransparente detrás del texto */
+  padding: 50px;
+  border-radius: 10px;
+  width: 95% !important;
+  text-align: justify !important; /* Alinear al centro */
+}
+
+.general-section {
+  padding-top: 0px !important;
+  font-size: 20px !important;
+  /*align-items: center !important; /* Alinear verticalmente */
+  text-align: justify !important; /* Alinear al centro */
+}
+
+.content-gen {
+  position: relative;
+  color: black; /* El texto será blanco por encima de la imagen */
+  padding-top: 0px !important;
+  /*margin-left: 20px !important;*/
+  align-items: center !important; /* Alinear verticalmente */
+  text-align: justify !important; /* Alinear al centro */
+}
+
+.text-general {
+  position: relative;
+  /*color: white;  /* El texto será blanco por encima de la imagen */
+  margin: 0 auto;
+  padding: 100px !important;
+  font-size: 19px !important; /* Ajusta el tamaño del texto*/
+  align-items: center !important; /* Alinear verticalmente */
+  text-align: left; /* Mantener el texto alineado a la izquierda */
+  width: 70%; /* Ajusta el ancho para controlar cuánto ocupa el bloque */
+}
+
+.filtros-gen {
+  align-items: center;
+  margin-bottom: 0px;
+  width: 50%;
+}
+
+.filtro-select {
+  width: 160px !important;
+}
+
+.filtro-button {
+  margin-left: 5px !important;
+  width: 40px !important;
+}
+
+.custom-icon {
+  font-size: 20px !important;
+  color: #ffffff; /* Cambia este color al deseado */
+}
+
+.menu-icon {
+  font-size: 15px !important;
+  margin-right: 10px !important;
+}
+
+.kpi-header {
+  height: auto;
+}
+
+.kpi-icon {
+  font-size: 16px !important;
+  align-items: center !important;
+  margin-right: 10px !important;
+}
+
+.kpi-icon2 {
+  font-size: 20px !important;
+  align-items: center !important;
+  margin-right: 10px !important;
+}
+
+.kpi-tittle {
+  font-size: 17px !important;
+  align-items: center !important;
+  padding: 3px !important;
+}
+
+.kpi-tittle-r {
+  text-align: right !important;
+  font-size: 17px !important;
+  align-items: center !important;
+  padding: 3px !important;
+}
+
+.kpi-text {
+  text-align: center !important;
+  font-size: 28px !important;
+}
+
+.kpi-text2 h5 {
+  text-align: center !important;
+  font-size: 4px !important;
+  margin-left: 5px !important;
+}
+
+.kpi-text h4 {
+  /*text-align: center !important;*/
+  font-size: 6px !important;
+  margin-left: 25px !important;
+}
+
+.period-tittle {
+  font-size: 17px !important;
+  text-align: right !important;
+  align-items: center !important;
+  padding: 3px !important;
+  font-weight: bold !important;
+}
+
+.table-tittle {
+  font-size: 20px !important;
+  text-align: center !important;
+  align-items: center !important;
+  padding: 2px !important;
+  /*font-weight: bold !important;
+    color: #0073B7 !important;*/
+  color: #2ca02c !important;
+}
+
+.custom-border {
+  border: 0px solid #ffffff;
+  color: black !important;
+}
+
+.transparent-box {
+  background: transparent !important;
+  color: black !important;
+}
+
+.transparent-box .box-header {
+  background: transparent !important;
+  color: black !important;
+}
+
+.graphs-tittle {
+  font-size: 17px !important;
+  color: #808080 !important;
+  text-align: center !important;
+  align-items: center !important;
+  padding: 3px !important;
+}
+
+.linea-divisoria_top {
+  border-top: 0.1px solid transparent !important;
+  margin: 8px 0;
+}
+
+.linea-divisoria {
+  border-top: 0.5px solid #e0e0e0 !important;
+  margin: 8px 0;
+}
+
+/* Estilo para hacer el controlbar sticky */
+.control-sidebar {
+  position: fixed !important;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1031;
+}
+
+/* Ajustar el contenido principal */
+.control-sidebar-open .content-wrapper {
+  margin-right: 230px;
+}
+
+/* Estilo para hacer el sidebar sticky */
+.main-sidebar {
+  position: fixed !important;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 1030; /* Un poco menor que el controlbar para manejar las capas correctamente */
+}
+
+/* Ajustar el contenido principal para evitar que se esconda debajo del sidebar */
+.content-wrapper {
+  margin-left: 230px; /* Ajusta según el ancho de tu sidebar */
+}
+
+/* Solo aplicar cuando la pantalla es lo suficientemente ancha (evita problemas en móviles) */
+@media (max-width: 767px) {
+  .content-wrapper {
+    margin-left: 0;
+  }
+}
+
+/* Asegurar que el sidebar se mantiene correcto cuando está colapsado */
+.sidebar-collapse .main-sidebar {
+  width: 50px;
+}
+
+.sidebar-collapse .content-wrapper {
+  margin-left: 50px;
+}
