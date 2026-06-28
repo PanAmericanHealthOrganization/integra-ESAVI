@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, TextField } from '@mui/material';
+import { useRefresh } from 'react-admin';
 import { integradorDataProvider } from '../../dataProviders/integrador.dataprovider';
 
 interface BulkDialogProps {
@@ -8,6 +9,7 @@ interface BulkDialogProps {
 }
 
 const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
+    const refresh = useRefresh();
     const [loading, setLoading] = useState(false);
     const [response, setResponse] = useState<string | null>(null);
     const [selectedOption, setSelectedOption] = useState<string | null>(null); // Usamos un solo estado para controlar el checkbox seleccionado
@@ -37,11 +39,11 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
         const endDateFormatted = endDate.replace(/-/g, ''); // Convierte la fecha 'YYYY-MM-DD' a 'YYYYMMDD'
 
         if (selectedOption === 'vigiflow') {
-            // Llamada al servicio de Vigiflow con las fechas formateadas
             respuesta = await integradorDataProvider.importDataVigiflow(startDateFormatted, endDateFormatted);
             console.log('respuesta:: ', respuesta);
             if (respuesta.status === 'OK') {
                 setResponse(`${respuesta.msg}`);
+                refresh();
             } else {
                 setResponse(`Error: ${respuesta.msg}`);
             }
@@ -52,18 +54,18 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
             console.log('respuesta:: ', respuesta);
             if (respuesta.status === 'OK') {
                 setResponse(`${respuesta.msg}`);
+                refresh();
             } else {
                 setResponse(`Error: ${respuesta.msg}`);
             }
         }
 
         if (selectedOption === 'dhis2') {
-            // Llamada al servicio de DHIS2 con las fechas formateadas
             respuesta = await integradorDataProvider.importDataDHIS2(startDateFormatted, endDateFormatted);
             console.log('respuesta:: ', respuesta);
             if (respuesta.status === 'OK') {
                 setResponse(`${respuesta.msg}`);
-                console.log("IMPORTADO CORRECTAMENTE");
+                refresh();
             } else {
                 setResponse(`Error: ${respuesta.status}`);
             }

@@ -50,9 +50,11 @@ export class NotificacionService {
   }
 
   async findOne(uuid: string, relation?: string): Promise<Notificacion> {
-    let relations: string[] = [];
+    const relations: string[] = ['establecimiento', 'tipoReporte', 'tipoEmisor'];
     if (relation) {
-      relations = relation.split(',');
+      for (const r of relation.split(',')) {
+        if (!relations.includes(r)) relations.push(r);
+      }
     }
     const notificacion = await this.notificacionRepository.findOne({
       where: { id: uuid },
@@ -73,11 +75,11 @@ export class NotificacionService {
   }
 
   async findAntecedenteEmbarazoByNotificacionUUID(uuidNotificacion: string) {
-    return this.antecedenteMedicoService.findAntecedenteMedicoByNotificacionUUID(uuidNotificacion);
+    return this.antecedenteEmbarazoService.findAntecedenteEmbarazoByNotificacionUUID(uuidNotificacion);
   }
 
   async findAntecedenteMedicoByNotificacionUUID(uuidNotificacion: string) {
-    return this.antecedenteEmbarazoService.findAntecedenteEmbarazoByNotificacionUUID(
+    return this.antecedenteMedicoService.findAntecedenteMedicoByNotificacionUUID(
       uuidNotificacion,
     );
   }
@@ -116,10 +118,9 @@ export class NotificacionService {
           } else if (key === 'fechaHasta') {
             query.andWhere('notificacion.fechaNotificacion <= :fechaHasta', { fechaHasta: value });
           } else if (key === 'identificacion') {
-            query.leftJoin('notificacion.paciente', 'paciente')
-                 .andWhere('UPPER(paciente.identificacion) LIKE UPPER(:identificacion)', {
-                   identificacion: `%${value}%`,
-                 });
+            query.andWhere('UPPER(paciente.identificacion) LIKE UPPER(:identificacion)', {
+              identificacion: `%${value}%`,
+            });
           } else if (key === 'codigoOrigenNotificacion') {
             query.andWhere('UPPER(notificacion.codigoOrigenNotificacion) LIKE UPPER(:codigoOrigenNotificacion)', {
               codigoOrigenNotificacion: `%${value}%`,

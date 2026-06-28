@@ -33,9 +33,15 @@ export class AntecedenteEmbarazo extends Antecedente {
     comment: 'Edad gestacional de la paciente en semanas',
   })
   edadGestacional: number;
-  /**
-   *
-   */
+
+  @Column({
+    name: 'DESCRIPCION_ANTECEDENTE',
+    type: 'text',
+    nullable: true,
+    comment: 'Descripción del antecedente de embarazo (caso narrativo del reporte)',
+  })
+  descripcionAntecedente: string;
+
   @BeforeInsert()
   beforeInsert() {
     this.createdAt = new Date();

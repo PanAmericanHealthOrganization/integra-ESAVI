@@ -93,4 +93,51 @@ export class CatalogoPadreService {
   findByCodigo(codigo: string): Promise<CatalogoPadre> {
     return this.catalogoPadreRepository.findOne({ where: { codigo } });
   }
+
+  async buscarSubcategoriaPorSimilitud(codigoPadre: string, nombre: string): Promise<CatalogoPadre | null> {
+    if (!nombre?.trim()) return null;
+    const subcategorias = await this.catalogoPadreRepository.find({
+      where: { padre: { codigo: codigoPadre }, isEnabled: true },
+      relations: ['padre'],
+    });
+    const nombreNorm = this.normalizar(nombre.trim());
+    let mejorMatch: CatalogoPadre | null = null;
+    let mejorSimilitud = 0;
+    for (const sub of subcategorias) {
+      const sim = this.calcularSimilitud(nombreNorm, this.normalizar(sub.nombre));
+      if (sim > mejorSimilitud) {
+        mejorSimilitud = sim;
+        mejorMatch = sub;
+      }
+    }
+    if (mejorMatch && mejorSimilitud >= 0.9) {
+      this.logger.log(`"${nombre}" → "${mejorMatch.nombre}" en ${codigoPadre} (${(mejorSimilitud * 100).toFixed(1)}%)`);
+      return mejorMatch;
+    }
+    this.logger.warn(`"${nombre}" sin coincidencia ≥90% en ${codigoPadre} (mejor: ${(mejorSimilitud * 100).toFixed(1)}%)`);
+    return null;
+  }
+
+  private normalizar(texto: string): string {
+    return texto.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  private calcularSimilitud(a: string, b: string): number {
+    if (a === b) return 1;
+    const la = a.length;
+    const lb = b.length;
+    if (la === 0 || lb === 0) return 0;
+    const matrix: number[][] = Array.from({ length: lb + 1 }, (_, i) =>
+      Array.from({ length: la + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= lb; i++) {
+      for (let j = 1; j <= la; j++) {
+        matrix[i][j] =
+          b[i - 1] === a[j - 1]
+            ? matrix[i - 1][j - 1]
+            : Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+      }
+    }
+    return (Math.max(la, lb) - matrix[lb][la]) / Math.max(la, lb);
+  }
 }

@@ -5,6 +5,7 @@ export class CreateAntecedenteEmbarazoDto {
   fechaUltimaMenstruacion: Date;
   fechaParto: Date;
   edadGestacional: number;
+  descripcionAntecedente: string;
 }
 
 export class UpdateAntecedenteEmbarazoDto extends PartialType(CreateAntecedenteEmbarazoDto) {}

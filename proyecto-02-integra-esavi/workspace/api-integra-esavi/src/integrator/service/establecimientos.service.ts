@@ -86,6 +86,13 @@ export class EstablecimientosService {
     });
   }
 
+  findAllLight(): Promise<Pick<Establecimiento, 'id' | 'uniNombre'>[]> {
+    return this.establecimientoRepository.find({
+      where: { isEnabled: true },
+      select: ['id', 'uniNombre'],
+    });
+  }
+
   async findOne(id: string): Promise<Establecimiento> {
     const est = await this.establecimientoRepository.findOne({
       where: { id, isEnabled: true },

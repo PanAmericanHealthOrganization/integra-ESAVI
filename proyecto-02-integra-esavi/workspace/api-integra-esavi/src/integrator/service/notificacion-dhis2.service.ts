@@ -8,7 +8,9 @@ import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoPadreService} from './catalogo-padre.service';
 import {CatalogoService} from './catalogo.service';
+import {NotificadorService} from './notificador.service';
 
 @Injectable()
 export class NotificacionDhis2Service {
@@ -20,6 +22,8 @@ export class NotificacionDhis2Service {
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
+    private readonly notificadorService: NotificadorService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   // async create(
@@ -310,13 +314,20 @@ export class NotificacionDhis2Service {
       }
     }
 
-    if (createDto.profesionNotificadorParam) {
+    if (createDto.profesionNotificadorParam && notificacionExistente.notificador) {
       try {
-        notificacionExistente.notificador.profesion = await this.catalogoService.findByDescriptionToDhis2(
-          createDto.profesionNotificadorParam,
-        );
+        const profesion = await this.notificadorService.buscarProfesionPorNombre(createDto.profesionNotificadorParam);
+        if (profesion) notificacionExistente.notificador.profesion = profesion;
       } catch (error:any) {
         console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
+      }
+    }
+
+    if (createDto.tipoEmisor) {
+      try {
+        notificacionExistente.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
+      } catch (error: any) {
+        console.error(`Error al buscar tipoEmisor: ${error.message}`);
       }
     }
 

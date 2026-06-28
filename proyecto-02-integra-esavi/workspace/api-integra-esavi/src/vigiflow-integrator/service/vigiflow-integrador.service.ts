@@ -9,7 +9,6 @@ import * as esLocale from 'i18n-iso-countries/langs/es.json';
 import {
   CreatePacienteEmbarazadaDto,
   UbicacionDto,
-  UpdateAntecedenteEmbarazoDto,
   CreateCompleteDto,
   CreateDatoEsaviDto,
   CreateDatoVacunaDto,
@@ -23,7 +22,6 @@ import {
   UpdateDatoVacunaDto,
 } from '../../integrator/dto';
 import { Auditoria, IAuditoria } from 'src/integrator/entity/auditoria.entity';
-import { AntecedenteEmbarazoService } from 'src/integrator/service/antecedente-embarazo.service';
 import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
@@ -78,7 +76,6 @@ export class VigiflowIntegradorService {
     private readonly medicamentoService: MedicamentoService,
     private readonly datoVacunaService: DatoVacunaService,
     private readonly datoEsaviService: DatoEsaviService,
-    private readonly antecedenteEmbarazo: AntecedenteEmbarazoService,
     private readonly drugService: DrugService,
     private readonly maholderService: MaholderService,
     private readonly activeIngredentService: ActiveIngredientsService,
@@ -316,6 +313,7 @@ export class VigiflowIntegradorService {
         fechaNacimiento: reg['G'] ?? null,
         edad: reg['H'] ?? null,
         unidadEdad: reg['I'] ?? null,
+        reportadoPor: reg['AB'] ? reg['AB'].toString().trim() : null,
       };
       paciente.origenOriginal = origenOriginal;
 
@@ -347,6 +345,7 @@ export class VigiflowIntegradorService {
       const fechaNotificacion = this.analizarCadenaFecha(reg['AD'] ? reg['AD'].toString() : reg['AD']);
       if (fechaNotificacion) {
         notificacion.fechaNotificacion = fechaNotificacion;
+        notificacion.fechaLlenadoFicha = fechaNotificacion;
       }//esta fecha se actualiza luego al extraer el otro Excel que contiene la hoja "Reportes".
       const fechaReporte = this.analizarCadenaFecha(reg['AE'] ? reg['AE'].toString() : reg['AE']);
       if (fechaReporte) {
@@ -425,7 +424,8 @@ export class VigiflowIntegradorService {
 
       //Paciente Embarazada
       const embarazada = new CreatePacienteEmbarazadaDto();
-      embarazada.momentoEsavi = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si')?'1':'0';
+      const esEmbarazada = reg['J'] && this.eliminarTildes(reg['J']).toLowerCase().includes('si');
+      embarazada.momentoEsavi = esEmbarazada ? '1' : '0';
 
       //Complete the dto
       let create = new CreateCompleteDto();
@@ -436,7 +436,7 @@ export class VigiflowIntegradorService {
       create.desenlaceEsavi = desenlaceEsaviDto;
       create.datoVacunacion = datoVacunacionDto;
       create.datoVacuna = datoVacunaDto;
-      if (embarazada.momentoEsavi) {
+      if (esEmbarazada) {
         create.pacienteEmbarazada = embarazada;
       }
       create = { ...create, ...auditoria };
@@ -462,9 +462,23 @@ export class VigiflowIntegradorService {
     const allPatients = await this.pacienteService.findAll();
     const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
+    // Detectar dinámicamente cuál columna es "Organización (Emisor)"
+    let orgCol = 'E'; // valor por defecto
+    if (toUpdate.length > 0) {
+      const headerRow = toUpdate[0] as Record<string, any>;
+      for (const [key, val] of Object.entries(headerRow)) {
+        const v = (val ?? '').toString().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+        if (v.includes('ORGANIZACI') && v.includes('EMISOR')) {
+          orgCol = key;
+          break;
+        }
+      }
+    }
+
     // Usar for...of para esperar que cada operación asíncrona termine
     for (const reg of toUpdate) {
-      const paciente = patientMap.get(reg['G']?.toString().trim()) ?? null;
+      const codigoFila = reg['G']?.toString().trim();
+      const paciente = patientMap.get(codigoFila) ?? null;
 
       if (paciente && paciente.id) {
         const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
@@ -478,16 +492,21 @@ export class VigiflowIntegradorService {
           const profesionNotificador = reg['AQ'] && this.obtenerPrimerComentario(reg['AQ']);
           updateNotificacion.profesionNotificadorParam = this.encontrarCoincidencia(profesionNotificador, profesiones);
           updateNotificacion.tipoReporte = reg['N'];
-          updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
-          updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
-          updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
+          const fechaRecepcionInicial = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
+          updateNotificacion.fechaNotificacion = fechaRecepcionInicial;
+          updateNotificacion.fechaReporteNacional = fechaRecepcionInicial;
+          updateNotificacion.fechaAtencion = fechaRecepcionInicial;
+          updateNotificacion.tipoEmisor = reg['F'] ? reg['F'].toString().trim() : null;
+          updateNotificacion.peso = reg['AA'] ? parseFloat(reg['AA'].toString()) : null;
+          updateNotificacion.altura = reg['AB'] ? parseFloat(reg['AB'].toString()) : null;
 
-          // Crear/actualizar notificador primero para poder vincularlo
+          // Crear/actualizar notificador: identificacion=col W, nombres=origenOriginal.reportadoPor (AEFI AB)
           let notificador = null;
-          const especialistaId = reg['R']?.toString().trim();
+          const especialistaId = reg['W']?.toString().trim();
           if (especialistaId) {
             try {
-              notificador = await this.notificadorService.createOrUpdateFromVigiflow(especialistaId, profesionNotificador);
+              const nombresNotificador = notificacion.origenOriginal?.reportadoPor ?? null;
+              notificador = await this.notificadorService.createOrUpdateFromVigiflow(especialistaId, profesionNotificador, nombresNotificador);
             } catch (error) {
               this.logger.warn(`No se pudo registrar notificador ${especialistaId}: ${error.message}`);
             }
@@ -495,11 +514,8 @@ export class VigiflowIntegradorService {
 
           await this.notificacionVigiflowService.update(notificacion, updateNotificacion, notificador);
 
-          const antecedenteEmbarazo = new UpdateAntecedenteEmbarazoDto();
-          antecedenteEmbarazo.edadGestacional = reg['V'] && Number(reg['V']);
-          if (antecedenteEmbarazo.edadGestacional) {
-            await this.antecedenteEmbarazo.update(notificacion.id, antecedenteEmbarazo);
-          }
+          const orgEmisorRaw = reg[orgCol]?.toString().trim();
+          await this.notificacionVigiflowService.matchYGrabarEstablecimiento(notificacion.id, orgEmisorRaw);
         }
       }
     }
@@ -1099,6 +1115,7 @@ private transformarTipoEmisor(tipoEmisorTexto: string): string | null {
       return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     } catch (error) {}
   }
+
 
   obtenerPrimerComentario(cadena: string): string {
     // Verifica si la cadena existe y la divide por los delimitadores definidos

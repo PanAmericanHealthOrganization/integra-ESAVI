@@ -1,7 +1,7 @@
 import {DataSource,In,InsertResult,Repository} from 'typeorm';
 import {LLT} from '../models/standar/llt.entity';
 
-import {Logger} from '@nestjs/common';
+import {BadRequestException, ConflictException, Logger, NotFoundException} from '@nestjs/common';
 import {InjectDataSource,InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import {join} from 'path';
@@ -50,20 +50,24 @@ export class MeddraProcessFilesService {
     const langStr = String(lang ?? '').trim();
     console.log('version ::::', versionStr, langStr, description);
     if (!versionStr || !langStr) {
-      throw new Error('Los parámetros de versión e idioma son obligatorios');
+      throw new BadRequestException('Los parámetros de versión e idioma son obligatorios');
     }
 
-    // leer el archjivo del repositio upload_files/meddra*/27/es
     const exist = await this.validarVersion(versionStr, langStr);
     if (exist) {
-      throw new Error('La versión ya existe en la base de datos');
+      throw new ConflictException(`La versión ${versionStr}/${langStr} ya existe en la base de datos`);
     }
-    // validar que exista el directorio
+
     const path = join(process.cwd(), 'upload_files', 'meddra', versionStr, langStr);
-    console.log('Patth::: ', path);
+    this.logger.log(`Directorio MedDRA: ${path}`);
 
     if (!MeddraUtils.directoryExists(path)) {
-      throw new Error('El directorio no existe');
+      // Crear la estructura de directorios para que el usuario pueda subir los archivos
+      fs.mkdirSync(path, { recursive: true });
+      throw new NotFoundException(
+        `El directorio upload_files/meddra/${versionStr}/${langStr} no existía y fue creado. ` +
+        `Coloca los archivos soc.asc, pt.asc y llt.asc en esa carpeta y vuelve a intentarlo.`
+      );
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -202,7 +206,7 @@ export class MeddraProcessFilesService {
 
     if (!fs.existsSync(filePath)) {
       this.logger.error(`El archivo ${filePath} no existe`);
-      throw new Error(`El archivo ${filePath} no existe`);
+      throw new NotFoundException(`El archivo ${fileName} no existe en upload_files/MEDDRA/${version}/${lang}/`);
     }
 
     const workbook = XLSX.readFile(filePath);

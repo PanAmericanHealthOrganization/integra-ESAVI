@@ -3,12 +3,14 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
 import {Repository} from 'typeorm';
 import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
+import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Notificador} from '../entity/notificador.entity';
 import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoPadreService} from './catalogo-padre.service';
 import {CatalogoService} from './catalogo.service';
 
 @Injectable()
@@ -21,6 +23,7 @@ export class NotificacionVigiflowService {
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente): Promise<Notificacion> {
@@ -32,6 +35,16 @@ export class NotificacionVigiflowService {
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
         notificacion.origen = SourceEnum.VIGIFLOW;
         notificacion.paciente = pacienteUUID;
+        if (!this.isNullOrUndefinedOrEmpty(createDto.tipoReporte)) {
+          notificacion.tipoReporte = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_REPORTE', createDto.tipoReporte);
+        } else {
+          notificacion.tipoReporte = null;
+        }
+        if (!this.isNullOrUndefinedOrEmpty(createDto.tipoEmisor)) {
+          notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
+        } else {
+          notificacion.tipoEmisor = null;
+        }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.parroquia)) {
           try {
             notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
@@ -196,15 +209,21 @@ export class NotificacionVigiflowService {
     
   }//;
 
-  async update(notificacion: Notificacion, updateNotificacion: UpdateNotificacionDto, notificador?: Notificador) {
+  async update(
+    notificacion: Notificacion,
+    updateNotificacion: UpdateNotificacionDto,
+    notificador?: Notificador,
+    establecimientoId?: string,
+  ) {
     try {
-      
-
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
-      notificacion.tipoReporte = updateNotificacion.tipoReporte;
+      notificacion.tipoReporte = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_REPORTE', updateNotificacion.tipoReporte);
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
       notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;
-      notificacion.tipoEmisor = updateNotificacion.tipoEmisor;
+      notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', updateNotificacion.tipoEmisor);
+      if (updateNotificacion.peso != null) notificacion.peso = updateNotificacion.peso;
+      if (updateNotificacion.altura != null) notificacion.altura = updateNotificacion.altura;
+      if (updateNotificacion.fechaAtencion != null) notificacion.fechaAtencion = updateNotificacion.fechaAtencion;
 
       if (notificador) {
         notificacion.notificador = notificador;
@@ -301,5 +320,43 @@ export class NotificacionVigiflowService {
      * que han sido capturados en formato local.
      */
   }
-  
+
+  async matchYGrabarEstablecimiento(notificacionId: string, orgEmisorExcel: string): Promise<void> {
+    // quita tildes y pone en mayusculas
+    const norm = (s: string) =>
+      (s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
+
+    const rows: { id: string; nombre: string }[] = await this.notificacionRepository.manager.query(
+      `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
+    );
+
+    if (!orgEmisorExcel || rows.length === 0) return;
+
+    const excelNorm = norm(orgEmisorExcel);
+    const excelWords = excelNorm.split(/\s+/).filter(Boolean);
+
+    let bestId: string | null = null;
+    let bestScore = 0;
+    let bestName = '';
+
+    for (const row of rows) {
+      const dbNorm = norm(row.nombre);
+      if (dbNorm === excelNorm) { bestId = row.id; bestScore = 1; bestName = row.nombre; break; }
+      const dbWords = dbNorm.split(/\s+/).filter(Boolean);
+      const [smaller, largerArr] = excelWords.length <= dbWords.length ? [excelWords, dbWords] : [dbWords, excelWords];
+      const largerSet = new Set(largerArr);
+      let hits = 0;
+      for (const w of smaller) if (largerSet.has(w)) hits++;
+      const score = hits / smaller.length;
+      if (score > bestScore) { bestScore = score; bestId = row.id; bestName = row.nombre; }
+    }
+
+    if (bestScore >= 0.9 && bestId) {
+      await this.notificacionRepository.manager.query(
+        `UPDATE "DHI_ESAVI"."TR_NOTIFICACION" SET "ESTABLECIMIENTO_ID" = $1 WHERE "ID" = $2`,
+        [bestId, notificacionId],
+      );
+    }
+  }
+
 }

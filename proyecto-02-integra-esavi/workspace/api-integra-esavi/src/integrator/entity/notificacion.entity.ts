@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import {SourceEnum} from '../enum/source-enum';
 import {Auditoria} from './auditoria.entity';
+import {CatalogoPadre} from './catalogo-padre.entity';
 import {Catalogo} from './catalogo.entity';
 import {Establecimiento} from './establecimiento.entity';
 import {GravedadEsavi} from './gravedad-esavi.entity';
@@ -43,6 +44,9 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'PESO',
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
     nullable: true,
     comment: 'Peso del paciente en kilogramos',
   })
@@ -53,6 +57,9 @@ export class Notificacion extends Auditoria {
    */
   @Column({
     name: 'ALTURA',
+    type: 'decimal',
+    precision: 6,
+    scale: 2,
     nullable: true,
     comment: 'Altura del paciente en centímetros',
   })
@@ -111,15 +118,9 @@ export class Notificacion extends Auditoria {
   })
   tituloReporte: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'TIPO_REPORTE',
-    nullable: true,
-    comment: 'Tipo de reporte (inicial, seguimiento, final)',
-  })
-  tipoReporte: string;
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
+  @JoinColumn({ name: 'CT_TIPO_REPORTE_ID' })
+  tipoReporte: CatalogoPadre;
 
   /**
    *
@@ -132,15 +133,9 @@ export class Notificacion extends Auditoria {
   })
   medioNotificacion: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'TIPO_EMISOR',
-    nullable: true,
-    comment: 'Tipo de emisor del reporte. 1 = Profesional de la salud, 2 = Paciente / consumidor, 3 = Laboratorio farmacéutico, 4 = Centro regional de farmacovigilancia, 5 = Otro. Para DHIS2 el vlor predeterminado es "1" (Profesional de la salud).',
-  })
-  tipoEmisor: string;
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
+  @JoinColumn({ name: 'CT_TIPO_EMISOR_ID' })
+  tipoEmisor: CatalogoPadre;
 
   /**
    *

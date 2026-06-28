@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
+import { CatalogoPadre } from './catalogo-padre.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -11,7 +11,7 @@ export class Notificador extends Auditoria {
   @PrimaryColumn({
     name: 'IDENTIFICACION',
     type: 'varchar',
-    length: 20,
+    length: 50,
     comment: 'Número de identificación del notificador (cédula o pasaporte)',
   })
   identificacion: string;
@@ -25,7 +25,7 @@ export class Notificador extends Auditoria {
   })
   nombres: string;
 
-  @ManyToOne(() => Catalogo, { nullable: true, eager: false })
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
   @JoinColumn({ name: 'CT_PROFESION_ID' })
-  profesion: Catalogo;
+  profesion: CatalogoPadre;
 }
