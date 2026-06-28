@@ -10,6 +10,7 @@ import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoPadreService} from './catalogo-padre.service';
 import {CatalogoService} from './catalogo.service';
 
 @Injectable()
@@ -22,6 +23,7 @@ export class NotificacionVigiflowService {
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente): Promise<Notificacion> {
@@ -33,6 +35,16 @@ export class NotificacionVigiflowService {
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
         notificacion.origen = SourceEnum.VIGIFLOW;
         notificacion.paciente = pacienteUUID;
+        if (!this.isNullOrUndefinedOrEmpty(createDto.tipoReporte)) {
+          notificacion.tipoReporte = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_REPORTE', createDto.tipoReporte);
+        } else {
+          notificacion.tipoReporte = null;
+        }
+        if (!this.isNullOrUndefinedOrEmpty(createDto.tipoEmisor)) {
+          notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
+        } else {
+          notificacion.tipoEmisor = null;
+        }
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente.parroquia)) {
           try {
             notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
@@ -205,10 +217,12 @@ export class NotificacionVigiflowService {
   ) {
     try {
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
-      notificacion.tipoReporte = updateNotificacion.tipoReporte;
+      notificacion.tipoReporte = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_REPORTE', updateNotificacion.tipoReporte);
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
       notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;
-      notificacion.tipoEmisor = updateNotificacion.tipoEmisor;
+      notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', updateNotificacion.tipoEmisor);
+      if (updateNotificacion.peso != null) notificacion.peso = updateNotificacion.peso;
+      if (updateNotificacion.altura != null) notificacion.altura = updateNotificacion.altura;
 
       if (notificador) {
         notificacion.notificador = notificador;

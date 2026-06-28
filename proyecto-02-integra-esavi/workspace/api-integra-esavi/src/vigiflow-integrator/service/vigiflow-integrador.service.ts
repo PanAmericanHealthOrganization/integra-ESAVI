@@ -493,7 +493,9 @@ export class VigiflowIntegradorService {
           updateNotificacion.tipoReporte = reg['N'];
           updateNotificacion.fechaNotificacion = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
           updateNotificacion.fechaReporteNacional = this.analizarCadenaFecha(reg['J'] ? reg['J'].toString() : reg['J']);
-          updateNotificacion.tipoEmisor = reg['F'] && this.transformarTipoEmisor(reg['F']);
+          updateNotificacion.tipoEmisor = reg['F'] ? reg['F'].toString().trim() : null;
+          updateNotificacion.peso = reg['AA'] ? parseFloat(reg['AA'].toString()) : null;
+          updateNotificacion.altura = reg['AB'] ? parseFloat(reg['AB'].toString()) : null;
 
           // Crear/actualizar notificador: identificacion=col W, nombres=origenOriginal.reportadoPor (AEFI AB)
           let notificador = null;

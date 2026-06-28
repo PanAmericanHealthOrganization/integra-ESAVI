@@ -125,13 +125,13 @@ const TabNotificacion = () => {
                 <FieldRow label="Título del Reporte" value={record.tituloReporte} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <FieldRow label="Tipo de Reporte" value={record.tipoReporte} />
+                <FieldRow label="Tipo de Reporte" value={record.tipoReporte?.nombre} />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FieldRow label="Medio de Notificación" value={record.medioNotificacion} />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <FieldRow label="Tipo Emisor" value={record.tipoEmisor} />
+                <FieldRow label="Tipo Emisor" value={record.tipoEmisor?.nombre} />
               </Grid>
             </Grid>
           </Grid>

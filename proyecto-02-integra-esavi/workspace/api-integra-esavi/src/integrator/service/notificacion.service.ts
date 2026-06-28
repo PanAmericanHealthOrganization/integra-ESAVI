@@ -50,7 +50,7 @@ export class NotificacionService {
   }
 
   async findOne(uuid: string, relation?: string): Promise<Notificacion> {
-    const relations: string[] = ['establecimiento'];
+    const relations: string[] = ['establecimiento', 'tipoReporte', 'tipoEmisor'];
     if (relation) {
       for (const r of relation.split(',')) {
         if (!relations.includes(r)) relations.push(r);

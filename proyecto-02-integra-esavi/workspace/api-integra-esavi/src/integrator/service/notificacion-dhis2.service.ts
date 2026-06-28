@@ -8,6 +8,7 @@ import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
+import {CatalogoPadreService} from './catalogo-padre.service';
 import {CatalogoService} from './catalogo.service';
 import {NotificadorService} from './notificador.service';
 
@@ -22,6 +23,7 @@ export class NotificacionDhis2Service {
     private readonly parroquiaRepository: Repository<Parroquia>,
     private readonly catalogoService: CatalogoService,
     private readonly notificadorService: NotificadorService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   // async create(
@@ -318,6 +320,14 @@ export class NotificacionDhis2Service {
         if (profesion) notificacionExistente.notificador.profesion = profesion;
       } catch (error:any) {
         console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
+      }
+    }
+
+    if (createDto.tipoEmisor) {
+      try {
+        notificacionExistente.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
+      } catch (error: any) {
+        console.error(`Error al buscar tipoEmisor: ${error.message}`);
       }
     }
 

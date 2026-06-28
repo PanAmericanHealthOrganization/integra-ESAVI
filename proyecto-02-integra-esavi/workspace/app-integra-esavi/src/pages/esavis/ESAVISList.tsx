@@ -65,7 +65,7 @@ const formatFecha = (valor?: string | null) => {
 export const ESAVISList = () => {
   return (
     <Card variant="outlined" sx={{ padding: "10px" }}>
-      <List actions={<ListActions />} filters={postFilters} empty={false}>
+      <List actions={<ListActions />} filters={postFilters} empty={false} storeKey={false}>
         <Datagrid bulkActionButtons={false} rowClick="show">
           {/* ── ID ── */}
           <FunctionField

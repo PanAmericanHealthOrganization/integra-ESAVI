@@ -78,6 +78,7 @@ export class SeedService implements OnApplicationBootstrap {
     await this.seedUbicaciones();
     await this.loadTiposEntidadCatalogoPadre();
     await this.loadEstablecimientosFromCSV();
+    await this.migrarTipoEmisor();
   }
 
   async seedData() {
@@ -1800,5 +1801,106 @@ export class SeedService implements OnApplicationBootstrap {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  // ── Migración de TIPO_EMISOR (texto/número) → CT_TIPO_EMISOR_ID ─────────────
+  private async migrarTipoEmisor(): Promise<void> {
+    const queryRunner = this.notificacionRepository.manager.connection.createQueryRunner();
+    try {
+      // Verificar si la columna legada TIPO_EMISOR todavía existe
+      const columnaExiste: { exists: boolean }[] = await queryRunner.query(`
+        SELECT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_schema = 'DHI_ESAVI'
+            AND table_name   = 'TR_NOTIFICACION'
+            AND column_name  = 'TIPO_EMISOR'
+        ) AS exists
+      `);
+      if (!columnaExiste[0]?.exists) {
+        console.log('ℹ️ Migración TIPO_EMISOR: columna legada no encontrada. Se omite.');
+        return;
+      }
+
+      const pendientes: { total: string }[] = await queryRunner.query(`
+        SELECT COUNT(*) AS total FROM "DHI_ESAVI"."TR_NOTIFICACION"
+        WHERE "TIPO_EMISOR" IS NOT NULL AND "CT_TIPO_EMISOR_ID" IS NULL
+      `);
+      const total = parseInt(pendientes[0]?.total ?? '0', 10);
+      if (total === 0) {
+        console.log('ℹ️ Migración TIPO_EMISOR: sin registros pendientes. Se omite.');
+        return;
+      }
+      console.log(`🔄 Migración TIPO_EMISOR: ${total} registro(s) pendiente(s)...`);
+
+      // Reverso del mapa numérico heredado de VigiFlow
+      const mapaNumerico: Record<string, string> = {
+        '1': 'Profesional de la salud',
+        '2': 'Paciente / consumidor',
+        '3': 'Laboratorio farmacéutico',
+        '4': 'Centro regional de farmacovigilancia',
+        '5': 'Otro',
+      };
+
+      const subcategorias = await this.catalogoPadreRepository.find({
+        where: { padre: { codigo: 'TIPO_EMISOR' }, isEnabled: true },
+        relations: ['padre'],
+      });
+
+      const rows: { ID: string; TIPO_EMISOR: string }[] = await queryRunner.query(`
+        SELECT "ID", "TIPO_EMISOR" FROM "DHI_ESAVI"."TR_NOTIFICACION"
+        WHERE "TIPO_EMISOR" IS NOT NULL AND "CT_TIPO_EMISOR_ID" IS NULL
+      `);
+
+      let actualizados = 0;
+      let sinMatch = 0;
+
+      for (const row of rows) {
+        const textoOriginal = row['TIPO_EMISOR']?.toString().trim() ?? '';
+        const textoResuelto = mapaNumerico[textoOriginal] ?? textoOriginal;
+        const normBuscado = this.normalizarMigracion(textoResuelto);
+
+        let mejorMatch: CatalogoPadre | null = null;
+        let mejorSim = 0;
+        for (const sub of subcategorias) {
+          const sim = this.similitudMigracion(normBuscado, this.normalizarMigracion(sub.nombre));
+          if (sim > mejorSim) { mejorSim = sim; mejorMatch = sub; }
+        }
+
+        if (mejorMatch && mejorSim >= 0.9) {
+          await queryRunner.query(
+            `UPDATE "DHI_ESAVI"."TR_NOTIFICACION" SET "CT_TIPO_EMISOR_ID" = $1 WHERE "ID" = $2`,
+            [mejorMatch.id, row['ID']],
+          );
+          actualizados++;
+        } else {
+          this.logger.warn(`TIPO_EMISOR "${textoOriginal}" sin coincidencia ≥90% (mejor: ${(mejorSim * 100).toFixed(1)}%)`);
+          sinMatch++;
+        }
+      }
+
+      console.log(`✅ Migración TIPO_EMISOR: ${actualizados} actualizado(s), ${sinMatch} sin match ≥90%.`);
+    } catch (error) {
+      console.error('❌ Error en migración TIPO_EMISOR:', error);
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  private normalizarMigracion(texto: string): string {
+    return texto.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  }
+
+  private similitudMigracion(a: string, b: string): number {
+    if (a === b) return 1;
+    const la = a.length; const lb = b.length;
+    if (la === 0 || lb === 0) return 0;
+    const m: number[][] = Array.from({ length: lb + 1 }, (_, i) =>
+      Array.from({ length: la + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= lb; i++)
+      for (let j = 1; j <= la; j++)
+        m[i][j] = b[i-1] === a[j-1] ? m[i-1][j-1]
+          : Math.min(m[i-1][j-1] + 1, m[i][j-1] + 1, m[i-1][j] + 1);
+    return (Math.max(la, lb) - m[lb][la]) / Math.max(la, lb);
   }
 }
