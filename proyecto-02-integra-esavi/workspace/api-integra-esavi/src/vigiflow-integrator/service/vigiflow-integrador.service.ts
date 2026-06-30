@@ -285,8 +285,21 @@ export class VigiflowIntegradorService {
       defval: '',
     });
     this.logger.log(`Numero de reportes de vigiflow ${reports.length}`);
+
+    // Precargar pacientes y notificaciones existentes en bulk para evitar N+1 queries
+    const rows = reports.slice(1) as Record<string, any>[];
+    const codigos = [...new Set(rows.map(r => r['B']?.toString().trim()).filter(Boolean))];
+    const pacienteMap = await this.pacienteService.findByCodigosOrigen(codigos);
+    const notificacionMap = await this.notificacionVigiflowService.findAllByCodigosOrigen(codigos);
+
+    // Precarga en bloque: catálogo y datoVacunas para evitar N+1 dentro del loop
+    await this.notificacionVigiflowService.preloadCatalogoVigiflow();
+    const notifIds = [...notificacionMap.values()].flat().map(n => n.id);
+    await this.datoVacunaService.preloadByNotificacionIds(notifIds);
+
+    try {
     // Usar for...of para esperar que cada operación asíncrona termine
-    for (const reg of reports.slice(1)) {
+    for (const reg of rows) {
       // TODO: colocar auditoria correcta
       const auditoria: IAuditoria = {
         createdAt: new Date(),
@@ -441,7 +454,16 @@ export class VigiflowIntegradorService {
       }
       create = { ...create, ...auditoria };
 
-      await this.integradorService.create(create);
+      const codigoVf = create.pacienteVigiflow?.codigoVigiflow ?? null;
+      await this.integradorService.create(
+        create,
+        codigoVf ? pacienteMap.get(codigoVf) : undefined,
+        codigoVf ? notificacionMap.get(codigoVf)?.at(0) : undefined,
+      );
+    }
+    } finally {
+      this.notificacionVigiflowService.clearCatalogoVigiflow();
+      this.datoVacunaService.clearDatoVacunaCache();
     }
   }
 
@@ -462,6 +484,12 @@ export class VigiflowIntegradorService {
     const allPatients = await this.pacienteService.findAll();
     const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
+    // Precargar notificaciones en bulk para evitar N queries individuales
+    const notificacionMapUpdate = await this.notificacionVigiflowService.findAllByCodigosOrigen([...patientMap.keys()]);
+
+    // Precarga en bloque: establecimientos y catálogoPadre para evitar N+1 dentro del loop
+    await this.notificacionVigiflowService.preloadBulk();
+
     // Detectar dinámicamente cuál columna es "Organización (Emisor)"
     let orgCol = 'E'; // valor por defecto
     if (toUpdate.length > 0) {
@@ -481,9 +509,7 @@ export class VigiflowIntegradorService {
       const paciente = patientMap.get(codigoFila) ?? null;
 
       if (paciente && paciente.id) {
-        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
-
-        const notificacion = notificacionList.at(0);
+        const notificacion = notificacionMapUpdate.get(codigoFila)?.at(0) ?? null;
 
         if (notificacion) {
           const updateNotificacion = new UpdateNotificacionDto();
@@ -519,6 +545,7 @@ export class VigiflowIntegradorService {
         }
       }
     }
+    this.notificacionVigiflowService.clearBulkCache();
   }
 
   // async extractedFromJsonReportToCreateMedicamento(workbook2: WorkBook) {
@@ -611,13 +638,23 @@ export class VigiflowIntegradorService {
     const allPatients = await this.pacienteService.findAll();
     const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
+    // Precargar notificaciones en bulk para evitar N queries individuales
+    const notificacionMapMed = await this.notificacionVigiflowService.findAllByCodigosOrigen([...patientMap.keys()]);
+
+    // Precarga en bloque: medicamentos, datoVacunas y catálogo para evitar N+1 dentro del loop
+    const notifIdsMed = [...notificacionMapMed.values()].flat().map(n => n.id);
+    await this.medicamentoService.preloadByNotificacionIds(notifIdsMed);
+    await this.datoVacunaService.preloadByNotificacionIds(notifIdsMed);
+    await this.notificacionVigiflowService.preloadCatalogoVigiflow();
+
+    try {
     // Iterar con for...of, para esperar que cada operación asíncrona termine.
     // "toUpdate" es un arreglo de objetos JSON, cada uno de esos objetos representa una fila de la hoja "Medicamentos".
     for (const reg of toUpdate) {
       const medNumIdUnicoMundial = reg['A'] && reg['A'] ? reg['A'].toString().trim():null;
       const paciente = patientMap.get(medNumIdUnicoMundial) ?? null;
       if (paciente) {
-        const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
+        const notificacionList = notificacionMapMed.get(medNumIdUnicoMundial) ?? [];
         const notificacionMed = notificacionList.at(0);//TODO: Iterar por todas las notificaciones asociadas al paciente, o lo que es lo mismo, a su código vigiflow. RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07. Y finalmente, un J07 no siempre aparece en la primera ocurrencia o posiciión del array notificacionList.
         let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
@@ -734,6 +771,8 @@ export class VigiflowIntegradorService {
               //y fue creado inicialmente con los datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones asociadas al paciente.
 
               await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
+              // Invalidar caché mínimo para evitar doble-update si el mismo paciente tiene varios ATCs J07
+              this.datoVacunaService.invalidateMinimoEntry(notificacion.id, datoVacunaList[0].id);
             } else {
               /**Crear un registro completamente nuevo de DatoVacuna asociado a la 
                * notificación, utilizando el método "create" del servicio datoVacunaService.
@@ -748,6 +787,11 @@ export class VigiflowIntegradorService {
       } else {
         console.log(`Por favor, verificar el paciente con id: ${paciente}`);
       }
+    }
+    } finally {
+      this.medicamentoService.clearMedicamentosCache();
+      this.datoVacunaService.clearDatoVacunaCache();
+      this.notificacionVigiflowService.clearCatalogoVigiflow();
     }
   }
 
@@ -778,6 +822,9 @@ export class VigiflowIntegradorService {
     const allPatients = await this.pacienteService.findAll();
     const patientMap = new Map(allPatients.map(p => [p.codigoOrigen?.trim(), p]));
 
+    // Precargar notificaciones en bulk para evitar N queries individuales
+    const notificacionMapReac = await this.notificacionVigiflowService.findAllByCodigosOrigen([...patientMap.keys()]);
+
     // La primera fila de la hoja es el encabezado; se omite explícitamente
     for (const reg of toCreate.slice(1)) {
       const caseCode = reg['A']?.toString().trim();
@@ -789,8 +836,7 @@ export class VigiflowIntegradorService {
         continue;
       }
 
-      const notificacionList = await this.notificacionVigiflowService.findByPacienteUUID(paciente.id);
-      const notificacion = notificacionList.at(0);
+      const notificacion = notificacionMapReac.get(caseCode)?.at(0) ?? null;
 
       if (!notificacion) {
         this.logger.warn(`[Reacciones] Notificación no encontrada para paciente ${paciente.codigoOrigen} — se omite la fila`);

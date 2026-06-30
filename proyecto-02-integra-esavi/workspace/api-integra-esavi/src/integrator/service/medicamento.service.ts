@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateMedicamentoDto, UpdateMedicamentoDto } from '../dto';
 import { Medicamento } from '../entity/medicamento.entity';
 import { Notificacion } from '../entity/notificacion.entity';
@@ -11,10 +11,32 @@ import { EntityNotFoundException } from '../exception/enntity-not-found.exceptio
 export class MedicamentoService {
   private readonly logger = new Logger(MedicamentoService.name);
 
+  private medicamentosCache: Map<string, Map<string, Medicamento>> | null = null;
+
   constructor(
     @InjectRepository(Medicamento, 'POSTGRES_INTEGRATOR_DS')
     private readonly medicamentoRepository: Repository<Medicamento>,
   ) {}
+
+  async preloadByNotificacionIds(notificacionIds: string[]): Promise<void> {
+    if (!notificacionIds.length) { this.medicamentosCache = new Map(); return; }
+    const items = await this.medicamentoRepository.find({
+      where: { notificacion: { id: In(notificacionIds) } },
+      relations: ['notificacion'],
+    });
+    this.medicamentosCache = new Map();
+    for (const m of items) {
+      const nid = m.notificacion?.id;
+      if (!nid || !m.codigoATC) continue;
+      if (!this.medicamentosCache.has(nid)) this.medicamentosCache.set(nid, new Map());
+      this.medicamentosCache.get(nid).set(m.codigoATC, m);
+    }
+    this.logger.log(`Medicamentos precargados: ${items.length}`);
+  }
+
+  clearMedicamentosCache(): void {
+    this.medicamentosCache = null;
+  }
 
   async createOneToMany(notificacion: Notificacion, createDto: CreateMedicamentoDto[]): Promise<Medicamento[]> {
     try {
@@ -61,38 +83,28 @@ export class MedicamentoService {
       // Verificar si ya existe un medicamento con los mismos datos
       const notificacionExistente = new Notificacion();
       notificacionExistente.id = notificacion.id;
-      const existingMedicamento = await this.medicamentoRepository.findOne({
-        where: {
-          notificacion: notificacionExistente,
-          nombre: createDto.nombre,
-          codigoATC: createDto.codigoATC,
-        },
-      });
+      const existingMedicamento = this.medicamentosCache !== null
+        ? (this.medicamentosCache.get(notificacion.id)?.get(createDto.codigoATC) ?? null)
+        : await this.medicamentoRepository.findOne({
+            where: { notificacion: notificacionExistente, codigoATC: createDto.codigoATC },
+          });
 
-      // Si existe, lo actualizamos
       if (existingMedicamento) {
-        this.logger.log('Medicamento existe, se actualizará con los nuevos datos.');
-
-        // Actualizamos el registro con los nuevos datos
-        Object.assign(existingMedicamento, createDto); // Actualizamos las propiedades del registro
-
-        // También actualizamos la notificación, por si se cambia
+        Object.assign(existingMedicamento, createDto);
         existingMedicamento.notificacion = notificacion;
-
-        // Actualizamos el campo de quién lo está creando
         existingMedicamento.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-
-        // Guardamos el registro actualizado
         return this.medicamentoRepository.save(existingMedicamento);
       }
 
-      // Si no existe, creamos uno nuevo
       const medicamento = plainToClass(Medicamento, createDto);
       medicamento.notificacion = notificacion;
       medicamento.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
-
-      // Guardamos el nuevo Medicamento
-      return this.medicamentoRepository.save(medicamento);
+      const saved = await this.medicamentoRepository.save(medicamento);
+      if (this.medicamentosCache !== null && saved.codigoATC) {
+        if (!this.medicamentosCache.has(notificacion.id)) this.medicamentosCache.set(notificacion.id, new Map());
+        this.medicamentosCache.get(notificacion.id).set(saved.codigoATC, saved);
+      }
+      return saved;
     } catch (e) {
       this.logger.error(e);
       throw e;

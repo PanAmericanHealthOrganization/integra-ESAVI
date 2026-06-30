@@ -1,7 +1,7 @@
 import {Injectable,Logger} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
-import {IsNull,Repository} from 'typeorm';
+import {In,IsNull,Repository} from 'typeorm';
 import {CreateDatoVacunaDto,UpdateDatoVacunaDto} from '../dto';
 import {DatoVacuna} from '../entity/dato-vacuna.entity';
 import {Notificacion} from '../entity/notificacion.entity';
@@ -12,11 +12,54 @@ import {CatalogoService} from './catalogo.service';
 export class DatoVacunaService {
   private readonly logger = new Logger(DatoVacunaService.name);
 
+  private datoVacunaMinimoCache: Map<string, DatoVacuna[]> | null = null;
+  private datoVacunaCompletoCache: Map<string, Map<string, DatoVacuna>> | null = null;
+
   constructor(
     @InjectRepository(DatoVacuna, 'POSTGRES_INTEGRATOR_DS')
     private readonly datoVacunaRepository: Repository<DatoVacuna>,
     private readonly catalogoService: CatalogoService,
   ) {}
+
+  async preloadByNotificacionIds(notificacionIds: string[]): Promise<void> {
+    if (!notificacionIds.length) {
+      this.datoVacunaMinimoCache = new Map();
+      this.datoVacunaCompletoCache = new Map();
+      return;
+    }
+    const all = await this.datoVacunaRepository.find({
+      where: { notificacion: { id: In(notificacionIds) } },
+      relations: ['notificacion', 'rolVacuna'],
+    });
+    this.datoVacunaMinimoCache = new Map();
+    this.datoVacunaCompletoCache = new Map();
+    for (const dv of all) {
+      const nid = dv.notificacion?.id;
+      if (!nid) continue;
+      if (!dv.codigoAtc && !dv.rolVacuna && !dv.numeroLote && !dv.indicacionMeddra) {
+        if (!this.datoVacunaMinimoCache.has(nid)) this.datoVacunaMinimoCache.set(nid, []);
+        this.datoVacunaMinimoCache.get(nid).push(dv);
+      } else if (dv.codigoAtc) {
+        if (!this.datoVacunaCompletoCache.has(nid)) this.datoVacunaCompletoCache.set(nid, new Map());
+        this.datoVacunaCompletoCache.get(nid).set(dv.codigoAtc, dv);
+      }
+    }
+    this.logger.log(`DatoVacuna precargados: ${all.length} registros`);
+  }
+
+  invalidateMinimoEntry(notificacionId: string, datoVacunaId: string): void {
+    if (!this.datoVacunaMinimoCache) return;
+    const list = this.datoVacunaMinimoCache.get(notificacionId);
+    if (!list) return;
+    const filtered = list.filter(dv => dv.id !== datoVacunaId);
+    if (filtered.length) this.datoVacunaMinimoCache.set(notificacionId, filtered);
+    else this.datoVacunaMinimoCache.delete(notificacionId);
+  }
+
+  clearDatoVacunaCache(): void {
+    this.datoVacunaMinimoCache = null;
+    this.datoVacunaCompletoCache = null;
+  }
 
   /**
    *
@@ -93,29 +136,45 @@ export class DatoVacunaService {
         }
         datoVacuna.notificacion = notificacion;
 
-        // Buscar si ya existe un DatoVacuna con la misma notificación y nombreVacuna
-        const existingDatoVacuna = await this.datoVacunaRepository.findOne({
-          where: {
-            notificacion: { id: notificacion.id },
-            codigoAtc: dto.codigoAtc,
-          },
-        });
+        // Búsqueda del registro existente:
+        // - Con codigoAtc: buscar por notificación + codigoAtc específico.
+        // - Sin codigoAtc (registro mínimo del AEFI): buscar cualquier DatoVacuna
+        //   de la notificación para evitar duplicados en segunda carga.
+        let existingDatoVacuna: DatoVacuna | null;
+        if (dto.codigoAtc) {
+          existingDatoVacuna = this.datoVacunaCompletoCache !== null
+            ? (this.datoVacunaCompletoCache.get(notificacion.id)?.get(dto.codigoAtc) ?? null)
+            : await this.datoVacunaRepository.findOne({
+                where: { notificacion: { id: notificacion.id }, codigoAtc: dto.codigoAtc },
+              });
+        } else {
+          existingDatoVacuna = this.datoVacunaMinimoCache !== null
+            ? (this.datoVacunaMinimoCache.get(notificacion.id)?.[0] ?? null)
+            : await this.datoVacunaRepository.findOne({
+                where: { notificacion: { id: notificacion.id } },
+              });
+        }
 
         if (existingDatoVacuna) {
-          // Si existe, actualizamos el objeto
-          const { rolVacuna, ...otherFields } = dto;
-          
-          if (rolVacuna) {
-            existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+          if (dto.codigoAtc) {
+            // Actualización completa cuando viene con codigoAtc
+            const { rolVacuna, ...otherFields } = dto;
+            if (rolVacuna) {
+              existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+            }
+            Object.assign(existingDatoVacuna, otherFields);
+          } else {
+            // Registro mínimo (AEFI): solo actualizar numeroDosisVacuna
+            if (dto.numeroDosisVacuna != null) {
+              existingDatoVacuna.numeroDosisVacuna = dto.numeroDosisVacuna;
+            }
           }
-          
-          Object.assign(existingDatoVacuna, otherFields);
           await this.datoVacunaRepository.save(existingDatoVacuna);
           datoVacunaArray.push(existingDatoVacuna);
         } else {
-          // Si no existe, creamos un nuevo DatoVacuna
+          // Si no existe ningún registro, crear uno nuevo
           await this.datoVacunaRepository.save(datoVacuna);
-          datoVacunaArray.push(datoVacuna); // Añadimos al arreglo
+          datoVacunaArray.push(datoVacuna);
         }
       }
 
@@ -147,17 +206,19 @@ export class DatoVacunaService {
   }
 
   async findByNotifIdDtoMinimo(uuidNotificacion: string): Promise<DatoVacuna[]> {
+    if (this.datoVacunaMinimoCache !== null) {
+      return this.datoVacunaMinimoCache.get(uuidNotificacion) ?? [];
+    }
     try {
-      const datosVacuna = await this.datoVacunaRepository.find({
+      return await this.datoVacunaRepository.find({
         where: {
-          notificacion: { id: uuidNotificacion }, // Buscar por el id de la notificación
+          notificacion: { id: uuidNotificacion },
           rolVacuna: IsNull(),
           numeroLote: IsNull(),
           codigoAtc: IsNull(),
           indicacionMeddra: IsNull(),
         },
-      });
-      return datosVacuna || []; // Devolver un arreglo vacío si no se encuentran registros
+      }) ?? [];
     } catch (error) {
       console.error('Error al buscar DatoVacuna por ID de Notificacion:', error);
       return [];
