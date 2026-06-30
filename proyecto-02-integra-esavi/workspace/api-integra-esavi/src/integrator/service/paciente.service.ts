@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { QueryFailedError, Repository } from 'typeorm';
+import { In, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
 import { CreatePacienteDhis2Dto, CreatePacienteVigiflowDto, UpdatePacienteDto } from '../dto';
@@ -17,12 +17,37 @@ export class PacienteService {
     private readonly catalogoService: CatalogoService,
   ) {}
 
-  async createFromVigiflow(createDto: CreatePacienteVigiflowDto): Promise<Paciente> {
+  async findByCodigosOrigen(codigos: string[]): Promise<Map<string, Paciente>> {
+    if (!codigos.length) return new Map();
+    const pacientes = await this.pacientRepository.find({ where: { codigoOrigen: In(codigos) } });
+    return new Map(pacientes.map(p => [p.codigoOrigen?.trim(), p]));
+  }
+
+  async createFromVigiflow(createDto: CreatePacienteVigiflowDto, preloaded?: Paciente): Promise<Paciente> {
     const codigo = createDto.codigoVigiflow?.trim();
     if (!codigo) throw new Error('Vigiflow code is a mandatory field');
 
-    const existing = await this.findByCodigoOrigen(codigo);
-    if (existing) return existing;
+    const existing = preloaded ?? await this.findByCodigoOrigen(codigo);
+    if (existing) {
+      let changed = false;
+      const incomingId = createDto.identificacion ?? null;
+      if (incomingId !== existing.identificacion) {
+        existing.identificacion = incomingId;
+        changed = true;
+      }
+      if (createDto.fechaNacimiento) {
+        const incomingTime = new Date(createDto.fechaNacimiento).getTime();
+        const existingTime = existing.fechaNacimiento ? new Date(existing.fechaNacimiento).getTime() : null;
+        if (incomingTime !== existingTime) {
+          existing.fechaNacimiento = createDto.fechaNacimiento;
+          changed = true;
+        }
+      }
+      if (changed) {
+        return await this.pacientRepository.save(existing);
+      }
+      return existing;
+    }
 
     const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
     if (createDto.sexoPaciente) {

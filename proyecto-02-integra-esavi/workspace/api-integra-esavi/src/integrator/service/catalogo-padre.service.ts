@@ -10,10 +10,31 @@ const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 export class CatalogoPadreService {
   private readonly logger = new Logger(CatalogoPadreService.name);
 
+  private subcategoriasCache: Map<string, CatalogoPadre[]> | null = null;
+
   constructor(
     @InjectRepository(CatalogoPadre, 'POSTGRES_INTEGRATOR_DS')
     private readonly catalogoPadreRepository: Repository<CatalogoPadre>,
   ) {}
+
+  async preloadSubcategoriasMap(): Promise<void> {
+    const all = await this.catalogoPadreRepository.find({
+      where: { isEnabled: true },
+      relations: ['padre'],
+    });
+    this.subcategoriasCache = new Map();
+    for (const item of all) {
+      const key = item.padre?.codigo;
+      if (!key) continue;
+      if (!this.subcategoriasCache.has(key)) this.subcategoriasCache.set(key, []);
+      this.subcategoriasCache.get(key).push(item);
+    }
+    this.logger.log(`CatalogoPadre precargado: ${this.subcategoriasCache.size} grupos`);
+  }
+
+  clearSubcategoriasCache(): void {
+    this.subcategoriasCache = null;
+  }
 
   async create(createDto: CreateCatalogoPadreDto, currentUser: string = FALLBACK_USER): Promise<CatalogoPadre> {
     try {
@@ -96,10 +117,12 @@ export class CatalogoPadreService {
 
   async buscarSubcategoriaPorSimilitud(codigoPadre: string, nombre: string): Promise<CatalogoPadre | null> {
     if (!nombre?.trim()) return null;
-    const subcategorias = await this.catalogoPadreRepository.find({
-      where: { padre: { codigo: codigoPadre }, isEnabled: true },
-      relations: ['padre'],
-    });
+    const subcategorias = this.subcategoriasCache
+      ? (this.subcategoriasCache.get(codigoPadre) ?? [])
+      : await this.catalogoPadreRepository.find({
+          where: { padre: { codigo: codigoPadre }, isEnabled: true },
+          relations: ['padre'],
+        });
     const nombreNorm = this.normalizar(nombre.trim());
     let mejorMatch: CatalogoPadre | null = null;
     let mejorSimilitud = 0;

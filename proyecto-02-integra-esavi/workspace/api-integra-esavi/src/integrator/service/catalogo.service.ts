@@ -10,10 +10,24 @@ import { EntityNotFoundException } from '../exception/enntity-not-found.exceptio
 export class CatalogoService {
   private readonly logger = new Logger(CatalogoService.name);
 
+  private vigiflowCache: Map<string, Catalogo> | null = null;
+
   constructor(
     @InjectRepository(Catalogo, 'POSTGRES_INTEGRATOR_DS')
     private readonly catalogoRepository: Repository<Catalogo>,
   ) {}
+
+  async preloadVigiflowMap(): Promise<void> {
+    const all = await this.catalogoRepository.find();
+    this.vigiflowCache = new Map(
+      all.filter(c => c.vigiflow).map(c => [c.vigiflow.toUpperCase().trim(), c]),
+    );
+    this.logger.log(`Catálogo Vigiflow precargado: ${this.vigiflowCache.size} entradas`);
+  }
+
+  clearVigiflowCache(): void {
+    this.vigiflowCache = null;
+  }
 
   async create(createDto: CreateCatalogoDto): Promise<Catalogo> {
     try {
@@ -59,14 +73,15 @@ export class CatalogoService {
   }
 
   async findByDescriptionToVigiflow(name: string) {
-    const catalogo = await this.catalogoRepository.findOne({
-      where: {
-        vigiflow: ILike(name.toUpperCase()),
-      },
-    });
-    if (catalogo) {
-      return catalogo;
+    if (this.vigiflowCache) {
+      const found = this.vigiflowCache.get(name?.toUpperCase().trim());
+      if (found) return found;
+      throw new EntityNotFoundException(`Catalogo`, name);
     }
+    const catalogo = await this.catalogoRepository.findOne({
+      where: { vigiflow: ILike(name.toUpperCase()) },
+    });
+    if (catalogo) return catalogo;
     throw new EntityNotFoundException(`Catalogo`, name);
   }
 

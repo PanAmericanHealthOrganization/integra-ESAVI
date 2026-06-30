@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CreateCompleteDto } from '../dto';
 import { Notificacion } from '../entity/notificacion.entity';
+import { Paciente } from '../entity/paciente.entity';
 import { SourceEnum } from '../enum/source-enum';
 import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
 import { AntecedenteEventoService } from '../service/antecedente-evento.service';
@@ -45,7 +46,11 @@ export class IntegradorService {
     private readonly investigacionService: InvestigacionService,
   ) {}
 
-  async create(createDto: CreateCompleteDto) {
+  async create(
+    createDto: CreateCompleteDto,
+    preloadedPaciente?: Paciente,
+    preloadedNotif?: Notificacion,
+  ) {
     let notificacion: Notificacion;
 
     if (SourceEnum.DHIS2 == createDto.source) {
@@ -55,8 +60,8 @@ export class IntegradorService {
         notificacion = await this.notificacionDhis2Service.create(createDto.notificacion, paciente);
       }
     } else {
-      const paciente = await this.pacienteService.createFromVigiflow(createDto.pacienteVigiflow);
-      notificacion = await this.notificacionVigiflowService.create(createDto.notificacion, paciente);
+      const paciente = await this.pacienteService.createFromVigiflow(createDto.pacienteVigiflow, preloadedPaciente);
+      notificacion = await this.notificacionVigiflowService.create(createDto.notificacion, paciente, preloadedNotif);
     }
     if (notificacion) {
       if (createDto.medicamento && createDto.medicamento.length > 0) {

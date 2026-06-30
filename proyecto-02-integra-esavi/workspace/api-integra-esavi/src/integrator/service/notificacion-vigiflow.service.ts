@@ -1,7 +1,7 @@
 import {Injectable,Logger} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
-import {Repository} from 'typeorm';
+import {In,Repository} from 'typeorm';
 import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
 import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
@@ -17,6 +17,8 @@ import {CatalogoService} from './catalogo.service';
 export class NotificacionVigiflowService {
   private readonly logger = new Logger(NotificacionVigiflowService.name);
 
+  private establecimientosCache: { id: string; nombre: string }[] | null = null;
+
   constructor(
     @InjectRepository(Notificacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly notificacionRepository: Repository<Notificacion>,
@@ -26,10 +28,51 @@ export class NotificacionVigiflowService {
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
-  async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente): Promise<Notificacion> {
+  async findAllByCodigosOrigen(codigos: string[]): Promise<Map<string, Notificacion[]>> {
+    if (!codigos.length) return new Map();
+    const notificaciones = await this.notificacionRepository.find({
+      where: { codigoOrigenNotificacion: In(codigos) },
+    });
+    const map = new Map<string, Notificacion[]>();
+    for (const n of notificaciones) {
+      const key = n.codigoOrigenNotificacion?.trim();
+      if (key) {
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(n);
+      }
+    }
+    return map;
+  }
+
+  async create(createDto: CreateNotificacionDto, pacienteUUID: Paciente, preloaded?: Notificacion): Promise<Notificacion> {
     if (pacienteUUID) {
-      const notificacion = await this.findByCodigoOrigen(createDto.codigoVigiflow);
+      const notificacion = preloaded ?? await this.findByCodigoOrigen(createDto.codigoVigiflow);
       if (notificacion) {
+        let changed = false;
+
+        if (createDto.edad != null && createDto.edad !== notificacion.edad) {
+          notificacion.edad = createDto.edad;
+          changed = true;
+        }
+
+        if (createDto.unidadEdadPaciente) {
+          try {
+            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(createDto.unidadEdadPaciente);
+            changed = true;
+          } catch (_) { /* catálogo no encontrado, se ignora */ }
+        }
+
+        if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente?.parroquia)) {
+          try {
+            const parroquia = await this.findParroquiaByCodigo(createDto.residenciaPaciente.parroquia);
+            if (parroquia) { notificacion.parroquiaResidencia = parroquia; changed = true; }
+          } catch (_) { /* parroquia no encontrada, se ignora */ }
+        }
+
+        if (changed) {
+          await this.notificacionRepository.save(notificacion);
+        }
+
         return notificacion;
       } else {
         const notificacion = plainToClass(Notificacion, { ...createDto, codigoOrigenNotificacion: createDto.codigoVigiflow }) as Notificacion;
@@ -224,6 +267,7 @@ export class NotificacionVigiflowService {
       if (updateNotificacion.peso != null) notificacion.peso = updateNotificacion.peso;
       if (updateNotificacion.altura != null) notificacion.altura = updateNotificacion.altura;
       if (updateNotificacion.fechaAtencion != null) notificacion.fechaAtencion = updateNotificacion.fechaAtencion;
+      if (updateNotificacion.tituloReporte) notificacion.tituloReporte = updateNotificacion.tituloReporte;
 
       if (notificador) {
         notificacion.notificador = notificador;
@@ -321,14 +365,47 @@ export class NotificacionVigiflowService {
      */
   }
 
+  async preloadBulk(): Promise<void> {
+    await this.catalogoService.preloadVigiflowMap();
+    await this.catalogoPadreService.preloadSubcategoriasMap();
+    this.establecimientosCache = await this.notificacionRepository.manager.query(
+      `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
+    );
+    this.logger.log(`Establecimientos precargados: ${this.establecimientosCache.length}`);
+  }
+
+  async preloadEstablecimientos(): Promise<void> {
+    this.establecimientosCache = await this.notificacionRepository.manager.query(
+      `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
+    );
+  }
+
+  async preloadCatalogoVigiflow(): Promise<void> {
+    await this.catalogoService.preloadVigiflowMap();
+  }
+
+  clearBulkCache(): void {
+    this.catalogoService.clearVigiflowCache();
+    this.catalogoPadreService.clearSubcategoriasCache();
+    this.establecimientosCache = null;
+  }
+
+  clearCatalogoVigiflow(): void {
+    this.catalogoService.clearVigiflowCache();
+  }
+
+  clearEstablecimientosCache(): void {
+    this.establecimientosCache = null;
+  }
+
   async matchYGrabarEstablecimiento(notificacionId: string, orgEmisorExcel: string): Promise<void> {
-    // quita tildes y pone en mayusculas
     const norm = (s: string) =>
       (s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
 
-    const rows: { id: string; nombre: string }[] = await this.notificacionRepository.manager.query(
-      `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
-    );
+    const rows: { id: string; nombre: string }[] = this.establecimientosCache
+      ?? await this.notificacionRepository.manager.query(
+          `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
+        );
 
     if (!orgEmisorExcel || rows.length === 0) return;
 
