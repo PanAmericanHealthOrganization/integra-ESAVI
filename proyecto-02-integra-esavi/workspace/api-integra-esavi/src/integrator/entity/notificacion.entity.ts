@@ -78,9 +78,9 @@ export class Notificacion extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
   @JoinColumn({ name: 'CTUNIDADEDAD_ID' })
-  unidadEdad: Catalogo;
+  unidadEdad: CatalogoPadre;
 
 /**
  * 

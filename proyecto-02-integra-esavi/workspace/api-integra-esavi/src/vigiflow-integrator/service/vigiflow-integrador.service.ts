@@ -26,6 +26,7 @@ import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
+import { Icd10MeddraService } from 'src/integrator/service/icd10-meddra.service';
 import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
@@ -33,6 +34,7 @@ import { read, utils, WorkBook } from 'xlsx';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
+import { DatoVacunacionService } from '../../integrator/service/dato-vacunacion.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
 import { NotificacionVigiflowService } from '../../integrator/service/notificacion-vigiflow.service';
 import { NotificadorService } from '../../integrator/service/notificador.service';
@@ -75,6 +77,7 @@ export class VigiflowIntegradorService {
     private readonly notificadorService: NotificadorService,
     private readonly medicamentoService: MedicamentoService,
     private readonly datoVacunaService: DatoVacunaService,
+    private readonly datoVacunacionService: DatoVacunacionService,
     private readonly datoEsaviService: DatoEsaviService,
     private readonly drugService: DrugService,
     private readonly maholderService: MaholderService,
@@ -84,6 +87,7 @@ export class VigiflowIntegradorService {
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
     private readonly meddraSocService: MeddraSocService,
+    private readonly icd10MeddraService: Icd10MeddraService,
   ) {
     const fechaInicioStr = this.configService.get<string>('VIGIFLOW_FECHA_INICIO_CRON', '2024-11-01');
     this.originalFechaInicio = new Date(`${fechaInicioStr}T00:00:00.000Z`);
@@ -686,6 +690,13 @@ export class VigiflowIntegradorService {
           const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
           //const datoVacunaExistente = datoVacunaList && datoVacunaList.length > 0 ? datoVacunaList[0] : null;
 
+          // Guardar INICIO_ADMINISTRACION (col W) y FIN_ADMINISTRACION (col X) en DatoVacunacion.
+          // create() tiene lógica upsert: actualiza si ya existe, crea si no existe.
+          const dtoDatoVacunacion = new CreateDatoVacunacionDto();
+          dtoDatoVacunacion.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
+          dtoDatoVacunacion.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
+          await this.datoVacunacionService.create(notificacion, dtoDatoVacunacion);
+
           //En realidad este fragmento de código no solo actualiza registros, también crea nuevos registros de datoVacuna cuando es necesario (ver datoVacunaService.create al final del bloque).
           if ( codigoAtcVacunaTransformado ) { //if (validacionCdgAtcVacunas) {
             let updateDatoVacuna = new UpdateDatoVacunaDto();
@@ -695,8 +706,6 @@ export class VigiflowIntegradorService {
             updateDatoVacuna.intervaloDosificacion = reg['T'];
             updateDatoVacuna.dosis1 = reg['U'];
             updateDatoVacuna.duracion = reg['V'];
-            updateDatoVacuna.inicioAdministracion = this.formatoFecha(reg['W'] ? reg['W'].toString() : reg['W']);
-            updateDatoVacuna.finAdministracion = this.formatoFecha(reg['X'] ? reg['X'].toString() : reg['X']);
             updateDatoVacuna.formaFarmaceutica = reg['Y'];
             updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
             updateDatoVacuna.viaAdministracion = reg['AA'];
@@ -778,7 +787,7 @@ export class VigiflowIntegradorService {
                * notificación, utilizando el método "create" del servicio datoVacunaService.
                * "create" utiliza filtros internos de TypeORM para evitar duplicados.
                * */
-              await this.datoVacunaService.create(notificacion, updateDatoVacuna as CreateDatoVacunaDto); //Existe otra forma, utilizando la actualización propia que tiene este método create.
+              await this.datoVacunaService.createByNotificacion(notificacion, updateDatoVacuna as CreateDatoVacunaDto); //Existe otra forma, utilizando la actualización propia que tiene este método create.
               //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
               //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
             }
@@ -882,15 +891,15 @@ export class VigiflowIntegradorService {
           datoEsavi.nameHLGT = (nombresHLGT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameSOC = (nombresSOC[i] ?? '').toUpperCase() || null;
 
-          const meddraLlt = await this.meddraLltService.searchLLT(nombreLLT);
+          // Buscar CODE en MEDDRA.MED_LLT comparando NAME en mayúsculas (similitud >= 90%)
+          datoEsavi.codigoLLT = await this.meddraLltService.buscarCodigoPorSimilitud(nombreLLT);
+
           const meddraPT  = await this.meddraPtService.searchPT(nombresPT[i] ?? '');
           const meddraSOC = await this.meddraSocService.searchSOC(nombresSOC[i] ?? '');
 
-          datoEsavi.CTLLTMEDDRA_ID = meddraLlt?.id ?? null;
           datoEsavi.CTPTMEDDRA_ID  = meddraPT?.id  ?? null;
           datoEsavi.CTSOCMEDDRA_ID = meddraSOC?.id ?? null;
 
-          datoEsavi.codigoLLT = meddraLlt?.code ?? null;
           datoEsavi.codigoPT  = meddraPT?.code  ?? null;
           datoEsavi.codigoSOC = meddraSOC?.code ?? null;
 

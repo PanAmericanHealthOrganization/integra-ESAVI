@@ -11,6 +11,8 @@ export class CreateDatoVacunacionDto {
   fechaReconstitucion: Date;
   horaConstitucion: Date;
   usuarioCreacion: string;
+  inicioAdministracion: Date;
+  finAdministracion: Date;
 }
 
 export class UpdateDatoVacunacionDto extends PartialType(CreateDatoVacunacionDto) {}

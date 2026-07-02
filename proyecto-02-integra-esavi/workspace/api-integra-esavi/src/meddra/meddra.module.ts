@@ -81,6 +81,6 @@ export const MEDDRA_DS = 'MEDDRA';
     MeddraLltController,
     MeddraSyncController,
   ],
-  exports: [MeddraSocService, MeddraPtService, MeddraLLTService],
+  exports: [MeddraSocService, MeddraPtService, MeddraLLTService, MeddraStandarService],
 })
 export class MeddraModule {}

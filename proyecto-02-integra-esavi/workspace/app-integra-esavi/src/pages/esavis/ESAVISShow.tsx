@@ -550,7 +550,7 @@ const TabEsavi = () => {
         const items: any[] = Array.isArray(res.data) ? res.data : []
         setEsavis(items)
 
-        const codes = Array.from(new Set(items.map((e) => e.codigoLlt).filter(Boolean)))
+        const codes = Array.from(new Set(items.map((e) => e.codigoLLT).filter(Boolean)))
         if (codes.length === 0) return
 
         const results = await Promise.allSettled(
@@ -620,7 +620,7 @@ const TabEsavi = () => {
         <FunctionField
           label="MedDRA"
           render={(rec: any) => {
-            const nodes: MeddraNode[] = rec.codigoLlt ? (meddraMap[rec.codigoLlt] ?? []) : []
+            const nodes: MeddraNode[] = rec.codigoLLT ? (meddraMap[rec.codigoLLT] ?? []) : []
             if (nodes.length === 0) return null
             return (
               <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", py: 0.5 }}>

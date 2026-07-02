@@ -51,7 +51,8 @@ export class DatoEsaviService {
       }
 
       // Si no existe, creamos uno nuevo
-      const datoEsavi = plainToClass(DatoEsavi, createDto);
+      const datoEsavi = new DatoEsavi();
+      Object.assign(datoEsavi, createDto);
       datoEsavi.notificacion = notificacion;
 
       // Guardamos el nuevo DatoEsavi

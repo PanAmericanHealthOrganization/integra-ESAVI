@@ -89,13 +89,14 @@ export class DimExactitudService {
     // Valida que el código ATC registrado corresponda a una vacuna (prefijo J07)
     const query = `
     select
-    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" is not null) as "totalRegistros",
-    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" like 'J07%') "totalRegistrosValidos",
-    count(tn."CODIGO_ATC") filter (where tn."CODIGO_ATC" not like 'J07%') "totalRegistrosNoValidos"
-    ,coalesce(json_agg(DISTINCT tn."NOTIFICACION_ID") filter (where tn."CODIGO_ATC" not like 'J07%'), '[]') as "idNotificacionesNoValidos"
+    count(tdv."CODIGO_ATC") filter (where tdv."CODIGO_ATC" is not null) as "totalRegistros",
+    count(tdv."CODIGO_ATC") filter (where tdv."CODIGO_ATC" like 'J07%') "totalRegistrosValidos",
+    count(tdv."CODIGO_ATC") filter (where tdv."CODIGO_ATC" not like 'J07%') "totalRegistrosNoValidos",
+    coalesce(json_agg(DISTINCT tdvn."NOTIFICACION_ID") filter (where tdv."CODIGO_ATC" not like 'J07%'), '[]') as "idNotificacionesNoValidos"
     from
-      "DHI_ESAVI"."TR_DATO_VACUNA" tn
-    where tn."AUD_FECHA_CREACION" <= '${day.toISOString()}'
+      "DHI_ESAVI"."TR_DATO_VACUNA" tdv
+    inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdvn on tdvn."ID" = tdv."DATO_VACUNACION_ID"
+    where tdv."AUD_FECHA_CREACION" <= '${day.toISOString()}'
     `;
     const result = await this.dataSource.query(query);
     //

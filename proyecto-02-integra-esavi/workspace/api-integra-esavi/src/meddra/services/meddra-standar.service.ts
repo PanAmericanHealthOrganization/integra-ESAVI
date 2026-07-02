@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {ILike,Repository} from 'typeorm';
 import {MeddraStandarDto} from '../models/dto';
@@ -10,6 +10,9 @@ import {SOC} from '../models/standar/soc.entity';
 
 @Injectable()
 export class MeddraStandarService {
+  private readonly logger = new Logger(MeddraStandarService.name);
+  private readonly SIMILITUD_MINIMA = 0.9;
+
   constructor(
     @InjectRepository(LLT, 'MEDDRA')
     private readonly lltRepository: Repository<LLT>,
@@ -22,6 +25,53 @@ export class MeddraStandarService {
     @InjectRepository(CIE10ES, 'MEDDRA')
     private readonly CIE10ESRepository: Repository<CIE10ES>,
   ) {}
+
+  private levenshtein(a: string, b: string): number {
+    const m = a.length, n = b.length;
+    const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+      Array.from({ length: n + 1 }, (_, j) => (i === 0 ? j : j === 0 ? i : 0)),
+    );
+    for (let i = 1; i <= m; i++)
+      for (let j = 1; j <= n; j++)
+        dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    return dp[m][n];
+  }
+
+  private similitud(a: string, b: string): number {
+    const s1 = a.toUpperCase();
+    const s2 = b.toUpperCase();
+    const maxLen = Math.max(s1.length, s2.length);
+    if (maxLen === 0) return 1;
+    return (maxLen - this.levenshtein(s1, s2)) / maxLen;
+  }
+
+  async buscarLltPorSimilitud(nombre: string): Promise<cie10Meddra | null> {
+    if (!nombre?.trim()) return null;
+    const nombreNorm = nombre.trim().toUpperCase();
+    const registros = await this.cie10MeddraRepository.find();
+    this.logger.debug(`[buscarLltPorSimilitud] Buscando "${nombreNorm}" en ${registros.length} registros de MED_CIE10_TO_MED`);
+
+    // Recopilar todos los candidatos con similitud >= 90%
+    const candidatos: { reg: cie10Meddra; sim: number }[] = [];
+    for (const reg of registros) {
+      const sim = this.similitud(nombreNorm, (reg.meddra_llt_name ?? '').toUpperCase());
+      if (sim >= this.SIMILITUD_MINIMA) {
+        candidatos.push({ reg, sim });
+      }
+    }
+
+    if (candidatos.length === 0) {
+      this.logger.debug(`[buscarLltPorSimilitud] "${nombreNorm}" → sin coincidencias`);
+      return null;
+    }
+
+    // Ordenar por mayor similitud primero
+    candidatos.sort((a, b) => b.sim - a.sim);
+
+    const mejor = candidatos[0].reg;
+    this.logger.debug(`[buscarLltPorSimilitud] "${nombreNorm}" → ${(candidatos[0].sim * 100).toFixed(1)}% — ${mejor.meddra_llt_name} (código: ${mejor.meddra_llt_code})`);
+    return mejor;
+  }
 
   async getLltByCode(code: string): Promise<MeddraStandarDto> {
     const llt = await this.lltRepository.findOne({

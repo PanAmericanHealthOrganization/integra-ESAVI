@@ -1,5 +1,6 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
+import { DatoVacuna } from './dato-vacuna.entity';
 import { Establecimiento } from './establecimiento.entity';
 import { Notificacion } from './notificacion.entity';
 
@@ -107,9 +108,34 @@ export class DatoVacunacion extends Auditoria {
   /**
    *
    */
+  @Column({
+    name: 'INICIO_ADMINISTRACION',
+    type: 'timestamptz',
+    nullable: true,
+    comment: 'Fecha y hora de inicio de administración de la vacuna',
+  })
+  inicioAdministracion: Date;
+
+  /**
+   *
+   */
+  @Column({
+    name: 'FIN_ADMINISTRACION',
+    type: 'timestamptz',
+    nullable: true,
+    comment: 'Fecha y hora de fin de administración de la vacuna',
+  })
+  finAdministracion: Date;
+
+  /**
+   *
+   */
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;
+
+  @OneToMany(() => DatoVacuna, (datoVacuna) => datoVacuna.datoVacunacion, { cascade: true })
+  datosVacuna: DatoVacuna[];
 
   @BeforeInsert()
   beforeInsert() {

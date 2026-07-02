@@ -54,6 +54,10 @@ export class GeneralService {
       });
     }
 
+    if (!dataQualityDimension) {
+      return null;
+    }
+
     return {
       ...dataQualityDimension,
       jsonQuality: JSON.parse(dataQualityDimension.jsonQuality),
