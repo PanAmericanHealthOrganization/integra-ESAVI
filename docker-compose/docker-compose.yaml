@@ -108,5 +108,89 @@ services:
       api:
         condition: service_healthy
 
+  # ── Dashboard Shiny ────────────────────────────────────────────────────────────
+  dashboard:
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/dash-integra-esavi
+      dockerfile: Dockerfile
+    container_name: esavi-dashboard
+    restart: unless-stopped
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: DHI_ESAVI
+      DB_USER: dhis
+      DB_PASS: dhis
+      LOG_ACCESS_ATTEMPTS: "true"
+      LOG_FILE_PATH: /app/logs/access.log
+    volumes:
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/datos:/app/datos
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/fuente_de_datos:/app/fuente_de_datos
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - default
+      - esavi-internal
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+  # ── oauth2-proxy: autenticación Keycloak + control de roles ───────────────────
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    container_name: esavi-oauth2-proxy
+    restart: unless-stopped
+    command:
+      - --provider=keycloak-oidc
+      - --client-id=dash-integra-esavi-client
+      - --client-secret=CAMBIAR_POR_SECRET_REAL
+      - --oidc-issuer-url=https://auth-kk.kuyacode.com/realms/integra-esavi
+      - --redirect-url=https://localhost/oauth2/callback
+      - --upstream=http://dashboard:80
+      - --http-address=0.0.0.0:4180
+      - --cookie-secret=RtHzFPFkutUi6eU0f8N1UDQ3Xb3aK8Y9Q+GBrd+uw34=
+      - --cookie-secure=true
+      - --cookie-name=_esavi_session
+      - --email-domain=*
+      - --allowed-role=integra-esavi:analitic
+      - --allowed-role=integra-esavi:arcsa
+      - --allowed-role=integra-esavi:dhis
+      - --allowed-role=integra-esavi:paho
+      - --set-xauthrequest=true
+      - --pass-user-headers=true
+    networks:
+      - esavi-internal
+      - esavi-public
+    depends_on:
+      dashboard:
+        condition: service_healthy
+
+  # ── Nginx: TLS + proxy hacia oauth2-proxy ────────────────────────────────────
+  dash-nginx:
+    image: nginx:1.27-alpine
+    container_name: esavi-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - esavi-public
+    depends_on:
+      - oauth2-proxy
+
 volumes:
   postgres_data:
+
+networks:
+  esavi-internal:
+    internal: true
+  esavi-public:
+    driver: bridge
