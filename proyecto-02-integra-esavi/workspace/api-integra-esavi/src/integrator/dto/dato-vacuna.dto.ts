@@ -32,8 +32,6 @@ export class CreateDatoVacunaDto {
   indicacionMeddra: string;
   indicacionNotificadorPrimario: string;
   duracion: string;
-  inicioAdministracion: Date;
-  finAdministracion: Date;
   formaFarmaceutica: string;
   formaFarmaceuticaEDQM: string;
   viaAdministracion: string;

@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
-import { Notificacion } from '../entity/notificacion.entity';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
 import { CreateCausalidadEsaviDto } from '../dto';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
@@ -17,12 +16,10 @@ export class CausalidadEsaviService {
   ) {}
 
   async create(
-    notificacion: Notificacion,
     createDto: CreateCausalidadEsaviDto,
   ): Promise<CausalidadEsavi> {
     try {
       const causalidadEsavi = plainToClass(CausalidadEsavi, createDto);
-      causalidadEsavi.notificacion = notificacion;
       causalidadEsavi.createdBy = 'AUTOMATICO';
       return this.causalidadEsaviRepository.save(causalidadEsavi);
     } catch (e) {

@@ -92,7 +92,9 @@ export class DatoVacunacionService {
     });
   }
 
-  async update(uuid: string, vacunaDto: UpdateDatoVacunacionDto) {
-    const datoVacuna = await this.findOne(uuid);
+  async update(uuid: string, dto: UpdateDatoVacunacionDto): Promise<DatoVacunacion> {
+    const datoVacunacion = await this.findOne(uuid);
+    Object.assign(datoVacunacion, dto);
+    return this.datoVacunacionRepository.save(datoVacunacion);
   }
 }

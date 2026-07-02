@@ -2,7 +2,6 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { Auditoria } from './auditoria.entity';
 import { DatoEsavi } from './dato-esavi.entity';
 import { DatoVacuna } from './dato-vacuna.entity';
-import { Notificacion } from './notificacion.entity';
 
 @Entity({ schema: 'DHI_ESAVI', name: 'TR_CAUSALIDAD_ESAVI', comment: 'Tabla de causalidad del ESAVI' })
 export class CausalidadEsavi extends Auditoria {
@@ -133,7 +132,4 @@ export class CausalidadEsavi extends Auditoria {
   //TODO: Relación TR_CAUSALIDAD_ESAVI - TR_DATO_VACUNA (1:N) --->Una causalidad puede tener varias Vacunas evaluadas asociadas.
   //------------------------------------------------------------
 
-  @ManyToOne(() => Notificacion)
-  @JoinColumn({ name: 'NOTIFICACION_ID' })
-  notificacion: Notificacion;
 }

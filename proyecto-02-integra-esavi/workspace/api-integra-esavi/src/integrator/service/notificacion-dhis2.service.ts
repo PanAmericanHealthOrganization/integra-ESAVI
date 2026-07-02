@@ -118,11 +118,8 @@ export class NotificacionDhis2Service {
 
         // Asignamos las propiedades de la notificación
         if (createDto.unidadEdadPaciente) {
-          try {
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(createDto.unidadEdadPaciente);
-          } catch (error:any) {
-            console.error(`Error al buscar unidadEdadPaciente: ${error.message}`);
-          }
+          const unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', createDto.unidadEdadPaciente);
+          if (unidadEdad) notificacion.unidadEdad = unidadEdad;
         }
 
         if (createDto.residenciaPaciente.parroquia) {
@@ -149,9 +146,8 @@ export class NotificacionDhis2Service {
           try {
             if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
               const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-              const unidad = 'AÑOS';
               notificacion.edad = edad;
-              notificacion.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
+              notificacion.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', 'Años');
             }
           } catch (error:any) {
             console.log('No se puede calcular edad');
@@ -273,13 +269,8 @@ export class NotificacionDhis2Service {
 
     // Actualizamos los campos relevantes
     if (createDto.unidadEdadPaciente) {
-      try {
-        notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(
-          createDto.unidadEdadPaciente,
-        );
-      } catch (error:any) {
-        console.error(`Error al buscar unidadEdadPaciente: ${error.message}`);
-      }
+      const unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', createDto.unidadEdadPaciente);
+      if (unidadEdad) notificacionExistente.unidadEdad = unidadEdad;
     }
 
     if (createDto.residenciaPaciente.parroquia) {
@@ -305,9 +296,8 @@ export class NotificacionDhis2Service {
       try {
         if (createDto.fechaNotificacion && createDto.fechaNacimiento) {
           const edad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
-          const unidad = 'AÑOS';
           notificacionExistente.edad = edad;
-          notificacionExistente.unidadEdad = await this.catalogoService.findByDescriptionToDhis2(unidad);
+          notificacionExistente.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', 'Años');
         }
       } catch (error:any) {
         console.log('No se puede calcular edad');

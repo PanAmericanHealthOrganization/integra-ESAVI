@@ -1151,13 +1151,7 @@ export class Dhis2IntegratorService {
             (header) => header.column === `DNVE ESAVI TRK - Es sospechosa vacuna ${i}`,
           )
         ];
-      datoVacuna.inicioAdministracion = this.formatoFecha(
-        row[
-          headers.findIndex(
-            (header) => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`,
-          )
-        ],
-      );
+      // inicioAdministracion se gestiona desde DatoVacunacion (movido del DTO de vacuna)
 
       if (
         datoVacuna.drugName ||
@@ -1166,8 +1160,7 @@ export class Dhis2IntegratorService {
         datoVacuna.fechaVencimientoVacuna ||
         datoVacuna.viaAdministracion ||
         datoVacuna.fechaVencimientoDiluyente ||
-        datoVacuna.nombreDiluyenteVacuna ||
-        datoVacuna.inicioAdministracion
+        datoVacuna.nombreDiluyenteVacuna
       ) {
         datoVacunas.push(datoVacuna);
       }
@@ -1826,13 +1819,7 @@ export class Dhis2IntegratorService {
                 header.column === `DNVE ESAVI TRK - Nombre del diluyente usado vacuna ${i}`,
             )
           ];
-        datoVacuna.inicioAdministracion = this.formatoFecha(
-          row[
-            data.headers.findIndex(
-              (header) => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`,
-            )
-          ],
-        );
+        // inicioAdministracion se gestiona desde DatoVacunacion (movido del DTO de vacuna)
         // datoVacuna.numeroDosisVacuna = (row[data.headers.findIndex(header => header.column === `DNVE ESAVI TRK - Fecha de vacunación vacuna ${i}`)])
 
         if (
@@ -1842,8 +1829,7 @@ export class Dhis2IntegratorService {
           datoVacuna.fechaVencimientoVacuna ||
           datoVacuna.viaAdministracion ||
           datoVacuna.fechaVencimientoDiluyente ||
-          datoVacuna.nombreDiluyenteVacuna ||
-          datoVacuna.inicioAdministracion
+          datoVacuna.nombreDiluyenteVacuna
         ) {
           datoVacunas.push(datoVacuna);
         }

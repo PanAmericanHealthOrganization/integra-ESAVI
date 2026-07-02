@@ -33,7 +33,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Nombre del evento supuestamente atribuido a la vacunación o inmunización',
   })
-  nombre: string; 
+  nombre: string;
   /**
    *
    */
@@ -42,7 +42,7 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Descripción detallada de la complicación o evento adverso',
   })
-  descripcion: string; 
+  descripcion: string;
   /**
    *
    */
@@ -51,30 +51,30 @@ export class DatoEsavi extends Auditoria {
     nullable: true,
     comment: 'Nombre del ESAVI tal como fue reportado inicialmente',
   })
-  nombreReportado: string; 
-  
+  nombreReportado: string;
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'CODIGO_CIE10',
     nullable: true,
     comment: 'Código del ESAVI según clasificación CIE-10',
   })
-  codigoEsaviCie10: string; 
-  
+  codigoEsaviCie10: string;
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'CODIGO_LLT',
     nullable: true,
-    comment: 'Código llt',
+    comment: 'Código LLT MedDRA',
   })
-  codigoLlt: string; 
+  codigoLLT: string;
 
   /**
-   * 
+   *
    */
   @Column({
     name: 'FECHA_ESAVI',
@@ -83,9 +83,9 @@ export class DatoEsavi extends Auditoria {
     comment: 'Fecha de inicio del evento supuestamente atribuido a la vacunación',
   })
   fechaEsavi: Date;
-  
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'FECHA_FINALIZACION',
@@ -94,9 +94,9 @@ export class DatoEsavi extends Auditoria {
     comment: 'Fecha de finalización o resolución del ESAVI',
   })
   fechaFinalizacion: Date;
-  
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'DURACION_EVENTO',
@@ -104,9 +104,9 @@ export class DatoEsavi extends Auditoria {
     comment: 'Duración del evento adverso',
   })
   duracion: string;
-  
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'RESULTADO_EVENTO',
@@ -115,9 +115,9 @@ export class DatoEsavi extends Auditoria {
   })
   resultado: string;
 
-  
+
   /**
-   * 
+   *
    */
   @Column({
     name: 'COGIDO_CASO',
@@ -127,7 +127,7 @@ export class DatoEsavi extends Auditoria {
   codigoCaso: string;
 
   /**
-   * 
+   *
    */
   @Column({
     name: 'GRAVEDAD',

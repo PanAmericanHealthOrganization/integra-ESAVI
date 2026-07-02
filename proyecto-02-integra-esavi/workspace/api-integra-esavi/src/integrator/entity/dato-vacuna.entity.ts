@@ -1,7 +1,7 @@
 import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
-import {Notificacion} from './notificacion.entity';
+import {DatoVacunacion} from './dato-vacunacion.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -211,28 +211,6 @@ export class DatoVacuna extends Auditoria {
    *
    */
   @Column({
-    name: 'INICIO_ADMINISTRACION',
-    type: 'timestamptz',
-    nullable: true,
-    comment: 'Fecha y hora de inicio de administración de la vacuna',
-  })
-  inicioAdministracion: Date; // utilizado por vf y d2.
-
-  /**
-   *
-   */
-  @Column({
-    name: 'FIN_ADMINISTRACION',
-    type: 'timestamptz',
-    nullable: true,
-    comment: 'Fecha y hora de fin de administración de la vacuna',
-  })
-  finAdministracion: Date; // utilizado por vf.
-
-  /**
-   *
-   */
-  @Column({
     name: 'FORMA_FARMACEUTICA',
     nullable: true,
     comment: 'Forma farmacéutica de la vacuna',
@@ -267,8 +245,8 @@ export class DatoVacuna extends Auditoria {
   })
   viaAdministracionEDQM: string; // utilizado por vf.
 
-  @ManyToOne(() => Notificacion)
-  @JoinColumn({ name: 'NOTIFICACION_ID' })
-  notificacion: Notificacion;
+  @ManyToOne(() => DatoVacunacion, (dv) => dv.datosVacuna, { nullable: true })
+  @JoinColumn({ name: 'DATO_VACUNACION_ID' })
+  datoVacunacion: DatoVacunacion;
 
 }

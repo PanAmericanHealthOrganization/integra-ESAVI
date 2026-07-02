@@ -473,7 +473,7 @@ export class DimConsistenciaService {
       inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdvn on
         tdvn."NOTIFICACION_ID" = tn."ID"
       inner join "DHI_ESAVI"."TR_DATO_VACUNA" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
+        tdv."DATO_VACUNACION_ID" = tdvn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;

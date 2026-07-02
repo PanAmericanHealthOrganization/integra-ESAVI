@@ -56,10 +56,8 @@ export class NotificacionVigiflowService {
         }
 
         if (createDto.unidadEdadPaciente) {
-          try {
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(createDto.unidadEdadPaciente);
-            changed = true;
-          } catch (_) { /* catálogo no encontrado, se ignora */ }
+          const unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', createDto.unidadEdadPaciente);
+          if (unidadEdad) { notificacion.unidadEdad = unidadEdad; changed = true; }
         }
 
         if (!this.isNullOrUndefinedOrEmpty(createDto.residenciaPaciente?.parroquia)) {
@@ -98,13 +96,8 @@ export class NotificacionVigiflowService {
           }
         }
         if (!this.isNullOrUndefinedOrEmpty(createDto.unidadEdadPaciente)) {
-          try {
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(
-              createDto.unidadEdadPaciente,
-            );
-          } catch (error) {
-            console.log('Unidad Edad paciente no encontrada');
-          }
+          const unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', createDto.unidadEdadPaciente);
+          if (unidadEdad) notificacion.unidadEdad = unidadEdad;
         }
         /* calculo de la edad, unidad de edad */
         if( (createDto.fechaNotificacion && createDto.fechaNacimiento) && 
@@ -113,14 +106,14 @@ export class NotificacionVigiflowService {
 
             let resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);           
             notificacion.edad = resultadoUnidadYedad.edadCalculada;
-            notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow(resultadoUnidadYedad.unidadEdadCalculada);
+            notificacion.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', resultadoUnidadYedad.unidadEdadCalculada);
             /**
              * Para el cálculo del grupo etario, según el catálogo del Ministerio de Salud Pública,
              * está bien utilizar la unidad de edad en años y meses solamente. Pero, para edades
              * inferiores a un mes, se debe almacenar en la tabla, la unidad en días.
              */
             if(resultadoUnidadYedad.edadCalculada === 0 && resultadoUnidadYedad.unidadEdadCalculada === 'MESES'){// El método calcularEdad devuelve  las unidades en PLURAL.
-              notificacion.unidadEdad = await this.catalogoService.findByDescriptionToVigiflow('DÍAS'); //Aquí ya se homologa la unidad de dad, con los valores numéricos (FK) del catálogo.
+              notificacion.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', 'Dias'); //Aquí ya se homologa la unidad de edad con el catálogo UNIDAD_EDAD.
               // como el grupo etario se calcula con meses y años, no es necesario recalcularlo,
               // ahora se calcula el valor numérico de la edad en días
               const msPorDia = 1000 * 60 * 60 * 24;

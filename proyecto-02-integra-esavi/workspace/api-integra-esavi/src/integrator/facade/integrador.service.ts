@@ -82,7 +82,7 @@ export class IntegradorService {
       }
       //ESAVI
       if (createDto.causalidadEsavi) {
-        await this.causalidadEsaviService.create(notificacion, createDto.causalidadEsavi);
+        await this.causalidadEsaviService.create(createDto.causalidadEsavi);
       }
       if (createDto.desenlaceEsavi) {
         await this.desenlaceEsaviService.create(notificacion, createDto.desenlaceEsavi);
@@ -101,13 +101,19 @@ export class IntegradorService {
         await this.gravedadEsaviService.create(notificacion, createDto.gravedadEsavi);
       }
 
-      // Datos Vacunacion
-      if (createDto.datoVacuna) {
-        await this.datoVacunaService.create(notificacion, createDto.datoVacuna);
+      // Datos Vacunacion: primero crear datoVacunacion, luego datoVacuna con la referencia
+      let datoVacunacion = null;
+      if (createDto.datoVacunacion) {
+        datoVacunacion = await this.datoVacunacionService.create(notificacion, createDto.datoVacunacion);
       }
 
-      if (createDto.datoVacunacion) {
-        await this.datoVacunacionService.create(notificacion, createDto.datoVacunacion);
+      if (createDto.datoVacuna) {
+        if (datoVacunacion) {
+          await this.datoVacunaService.create(datoVacunacion as any, createDto.datoVacuna);
+        } else {
+          // Sin datoVacunacion explícito (ej. flujo DHIS2): crear/buscar datoVacunacion implícitamente
+          await this.datoVacunaService.createByNotificacion(notificacion, createDto.datoVacuna as any);
+        }
       }
 
       if (createDto.datoEsavi) {

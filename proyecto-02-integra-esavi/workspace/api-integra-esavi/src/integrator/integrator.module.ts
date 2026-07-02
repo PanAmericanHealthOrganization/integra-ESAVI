@@ -93,6 +93,7 @@ import {ParroquiaService} from './service/parroquia.service';
 import {ProvinciaService} from './service/provincia.service';
 import {SyncService} from './service/sync.service';
 import {VacunometroService} from './service/vacunometro.service';
+import {Icd10MeddraService} from './service/icd10-meddra.service';
 
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({
@@ -215,6 +216,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     InvestigacionService,
     GacetaService,
     NotificadorService,
+    Icd10MeddraService,
   ],
   exports: [
     SyncService,
@@ -223,6 +225,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     MedicamentoService,
     NotificacionVigiflowService,
     DatoVacunaService,
+    DatoVacunacionService,
     ReporteService,
     PacienteEmbarazadaServive,
     DatoEsaviService,
@@ -230,6 +233,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     VacunometroService,
     NotificadorService,
     EstablecimientosService,
+    Icd10MeddraService,
   ],
 })
 export class IntegratorModule {}
