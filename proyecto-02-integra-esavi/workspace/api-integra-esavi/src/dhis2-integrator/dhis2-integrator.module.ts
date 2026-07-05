@@ -2,7 +2,6 @@ import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { IntegratorModule } from '../integrator/integrator.module';
 import { Dhis2IntegradorController } from './controllers/dhis2-integrador.controller';
-import { Dhis2AnalyticsService } from './services/dhis2-analytics.service';
 import { Dhis2DataElementService } from './services/dhis2-data-element.service';
 import { Dhis2DuplicateHandlerService } from './services/dhis2-duplicate-handler.service';
 import { Dhis2EventsService } from './services/dhis2-events.service';
@@ -29,7 +28,6 @@ import { MeddraModule } from 'src/meddra/meddra.module';
     Dhis2ProgramService,
     Dhis2ProgramStageService,
     Dhis2EventsService,
-    Dhis2AnalyticsService,
     Dhis2ProcessingLogService,
     Dhis2DuplicateHandlerService,
   ],

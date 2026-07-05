@@ -3,7 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { Option } from '../dto';
+import { Option, OptionSet } from '../dto';
 
 @Injectable()
 export class Dhis2OptionsService {
@@ -47,5 +47,29 @@ export class Dhis2OptionsService {
       ),
     );
     return data.options;
+  }
+
+  /**
+   * Obtiene los option sets con sus opciones (código y nombre) para traducir
+   * los códigos que entrega el API de eventos/tracker al nombre que entrega analytics.
+   */
+  async getOptionSets(ids: string[]): Promise<OptionSet[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const uri = `${baseUrl}/api/optionSets.json?filter=id:in:[${ids.join(
+      ',',
+    )}]&fields=id,options[code,name]&paging=false`;
+
+    const { data } = await firstValueFrom(
+      this.httpService.get(uri, this.getConfig()).pipe(
+        catchError((e: AxiosError) => {
+          this.logger.error(e);
+          throw new HttpException(e.response.data, e.response.status);
+        }),
+      ),
+    );
+    return data.optionSets;
   }
 }

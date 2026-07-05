@@ -7,3 +7,16 @@ export { ProgramStagesResponse, ProgramStage, Style, UserAccess, UserGroupAccess
 export { OptionResponse, Option } from './options.interface';
 export { ProgramTrackedEntityAttributeResponse, ProgramTrackedEntityAttribute, TrackedEntityAttribute } from './programTrackedEntityAttribute.interface';
 export { IHeader, IData } from './report.interface';
+export {
+  TrackedEntityInstancesResponse,
+  TrackedEntityInstance,
+  Enrollment,
+  TrackerEvent,
+  TrackerApiResponse,
+  TrackerApiTrackedEntity,
+  TrackerApiEnrollment,
+  TrackerApiEvent,
+  OrganisationUnit,
+  TrackedEntityAttributeMetadata,
+  OptionSet,
+} from './tracked-entity-instance.interface';

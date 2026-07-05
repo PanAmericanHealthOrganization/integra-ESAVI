@@ -127,6 +127,8 @@ export class NotificacionService {
             });
           } else if (key === 'origen') {
             query.andWhere('notificacion.origen = :origen', { origen: value });
+          } else if (key === 'gravedad') {
+            query.andWhere('gravedad.tipo = :gravedad', { gravedad: value });
           } else {
             query.andWhere(`notificacion.${key} = :${key}`, { [key]: value });
           }

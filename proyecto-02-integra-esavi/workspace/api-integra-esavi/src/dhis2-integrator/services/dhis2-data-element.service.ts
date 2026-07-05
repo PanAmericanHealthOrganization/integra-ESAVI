@@ -26,7 +26,7 @@ export class Dhis2DataElementService {
     const baseUrl = this.configService.get<string>('DHIS2_URL');
     const idsCadena = idsDataElemet.join(',');
     const uri = baseUrl.concat(
-      `/api/dataElements.json?fields=id,code,name,shortName,displayFormName&paging=false&filter=id:in:[${idsCadena}]`,
+      `/api/dataElements.json?fields=id,code,name,shortName,displayFormName,valueType,optionSet[id]&paging=false&filter=id:in:[${idsCadena}]`,
     );
     const { data } = await firstValueFrom(
       this.httpService.get(uri, this.getConfig()).pipe(

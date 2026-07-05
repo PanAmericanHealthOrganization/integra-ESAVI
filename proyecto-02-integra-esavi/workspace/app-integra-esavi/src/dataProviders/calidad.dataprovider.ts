@@ -46,6 +46,12 @@ export interface ICalidadDataProvider extends DataProvider {
     startDay: string,
     endDay: string
   ) => Promise<any>
+  deleteEvaluations: (resource: string) => Promise<any>
+  recalculateRange: (
+    resource: string,
+    startDate: string,
+    endDate: string
+  ) => Promise<any>
 }
 
 export const calidadDataProvider: ICalidadDataProvider = {
@@ -136,6 +142,23 @@ export const calidadDataProvider: ICalidadDataProvider = {
       startDay,
       endDay,
     })
+    return response.data
+  },
+  deleteEvaluations: async function (resource: string): Promise<any> {
+    const response = await intESAVIClient.delete(
+      `/${resource}/maintenance/evaluations`
+    )
+    return response.data
+  },
+  recalculateRange: async function (
+    resource: string,
+    startDate: string,
+    endDate: string
+  ): Promise<any> {
+    const response = await intESAVIClient.post(
+      `/${resource}/maintenance/evaluations/range`,
+      { startDate, endDate }
+    )
     return response.data
   },
   getList: function <RecordType extends RaRecord = any>(

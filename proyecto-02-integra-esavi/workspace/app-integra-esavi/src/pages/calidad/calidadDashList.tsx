@@ -8,17 +8,18 @@ import {
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Container,
+  IconButton,
   Paper,
   Stack,
   Tab,
   Tabs,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material"
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 
 // Importar componentes de tabs
 import {
@@ -26,6 +27,8 @@ import {
   useCalidadDataQuality,
 } from "./calidadDataQualityContext"
 import { CalidadNavigationProvider } from "./contexts/CalidadNavigationContext"
+import RecalcularCalidad from "./components/RecalcularCalidad"
+import { MesUtils } from "./utils/mesUtils"
 import CalidadCompletitud from "./tabs/calidad_completitud"
 import { CalidadGeneral } from "./tabs/calidad_genera"
 import CalidadSemantica from "./tabs/calidad_semantica"
@@ -47,7 +50,7 @@ function TabPanel(props: TabPanelProps) {
       id={`calidad-tabpanel-${index}`}
       aria-labelledby={`calidad-tab-${index}`}
       {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 2 }}>{children}</Box>}
     </div>
   )
 }
@@ -83,6 +86,48 @@ const CalidadDashListContent: React.FC = () => {
     }
   }
 
+  // Navegación por teclado entre meses:
+  // ← mes anterior · → mes siguiente · ↑/↓ mes actual
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      const tag = target.tagName
+      const esCampoFormulario =
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        target.isContentEditable
+      // No interferir al escribir en formularios, salvo en el propio
+      // campo de fecha de referencia
+      if (esCampoFormulario && target.id !== "fecha-referencia-calidad") return
+      // No interferir cuando hay un diálogo abierto (p. ej. Recalcular)
+      if (target.closest(".MuiDialog-root")) return
+
+      const cambiarMes = (nuevoMes: string) => {
+        event.preventDefault()
+        setSelectedDate(
+          MesUtils.limitar(nuevoMes, MesUtils.mesMinimo(), MesUtils.mesActual())
+        )
+      }
+
+      switch (event.key) {
+        case "ArrowLeft":
+          cambiarMes(MesUtils.sumarMeses(selectedDate, -1))
+          break
+        case "ArrowRight":
+          cambiarMes(MesUtils.sumarMeses(selectedDate, 1))
+          break
+        case "ArrowUp":
+        case "ArrowDown":
+          cambiarMes(MesUtils.mesActual())
+          break
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [selectedDate, setSelectedDate])
+
   const tabs = useMemo(
     () => [
       {
@@ -111,15 +156,15 @@ const CalidadDashListContent: React.FC = () => {
 
   return (
     <CalidadNavigationProvider onNavigateToTab={handleNavigateToTab}>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container maxWidth="xl" sx={{ py: 1 }}>
         <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: 1,
-              px: 1,
-              py: 1,
+              gap: 0.5,
+              px: 2,
+              py: 0.5,
             }}>
             <Box
               sx={{
@@ -131,7 +176,7 @@ const CalidadDashListContent: React.FC = () => {
                 flexWrap: "wrap",
               }}>
               <Typography
-                variant="h4"
+                variant="h5"
                 sx={{ fontWeight: "bold", flexShrink: 0 }}>
                 Monitoreo de Calidad de Datos
               </Typography>
@@ -141,6 +186,14 @@ const CalidadDashListContent: React.FC = () => {
                 spacing={1}
                 alignItems="center"
                 sx={{ flexShrink: 1 }}>
+                {loading && (
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <CircularProgress size={18} />
+                    <Typography variant="body2" color="text.secondary">
+                      Cargando…
+                    </Typography>
+                  </Stack>
+                )}
                 <TextField
                   label="Fecha de referencia"
                   type="month"
@@ -152,36 +205,28 @@ const CalidadDashListContent: React.FC = () => {
                     setSelectedDate(selectedValue)
                   }}
                   inputProps={{
-                    min: (() => {
-                      const date = new Date()
-                      date.setFullYear(date.getFullYear() - 5)
-                      return date.toISOString().slice(0, 7)
-                    })(),
-                    max: new Date().toISOString().slice(0, 7),
+                    id: "fecha-referencia-calidad",
+                    min: MesUtils.mesMinimo(),
+                    max: MesUtils.mesActual(),
                   }}
                   sx={{ minWidth: 180 }}
                 />
-                <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<Refresh />}
-                  onClick={refresh}
-                  disabled={loading}>
-                  Actualizar
-                </Button>
-                {loading && (
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <CircularProgress size={20} />
-                    <Typography variant="body2" color="text.secondary">
-                      Cargando información…
-                    </Typography>
-                  </Stack>
-                )}
+                <Tooltip title="Actualizar datos">
+                  <span>
+                    <IconButton
+                      color="primary"
+                      onClick={refresh}
+                      disabled={loading}>
+                      <Refresh />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+                <RecalcularCalidad />
               </Stack>
             </Box>
 
             {error && (
-              <Alert severity="warning" sx={{ mb: 2 }}>
+              <Alert severity="warning" sx={{ my: 0.5 }}>
                 {error}
               </Alert>
             )}
@@ -195,8 +240,9 @@ const CalidadDashListContent: React.FC = () => {
               variant="scrollable"
               scrollButtons="auto"
               sx={{
+                minHeight: 48,
                 "& .MuiTab-root": {
-                  minHeight: 72,
+                  minHeight: 48,
                   textTransform: "none",
                   fontSize: "1rem",
                   fontWeight: 500,

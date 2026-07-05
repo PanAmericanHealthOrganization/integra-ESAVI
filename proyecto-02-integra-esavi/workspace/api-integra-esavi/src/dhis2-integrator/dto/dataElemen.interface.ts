@@ -8,4 +8,6 @@ export interface DataElement {
   name: string;
   shortName: string;
   displayFormName: string;
+  valueType?: string;
+  optionSet?: { id: string };
 }

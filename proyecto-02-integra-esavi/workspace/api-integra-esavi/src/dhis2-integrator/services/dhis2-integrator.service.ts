@@ -34,7 +34,6 @@ import {
   IHeader,
   ProcessingStatus
 } from '../dto';
-import {Dhis2AnalyticsService} from './dhis2-analytics.service';
 import {Dhis2DuplicateHandlerService} from './dhis2-duplicate-handler.service';
 import {Dhis2EventsService} from './dhis2-events.service';
 import {Dhis2ProcessingLogService} from './dhis2-processing-log.service';
@@ -51,7 +50,6 @@ export class Dhis2IntegratorService {
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
-    private readonly dhis2AnalyticsService: Dhis2AnalyticsService,
     private readonly processingLogService: Dhis2ProcessingLogService,
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
   ) {}
@@ -143,8 +141,7 @@ export class Dhis2IntegratorService {
         'SYSTEM',
       );
 
-      //const eventos = await this.dhis2EventsService.getEventos('NrEU7cRCZd7');
-      const data = await this.dhis2AnalyticsService.getEventsReports(
+      const data = await this.dhis2EventsService.getEventsReports(
         'NrEU7cRCZd7',
         fechaInicio,
         fechaFin,

@@ -1,7 +1,7 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
-import { ProgramTrackedEntityAttribute, Attribute } from '../dto';
+import { ProgramTrackedEntityAttribute, Attribute, TrackedEntityAttributeMetadata } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 
@@ -58,5 +58,31 @@ export class Dhis2ProgramService {
       ),
     );
     return data.attributes;
+  }
+
+  /**
+   * Obtiene los metadatos (nombre, tipo de valor y option set) de los atributos
+   * de la entidad de seguimiento, para nombrar columnas y normalizar valores
+   * igual que lo hace el API de analytics.
+   */
+  async getTrackedEntityAttributesMetadata(ids: string[]): Promise<TrackedEntityAttributeMetadata[]> {
+    if (ids.length === 0) {
+      return [];
+    }
+    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const uri = baseUrl.concat(
+      `/api/trackedEntityAttributes.json?filter=id:in:[${ids.join(
+        ',',
+      )}]&fields=id,name,valueType,optionSet[id]&paging=false`,
+    );
+    const { data } = await firstValueFrom(
+      this.httpService.get(uri, this.getConfig()).pipe(
+        catchError((e: AxiosError) => {
+          this.logger.error(e);
+          throw new HttpException(e.response.data, e.response.status);
+        }),
+      ),
+    );
+    return data.trackedEntityAttributes;
   }
 }

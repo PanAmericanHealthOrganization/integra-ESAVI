@@ -3,7 +3,6 @@ import {Box,Button,Card,Chip,Typography} from "@mui/material"
 import {useState} from "react"
 import {
   Datagrid,
-  ExportButton,
   FunctionField,
   List,
   SelectInput,
@@ -17,6 +16,11 @@ const origenChoices = [
   { id: "DHIS2", name: "DHIS2" },
 ]
 
+const gravedadChoices = [
+  { id: "1", name: "Grave" },
+  { id: "0", name: "No grave" },
+]
+
 const postFilters = [
   <SelectInput
     label="Origen"
@@ -24,6 +28,14 @@ const postFilters = [
     choices={origenChoices}
     alwaysOn
     emptyText="Todos"
+    emptyValue=""
+  />,
+  <SelectInput
+    label="Gravedad"
+    source="gravedad"
+    choices={gravedadChoices}
+    alwaysOn
+    emptyText="Todas"
     emptyValue=""
   />,
   <TextInput label="Identificación" source="identificacion" alwaysOn />,
@@ -34,12 +46,10 @@ const ListActions = () => {
   const [open, setOpen] = useState(false)
   return (
     <TopToolbar>
-      <ExportButton label="CSV" />
       <Button
         variant="contained"
         color="primary"
-        onClick={() => setOpen(true)}
-        style={{ marginLeft: "10px" }}>
+        onClick={() => setOpen(true)}>
         Importar datos
       </Button>
       <BulkDialog open={open} onClose={() => setOpen(false)} />
