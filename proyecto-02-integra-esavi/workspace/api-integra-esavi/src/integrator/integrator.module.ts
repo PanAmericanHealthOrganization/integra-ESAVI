@@ -1,8 +1,8 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule,ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
 import {Homologador} from 'src/homologator/entity/homologador.entity';
+import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
@@ -29,30 +29,30 @@ import {SeedController} from './controller/seed.controller';
 import {SyncController} from './controller/sync.controller';
 import {VacunometroController} from './controller/vacunometro.controller';
 import {
-    AntecedenteEmbarazo,
-    AntecedenteEvento,
-    AntecedenteMedico,
-    AntecedentePreexistencia,
-    Catalogo,
-    CatalogoPadre,
-    CausalidadEsavi,
-    DatoEsavi,
-    DatoVacuna,
-    DatoVacunacion,
-    DesenlaceEsavi,
-    EmbarazoEsavi,
-    Gaceta,
-    GravedadEsavi,
-    Medicamento,
-    Notificacion,
-    Notificador,
-    Paciente,
-    PacienteEmbarazada,
-    Parametro,
-    SyncProcess,
-    TipoCatalogo,
-    Vacunacion,
-    Vacunometro,
+  AntecedenteEmbarazo,
+  AntecedenteEvento,
+  AntecedenteMedico,
+  AntecedentePreexistencia,
+  Catalogo,
+  CatalogoPadre,
+  CausalidadEsavi,
+  DatoEsavi,
+  DatoVacuna,
+  DatoVacunacion,
+  DesenlaceEsavi,
+  EmbarazoEsavi,
+  Gaceta,
+  GravedadEsavi,
+  Medicamento,
+  Notificacion,
+  Notificador,
+  Paciente,
+  PacienteEmbarazada,
+  Parametro,
+  SyncProcess,
+  TipoCatalogo,
+  Vacunacion,
+  Vacunometro,
 } from './entity';
 import {Canton} from './entity/canton.entity';
 import {Establecimiento} from './entity/establecimiento.entity';
@@ -61,31 +61,32 @@ import {Parroquia} from './entity/parroquia.entity';
 import {Provincia} from './entity/provincia.entity';
 import {IntegradorService} from './facade/integrador.service';
 import {
-    AntecedenteEmbarazoService,
-    AntecedenteEventoService,
-    AntecedenteMedicoService,
-    AntecedentePreexistenciaService,
-    CatalogoPadreService,
-    CatalogoService,
-    CausalidadEsaviService,
-    DatoEsaviService,
-    DatoVacunaService,
-    DatoVacunacionService,
-    DesenlaceEsaviService,
-    EmbarazoEsaviService,
-    GacetaService,
-    GravedadEsaviService,
-    MedicamentoService,
-    NotificacionDhis2Service,
-    NotificacionService,
-    NotificacionVigiflowService,
-    PacienteEmbarazadaServive,
-    ParametroService,
-    ReporteService,
-    SeedService,
+  AntecedenteEmbarazoService,
+  AntecedenteEventoService,
+  AntecedenteMedicoService,
+  AntecedentePreexistenciaService,
+  CatalogoPadreService,
+  CatalogoService,
+  CausalidadEsaviService,
+  DatoEsaviService,
+  DatoVacunaService,
+  DatoVacunacionService,
+  DesenlaceEsaviService,
+  EmbarazoEsaviService,
+  GacetaService,
+  GravedadEsaviService,
+  MedicamentoService,
+  NotificacionDhis2Service,
+  NotificacionService,
+  NotificacionVigiflowService,
+  PacienteEmbarazadaServive,
+  ParametroService,
+  ReporteService,
+  SeedService,
 } from './service';
 import {CantonService} from './service/canton.service';
 import {EstablecimientosService} from './service/establecimientos.service';
+import {Icd10MeddraService} from './service/icd10-meddra.service';
 import {InvestigacionService} from './service/investigacion.service';
 import {NotificadorService} from './service/notificador.service';
 import {PacienteService} from './service/paciente.service';
@@ -93,7 +94,6 @@ import {ParroquiaService} from './service/parroquia.service';
 import {ProvinciaService} from './service/provincia.service';
 import {SyncService} from './service/sync.service';
 import {VacunometroService} from './service/vacunometro.service';
-import {Icd10MeddraService} from './service/icd10-meddra.service';
 
 const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
 @Module({

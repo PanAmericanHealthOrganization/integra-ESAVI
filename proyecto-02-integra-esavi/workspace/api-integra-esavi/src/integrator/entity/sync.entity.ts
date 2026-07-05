@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ISync } from '../dto/sync.dto';
-import { Auditoria } from './auditoria.entity';
+import {Column,Entity,PrimaryGeneratedColumn} from 'typeorm';
+import {ISync} from '../dto/sync.dto';
+import {Auditoria} from './auditoria.entity';
 
 /**
  *
@@ -41,8 +41,7 @@ export class SyncProcess extends Auditoria implements ISync {
   @Column({
     name: 'START_TIME',
     type: 'timestamp',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMP',
+    nullable: true,
     comment: 'Fecha y hora de inicio del proceso de sincronización',
   })
   startTime: Date;
