@@ -14,6 +14,9 @@ const toSentenceCase = (text: string): string => {
   return lower.charAt(0).toUpperCase() + lower.slice(1);
 };
 
+const padUniCodigo = (codigo: string): string =>
+  /^[0-9]+$/.test(codigo) ? codigo.padStart(6, '0') : codigo;
+
 @Injectable()
 export class EstablecimientosService {
   private readonly logger = new Logger(EstablecimientosService.name);
@@ -28,15 +31,17 @@ export class EstablecimientosService {
   ) {}
 
   async create(dto: CreateEstablecimientoDto, currentUser = FALLBACK_USER): Promise<Establecimiento> {
+    const uniCodigo = padUniCodigo(dto.uniCodigo);
+
     const existing = await this.establecimientoRepository.findOne({
-      where: { uniCodigo: dto.uniCodigo, isEnabled: true },
+      where: { uniCodigo, isEnabled: true },
     });
     if (existing) {
-      throw new BadRequestException(`Ya existe un establecimiento activo con el código: ${dto.uniCodigo}`);
+      throw new BadRequestException(`Ya existe un establecimiento activo con el código: ${uniCodigo}`);
     }
 
     const establecimiento = this.establecimientoRepository.create({
-      uniCodigo: dto.uniCodigo,
+      uniCodigo,
       uniNombre: toSentenceCase(dto.uniNombre),
       direccion: dto.direccion,
       telefono: dto.telefono,

@@ -1689,7 +1689,7 @@ export class SeedService implements OnApplicationBootstrap {
       let omitidos = 0;
 
       for (const row of rows) {
-        const uniCodigo = String(row['UNI_CODIGO'] ?? '').trim().replace(/"/g, '');
+        const uniCodigo = String(row['UNI_CODIGO'] ?? '').trim().replace(/"/g, '').padStart(6, '0');
         const uniNombre = this.toSentenceCase(String(row['UNI_NOMBRE'] ?? '').trim());
         const direccion = String(row['UNI_DIRECCION'] ?? '').trim();
         const telefono = String(row['UNI_TELEFONO'] ?? '').trim();

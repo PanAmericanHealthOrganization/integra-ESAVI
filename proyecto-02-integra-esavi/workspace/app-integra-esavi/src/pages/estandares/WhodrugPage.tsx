@@ -1,10 +1,17 @@
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import MedicationIcon from "@mui/icons-material/Medication"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Collapse,
+  Divider,
   FormControl,
+  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
@@ -19,6 +26,7 @@ import {
   TablePagination,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
@@ -53,6 +61,7 @@ export const WhodrugPage = () => {
   const [loading, setLoading] = useState(false)
   const [country, setCountry] = useState("EC")
   const [searchName, setSearchName] = useState("")
+  const [showFilter, setShowFilter] = useState(false)
   const [debouncedName, setDebouncedName] = useState("")
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -88,70 +97,103 @@ export const WhodrugPage = () => {
     <Box p={2}>
       <Title title="WHODrug — Diccionario de Medicamentos" />
 
-      <Paper elevation={2} sx={{ p: 2, mb: 2 }}>
-        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-          <MedicationIcon color="primary" />
-          <Typography variant="h6" fontWeight={600}>
-            WHODrug — Medicamentos
+      <Paper elevation={2}>
+        {/* ── Cabecera ── */}
+        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <MedicationIcon color="primary" />
+            <Typography variant="h6" fontWeight={600}>
+              WHODrug — Medicamentos
+            </Typography>
+          </Stack>
+          <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+            <IconButton
+              size="small"
+              onClick={() => setShowFilter((v) => !v)}
+              color={showFilter ? "primary" : "default"}>
+              <Badge variant="dot" color="primary" invisible={!searchName}>
+                <FilterListIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <Box px={2} pb={1.5}>
+          <Typography variant="body2" color="text.secondary">
+            Diccionario internacional de medicamentos de la OMS (WHO Drug Dictionary)
           </Typography>
-        </Stack>
-        <Typography variant="body2" color="text.secondary" mb={2}>
-          Diccionario internacional de medicamentos de la OMS (WHO Drug Dictionary)
-        </Typography>
+        </Box>
 
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={2}>
-          <FormControl size="small" sx={{ minWidth: 220 }}>
-            <InputLabel>País</InputLabel>
-            <Select
-              label="País"
-              value={country}
-              onChange={(e) => { setCountry(e.target.value); setPage(0) }}>
-              {COUNTRIES.map((c) => (
-                <MenuItem key={c.code} value={c.code}>
-                  {c.label}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+        {/* ── Filtros ── */}
+        <Collapse in={showFilter}>
+          <Box px={2} pb={1.5} display="flex" flexDirection="column" gap={1.5}>
+            <TextField
+              placeholder="Buscar por nombre de medicamento…"
+              size="small"
+              fullWidth
+              autoFocus={showFilter}
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
 
-          <TextField
-            size="small"
-            placeholder="Buscar por nombre de medicamento…"
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-            sx={{ flex: 1 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
-        </Stack>
+            <Box display="flex" gap={2} alignItems="center">
+              <FormControl size="small" sx={{ minWidth: 220 }}>
+                <InputLabel>País</InputLabel>
+                <Select
+                  label="País"
+                  value={country}
+                  onChange={(e) => { setCountry(e.target.value); setPage(0) }}>
+                  {COUNTRIES.map((c) => (
+                    <MenuItem key={c.code} value={c.code}>
+                      {c.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <Button size="small" onClick={() => { setSearchName(""); setPage(0) }}>
+                Limpiar
+              </Button>
+            </Box>
+          </Box>
+        </Collapse>
 
-        <TableContainer>
-          <Table size="small">
+        <Divider />
+
+        {/* ── Tabla ── */}
+        <TableContainer sx={{ maxHeight: 480 }}>
+          <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell>Nombre del Medicamento</TableCell>
-                <TableCell>Código</TableCell>
-                <TableCell>ID Producto Medicinal</TableCell>
-                <TableCell align="center">Genérico</TableCell>
-                <TableCell align="center">Preferido</TableCell>
+                <TableCell sx={{ minWidth: 100 }}>Código</TableCell>
+                <TableCell sx={{ minWidth: 140 }}>ID Producto Medicinal</TableCell>
+                <TableCell align="center" sx={{ minWidth: 100 }}>Genérico</TableCell>
+                <TableCell align="center" sx={{ minWidth: 100 }}>Preferido</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4 }}>
-                    <CircularProgress size={32} />
+                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                    <CircularProgress size={28} />
                   </TableCell>
                 </TableRow>
               ) : drugs.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} align="center" sx={{ py: 4, color: "text.secondary" }}>
-                    No se encontraron medicamentos. Seleccione un país e intente nuevamente.
+                  <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
+                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                      <Typography variant="body2" color="text.secondary">
+                        No se encontraron medicamentos. Seleccione un país e intente nuevamente.
+                      </Typography>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ) : (
@@ -163,12 +205,14 @@ export const WhodrugPage = () => {
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontFamily="monospace" color="text.secondary">
+                      <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
                         {drug.drugCode}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">{drug.medicinalProductID}</Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {drug.medicinalProductID}
+                      </Typography>
                     </TableCell>
                     <TableCell align="center">
                       <Chip
@@ -193,6 +237,7 @@ export const WhodrugPage = () => {
           </Table>
         </TableContainer>
 
+        {/* ── Paginación ── */}
         <TablePagination
           component="div"
           count={total}
