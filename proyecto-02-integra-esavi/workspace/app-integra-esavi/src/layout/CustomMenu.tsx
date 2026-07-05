@@ -100,11 +100,6 @@ sx={{ pl: "16px", minHeight: 48 }}>
           primaryText="Procesos de sincronización"
           leftIcon={<SyncIcon />}
         />
-        <Menu.Item
-          to="/catalogos"
-          primaryText="Catálogos"
-          leftIcon={<SegmentIcon />}
-        />
         {/* Estándares */}
         <SubMenu
           dense={false}

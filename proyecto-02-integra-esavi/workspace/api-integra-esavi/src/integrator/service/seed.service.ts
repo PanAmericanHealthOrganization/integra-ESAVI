@@ -28,6 +28,7 @@ import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
+import {Vacunometro} from '../entity/vacunometro.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -71,6 +72,8 @@ export class SeedService implements OnApplicationBootstrap {
     private homologadorRepository: Repository<Homologador>,
     @InjectRepository(ReglaHomologacion, 'POSTGRES_INTEGRATOR_DS')
     private reglaHomologacionRepository: Repository<ReglaHomologacion>,
+    @InjectRepository(Vacunometro, 'POSTGRES_INTEGRATOR_DS')
+    private vacunometroRepository: Repository<Vacunometro>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -1312,7 +1315,7 @@ export class SeedService implements OnApplicationBootstrap {
     });
   }
 
-  // ── Carga de TC_PROVINCIA, TC_CANTON, TC_PARROQUIA ──────────────────────────
+  // ── Carga de TC_DPA_PROVINCIA, TC_DPA_CANTON, TC_DPA_PARROQUIA ──────────────────────────
 
   async seedUbicaciones() {
     await this.seedProvincias();
@@ -1339,14 +1342,14 @@ export class SeedService implements OnApplicationBootstrap {
   private async seedProvincias() {
     const count = await this.provinciaRepository.count();
     if (count >= 20) {
-      console.log(`ℹ️ TC_PROVINCIA ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_PROVINCIA ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_PROVINCIA incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_PROVINCIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_PROVINCIA desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_PROVINCIA desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1371,23 +1374,23 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_PROVINCIA: ${insertados} provincia(s) insertada(s).`);
+      console.log(`✅ TC_DPA_PROVINCIA: ${insertados} provincia(s) insertada(s).`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_PROVINCIA:', error);
+      console.error('❌ Error al cargar TC_DPA_PROVINCIA:', error);
     }
   }
 
   private async seedCantones() {
     const count = await this.cantonRepository.count();
     if (count >= 200) {
-      console.log(`ℹ️ TC_CANTON ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_CANTON ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_CANTON incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_CANTON incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_CANTON desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_CANTON desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1420,23 +1423,23 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_CANTON: ${insertados} cantón(es) insertado(s), ${omitidos} omitido(s) por provincia no encontrada.`);
+      console.log(`✅ TC_DPA_CANTON: ${insertados} cantón(es) insertado(s), ${omitidos} omitido(s) por provincia no encontrada.`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_CANTON:', error);
+      console.error('❌ Error al cargar TC_DPA_CANTON:', error);
     }
   }
 
   private async seedParroquias() {
     const count = await this.parroquiaRepository.count();
     if (count >= 1400) {
-      console.log(`ℹ️ TC_PARROQUIA ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_PARROQUIA ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_PARROQUIA incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_PARROQUIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_PARROQUIA desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_PARROQUIA desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1469,7 +1472,7 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
+      console.log(`✅ TC_DPA_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
 
       // Insertar una parroquia "Desconocido-{canton}" por cada cantón
       const todosLosCantones = await this.cantonRepository.find();
@@ -1487,9 +1490,9 @@ export class SeedService implements OnApplicationBootstrap {
           insertadosDesconocido++;
         }
       }
-      console.log(`✅ TC_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
+      console.log(`✅ TC_DPA_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_PARROQUIA:', error);
+      console.error('❌ Error al cargar TC_DPA_PARROQUIA:', error);
     }
     };
   
@@ -1734,6 +1737,86 @@ export class SeedService implements OnApplicationBootstrap {
     } catch (error) {
       console.error('❌ Error al cargar TR_ESTABLECIMIENTO desde CSV:', error);
     }
+  }
+
+  /**
+   * Genera datos simulados en TR_VACUNOMETRO para pruebas y demos.
+   * Usa unicodigos reales de TR_ESTABLECIMIENTO cuando existen; caso contrario,
+   * genera códigos sintéticos.
+   * @param registros cantidad de registros a generar
+   * @param dias rango hacia atrás desde hoy para las fechas de aplicación
+   */
+  async seedVacunometro(registros = 1000, dias = 365): Promise<{ insertados: number }> {
+    const VACUNAS = [
+      'BCG',
+      'Hepatitis B pediátrica',
+      'Rotavirus',
+      'fIPV',
+      'bOPV',
+      'Pentavalente (DPT-HB-Hib)',
+      'Neumococo conjugada',
+      'SRP (Sarampión-Rubéola-Parotiditis)',
+      'Fiebre Amarilla',
+      'Varicela',
+      'DPT refuerzo',
+      'HPV',
+      'dT adulto',
+      'Influenza estacional',
+      'COVID-19',
+    ];
+    const GRUPOS_ETARIOS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    const aleatorio = (max: number) => Math.floor(Math.random() * max);
+
+    let insertados = 0;
+    await this.runSyncProcess(`Simulación de ${registros} registros de VACUNOMETRO...`, async () => {
+      const establecimientos = await this.establecimientoRepository.find({
+        select: { uniCodigo: true },
+        take: 300,
+      });
+      const unicodigos =
+        establecimientos.length > 0
+          ? establecimientos.map((e) => e.uniCodigo)
+          : Array.from({ length: 50 }, (_, i) => String(i + 1).padStart(6, '0'));
+
+      const auditoriaDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+
+      const ahora = Date.now();
+      const rangoMs = dias * 24 * 60 * 60 * 1000;
+      const lote: Partial<Vacunometro>[] = Array.from({ length: registros }, () => {
+        const totalHombres = aleatorio(250);
+        const totalMujeres = aleatorio(250);
+        return {
+          unicodigo: unicodigos[aleatorio(unicodigos.length)],
+          nombreVacuna: VACUNAS[aleatorio(VACUNAS.length)],
+          grupoEtario: GRUPOS_ETARIOS[aleatorio(GRUPOS_ETARIOS.length)],
+          fechaAplicacion: new Date(ahora - aleatorio(rangoMs)),
+          totalHombres,
+          totalMujeres,
+          total: totalHombres + totalMujeres,
+          ...auditoriaDto,
+        };
+      });
+
+      const CHUNK_SIZE = 1000;
+      for (let i = 0; i < lote.length; i += CHUNK_SIZE) {
+        const chunk = lote.slice(i, i + CHUNK_SIZE);
+        await this.vacunometroRepository.insert(chunk);
+        insertados += chunk.length;
+        console.log(`✅ TR_VACUNOMETRO: ${insertados} de ${lote.length} registros simulados insertados.`);
+      }
+    });
+
+    return { insertados };
   }
 
   async truncateNotificacion() {

@@ -126,14 +126,14 @@ export const WhodrugPage = () => {
 
         {/* ── Filtros ── */}
         <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" flexDirection="column" gap={1.5}>
+          <Box px={2} pb={1.5} display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
             <TextField
               placeholder="Buscar por nombre de medicamento…"
               size="small"
-              fullWidth
               autoFocus={showFilter}
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
+              sx={{ width: 280 }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -142,25 +142,22 @@ export const WhodrugPage = () => {
                 ),
               }}
             />
-
-            <Box display="flex" gap={2} alignItems="center">
-              <FormControl size="small" sx={{ minWidth: 220 }}>
-                <InputLabel>País</InputLabel>
-                <Select
-                  label="País"
-                  value={country}
-                  onChange={(e) => { setCountry(e.target.value); setPage(0) }}>
-                  {COUNTRIES.map((c) => (
-                    <MenuItem key={c.code} value={c.code}>
-                      {c.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <Button size="small" onClick={() => { setSearchName(""); setPage(0) }}>
-                Limpiar
-              </Button>
-            </Box>
+            <FormControl size="small" sx={{ width: 280 }}>
+              <InputLabel>País</InputLabel>
+              <Select
+                label="País"
+                value={country}
+                onChange={(e) => { setCountry(e.target.value); setPage(0) }}>
+                {COUNTRIES.map((c) => (
+                  <MenuItem key={c.code} value={c.code}>
+                    {c.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button size="small" sx={{ ml: "auto" }} onClick={() => { setSearchName(""); setPage(0) }}>
+              Limpiar
+            </Button>
           </Box>
         </Collapse>
 

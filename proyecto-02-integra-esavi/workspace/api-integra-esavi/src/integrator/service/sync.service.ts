@@ -4,7 +4,7 @@ import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
 import { CreateSyncDto, ISync, SyncDto, UpdateSyncDto } from '../dto/sync.dto';
-import { SyncProcess } from '../entity';
+import { SyncProcess, SyncStatus } from '../entity';
 /**
  *
  */
@@ -90,6 +90,57 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
   public async createSyncProcess(syncProcess: ISync): Promise<SyncProcess> {
     const t = this.syncProcessRepository.create(syncProcess);
     return this.syncProcessRepository.save(t);
+  }
+
+  /**
+   * Crea el registro del proceso de sincronización, ejecuta el proceso y actualiza el
+   * registro a COMPLETED o FAILED según el resultado. El proceso debe retornar el
+   * resultado a propagar y el mensaje de éxito a registrar.
+   */
+  public async ejecutarConRegistro<T>(
+    syncName: string,
+    proceso: () => Promise<{ resultado?: T; mensaje: string }>,
+    dataStartDate: Date | null = null,
+    dataEndDate: Date | null = null,
+  ): Promise<T> {
+    const syncRecord = await this.createSyncProcess({
+      name: syncName,
+      status: SyncStatus.RUNNING,
+      startTime: new Date(),
+      endTime: null,
+      dataStartDate,
+      dataEndDate,
+      message: null,
+      errorMessage: null,
+      errorStack: null,
+      errorTrace: null,
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: new Date(),
+      updatedBy: 'System',
+      deletedAt: null,
+      deletedBy: null,
+      isEnabled: true,
+      isActive: true,
+    });
+
+    try {
+      const { resultado, mensaje } = await proceso();
+      await this.update(syncRecord.id, {
+        status: SyncStatus.COMPLETED,
+        endTime: new Date(),
+        message: mensaje,
+      });
+      return resultado;
+    } catch (error) {
+      await this.update(syncRecord.id, {
+        status: SyncStatus.FAILED,
+        endTime: new Date(),
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : null,
+      });
+      throw error;
+    }
   }
 
   /**

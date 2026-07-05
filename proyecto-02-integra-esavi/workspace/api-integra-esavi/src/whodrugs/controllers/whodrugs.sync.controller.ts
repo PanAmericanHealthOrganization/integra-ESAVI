@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { DrugSync } from '../models/drugSync.entity';
 import { WhoDrugsAsAnyService } from '../services/whodrugasany.service';
 import { WhoDrugsSyncService } from '../services/whodrugs-sync.service';
@@ -37,6 +37,26 @@ export class WhodrugsSyncController {
   })
   public async sync(): Promise<any> {
     await this.whoDrugsSincService.sync();
+  }
+
+  /**
+   *
+   */
+  @Delete('/truncate')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Trunca todas las tablas del esquema WHO_DRUG (TRUNCATE CASCADE)',
+    description:
+      'Limpia DRUG, ACTIVE_INGREDIENTS, INGREDIENT_TRANSLATION, COUNTRY_SALES, MAHOLDER, ATOMIC_THERAPEUTIC_CHEMICALS y DRUG_SYNC. Al incluir DRUG_SYNC, la próxima sincronización volverá a importar los datos.',
+  })
+  @ApiResponse({ status: 200, description: 'Tablas de WHO_DRUG truncadas exitosamente' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  public async truncate() {
+    await this.whoDrugsSincService.truncate();
+    return {
+      message: 'Tablas del esquema WHO_DRUG truncadas exitosamente',
+      timestamp: new Date().toISOString(),
+    };
   }
 
   /**

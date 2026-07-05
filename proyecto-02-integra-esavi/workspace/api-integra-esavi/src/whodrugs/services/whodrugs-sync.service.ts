@@ -5,6 +5,7 @@ import {formatDate} from 'date-fns';
 import {createHash} from 'node:crypto';
 import {withAuditOnCreate,withAuditOnUpdate} from 'src/common/utils/audit.util';
 import {Auditoria} from 'src/integrator/entity';
+import {SyncService} from 'src/integrator/service/sync.service';
 import {Repository} from 'typeorm';
 import {ActiveIngredient} from '../models/activeIngredient.entity';
 import {AnatomicalTherapeuticChemical} from '../models/atomicTerapeutalChemical.entity';
@@ -49,6 +50,8 @@ export class WhoDrugsSyncService {
 
     @InjectRepository(Maholder, 'WHO_DRUG')
     private readonly maholderRepository: Repository<Maholder>,
+
+    private readonly syncService: SyncService,
   ) {}
 
   private readonly logger = new Logger(WhoDrugsSyncService.name);
@@ -67,28 +70,33 @@ export class WhoDrugsSyncService {
    * @returns
    */
   public async sync(): Promise<void> {
-    try {
-      // Obtener la sincronización
-      this.logger.log('Iniciando sincronización, descargando archivo de whodrugs');
-      //
-      const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
-      const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
+    await this.syncService.ejecutarConRegistro('Sincronización WHODrug', async () => {
+      try {
+        // Obtener la sincronización
+        this.logger.log('Iniciando sincronización, descargando archivo de whodrugs');
+        //
+        const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
+        const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
 
-      // Verificar si hay actualizaciones
-      const existe = await this.getDrugSyncBySHA(sha256);
-      if (!existe) {
+        // Verificar si hay actualizaciones
+        const existe = await this.getDrugSyncBySHA(sha256);
+        if (existe) {
+          return { mensaje: 'Sin cambios: la versión de WHODrug ya se encontraba sincronizada' };
+        }
+
         // Procesar la sincronización
         const drugSync = await this.createDrugSync(sha256);
         this.logger.log(`Syncronización iniciada ${drugSync.id} a las ${drugSync.startSyncDate}`);
         await this.saveDrugs(drugsResponse, drugSync);
         this.logger.log(`Syncronización finalizada ${drugSync.id} a las ${drugSync.endSyncDate}`);
+        return { mensaje: `Sincronización WHODrug completada (drug sync ${drugSync.id})` };
+      } catch (e) {
+        this.logger.error(`Error al procesar la sincronización ${e.message}`);
+        throw e;
+      } finally {
+        this.logger.log('Proceso Finalizado');
       }
-    } catch (e) {
-      this.logger.error(`Error al procesar la sincronización ${e.message}`);
-      throw e;
-    } finally {
-      this.logger.log('Proceso Finalizado');
-    }
+    });
   }
 
   /**
@@ -290,6 +298,43 @@ export class WhoDrugsSyncService {
       this.anatomicalTherapeuticChemicalRepository,
       AnatomicalTherapeuticChemical.name,
     );
+  }
+
+  /**
+   * Trunca todas las tablas del esquema WHO_DRUG en cascada,
+   * incluyendo DRUG_SYNC para que una nueva sincronización no se omita por SHA repetido.
+   */
+  public async truncate(): Promise<void> {
+    this.logger.log('Truncando tablas del esquema WHO_DRUG...');
+    const connection = this.drugRepository.manager.connection;
+
+    const listaTablas = [
+      Drug,
+      ActiveIngredient,
+      IngredientTranslation,
+      CountryOfSale,
+      Maholder,
+      AnatomicalTherapeuticChemical,
+      DrugSync,
+    ]
+      .map((entity) => {
+        const metadata = connection.getMetadata(entity);
+        return `"${metadata.schema}"."${metadata.tableName}"`;
+      })
+      .join(', ');
+
+    const queryRunner = connection.createQueryRunner();
+    try {
+      await queryRunner.query('SET session_replication_role = replica;');
+      await queryRunner.query(`TRUNCATE TABLE ${listaTablas} CASCADE;`);
+      await queryRunner.query('SET session_replication_role = DEFAULT;');
+      this.logger.log('Tablas del esquema WHO_DRUG truncadas exitosamente');
+    } catch (error) {
+      this.logger.error(`Error al truncar las tablas de WHO_DRUG: ${error.message}`);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**

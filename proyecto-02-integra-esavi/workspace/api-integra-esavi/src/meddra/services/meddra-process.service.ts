@@ -1,11 +1,12 @@
 import {DataSource,In,InsertResult,Repository} from 'typeorm';
 import {LLT} from '../models/standar/llt.entity';
 
-import {BadRequestException, ConflictException, Logger, NotFoundException} from '@nestjs/common';
+import {BadRequestException, ConflictException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 import {InjectDataSource,InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import {join} from 'path';
 import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {SyncService} from 'src/integrator/service/sync.service';
 import * as XLSX from 'xlsx';
 import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
 import {MeddraSync} from '../models/standar/meddraSync.entity';
@@ -16,6 +17,7 @@ import {MeddraUtils} from '../utils/meddra.utils';
 /**
  * Permite procesar los archivos de meddra
  */
+@Injectable()
 export class MeddraProcessFilesService {
   meddraVersionFilePath = null;
   constructor(
@@ -36,6 +38,8 @@ export class MeddraProcessFilesService {
 
     @InjectDataSource('MEDDRA')
     private dataSource: DataSource,
+
+    private readonly syncService: SyncService,
   ) {
     this.meddraVersionFilePath = '';
   }
@@ -70,49 +74,54 @@ export class MeddraProcessFilesService {
       );
     }
 
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    let socDB = [];
-    let ptDB = [];
-    let llDB = [];
+    return this.syncService.ejecutarConRegistro(
+      `Sincronización MedDRA ${versionStr}/${langStr}`,
+      async () => {
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+        let socDB = [];
+        let ptDB = [];
+        let llDB = [];
 
-    const syncRecord = withAuditOnCreate(new MeddraSync(versionStr, langStr, description));
-    syncRecord.startSyncDate = new Date();
-    const versionEntity = await this.meddraSuncRepository.save(syncRecord);
+        const syncRecord = withAuditOnCreate(new MeddraSync(versionStr, langStr, description));
+        syncRecord.startSyncDate = new Date();
+        const versionEntity = await this.meddraSuncRepository.save(syncRecord);
 
-    try {
-      // Nivel superior
-      const soc = await MeddraUtils.readFileContent(versionStr, langStr, 'soc.asc');
-      socDB = await this.processSOC(soc, versionEntity);
+        try {
+          // Nivel superior
+          const soc = await MeddraUtils.readFileContent(versionStr, langStr, 'soc.asc');
+          socDB = await this.processSOC(soc, versionEntity);
 
-      // Nivel intermedio, requiere soc por pt
-      const ptDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'pt.asc');
-      ptDB = await this.processPT(ptDataFile, socDB);
+          // Nivel intermedio, requiere soc por pt
+          const ptDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'pt.asc');
+          ptDB = await this.processPT(ptDataFile, socDB);
 
-      // Nivel inferior, requiere pt por llt
-      const lltDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'llt.asc');
-      llDB = await this.processLLT(lltDataFile, ptDB);
+          // Nivel inferior, requiere pt por llt
+          const lltDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'llt.asc');
+          llDB = await this.processLLT(lltDataFile, ptDB);
 
-      await this.meddraSuncRepository.update(versionEntity.id, {
-        syncStatus: SyncStateEnum.FINISHED,
-        endSyncDate: new Date(),
-      });
-    } catch (e) {
-      await queryRunner.rollbackTransaction();
-      await this.meddraSuncRepository.update(versionEntity.id, {
-        syncStatus: SyncStateEnum.ERROR,
-        endSyncDate: new Date(),
-      });
-      throw e;
-    } finally {
-      await queryRunner.release();
-    }
-    this.logger.log('Proceso de archivos de meddra finalizado');
-    return { soc: socDB, pt: ptDB, llt: llDB };
-    /**
-     *
-     */
+          await this.meddraSuncRepository.update(versionEntity.id, {
+            syncStatus: SyncStateEnum.FINISHED,
+            endSyncDate: new Date(),
+          });
+        } catch (e) {
+          await queryRunner.rollbackTransaction();
+          await this.meddraSuncRepository.update(versionEntity.id, {
+            syncStatus: SyncStateEnum.ERROR,
+            endSyncDate: new Date(),
+          });
+          throw e;
+        } finally {
+          await queryRunner.release();
+        }
+        this.logger.log('Proceso de archivos de meddra finalizado');
+        return {
+          resultado: { soc: socDB, pt: ptDB, llt: llDB },
+          mensaje: `Versión MedDRA ${versionStr}/${langStr} procesada exitosamente`,
+        };
+      },
+    );
   }
 
   /**

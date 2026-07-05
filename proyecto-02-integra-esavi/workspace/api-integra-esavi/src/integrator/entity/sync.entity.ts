@@ -1,6 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { ISync } from '../dto/sync.dto';
-import { Auditoria } from './auditoria.entity';
+import {Column,Entity,PrimaryGeneratedColumn} from 'typeorm';
+import {ISync} from '../dto/sync.dto';
+import {Auditoria} from './auditoria.entity';
 
 /**
  *

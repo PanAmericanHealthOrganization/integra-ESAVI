@@ -1,5 +1,5 @@
-import { Controller, Delete, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Delete, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SeedService } from '../service/seed.service';
 
 /**
@@ -19,6 +19,25 @@ export class SeedController {
     return {
       message:
         'Controlador del semillero: Valores cargados exitosamente en el catálogo de homologación.',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Post('vacunometro')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Generar datos simulados de vacunómetro (TR_VACUNOMETRO)',
+    description:
+      'Inserta registros aleatorios de conteo de vacunas para pruebas y demos, usando unicodigos reales de TR_ESTABLECIMIENTO cuando existen.',
+  })
+  @ApiQuery({ name: 'registros', required: false, description: 'Cantidad de registros a generar (default 1000)' })
+  @ApiQuery({ name: 'dias', required: false, description: 'Rango de días hacia atrás para las fechas de aplicación (default 365)' })
+  @ApiResponse({ status: 200, description: 'Datos simulados insertados exitosamente' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  async seedVacunometro(@Query('registros') registros = 1000, @Query('dias') dias = 365) {
+    const { insertados } = await this.seedService.seedVacunometro(+registros, +dias);
+    return {
+      message: `${insertados} registros simulados de vacunómetro insertados exitosamente`,
       timestamp: new Date().toISOString(),
     };
   }

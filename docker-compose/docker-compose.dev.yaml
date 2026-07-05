@@ -1,0 +1,156 @@
+# ── Docker Compose para DESARROLLO (solo localhost) ─────────────────────────────
+# Levanta únicamente: postgres, keycloak, api (watch) y app (vite dev server).
+# La API y la app montan el código fuente del host, con hot-reload en ambos.
+#
+# Uso:
+#   docker compose -f docker-compose.dev.yaml up -d
+#   docker compose -f docker-compose.dev.yaml logs -f api
+#
+# Todos los puertos se publican solo en 127.0.0.1.
+
+name: integra-esavi-dev
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_esavi_dev
+    environment:
+      POSTGRES_USER: dhis
+      POSTGRES_PASSWORD: dhis
+      POSTGRES_DB: DHI_ESAVI
+      TZ: America/Guayaquil
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dhis -d DHI_ESAVI"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Crea los esquemas de la BD y el usuario/BD de keycloak (requerido por keycloak)
+  db-init:
+    image: postgres:15
+    container_name: db_init_esavi_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: dhis
+    volumes:
+      - ./scripts/init-db.sh:/init-db.sh
+    entrypoint: ["/bin/bash", "/init-db.sh"]
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.3
+    container_name: keycloak_server_dev
+    restart: unless-stopped
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin_password
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password123
+      KC_HTTP_ENABLED: "true"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./scripts/keycloak-realm.json:/opt/keycloak/data/import/realm-export.json
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/9000 && echo -e 'GET /health/ready HTTP/1.0\\r\\nHost: localhost\\r\\n\\r\\n' >&3 && grep -q 'UP' <&3"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+  # ── API NestJS en modo watch (nest start --watch) ─────────────────────────────
+  api:
+    image: node:22-bullseye
+    container_name: api_integra_esavi_dev
+    restart: unless-stopped
+    working_dir: /app
+    # pnpm 11 (igual que el host): pnpm 9 falla con "packages field missing or empty"
+    # porque el pnpm-workspace.yaml del proyecto solo define allowBuilds, sin packages.
+    # strict-dep-builds=false: con CI=true los build scripts ignorados (puppeteer,
+    # oracledb, scarf) son error fatal, pero en dev no se necesitan esos builds.
+    command: >
+      bash -c "corepack enable &&
+               corepack prepare pnpm@11.5.3 --activate &&
+               pnpm install --config.strict-dep-builds=false &&
+               pnpm run start:dev"
+    environment:
+      HOST_DATABASE: postgres
+      PORT_DATABASE: "5432"
+      NAME_DATABASE: DHI_ESAVI
+      USER_DATABASE: dhis
+      PASS_DATABASE: dhis
+      SCHEMA_DATABASE: DHI_ESAVI
+      MDD_DB_HOST: postgres
+      MDD_DB_PORT: "5432"
+      MDD_DB_NAME: DHI_ESAVI
+      MDD_DB_USER: dhis
+      MDD_DB_PASS: dhis
+      WHD_DB_HOST: postgres
+      WHD_DB_PORT: "5432"
+      WHD_DB_NAME: DHI_ESAVI
+      WHD_DB_USER: dhis
+      WHD_DB_PASS: dhis
+      TZ: America/Guayaquil
+      # Evita descargar chromium en cada install; el crawler de puppeteer no está disponible en dev
+      PUPPETEER_SKIP_DOWNLOAD: "true"
+      # Sin TTY, pnpm no puede pedir confirmación para purgar node_modules (ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY)
+      CI: "true"
+    volumes:
+      # Código fuente montado desde el host para hot-reload
+      - ../proyecto-02-integra-esavi/workspace/api-integra-esavi:/app
+      # node_modules propio del contenedor (evita conflictos de binarios macOS/Linux)
+      - api_node_modules:/app/node_modules
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      # Margen amplio: el primer arranque hace pnpm install + compilación
+      start_period: 180s
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+
+  # ── App web (vite dev server con HMR) ─────────────────────────────────────────
+  # Lee el .env del proyecto (VITE_KEYCLOAK_URL, VITE_INTEGRA_ESAVI_API_URL, etc.),
+  # que ya apunta a http://localhost:8080 y http://localhost:3000.
+  app-web:
+    image: node:20-alpine
+    container_name: app_integra_esavi_dev
+    restart: unless-stopped
+    working_dir: /app
+    command: >
+      sh -c "corepack enable &&
+             corepack prepare pnpm@9.12.1 --activate &&
+             pnpm install &&
+             pnpm run start:dev -- --host 0.0.0.0 --port 5173"
+    volumes:
+      - ../proyecto-02-integra-esavi/workspace/app-integra-esavi:/app
+      - app_node_modules:/app/node_modules
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      keycloak:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data_dev:
+  api_node_modules:
+  app_node_modules:

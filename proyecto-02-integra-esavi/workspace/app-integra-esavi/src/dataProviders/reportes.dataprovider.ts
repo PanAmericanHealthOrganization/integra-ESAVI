@@ -28,7 +28,7 @@ import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
 export const reporteDataProvider: DataProvider = {
   obtenerReporte: async (fechaDesde: string, fechaHasta: string) => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/retrivePdf?startDate=${fechaDesde}&endDate=${fechaHasta}`,
+      `${INT_ESAV_API}/v1/integrator/reports/retrivePdf?startDate=${fechaDesde}&endDate=${fechaHasta}`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
