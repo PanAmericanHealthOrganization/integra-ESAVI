@@ -28,6 +28,7 @@ import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
+import {Vacunometro} from '../entity/vacunometro.entity';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -71,6 +72,8 @@ export class SeedService implements OnApplicationBootstrap {
     private homologadorRepository: Repository<Homologador>,
     @InjectRepository(ReglaHomologacion, 'POSTGRES_INTEGRATOR_DS')
     private reglaHomologacionRepository: Repository<ReglaHomologacion>,
+    @InjectRepository(Vacunometro, 'POSTGRES_INTEGRATOR_DS')
+    private vacunometroRepository: Repository<Vacunometro>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -1734,6 +1737,86 @@ export class SeedService implements OnApplicationBootstrap {
     } catch (error) {
       console.error('❌ Error al cargar TR_ESTABLECIMIENTO desde CSV:', error);
     }
+  }
+
+  /**
+   * Genera datos simulados en TR_VACUNOMETRO para pruebas y demos.
+   * Usa unicodigos reales de TR_ESTABLECIMIENTO cuando existen; caso contrario,
+   * genera códigos sintéticos.
+   * @param registros cantidad de registros a generar
+   * @param dias rango hacia atrás desde hoy para las fechas de aplicación
+   */
+  async seedVacunometro(registros = 1000, dias = 365): Promise<{ insertados: number }> {
+    const VACUNAS = [
+      'BCG',
+      'Hepatitis B pediátrica',
+      'Rotavirus',
+      'fIPV',
+      'bOPV',
+      'Pentavalente (DPT-HB-Hib)',
+      'Neumococo conjugada',
+      'SRP (Sarampión-Rubéola-Parotiditis)',
+      'Fiebre Amarilla',
+      'Varicela',
+      'DPT refuerzo',
+      'HPV',
+      'dT adulto',
+      'Influenza estacional',
+      'COVID-19',
+    ];
+    const GRUPOS_ETARIOS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    const aleatorio = (max: number) => Math.floor(Math.random() * max);
+
+    let insertados = 0;
+    await this.runSyncProcess(`Simulación de ${registros} registros de VACUNOMETRO...`, async () => {
+      const establecimientos = await this.establecimientoRepository.find({
+        select: { uniCodigo: true },
+        take: 300,
+      });
+      const unicodigos =
+        establecimientos.length > 0
+          ? establecimientos.map((e) => e.uniCodigo)
+          : Array.from({ length: 50 }, (_, i) => String(i + 1).padStart(6, '0'));
+
+      const auditoriaDto: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+
+      const ahora = Date.now();
+      const rangoMs = dias * 24 * 60 * 60 * 1000;
+      const lote: Partial<Vacunometro>[] = Array.from({ length: registros }, () => {
+        const totalHombres = aleatorio(250);
+        const totalMujeres = aleatorio(250);
+        return {
+          unicodigo: unicodigos[aleatorio(unicodigos.length)],
+          nombreVacuna: VACUNAS[aleatorio(VACUNAS.length)],
+          grupoEtario: GRUPOS_ETARIOS[aleatorio(GRUPOS_ETARIOS.length)],
+          fechaAplicacion: new Date(ahora - aleatorio(rangoMs)),
+          totalHombres,
+          totalMujeres,
+          total: totalHombres + totalMujeres,
+          ...auditoriaDto,
+        };
+      });
+
+      const CHUNK_SIZE = 1000;
+      for (let i = 0; i < lote.length; i += CHUNK_SIZE) {
+        const chunk = lote.slice(i, i + CHUNK_SIZE);
+        await this.vacunometroRepository.insert(chunk);
+        insertados += chunk.length;
+        console.log(`✅ TR_VACUNOMETRO: ${insertados} de ${lote.length} registros simulados insertados.`);
+      }
+    });
+
+    return { insertados };
   }
 
   async truncateNotificacion() {

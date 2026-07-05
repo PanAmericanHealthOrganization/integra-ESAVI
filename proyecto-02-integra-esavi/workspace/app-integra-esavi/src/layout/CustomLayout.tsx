@@ -71,6 +71,21 @@ const globalLayoutFix = `
   .RaDatagrid-tableWrapper::-webkit-scrollbar {
     display: none !important;
   }
+
+  /* Marca de agua: escudo del Ecuador fijo en la esquina inferior derecha,
+     sobre el contenido pero sin interceptar clics */
+  .RaLayout-content::after {
+    content: '';
+    position: fixed;
+    right: clamp(12px, 2vw, 24px);
+    bottom: ${FOOTER_HEIGHT + 16}px;
+    width: clamp(110px, 28vw, 243px);
+    aspect-ratio: 1000 / 1200;
+    background: url('/logos/escudo_ecuador.png') no-repeat center / contain;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 1000;
+  }
 `;
 
 export const CustomLayout = (props: LayoutProps) => (

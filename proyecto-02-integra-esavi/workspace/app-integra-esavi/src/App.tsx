@@ -13,7 +13,6 @@ import keycloak from "./keycloak"
 import {CustomLayout} from "./layout/CustomLayout"
 import {CustomLoginPage} from "./layout/CustomLogin"
 import analisis from "./pages/analisis"
-import catalogos from "./pages/catalogos"
 import {CatalogosConfigList} from "./pages/catalogos-config/catalogosConfigList"
 import dashboard from "./pages/dashboard"
 import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
@@ -96,7 +95,6 @@ const App = () => {
       <Resource name="parametros" list={ParametrosPage} />
       <Resource name="calidad" list={CalidadDashList} />
       <Resource name="syncs" {...syncs} />
-      <Resource name="catalogos" {...catalogos} />
       <Resource name="catalogos-config" list={CatalogosConfigPage} />
       <Resource name="catalogo-padre" />
       <Resource name="dpa" list={DpaPage} />
