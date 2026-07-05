@@ -1,14 +1,22 @@
+import FilterListIcon from "@mui/icons-material/FilterList"
+import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import SearchIcon from "@mui/icons-material/Search"
 import {
+  Badge,
   Box,
+  Button,
   Chip,
   CircularProgress,
+  Collapse,
+  Divider,
+  IconButton,
   InputAdornment,
   Pagination,
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material"
 import { TreeItem, TreeView } from "@mui/x-tree-view"
@@ -107,6 +115,7 @@ const PAGE_SIZE = 20
 export const MeddraPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [showFilter, setShowFilter] = useState(false)
   const [socPage, setSocPage] = useState(1)
   const [socs, setSocs] = useState<SOC[]>([])
   const [socTotal, setSocTotal] = useState(0)
@@ -255,43 +264,73 @@ export const MeddraPage = () => {
     <Box p={2}>
       <Title title="MedDRA — Estándar Internacional" />
 
-      <Paper elevation={2} sx={{ p: 2 }}>
-        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-          <LocalHospitalIcon color="primary" />
-          <Typography variant="h6" fontWeight={600}>
-            MedDRA — Árbol de Terminología Médica
+      <Paper elevation={2}>
+        {/* ── Cabecera ── */}
+        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <LocalHospitalIcon color="primary" />
+            <Typography variant="h6" fontWeight={600}>
+              MedDRA — Árbol de Terminología Médica
+            </Typography>
+          </Stack>
+          <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+            <IconButton
+              size="small"
+              onClick={() => setShowFilter((v) => !v)}
+              color={showFilter ? "primary" : "default"}>
+              <Badge variant="dot" color="primary" invisible={!searchTerm}>
+                <FilterListIcon />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+        </Box>
+
+        <Box px={2} pb={1.5}>
+          <Typography variant="body2" color="text.secondary">
+            SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo
           </Typography>
-        </Stack>
-        <Typography variant="body2" color="text.secondary" mb={2}>
-          SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo
-        </Typography>
+        </Box>
 
-        <TextField
-          fullWidth
-          size="small"
-          placeholder="Buscar SOC por nombre o abreviatura…"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{ mb: 2 }}
-        />
-
-        {socsLoading ? (
-          <Box display="flex" justifyContent="center" py={6}>
-            <CircularProgress />
+        {/* ── Filtro ── */}
+        <Collapse in={showFilter}>
+          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            <TextField
+              placeholder="Buscar SOC por nombre o abreviatura…"
+              size="small"
+              sx={{ flex: 1 }}
+              autoFocus={showFilter}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button size="small" onClick={() => setSearchTerm("")}>
+              Limpiar
+            </Button>
           </Box>
-        ) : socs.length === 0 ? (
-          <Typography color="text.secondary" align="center" py={4}>
-            No se encontraron resultados.
-          </Typography>
-        ) : (
-          <>
+        </Collapse>
+
+        <Divider />
+
+        {/* ── Árbol ── */}
+        <Box sx={{ maxHeight: 480, overflow: "auto" }} px={2} py={1.5}>
+          {socsLoading ? (
+            <Box display="flex" justifyContent="center" py={6}>
+              <CircularProgress size={28} />
+            </Box>
+          ) : socs.length === 0 ? (
+            <Box display="flex" flexDirection="column" alignItems="center" gap={1} py={6}>
+              <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+              <Typography variant="body2" color="text.secondary">
+                No se encontraron resultados.
+              </Typography>
+            </Box>
+          ) : (
             <TreeView
               expanded={expandedItems}
               onNodeToggle={handleNodeToggle}
@@ -318,9 +357,14 @@ export const MeddraPage = () => {
                 </TreeItem>
               ))}
             </TreeView>
+          )}
+        </Box>
 
-            {totalPages > 1 && (
-              <Box display="flex" justifyContent="center" mt={2}>
+        {!socsLoading && socs.length > 0 && (
+          <>
+            <Divider />
+            <Box display="flex" flexDirection="column" alignItems="center" gap={0.5} py={1.5}>
+              {totalPages > 1 && (
                 <Pagination
                   count={totalPages}
                   page={socPage}
@@ -331,12 +375,13 @@ export const MeddraPage = () => {
                     setExpandedItems([])
                   }}
                   color="primary"
+                  size="small"
                 />
-              </Box>
-            )}
-            <Typography variant="caption" color="text.secondary" display="block" textAlign="center" mt={1}>
-              {socTotal} SOC{socTotal !== 1 ? "s" : ""} encontrado{socTotal !== 1 ? "s" : ""}
-            </Typography>
+              )}
+              <Typography variant="caption" color="text.secondary">
+                {socTotal} SOC{socTotal !== 1 ? "s" : ""} encontrado{socTotal !== 1 ? "s" : ""}
+              </Typography>
+            </Box>
           </>
         )}
       </Paper>

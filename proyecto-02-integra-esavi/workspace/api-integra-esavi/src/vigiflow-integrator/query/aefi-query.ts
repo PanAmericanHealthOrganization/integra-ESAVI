@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsNotEmpty, Validate } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsOptional, Validate } from 'class-validator';
 
 export class AefiQuery {
   @ApiProperty({
     required: false,
   })
+  @IsOptional()
   @IsNotEmpty()
   codigoATC: string;
   @ApiProperty({

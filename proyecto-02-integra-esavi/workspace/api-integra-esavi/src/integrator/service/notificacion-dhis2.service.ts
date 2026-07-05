@@ -3,6 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
 import {Repository} from 'typeorm';
 import {CreateNotificacionDto} from '../dto';
+import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
@@ -21,10 +22,19 @@ export class NotificacionDhis2Service {
     private readonly notificacionRepository: Repository<Notificacion>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
+    @InjectRepository(Establecimiento, 'POSTGRES_INTEGRATOR_DS')
+    private readonly establecimientoRepository: Repository<Establecimiento>,
     private readonly catalogoService: CatalogoService,
     private readonly notificadorService: NotificadorService,
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
+
+  private async findEstablecimientoByCodigo(codigoUnidadSalud: string): Promise<Establecimiento | null> {
+    if (!codigoUnidadSalud) return null;
+    return this.establecimientoRepository.findOne({
+      where: { uniCodigo: codigoUnidadSalud.trim(), isEnabled: true },
+    });
+  }
 
   // async create(
   //   createDto: CreateNotificacionDto,
@@ -129,6 +139,22 @@ export class NotificacionDhis2Service {
             );
           } catch (error:any) {
             console.error(`Error al buscar parroquia: ${error.message}`);
+          }
+        }
+
+        if (createDto.tipoEmisor) {
+          try {
+            notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
+          } catch (error: any) {
+            console.error(`Error al buscar tipoEmisor: ${error.message}`);
+          }
+        }
+
+        if (createDto.codigoUnidadSalud) {
+          try {
+            notificacion.establecimiento = await this.findEstablecimientoByCodigo(createDto.codigoUnidadSalud);
+          } catch (error: any) {
+            console.error(`Error al buscar establecimiento: ${error.message}`);
           }
         }
 
@@ -318,6 +344,14 @@ export class NotificacionDhis2Service {
         notificacionExistente.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
       } catch (error: any) {
         console.error(`Error al buscar tipoEmisor: ${error.message}`);
+      }
+    }
+
+    if (createDto.codigoUnidadSalud) {
+      try {
+        notificacionExistente.establecimiento = await this.findEstablecimientoByCodigo(createDto.codigoUnidadSalud);
+      } catch (error: any) {
+        console.error(`Error al buscar establecimiento: ${error.message}`);
       }
     }
 
