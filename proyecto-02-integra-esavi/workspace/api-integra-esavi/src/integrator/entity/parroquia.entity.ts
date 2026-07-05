@@ -4,7 +4,7 @@ import { Canton } from './canton.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
-  name: 'TC_PARROQUIA',
+  name: 'TC_DPA_PARROQUIA',
   comment: 'Catálogo de parroquias del Ecuador',
 })
 export class Parroquia extends Auditoria {

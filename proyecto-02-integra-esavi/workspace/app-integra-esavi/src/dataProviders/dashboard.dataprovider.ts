@@ -19,7 +19,7 @@ import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
 export const dashboardDataProvider: DataProvider = {
   casosEsaviPorSexoGrave: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosEsaviPorSexoGrave`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorSexoGrave`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
@@ -32,7 +32,7 @@ export const dashboardDataProvider: DataProvider = {
 
   casosEsaviPorSexoNoGrave: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosEsaviPorSexoNoGrave`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorSexoNoGrave`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
@@ -45,7 +45,7 @@ export const dashboardDataProvider: DataProvider = {
 
   casosCruzadosMeddra: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosCruzadosMeddra`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosCruzadosMeddra`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
@@ -58,7 +58,7 @@ export const dashboardDataProvider: DataProvider = {
 
   casosNoCruzadosMeddra: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosNoCruzadosMeddra`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosNoCruzadosMeddra`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
@@ -71,7 +71,7 @@ export const dashboardDataProvider: DataProvider = {
 
   casosCruzadosWhodrug: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosCruzadosWhodrug`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosCruzadosWhodrug`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",
@@ -84,7 +84,7 @@ export const dashboardDataProvider: DataProvider = {
 
   casosEsaviPorMes: async () => {
     const response = await fetch(
-      `${INT_ESAV_API}/integrator/reports/casosEsaviPorMes`,
+      `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorMes`,
       {
         headers: {
           "X-API-KEY": INT_API_KEY || "",

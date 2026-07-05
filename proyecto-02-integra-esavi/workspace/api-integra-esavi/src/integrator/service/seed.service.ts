@@ -1312,7 +1312,7 @@ export class SeedService implements OnApplicationBootstrap {
     });
   }
 
-  // ── Carga de TC_PROVINCIA, TC_CANTON, TC_PARROQUIA ──────────────────────────
+  // ── Carga de TC_DPA_PROVINCIA, TC_DPA_CANTON, TC_DPA_PARROQUIA ──────────────────────────
 
   async seedUbicaciones() {
     await this.seedProvincias();
@@ -1339,14 +1339,14 @@ export class SeedService implements OnApplicationBootstrap {
   private async seedProvincias() {
     const count = await this.provinciaRepository.count();
     if (count >= 20) {
-      console.log(`ℹ️ TC_PROVINCIA ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_PROVINCIA ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_PROVINCIA incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_PROVINCIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_PROVINCIA desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_PROVINCIA desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'provincias_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1371,23 +1371,23 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_PROVINCIA: ${insertados} provincia(s) insertada(s).`);
+      console.log(`✅ TC_DPA_PROVINCIA: ${insertados} provincia(s) insertada(s).`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_PROVINCIA:', error);
+      console.error('❌ Error al cargar TC_DPA_PROVINCIA:', error);
     }
   }
 
   private async seedCantones() {
     const count = await this.cantonRepository.count();
     if (count >= 200) {
-      console.log(`ℹ️ TC_CANTON ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_CANTON ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_CANTON incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_CANTON incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_CANTON desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_CANTON desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'cantones_dhis2_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1420,23 +1420,23 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_CANTON: ${insertados} cantón(es) insertado(s), ${omitidos} omitido(s) por provincia no encontrada.`);
+      console.log(`✅ TC_DPA_CANTON: ${insertados} cantón(es) insertado(s), ${omitidos} omitido(s) por provincia no encontrada.`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_CANTON:', error);
+      console.error('❌ Error al cargar TC_DPA_CANTON:', error);
     }
   }
 
   private async seedParroquias() {
     const count = await this.parroquiaRepository.count();
     if (count >= 1400) {
-      console.log(`ℹ️ TC_PARROQUIA ya cargada (${count} registros). Se omite.`);
+      console.log(`ℹ️ TC_DPA_PARROQUIA ya cargada (${count} registros). Se omite.`);
       return;
     }
     if (count > 0) {
-      console.log(`⚠️ TC_PARROQUIA incompleta (${count} registros). Re-cargando desde CSV...`);
+      console.log(`⚠️ TC_DPA_PARROQUIA incompleta (${count} registros). Re-cargando desde CSV...`);
     }
 
-    console.log('🗺️ Cargando TC_PARROQUIA desde CSV...');
+    console.log('🗺️ Cargando TC_DPA_PARROQUIA desde CSV...');
     try {
       const csvPath = path.join(process.cwd(), 'upload_files', 'catalogos-csv', 'parroquias_dhis2_ecuador.csv');
       const lines = fs.readFileSync(csvPath, 'utf-8').split('\n').filter((l) => l.trim());
@@ -1469,7 +1469,7 @@ export class SeedService implements OnApplicationBootstrap {
           insertados++;
         }
       }
-      console.log(`✅ TC_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
+      console.log(`✅ TC_DPA_PARROQUIA: ${insertados} parroquia(s) insertada(s), ${omitidos} omitida(s) por cantón no encontrado.`);
 
       // Insertar una parroquia "Desconocido-{canton}" por cada cantón
       const todosLosCantones = await this.cantonRepository.find();
@@ -1487,9 +1487,9 @@ export class SeedService implements OnApplicationBootstrap {
           insertadosDesconocido++;
         }
       }
-      console.log(`✅ TC_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
+      console.log(`✅ TC_DPA_PARROQUIA: ${insertadosDesconocido} parroquia(s) "Desconocido" insertada(s) por cantón.`);
     } catch (error) {
-      console.error('❌ Error al cargar TC_PARROQUIA:', error);
+      console.error('❌ Error al cargar TC_DPA_PARROQUIA:', error);
     }
     };
   

@@ -3,6 +3,7 @@ import {Module} from '@nestjs/common';
 import {ConfigModule,ConfigService} from '@nestjs/config';
 import {ScheduleModule} from '@nestjs/schedule';
 import {TypeOrmModule} from '@nestjs/typeorm';
+import {IntegratorModule} from 'src/integrator/integrator.module';
 import {SettingsModule} from 'src/settings/settings.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {AutoEncryptSubscriber} from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
@@ -32,6 +33,7 @@ export const WHODRUGS_DS = 'WHO_DRUG';
 @Module({
   imports: [
     SettingsModule,
+    IntegratorModule,
     ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       name: WHODRUGS_DS, // a

@@ -41,7 +41,8 @@ export class SyncProcess extends Auditoria implements ISync {
   @Column({
     name: 'START_TIME',
     type: 'timestamp',
-    nullable: true,
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMP',
     comment: 'Fecha y hora de inicio del proceso de sincronización',
   })
   startTime: Date;
