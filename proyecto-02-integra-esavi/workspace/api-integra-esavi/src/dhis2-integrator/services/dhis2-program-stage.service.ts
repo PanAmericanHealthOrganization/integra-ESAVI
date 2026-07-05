@@ -16,16 +16,12 @@ export class Dhis2ProgramStageService {
   ) {}
 
   private getConfig() {
-    const username = this.configService.get<string>('DHIS2_USERNAME');
-    const passwd = this.configService.get<string>('DHIS2_PASSWD');
+    const token = this.configService.get<string>('DHIS2_API_TOKEN');
 
     return {
       maxBodyLength: Infinity,
       headers: {
-        Authorization: `Basic ${Buffer.from(
-          `${username}:${passwd}`,
-          'utf8',
-        ).toString('base64')}`,
+        Authorization: `ApiToken ${token}`,
       },
     };
   }
