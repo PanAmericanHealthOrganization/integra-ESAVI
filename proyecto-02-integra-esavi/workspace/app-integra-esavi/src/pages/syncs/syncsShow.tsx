@@ -10,9 +10,9 @@ export const SyncsShow = () => {
           <TextField source="status" />
           <TextField source="startTime" />
           <TextField source="endTime" />
-          <TextField source="errorMessage" />
-          <TextField source="errorStack" />
-          <TextField source="errorTrace" />
+          <TextField source="errorMessage" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} />
+          <TextField source="errorStack" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} />
+          <TextField source="errorTrace" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }} />
         </SimpleShowLayout>
       </Show>
     </>

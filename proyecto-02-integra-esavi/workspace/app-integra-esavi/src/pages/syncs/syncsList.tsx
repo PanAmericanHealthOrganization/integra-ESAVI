@@ -10,7 +10,17 @@ const syncFilters = [
 export const SyncsList = () => {
   return (
     <List filters={syncFilters}>
-      <Datagrid>
+      <Datagrid
+        rowClick="show"
+        sx={{
+          tableLayout: "fixed",
+          width: "100%",
+          "& .MuiTableCell-root": {
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          },
+        }}>
         <TextField source="name" />
         <TextField source="status" />
         <DateField
