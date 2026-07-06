@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ProgramTrackedEntityAttribute, Attribute, TrackedEntityAttributeMetadata } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
 @Injectable()
 export class Dhis2ProgramService {
@@ -13,15 +14,6 @@ export class Dhis2ProgramService {
     private readonly configService: ConfigService,
   ) {}
 
-  private getConfig() {
-    const token = this.configService.get<string>('DHIS2_API_TOKEN');
-    return {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: `ApiToken ${token}`,
-      },
-    };
-  }
 
   async getProgramTrackedEntityAttribute(
     idProgram: string,
@@ -31,7 +23,7 @@ export class Dhis2ProgramService {
       `/api/programs/${idProgram}.json?fields=programTrackedEntityAttributes[id,name,displayName,sortOrder,trackedEntityAttribute]`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -50,7 +42,7 @@ export class Dhis2ProgramService {
       `/api/trackedEntityInstances/${tei}.json?program=${programId}&fields=attributes`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -76,7 +68,7 @@ export class Dhis2ProgramService {
       )}]&fields=id,name,valueType,optionSet[id]&paging=false`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);

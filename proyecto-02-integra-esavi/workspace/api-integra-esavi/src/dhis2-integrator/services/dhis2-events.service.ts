@@ -45,15 +45,6 @@ export class Dhis2EventsService {
     private readonly dhis2ProgramService: Dhis2ProgramService,
   ) {}
 
-  private getConfig() {
-    const token = this.configService.get<string>('DHIS2_API_TOKEN');
-    return {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: `ApiToken ${token}`,
-      },
-    };
-  }
 
   /**
    * Punto de entrada de la extracción: lee los datos crudos del formulario
@@ -104,7 +95,8 @@ export class Dhis2EventsService {
 
     while (hasMoreData) {
       const uri =
-        `${baseUrl}/api/tracker/trackedEntities.json?orgUnits=${rootOrgUnit}&orgUnitMode=DESCENDANTS` +
+        // orgUnit/ouMode: nombres vigentes en 2.36-2.40 y aceptados (deprecados) en 2.41
+        `${baseUrl}/api/tracker/trackedEntities.json?orgUnit=${rootOrgUnit}&ouMode=DESCENDANTS` +
         `&program=${idPrograma}` +
         `&enrollmentEnrolledAfter=${fechaInicio.toISOString().slice(0, 10)}` +
         `&enrollmentEnrolledBefore=${fechaFin.toISOString().slice(0, 10)}` +
@@ -112,7 +104,7 @@ export class Dhis2EventsService {
         `&totalPages=false&page=${page}&pageSize=${TAMANIO_PAGINA_TEI}`;
 
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, this.getConfig()).pipe(
+        this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando tracker/trackedEntities:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);
@@ -212,7 +204,7 @@ export class Dhis2EventsService {
         `${baseUrl}/api/organisationUnits.json?filter=id:in:[${lote.join(',')}]` +
         `&fields=id,name,code&paging=false`;
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, this.getConfig()).pipe(
+        this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando organisationUnits:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);

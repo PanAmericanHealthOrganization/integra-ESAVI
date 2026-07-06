@@ -1,9 +1,27 @@
+import { ConfigService } from '@nestjs/config';
+
 /**
  * Utilidades para la extracción de datos crudos desde el API de eventos/tracker de DHIS2
  * y su normalización al formato que entrega el API de analytics (headers/rows),
  * de modo que el pipeline de persistencia no requiera cambios.
  */
 export abstract class Dhis2ExtraccionUtils {
+  /**
+   * Configuración común de las peticiones HTTP a DHIS2: autenticación por
+   * Personal Access Token (DHIS2_API_TOKEN o DHIS2_USER_KEY).
+   */
+  static getConfig(configService: ConfigService) {
+    const token =
+      configService.get<string>('DHIS2_API_TOKEN') ??
+      configService.get<string>('DHIS2_USER_KEY');
+    return {
+      maxBodyLength: Infinity,
+      headers: {
+        Authorization: `ApiToken ${token}`,
+      },
+    };
+  }
+
   /**
    * Divide una lista de ids en lotes para no exceder el largo máximo de la URL
    * en los filtros id:in:[...] de la API de metadatos.

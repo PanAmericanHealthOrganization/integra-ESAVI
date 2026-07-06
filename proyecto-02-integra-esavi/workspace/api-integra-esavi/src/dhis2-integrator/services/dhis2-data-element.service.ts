@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { DataElement } from '../dto';
+import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
 @Injectable()
 export class Dhis2DataElementService {
@@ -13,15 +14,6 @@ export class Dhis2DataElementService {
     private readonly configService: ConfigService,
   ) {}
 
-  private getConfig() {
-    const token = this.configService.get<string>('DHIS2_API_TOKEN');
-    return {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: `ApiToken ${token}`,
-      },
-    };
-  }
   async getDataElements(idsDataElemet: string[]): Promise<DataElement[]> {
     const baseUrl = this.configService.get<string>('DHIS2_URL');
     const idsCadena = idsDataElemet.join(',');
@@ -29,7 +21,7 @@ export class Dhis2DataElementService {
       `/api/dataElements.json?fields=id,code,name,shortName,displayFormName,valueType,optionSet[id]&paging=false&filter=id:in:[${idsCadena}]`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);

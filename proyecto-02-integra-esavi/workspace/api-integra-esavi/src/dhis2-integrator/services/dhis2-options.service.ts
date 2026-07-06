@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { Option, OptionSet } from '../dto';
+import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
 @Injectable()
 export class Dhis2OptionsService {
@@ -13,15 +14,6 @@ export class Dhis2OptionsService {
     private readonly configService: ConfigService,
   ) {}
 
-  private getConfig() {
-    const token = this.configService.get<string>('DHIS2_API_TOKEN');
-    return {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: `ApiToken ${token}`,
-      },
-    };
-  }
 
   async getOptions(codes: string[]): Promise<Option[]> {
     const baseUrl = this.configService.get<string>('DHIS2_URL');
@@ -39,7 +31,7 @@ export class Dhis2OptionsService {
     console.log('AQUI ERROR URL: ' + uri);
     
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -63,7 +55,7 @@ export class Dhis2OptionsService {
     )}]&fields=id,options[code,name]&paging=false`;
 
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, this.getConfig()).pipe(
+      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);

@@ -5,6 +5,7 @@ import { ProgramStage, DataElement } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { Dhis2DataElementService } from './dhis2-data-element.service';
+import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
 @Injectable()
 export class Dhis2ProgramStageService {
@@ -15,16 +16,6 @@ export class Dhis2ProgramStageService {
     private readonly dhis2DataElementService: Dhis2DataElementService,
   ) {}
 
-  private getConfig() {
-    const token = this.configService.get<string>('DHIS2_API_TOKEN');
-
-    return {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: `ApiToken ${token}`,
-      },
-    };
-  }
 
   async getEstructuraPrograma(idPrograma: string): Promise<ProgramStage[]> {
     const base = this.configService.get<string>('DHIS2_URL');
@@ -34,7 +25,7 @@ export class Dhis2ProgramStageService {
     const url = base.concat(uri);
 
     const { data } = await firstValueFrom(
-      this.httpService.get(url, this.getConfig()).pipe(
+      this.httpService.get(url, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error('Error con codigo::: ', e);
           this.logger.error('Error con codigo::: ', e.message);
