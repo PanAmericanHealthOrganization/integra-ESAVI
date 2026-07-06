@@ -1,12 +1,12 @@
-import { HttpService } from '@nestjs/axios';
-import { HttpException, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AxiosError } from 'axios';
+import {HttpService} from '@nestjs/axios';
+import {HttpException,Injectable,Logger} from '@nestjs/common';
+import {ConfigService} from '@nestjs/config';
+import {AxiosError} from 'axios';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as puppeteer from 'puppeteer';
-import { catchError, firstValueFrom } from 'rxjs';
-import { read } from 'xlsx';
+import {catchError,firstValueFrom} from 'rxjs';
+import {read} from 'xlsx';
 
 @Injectable()
 export class VigiflowCrawlerService {
@@ -68,7 +68,13 @@ export class VigiflowCrawlerService {
 
     const browser = await puppeteer.launch({
       headless: 'new',
-      ...(chromePath && { executablePath: chromePath }),
+        ...(chromePath && { executablePath: chromePath }),
+        args: [
+      '--no-sandbox',                // Vital para entornos Linux/Docker
+      '--disable-setuid-sandbox',    // Vital para entornos Linux/Docker
+      '--disable-gpu',               // Desactiva la aceleración por hardware (ideal para servidores sin GUI)
+      '--disable-dev-shm-usage',     // Evita problemas de memoria compartida en Linux (/dev/shm)
+    ],
     });
 
     const page = await browser.newPage();
@@ -120,8 +126,9 @@ export class VigiflowCrawlerService {
         throw new Error('VigiFlow no devolvió un token de autorización en la respuesta de login');
       }
     } catch (e) {
-      this.logger.error('Error al obtener el token JWT de VigiFlow:', e?.message ?? e);
-      throw new Error(`Autenticación VigiFlow fallida: ${e?.message ?? e}`);
+      const message = e instanceof Error ? e.message : String(e);
+      this.logger.error('Error al obtener el token JWT de VigiFlow:', message);
+      throw new Error(`Autenticación VigiFlow fallida: ${message}`);
     } finally {
       await browser.close();
     }
