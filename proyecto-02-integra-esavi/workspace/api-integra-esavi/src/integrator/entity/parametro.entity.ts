@@ -1,4 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { TipoDato } from '../../homologator/enum/tipo-dato.enum';
 import { Auditoria } from './auditoria.entity';
 
 export enum IntegrationGroup {
@@ -55,4 +56,40 @@ export class Parametro extends Auditoria {
     comment: 'Descripción detallada del parámetro',
   })
   descripcion: string;
+
+  /**
+   * Column  of parametro
+   */
+  @Column({
+    name: 'MODULO',
+    nullable: true,
+    length: 64,
+    comment: 'Módulo al que pertenece el parámetro de configuración',
+  })
+  modulo: string;
+
+  /**
+   * Column  of parametro
+   */
+  @Column({
+    name: 'TIPO_DATO',
+    type: 'enum',
+    enum: TipoDato,
+    default: TipoDato.STRING,
+    nullable: false,
+    comment: 'Tipo de dato del valor del parámetro de configuración',
+  })
+  tipo_dato: TipoDato;
+
+  /**
+   * Column  of parametro
+   */
+  @Column({
+    name: 'ES_ENCRIPTADO',
+    type: 'boolean',
+    default: false,
+    nullable: false,
+    comment: 'Indica si el valor del parámetro se encuentra encriptado',
+  })
+  es_encriptado: boolean;
 }

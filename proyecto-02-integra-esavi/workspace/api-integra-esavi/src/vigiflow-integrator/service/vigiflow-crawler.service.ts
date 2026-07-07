@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as puppeteer from 'puppeteer';
 import {catchError,firstValueFrom} from 'rxjs';
+import {ParametroService} from '../../integrator/service/parametro.service';
 import {read} from 'xlsx';
 
 @Injectable()
@@ -15,6 +16,7 @@ export class VigiflowCrawlerService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly parametroService: ParametroService,
   ) {
     this._jwtToken = '';
   }
@@ -60,8 +62,8 @@ export class VigiflowCrawlerService {
 
   async retrieveJWT(): Promise<any> {
     const base = this.configService.get<string>('VIGIFLOW_URL');
-    const username = this.configService.get<string>('VIGIFLOW_USERNAME');
-    const password = this.configService.get<string>('VIGIFLOW_PASSWD');
+    const username = await this.parametroService.getValor('VIGIFLOW', 'VIGIFLOW_USERNAME');
+    const password = await this.parametroService.getValor('VIGIFLOW', 'VIGIFLOW_PASSWD');
     const chromePath = this.resolveChromePath();
 
     const queryUserUrl = new URL('/query/user', base).href;

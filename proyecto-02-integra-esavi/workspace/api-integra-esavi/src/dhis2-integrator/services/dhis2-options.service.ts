@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { ParametroService } from '../../integrator/service/parametro.service';
 import { Option, OptionSet } from '../dto';
 import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
@@ -12,6 +13,7 @@ export class Dhis2OptionsService {
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly parametroService: ParametroService,
   ) {}
 
 
@@ -31,7 +33,7 @@ export class Dhis2OptionsService {
     console.log('AQUI ERROR URL: ' + uri);
     
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -55,7 +57,7 @@ export class Dhis2OptionsService {
     )}]&fields=id,options[code,name]&paging=false`;
 
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);

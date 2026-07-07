@@ -10,25 +10,34 @@ describe('Dhis2ExtraccionUtils', () => {
         get: jest.fn((key: string) => valores[key]),
       } as unknown as ConfigService);
 
-    it('arma la cabecera Authorization con ApiToken desde DHIS2_API_TOKEN', () => {
+    const makeParametroService = (dhis2UserKey?: string) =>
+      ({
+        getValor: jest.fn(async (modulo: string, clave: string) => {
+          if (modulo === 'DHIS2' && clave === 'DHIS2_USER_KEY' && dhis2UserKey) {
+            return dhis2UserKey;
+          }
+          throw new Error(`Parámetro no encontrado: ${modulo}.${clave}`);
+        }),
+      } as unknown as import('../../integrator/service/parametro.service').ParametroService);
+
+    it('arma la cabecera Authorization con ApiToken desde DHIS2_API_TOKEN', async () => {
       const configService = makeConfigService({ DHIS2_API_TOKEN: 'd2pat_abc' });
-      const config = Dhis2ExtraccionUtils.getConfig(configService);
+      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService(), configService);
       expect(config.headers.Authorization).toBe('ApiToken d2pat_abc');
       expect(config.maxBodyLength).toBe(Infinity);
     });
 
-    it('usa DHIS2_USER_KEY como respaldo cuando no existe DHIS2_API_TOKEN', () => {
-      const configService = makeConfigService({ DHIS2_USER_KEY: 'd2pat_xyz' });
-      const config = Dhis2ExtraccionUtils.getConfig(configService);
+    it('usa DHIS2_USER_KEY (TC_PARAMETRO) como respaldo cuando no existe DHIS2_API_TOKEN', async () => {
+      const configService = makeConfigService({});
+      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService('d2pat_xyz'), configService);
       expect(config.headers.Authorization).toBe('ApiToken d2pat_xyz');
     });
 
-    it('prefiere DHIS2_API_TOKEN cuando ambos existen', () => {
+    it('prefiere DHIS2_API_TOKEN cuando ambos existen', async () => {
       const configService = makeConfigService({
         DHIS2_API_TOKEN: 'd2pat_principal',
-        DHIS2_USER_KEY: 'd2pat_respaldo',
       });
-      const config = Dhis2ExtraccionUtils.getConfig(configService);
+      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService('d2pat_respaldo'), configService);
       expect(config.headers.Authorization).toBe('ApiToken d2pat_principal');
     });
   });
