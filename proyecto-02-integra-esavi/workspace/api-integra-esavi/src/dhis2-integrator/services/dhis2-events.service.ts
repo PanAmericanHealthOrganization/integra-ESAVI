@@ -3,6 +3,7 @@ import {HttpException,Injectable,Logger} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {AxiosError} from 'axios';
 import {catchError,firstValueFrom} from 'rxjs';
+import {ParametroService} from '../../integrator/service/parametro.service';
 import {
   DataElement,
   Enrollment,
@@ -43,6 +44,7 @@ export class Dhis2EventsService {
     private readonly dhis2DataElementService: Dhis2DataElementService,
     private readonly dhis2OptionsService: Dhis2OptionsService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
+    private readonly parametroService: ParametroService,
   ) {}
 
 
@@ -104,7 +106,7 @@ export class Dhis2EventsService {
         `&totalPages=false&page=${page}&pageSize=${TAMANIO_PAGINA_TEI}`;
 
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
+        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando tracker/trackedEntities:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);
@@ -204,7 +206,7 @@ export class Dhis2EventsService {
         `${baseUrl}/api/organisationUnits.json?filter=id:in:[${lote.join(',')}]` +
         `&fields=id,name,code&paging=false`;
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
+        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando organisationUnits:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);

@@ -234,6 +234,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     NotificadorService,
     EstablecimientosService,
     Icd10MeddraService,
+    ParametroService,
   ],
 })
 export class IntegratorModule {}

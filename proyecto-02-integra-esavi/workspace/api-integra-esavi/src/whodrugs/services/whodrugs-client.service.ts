@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+import { ParametroService } from '../../integrator/service/parametro.service';
 import { IDrug } from '../models/dtos';
 //import { readFile } from 'fs/promises';
 /**
@@ -11,7 +12,10 @@ export class WhoDrugsClientService {
   //
   private readonly logger = new Logger(WhoDrugsClientService.name);
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly parametroService: ParametroService,
+  ) {}
 
   /**
    * Obtiene todos los datos desde la API de whodrugs
@@ -21,9 +25,20 @@ export class WhoDrugsClientService {
     try {
       console.log(includeAtc, ingredientTraslations, level);
 
+      const [umcLicenseKey, umcClientKey] = await Promise.all([
+        this.parametroService.getValor('WHODRUG', 'WHD_UMC_LICENSE_KEY'),
+        this.parametroService.getValor('WHODRUG', 'WHD_UMC_CLIENT_KEY'),
+      ]);
+
       const { data } = await firstValueFrom(
         this.httpService.get(
           `/whodrug/download/v2/regional-drugs?MedProdLevel=${level}&IngredientTranslations=${ingredientTraslations}&IncludeAtc=${includeAtc}`,
+          {
+            headers: {
+              'umc-license-key': umcLicenseKey,
+              'umc-client-key': umcClientKey,
+            },
+          },
         ),
       );
       return data;

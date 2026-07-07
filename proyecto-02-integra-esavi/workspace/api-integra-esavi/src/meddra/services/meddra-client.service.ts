@@ -3,6 +3,7 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { lastValueFrom } from 'rxjs';
 
 import { ConfigService } from '@nestjs/config';
+import { ParametroService } from '../../integrator/service/parametro.service';
 import { MeddraHistoryService } from './meddra-history.service';
 import { IMeddraJWTResponse, IMeddraQueryRequest, IMeddraResponse } from '../models/dto';
 import { MeddraQuery } from '../models/meddraquerys.entity';
@@ -13,6 +14,7 @@ export class MeddraClientService {
     private readonly configService: ConfigService,
     private readonly meddraHistoryService: MeddraHistoryService,
     private readonly httpService: HttpService,
+    private readonly parametroService: ParametroService,
   ) {}
 
   private readonly logger = new Logger(MeddraClientService.name);
@@ -48,11 +50,11 @@ export class MeddraClientService {
 
     // add query params
     const data = new URLSearchParams({
-      grant_type: this.configService.get('MED_GRANT_TYPE'),
-      client_id: this.configService.get('MED_CLIENT_ID'),
-      username: this.configService.get('MED_USER_NAME'),
-      scope: this.configService.get('MED_SCOPE'),
-      password: this.configService.get('MED_PASSWORD'),
+      grant_type: await this.parametroService.getValor('MEDDRA', 'MED_GRANT_TYPE'),
+      client_id: await this.parametroService.getValor('MEDDRA', 'MED_CLIENT_ID'),
+      username: await this.parametroService.getValor('MEDDRA', 'MED_USER_NAME'),
+      scope: await this.parametroService.getValor('MEDDRA', 'MED_SCOPE'),
+      password: await this.parametroService.getValor('MEDDRA', 'MED_PASSWORD'),
     });
 
     // request

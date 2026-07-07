@@ -8,6 +8,7 @@ import { Dhis2EventsService } from './dhis2-events.service';
 import { Dhis2DataElementService } from './dhis2-data-element.service';
 import { Dhis2OptionsService } from './dhis2-options.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
+import { ParametroService } from '../../integrator/service/parametro.service';
 
 const PROGRAMA = 'NrEU7cRCZd7';
 const ORG_UNIT_RAIZ = 'CcPKoI4rpPZ';
@@ -19,9 +20,17 @@ const mockConfigService = {
   get: jest.fn((key: string, defecto?: string) => {
     const valores: Record<string, string> = {
       DHIS2_URL: 'http://dhis2.test',
-      DHIS2_USER_KEY: 'd2pat_prueba',
     };
     return valores[key] ?? defecto;
+  }),
+};
+
+const mockParametroService = {
+  getValor: jest.fn(async (modulo: string, clave: string) => {
+    if (modulo === 'DHIS2' && clave === 'DHIS2_USER_KEY') {
+      return 'd2pat_prueba';
+    }
+    throw new Error(`Parámetro no encontrado: ${modulo}.${clave}`);
   }),
 };
 
@@ -142,6 +151,7 @@ describe('Dhis2EventsService', () => {
         { provide: Dhis2DataElementService, useValue: mockDataElementService },
         { provide: Dhis2OptionsService, useValue: mockOptionsService },
         { provide: Dhis2ProgramService, useValue: mockProgramService },
+        { provide: ParametroService, useValue: mockParametroService },
       ],
     }).compile();
     service = module.get<Dhis2EventsService>(Dhis2EventsService);

@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ProgramStage, DataElement } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { ParametroService } from '../../integrator/service/parametro.service';
 import { Dhis2DataElementService } from './dhis2-data-element.service';
 import { Dhis2ExtraccionUtils } from '../utils/dhis2-extraccion.utils';
 
@@ -14,18 +15,19 @@ export class Dhis2ProgramStageService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
     private readonly dhis2DataElementService: Dhis2DataElementService,
+    private readonly parametroService: ParametroService,
   ) {}
 
 
   async getEstructuraPrograma(idPrograma: string): Promise<ProgramStage[]> {
     const base = this.configService.get<string>('DHIS2_URL');
     console.log('Base URL: ' + base);
-    
+
     const uri = `/api/programStages.json?fields=*&paging=false&filter=program.id:eq:${idPrograma}`;
     const url = base.concat(uri);
 
     const { data } = await firstValueFrom(
-      this.httpService.get(url, Dhis2ExtraccionUtils.getConfig(this.configService)).pipe(
+      this.httpService.get(url, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error('Error con codigo::: ', e);
           this.logger.error('Error con codigo::: ', e.message);

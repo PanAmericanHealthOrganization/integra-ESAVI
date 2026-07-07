@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { ParametroService } from '../../integrator/service/parametro.service';
 
 /**
  * Utilidades para la extracción de datos crudos desde el API de eventos/tracker de DHIS2
@@ -8,12 +9,13 @@ import { ConfigService } from '@nestjs/config';
 export abstract class Dhis2ExtraccionUtils {
   /**
    * Configuración común de las peticiones HTTP a DHIS2: autenticación por
-   * Personal Access Token (DHIS2_API_TOKEN o DHIS2_USER_KEY).
+   * Personal Access Token (DHIS2_API_TOKEN de entorno, o DHIS2_USER_KEY
+   * almacenado en TC_PARAMETRO como respaldo).
    */
-  static getConfig(configService: ConfigService) {
+  static async getConfig(parametroService: ParametroService, configService: ConfigService) {
     const token =
       configService.get<string>('DHIS2_API_TOKEN') ??
-      configService.get<string>('DHIS2_USER_KEY');
+      (await parametroService.getValor('DHIS2', 'DHIS2_USER_KEY'));
     return {
       maxBodyLength: Infinity,
       headers: {

@@ -68,10 +68,11 @@ export const WHODRUGS_DS = 'WHO_DRUG';
         // se agrega infinity por el crecimiento del archivo
         maxContentLength: Infinity,
         withCredentials: true,
-        headers: {
-          'umc-license-key': configService.get('WHD_UMC_LICENSE_KEY'),
-          'umc-client-key': configService.get('WHD_UMC_CLIENT_KEY'),
-        },
+        // 'umc-license-key'/'umc-client-key' ya no se fijan aquí: dependen de TC_PARAMETRO
+        // (vía ParametroService), que aún no tiene datos sembrados en el momento en que
+        // Nest construye este cliente HTTP (el seed corre en onApplicationBootstrap,
+        // después de instanciar todos los providers). Se agregan por request en
+        // WhoDrugsClientService, que sí puede esperar (await) al ParametroService.
       }),
       inject: [ConfigService],
     }),
