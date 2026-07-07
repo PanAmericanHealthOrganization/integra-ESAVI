@@ -25,6 +25,7 @@ import {GravedadEsavi} from '../entity/gravedad-esavi.entity';
 import {Medicamento} from '../entity/medicamento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Paciente} from '../entity/paciente.entity';
+import {Parametro} from '../entity/parametro.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
@@ -74,6 +75,8 @@ export class SeedService implements OnApplicationBootstrap {
     private reglaHomologacionRepository: Repository<ReglaHomologacion>,
     @InjectRepository(Vacunometro, 'POSTGRES_INTEGRATOR_DS')
     private vacunometroRepository: Repository<Vacunometro>,
+    @InjectRepository(Parametro, 'POSTGRES_INTEGRATOR_DS')
+    private parametroRepository: Repository<Parametro>,
   ) {}
 
   async onApplicationBootstrap() {
@@ -82,6 +85,110 @@ export class SeedService implements OnApplicationBootstrap {
     await this.loadTiposEntidadCatalogoPadre();
     await this.loadEstablecimientosFromCSV();
     await this.migrarTipoEmisor();
+    await this.seedParametrosDev();
+  }
+
+  // ── Seed TC_PARAMETRO: valores dummy solo para entornos de desarrollo ──────
+  // Evita que un despliegue nuevo en DEV falle por falta de parámetros
+  // (DHIS2, VIGIFLOW, WHODRUG, MEDDRA) que ParametroService.getValor() exige.
+  // En PROD estos valores deben reemplazarse manualmente desde el módulo de
+  // Parámetros; por eso solo se insertan si ENV=DEV y la clave no existe aún.
+  private async seedParametrosDev() {
+    if ((process.env.ENV || '').toUpperCase() !== 'DEV') {
+      return;
+    }
+
+    await this.runSyncProcess('Carga de parámetros dummy de desarrollo (TC_PARAMETRO)...', async () => {
+      console.log('🔧 Verificando parámetros de desarrollo en TC_PARAMETRO...');
+
+      const parametrosDev = [
+        {
+          modulo: 'DHIS2',
+          clave: 'DHIS2_USER_KEY',
+          valor: 'CAMBIAR_DHIS2_USER_KEY',
+          descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'VIGIFLOW',
+          clave: 'VIGIFLOW_USERNAME',
+          valor: 'CAMBIAR_VIGIFLOW_USERNAME',
+          descripcion: 'Usuario de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'VIGIFLOW',
+          clave: 'VIGIFLOW_PASSWD',
+          valor: 'CAMBIAR_VIGIFLOW_PASSWD',
+          descripcion: 'Contraseña de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'WHODRUG',
+          clave: 'WHD_UMC_LICENSE_KEY',
+          valor: 'CAMBIAR_WHD_UMC_LICENSE_KEY',
+          descripcion: 'License key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'WHODRUG',
+          clave: 'WHD_UMC_CLIENT_KEY',
+          valor: 'CAMBIAR_WHD_UMC_CLIENT_KEY',
+          descripcion: 'Client key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_GRANT_TYPE',
+          valor: 'password',
+          descripcion: 'Grant type OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_CLIENT_ID',
+          valor: 'CAMBIAR_MED_CLIENT_ID',
+          descripcion: 'Client ID de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_USER_NAME',
+          valor: 'CAMBIAR_MED_USER_NAME',
+          descripcion: 'Usuario de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_PASSWORD',
+          valor: 'CAMBIAR_MED_PASSWORD',
+          descripcion: 'Contraseña de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_SCOPE',
+          valor: 'CAMBIAR_MED_SCOPE',
+          descripcion: 'Scope OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+        },
+      ];
+
+      const auditoria: IAuditoria = {
+        createdAt: new Date(),
+        createdBy: 'System',
+        updatedAt: undefined,
+        updatedBy: '',
+        deletedAt: undefined,
+        deletedBy: '',
+        isEnabled: true,
+        isActive: true,
+      };
+
+      for (const parametro of parametrosDev) {
+        const existing = await this.parametroRepository.findOne({ where: { clave: parametro.clave } });
+        if (!existing) {
+          await this.parametroRepository.save({
+            ...parametro,
+            tipo_dato: TipoDato.STRING,
+            es_encriptado: false,
+            ...auditoria,
+          } as Parametro);
+        }
+      }
+
+      console.log('✅ Parámetros dummy de desarrollo verificados en TC_PARAMETRO');
+    });
   }
 
   async seedData() {
