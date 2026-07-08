@@ -1,22 +1,23 @@
 import AddIcon from "@mui/icons-material/Add"
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
-import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import CloseIcon from "@mui/icons-material/Close"
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
+import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined"
 import SearchIcon from "@mui/icons-material/Search"
+import TuneIcon from "@mui/icons-material/Tune"
 import VisibilityIcon from "@mui/icons-material/Visibility"
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 import {
   Autocomplete,
-  Badge,
+  Avatar,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -39,6 +40,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { Fragment, useMemo, useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
@@ -73,14 +75,33 @@ const DEFAULT_FORM = {
   es_encriptado: false,
 }
 
+const UNASSIGNED_MODULE = "Sin módulo"
+
+// Paleta de acento por módulo: se asigna de forma determinística (hash del
+// nombre) para que cada módulo tenga siempre el mismo color entre recargas.
+const MODULE_COLOR_KEYS = ["primary", "secondary", "success", "warning", "info", "error"] as const
+type ModuleColorKey = (typeof MODULE_COLOR_KEYS)[number]
+
+const getModuleColorKey = (modulo: string): ModuleColorKey => {
+  let hash = 0
+  for (let i = 0; i < modulo.length; i++) hash = (hash * 31 + modulo.charCodeAt(i)) >>> 0
+  return MODULE_COLOR_KEYS[hash % MODULE_COLOR_KEYS.length]
+}
+
+const getModuleInitials = (modulo: string): string => {
+  const parts = modulo.trim().split(/[\s_-]+/).filter(Boolean)
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+  return modulo.trim().slice(0, 2).toUpperCase() || "?"
+}
+
 export const ParametrosList = () => {
   const notify = useNotify()
+  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
 
   const [search, setSearch] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
   const [collapsedModules, setCollapsedModules] = useState<Set<string>>(new Set())
   const [revealedValues, setRevealedValues] = useState<Set<string>>(new Set())
 
@@ -100,7 +121,7 @@ export const ParametrosList = () => {
   const moduleGroups = useMemo(() => {
     const map = new Map<string, ParametroRecord[]>()
     ;(data ?? []).forEach((row) => {
-      const key = row.modulo?.trim() || "Sin módulo"
+      const key = row.modulo?.trim() || UNASSIGNED_MODULE
       if (!map.has(key)) map.set(key, [])
       map.get(key)!.push(row)
     })
@@ -116,6 +137,14 @@ export const ParametrosList = () => {
     })
     return Array.from(set).sort((a, b) => a.localeCompare(b, "es"))
   }, [data])
+
+  const moduleAccent = (modulo: string) => {
+    if (modulo === UNASSIGNED_MODULE) {
+      return { main: theme.palette.text.disabled, soft: alpha(theme.palette.text.disabled, 0.08) }
+    }
+    const main = theme.palette[getModuleColorKey(modulo)].main
+    return { main, soft: alpha(main, 0.1) }
+  }
 
   const toggleModule = (modulo: string) => {
     setCollapsedModules((prev) => {
@@ -133,6 +162,15 @@ export const ParametrosList = () => {
       else next.add(id)
       return next
     })
+  }
+
+  const copyValue = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value ?? "")
+      notify("Valor copiado al portapapeles", { type: "info" })
+    } catch {
+      notify("No se pudo copiar el valor", { type: "warning" })
+    }
   }
 
   const openCreate = () => {
@@ -182,43 +220,41 @@ export const ParametrosList = () => {
     }
   }
 
-
   return (
     <Box p={2} pb={4}>
       <Title title="Parámetros" />
-      <Paper elevation={2}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Box>
-            <Typography variant="h6" fontWeight={600} lineHeight={1.2}>
-              Parámetros
-            </Typography>
+      <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+        <Box
+          px={2.5}
+          py={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          gap={2}
+          flexWrap="wrap"
+          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
+              <TuneIcon fontSize="small" />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                Parámetros
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isLoading
+                  ? "Cargando..."
+                  : `${data?.length ?? 0} parámetro${data?.length === 1 ? "" : "s"} en ${moduleGroups.length} módulo${moduleGroups.length === 1 ? "" : "s"}`}
+              </Typography>
+            </Box>
           </Box>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-              <IconButton
-                size="small"
-                onClick={() => setShowFilter((v) => !v)}
-                color={showFilter ? "primary" : "default"}>
-                <Badge variant="dot" color="primary" invisible={!search}>
-                  <FilterListIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-              Nuevo
-            </Button>
-          </Stack>
-        </Box>
-
-        <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <TextField
-              placeholder="Buscar..."
+              placeholder="Buscar clave, valor o módulo..."
               size="small"
-              sx={{ width: 300 }}
               value={search}
-              autoFocus={showFilter}
               onChange={(e) => setSearch(e.target.value)}
+              sx={{ width: 280, bgcolor: "background.paper" }}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -227,118 +263,193 @@ export const ParametrosList = () => {
                 ),
               }}
             />
-            <Button size="small" onClick={() => setSearch("")}>
+            <Button size="small" onClick={() => setSearch("")} disabled={!search}>
               Limpiar
             </Button>
-          </Box>
-        </Collapse>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+              Nuevo
+            </Button>
+          </Stack>
+        </Box>
 
         <Divider />
         <TableContainer sx={{ maxHeight: "calc(100vh - 260px)", overflowY: "auto" }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell>Clave</TableCell>
-                <TableCell>Valor</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell>Tipo de dato</TableCell>
-                <TableCell align="center">Encriptado</TableCell>
-                <TableCell align="right">Acciones</TableCell>
+                {["Clave", "Valor", "Descripción", "Tipo de dato", "Encriptado", ""].map((head, idx) => (
+                  <TableCell
+                    key={head || idx}
+                    align={head === "Encriptado" ? "center" : idx === 5 ? "right" : "left"}
+                    sx={{
+                      bgcolor: "background.paper",
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                      textTransform: "uppercase",
+                      color: "text.secondary",
+                    }}>
+                    {head}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={6} align="center" sx={{ py: 8, border: 0 }}>
                     <CircularProgress size={28} />
                   </TableCell>
                 </TableRow>
               ) : !data?.length && search ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                  <TableCell colSpan={6} align="center" sx={{ py: 8, border: 0 }}>
+                    <Stack alignItems="center" spacing={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 42, color: "text.disabled" }} />
                       <Typography variant="body2" color="text.secondary">
                         Sin resultados para "{search}"
                       </Typography>
-                    </Box>
+                      <Button size="small" onClick={() => setSearch("")}>
+                        Limpiar búsqueda
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ) : !data?.length ? (
                 <TableRow>
-                  <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
-                    <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-                      <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
+                  <TableCell colSpan={6} align="center" sx={{ py: 8, border: 0 }}>
+                    <Stack alignItems="center" spacing={1}>
+                      <InboxOutlinedIcon sx={{ fontSize: 42, color: "text.disabled" }} />
                       <Typography variant="body2" color="text.secondary">
-                        Sin parámetros registrados. Crea el primero con + Nuevo.
+                        Sin parámetros registrados
                       </Typography>
-                    </Box>
+                      <Button size="small" variant="outlined" startIcon={<AddIcon />} onClick={openCreate}>
+                        Crear el primero
+                      </Button>
+                    </Stack>
                   </TableCell>
                 </TableRow>
               ) : (
                 moduleGroups.map((group) => {
                   const isCollapsed = collapsedModules.has(group.modulo)
+                  const accent = moduleAccent(group.modulo)
                   return (
                     <Fragment key={group.modulo}>
                       <TableRow
                         hover
                         onClick={() => toggleModule(group.modulo)}
-                        sx={{ cursor: "pointer", bgcolor: "action.hover" }}>
-                        <TableCell colSpan={6} sx={{ py: 0.75 }}>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                            {isCollapsed ? (
-                              <ChevronRightIcon sx={{ fontSize: 20, color: "text.secondary" }} />
-                            ) : (
-                              <ExpandMoreIcon sx={{ fontSize: 20, color: "text.secondary" }} />
-                            )}
+                        sx={{
+                          cursor: "pointer",
+                          bgcolor: accent.soft,
+                          "& td": { borderBottom: isCollapsed ? "1px solid" : 0, borderColor: "divider" },
+                        }}>
+                        <TableCell colSpan={6} sx={{ py: 1, borderLeft: `3px solid ${accent.main}` }}>
+                          <Box display="flex" alignItems="center" gap={1.25}>
+                            <ExpandMoreIcon
+                              sx={{
+                                fontSize: 20,
+                                color: "text.secondary",
+                                transition: "transform 0.18s ease",
+                                transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
+                              }}
+                            />
+                            <Avatar
+                              variant="rounded"
+                              sx={{
+                                width: 26,
+                                height: 26,
+                                fontSize: 11,
+                                fontWeight: 700,
+                                bgcolor: accent.main,
+                                color: theme.palette.getContrastText(accent.main),
+                              }}>
+                              {getModuleInitials(group.modulo)}
+                            </Avatar>
                             <Typography variant="subtitle2" fontWeight={700}>
                               {group.modulo}
                             </Typography>
-                            <Chip label={group.rows.length} size="small" sx={{ height: 20, fontSize: 11 }} />
+                            <Chip
+                              label={group.rows.length}
+                              size="small"
+                              sx={{
+                                height: 20,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                bgcolor: alpha(accent.main, 0.16),
+                                color: accent.main,
+                              }}
+                            />
                           </Box>
                         </TableCell>
                       </TableRow>
                       {!isCollapsed &&
                         group.rows.map((row) => (
-                          <TableRow key={row.id} hover>
-                            <TableCell sx={{ pl: 5 }}>
-                              <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                          <TableRow
+                            key={row.id}
+                            hover
+                            sx={{ "&:last-of-type td": { borderBottom: 0 } }}>
+                            <TableCell sx={{ pl: 3.5, borderLeft: `3px solid ${alpha(accent.main, 0.25)}` }}>
+                              <Box
+                                component="span"
+                                sx={{
+                                  fontFamily: "monospace",
+                                  fontSize: 12.5,
+                                  fontWeight: 600,
+                                  bgcolor: "action.hover",
+                                  px: 0.9,
+                                  py: 0.3,
+                                  borderRadius: 1,
+                                  whiteSpace: "nowrap",
+                                }}>
                                 {row.clave}
-                              </Typography>
+                              </Box>
                             </TableCell>
                             <TableCell>
                               {(() => {
                                 const isMasked = row.es_encriptado && !revealedValues.has(row.id)
                                 return (
-                                  <Box display="flex" alignItems="center">
+                                  <Box display="flex" alignItems="center" gap={0.25}>
                                     <Typography
                                       variant="body2"
                                       fontFamily={row.es_encriptado ? "monospace" : undefined}
                                       color={isMasked ? "text.secondary" : "text.primary"}
                                       sx={{
-                                        maxWidth: 260,
+                                        maxWidth: 220,
                                         overflow: "hidden",
                                         textOverflow: "ellipsis",
                                         whiteSpace: "nowrap",
                                       }}>
                                       {isMasked ? "••••••••••" : row.valor || "—"}
                                     </Typography>
-                                    <Box sx={{ width: 30, flexShrink: 0, display: "flex", justifyContent: "center" }}>
-                                      {row.es_encriptado && (
-                                        <Tooltip title={isMasked ? "Mostrar valor" : "Ocultar valor"}>
-                                          <IconButton
-                                            size="small"
-                                            onClick={() => toggleReveal(row.id)}
-                                            sx={{ p: 0.5, color: isMasked ? "text.secondary" : "primary.main" }}>
-                                            {isMasked ? (
-                                              <VisibilityIcon sx={{ fontSize: 16 }} />
-                                            ) : (
-                                              <VisibilityOffIcon sx={{ fontSize: 16 }} />
-                                            )}
-                                          </IconButton>
-                                        </Tooltip>
-                                      )}
-                                    </Box>
+                                    {row.es_encriptado && (
+                                      <Tooltip title={isMasked ? "Mostrar valor" : "Ocultar valor"}>
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => toggleReveal(row.id)}
+                                          sx={{ p: 0.5, color: isMasked ? "text.secondary" : "primary.main" }}>
+                                          {isMasked ? (
+                                            <VisibilityIcon sx={{ fontSize: 15 }} />
+                                          ) : (
+                                            <VisibilityOffIcon sx={{ fontSize: 15 }} />
+                                          )}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                    {row.valor && (
+                                      <Tooltip title="Copiar valor">
+                                        <IconButton
+                                          size="small"
+                                          onClick={() => copyValue(row.valor)}
+                                          sx={{ p: 0.5, color: "text.disabled", "&:hover": { color: "text.secondary" } }}>
+                                          <ContentCopyIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
                                   </Box>
                                 )
                               })()}
@@ -347,36 +458,59 @@ export const ParametrosList = () => {
                               <Typography
                                 variant="body2"
                                 color="text.secondary"
-                                sx={{ maxWidth: 360, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                sx={{ maxWidth: 340, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                                 {row.descripcion || "—"}
                               </Typography>
                             </TableCell>
                             <TableCell>
-                              <Typography variant="body2">{row.tipo_dato || "—"}</Typography>
+                              <Chip
+                                label={row.tipo_dato || "—"}
+                                size="small"
+                                variant="outlined"
+                                sx={{ height: 20, fontSize: 10.5, fontWeight: 600, color: "text.secondary" }}
+                              />
                             </TableCell>
                             <TableCell align="center">
                               {row.es_encriptado ? (
-                                <CheckCircleIcon sx={{ fontSize: 18 }} color="success" />
+                                <Chip
+                                  icon={<LockOutlinedIcon sx={{ fontSize: 13 }} />}
+                                  label="Cifrado"
+                                  size="small"
+                                  sx={{
+                                    height: 22,
+                                    fontSize: 10.5,
+                                    fontWeight: 600,
+                                    bgcolor: alpha(theme.palette.success.main, 0.12),
+                                    color: "success.dark",
+                                    "& .MuiChip-icon": { color: "success.dark" },
+                                  }}
+                                />
                               ) : (
-                                <Typography variant="body2" color="text.disabled">
-                                  —
-                                </Typography>
+                                <Chip
+                                  icon={<LockOpenOutlinedIcon sx={{ fontSize: 13 }} />}
+                                  label="Plano"
+                                  size="small"
+                                  variant="outlined"
+                                  sx={{ height: 22, fontSize: 10.5, fontWeight: 600, color: "text.disabled", borderColor: "divider" }}
+                                />
                               )}
                             </TableCell>
                             <TableCell align="right">
-                              <Tooltip title="Editar">
-                                <IconButton size="small" onClick={() => openEdit(row)}>
-                                  <EditOutlinedIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Eliminar">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => setDeleteConfirm({ open: true, id: row.id, label: row.clave })}>
-                                  <DeleteOutlineIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
+                              <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                                <Tooltip title="Editar">
+                                  <IconButton size="small" onClick={() => openEdit(row)}>
+                                    <EditOutlinedIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Eliminar">
+                                  <IconButton
+                                    size="small"
+                                    color="error"
+                                    onClick={() => setDeleteConfirm({ open: true, id: row.id, label: row.clave })}>
+                                    <DeleteOutlineIcon fontSize="small" />
+                                  </IconButton>
+                                </Tooltip>
+                              </Stack>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -390,8 +524,14 @@ export const ParametrosList = () => {
       </Paper>
 
       {/* Create / Edit Dialog */}
-      <Dialog open={dialog.open} onClose={closeDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{dialog.mode === "create" ? "Nuevo Parámetro" : "Editar Parámetro"}</DialogTitle>
+      <Dialog open={dialog.open} onClose={closeDialog} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
+        <DialogTitle sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", pb: 1 }}>
+          {dialog.mode === "create" ? "Nuevo parámetro" : "Editar parámetro"}
+          <IconButton size="small" onClick={closeDialog}>
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </DialogTitle>
+        <Divider />
         <DialogContent>
           <Stack spacing={2.5} mt={1}>
             <Box display="flex" gap={2}>
@@ -413,7 +553,7 @@ export const ParametrosList = () => {
                 required
                 fullWidth
                 size="small"
-                inputProps={{ maxLength: 32 }}
+                inputProps={{ maxLength: 32, style: { fontFamily: "monospace" } }}
                 disabled={dialog.mode === "edit"}
                 helperText={dialog.mode === "edit" ? "La clave no puede modificarse" : "Máximo 32 caracteres, debe ser única"}
               />
@@ -426,6 +566,7 @@ export const ParametrosList = () => {
               size="small"
               multiline
               rows={3}
+              inputProps={{ style: { fontFamily: "monospace", fontSize: 13 } }}
             />
             <TextField
               label="Descripción"
@@ -458,17 +599,27 @@ export const ParametrosList = () => {
                 alignItems="center"
                 justifyContent="space-between"
                 flexShrink={0}
+                gap={0.5}
                 sx={{
-                  width: 150,
+                  width: 160,
                   height: 40,
                   px: 1.5,
                   border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 1,
+                  borderColor: form.es_encriptado ? "success.main" : "divider",
+                  bgcolor: form.es_encriptado ? alpha(theme.palette.success.main, 0.08) : "transparent",
+                  borderRadius: 5,
+                  transition: "all 0.15s ease",
                 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Encriptado
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.5}>
+                  {form.es_encriptado ? (
+                    <LockOutlinedIcon sx={{ fontSize: 15, color: "success.dark" }} />
+                  ) : (
+                    <LockOpenOutlinedIcon sx={{ fontSize: 15, color: "text.disabled" }} />
+                  )}
+                  <Typography variant="body2" color={form.es_encriptado ? "success.dark" : "text.secondary"}>
+                    Cifrado
+                  </Typography>
+                </Stack>
                 <Switch
                   size="small"
                   checked={form.es_encriptado}
@@ -478,14 +629,15 @@ export const ParametrosList = () => {
             </Box>
           </Stack>
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2.5 }}>
           <Button onClick={closeDialog} disabled={creating || updating}>
             Cancelar
           </Button>
           <Button
             variant="contained"
             onClick={submit}
-            disabled={creating || updating || !form.clave}>
+            disabled={creating || updating || !form.clave}
+            sx={{ borderRadius: 5, px: 2.5, boxShadow: "none" }}>
             {creating || updating ? (
               <CircularProgress size={18} />
             ) : dialog.mode === "create" ? (
@@ -499,18 +651,18 @@ export const ParametrosList = () => {
 
       {/* Delete Confirm Dialog */}
       {deleteConfirm && (
-        <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth>
+        <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
           <DialogTitle>Confirmar eliminación</DialogTitle>
           <DialogContent>
             <DialogContentText>
               ¿Eliminar el parámetro <strong>{deleteConfirm.label}</strong>? Esta acción no se puede deshacer.
             </DialogContentText>
           </DialogContent>
-          <DialogActions>
+          <DialogActions sx={{ px: 3, pb: 2.5 }}>
             <Button onClick={() => setDeleteConfirm(null)} disabled={deleting}>
               Cancelar
             </Button>
-            <Button color="error" variant="contained" onClick={confirmDelete} disabled={deleting}>
+            <Button color="error" variant="contained" onClick={confirmDelete} disabled={deleting} sx={{ borderRadius: 5, boxShadow: "none" }}>
               {deleting ? <CircularProgress size={18} /> : "Eliminar"}
             </Button>
           </DialogActions>

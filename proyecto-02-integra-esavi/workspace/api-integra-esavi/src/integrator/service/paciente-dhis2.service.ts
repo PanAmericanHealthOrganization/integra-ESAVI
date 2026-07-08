@@ -5,6 +5,9 @@ import { Repository } from 'typeorm';
 import { CreatePacienteDhis2Dto, UpdatePacienteDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { CatalogoService } from './catalogo.service';
+import { CatalogoPadreService } from './catalogo-padre.service';
+
+const ETNIA_CODIGO_PADRE = 'ETNIA';
 
 @Injectable()
 export class PacienteDhis2Service {
@@ -14,6 +17,7 @@ export class PacienteDhis2Service {
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacienteRepository: Repository<Paciente>,
     private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   async create(createDto: CreatePacienteDhis2Dto): Promise<Paciente> {
@@ -38,10 +42,13 @@ export class PacienteDhis2Service {
           const autoIdentificacionPaciente = createDto.autoIdentificacionPaciente
             .toUpperCase()
             .replace('Í', 'I');
-          const autoIdentificacion = await this.catalogoService.findByDescriptionToDhis2(
+          const homologado = await this.catalogoService.findByDescriptionToDhis2(
             autoIdentificacionPaciente,
           );
-          paciente.autoIdentificacion = autoIdentificacion;
+          paciente.autoIdentificacion = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+            ETNIA_CODIGO_PADRE,
+            homologado.homologada,
+          );
         }
 
         paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;

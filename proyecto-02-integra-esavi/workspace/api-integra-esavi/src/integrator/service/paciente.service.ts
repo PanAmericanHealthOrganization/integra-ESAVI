@@ -6,6 +6,9 @@ import { CreatePacienteDhis2Dto, CreatePacienteVigiflowDto, UpdatePacienteDto } 
 import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 import { CatalogoService } from './catalogo.service';
+import { CatalogoPadreService } from './catalogo-padre.service';
+
+const ETNIA_CODIGO_PADRE = 'ETNIA';
 
 @Injectable()
 export class PacienteService {
@@ -15,7 +18,28 @@ export class PacienteService {
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacientRepository: Repository<Paciente>,
     private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
+
+  /**
+   * Homologa el valor crudo de autoidentificación étnica (VigiFlow/DHIS2) al
+   * término estandarizado vía TC_CATALOGO y resuelve el registro correspondiente
+   * en TC_CATALOGO_PADRE (hijo de ETNIA) por similitud de nombre.
+   */
+  private async resolveAutoIdentificacionEtnica(
+    raw: string,
+    homologar: (valor: string) => Promise<{ homologada: string }>,
+  ) {
+    const homologado = await homologar(raw);
+    const etnia = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+      ETNIA_CODIGO_PADRE,
+      homologado.homologada,
+    );
+    if (!etnia) {
+      this.logger.warn(`Autoidentificación étnica "${raw}" (homologada: "${homologado.homologada}") sin coincidencia en TC_CATALOGO_PADRE/ETNIA`);
+    }
+    return etnia;
+  }
 
   async findByCodigosOrigen(codigos: string[]): Promise<Map<string, Paciente>> {
     if (!codigos.length) return new Map();
@@ -54,8 +78,9 @@ export class PacienteService {
       paciente.sexo = await this.catalogoService.findByDescriptionToVigiflow(createDto.sexoPaciente);
     }
     if (createDto.autoIdentificacionPaciente) {
-      paciente.autoIdentificacion = await this.catalogoService.findByDescriptionToVigiflow(
+      paciente.autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
         createDto.autoIdentificacionPaciente,
+        (v) => this.catalogoService.findByDescriptionToVigiflow(v),
       );
     }
     paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -90,7 +115,10 @@ export class PacienteService {
       }
       if (createDto.autoIdentificacionPaciente) {
         const autoId = createDto.autoIdentificacionPaciente.toUpperCase().replace('Í', 'I');
-        paciente.autoIdentificacion = await this.catalogoService.findByDescriptionToDhis2(autoId);
+        paciente.autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
+          autoId,
+          (v) => this.catalogoService.findByDescriptionToDhis2(v),
+        );
       }
       paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
       return await this.pacientRepository.save(paciente);

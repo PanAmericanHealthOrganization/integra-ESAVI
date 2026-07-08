@@ -1,9 +1,11 @@
 import AddIcon from "@mui/icons-material/Add"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import FilterListIcon from "@mui/icons-material/FilterList"
+import SearchIcon from "@mui/icons-material/Search"
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -35,6 +37,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
@@ -314,6 +317,7 @@ const DeleteConfirmDialog = ({ open, label, onClose, onConfirm, loading }: Delet
 
 export const HomologadoresPage = () => {
   const notify = useNotify()
+  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -323,7 +327,6 @@ export const HomologadoresPage = () => {
   const [homPerPage] = useState(10)
   const [filterEntity, setFilterEntity] = useState("")
   const [filterField, setFilterField] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
   const [selectedHom, setSelectedHom] = useState<HomologatorRecord | null>(null)
 
   // ── Homologations state ──
@@ -487,58 +490,86 @@ export const HomologadoresPage = () => {
       <Title title="Homologación ESAVI" />
 
       {/* ── HOMOLOGATORS TABLE ── */}
-      <Paper elevation={2} sx={{ mb: 2 }}>
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" fontWeight={600}>
-            Homologadores
-          </Typography>
-          <Stack direction="row" spacing={1}>
-            <Tooltip title="Filtros">
-              <IconButton size="small" onClick={() => setShowFilter((v) => !v)} color={showFilter ? "primary" : "default"}>
-                <FilterListIcon />
-              </IconButton>
-            </Tooltip>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateHom}>
+      <Paper elevation={0} sx={{ mb: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+        <Box
+          px={2.5}
+          py={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          gap={1.5}
+          flexWrap="wrap"
+          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
+              <CompareArrowsIcon fontSize="small" />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                Homologadores
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {homLoading ? "Cargando..." : `${homTotal ?? 0} homologador${homTotal === 1 ? "" : "es"}`}
+              </Typography>
+            </Box>
+          </Box>
+          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+            <TextField
+              placeholder="Filtrar entidad..."
+              size="small"
+              value={filterEntity}
+              onChange={(e) => { setFilterEntity(e.target.value); setHomPage(0) }}
+              sx={{ width: 170, bgcolor: "background.paper" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <TextField
+              placeholder="Filtrar campo..."
+              size="small"
+              value={filterField}
+              onChange={(e) => { setFilterField(e.target.value); setHomPage(0) }}
+              sx={{ width: 170, bgcolor: "background.paper" }}
+            />
+            <Button
+              size="small"
+              onClick={() => { setFilterEntity(""); setFilterField(""); setHomPage(0) }}
+              disabled={!filterEntity && !filterField}>
+              Limpiar
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={openCreateHom}
+              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
               Nuevo
             </Button>
           </Stack>
         </Box>
 
-        <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" gap={2}>
-            <TextField
-              label="Filtrar entidad"
-              size="small"
-              value={filterEntity}
-              onChange={(e) => { setFilterEntity(e.target.value); setHomPage(0) }}
-              sx={{ width: 200 }}
-            />
-            <TextField
-              label="Filtrar campo"
-              size="small"
-              value={filterField}
-              onChange={(e) => { setFilterField(e.target.value); setHomPage(0) }}
-              sx={{ width: 200 }}
-            />
-            <Button
-              size="small"
-              onClick={() => { setFilterEntity(""); setFilterField(""); setHomPage(0) }}>
-              Limpiar
-            </Button>
-          </Box>
-        </Collapse>
-
         <TableContainer>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell />
-                <TableCell>Entidad</TableCell>
-                <TableCell>Campo</TableCell>
-                <TableCell>Tipo destino</TableCell>
-                <TableCell>Descripción</TableCell>
-                <TableCell>Estado</TableCell>
-                <TableCell align="right">Acciones</TableCell>
+                {["", "Entidad", "Campo", "Tipo destino", "Descripción", "Estado", ""].map((head, idx) => (
+                  <TableCell
+                    key={head || idx}
+                    align={idx === 6 ? "right" : "left"}
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                      textTransform: "uppercase",
+                      color: "text.secondary",
+                    }}>
+                    {head}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -582,12 +613,28 @@ export const HomologadoresPage = () => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                        <Box
+                          component="span"
+                          sx={{
+                            display: "inline-block",
+                            fontFamily: "monospace",
+                            fontSize: 12.5,
+                            fontWeight: 600,
+                            bgcolor: "action.hover",
+                            px: 0.9,
+                            py: 0.3,
+                            borderRadius: 1,
+                          }}>
                           {row.field}
-                        </Typography>
+                        </Box>
                       </TableCell>
                       <TableCell>
-                        <Chip label={row.targetType} size="small" variant="outlined" />
+                        <Chip
+                          label={row.targetType}
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: 10.5, fontWeight: 600, color: "text.secondary" }}
+                        />
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 260 }}>
@@ -598,7 +645,12 @@ export const HomologadoresPage = () => {
                         <Chip
                           label={row.isActive ? "Activo" : "Inactivo"}
                           size="small"
-                          color={row.isActive ? "success" : "default"}
+                          sx={
+                            row.isActive
+                              ? { height: 22, fontSize: 10.5, fontWeight: 600, bgcolor: alpha(theme.palette.success.main, 0.12), color: "success.dark" }
+                              : { height: 22, fontSize: 10.5, fontWeight: 600, color: "text.disabled" }
+                          }
+                          variant={row.isActive ? "filled" : "outlined"}
                         />
                       </TableCell>
                       <TableCell align="right" onClick={(e) => e.stopPropagation()}>
@@ -643,21 +695,38 @@ export const HomologadoresPage = () => {
 
       {/* ── HOMOLOGATIONS TABLE ── */}
       <Collapse in={!!selectedHom} unmountOnExit>
-        <Paper elevation={2}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box>
-              <Typography variant="h6" fontWeight={600}>
-                Reglas de Homologación
-              </Typography>
-              {selectedHom && (
-                <Typography variant="caption" color="text.secondary">
-                  {selectedHom.entity}
-                  <strong>.{selectedHom.field}</strong> → tipo{" "}
-                  <strong>{selectedHom.targetType}</strong>
+        <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2.5}
+            py={2}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            gap={1.5}
+            flexWrap="wrap"
+            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Avatar sx={{ bgcolor: "secondary.main", width: 38, height: 38 }}>
+                <CompareArrowsIcon fontSize="small" />
+              </Avatar>
+              <Box>
+                <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                  Reglas de Homologación
                 </Typography>
-              )}
+                {selectedHom && (
+                  <Typography variant="caption" color="text.secondary">
+                    {selectedHom.entity}.<strong>{selectedHom.field}</strong> → tipo{" "}
+                    <strong>{selectedHom.targetType}</strong> · {honTotal ?? 0} regla{honTotal === 1 ? "" : "s"}
+                  </Typography>
+                )}
+              </Box>
             </Box>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateHon}>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={openCreateHon}
+              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
               Nuevo
             </Button>
           </Box>
@@ -666,15 +735,22 @@ export const HomologadoresPage = () => {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Sistema origen</TableCell>
-                  <TableCell>Campo origen</TableCell>
-                  <TableCell>Valor origen</TableCell>
-                  <TableCell>Valor destino</TableCell>
-                  <TableCell>Comparación</TableCell>
-                  <TableCell>Case</TableCell>
-                  <TableCell>Prioridad</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Sistema origen", "Campo origen", "Valor origen", "Valor destino", "Comparación", "Case", "Prioridad", "Estado", ""].map(
+                    (head, idx) => (
+                      <TableCell
+                        key={head || idx}
+                        align={idx === 8 ? "right" : "left"}
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: 0.6,
+                          textTransform: "uppercase",
+                          color: "text.secondary",
+                        }}>
+                        {head}
+                      </TableCell>
+                    ),
+                  )}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -694,12 +770,19 @@ export const HomologadoresPage = () => {
                   homologations.map((row) => (
                     <TableRow key={row.id} hover>
                       <TableCell>
-                        <Chip label={row.sourceSystem} size="small" variant="outlined" />
+                        <Chip
+                          label={row.sourceSystem}
+                          size="small"
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: 10.5, fontWeight: 600, color: "text.secondary" }}
+                        />
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2" fontFamily="monospace">
+                        <Box
+                          component="span"
+                          sx={{ display: "inline-block", fontFamily: "monospace", fontSize: 12.5, bgcolor: "action.hover", px: 0.9, py: 0.3, borderRadius: 1 }}>
                           {row.sourceField}
-                        </Typography>
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontFamily="monospace" color="text.secondary">
@@ -716,6 +799,7 @@ export const HomologadoresPage = () => {
                           label={row.comparisonType}
                           size="small"
                           color={COMPARISON_COLOR[row.comparisonType]}
+                          sx={{ height: 20, fontSize: 10.5, fontWeight: 600 }}
                         />
                       </TableCell>
                       <TableCell>
@@ -724,6 +808,7 @@ export const HomologadoresPage = () => {
                           size="small"
                           variant="outlined"
                           color={row.caseSensitive ? "warning" : "default"}
+                          sx={{ height: 20, fontSize: 10.5, fontWeight: 600 }}
                         />
                       </TableCell>
                       <TableCell align="center">{row.priority}</TableCell>
@@ -731,7 +816,12 @@ export const HomologadoresPage = () => {
                         <Chip
                           label={row.isActive ? "Activo" : "Inactivo"}
                           size="small"
-                          color={row.isActive ? "success" : "default"}
+                          sx={
+                            row.isActive
+                              ? { height: 22, fontSize: 10.5, fontWeight: 600, bgcolor: alpha(theme.palette.success.main, 0.12), color: "success.dark" }
+                              : { height: 22, fontSize: 10.5, fontWeight: 600, color: "text.disabled" }
+                          }
+                          variant={row.isActive ? "filled" : "outlined"}
                         />
                       </TableCell>
                       <TableCell align="right">

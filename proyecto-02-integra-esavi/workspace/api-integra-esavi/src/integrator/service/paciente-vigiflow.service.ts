@@ -5,6 +5,9 @@ import { UpdatePacienteDto, CreatePacienteVigiflowDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { plainToClass } from 'class-transformer';
 import { CatalogoService } from './catalogo.service';
+import { CatalogoPadreService } from './catalogo-padre.service';
+
+const ETNIA_CODIGO_PADRE = 'ETNIA';
 
 @Injectable()
 export class PacienteVigiflowService {
@@ -14,6 +17,7 @@ export class PacienteVigiflowService {
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacienteRepository: Repository<Paciente>,
     private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   async create(createDto: CreatePacienteVigiflowDto): Promise<Paciente> {
@@ -33,8 +37,12 @@ export class PacienteVigiflowService {
           );
         }
         if (createDto.autoIdentificacionPaciente) {
-          paciente.autoIdentificacion = await this.catalogoService.findByDescriptionToVigiflow(
+          const homologado = await this.catalogoService.findByDescriptionToVigiflow(
             createDto.autoIdentificacionPaciente,
+          );
+          paciente.autoIdentificacion = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+            ETNIA_CODIGO_PADRE,
+            homologado.homologada,
           );
         }
         paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -91,11 +99,14 @@ export class PacienteVigiflowService {
     const sexo = await this.catalogoService.findByDescriptionToVigiflow(
       updatePersonaDto.sexoPaciente,
     );
-    const autoidentificacion = await this.catalogoService.findByDescriptionToVigiflow(
+    const homologado = await this.catalogoService.findByDescriptionToVigiflow(
       updatePersonaDto.autoIdentificacionPaciente,
     );
     paciente.sexo = sexo;
-    paciente.autoIdentificacion = autoidentificacion;
+    paciente.autoIdentificacion = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+      ETNIA_CODIGO_PADRE,
+      homologado.homologada,
+    );
     this.pacienteRepository.merge(paciente, updatePersonaDto);
     return this.pacienteRepository.save(paciente);
   }
