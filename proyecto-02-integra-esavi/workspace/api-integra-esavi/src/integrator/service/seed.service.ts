@@ -30,6 +30,7 @@ import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {TipoCatalogo} from '../entity/tipo-catalogo.entity';
 import {Vacunometro} from '../entity/vacunometro.entity';
+import {encryptValue} from '../utils/parametro-crypto.util';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -101,66 +102,107 @@ export class SeedService implements OnApplicationBootstrap {
     await this.runSyncProcess('Carga de parámetros dummy de desarrollo (TC_PARAMETRO)...', async () => {
       console.log('🔧 Verificando parámetros de desarrollo en TC_PARAMETRO...');
 
+      // es_encriptado: true únicamente para contraseñas y llaves/tokens sensibles
+      // (DHIS2_USER_KEY, *_PASSWD, WHD_UMC_*_KEY). El resto (URLs, usuarios,
+      // client id, grant type, scope) no son secretos y viajan en texto plano.
       const parametrosDev = [
         {
           modulo: 'DHIS2',
           clave: 'DHIS2_USER_KEY',
           valor: 'CAMBIAR_DHIS2_USER_KEY',
           descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
+        },
+        {
+          modulo: 'DHIS2',
+          clave: 'DHIS2_USERNAME',
+          valor: 'CAMBIAR_DHIS2_USERNAME',
+          descripcion: 'Usuario de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'DHIS2',
+          clave: 'DHIS2_PASSWD',
+          valor: 'CAMBIAR_DHIS2_PASSWD',
+          descripcion: 'Contraseña de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
         },
         {
           modulo: 'VIGIFLOW',
           clave: 'VIGIFLOW_USERNAME',
           valor: 'CAMBIAR_VIGIFLOW_USERNAME',
           descripcion: 'Usuario de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
         },
         {
           modulo: 'VIGIFLOW',
           clave: 'VIGIFLOW_PASSWD',
           valor: 'CAMBIAR_VIGIFLOW_PASSWD',
           descripcion: 'Contraseña de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
         },
         {
           modulo: 'WHODRUG',
           clave: 'WHD_UMC_LICENSE_KEY',
           valor: 'CAMBIAR_WHD_UMC_LICENSE_KEY',
           descripcion: 'License key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
         },
         {
           modulo: 'WHODRUG',
           clave: 'WHD_UMC_CLIENT_KEY',
           valor: 'CAMBIAR_WHD_UMC_CLIENT_KEY',
           descripcion: 'Client key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_URL_TOKEN',
+          valor: 'https://mid.meddra.org/connect/token',
+          descripcion: 'URL del endpoint OAuth (token) de MedDRA',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'MEDDRA',
+          clave: 'MED_URL_API',
+          valor: 'https://mapisbx.meddra.org/api/search',
+          descripcion: 'URL del endpoint de búsqueda (API) de MedDRA',
+          es_encriptado: false,
         },
         {
           modulo: 'MEDDRA',
           clave: 'MED_GRANT_TYPE',
           valor: 'password',
           descripcion: 'Grant type OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
         },
         {
           modulo: 'MEDDRA',
           clave: 'MED_CLIENT_ID',
           valor: 'CAMBIAR_MED_CLIENT_ID',
           descripcion: 'Client ID de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
         },
         {
           modulo: 'MEDDRA',
           clave: 'MED_USER_NAME',
           valor: 'CAMBIAR_MED_USER_NAME',
           descripcion: 'Usuario de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
         },
         {
           modulo: 'MEDDRA',
           clave: 'MED_PASSWORD',
           valor: 'CAMBIAR_MED_PASSWORD',
           descripcion: 'Contraseña de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: true,
         },
         {
           modulo: 'MEDDRA',
           clave: 'MED_SCOPE',
           valor: 'CAMBIAR_MED_SCOPE',
           descripcion: 'Scope OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
         },
       ];
 
@@ -180,8 +222,8 @@ export class SeedService implements OnApplicationBootstrap {
         if (!existing) {
           await this.parametroRepository.save({
             ...parametro,
+            valor: parametro.es_encriptado ? encryptValue(parametro.valor) : parametro.valor,
             tipo_dato: TipoDato.STRING,
-            es_encriptado: false,
             ...auditoria,
           } as Parametro);
         }

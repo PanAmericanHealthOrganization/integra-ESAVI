@@ -1,16 +1,15 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
+import LocationCityIcon from "@mui/icons-material/LocationCity"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Badge,
+  Avatar,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -35,6 +34,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { useMemo, useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
@@ -64,6 +64,7 @@ const EMPTY_PARROQUIA = { codigo: "", nombre: "", cantonCodigo: "" }
 
 export const DpaList = () => {
   const notify = useNotify()
+  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -76,11 +77,6 @@ export const DpaList = () => {
   const [searchProvincia, setSearchProvincia] = useState("")
   const [searchCanton, setSearchCanton] = useState("")
   const [searchParroquia, setSearchParroquia] = useState("")
-
-  // Filter visibility state
-  const [showFilterProv, setShowFilterProv] = useState(false)
-  const [showFilterCanton, setShowFilterCanton] = useState(false)
-  const [showFilterParroquia, setShowFilterParroquia] = useState(false)
 
   // Form state
   const [formProvincia, setFormProvincia] = useState({ ...EMPTY_PROVINCIA })
@@ -295,34 +291,43 @@ export const DpaList = () => {
       <Box display="flex" gap={2} alignItems="flex-start" sx={{ overflowX: "auto" }}>
 
         {/* ── Panel Provincias ── */}
-        <Paper elevation={2} sx={{ flex: 1, minWidth: 220 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="baseline" gap={1}>
-              <Typography variant="subtitle2" fontWeight={700}>
-                Provincias
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Tooltip title={showFilterProv ? "Ocultar filtros" : "Mostrar filtros"}>
-                <IconButton size="small" onClick={() => setShowFilterProv((v) => !v)} color={showFilterProv ? "primary" : "default"}>
-                  <Badge variant="dot" color="primary" invisible={!searchProvincia}>
-                    <FilterListIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreateProvincia}>
+        <Paper elevation={0} sx={{ flex: 1, minWidth: 220, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2}
+            py={1.75}
+            display="flex"
+            flexDirection="column"
+            gap={1.25}
+            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Avatar sx={{ bgcolor: "primary.main", width: 30, height: 30 }}>
+                  <LocationCityIcon sx={{ fontSize: 16 }} />
+                </Avatar>
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2}>
+                    Provincias
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {loadingProvincias ? "..." : `${provincias?.length ?? 0}`}
+                  </Typography>
+                </Box>
+              </Box>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={openCreateProvincia}
+                sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
                 Nueva
               </Button>
-            </Stack>
-          </Box>
-
-          <Collapse in={showFilterProv}>
-            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
                 size="small"
-                autoFocus
-                sx={{ width: 180 }}
+                fullWidth
+                sx={{ bgcolor: "background.paper" }}
                 value={searchProvincia}
                 onChange={(e) => setSearchProvincia(e.target.value)}
                 InputProps={{
@@ -333,20 +338,25 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchProvincia("")}>
+              <Button size="small" onClick={() => setSearchProvincia("")} disabled={!searchProvincia} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
-            </Box>
-          </Collapse>
+            </Stack>
+          </Box>
 
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Cód</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Cód", "Nombre", ""].map((head, idx) => (
+                    <TableCell
+                      key={head || idx}
+                      align={idx === 2 ? "right" : "left"}
+                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -394,9 +404,11 @@ export const DpaList = () => {
                           setSearchParroquia("")
                         }}>
                         <TableCell>
-                          <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                          <Box
+                            component="span"
+                            sx={{ display: "inline-block", fontFamily: "monospace", fontSize: 12.5, fontWeight: 600, bgcolor: "action.hover", px: 0.9, py: 0.3, borderRadius: 1 }}>
                             {p.codigo}
-                          </Typography>
+                          </Box>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
@@ -431,32 +443,33 @@ export const DpaList = () => {
         </Paper>
 
         {/* ── Panel Cantones ── */}
-        <Paper elevation={2} sx={{ flex: 1.2, minWidth: 240 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
-              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
-                  Cantones
-                </Typography>
+        <Paper elevation={0} sx={{ flex: 1.2, minWidth: 240, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2}
+            py={1.75}
+            display="flex"
+            flexDirection="column"
+            gap={1.25}
+            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden" }}>
+                <Avatar sx={{ bgcolor: "secondary.main", width: 30, height: 30 }}>
+                  <LocationCityIcon sx={{ fontSize: 16 }} />
+                </Avatar>
+                <Box sx={{ minWidth: 0 }}>
+                  <Box display="flex" alignItems="center" gap={0.75}>
+                    <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
+                      Cantones
+                    </Typography>
+                    {selectedProvincia && (
+                      <Chip label={selectedProvincia.nombre} size="small" color="secondary" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
+                    )}
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {!selectedProvincia ? "Selecciona provincia" : `${cantonesOfProvincia.length}`}
+                  </Typography>
+                </Box>
               </Box>
-              {selectedProvincia && (
-                <Chip label={selectedProvincia.nombre} size="small" color="primary" variant="outlined" sx={{ maxWidth: 110, overflow: "hidden" }} />
-              )}
-            </Box>
-            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-              <Tooltip title={showFilterCanton ? "Ocultar filtros" : "Mostrar filtros"}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={() => setShowFilterCanton((v) => !v)}
-                    color={showFilterCanton ? "primary" : "default"}
-                    disabled={!selectedProvincia}>
-                    <Badge variant="dot" color="primary" invisible={!searchCanton}>
-                      <FilterListIcon />
-                    </Badge>
-                  </IconButton>
-                </span>
-              </Tooltip>
               <Tooltip title={!selectedProvincia ? "Selecciona una provincia primero" : ""} placement="left">
                 <span>
                   <Button
@@ -464,23 +477,22 @@ export const DpaList = () => {
                     size="small"
                     startIcon={<AddIcon />}
                     disabled={!selectedProvincia}
-                    onClick={openCreateCanton}>
+                    onClick={openCreateCanton}
+                    sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
                     Nuevo
                   </Button>
                 </span>
               </Tooltip>
-            </Stack>
-          </Box>
-
-          <Collapse in={showFilterCanton && !!selectedProvincia}>
-            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
                 size="small"
-                autoFocus
-                sx={{ width: 180 }}
+                fullWidth
+                sx={{ bgcolor: "background.paper" }}
                 value={searchCanton}
                 onChange={(e) => setSearchCanton(e.target.value)}
+                disabled={!selectedProvincia}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -489,20 +501,25 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchCanton("")}>
+              <Button size="small" onClick={() => setSearchCanton("")} disabled={!searchCanton} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
-            </Box>
-          </Collapse>
+            </Stack>
+          </Box>
 
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Cód</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Cód", "Nombre", ""].map((head, idx) => (
+                    <TableCell
+                      key={head || idx}
+                      align={idx === 2 ? "right" : "left"}
+                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -559,9 +576,11 @@ export const DpaList = () => {
                           setSearchParroquia("")
                         }}>
                         <TableCell>
-                          <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                          <Box
+                            component="span"
+                            sx={{ display: "inline-block", fontFamily: "monospace", fontSize: 12.5, fontWeight: 600, bgcolor: "action.hover", px: 0.9, py: 0.3, borderRadius: 1 }}>
                             {c.codigo}
-                          </Typography>
+                          </Box>
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={isSelected ? 700 : 500}>
@@ -596,32 +615,33 @@ export const DpaList = () => {
         </Paper>
 
         {/* ── Panel Parroquias ── */}
-        <Paper elevation={2} sx={{ flex: 1.2, minWidth: 240 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="center" gap={0.75} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
-              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle2" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
-                  Parroquias
-                </Typography>
+        <Paper elevation={0} sx={{ flex: 1.2, minWidth: 240, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2}
+            py={1.75}
+            display="flex"
+            flexDirection="column"
+            gap={1.25}
+            sx={{ bgcolor: alpha(theme.palette.success.main, 0.04) }}>
+            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden" }}>
+                <Avatar sx={{ bgcolor: "success.main", width: 30, height: 30 }}>
+                  <LocationCityIcon sx={{ fontSize: 16 }} />
+                </Avatar>
+                <Box sx={{ minWidth: 0 }}>
+                  <Box display="flex" alignItems="center" gap={0.75}>
+                    <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
+                      Parroquias
+                    </Typography>
+                    {selectedCanton && (
+                      <Chip label={selectedCanton.nombre} size="small" color="success" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
+                    )}
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {!selectedCanton ? "Selecciona cantón" : `${parroquiasOfCanton.length}`}
+                  </Typography>
+                </Box>
               </Box>
-              {selectedCanton && (
-                <Chip label={selectedCanton.nombre} size="small" color="secondary" variant="outlined" sx={{ maxWidth: 110, overflow: "hidden" }} />
-              )}
-            </Box>
-            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-              <Tooltip title={showFilterParroquia ? "Ocultar filtros" : "Mostrar filtros"}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={() => setShowFilterParroquia((v) => !v)}
-                    color={showFilterParroquia ? "primary" : "default"}
-                    disabled={!selectedCanton}>
-                    <Badge variant="dot" color="primary" invisible={!searchParroquia}>
-                      <FilterListIcon />
-                    </Badge>
-                  </IconButton>
-                </span>
-              </Tooltip>
               <Tooltip title={!selectedCanton ? "Selecciona un cantón primero" : ""} placement="left">
                 <span>
                   <Button
@@ -629,23 +649,22 @@ export const DpaList = () => {
                     size="small"
                     startIcon={<AddIcon />}
                     disabled={!selectedCanton}
-                    onClick={openCreateParroquia}>
+                    onClick={openCreateParroquia}
+                    sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
                     Nueva
                   </Button>
                 </span>
               </Tooltip>
-            </Stack>
-          </Box>
-
-          <Collapse in={showFilterParroquia && !!selectedCanton}>
-            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            </Box>
+            <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
                 size="small"
-                autoFocus
-                sx={{ width: 180 }}
+                fullWidth
+                sx={{ bgcolor: "background.paper" }}
                 value={searchParroquia}
                 onChange={(e) => setSearchParroquia(e.target.value)}
+                disabled={!selectedCanton}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -654,20 +673,25 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchParroquia("")}>
+              <Button size="small" onClick={() => setSearchParroquia("")} disabled={!searchParroquia} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
-            </Box>
-          </Collapse>
+            </Stack>
+          </Box>
 
           <Divider />
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Cód</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Cód", "Nombre", ""].map((head, idx) => (
+                    <TableCell
+                      key={head || idx}
+                      align={idx === 2 ? "right" : "left"}
+                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -714,9 +738,11 @@ export const DpaList = () => {
                   filteredParroquias.map((p) => (
                     <TableRow key={p.id} hover>
                       <TableCell>
-                        <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                        <Box
+                          component="span"
+                          sx={{ display: "inline-block", fontFamily: "monospace", fontSize: 12.5, fontWeight: 600, bgcolor: "action.hover", px: 0.9, py: 0.3, borderRadius: 1 }}>
                           {p.codigo}
-                        </Typography>
+                        </Box>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontWeight={500}>{p.nombre}</Typography>

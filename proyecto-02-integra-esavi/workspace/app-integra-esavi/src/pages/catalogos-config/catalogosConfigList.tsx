@@ -1,16 +1,15 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
+import SegmentIcon from "@mui/icons-material/Segment"
 import {
-  Badge,
+  Avatar,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -31,6 +30,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
@@ -48,6 +48,7 @@ const DEFAULT_FORM = { codigo: "", nombre: "", descripcion: "" }
 
 export const CatalogosConfigList = () => {
   const notify = useNotify()
+  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -55,8 +56,6 @@ export const CatalogosConfigList = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<CatalogoPadreRecord | null>(null)
   const [searchCategoria, setSearchCategoria] = useState("")
   const [searchSubcategoria, setSearchSubcategoria] = useState("")
-  const [showFilterCat, setShowFilterCat] = useState(false)
-  const [showFilterSub, setShowFilterSub] = useState(false)
 
   const [dialog, setDialog] = useState<{
     open: boolean
@@ -182,37 +181,34 @@ export const CatalogosConfigList = () => {
       <Box display="flex" gap={2} alignItems="flex-start">
 
         {/* ── Panel: Categorías ── */}
-        <Paper elevation={2} sx={{ flex: 2, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="baseline" gap={1}>
-              <Typography variant="subtitle1" fontWeight={700}>
-                Categorías
-              </Typography>
+        <Paper elevation={0} sx={{ flex: 2, minWidth: 0, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2.5}
+            py={2}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            gap={1.5}
+            flexWrap="wrap"
+            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+            <Box display="flex" alignItems="center" gap={1.5}>
+              <Avatar sx={{ bgcolor: "primary.main", width: 34, height: 34 }}>
+                <SegmentIcon fontSize="small" />
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2}>
+                  Categorías
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {isLoading ? "Cargando..." : `${categorias.length} categoría${categorias.length === 1 ? "" : "s"}`}
+                </Typography>
+              </Box>
             </Box>
-            <Stack direction="row" spacing={1}>
-              <Tooltip title={showFilterCat ? "Ocultar filtros" : "Mostrar filtros"}>
-                <IconButton
-                  size="small"
-                  onClick={() => setShowFilterCat((v) => !v)}
-                  color={showFilterCat ? "primary" : "default"}>
-                  <Badge variant="dot" color="primary" invisible={!searchCategoria}>
-                    <FilterListIcon />
-                  </Badge>
-                </IconButton>
-              </Tooltip>
-              <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
-                Nuevo
-              </Button>
-            </Stack>
-          </Box>
-
-          <Collapse in={showFilterCat}>
-            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar..."
                 size="small"
-                autoFocus
-                sx={{ width: 240 }}
+                sx={{ width: 200, bgcolor: "background.paper" }}
                 value={searchCategoria}
                 onChange={(e) => setSearchCategoria(e.target.value)}
                 InputProps={{
@@ -223,20 +219,40 @@ export const CatalogosConfigList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchCategoria("")}>
+              <Button size="small" onClick={() => setSearchCategoria("")} disabled={!searchCategoria}>
                 Limpiar
               </Button>
-            </Box>
-          </Collapse>
+              <Button
+                variant="contained"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={openNuevaCategoria}
+                sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+                Nuevo
+              </Button>
+            </Stack>
+          </Box>
 
           <Divider />
           <TableContainer sx={{ maxHeight: 460 }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Código</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Código", "Nombre", ""].map((head, idx) => (
+                    <TableCell
+                      key={head || idx}
+                      align={idx === 2 ? "right" : "left"}
+                      sx={{
+                        bgcolor: "background.paper",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 0.6,
+                        textTransform: "uppercase",
+                        color: "text.secondary",
+                      }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -280,9 +296,24 @@ export const CatalogosConfigList = () => {
                         onClick={() => { setSelectedCategoria(cat); setSearchSubcategoria("") }}>
                         <TableCell sx={{ maxWidth: 160 }}>
                           <Tooltip title={cat.codigo} placement="top">
-                            <Typography variant="body2" fontFamily="monospace" fontWeight={500} noWrap>
+                            <Box
+                              component="span"
+                              sx={{
+                                display: "inline-block",
+                                fontFamily: "monospace",
+                                fontSize: 12.5,
+                                fontWeight: 600,
+                                bgcolor: "action.hover",
+                                px: 0.9,
+                                py: 0.3,
+                                borderRadius: 1,
+                                maxWidth: "100%",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}>
                               {cat.codigo}
-                            </Typography>
+                            </Box>
                           </Tooltip>
                         </TableCell>
                         <TableCell>
@@ -318,62 +349,50 @@ export const CatalogosConfigList = () => {
         </Paper>
 
         {/* ── Panel: Subcategorías ── */}
-        <Paper elevation={2} sx={{ flex: 3, minWidth: 0 }}>
-          <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden", flex: 1, mr: 1 }}>
-              <Box display="flex" alignItems="baseline" gap={1} sx={{ minWidth: 0 }}>
-                <Typography variant="subtitle1" fontWeight={700} sx={{ whiteSpace: "nowrap" }}>
-                  Subcategorías
+        <Paper elevation={0} sx={{ flex: 3, minWidth: 0, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+          <Box
+            px={2.5}
+            py={2}
+            display="flex"
+            alignItems="center"
+            justifyContent="space-between"
+            gap={1.5}
+            flexWrap="wrap"
+            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
+            <Box display="flex" alignItems="center" gap={1.5} sx={{ minWidth: 0, overflow: "hidden" }}>
+              <Avatar sx={{ bgcolor: "secondary.main", width: 34, height: 34 }}>
+                <SegmentIcon fontSize="small" />
+              </Avatar>
+              <Box sx={{ minWidth: 0 }}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
+                    Subcategorías
+                  </Typography>
+                  {selectedCategoria && (
+                    <Chip
+                      label={selectedCategoria.nombre}
+                      size="small"
+                      color="secondary"
+                      variant="outlined"
+                      sx={{ maxWidth: 140, overflow: "hidden", height: 20, fontSize: 11 }}
+                    />
+                  )}
+                </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {!selectedCategoria
+                    ? "Selecciona una categoría"
+                    : `${subcategorias.length} subcategoría${subcategorias.length === 1 ? "" : "s"}`}
                 </Typography>
               </Box>
-              {selectedCategoria && (
-                <Chip
-                  label={selectedCategoria.nombre}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                  sx={{ maxWidth: 140, overflow: "hidden" }}
-                />
-              )}
             </Box>
-            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
-              <Tooltip title={showFilterSub ? "Ocultar filtros" : "Mostrar filtros"}>
-                <span>
-                  <IconButton
-                    size="small"
-                    onClick={() => setShowFilterSub((v) => !v)}
-                    color={showFilterSub ? "primary" : "default"}
-                    disabled={!selectedCategoria}>
-                    <Badge variant="dot" color="primary" invisible={!searchSubcategoria}>
-                      <FilterListIcon />
-                    </Badge>
-                  </IconButton>
-                </span>
-              </Tooltip>
-              <Tooltip title={!selectedCategoria ? "Selecciona una categoría primero" : ""} placement="left">
-                <span>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    startIcon={<AddIcon />}
-                    disabled={!selectedCategoria}
-                    onClick={openNuevaSubcategoria}>
-                    Nuevo
-                  </Button>
-                </span>
-              </Tooltip>
-            </Stack>
-          </Box>
-
-          <Collapse in={showFilterSub && !!selectedCategoria}>
-            <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }} alignItems="center">
               <TextField
                 placeholder="Buscar..."
                 size="small"
-                autoFocus
-                sx={{ width: 240 }}
+                sx={{ width: 200, bgcolor: "background.paper" }}
                 value={searchSubcategoria}
                 onChange={(e) => setSearchSubcategoria(e.target.value)}
+                disabled={!selectedCategoria}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -382,21 +401,45 @@ export const CatalogosConfigList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchSubcategoria("")}>
+              <Button size="small" onClick={() => setSearchSubcategoria("")} disabled={!searchSubcategoria}>
                 Limpiar
               </Button>
-            </Box>
-          </Collapse>
+              <Tooltip title={!selectedCategoria ? "Selecciona una categoría primero" : ""} placement="left">
+                <span>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    startIcon={<AddIcon />}
+                    disabled={!selectedCategoria}
+                    onClick={openNuevaSubcategoria}
+                    sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+                    Nuevo
+                  </Button>
+                </span>
+              </Tooltip>
+            </Stack>
+          </Box>
 
           <Divider />
           <TableContainer sx={{ maxHeight: 460 }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
-                  <TableCell>Código</TableCell>
-                  <TableCell>Nombre</TableCell>
-                  <TableCell>Descripción</TableCell>
-                  <TableCell align="right">Acciones</TableCell>
+                  {["Código", "Nombre", "Descripción", ""].map((head, idx) => (
+                    <TableCell
+                      key={head || idx}
+                      align={idx === 3 ? "right" : "left"}
+                      sx={{
+                        bgcolor: "background.paper",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        letterSpacing: 0.6,
+                        textTransform: "uppercase",
+                        color: "text.secondary",
+                      }}>
+                      {head}
+                    </TableCell>
+                  ))}
                 </TableRow>
               </TableHead>
               <TableBody>

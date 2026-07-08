@@ -1,6 +1,7 @@
 import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
 import {Auditoria} from './auditoria.entity';
 import {Catalogo} from './catalogo.entity';
+import {CatalogoPadre} from './catalogo-padre.entity';
 
 /**
  *
@@ -64,9 +65,9 @@ export class Paciente extends Auditoria {
   sexo: Catalogo;
 
 
-  @ManyToOne(() => Catalogo)
+  @ManyToOne(() => CatalogoPadre)
   @JoinColumn({ name: 'CT_AUTO_IDENTIFICACION_ETNICA_ID' })
-  autoIdentificacion: Catalogo;
+  autoIdentificacion: CatalogoPadre;
 
   @Column({
     name: 'FECHA_NACIMIENTO',

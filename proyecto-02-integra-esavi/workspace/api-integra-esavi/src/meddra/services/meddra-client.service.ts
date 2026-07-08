@@ -49,20 +49,24 @@ export class MeddraClientService {
     };
 
     // add query params
+    const [grantType, clientId, username, scope, password, urlToken] = await Promise.all([
+      this.parametroService.getValor('MEDDRA', 'MED_GRANT_TYPE'),
+      this.parametroService.getValor('MEDDRA', 'MED_CLIENT_ID'),
+      this.parametroService.getValor('MEDDRA', 'MED_USER_NAME'),
+      this.parametroService.getValor('MEDDRA', 'MED_SCOPE'),
+      this.parametroService.getValor('MEDDRA', 'MED_PASSWORD'),
+      this.parametroService.getValor('MEDDRA', 'MED_URL_TOKEN'),
+    ]);
     const data = new URLSearchParams({
-      grant_type: await this.parametroService.getValor('MEDDRA', 'MED_GRANT_TYPE'),
-      client_id: await this.parametroService.getValor('MEDDRA', 'MED_CLIENT_ID'),
-      username: await this.parametroService.getValor('MEDDRA', 'MED_USER_NAME'),
-      scope: await this.parametroService.getValor('MEDDRA', 'MED_SCOPE'),
-      password: await this.parametroService.getValor('MEDDRA', 'MED_PASSWORD'),
+      grant_type: grantType,
+      client_id: clientId,
+      username: username,
+      scope: scope,
+      password: password,
     });
 
     // request
-    const request = this.httpService.post<IMeddraJWTResponse>(
-      'https://mid.meddra.org/connect/token',
-      data,
-      requestConfig,
-    );
+    const request = this.httpService.post<IMeddraJWTResponse>(urlToken, data, requestConfig);
 
     try {
       const { data } = await lastValueFrom(request);
@@ -78,13 +82,10 @@ export class MeddraClientService {
     // add headers
     const headers = { Authorization: `Bearer ${token}` };
     // build request
-    const request = this.httpService.post<IMeddraResponse>(
-      'https://mapisbx.meddra.org/api/search/',
-      query,
-      {
-        headers,
-      },
-    );
+    const urlApi = await this.parametroService.getValor('MEDDRA', 'MED_URL_API');
+    const request = this.httpService.post<IMeddraResponse>(`${urlApi}/`, query, {
+      headers,
+    });
 
     try {
       const { data } = await lastValueFrom(request);

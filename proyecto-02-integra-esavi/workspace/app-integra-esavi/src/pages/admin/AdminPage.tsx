@@ -1,7 +1,9 @@
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import {
   Alert,
+  Avatar,
   Box,
   Button,
   CircularProgress,
@@ -10,11 +12,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   Paper,
   Stack,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { useState } from "react"
 import { Title, useNotify, usePermissions } from "react-admin"
 import intESAVIClient from "../../dataProviders/axios.client"
@@ -57,7 +59,7 @@ const AdminAction = ({
 
   return (
     <>
-      <Paper variant="outlined" sx={{ p: 2.5 }}>
+      <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 2 }}>
         <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2}>
           <Box>
             <Typography variant="subtitle1" fontWeight={600}>
@@ -109,6 +111,7 @@ const AdminAction = ({
 
 export const AdminPage = () => {
   const { permissions, isPending } = usePermissions()
+  const theme = useTheme()
 
   if (isPending) {
     return (
@@ -132,18 +135,31 @@ export const AdminPage = () => {
     <Box p={2} maxWidth={800}>
       <Title title="Administración del sistema" />
 
-      <Typography variant="h6" fontWeight={600} mb={0.5}>
-        Administración del sistema
-      </Typography>
-      <Typography variant="body2" color="text.secondary" mb={2}>
-        Operaciones destructivas e irreversibles. Úselas con precaución.
-      </Typography>
+      <Paper elevation={0} sx={{ mb: 3, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+        <Box
+          px={2.5}
+          py={2}
+          display="flex"
+          alignItems="center"
+          gap={1.5}
+          sx={{ bgcolor: alpha(theme.palette.error.main, 0.04) }}>
+          <Avatar sx={{ bgcolor: "error.main", width: 38, height: 38 }}>
+            <AdminPanelSettingsIcon fontSize="small" />
+          </Avatar>
+          <Box>
+            <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+              Administración del sistema
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Operaciones destructivas e irreversibles. Úselas con precaución.
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
 
-      <Alert severity="warning" sx={{ mb: 3 }}>
+      <Alert severity="warning" sx={{ mb: 3, borderRadius: 2 }}>
         Las acciones de esta página son <strong>irreversibles</strong>. Confirme antes de ejecutar.
       </Alert>
-
-      <Divider sx={{ mb: 3 }} />
 
       <Stack spacing={2}>
         <AdminAction

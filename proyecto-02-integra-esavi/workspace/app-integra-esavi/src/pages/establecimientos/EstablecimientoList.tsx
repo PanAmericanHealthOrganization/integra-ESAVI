@@ -1,15 +1,14 @@
 import AddIcon from "@mui/icons-material/Add"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Badge,
+  Avatar,
   Box,
   Button,
   CircularProgress,
-  Collapse,
   Dialog,
   DialogActions,
   DialogContent,
@@ -36,6 +35,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import { useEffect, useMemo, useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
@@ -76,6 +76,7 @@ const EMPTY_FORM = {
 
 export const EstablecimientoList = () => {
   const notify = useNotify()
+  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -83,7 +84,6 @@ export const EstablecimientoList = () => {
   const [page, setPage] = useState(0)
   const [perPage] = useState(10)
   const [search, setSearch] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [selectedProvincia, setSelectedProvincia] = useState("")
   const [selectedCanton, setSelectedCanton] = useState("")
@@ -264,38 +264,36 @@ export const EstablecimientoList = () => {
   return (
     <Box p={2}>
       <Title title="Establecimientos" />
-      <Paper elevation={2}>
+      <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
         {/* ── Cabecera ── */}
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6" fontWeight={600}>
-            Establecimientos
-          </Typography>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-              <IconButton
-                size="small"
-                onClick={() => setShowFilter((v) => !v)}
-                color={showFilter ? "primary" : "default"}>
-                <Badge variant="dot" color="primary" invisible={!search}>
-                  <FilterListIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-            <Button variant="contained" size="small" startIcon={<AddIcon />} onClick={openCreate}>
-              Nuevo
-            </Button>
-          </Stack>
-        </Box>
-
-        {/* ── Filtro de búsqueda ── */}
-        <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+        <Box
+          px={2.5}
+          py={2}
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          gap={1.5}
+          flexWrap="wrap"
+          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
+              <LocalHospitalIcon fontSize="small" />
+            </Avatar>
+            <Box>
+              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                Establecimientos
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isLoading ? "Cargando..." : `${filtered.length} establecimiento${filtered.length === 1 ? "" : "s"}`}
+              </Typography>
+            </Box>
+          </Box>
+          <Stack direction="row" spacing={1.5} alignItems="center">
             <TextField
               placeholder="Buscar..."
               size="small"
-              sx={{ width: 300 }}
+              sx={{ width: 280, bgcolor: "background.paper" }}
               value={search}
-              autoFocus={showFilter}
               onChange={(e) => { setSearch(e.target.value); setPage(0) }}
               InputProps={{
                 startAdornment: (
@@ -305,11 +303,19 @@ export const EstablecimientoList = () => {
                 ),
               }}
             />
-            <Button size="small" onClick={() => { setSearch(""); setPage(0) }}>
+            <Button size="small" onClick={() => { setSearch(""); setPage(0) }} disabled={!search}>
               Limpiar
             </Button>
-          </Box>
-        </Collapse>
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={<AddIcon />}
+              onClick={openCreate}
+              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+              Nuevo
+            </Button>
+          </Stack>
+        </Box>
 
         <Divider />
 
@@ -318,15 +324,21 @@ export const EstablecimientoList = () => {
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ minWidth: 80 }}>Código</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell sx={{ minWidth: 140 }}>Tipo</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Provincia</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Cantón</TableCell>
-                <TableCell sx={{ minWidth: 110 }}>Parroquia</TableCell>
-                <TableCell sx={{ minWidth: 160 }}>Ubicación</TableCell>
-                <TableCell sx={{ minWidth: 140 }}>Correo</TableCell>
-                <TableCell align="right">Acciones</TableCell>
+                {["Código", "Nombre", "Tipo", "Provincia", "Cantón", "Parroquia", "Ubicación", "Correo", ""].map((head, idx) => (
+                  <TableCell
+                    key={head || idx}
+                    align={idx === 8 ? "right" : "left"}
+                    sx={{
+                      minWidth: idx === 0 ? 80 : idx === 2 ? 140 : [3, 4, 5].includes(idx) ? 110 : idx === 6 ? 160 : idx === 7 ? 140 : undefined,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                      textTransform: "uppercase",
+                      color: "text.secondary",
+                    }}>
+                    {head}
+                  </TableCell>
+                ))}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -362,9 +374,11 @@ export const EstablecimientoList = () => {
                 paginated.map((est) => (
                   <TableRow key={est.id} hover>
                     <TableCell>
-                      <Typography variant="body2" fontFamily="monospace" fontWeight={500}>
+                      <Box
+                        component="span"
+                        sx={{ display: "inline-block", fontFamily: "monospace", fontSize: 12.5, fontWeight: 600, bgcolor: "action.hover", px: 0.9, py: 0.3, borderRadius: 1 }}>
                         {est.uniCodigo}
-                      </Typography>
+                      </Box>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={500}>
