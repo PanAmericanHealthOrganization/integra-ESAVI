@@ -2,10 +2,10 @@ import {PartialType} from "@nestjs/swagger";
 
 export class CreateAntecedenteEventoDto {
   antecedente: number;
-  alergiaMedicamento: string;
-  alergiaAlimentos: string;
-  alergiaInsectos: string;
-  alergiaPolvo: string;
+  alergiaMedicamento: boolean;
+  alergiaAlimentos: boolean;
+  alergiaInsectos: boolean;
+  alergiaPolvo: boolean;
   otrasAlergias: string;
 }
 

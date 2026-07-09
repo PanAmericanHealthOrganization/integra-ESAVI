@@ -36,7 +36,7 @@ import {
   Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 interface ParroquiaRecord {
@@ -84,6 +84,8 @@ export const EstablecimientoList = () => {
   const [page, setPage] = useState(0)
   const [perPage] = useState(10)
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [form, setForm] = useState({ ...EMPTY_FORM })
   const [selectedProvincia, setSelectedProvincia] = useState("")
   const [selectedCanton, setSelectedCanton] = useState("")
@@ -95,11 +97,22 @@ export const EstablecimientoList = () => {
     open: boolean; id: string; label: string
   } | null>(null)
 
-  useEffect(() => { setPage(0) }, [search])
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(0)
+    }, 400)
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
+  }, [search])
 
-  const { data: establecimientos, isLoading, refetch } = useGetList<EstablecimientoRecord>(
+  const { data: establecimientos, total, isLoading, refetch } = useGetList<EstablecimientoRecord>(
     "establecimientos",
-    { pagination: { page: 1, perPage: 9999 }, sort: { field: "uniNombre", order: "ASC" }, filter: {} }
+    {
+      pagination: { page: page + 1, perPage },
+      sort: { field: "uniNombre", order: "ASC" },
+      filter: debouncedSearch ? { q: debouncedSearch } : {},
+    }
   )
 
   const { data: allCatalogoPadre } = useGetList<CatalogoPadreRecord>(
@@ -146,26 +159,7 @@ export const EstablecimientoList = () => {
       .sort((a, b) => a.nombre.localeCompare(b.nombre))
   }, [todasParroquias, selectedCanton])
 
-  const filtered = useMemo(() => {
-    const all = establecimientos ?? []
-    if (!search) return all
-    const q = search.toLowerCase()
-    return all.filter(
-      (e) =>
-        e.uniCodigo.toLowerCase().includes(q) ||
-        e.uniNombre.toLowerCase().includes(q) ||
-        (e.tipoEntidad?.nombre ?? "").toLowerCase().includes(q) ||
-        (e.parroquiaResidencia?.nombre ?? "").toLowerCase().includes(q) ||
-        (e.parroquiaResidencia?.canton?.nombre ?? "").toLowerCase().includes(q) ||
-        (e.parroquiaResidencia?.canton?.provincia?.nombre ?? "").toLowerCase().includes(q) ||
-        (e.mail ?? "").toLowerCase().includes(q)
-    )
-  }, [establecimientos, search])
-
-  const paginated = useMemo(
-    () => filtered.slice(page * perPage, page * perPage + perPage),
-    [filtered, page, perPage]
-  )
+  const rows = establecimientos ?? []
 
   const resetLocation = () => {
     setSelectedProvincia("")
@@ -284,7 +278,7 @@ export const EstablecimientoList = () => {
                 Establecimientos
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {isLoading ? "Cargando..." : `${filtered.length} establecimiento${filtered.length === 1 ? "" : "s"}`}
+                {isLoading ? "Cargando..." : `${total ?? 0} establecimiento${total === 1 ? "" : "s"}`}
               </Typography>
             </Box>
           </Box>
@@ -294,7 +288,7 @@ export const EstablecimientoList = () => {
               size="small"
               sx={{ width: 280, bgcolor: "background.paper" }}
               value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(0) }}
+              onChange={(e) => setSearch(e.target.value)}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -303,7 +297,7 @@ export const EstablecimientoList = () => {
                 ),
               }}
             />
-            <Button size="small" onClick={() => { setSearch(""); setPage(0) }} disabled={!search}>
+            <Button size="small" onClick={() => { setSearch(""); setDebouncedSearch(""); setPage(0) }} disabled={!search}>
               Limpiar
             </Button>
             <Button
@@ -348,18 +342,18 @@ export const EstablecimientoList = () => {
                     <CircularProgress size={28} />
                   </TableCell>
                 </TableRow>
-              ) : !filtered.length && search ? (
+              ) : !rows.length && debouncedSearch ? (
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
                       <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
                       <Typography variant="body2" color="text.secondary">
-                        Sin resultados para "{search}"
+                        Sin resultados para "{debouncedSearch}"
                       </Typography>
                     </Box>
                   </TableCell>
                 </TableRow>
-              ) : !filtered.length ? (
+              ) : !rows.length ? (
                 <TableRow>
                   <TableCell colSpan={9} align="center" sx={{ py: 6 }}>
                     <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
@@ -371,7 +365,7 @@ export const EstablecimientoList = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                paginated.map((est) => (
+                rows.map((est) => (
                   <TableRow key={est.id} hover>
                     <TableCell>
                       <Box
@@ -453,7 +447,7 @@ export const EstablecimientoList = () => {
         {/* ── Paginación ── */}
         <TablePagination
           component="div"
-          count={filtered.length}
+          count={total ?? 0}
           page={page}
           rowsPerPage={perPage}
           rowsPerPageOptions={[10]}

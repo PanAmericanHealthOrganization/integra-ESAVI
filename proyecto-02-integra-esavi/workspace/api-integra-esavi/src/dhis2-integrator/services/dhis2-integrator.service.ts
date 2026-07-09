@@ -638,21 +638,21 @@ export class Dhis2IntegratorService {
     ); // En notificacion ya está este campo como antecedenteEventoPrevio. Pero, se conserva hasta pedir confirmación.
     antecedenteEventoAdverso.alergiaMedicamento = this.esValorAfirmativo(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Medicamentos')],
-    ).toString();
+    );
 
     antecedenteEventoAdverso.alergiaAlimentos = this.esValorAfirmativo(
       row[
         headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Alimentos')
       ],
-    ).toString();
+    );
     antecedenteEventoAdverso.alergiaInsectos = this.esValorAfirmativo(
       row[
         headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Insectos')
       ],
-    ).toString();// dhis2 entrega 1 si el cuadro de check está marcado, y null si no lo está.
+    );// dhis2 entrega 1 si el cuadro de check está marcado, y null si no lo está.
     antecedenteEventoAdverso.alergiaPolvo = this.esValorAfirmativo(
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Alergia Polvo')],
-    ).toString();
+    );
     antecedenteEventoAdverso.otrasAlergias =
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Otro Alergias')];
 
@@ -667,7 +667,11 @@ export class Dhis2IntegratorService {
     );
     antecedentePreexistencia.codigoEsaviCIE10 = antecedentePrevio.codigo;
     antecedentePreexistencia.descripcion = antecedentePrevio.descripcion;
-    
+    if (antecedentePrevio.descripcion) {
+      const lltEncontrado = await this.meddraLltService.buscarPorSimilitud(antecedentePrevio.descripcion);
+      antecedentePreexistencia.ctLltMeddraId = lltEncontrado?.id ?? null;
+    }
+
     // Create Causalidad Esavi
     const causalidadEsavi = new CreateCausalidadEsaviDto();
     // Implementación temporal, mientras se revisa la Relación entre tablas.

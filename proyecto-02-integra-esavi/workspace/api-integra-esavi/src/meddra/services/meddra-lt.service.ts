@@ -32,45 +32,52 @@ export class MeddraLLTService {
   }
 
   /**
-   * Busca el código LLT en MEDDRA.MED_LLT comparando NAME en mayúsculas.
+   * Busca el LLT en MEDDRA.MED_LLT comparando NAME en mayúsculas.
    * Primero intenta coincidencia exacta; si no, aplica similitud Levenshtein >= 90%.
    */
-  async buscarCodigoPorSimilitud(nombre: string): Promise<string | null> {
+  async buscarPorSimilitud(nombre: string): Promise<LLT | null> {
     if (!nombre?.trim()) return null;
     const nombreNorm = nombre.trim().toUpperCase();
 
     // 1° coincidencia exacta (más rápido)
     const exacto = await this.lltRepository
       .createQueryBuilder('llt')
-      .select(['llt.code', 'llt.name'])
       .where('UPPER(llt.name) = :nombre', { nombre: nombreNorm })
       .getOne();
 
     if (exacto) {
       this.logger.debug(`[LLT] "${nombreNorm}" → exacto: ${exacto.name} (${exacto.code})`);
-      return exacto.code;
+      return exacto;
     }
 
     // 2° candidatos con prefijo para Levenshtein (máximo 4 chars)
     const prefijo = nombreNorm.substring(0, 4);
     const candidatos = await this.lltRepository
       .createQueryBuilder('llt')
-      .select(['llt.code', 'llt.name'])
       .where('UPPER(llt.name) LIKE :like', { like: `${prefijo}%` })
       .getMany();
 
-    let mejorCodigo: string | null = null;
+    let mejorMatch: LLT | null = null;
     let mejorSim = 0;
     for (const llt of candidatos) {
       const sim = this.similitud(nombreNorm, (llt.name ?? '').toUpperCase());
       if (sim >= SIMILITUD_MINIMA && sim > mejorSim) {
         mejorSim = sim;
-        mejorCodigo = llt.code;
+        mejorMatch = llt;
       }
     }
 
-    this.logger.debug(`[LLT] "${nombreNorm}" → similitud ${(mejorSim * 100).toFixed(1)}% — código: ${mejorCodigo ?? 'NINGUNO'}`);
-    return mejorCodigo;
+    this.logger.debug(`[LLT] "${nombreNorm}" → similitud ${(mejorSim * 100).toFixed(1)}% — código: ${mejorMatch?.code ?? 'NINGUNO'}`);
+    return mejorMatch;
+  }
+
+  /**
+   * Busca el código LLT en MEDDRA.MED_LLT comparando NAME en mayúsculas.
+   * Primero intenta coincidencia exacta; si no, aplica similitud Levenshtein >= 90%.
+   */
+  async buscarCodigoPorSimilitud(nombre: string): Promise<string | null> {
+    const llt = await this.buscarPorSimilitud(nombre);
+    return llt?.code ?? null;
   }
 
   async listLLTs(ptCode: string, page: number, size: number): Promise<{ data: LLT[]; total: number }> {

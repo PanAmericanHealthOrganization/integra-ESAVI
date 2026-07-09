@@ -9,6 +9,11 @@ import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
 const ETNIA_CODIGO_PADRE = 'ETNIA';
+const GENERO_CODIGO_PADRE = 'GENERO';
+// VigiFlow ha exportado históricamente el sexo tanto como "Masculino/Femenino" como "Hombre/Mujer".
+// TC_CATALOGO_PADRE/GENERO solo tiene Hombre/Mujer/Otro, así que se homologan los sinónimos antes de buscar por similitud.
+const SINONIMOS_SEXO: Record<string, string> = { MASCULINO: 'HOMBRE', FEMENINO: 'MUJER' };
+const normalizarSexo = (valor: string): string => SINONIMOS_SEXO[valor?.trim().toUpperCase()] ?? valor;
 
 @Injectable()
 export class PacienteService {
@@ -75,7 +80,10 @@ export class PacienteService {
 
     const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
     if (createDto.sexoPaciente) {
-      paciente.sexo = await this.catalogoService.findByDescriptionToVigiflow(createDto.sexoPaciente);
+      paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+        GENERO_CODIGO_PADRE,
+        normalizarSexo(createDto.sexoPaciente),
+      );
     }
     if (createDto.autoIdentificacionPaciente) {
       paciente.autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
@@ -111,7 +119,10 @@ export class PacienteService {
 
       const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
       if (createDto.sexoPaciente) {
-        paciente.sexo = await this.catalogoService.findByDescriptionToDhis2(createDto.sexoPaciente);
+        paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+          GENERO_CODIGO_PADRE,
+          normalizarSexo(createDto.sexoPaciente),
+        );
       }
       if (createDto.autoIdentificacionPaciente) {
         const autoId = createDto.autoIdentificacionPaciente.toUpperCase().replace('Í', 'I');
@@ -151,7 +162,10 @@ export class PacienteService {
   async update(uuid: string, updatePersonaDto: UpdatePacienteDto): Promise<Paciente> {
     const paciente = await this.findOne(uuid);
     if (updatePersonaDto.sexoPaciente) {
-      paciente.sexo = await this.catalogoService.findByDescriptionToDhis2(updatePersonaDto.sexoPaciente);
+      paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+        GENERO_CODIGO_PADRE,
+        normalizarSexo(updatePersonaDto.sexoPaciente),
+      );
     }
     this.pacientRepository.merge(paciente, updatePersonaDto);
     return this.pacientRepository.save(paciente);

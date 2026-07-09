@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { PacienteService } from './paciente.service';
 import { Paciente } from '../entity/paciente.entity';
 import { CatalogoService } from './catalogo.service';
+import { CatalogoPadreService } from './catalogo-padre.service';
 
 const mockPacienteRepo = {
   find: jest.fn(),
@@ -14,6 +15,10 @@ const mockPacienteRepo = {
 const mockCatalogoService = {
   findByDescriptionToVigiflow: jest.fn(),
   findByDescriptionToDhis2: jest.fn(),
+};
+
+const mockCatalogoPadreService = {
+  buscarSubcategoriaPorSimilitud: jest.fn(),
 };
 
 const makePaciente = (overrides: Partial<Paciente> = {}): Paciente =>
@@ -36,6 +41,7 @@ describe('PacienteService', () => {
         PacienteService,
         { provide: getRepositoryToken(Paciente, 'POSTGRES_INTEGRATOR_DS'), useValue: mockPacienteRepo },
         { provide: CatalogoService, useValue: mockCatalogoService },
+        { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
       ],
     }).compile();
     service = module.get<PacienteService>(PacienteService);
@@ -180,14 +186,14 @@ describe('PacienteService', () => {
       expect(result).toEqual(saved);
     });
 
-    it('busca sexo en catálogo cuando viene en el DTO', async () => {
+    it('busca sexo en catalogo_padre (GENERO) normalizando sinónimos VigiFlow', async () => {
       mockPacienteRepo.findOne.mockResolvedValue(null);
-      mockCatalogoService.findByDescriptionToVigiflow.mockResolvedValue({ id: 'cat1' });
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue({ id: 'cp1' });
       mockPacienteRepo.save.mockResolvedValue(makePaciente());
 
       await service.createFromVigiflow({ codigoVigiflow: 'EC-NEW', sexoPaciente: 'MASCULINO' } as any);
 
-      expect(mockCatalogoService.findByDescriptionToVigiflow).toHaveBeenCalledWith('MASCULINO');
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith('GENERO', 'HOMBRE');
     });
   });
 
