@@ -1,6 +1,5 @@
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { Antecedente } from './antecedente.entity';
-import { Catalogo } from './catalogo.entity';
 import { Notificacion } from './notificacion.entity';
 
 //TODO: ralopez, aplicar clean-code a nombre de modelo ER
@@ -12,10 +11,20 @@ export class AntecedentePreexistencia extends Antecedente {
     comment: 'Descripción de la enfermedad previa del paciente',
   })
   descripcion: string;
-  //TODO: ralopez, este catalogo a quien apunta. no hay relacion
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CTLLTMEDDRA_ID' })
-  catalogoMedra: Catalogo;
+
+  /**
+   * MED_LLT.ID vive en el esquema MEDDRA, gestionado por una conexión TypeORM distinta
+   * (MEDDRA_DS) a la de esta entidad (POSTGRES_INTEGRATOR_DS), por lo que no puede
+   * modelarse como relación ORM (@ManyToOne). Se guarda el id numérico resuelto por
+   * MeddraLLTService y se consulta manualmente cuando se necesita el registro completo.
+   */
+  @Column({
+    name: 'CTLLTMEDDRA_ID',
+    type: 'int',
+    nullable: true,
+    comment: 'Id de MED_LLT (esquema MEDDRA) correspondiente a la enfermedad previa',
+  })
+  ctLltMeddraId: number;
 
   @Column({
     name: 'CODIGO_ESAVI_CIE10',

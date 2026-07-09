@@ -13,25 +13,13 @@ export const establecimientoDataProvider: DataProvider = {
     _resource: string,
     params: GetListParams
   ): Promise<GetListResult<RecordType>> {
-    const response = await intESAVIClient.get("/integrator/establecimientos")
-    let data: RecordType[] = (response.data || []).map(withId)
-
+    const { page, perPage } = params.pagination ?? { page: 1, perPage: 10 }
     const { q } = params.filter || {}
-    if (q) {
-      const lower = q.toLowerCase()
-      data = data.filter(
-        (item: any) =>
-          item.uniCodigo?.toLowerCase().includes(lower) ||
-          item.uniNombre?.toLowerCase().includes(lower) ||
-          (item.tipoEntidad ?? "").toLowerCase().includes(lower) ||
-          (item.parroquiaResidencia?.nombre ?? "").toLowerCase().includes(lower)
-      )
-    }
-
-    const { page, perPage } = params.pagination ?? { page: 1, perPage: 9999 }
-    const total = data.length
-    const start = (page - 1) * perPage
-    return { data: data.slice(start, start + perPage), total }
+    const response = await intESAVIClient.get("/integrator/establecimientos", {
+      params: { page, perPage, ...(q ? { q } : {}) },
+    })
+    const data: RecordType[] = (response.data?.data ?? []).map(withId)
+    return { data, total: response.data?.total ?? 0 }
   },
 
   getOne: async function <RecordType extends RaRecord = any>(
@@ -46,8 +34,8 @@ export const establecimientoDataProvider: DataProvider = {
     _resource: string,
     params: GetManyParams
   ): Promise<GetManyResult<RecordType>> {
-    const response = await intESAVIClient.get("/integrator/establecimientos")
-    const data = (response.data || []).map(withId).filter((item: any) => params.ids.includes(item.id))
+    const response = await intESAVIClient.get("/integrator/establecimientos", { params: { perPage: 9999 } })
+    const data = (response.data?.data ?? []).map(withId).filter((item: any) => params.ids.includes(item.id))
     return { data }
   },
 

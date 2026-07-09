@@ -7,7 +7,9 @@ import {DatoVacuna} from '../entity/dato-vacuna.entity';
 import {DatoVacunacion} from '../entity/dato-vacunacion.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
-import {CatalogoService} from './catalogo.service';
+import {CatalogoPadreService} from './catalogo-padre.service';
+
+const CODIGO_PADRE_ROL_VACUNA = 'CARACTERIZACION_VACUNA';
 
 @Injectable()
 export class DatoVacunaService {
@@ -21,7 +23,7 @@ export class DatoVacunaService {
     private readonly datoVacunaRepository: Repository<DatoVacuna>,
     @InjectRepository(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS')
     private readonly datoVacunacionRepository: Repository<DatoVacunacion>,
-    private readonly catalogoService: CatalogoService,
+    private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
   async preloadByDatoVacunacionIds(datoVacunacionIds: string[]): Promise<void> {
@@ -113,14 +115,14 @@ export class DatoVacunaService {
       if (existingDatoVacuna) {
         const { rolVacuna, ...otherFields } = createDto;
         if (rolVacuna) {
-          existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+          existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
         }
         Object.assign(existingDatoVacuna, otherFields);
         return this.datoVacunaRepository.save(existingDatoVacuna);
       } else {
         const nuevoDatoVacuna = plainToClass(DatoVacuna, createDto);
         if (createDto.rolVacuna) {
-          nuevoDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(createDto.rolVacuna);
+          nuevoDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, createDto.rolVacuna);
         }
         nuevoDatoVacuna.datoVacunacion = datoVacunacion;
         return this.datoVacunaRepository.save(nuevoDatoVacuna);
@@ -154,7 +156,7 @@ export class DatoVacunaService {
           ...dto,
         });
         if (dto.rolVacuna) {
-          datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(dto.rolVacuna);
+          datoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, dto.rolVacuna);
         }
         datoVacuna.datoVacunacion = datoVacunacion;
 
@@ -177,7 +179,7 @@ export class DatoVacunaService {
           if (dto.codigoAtc) {
             const { rolVacuna, ...otherFields } = dto;
             if (rolVacuna) {
-              existingDatoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+              existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
             }
             Object.assign(existingDatoVacuna, otherFields);
           } else {
@@ -345,7 +347,7 @@ export class DatoVacunaService {
     const { rolVacuna, nombreVacPatenteWHODrug, ...otherFields } = vacunaDto;
     
     if (rolVacuna) {
-      datoVacuna.rolVacuna = await this.catalogoService.findByDescriptionToVigiflow(rolVacuna);
+      datoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
     }
     Object.assign(datoVacuna, otherFields);
     const savedDatoVacuna = await this.datoVacunaRepository.save(datoVacuna);

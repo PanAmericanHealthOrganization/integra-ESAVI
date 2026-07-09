@@ -91,6 +91,42 @@ export class EstablecimientosService {
     });
   }
 
+  async findAllPaginated(
+    page: number,
+    perPage: number,
+    q?: string,
+  ): Promise<{ data: Establecimiento[]; total: number }> {
+    const qb = this.establecimientoRepository
+      .createQueryBuilder('establecimiento')
+      .leftJoinAndSelect('establecimiento.parroquiaResidencia', 'parroquia')
+      .leftJoinAndSelect('parroquia.canton', 'canton')
+      .leftJoinAndSelect('canton.provincia', 'provincia')
+      .leftJoinAndSelect('establecimiento.tipoEntidad', 'tipoEntidad')
+      .where('establecimiento.isEnabled = true');
+
+    if (q?.trim()) {
+      const term = `%${q.trim().toLowerCase()}%`;
+      qb.andWhere(
+        `(LOWER(establecimiento.uniCodigo) LIKE :term
+          OR LOWER(establecimiento.uniNombre) LIKE :term
+          OR LOWER(establecimiento.mail) LIKE :term
+          OR LOWER(tipoEntidad.nombre) LIKE :term
+          OR LOWER(parroquia.nombre) LIKE :term
+          OR LOWER(canton.nombre) LIKE :term
+          OR LOWER(provincia.nombre) LIKE :term)`,
+        { term },
+      );
+    }
+
+    const [data, total] = await qb
+      .orderBy('establecimiento.uniNombre', 'ASC')
+      .skip((page - 1) * perPage)
+      .take(perPage)
+      .getManyAndCount();
+
+    return { data, total };
+  }
+
   findAllLight(): Promise<Pick<Establecimiento, 'id' | 'uniNombre'>[]> {
     return this.establecimientoRepository.find({
       where: { isEnabled: true },

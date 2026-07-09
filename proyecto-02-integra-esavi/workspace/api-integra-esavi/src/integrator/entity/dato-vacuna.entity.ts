@@ -1,6 +1,6 @@
 import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
 import {Auditoria} from './auditoria.entity';
-import {Catalogo} from './catalogo.entity';
+import {CatalogoPadre} from './catalogo-padre.entity';
 import {DatoVacunacion} from './dato-vacunacion.entity';
 
 @Entity({
@@ -28,9 +28,9 @@ export class DatoVacuna extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @ManyToOne(() => CatalogoPadre)
   @JoinColumn({ name: 'CT_ROL_VACUNA_ID' })
-  rolVacuna: Catalogo;// utilizado por vf.
+  rolVacuna: CatalogoPadre;// utilizado por vf.
 
   /**
    *

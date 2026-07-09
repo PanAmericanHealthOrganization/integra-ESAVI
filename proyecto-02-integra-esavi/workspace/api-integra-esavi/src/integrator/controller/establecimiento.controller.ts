@@ -14,10 +14,16 @@ export class EstablecimientoController {
   constructor(private readonly establecimientosService: EstablecimientosService) {}
 
   @Get()
-  @ApiResponse({ status: 200, description: 'Listado de establecimientos.' })
-  @ApiQuery({ name: 'parroquia', required: false })
-  findAll() {
-    return this.establecimientosService.findAll();
+  @ApiResponse({ status: 200, description: 'Listado paginado de establecimientos.' })
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Página (base 1). Default: 1' })
+  @ApiQuery({ name: 'perPage', required: false, type: Number, description: 'Tamaño de página. Default: 10' })
+  @ApiQuery({ name: 'q', required: false, description: 'Texto de búsqueda' })
+  findAll(
+    @Query('page') page = '1',
+    @Query('perPage') perPage = '10',
+    @Query('q') q?: string,
+  ) {
+    return this.establecimientosService.findAllPaginated(Number(page) || 1, Number(perPage) || 10, q);
   }
 
   @Get(':id')

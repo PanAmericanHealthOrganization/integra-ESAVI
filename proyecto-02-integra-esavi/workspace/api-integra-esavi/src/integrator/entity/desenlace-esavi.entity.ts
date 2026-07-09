@@ -1,6 +1,5 @@
 import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria } from './auditoria.entity';
-import { Catalogo } from './catalogo.entity';
 import { Notificacion } from './notificacion.entity';
 
 @Entity({
@@ -131,13 +130,21 @@ export class DesenlaceEsavi extends Auditoria {
   })
   clasificacionFinalCasoB: string;
 
+  /**
+   *
+   */
+  @Column({
+    name: 'CAUSALIDADESAVI_ID',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+    comment: 'Causalidad del ESAVI. Antes era una relación a TC_CATALOGO; se dejó como campo simple porque nunca fue poblado por la lógica de integración.',
+  })
+  causalidadEsavi: string;
+
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;
-
-  @ManyToOne(() => Catalogo)
-  @JoinColumn({ name: 'CAUSALIDADESAVI_ID' })
-  causalidadEsavi: Catalogo;
 
   @BeforeInsert()
   beforeInsert() {

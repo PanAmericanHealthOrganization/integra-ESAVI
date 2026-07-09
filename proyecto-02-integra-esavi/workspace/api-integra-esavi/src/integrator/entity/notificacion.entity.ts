@@ -9,7 +9,6 @@ import {
 import {SourceEnum} from '../enum/source-enum';
 import {Auditoria} from './auditoria.entity';
 import {CatalogoPadre} from './catalogo-padre.entity';
-import {Catalogo} from './catalogo.entity';
 import {Establecimiento} from './establecimiento.entity';
 import {GravedadEsavi} from './gravedad-esavi.entity';
 import {Notificador} from './notificador.entity';

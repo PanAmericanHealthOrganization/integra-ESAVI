@@ -142,7 +142,7 @@ export class CatalogoPadreService {
   }
 
   private normalizar(texto: string): string {
-    return texto.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return texto.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '');
   }
 
   private calcularSimilitud(a: string, b: string): number {

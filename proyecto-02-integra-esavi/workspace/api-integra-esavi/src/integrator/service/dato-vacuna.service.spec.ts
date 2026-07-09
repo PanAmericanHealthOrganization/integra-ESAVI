@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DatoVacunaService } from './dato-vacuna.service';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
 import { Notificacion } from '../entity/notificacion.entity';
-import { CatalogoService } from './catalogo.service';
+import { CatalogoPadreService } from './catalogo-padre.service';
 
 const mockRepo = {
   find: jest.fn(),
@@ -11,8 +11,8 @@ const mockRepo = {
   save: jest.fn(),
 };
 
-const mockCatalogoService = {
-  findByDescriptionToVigiflow: jest.fn(),
+const mockCatalogoPadreService = {
+  buscarSubcategoriaPorSimilitud: jest.fn(),
 };
 
 const makeNotif = (id = 'n1'): Notificacion => ({ id } as Notificacion);
@@ -41,7 +41,7 @@ describe('DatoVacunaService', () => {
       providers: [
         DatoVacunaService,
         { provide: getRepositoryToken(DatoVacuna, 'POSTGRES_INTEGRATOR_DS'), useValue: mockRepo },
-        { provide: CatalogoService, useValue: mockCatalogoService },
+        { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
       ],
     }).compile();
     service = module.get<DatoVacunaService>(DatoVacunaService);

@@ -1,6 +1,5 @@
 import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
 import {Auditoria} from './auditoria.entity';
-import {Catalogo} from './catalogo.entity';
 import {CatalogoPadre} from './catalogo-padre.entity';
 
 /**
@@ -60,9 +59,9 @@ export class Paciente extends Auditoria {
   /**
    *
    */
-  @ManyToOne(() => Catalogo)
+  @ManyToOne(() => CatalogoPadre)
   @JoinColumn({ name: 'CT_SEXO_ID' })
-  sexo: Catalogo;
+  sexo: CatalogoPadre;
 
 
   @ManyToOne(() => CatalogoPadre)

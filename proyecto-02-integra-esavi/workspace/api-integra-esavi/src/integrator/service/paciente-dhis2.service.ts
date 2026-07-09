@@ -8,6 +8,10 @@ import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
 const ETNIA_CODIGO_PADRE = 'ETNIA';
+const GENERO_CODIGO_PADRE = 'GENERO';
+// DHIS2 entrega el sexo ya homologado como Hombre/Mujer/Otro, pero se normaliza igual por consistencia.
+const SINONIMOS_SEXO: Record<string, string> = { MASCULINO: 'HOMBRE', FEMENINO: 'MUJER' };
+const normalizarSexo = (valor: string): string => SINONIMOS_SEXO[valor?.trim().toUpperCase()] ?? valor;
 
 @Injectable()
 export class PacienteDhis2Service {
@@ -34,8 +38,10 @@ export class PacienteDhis2Service {
         });
 
         if (createDto.sexoPaciente) {
-          const sexo = await this.catalogoService.findByDescriptionToDhis2(createDto.sexoPaciente);
-          paciente.sexo = sexo;
+          paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+            GENERO_CODIGO_PADRE,
+            normalizarSexo(createDto.sexoPaciente),
+          );
         }
 
         if (createDto.autoIdentificacionPaciente) {
@@ -86,7 +92,10 @@ export class PacienteDhis2Service {
         throw new Error('Sexo del paciente no definido');
       }
 
-      const sexo = await this.catalogoService.findByDescriptionToDhis2(pacienteDto?.sexoPaciente);
+      const sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+        GENERO_CODIGO_PADRE,
+        normalizarSexo(pacienteDto?.sexoPaciente),
+      );
       const paciente = await this.findOne(uuid);
 
       if (!paciente) {
