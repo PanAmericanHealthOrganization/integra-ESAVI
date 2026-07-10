@@ -25,6 +25,7 @@ import intESAVIClient from "./axios.client"
 
 export interface IVacunometroDataProvider extends DataProvider {
   syncVacunometro(resource: string, params: any): Promise<any>
+  simularVacunacion?(resource: string, params: { dias: number }): Promise<any>
 }
 
 export const vacunometroDataProvider: IVacunometroDataProvider = {
@@ -151,6 +152,18 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
       }
     } catch (error) {
       throw new Error("Error al sincronizar el vacunometro")
+    }
+  },
+  simularVacunacion: async function (resource: string, params: { dias: number }) {
+    try {
+      const response = await intESAVIClient.post(
+        `seed/simulacion-vacunacion?dias=${params.dias}`
+      )
+      return {
+        data: response.data,
+      }
+    } catch (error) {
+      throw new Error("Error al generar la simulación de vacunaciones")
     }
   },
 }

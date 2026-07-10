@@ -10,6 +10,7 @@ import {
   TopToolbar,
 } from "react-admin"
 import { GRUPO_ETARIO_OPTIONS } from "../../dataProviders/grupoEtario.provider"
+import { SimularVacunacionDialog } from "./forms/simular-vacunacion-dlg"
 import { SyncVacunometroDialog } from "./forms/sinc-vacunometro-dlg"
 
 const VacunometroFilters = [
@@ -21,10 +22,12 @@ const VacunometroFilters = [
 
 const VacunometroList = () => {
   const [open, setOpen] = useState<boolean>(false)
+  const [openSimular, setOpenSimular] = useState<boolean>(false)
 
   const ListActions = () => (
     <TopToolbar>
       <FilterButton />
+      <SimularVacunacionDialog open={openSimular} setOpen={setOpenSimular} />
       <SyncVacunometroDialog open={open} setOpen={setOpen} />
     </TopToolbar>
   )

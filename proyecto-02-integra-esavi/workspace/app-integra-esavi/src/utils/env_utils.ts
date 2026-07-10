@@ -1,4 +1,9 @@
 const ENV_CONFIG = {
+  // Ambiente de despliegue (DEV, QA, PROD...). Se considera producción todo valor que inicie con "PROD"
+  INT_ENV: (import.meta.env.VITE_ENV || "") as string,
+  IS_PRODUCTION: String(import.meta.env.VITE_ENV || "")
+    .toUpperCase()
+    .startsWith("PROD"),
   INT_ESAV_API: import.meta.env.VITE_INTEGRA_ESAVI_API_URL,
   INT_API_KEY: import.meta.env.VITE_API_KEY,
   INT_KEYCLOAK_URL: import.meta.env.VITE_KEYCLOAK_URL,
