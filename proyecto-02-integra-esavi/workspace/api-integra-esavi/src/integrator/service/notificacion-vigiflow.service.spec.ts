@@ -132,7 +132,7 @@ describe('NotificacionVigiflowService', () => {
     it('actualiza unidadEdad cuando se proporciona en el DTO', async () => {
       const existing = makeNotif({ edad: 30 });
       const unidadCat = { id: 'cat-anios' };
-      mockCatalogoService.findByDescriptionToVigiflow.mockResolvedValue(unidadCat);
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue(unidadCat);
       mockNotificacionRepo.save.mockResolvedValue(existing);
 
       const dto = {
@@ -143,13 +143,13 @@ describe('NotificacionVigiflowService', () => {
 
       await service.create(dto, { id: 'p1' } as any, existing);
 
-      expect(mockCatalogoService.findByDescriptionToVigiflow).toHaveBeenCalledWith('AÑOS');
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith('UNIDAD_EDAD', 'AÑOS');
       expect(mockNotificacionRepo.save).toHaveBeenCalledTimes(1);
     });
 
     it('no falla cuando el catálogo de unidadEdad no se encuentra', async () => {
       const existing = makeNotif({ edad: 30 });
-      mockCatalogoService.findByDescriptionToVigiflow.mockRejectedValue(new Error('Not found'));
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue(null);
 
       const dto = {
         codigoVigiflow: 'EC-001',

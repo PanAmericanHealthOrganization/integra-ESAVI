@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DatoVacunaService } from './dato-vacuna.service';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
+import { DatoVacunacion } from '../entity/dato-vacunacion.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
@@ -11,11 +12,21 @@ const mockRepo = {
   save: jest.fn(),
 };
 
+const mockDatoVacunacionRepo = {
+  findOne: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+};
+
 const mockCatalogoPadreService = {
   buscarSubcategoriaPorSimilitud: jest.fn(),
 };
 
 const makeNotif = (id = 'n1'): Notificacion => ({ id } as Notificacion);
+
+// En el flujo VigiFlow el caché se precarga por notificacion.id y create() busca por
+// datoVacunacion.id, por eso en las pruebas ambos comparten el mismo identificador.
+const makeDatoVacunacion = (id = 'n1'): DatoVacunacion => ({ id } as DatoVacunacion);
 
 const makeDvMinimo = (id: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   id,
@@ -23,14 +34,14 @@ const makeDvMinimo = (id: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   rolVacuna: null,
   numeroLote: null,
   indicacionMeddra: null,
-  notificacion: { id: notifId } as Notificacion,
-} as DatoVacuna);
+  datoVacunacion: { id: notifId, notificacion: { id: notifId } } as DatoVacunacion,
+});
 
 const makeDvCompleto = (id: string, codigoAtc: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   id,
   codigoAtc,
-  notificacion: { id: notifId } as Notificacion,
-} as DatoVacuna);
+  datoVacunacion: { id: notifId, notificacion: { id: notifId } } as DatoVacunacion,
+});
 
 describe('DatoVacunaService', () => {
   let service: DatoVacunaService;
@@ -41,6 +52,7 @@ describe('DatoVacunaService', () => {
       providers: [
         DatoVacunaService,
         { provide: getRepositoryToken(DatoVacuna, 'POSTGRES_INTEGRATOR_DS'), useValue: mockRepo },
+        { provide: getRepositoryToken(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS'), useValue: mockDatoVacunacionRepo },
         { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
       ],
     }).compile();
@@ -70,9 +82,9 @@ describe('DatoVacunaService', () => {
       expect(mockRepo.find).toHaveBeenCalledTimes(1);
     });
 
-    it('ignora registros sin notificacion.id', async () => {
+    it('ignora registros sin datoVacunacion/notificacion', async () => {
       mockRepo.find.mockResolvedValue([
-        { id: 'dv1', codigoAtc: null, rolVacuna: null, numeroLote: null, indicacionMeddra: null, notificacion: null },
+        { id: 'dv1', codigoAtc: null, rolVacuna: null, numeroLote: null, indicacionMeddra: null, datoVacunacion: null },
       ]);
 
       await expect(service.preloadByNotificacionIds(['n1'])).resolves.not.toThrow();
@@ -212,7 +224,7 @@ describe('DatoVacunaService', () => {
       await service.preloadByNotificacionIds(['n1']);
       mockRepo.save.mockResolvedValue(dvMinimo);
 
-      await service.create(makeNotif('n1'), { numeroDosisVacuna: 2 } as any);
+      await service.create(makeDatoVacunacion('n1'), { numeroDosisVacuna: 2 } as any);
 
       expect(mockRepo.findOne).not.toHaveBeenCalled();
       expect(mockRepo.save).toHaveBeenCalledTimes(1);
@@ -224,7 +236,7 @@ describe('DatoVacunaService', () => {
       await service.preloadByNotificacionIds(['n1']);
       mockRepo.save.mockResolvedValue(dvCompleto);
 
-      await service.create(makeNotif('n1'), { codigoAtc: 'J07AA01', numeroDosisVacuna: 1 } as any);
+      await service.create(makeDatoVacunacion('n1'), { codigoAtc: 'J07AA01', numeroDosisVacuna: 1 } as any);
 
       expect(mockRepo.findOne).not.toHaveBeenCalled();
       expect(mockRepo.save).toHaveBeenCalledTimes(1);
@@ -236,8 +248,9 @@ describe('DatoVacunaService', () => {
       const nuevo = makeDvCompleto('dv-new', 'J07ZZ99', 'n1') as DatoVacuna;
       mockRepo.save.mockResolvedValue(nuevo);
 
-      await service.create(makeNotif('n1'), { codigoAtc: 'J07ZZ99' } as any);
+      await service.create(makeDatoVacunacion('n1'), { codigoAtc: 'J07ZZ99' } as any);
 
+      expect(mockRepo.findOne).not.toHaveBeenCalled();
       expect(mockRepo.save).toHaveBeenCalledTimes(1);
     });
 
@@ -247,7 +260,7 @@ describe('DatoVacunaService', () => {
       await service.preloadByNotificacionIds(['n1']);
       mockRepo.save.mockResolvedValue({ ...dvMinimo, numeroDosisVacuna: 3 });
 
-      await service.create(makeNotif('n1'), { numeroDosisVacuna: 3 } as any);
+      await service.create(makeDatoVacunacion('n1'), { numeroDosisVacuna: 3 } as any);
 
       const savedArg: DatoVacuna = mockRepo.save.mock.calls[0][0];
       expect(savedArg.numeroDosisVacuna).toBe(3);
@@ -261,9 +274,44 @@ describe('DatoVacunaService', () => {
       mockRepo.findOne.mockResolvedValue(null);
       mockRepo.save.mockResolvedValue(makeDvMinimo('dv-new', 'n1') as DatoVacuna);
 
-      await service.create(makeNotif('n1'), {} as any);
+      await service.create(makeDatoVacunacion('n1'), {} as any);
 
       expect(mockRepo.findOne).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // ─── createByNotificacion ────────────────────────────────────────────────
+
+  describe('createByNotificacion', () => {
+    it('reutiliza el DatoVacunacion existente de la notificación', async () => {
+      const datoVacunacion = makeDatoVacunacion('dvz1');
+      mockDatoVacunacionRepo.findOne.mockResolvedValue(datoVacunacion);
+      mockRepo.findOne.mockResolvedValue(null);
+      mockRepo.save.mockResolvedValue(makeDvCompleto('dv-new', 'J07AA01', 'dvz1') as DatoVacuna);
+
+      await service.createByNotificacion(makeNotif('n1'), { codigoAtc: 'J07AA01' } as any);
+
+      expect(mockDatoVacunacionRepo.findOne).toHaveBeenCalledWith({
+        where: { notificacion: { id: 'n1' } },
+      });
+      expect(mockDatoVacunacionRepo.save).not.toHaveBeenCalled();
+      expect(mockRepo.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('crea el DatoVacunacion intermedio cuando la notificación no tiene uno', async () => {
+      const notificacion = makeNotif('n1');
+      const nuevoDatoVacunacion = makeDatoVacunacion('dvz-new');
+      mockDatoVacunacionRepo.findOne.mockResolvedValue(null);
+      mockDatoVacunacionRepo.create.mockReturnValue(nuevoDatoVacunacion);
+      mockDatoVacunacionRepo.save.mockResolvedValue(nuevoDatoVacunacion);
+      mockRepo.findOne.mockResolvedValue(null);
+      mockRepo.save.mockResolvedValue(makeDvCompleto('dv-new', 'J07AA01', 'dvz-new') as DatoVacuna);
+
+      await service.createByNotificacion(notificacion, { codigoAtc: 'J07AA01' } as any);
+
+      expect(mockDatoVacunacionRepo.create).toHaveBeenCalledWith({ notificacion });
+      expect(mockDatoVacunacionRepo.save).toHaveBeenCalledTimes(1);
+      expect(mockRepo.save).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -276,7 +324,7 @@ describe('DatoVacunaService', () => {
       const result = await service.findByNotificacionId('n1');
 
       expect(mockRepo.find).toHaveBeenCalledWith(
-        expect.objectContaining({ relations: ['rolVacuna'] }),
+        expect.objectContaining({ relations: ['rolVacuna', 'datoVacunacion'] }),
       );
       expect(result).toHaveLength(1);
     });
