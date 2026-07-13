@@ -8,5 +8,6 @@ export {
   IActiveIngredient,
   IIngredientTranslation,
   IATC,
+  IWhodrugVaccineMatch,
 } from './drug.dto';
 export { IDrugSync, DrugSyncDTO } from './drugSync.dto';

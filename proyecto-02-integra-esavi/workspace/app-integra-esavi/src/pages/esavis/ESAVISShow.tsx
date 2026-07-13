@@ -3,12 +3,14 @@ import HistoryIcon from "@mui/icons-material/History"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import PersonIcon from "@mui/icons-material/Person"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
+import VisibilityIcon from "@mui/icons-material/Visibility"
 import {
   Box,
   Chip,
   CircularProgress,
   Divider,
   Grid,
+  IconButton,
   Paper,
   Tab,
   Tabs,
@@ -18,6 +20,7 @@ import {
 import React,{useEffect,useState} from "react"
 import {Datagrid,FunctionField,ListContextProvider,Pagination,Show,useList,useShowContext} from "react-admin"
 import intESAVIClient from "../../dataProviders/axios.client"
+import VacunaDetalleDialog from "./VacunaDetalleDialog"
 
 // ─── TabPanel ─────────────────────────────────────────────────────────────────
 
@@ -410,6 +413,7 @@ const TabVacunacion = () => {
   const [vacunacion, setVacunacion] = useState<any>(null)
   const [vacunas, setVacunas] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [vacunaDetalle, setVacunaDetalle] = useState<any>(null)
 
   useEffect(() => {
     if (!record?.id) return
@@ -478,12 +482,19 @@ const TabVacunacion = () => {
           <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
             {vacunas.map((v, idx) => (
               <Paper variant="outlined" sx={{ p: 2 }} key={v.id ?? idx}>
-                <Typography variant="subtitle2" fontWeight={600} gutterBottom>
-                  Vacuna {idx + 1}{v.drugName ? ` — ${v.drugName}` : ""}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
+                  <Typography variant="subtitle2" fontWeight={600}>
+                    Vacuna {idx + 1}{v.drugName ? ` — ${v.drugName}` : ""}
+                  </Typography>
+                  <Tooltip title="Ver detalle completo" arrow>
+                    <IconButton size="small" color="primary" onClick={() => setVacunaDetalle(v)}>
+                      <VisibilityIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
                 <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
                   <FieldCell label="Nombre (WHODrug)" value={v.nombreVacPatenteWHODrug ?? v.drugName} />
-                  <FieldCell label="Fabricante" value={v.nombreFabricante ?? v.nombreFabricanteWhoDrug} />
+                  <FieldCell label="Fabricante" value={v.maHolder ?? v.nombreFabricante ?? v.nombreFabricanteWhoDrug} />
                   <FieldCell label="N° Lote" value={v.numeroLote} />
                   <FieldCell label="N° Dosis" value={v.numeroDosisVacuna} />
                   <FieldCell label="Código ATC" value={v.codigoAtc} />
@@ -505,6 +516,13 @@ const TabVacunacion = () => {
           </Box>
         )}
       </Box>
+
+      {/* ── Detalle completo de la vacuna seleccionada ── */}
+      <VacunaDetalleDialog
+        open={vacunaDetalle != null}
+        vacuna={vacunaDetalle}
+        onClose={() => setVacunaDetalle(null)}
+      />
     </Box>
   )
 }

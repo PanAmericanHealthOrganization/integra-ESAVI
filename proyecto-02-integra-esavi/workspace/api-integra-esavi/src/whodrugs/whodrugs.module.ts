@@ -85,6 +85,6 @@ export const WHODRUGS_DS = 'WHO_DRUG';
     WhoDrugsAsAnyService,
   ],
   controllers: [WhodrugsController, WhodrugsSyncController, MaholderController, ActiveIngredientController],
-  exports: [ActiveIngredientsService, MaholderService, DrugService],
+  exports: [ActiveIngredientsService, MaholderService, DrugService, IngredientTranslationService],
 })
 export class WhodrugsModule {}
