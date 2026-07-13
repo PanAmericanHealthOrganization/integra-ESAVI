@@ -1,13 +1,17 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { Notificacion } from './notificacion.entity';
+import {Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
+import {Auditoria} from './auditoria.entity';
+import {Notificacion} from './notificacion.entity';
 
+/**
+ * 
+ */
 @Entity({
   schema: 'DHI_ESAVI',
   name: 'TR_MEDICAMENTO',
   comment: 'Tabla de medicamentos',
 })
 export class Medicamento extends Auditoria {
+  
   /**
    * Primary generated column of medicamento
    */
@@ -63,6 +67,7 @@ export class Medicamento extends Auditoria {
     comment: 'Nombre comercial del medicamento',
   })
   nombre: string;
+  
   /**
    *
    */
@@ -126,13 +131,7 @@ export class Medicamento extends Auditoria {
     comment: 'Nombre de la vía de administración (oral, intravenosa, etc.)',
   })
   nombreViaAdministracion: string;
-
   @ManyToOne(() => Notificacion)
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;
-
-  @BeforeInsert()
-  beforeInsert() {
-    this.createdAt = new Date();
-  }
 }

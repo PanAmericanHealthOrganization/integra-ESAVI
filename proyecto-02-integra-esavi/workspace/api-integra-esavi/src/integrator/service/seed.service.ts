@@ -143,6 +143,13 @@ export class SeedService implements OnApplicationBootstrap {
         },
         {
           modulo: 'WHODRUG',
+          clave: 'WHD_API_URL',
+          valor: 'https://api.who-umc.org/',
+          descripcion: 'URL base de la API de WHODrug (UMC)',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'WHODRUG',
           clave: 'WHD_UMC_LICENSE_KEY',
           valor: 'CAMBIAR_WHD_UMC_LICENSE_KEY',
           descripcion: 'License key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',

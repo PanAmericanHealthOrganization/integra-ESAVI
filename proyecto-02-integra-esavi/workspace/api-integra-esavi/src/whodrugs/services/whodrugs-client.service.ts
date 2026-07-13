@@ -23,9 +23,8 @@ export class WhoDrugsClientService {
    */
   public async getDrugs(level: number, ingredientTraslations: string, includeAtc: boolean): Promise<IDrug[]> {
     try {
-      console.log(includeAtc, ingredientTraslations, level);
-
-      const [umcLicenseKey, umcClientKey] = await Promise.all([
+      const [baseURL, umcLicenseKey, umcClientKey] = await Promise.all([
+        this.parametroService.getValor('WHODRUG', 'WHD_API_URL'),
         this.parametroService.getValor('WHODRUG', 'WHD_UMC_LICENSE_KEY'),
         this.parametroService.getValor('WHODRUG', 'WHD_UMC_CLIENT_KEY'),
       ]);
@@ -34,6 +33,7 @@ export class WhoDrugsClientService {
         this.httpService.get(
           `/whodrug/download/v2/regional-drugs?MedProdLevel=${level}&IngredientTranslations=${ingredientTraslations}&IncludeAtc=${includeAtc}`,
           {
+            baseURL,
             headers: {
               'umc-license-key': umcLicenseKey,
               'umc-client-key': umcClientKey,
