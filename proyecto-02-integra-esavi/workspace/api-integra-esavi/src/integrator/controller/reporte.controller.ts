@@ -1,8 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import { ReporteService } from '../service/reporte.service';
 
 @ApiTags('Reports')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard)
 @Controller({ path: 'integrator/reports', version: '1' })
 export class ReporteController {
   constructor(private reporteService: ReporteService) {}

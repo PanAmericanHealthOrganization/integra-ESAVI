@@ -108,6 +108,13 @@ export class SeedService implements OnApplicationBootstrap {
       const parametrosDev = [
         {
           modulo: 'DHIS2',
+          clave: 'DHIS2_URL',
+          valor: 'https://dev-ops-gss.msp.gob.ec',
+          descripcion: 'URL base del servidor DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'DHIS2',
           clave: 'DHIS2_USER_KEY',
           valor: 'CAMBIAR_DHIS2_USER_KEY',
           descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',

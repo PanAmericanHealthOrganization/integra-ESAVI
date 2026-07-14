@@ -1,0 +1,47 @@
+{
+  "apps": [
+    {
+      "name": "api-integra-esavi",
+      "cwd": "./api-integra-esavi",
+      "script": "dist/main.js",
+      "interpreter": "node",
+      "instances": 1,
+      "exec_mode": "fork",
+      "watch": false,
+      "autorestart": true,
+      "max_memory_restart": "512M",
+      "env": {
+        "NODE_ENV": "prod"
+      },
+      "env_production": {
+        "NODE_ENV": "prod"
+      },
+      "error_file": "./logs/error.log",
+      "out_file": "./logs/out.log",
+      "merge_logs": true,
+      "time": true
+    },
+    {
+      "name": "app-integra-esavi",
+      "cwd": "./app-integra-esavi",
+      "script": "node_modules/vite/bin/vite.js",
+      "args": ["preview", "--host", "0.0.0.0", "--port", "5173"],
+      "interpreter": "node",
+      "instances": 1,
+      "exec_mode": "fork",
+      "watch": false,
+      "autorestart": true,
+      "max_memory_restart": "256M",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "env_production": {
+        "NODE_ENV": "production"
+      },
+      "error_file": "./logs/error.log",
+      "out_file": "./logs/out.log",
+      "merge_logs": true,
+      "time": true
+    }
+  ]
+}

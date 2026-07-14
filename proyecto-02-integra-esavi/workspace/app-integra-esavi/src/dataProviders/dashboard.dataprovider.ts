@@ -12,6 +12,22 @@ import {
   UpdateResult,
 } from "react-admin"
 import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
+import keycloak from "../keycloak"
+
+// Refresca el token si está por expirar y arma los headers de la petición.
+// El backend ahora valida el JWT de Keycloak (firma/issuer) en los endpoints de reportes.
+const authHeaders = async (): Promise<HeadersInit> => {
+  try {
+    await keycloak.updateToken(30)
+  } catch {
+    // Si el refresh falla, la petición vendrá sin token válido y el backend
+    // responderá 401; react-admin manejará la redirección al login.
+  }
+  return {
+    "X-API-KEY": INT_API_KEY || "",
+    Authorization: keycloak.token ? `Bearer ${keycloak.token}` : "",
+  }
+}
 
 /**
  *
@@ -21,9 +37,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorSexoGrave`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
@@ -34,9 +48,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorSexoNoGrave`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
@@ -47,9 +59,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosCruzadosMeddra`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
@@ -60,9 +70,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosNoCruzadosMeddra`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
@@ -73,9 +81,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosCruzadosWhodrug`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
@@ -86,9 +92,7 @@ export const dashboardDataProvider: DataProvider = {
     const response = await fetch(
       `${INT_ESAV_API}/v1/integrator/reports/casosEsaviPorMes`,
       {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
+        headers: await authHeaders(),
       }
     )
     const data = await response.json()
