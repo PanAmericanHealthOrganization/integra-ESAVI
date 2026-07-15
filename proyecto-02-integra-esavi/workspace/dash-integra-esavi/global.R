@@ -61,6 +61,8 @@ library(sf) # Manejo de datos espaciales y geográficos
 library(flextable) # Creación y formateo de tablas flexibles
 library(htmltools) # Herramientas para generar y manipular contenido HTML
 library(data.table) # Manipulación de datos de alta performance
+library(duckdb) # Lectura del datamart (esavi.duckdb) generado por el API
+library(DBI) # Interfaz de base de datos (conexión a DuckDB)
 library(waiter) # Añade pantallas de carga y spinners a aplicaciones Shiny
 library(wordcloud) # Creación de nubes de palabras
 library(stringr) # Manipulación y procesamiento de cadenas de texto
@@ -686,16 +688,21 @@ if (interactive() && requireNamespace("rstudioapi", quietly = TRUE)) {
 
 path_datos <- "datos/"
 
+# Ruta del datamart DuckDB generado por api-integra-esavi (módulo datamart).
+# Reemplaza a datos_procesados.rds y dosis_admin.rds. Configurable por entorno.
+duckdb_path <- Sys.getenv("DUCKDB_PATH", paste0(path_datos, "esavi.duckdb"))
+
 
 # 2.2 Función de carga de datos ----
 
 load_data <- function() {
   cat("Cargando archivos de datos...\n")
 
-  # Verificar archivos requeridos
+  # Verificar archivos/artefactos requeridos.
+  # datos_procesados y dosis_admin ahora vienen del DuckDB; geo_datos.rds y
+  # timeline.csv siguen siendo archivos estáticos (geometría y línea de tiempo).
   archivos_requeridos <- c(
-    paste0(path_datos, "datos_procesados.rds"),
-    paste0(path_datos, "dosis_admin.rds"),
+    duckdb_path,
     paste0(path_datos, "geo_datos.rds"),
     paste0(path_datos, "timeline.csv")
   )
@@ -707,15 +714,19 @@ load_data <- function() {
     for (archivo in archivos_faltantes) {
       cat("  -", archivo, "\n")
     }
-    stop("No se pueden cargar los datos. Por favor, asegúrate de que todos los archivos de datos estén disponibles en la carpeta 'datos/'.")
+    stop("No se pueden cargar los datos. Verifica que exista el datamart DuckDB (esavi.duckdb) y los archivos estáticos en la carpeta 'datos/'.")
   }
 
-  # Cargar datos
-  cat("Cargando datos principales...\n")
-  datos <- readRDS(paste0(path_datos, "datos_procesados.rds"))
+  # Cargar datos principales desde el datamart DuckDB (solo lectura).
+  cat("Cargando datos principales desde DuckDB:", duckdb_path, "\n")
+  con <- DBI::dbConnect(duckdb::duckdb(), dbdir = duckdb_path, read_only = TRUE)
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
 
-  cat("Cargando datos de dosis...\n")
-  dosis <- readRDS(paste0(path_datos, "dosis_admin.rds"))
+  cat("Cargando datos_procesados...\n")
+  datos <- setDT(DBI::dbReadTable(con, "datos_procesados"))
+
+  cat("Cargando dosis_admin...\n")
+  dosis <- setDT(DBI::dbReadTable(con, "dosis_admin"))
 
   cat("Cargando datos geográficos...\n")
   geodt <- readRDS(paste0(path_datos, "geo_datos.rds"))

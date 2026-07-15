@@ -1,3 +1,10 @@
+# =============================================================================
+# [RETIRADO] Este script fue portado a SQL y ahora corre dentro del módulo
+# `datamart` de api-integra-esavi (genera datos/esavi.duckdb). El dashboard ya
+# no lo ejecuta; lee las tablas ya procesadas desde el DuckDB.
+# Se conserva solo como referencia histórica.
+# =============================================================================
+
 # -------------------------------------------------------------------------------------------------------------- -
 # Script: Procesamiento de ESAVI ----
 # Version: 1.0

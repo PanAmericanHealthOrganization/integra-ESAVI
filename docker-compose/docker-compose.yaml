@@ -82,8 +82,15 @@ services:
       WHD_DB_USER: dhis
       WHD_DB_PASS: dhis
       TZ: America/Guayaquil
+      # Datamart DuckDB: el API lo genera en el volumen compartido con el dashboard.
+      DATAMART_DUCKDB_PATH: /app/datamart-out/esavi.duckdb
+      DATAMART_TMP_DIR: /app/datamart-out
+      DATAMART_CRON: "0 2 * * *"
     ports:
       - "3000:3000"
+    volumes:
+      # Directorio compartido con el dashboard: aquí se escribe esavi.duckdb.
+      - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/datos:/app/datamart-out
     healthcheck:
       test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/health || exit 1"]
       interval: 15s
@@ -123,6 +130,8 @@ services:
       DB_PASS: dhis
       LOG_ACCESS_ATTEMPTS: "true"
       LOG_FILE_PATH: /app/logs/access.log
+      # Datamart DuckDB generado por el API (reemplaza los RDS de datos).
+      DUCKDB_PATH: /app/datos/esavi.duckdb
     volumes:
       - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/datos:/app/datos
       - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/fuente_de_datos:/app/fuente_de_datos

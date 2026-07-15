@@ -7,6 +7,7 @@ import { HomologadorModule } from './homologator/homologador.module';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { DataqualityModule } from './dataquality/dataquality.module';
+import { DatamartModule } from './datamart/datamart.module';
 import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';
@@ -25,6 +26,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
     WhodrugsModule,
     MeddraModule,
     DataqualityModule,
+    DatamartModule,
     HomologadorModule,
   ],
   providers: [],

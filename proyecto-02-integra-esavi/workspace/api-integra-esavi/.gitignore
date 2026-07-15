@@ -1,6 +1,10 @@
 # compiled output
 /dist
 /node_modules
+# Datamart DuckDB (artefacto generado por el módulo datamart, no versionar)
+/datos
+*.duckdb
+*.duckdb.tmp
 /postgres_data
 /postgres_sdata
 /data
