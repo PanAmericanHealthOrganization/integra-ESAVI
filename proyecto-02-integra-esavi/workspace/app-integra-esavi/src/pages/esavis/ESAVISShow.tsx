@@ -275,11 +275,7 @@ const TabPaciente = () => {
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Auto-identificación Étnica"
-              value={
-                paciente.autoIdentificacion?.homologada ??
-                paciente.autoIdentificacion?.vigiflow ??
-                paciente.autoIdentificacion?.dhis2
-              }
+              value={paciente.autoIdentificacion?.nombre}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -299,7 +295,7 @@ const TabPaciente = () => {
               label="Edad"
               value={
                 record.edad != null
-                  ? `${record.edad} ${record.unidadEdad?.homologada ?? record.unidadEdad?.vigiflow ?? ""}`
+                  ? `${record.edad} ${record.unidadEdad?.nombre ?? ""}`
                   : undefined
               }
             />
@@ -322,31 +318,19 @@ const TabPaciente = () => {
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Provincia"
-              value={
-                record.provinciaResidencia?.homologada ??
-                record.provinciaResidencia?.vigiflow ??
-                record.provinciaResidencia?.dhis2
-              }
+              value={record.provinciaResidencia?.nombre}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Cantón"
-              value={
-                record.cantonResidencia?.homologada ??
-                record.cantonResidencia?.vigiflow ??
-                record.cantonResidencia?.dhis2
-              }
+              value={record.cantonResidencia?.nombre}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Parroquia"
-              value={
-                record.parroquiaResidencia?.homologada ??
-                record.parroquiaResidencia?.vigiflow ??
-                record.parroquiaResidencia?.dhis2
-              }
+              value={record.parroquiaResidencia?.nombre}
             />
           </Grid>
         </Grid>

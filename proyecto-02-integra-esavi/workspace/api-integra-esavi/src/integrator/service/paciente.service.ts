@@ -219,6 +219,14 @@ export class PacienteService {
     if (updatePersonaDto.sexoPaciente) {
       paciente.sexo = await this.resolveSexo('DHIS2', updatePersonaDto.sexoPaciente);
     }
+    if (updatePersonaDto.autoIdentificacionPaciente) {
+      const autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
+        updatePersonaDto.autoIdentificacionPaciente,
+      );
+      if (autoIdentificacion) {
+        paciente.autoIdentificacion = autoIdentificacion;
+      }
+    }
     this.pacientRepository.merge(paciente, updatePersonaDto);
     return this.pacientRepository.save(paciente);
   }
