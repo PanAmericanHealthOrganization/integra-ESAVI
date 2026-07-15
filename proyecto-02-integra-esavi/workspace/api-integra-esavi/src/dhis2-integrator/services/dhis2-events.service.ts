@@ -1,6 +1,5 @@
 import {HttpService} from '@nestjs/axios';
 import {HttpException,Injectable,Logger} from '@nestjs/common';
-import {ConfigService} from '@nestjs/config';
 import {AxiosError} from 'axios';
 import {catchError,firstValueFrom} from 'rxjs';
 import {ParametroService} from '../../integrator/service/parametro.service';
@@ -43,7 +42,6 @@ export class Dhis2EventsService {
 
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly dhis2DataElementService: Dhis2DataElementService,
     private readonly dhis2OptionsService: Dhis2OptionsService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
@@ -87,8 +85,8 @@ export class Dhis2EventsService {
     fechaInicio: Date,
     fechaFin: Date,
   ): Promise<TrackedEntityInstance[]> {
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
-    const rootOrgUnit = this.configService.get<string>('DHIS2_ROOT_ORG_UNIT', 'CcPKoI4rpPZ');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
+    const rootOrgUnit = await Dhis2ExtraccionUtils.getRootOrgUnit(this.parametroService);
     const fields =
       'trackedEntity,attributes[attribute,displayName,value],' +
       'enrollments[enrollment,program,status,orgUnit,enrolledAt,occurredAt,' +
@@ -109,7 +107,7 @@ export class Dhis2EventsService {
         `&totalPages=false&page=${page}&pageSize=${TAMANIO_PAGINA_TEI}`;
 
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando tracker/trackedEntities:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);
@@ -201,7 +199,7 @@ export class Dhis2EventsService {
   }
 
   private async getOrganisationUnits(ids: string[]): Promise<OrganisationUnit[]> {
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     const orgUnits: OrganisationUnit[] = [];
 
     for (const lote of Dhis2ExtraccionUtils.dividirEnLotes(ids, TAMANIO_LOTE_METADATOS)) {
@@ -209,7 +207,7 @@ export class Dhis2EventsService {
         `${baseUrl}/api/organisationUnits.json?filter=id:in:[${lote.join(',')}]` +
         `&fields=id,name,code&paging=false`;
       const { data } = await firstValueFrom(
-        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+        this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
           catchError((e: AxiosError) => {
             this.logger.error('Error consultando organisationUnits:', e);
             throw new HttpException(e.response?.data || e.message, e.response?.status || 500);

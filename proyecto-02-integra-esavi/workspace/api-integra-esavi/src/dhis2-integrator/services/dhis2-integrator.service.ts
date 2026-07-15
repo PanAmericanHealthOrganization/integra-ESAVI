@@ -1,6 +1,5 @@
 import {HttpService} from '@nestjs/axios';
 import {Injectable} from '@nestjs/common';
-import {ConfigService} from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import {CausalidadEsavi} from 'src/integrator/entity';
@@ -43,7 +42,6 @@ import {Dhis2ProgramService} from './dhis2-program.service';
 export class Dhis2IntegratorService {
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly integradorService: IntegradorService,
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,

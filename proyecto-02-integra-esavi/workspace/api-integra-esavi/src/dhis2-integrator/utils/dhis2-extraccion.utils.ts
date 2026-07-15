@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { ParametroService } from '../../integrator/service/parametro.service';
 
 /**
@@ -7,21 +6,61 @@ import { ParametroService } from '../../integrator/service/parametro.service';
  * de modo que el pipeline de persistencia no requiera cambios.
  */
 export abstract class Dhis2ExtraccionUtils {
+  /** Módulo bajo el que se almacenan los parámetros de DHIS2 en TC_PARAMETRO. */
+  private static readonly MODULO = 'DHIS2';
+
+  /** Unidad organizativa raíz por defecto cuando no está configurada en TC_PARAMETRO. */
+  private static readonly DEFAULT_ROOT_ORG_UNIT = 'CcPKoI4rpPZ';
+
+  /**
+   * URL base del servidor DHIS2 al que se dirigen las consultas. Se lee del
+   * parámetro DHIS2_URL en TC_PARAMETRO en cada consulta (ParametroService
+   * cachea el valor por unos minutos). Lanza si el parámetro no existe.
+   */
+  static async getBaseUrl(parametroService: ParametroService): Promise<string> {
+    return parametroService.getValor(Dhis2ExtraccionUtils.MODULO, 'DHIS2_URL');
+  }
+
   /**
    * Configuración común de las peticiones HTTP a DHIS2: autenticación por
-   * Personal Access Token (DHIS2_API_TOKEN de entorno, o DHIS2_USER_KEY
-   * almacenado en TC_PARAMETRO como respaldo).
+   * Personal Access Token leído del parámetro DHIS2_USER_KEY en TC_PARAMETRO
+   * en cada consulta. Lanza si el parámetro no existe.
    */
-  static async getConfig(parametroService: ParametroService, configService: ConfigService) {
-    const token =
-      configService.get<string>('DHIS2_API_TOKEN') ??
-      (await parametroService.getValor('DHIS2', 'DHIS2_USER_KEY'));
+  static async getConfig(parametroService: ParametroService) {
+    const token = await parametroService.getValor(Dhis2ExtraccionUtils.MODULO, 'DHIS2_USER_KEY');
     return {
       maxBodyLength: Infinity,
       headers: {
         Authorization: `ApiToken ${token}`,
       },
     };
+  }
+
+  /**
+   * Unidad organizativa raíz sobre la que se consultan las instancias del
+   * tracker. Se lee del parámetro DHIS2_ROOT_ORG_UNIT en TC_PARAMETRO; si no
+   * está configurado, usa el valor por defecto.
+   */
+  static async getRootOrgUnit(parametroService: ParametroService): Promise<string> {
+    return (
+      (await Dhis2ExtraccionUtils.getParametroOpcional(parametroService, 'DHIS2_ROOT_ORG_UNIT')) ??
+      Dhis2ExtraccionUtils.DEFAULT_ROOT_ORG_UNIT
+    );
+  }
+
+  /**
+   * Lee un parámetro del módulo DHIS2 desde TC_PARAMETRO devolviendo undefined
+   * en lugar de lanzar cuando no existe, para parámetros con valor por defecto.
+   */
+  private static async getParametroOpcional(
+    parametroService: ParametroService,
+    clave: string,
+  ): Promise<string | undefined> {
+    try {
+      return await parametroService.getValor(Dhis2ExtraccionUtils.MODULO, clave);
+    } catch {
+      return undefined;
+    }
   }
 
   /**

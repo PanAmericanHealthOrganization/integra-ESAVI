@@ -1,6 +1,5 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { ProgramTrackedEntityAttribute, Attribute, TrackedEntityAttributeMetadata } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -12,7 +11,6 @@ export class Dhis2ProgramService {
   private readonly logger = new Logger(Dhis2ProgramService.name);
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly parametroService: ParametroService,
   ) {}
 
@@ -20,12 +18,12 @@ export class Dhis2ProgramService {
   async getProgramTrackedEntityAttribute(
     idProgram: string,
   ): Promise<ProgramTrackedEntityAttribute[]> {
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     const uri = baseUrl.concat(
       `/api/programs/${idProgram}.json?fields=programTrackedEntityAttributes[id,name,displayName,sortOrder,trackedEntityAttribute]`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -39,12 +37,12 @@ export class Dhis2ProgramService {
     tei: string,
     programId: string,
   ): Promise<Attribute[]> {
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     const uri = baseUrl.concat(
       `/api/trackedEntityInstances/${tei}.json?program=${programId}&fields=attributes`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -63,14 +61,14 @@ export class Dhis2ProgramService {
     if (ids.length === 0) {
       return [];
     }
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     const uri = baseUrl.concat(
       `/api/trackedEntityAttributes.json?filter=id:in:[${ids.join(
         ',',
       )}]&fields=id,name,valueType,optionSet[id]&paging=false`,
     );
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
