@@ -33,7 +33,11 @@ const VacunometroList = () => {
   )
   return (
     <>
-      <List actions={<ListActions />} filters={VacunometroFilters} perPage={25}>
+      <List
+        actions={<ListActions />}
+        filters={VacunometroFilters}
+        perPage={25}
+        empty={false}>
         <Datagrid rowClick="show" bulkActionButtons={false}>
           <DateField
             locales={"sv-SE"}

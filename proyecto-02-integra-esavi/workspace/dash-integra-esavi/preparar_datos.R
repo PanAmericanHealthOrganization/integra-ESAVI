@@ -1,3 +1,10 @@
+# =============================================================================
+# [RETIRADO] Este script fue reemplazado por el módulo `datamart` de
+# api-integra-esavi, que genera datos/esavi.duckdb (extracción + transformación
+# dentro de DuckDB). El dashboard ya no ejecuta este pipeline; lee el DuckDB.
+# Se conserva solo como referencia histórica.
+# =============================================================================
+
 # Cargar variables de entorno si existen
 if (file.exists(".env")) {
   readRenviron(".env")

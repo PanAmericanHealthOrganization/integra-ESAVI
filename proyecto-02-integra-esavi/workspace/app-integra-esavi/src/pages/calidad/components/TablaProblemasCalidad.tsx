@@ -30,6 +30,17 @@ interface TablaProblemasCalidadProps {
 
 const numberFormatter = new Intl.NumberFormat("es-ES")
 
+// Estilo de celda de encabezado alineado con las tablas de catálogos:
+// mayúsculas, letra pequeña, gris y con tracking.
+const headCellSx = {
+  bgcolor: "background.paper",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: 0.6,
+  textTransform: "uppercase" as const,
+  color: "text.secondary",
+}
+
 export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
   dimension,
   subDimension,
@@ -165,30 +176,17 @@ export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
       )}
 
       {/* Tabla de problemas */}
-      <TableContainer component={Paper}>
-        <Table>
+      <TableContainer
+        component={Paper}
+        elevation={0}
+        sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
+        <Table size="small" stickyHeader>
           <TableHead>
             <TableRow>
-              <TableCell sx={{ width: "20%" }}>
-                <Typography variant="subtitle2" fontWeight="bold">
-                  Código / Regla
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ width: "30%" }}>
-                <Typography variant="subtitle2" fontWeight="bold">
-                  Descripción de Regla
-                </Typography>
-              </TableCell>
-              <TableCell sx={{ width: "28%" }}>
-                <Typography variant="subtitle2" fontWeight="bold">
-                  Porcentaje
-                </Typography>
-              </TableCell>
-              <TableCell align="center" sx={{ width: "10%" }}>
-                <Typography variant="subtitle2" fontWeight="bold">
-                  Descarga
-                </Typography>
-              </TableCell>
+              <TableCell sx={{ width: "20%", ...headCellSx }}>Código / Regla</TableCell>
+              <TableCell sx={{ width: "30%", ...headCellSx }}>Descripción de Regla</TableCell>
+              <TableCell sx={{ width: "28%", ...headCellSx }}>Porcentaje</TableCell>
+              <TableCell align="center" sx={{ width: "10%", ...headCellSx }}>Descarga</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

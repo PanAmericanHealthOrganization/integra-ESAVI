@@ -2,7 +2,6 @@ import CloseIcon from "@mui/icons-material/Close"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
 import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined"
@@ -68,21 +67,49 @@ const DEFAULT_FORM = {
 
 const UNASSIGNED_MODULE = "Sin módulo"
 
-// Paleta de acento por módulo: se asigna de forma determinística (hash del
-// nombre) para que cada módulo tenga siempre el mismo color entre recargas.
-const MODULE_COLOR_KEYS = ["primary", "secondary", "success", "warning", "info", "error"] as const
-type ModuleColorKey = (typeof MODULE_COLOR_KEYS)[number]
-
-const getModuleColorKey = (modulo: string): ModuleColorKey => {
-  let hash = 0
-  for (let i = 0; i < modulo.length; i++) hash = (hash * 31 + modulo.charCodeAt(i)) >>> 0
-  return MODULE_COLOR_KEYS[hash % MODULE_COLOR_KEYS.length]
+// Muestra un valor de ejemplo según el tipo de dato del parámetro. Si está
+// cifrado se representa siempre con asteriscos, sin importar el tipo.
+const getValorEjemplo = (row: ParametroRecord): string => {
+  if (row.es_encriptado) return "***"
+  switch (row.tipo_dato) {
+    case TipoDato.NUMBER:
+      return "123"
+    case TipoDato.BOOLEAN:
+      return "1,0"
+    default:
+      return "abc"
+  }
 }
 
-const getModuleInitials = (modulo: string): string => {
-  const parts = modulo.trim().split(/[\s_-]+/).filter(Boolean)
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
-  return modulo.trim().slice(0, 2).toUpperCase() || "?"
+// Alias legibles para las claves de parámetros. Se resuelve por el sufijo
+// semántico de la clave (independiente del módulo), del más específico al más
+// genérico. Los sufijos más largos deben ir primero para tener prioridad.
+const ALIAS_SUFIJOS: [string, string][] = [
+  ["USER_NAME", "Usuario"],
+  ["USER_KEY", "Clave de usuario"],
+  ["URL_TOKEN", "URL de token"],
+  ["URL_API", "Servidor (API)"],
+  ["API_URL", "Servidor (API)"],
+  ["CLIENT_ID", "ID de cliente"],
+  ["CLIENT_KEY", "Clave de cliente"],
+  ["LICENSE_KEY", "Clave de licencia"],
+  ["GRANT_TYPE", "Tipo de concesión"],
+  ["USERNAME", "Usuario"],
+  ["PASSWORD", "Contraseña"],
+  ["PASSWD", "Contraseña"],
+  ["SCOPE", "Alcance"],
+  ["TOKEN", "Token"],
+  ["URL", "Servidor"],
+]
+
+// Devuelve una etiqueta legible para la clave. Si no hay coincidencia, se usa
+// la clave tal cual.
+const getAliasClave = (clave: string): string => {
+  const key = (clave || "").trim().toUpperCase()
+  for (const [sufijo, alias] of ALIAS_SUFIJOS) {
+    if (key === sufijo || key.endsWith(`_${sufijo}`)) return alias
+  }
+  return clave
 }
 
 export const ParametrosList = () => {
@@ -91,7 +118,6 @@ export const ParametrosList = () => {
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
 
-  const [collapsedModules, setCollapsedModules] = useState<Set<string>>(new Set())
   const [revealedValues, setRevealedValues] = useState<Set<string>>(new Set())
 
   const [dialog, setDialog] = useState<{ open: boolean; id?: string }>({ open: false })
@@ -123,21 +149,10 @@ export const ParametrosList = () => {
     return Array.from(set).sort((a, b) => a.localeCompare(b, "es"))
   }, [data])
 
-  const moduleAccent = (modulo: string) => {
-    if (modulo === UNASSIGNED_MODULE) {
-      return { main: theme.palette.text.disabled, soft: alpha(theme.palette.text.disabled, 0.08) }
-    }
-    const main = theme.palette[getModuleColorKey(modulo)].main
+  // Todos los módulos usan el mismo acento: el azul del color primario.
+  const moduleAccent = () => {
+    const main = theme.palette.primary.main
     return { main, soft: alpha(main, 0.1) }
-  }
-
-  const toggleModule = (modulo: string) => {
-    setCollapsedModules((prev) => {
-      const next = new Set(prev)
-      if (next.has(modulo)) next.delete(modulo)
-      else next.add(modulo)
-      return next
-    })
   }
 
   const toggleReveal = (id: string) => {
@@ -235,8 +250,7 @@ export const ParametrosList = () => {
         ) : (
           <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2.5}>
             {moduleGroups.map((group) => {
-              const isCollapsed = collapsedModules.has(group.modulo)
-              const accent = moduleAccent(group.modulo)
+              const accent = moduleAccent()
               return (
                 <Box
                   key={group.modulo}
@@ -247,55 +261,28 @@ export const ParametrosList = () => {
                     borderRadius: 2,
                     px: 2,
                     pt: 0.5,
-                    pb: isCollapsed ? 0.5 : 2,
+                    pb: 2,
                     m: 0,
                   }}>
                   <Box
                     component="legend"
-                    onClick={() => toggleModule(group.modulo)}
-                    sx={{ display: "flex", alignItems: "center", gap: 1.25, px: 1, cursor: "pointer", userSelect: "none" }}>
-                    <ExpandMoreIcon
-                      sx={{
-                        fontSize: 18,
-                        color: "text.secondary",
-                        transition: "transform 0.18s ease",
-                        transform: isCollapsed ? "rotate(-90deg)" : "rotate(0deg)",
-                      }}
-                    />
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        width: 24,
-                        height: 24,
-                        fontSize: 10.5,
-                        fontWeight: 700,
-                        bgcolor: accent.main,
-                        color: theme.palette.getContrastText(accent.main),
-                      }}>
-                      {getModuleInitials(group.modulo)}
-                    </Avatar>
+                    sx={{ display: "flex", alignItems: "center", gap: 1.25, px: 1 }}>
                     <Typography variant="subtitle2" fontWeight={700}>
                       {group.modulo}
                     </Typography>
-                    <Chip
-                      label={group.rows.length}
-                      size="small"
-                      sx={{ height: 18, fontSize: 10.5, fontWeight: 600, bgcolor: alpha(accent.main, 0.16), color: accent.main }}
-                    />
                   </Box>
 
-                  {!isCollapsed && (
-                    <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2} pt={1}>
+                  <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2} pt={1}>
                       {group.rows.map((row) => {
                         const isMasked = row.es_encriptado && !revealedValues.has(row.id)
                         const field = (
                           <TextField
                             fullWidth
                             size="small"
-                            label={row.clave}
+                            label={getAliasClave(row.clave)}
                             value={isMasked ? "••••••••••" : row.valor || ""}
                             placeholder={!row.valor ? "—" : undefined}
-                            InputLabelProps={{ shrink: true, sx: { fontFamily: "monospace", fontSize: 12.5, fontWeight: 600 } }}
+                            InputLabelProps={{ shrink: true, sx: { fontSize: 12.5, fontWeight: 700 } }}
                             InputProps={{
                               readOnly: true,
                               sx: {
@@ -375,42 +362,29 @@ export const ParametrosList = () => {
                             ) : (
                               field
                             )}
-                            <Stack direction="row" spacing={0.5} mt={0.5}>
+                            <Stack direction="row" spacing={0.75} mt={0.5} alignItems="center">
                               <Chip
-                                label={row.tipo_dato || "—"}
+                                label={getValorEjemplo(row)}
                                 size="small"
                                 variant="outlined"
-                                sx={{ height: 18, fontSize: 9.5, fontWeight: 600, color: "text.secondary" }}
+                                sx={{
+                                  height: 18,
+                                  fontSize: 9.5,
+                                  fontWeight: 600,
+                                  fontFamily: "monospace",
+                                  color: "text.secondary",
+                                }}
                               />
-                              {row.es_encriptado ? (
-                                <Chip
-                                  icon={<LockOutlinedIcon sx={{ fontSize: 11 }} />}
-                                  label="Cifrado"
-                                  size="small"
-                                  sx={{
-                                    height: 18,
-                                    fontSize: 9.5,
-                                    fontWeight: 600,
-                                    bgcolor: alpha(theme.palette.success.main, 0.12),
-                                    color: "success.dark",
-                                    "& .MuiChip-icon": { color: "success.dark" },
-                                  }}
-                                />
-                              ) : (
-                                <Chip
-                                  icon={<LockOpenOutlinedIcon sx={{ fontSize: 11 }} />}
-                                  label="Plano"
-                                  size="small"
-                                  variant="outlined"
-                                  sx={{ height: 18, fontSize: 9.5, fontWeight: 600, color: "text.disabled", borderColor: "divider" }}
-                                />
-                              )}
+                              <Typography
+                                variant="caption"
+                                sx={{ fontFamily: "monospace", fontSize: 9.5, color: "text.disabled" }}>
+                                {row.clave}
+                              </Typography>
                             </Stack>
                           </Box>
                         )
                       })}
-                    </Box>
-                  )}
+                  </Box>
                 </Box>
               )
             })}

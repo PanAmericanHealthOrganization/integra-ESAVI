@@ -16,6 +16,8 @@ services:
       DB_PASS: ${DB_PASS}
       LOG_ACCESS_ATTEMPTS:       ${LOG_ACCESS_ATTEMPTS:-true}
       LOG_FILE_PATH:             /app/logs/access.log
+      # Datamart DuckDB generado por api-integra-esavi (reemplaza los RDS).
+      DUCKDB_PATH:               ${DUCKDB_PATH:-/app/datos/esavi.duckdb}
       INTEGRA_APP_URL:           ${INTEGRA_APP_URL:-http://localhost:8080}
       VITE_KEYCLOAK_URL:         ${VITE_KEYCLOAK_URL:-}
       VITE_KEYCLOAK_REALM:       ${VITE_KEYCLOAK_REALM:-}
@@ -36,32 +38,10 @@ services:
     networks:
       - esavi-internal
 
-  # ── Actualización periódica de datos (perfil opcional) ──────────────────────
-  # Uso: docker compose --profile refresh run --rm data-refresh
-  data-refresh:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: esavi-data-refresh
-    profiles: ["refresh"]
-    environment:
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-dhi_esavi}
-      DB_USER: ${DB_USER}
-      DB_PASS: ${DB_PASS}
-    volumes:
-      - ./datos:/app/datos
-      - ./fuente_de_datos:/app/fuente_de_datos
-      - ./logs:/app/logs
-    command: >
-      Rscript -e "
-        source('preparar_datos.R');
-        source('scripts/procesamiento_datos.R');
-        cat('Actualización de datos completada.\n')
-      "
-    networks:
-      - esavi-internal
+  # ── Actualización de datos (RETIRADA) ───────────────────────────────────────
+  # El pipeline R (preparar_datos.R + procesamiento_datos.R) fue reemplazado por
+  # el módulo `datamart` de api-integra-esavi, que genera datos/esavi.duckdb
+  # (cron diario + POST /v1/datamart/regenerar). El dashboard solo lo lee.
 
 # ── Redes ──────────────────────────────────────────────────────────────────────
 networks:
