@@ -7,6 +7,7 @@ import {
 } from "@mui/icons-material"
 import {
   Alert,
+  Avatar,
   Box,
   CircularProgress,
   Container,
@@ -19,6 +20,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
 import React, { useEffect, useMemo, useState } from "react"
 
 // Importar componentes de tabs
@@ -63,6 +65,7 @@ function a11yProps(index: number) {
 }
 
 const CalidadDashListContent: React.FC = () => {
+  const theme = useTheme()
   const [currentTab, setCurrentTab] = useState(0)
   const { error, loading, refresh, selectedDate, setSelectedDate } =
     useCalidadDataQuality()
@@ -157,14 +160,20 @@ const CalidadDashListContent: React.FC = () => {
   return (
     <CalidadNavigationProvider onNavigateToTab={handleNavigateToTab}>
       <Container maxWidth="xl" sx={{ py: 1 }}>
-        <Paper elevation={2} sx={{ width: "100%", overflow: "hidden" }}>
+        <Paper
+          elevation={0}
+          sx={{
+            width: "100%",
+            overflow: "hidden",
+            borderRadius: 2,
+            border: "1px solid",
+            borderColor: "divider",
+          }}>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               gap: 0.5,
-              px: 2,
-              py: 0.5,
             }}>
             <Box
               sx={{
@@ -174,12 +183,23 @@ const CalidadDashListContent: React.FC = () => {
                 alignItems: "center",
                 gap: 2,
                 flexWrap: "wrap",
+                px: 2.5,
+                py: 2,
+                bgcolor: alpha(theme.palette.primary.main, 0.04),
               }}>
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: "bold", flexShrink: 0 }}>
-                Monitoreo de Calidad de Datos
-              </Typography>
+              <Box display="flex" alignItems="center" gap={1.5} sx={{ flexShrink: 0 }}>
+                <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
+                  <Assessment fontSize="small" />
+                </Avatar>
+                <Box>
+                  <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
+                    Monitoreo de Calidad de Datos
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Evaluación de reglas de calidad por dimensión
+                  </Typography>
+                </Box>
+              </Box>
 
               <Stack
                 direction="row"
@@ -209,7 +229,7 @@ const CalidadDashListContent: React.FC = () => {
                     min: MesUtils.mesMinimo(),
                     max: MesUtils.mesActual(),
                   }}
-                  sx={{ minWidth: 180 }}
+                  sx={{ minWidth: 180, bgcolor: "background.paper" }}
                 />
                 <Tooltip title="Actualizar datos">
                   <span>
@@ -226,7 +246,7 @@ const CalidadDashListContent: React.FC = () => {
             </Box>
 
             {error && (
-              <Alert severity="warning" sx={{ my: 0.5 }}>
+              <Alert severity="warning" sx={{ mx: 2.5, my: 1 }}>
                 {error}
               </Alert>
             )}
