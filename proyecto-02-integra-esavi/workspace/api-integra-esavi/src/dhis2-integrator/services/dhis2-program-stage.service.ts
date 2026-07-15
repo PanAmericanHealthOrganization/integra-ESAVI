@@ -1,6 +1,5 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { ProgramStage, DataElement } from '../dto';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -13,21 +12,19 @@ export class Dhis2ProgramStageService {
   private readonly logger = new Logger(Dhis2ProgramStageService.name);
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly dhis2DataElementService: Dhis2DataElementService,
     private readonly parametroService: ParametroService,
   ) {}
 
 
   async getEstructuraPrograma(idPrograma: string): Promise<ProgramStage[]> {
-    const base = this.configService.get<string>('DHIS2_URL');
-    console.log('Base URL: ' + base);
+    const base = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
 
     const uri = `/api/programStages.json?fields=*&paging=false&filter=program.id:eq:${idPrograma}`;
     const url = base.concat(uri);
 
     const { data } = await firstValueFrom(
-      this.httpService.get(url, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(url, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error('Error con codigo::: ', e);
           this.logger.error('Error con codigo::: ', e.message);

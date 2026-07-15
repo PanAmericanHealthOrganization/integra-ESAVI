@@ -1,44 +1,60 @@
-import { ConfigService } from '@nestjs/config';
 import { Dhis2ExtraccionUtils } from './dhis2-extraccion.utils';
 
 describe('Dhis2ExtraccionUtils', () => {
+  const makeParametroService = (parametros: Record<string, string> = {}) =>
+    ({
+      getValor: jest.fn(async (modulo: string, clave: string) => {
+        if (modulo === 'DHIS2' && parametros[clave] !== undefined) {
+          return parametros[clave];
+        }
+        throw new Error(`Parámetro no encontrado: ${modulo}.${clave}`);
+      }),
+    } as unknown as import('../../integrator/service/parametro.service').ParametroService);
+
   // ─── getConfig ───────────────────────────────────────────────────────────
 
   describe('getConfig', () => {
-    const makeConfigService = (valores: Record<string, string>) =>
-      ({
-        get: jest.fn((key: string) => valores[key]),
-      } as unknown as ConfigService);
-
-    const makeParametroService = (dhis2UserKey?: string) =>
-      ({
-        getValor: jest.fn(async (modulo: string, clave: string) => {
-          if (modulo === 'DHIS2' && clave === 'DHIS2_USER_KEY' && dhis2UserKey) {
-            return dhis2UserKey;
-          }
-          throw new Error(`Parámetro no encontrado: ${modulo}.${clave}`);
-        }),
-      } as unknown as import('../../integrator/service/parametro.service').ParametroService);
-
-    it('arma la cabecera Authorization con ApiToken desde DHIS2_API_TOKEN', async () => {
-      const configService = makeConfigService({ DHIS2_API_TOKEN: 'd2pat_abc' });
-      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService(), configService);
-      expect(config.headers.Authorization).toBe('ApiToken d2pat_abc');
+    it('arma la cabecera Authorization con ApiToken desde DHIS2_USER_KEY (TC_PARAMETRO)', async () => {
+      const config = await Dhis2ExtraccionUtils.getConfig(
+        makeParametroService({ DHIS2_USER_KEY: 'd2pat_xyz' }),
+      );
+      expect(config.headers.Authorization).toBe('ApiToken d2pat_xyz');
       expect(config.maxBodyLength).toBe(Infinity);
     });
 
-    it('usa DHIS2_USER_KEY (TC_PARAMETRO) como respaldo cuando no existe DHIS2_API_TOKEN', async () => {
-      const configService = makeConfigService({});
-      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService('d2pat_xyz'), configService);
-      expect(config.headers.Authorization).toBe('ApiToken d2pat_xyz');
+    it('lanza cuando el parámetro DHIS2_USER_KEY no está configurado', async () => {
+      await expect(Dhis2ExtraccionUtils.getConfig(makeParametroService())).rejects.toThrow();
+    });
+  });
+
+  // ─── getBaseUrl ──────────────────────────────────────────────────────────
+
+  describe('getBaseUrl', () => {
+    it('lee la URL desde el parámetro DHIS2_URL (TC_PARAMETRO)', async () => {
+      const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(
+        makeParametroService({ DHIS2_URL: 'http://parametro' }),
+      );
+      expect(baseUrl).toBe('http://parametro');
     });
 
-    it('prefiere DHIS2_API_TOKEN cuando ambos existen', async () => {
-      const configService = makeConfigService({
-        DHIS2_API_TOKEN: 'd2pat_principal',
-      });
-      const config = await Dhis2ExtraccionUtils.getConfig(makeParametroService('d2pat_respaldo'), configService);
-      expect(config.headers.Authorization).toBe('ApiToken d2pat_principal');
+    it('lanza cuando el parámetro DHIS2_URL no está configurado', async () => {
+      await expect(Dhis2ExtraccionUtils.getBaseUrl(makeParametroService())).rejects.toThrow();
+    });
+  });
+
+  // ─── getRootOrgUnit ──────────────────────────────────────────────────────
+
+  describe('getRootOrgUnit', () => {
+    it('lee la unidad raíz desde el parámetro DHIS2_ROOT_ORG_UNIT (TC_PARAMETRO)', async () => {
+      const rootOrgUnit = await Dhis2ExtraccionUtils.getRootOrgUnit(
+        makeParametroService({ DHIS2_ROOT_ORG_UNIT: 'OU_RAIZ' }),
+      );
+      expect(rootOrgUnit).toBe('OU_RAIZ');
+    });
+
+    it('usa el valor por defecto cuando no existe el parámetro', async () => {
+      const rootOrgUnit = await Dhis2ExtraccionUtils.getRootOrgUnit(makeParametroService());
+      expect(rootOrgUnit).toBe('CcPKoI4rpPZ');
     });
   });
 

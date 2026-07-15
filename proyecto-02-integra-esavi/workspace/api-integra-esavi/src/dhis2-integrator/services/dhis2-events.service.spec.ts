@@ -1,6 +1,5 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { of, throwError } from 'rxjs';
 import { AxiosError } from 'axios';
@@ -16,19 +15,15 @@ const TAMANIO_PAGINA = 50;
 
 const mockHttpService = { get: jest.fn() };
 
-const mockConfigService = {
-  get: jest.fn((key: string, defecto?: string) => {
-    const valores: Record<string, string> = {
-      DHIS2_URL: 'http://dhis2.test',
-    };
-    return valores[key] ?? defecto;
-  }),
-};
-
 const mockParametroService = {
   getValor: jest.fn(async (modulo: string, clave: string) => {
-    if (modulo === 'DHIS2' && clave === 'DHIS2_USER_KEY') {
-      return 'd2pat_prueba';
+    const valores: Record<string, string> = {
+      DHIS2_URL: 'http://dhis2.test',
+      DHIS2_USER_KEY: 'd2pat_prueba',
+      DHIS2_ROOT_ORG_UNIT: ORG_UNIT_RAIZ,
+    };
+    if (modulo === 'DHIS2' && valores[clave] !== undefined) {
+      return valores[clave];
     }
     throw new Error(`Parámetro no encontrado: ${modulo}.${clave}`);
   }),
@@ -147,7 +142,6 @@ describe('Dhis2EventsService', () => {
       providers: [
         Dhis2EventsService,
         { provide: HttpService, useValue: mockHttpService },
-        { provide: ConfigService, useValue: mockConfigService },
         { provide: Dhis2DataElementService, useValue: mockDataElementService },
         { provide: Dhis2OptionsService, useValue: mockOptionsService },
         { provide: Dhis2ProgramService, useValue: mockProgramService },

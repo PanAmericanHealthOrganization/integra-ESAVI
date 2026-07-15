@@ -1,6 +1,5 @@
 import { HttpException, Injectable, Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { ParametroService } from '../../integrator/service/parametro.service';
@@ -12,13 +11,12 @@ export class Dhis2OptionsService {
   private readonly logger = new Logger(Dhis2OptionsService.name);
   constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
     private readonly parametroService: ParametroService,
   ) {}
 
 
   async getOptions(codes: string[]): Promise<Option[]> {
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     /*const uri = baseUrl.concat(
       `/api/options.json?filter=code:in:[${codes.join(
         ',',
@@ -30,10 +28,8 @@ export class Dhis2OptionsService {
   const quotedCodes = validOptionCodes.map(code => `${code.replace(/"/g, '')}`).join(',');
   const uri = `${baseUrl}/api/options.json?filter=code:in:[${quotedCodes}]&fields=code,id,displayName&paging=false`;
 
-    console.log('AQUI ERROR URL: ' + uri);
-    
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);
@@ -51,13 +47,13 @@ export class Dhis2OptionsService {
     if (ids.length === 0) {
       return [];
     }
-    const baseUrl = this.configService.get<string>('DHIS2_URL');
+    const baseUrl = await Dhis2ExtraccionUtils.getBaseUrl(this.parametroService);
     const uri = `${baseUrl}/api/optionSets.json?filter=id:in:[${ids.join(
       ',',
     )}]&fields=id,options[code,name]&paging=false`;
 
     const { data } = await firstValueFrom(
-      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService, this.configService)).pipe(
+      this.httpService.get(uri, await Dhis2ExtraccionUtils.getConfig(this.parametroService)).pipe(
         catchError((e: AxiosError) => {
           this.logger.error(e);
           throw new HttpException(e.response.data, e.response.status);

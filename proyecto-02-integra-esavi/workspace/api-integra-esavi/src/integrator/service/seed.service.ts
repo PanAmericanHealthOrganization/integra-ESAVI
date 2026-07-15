@@ -115,6 +115,13 @@ export class SeedService implements OnApplicationBootstrap {
         },
         {
           modulo: 'DHIS2',
+          clave: 'DHIS2_ROOT_ORG_UNIT',
+          valor: 'CcPKoI4rpPZ',
+          descripcion: 'Unidad organizativa raíz sobre la que se consultan las instancias del tracker',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'DHIS2',
           clave: 'DHIS2_USER_KEY',
           valor: 'CAMBIAR_DHIS2_USER_KEY',
           descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
