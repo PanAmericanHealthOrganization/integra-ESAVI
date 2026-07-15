@@ -878,17 +878,17 @@ export class DimConsistenciaService {
         count(*) filter (
           where
             (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."DESCRIPCION_HOMOLOGADA") = 'MUJER'
+            and upper(tc."NOMBRE") = 'MUJER'
         ) as "totalRegistrosValidos",
         count(*) filter (
           where
             (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."DESCRIPCION_HOMOLOGADA") != 'MUJER'
+            and upper(tc."NOMBRE") != 'MUJER'
         ) as "totalRegistrosNoValidos",
         coalesce(json_agg(DISTINCT tn."ID") filter (
           where
             (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."DESCRIPCION_HOMOLOGADA") != 'MUJER'
+            and upper(tc."NOMBRE") != 'MUJER'
         ), '[]') as "idNotificacionesNoValidos"
       from
         "DHI_ESAVI"."TR_NOTIFICACION" tn
@@ -896,7 +896,7 @@ export class DimConsistenciaService {
         tp."ID" = tn."PACIENTE_ID"
       inner join "DHI_ESAVI"."TR_PACIENTE_EMBARAZADA" tpe on
         tpe."NOTIFICACION_ID" = tn."ID"
-      left join "DHI_ESAVI"."TC_CATALOGO" tc on
+      left join "DHI_ESAVI"."TC_CATALOGO_PADRE" tc on
         tc."ID" = tp."CT_SEXO_ID"
       where
         tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'

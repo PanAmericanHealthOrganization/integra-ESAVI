@@ -8,6 +8,10 @@ export class CreatePacienteDto {
 
   @IsString()
   @IsOptional()
+  apellidos: string;
+
+  @IsString()
+  @IsOptional()
   inicialesNombre: string;
 
   @IsString()

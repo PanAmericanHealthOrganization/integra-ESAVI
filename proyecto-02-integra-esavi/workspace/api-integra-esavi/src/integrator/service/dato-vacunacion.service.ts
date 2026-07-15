@@ -24,8 +24,19 @@ export class DatoVacunacionService {
    * @param createDto
    * @returns
    */
-  public async create(notificacion: Notificacion, createDto: CreateDatoVacunacionDto | CreateDatoVacunacionDto[]): Promise<DatoVacunacion | DatoVacunacion[]> {
+  public async create(notificacion: Notificacion, createDto: CreateDatoVacunacionDto | CreateDatoVacunacionDto[]): Promise<DatoVacunacion> {
     try {
+      // El modelo es un único evento de vacunación por notificación (1:N con DatoVacuna).
+      // Cuando el origen entrega varios candidatos (p.ej. DHIS2, un dto por cada "antecedente
+      // vacuna"), se consolida en uno solo: se prioriza el primero con datos de lugar/fecha.
+      const dto = Array.isArray(createDto)
+        ? createDto.find((d) => d.nombreVacunatorio || d.fechaVacunacion || d.fechaReconstitucion) ?? createDto[0]
+        : createDto;
+
+      if (!dto) {
+        return null;
+      }
+
       // Verificar si ya existe un DatoVacunacion con la misma notificación
       const existingDatoVacunacion = await this.datoVacunacionRepository.findOne({
         where: { notificacion: { id: notificacion.id } }, // Buscamos por el ID de la notificación
@@ -36,7 +47,7 @@ export class DatoVacunacionService {
         this.logger.log('DatoVacunacion existe, se actualizará con los nuevos datos.');
 
         // Actualizamos el registro con los nuevos datos
-        Object.assign(existingDatoVacunacion, createDto); // Actualizamos las propiedades del registro
+        Object.assign(existingDatoVacunacion, dto); // Actualizamos las propiedades del registro
 
         // También actualizamos la notificación
         existingDatoVacunacion.notificacion = notificacion;
@@ -46,7 +57,7 @@ export class DatoVacunacionService {
       }
 
       // Si no existe, creamos uno nuevo
-      const datoVacuna = plainToClass(DatoVacunacion, createDto);
+      const datoVacuna = plainToClass(DatoVacunacion, dto);
       datoVacuna.notificacion = notificacion;
       datoVacuna.createdBy = this.configService.get('USUARIO_INSERTA_REGISTRO'); // Asignamos el creador automáticamente
 
@@ -56,7 +67,7 @@ export class DatoVacunacionService {
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(`DatoVacunacion ha sido procesadoDesenlaceEsavi ha sido creada`);
+      this.logger.log(`DatoVacunacion ha sido procesado`);
     }
   }
 

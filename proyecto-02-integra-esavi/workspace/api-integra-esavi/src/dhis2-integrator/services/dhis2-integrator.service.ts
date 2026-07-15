@@ -52,15 +52,19 @@ export class Dhis2IntegratorService {
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
   ) {}
 
+  // Acepta 'YYYY-MM-DD...' (formato ISO que entrega Dhis2ExtraccionUtils.normalizarFecha()/
+  // normalizarValor() desde el tracker API) y, por compatibilidad, el 'YYYYMMDD' compacto
+  // que entregaba la antigua API de analytics.
   formatoFecha(valor: string): Date | null {
-    if (valor && valor.length > 0 && valor !== '') {
-      const year = parseInt(valor.substring(0, 4), 10);
-      const month = parseInt(valor.substring(4, 6), 10);
-      const day = parseInt(valor.substring(6, 8), 10);
-      const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-      return isNaN(date.getTime()) ? null : date;
+    if (!valor) {
+      return null;
     }
-    return null;
+    const isoMatch = valor.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const [year, month, day] = isoMatch
+      ? [parseInt(isoMatch[1], 10), parseInt(isoMatch[2], 10), parseInt(isoMatch[3], 10)]
+      : [parseInt(valor.substring(0, 4), 10), parseInt(valor.substring(4, 6), 10), parseInt(valor.substring(6, 8), 10)];
+    const date = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
+    return isNaN(date.getTime()) ? null : date;
   }
 
   formatoInteger = (valor: string) => {
@@ -472,7 +476,8 @@ export class Dhis2IntegratorService {
       row[headers.findIndex((header) => header.column === 'Autoidentificación')];
     const nombre = row[headers.findIndex((header) => header.column === 'Nombres')];
     const apellido = row[headers.findIndex((header) => header.column === 'Apellidos')];
-    paciente.nombre = `${nombre} ${apellido}`;
+    paciente.nombre = nombre;
+    paciente.apellidos = apellido;
 
     // Create Notificacion
     const notificacion = new CreateNotificacionDto();
@@ -506,11 +511,14 @@ export class Dhis2IntegratorService {
       row[headers.findIndex((header) => header.column === 'Organisation unit')];
     notificacion.codigoDhis2Evento =
       row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Código del caso')];
+    // DHIS2 no tiene un data element "Fecha de notificación": el dato equivalente es la
+    // fecha del evento de la etapa "Notificación", que el tracker capture de DHIS2 etiqueta
+    // genéricamente como "Fecha de reporte" (ver Dhis2EventsService.construirReporte).
     notificacion.fechaNotificacion = this.formatoFecha(
-      row[headers.findIndex((header) => header.column === 'Fecha de notificación')],
+      row[headers.findIndex((header) => header.column === 'Fecha de reporte')],
     );
     notificacion.fechaReporteNacional = this.formatoFecha(
-      row[headers.findIndex((header) => header.column === 'Fecha de notificación')],
+      row[headers.findIndex((header) => header.column === 'Fecha de reporte')],
     );// Se acoge la recomendción del personal funcional, pero, los valores quedan duplicados con el campo FECHA_NOTIFICACION.
     notificacion.tipoEmisor = 'Profesional de la salud';
     

@@ -3,7 +3,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotificacionVigiflowService } from './notificacion-vigiflow.service';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Parroquia } from '../entity/parroquia.entity';
-import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
 const mockNotificacionRepo = {
@@ -17,12 +16,6 @@ const mockNotificacionRepo = {
 
 const mockParroquiaRepo = {
   findOne: jest.fn(),
-};
-
-const mockCatalogoService = {
-  findByDescriptionToVigiflow: jest.fn(),
-  preloadVigiflowMap: jest.fn(),
-  clearVigiflowCache: jest.fn(),
 };
 
 const mockCatalogoPadreService = {
@@ -52,7 +45,6 @@ describe('NotificacionVigiflowService', () => {
         NotificacionVigiflowService,
         { provide: getRepositoryToken(Notificacion, 'POSTGRES_INTEGRATOR_DS'), useValue: mockNotificacionRepo },
         { provide: getRepositoryToken(Parroquia, 'POSTGRES_INTEGRATOR_DS'), useValue: mockParroquiaRepo },
-        { provide: CatalogoService, useValue: mockCatalogoService },
         { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
       ],
     }).compile();
@@ -210,37 +202,23 @@ describe('NotificacionVigiflowService', () => {
   // ─── preloadBulk / clearBulkCache ────────────────────────────────────────
 
   describe('preloadBulk', () => {
-    it('llama a preloadVigiflowMap, preloadSubcategoriasMap y carga establecimientos', async () => {
+    it('llama a preloadSubcategoriasMap y carga establecimientos', async () => {
       mockNotificacionRepo.manager.query.mockResolvedValue([
         { id: 'est1', nombre: 'Hospital Eugenio Espejo' },
       ]);
 
       await service.preloadBulk();
 
-      expect(mockCatalogoService.preloadVigiflowMap).toHaveBeenCalledTimes(1);
       expect(mockCatalogoPadreService.preloadSubcategoriasMap).toHaveBeenCalledTimes(1);
       expect(mockNotificacionRepo.manager.query).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('clearBulkCache', () => {
-    it('limpia los tres cachés', () => {
+    it('limpia el caché de catalogoPadre', () => {
       service.clearBulkCache();
 
-      expect(mockCatalogoService.clearVigiflowCache).toHaveBeenCalledTimes(1);
       expect(mockCatalogoPadreService.clearSubcategoriasCache).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('preloadCatalogoVigiflow / clearCatalogoVigiflow', () => {
-    it('preloadCatalogoVigiflow delega en catalogoService', async () => {
-      await service.preloadCatalogoVigiflow();
-      expect(mockCatalogoService.preloadVigiflowMap).toHaveBeenCalledTimes(1);
-    });
-
-    it('clearCatalogoVigiflow delega en catalogoService', () => {
-      service.clearCatalogoVigiflow();
-      expect(mockCatalogoService.clearVigiflowCache).toHaveBeenCalledTimes(1);
     });
   });
 

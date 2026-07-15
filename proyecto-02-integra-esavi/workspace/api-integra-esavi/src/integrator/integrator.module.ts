@@ -3,6 +3,7 @@ import {ConfigModule,ConfigService} from '@nestjs/config';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {Homologador} from 'src/homologator/entity/homologador.entity';
 import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
+import {HomologadorModule} from 'src/homologator/homologador.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
@@ -33,7 +34,6 @@ import {
   AntecedenteEvento,
   AntecedenteMedico,
   AntecedentePreexistencia,
-  Catalogo,
   CatalogoPadre,
   CausalidadEsavi,
   DatoEsavi,
@@ -50,7 +50,6 @@ import {
   PacienteEmbarazada,
   Parametro,
   SyncProcess,
-  TipoCatalogo,
   Vacunacion,
   Vacunometro,
 } from './entity';
@@ -66,7 +65,6 @@ import {
   AntecedenteMedicoService,
   AntecedentePreexistenciaService,
   CatalogoPadreService,
-  CatalogoService,
   CausalidadEsaviService,
   DatoEsaviService,
   DatoVacunaService,
@@ -125,7 +123,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Canton,
         CatalogoPadre,
         Establecimiento,
-        Catalogo,
         Parroquia,
         Provincia,
         CausalidadEsavi,
@@ -142,7 +139,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Paciente,
         PacienteEmbarazada,
         Parametro,
-        TipoCatalogo,
         Vacunacion,
         Vacunometro,
         SyncProcess,
@@ -152,6 +148,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
       ],
       POSTGRES_INTEGRATOR_DS,
     ),
+    HomologadorModule,
   ],
   controllers: [
     AntecedenteEmbarazoController,
@@ -192,7 +189,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedenteMedicoService,
     AntecedentePreexistenciaService,
     EstablecimientosService,
-    CatalogoService,
     CausalidadEsaviService,
     DatoEsaviService,
     DatoVacunaService,

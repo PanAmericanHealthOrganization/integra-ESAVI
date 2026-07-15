@@ -118,10 +118,13 @@ const ocultarInformacion = (texto: string) => {
 
 const formatFecha = (valor?: string | null) => {
   if (!valor) return "—"
+  // Estas fechas se guardan como "solo fecha" a medianoche UTC (ver formatoFecha en el
+  // backend); forzar timeZone: "UTC" evita que se corran un día en husos negativos (ej. Ecuador).
   return new Date(valor).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
+    timeZone: "UTC",
   })
 }
 
@@ -202,8 +205,7 @@ export const ESAVISList = () => {
                 "—"
               const identificacion = ocultarInformacion(p.identificacion)
               const fechaNac = formatFecha(p.fechaNacimiento)
-              const sexo =
-                p.sexo?.vigiflow ?? p.sexo?.dhis2 ?? p.sexo?.homologada ?? "—"
+              const sexo = p.sexo?.nombre ?? "—"
 
               return (
                 <Box sx={{ lineHeight: 1.6 }}>

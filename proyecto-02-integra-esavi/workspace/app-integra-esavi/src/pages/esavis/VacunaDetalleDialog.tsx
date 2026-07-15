@@ -15,10 +15,13 @@ import React from "react"
 
 const formatDate = (value?: string | null) => {
   if (!value) return "—"
+  // Estas fechas se guardan como "solo fecha" a medianoche UTC (ver formatoFecha en el
+  // backend); forzar timeZone: "UTC" evita que se corran un día en husos negativos (ej. Ecuador).
   return new Date(value).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "UTC",
   })
 }
 

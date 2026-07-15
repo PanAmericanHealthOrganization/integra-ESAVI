@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ResolutorService } from 'src/homologator/service/resolutor.service';
 import { PacienteService } from './paciente.service';
 import { Paciente } from '../entity/paciente.entity';
-import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
 const mockPacienteRepo = {
@@ -12,13 +12,13 @@ const mockPacienteRepo = {
   merge: jest.fn(),
 };
 
-const mockCatalogoService = {
-  findByDescriptionToVigiflow: jest.fn(),
-  findByDescriptionToDhis2: jest.fn(),
-};
-
 const mockCatalogoPadreService = {
   buscarSubcategoriaPorSimilitud: jest.fn(),
+  findOne: jest.fn(),
+};
+
+const mockResolutorService = {
+  resolver: jest.fn(),
 };
 
 const makePaciente = (overrides: Partial<Paciente> = {}): Paciente =>
@@ -36,12 +36,20 @@ describe('PacienteService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    // Por defecto no hay regla de homologación configurada: el resolutor "no coincide"
+    // y el flujo cae al match por similitud contra TC_CATALOGO_PADRE (comportamiento previo).
+    mockResolutorService.resolver.mockResolvedValue({
+      coincidio: false,
+      valorOrigen: '',
+      valorDestino: '',
+      valorCasteado: '',
+    });
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PacienteService,
         { provide: getRepositoryToken(Paciente, 'POSTGRES_INTEGRATOR_DS'), useValue: mockPacienteRepo },
-        { provide: CatalogoService, useValue: mockCatalogoService },
         { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
+        { provide: ResolutorService, useValue: mockResolutorService },
       ],
     }).compile();
     service = module.get<PacienteService>(PacienteService);
@@ -194,6 +202,94 @@ describe('PacienteService', () => {
       await service.createFromVigiflow({ codigoVigiflow: 'EC-NEW', sexoPaciente: 'MASCULINO' } as any);
 
       expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith('GENERO', 'HOMBRE');
+    });
+
+    it('resuelve sexo vía TR_HOMOLOGADOR (VIGIFLOW) cuando hay regla configurada, sin caer a similitud', async () => {
+      mockPacienteRepo.findOne.mockResolvedValue(null);
+      mockResolutorService.resolver.mockResolvedValue({
+        coincidio: true,
+        valorOrigen: 'Femenino',
+        valorDestino: 'cp-mujer-uuid',
+        valorCasteado: 'cp-mujer-uuid',
+      });
+      mockCatalogoPadreService.findOne.mockResolvedValue({ id: 'cp-mujer-uuid', nombre: 'Mujer' });
+      mockPacienteRepo.save.mockResolvedValue(makePaciente());
+
+      await service.createFromVigiflow({ codigoVigiflow: 'EC-NEW', sexoPaciente: 'Femenino' } as any);
+
+      expect(mockResolutorService.resolver).toHaveBeenCalledWith({
+        entity: 'Paciente',
+        field: 'sexo',
+        sourceSystem: 'VIGIFLOW',
+        sourceValue: 'Femenino',
+      });
+      expect(mockCatalogoPadreService.findOne).toHaveBeenCalledWith('cp-mujer-uuid');
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).not.toHaveBeenCalled();
+      const savedArg: Paciente = mockPacienteRepo.save.mock.calls[0][0];
+      expect(savedArg.sexo).toEqual({ id: 'cp-mujer-uuid', nombre: 'Mujer' });
+    });
+
+    it('cae a similitud contra TC_CATALOGO_PADRE si la regla de homologación apunta a un catálogo inexistente', async () => {
+      mockPacienteRepo.findOne.mockResolvedValue(null);
+      mockResolutorService.resolver.mockResolvedValue({
+        coincidio: true,
+        valorOrigen: 'Femenino',
+        valorDestino: 'id-borrado',
+        valorCasteado: 'id-borrado',
+      });
+      mockCatalogoPadreService.findOne.mockRejectedValue(new Error('not found'));
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue({ id: 'cp1' });
+      mockPacienteRepo.save.mockResolvedValue(makePaciente());
+
+      await service.createFromVigiflow({ codigoVigiflow: 'EC-NEW', sexoPaciente: 'Femenino' } as any);
+
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith('GENERO', 'MUJER');
+    });
+
+    it('busca etnia en catalogo_padre (ETNIA) homologando alias semánticos VigiFlow', async () => {
+      mockPacienteRepo.findOne.mockResolvedValue(null);
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue({ id: 'cp2' });
+      mockPacienteRepo.save.mockResolvedValue(makePaciente());
+
+      await service.createFromVigiflow({
+        codigoVigiflow: 'EC-NEW',
+        autoIdentificacionPaciente: 'Afroecuatoriano',
+      } as any);
+
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith(
+        'ETNIA',
+        'AFRODESCENDIENTE',
+      );
+    });
+
+    it('busca etnia en catalogo_padre (ETNIA) resolviendo el sufijo "/A" de VigiFlow', async () => {
+      mockPacienteRepo.findOne.mockResolvedValue(null);
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue({ id: 'cp3' });
+      mockPacienteRepo.save.mockResolvedValue(makePaciente());
+
+      await service.createFromVigiflow({
+        codigoVigiflow: 'EC-NEW',
+        autoIdentificacionPaciente: 'NEGRO/A',
+      } as any);
+
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith('ETNIA', 'NEGRO/A');
+    });
+
+    it('registra advertencia y deja etnia sin asignar cuando no hay coincidencia en catalogo_padre', async () => {
+      mockPacienteRepo.findOne.mockResolvedValue(null);
+      mockCatalogoPadreService.buscarSubcategoriaPorSimilitud.mockResolvedValue(null);
+      mockPacienteRepo.save.mockResolvedValue(makePaciente());
+
+      const result = await service.createFromVigiflow({
+        codigoVigiflow: 'EC-NEW',
+        autoIdentificacionPaciente: 'Desconocido',
+      } as any);
+
+      expect(mockCatalogoPadreService.buscarSubcategoriaPorSimilitud).toHaveBeenCalledWith(
+        'ETNIA',
+        'Desconocido',
+      );
+      expect(result).toBeDefined();
     });
   });
 
