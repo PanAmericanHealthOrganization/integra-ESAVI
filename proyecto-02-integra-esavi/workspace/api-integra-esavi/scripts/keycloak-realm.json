@@ -1,0 +1,99 @@
+{
+  "realm": "integra-esavi",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "roles": {
+    "realm": [
+      { "name": "admin",    "description": "Administrador del sistema" },
+      { "name": "analitic", "description": "Usuario analítico" },
+      { "name": "arcsa",    "description": "Usuario ARCSA" },
+      { "name": "dhis",     "description": "Usuario DHIS2" },
+      { "name": "paho",     "description": "Usuario PAHO" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "integra-esavi-client",
+      "name": "Integra ESAVI Frontend",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:5173",
+        "http://localhost:*",
+        "http://127.0.0.1:*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:*"
+      ],
+      "protocol": "openid-connect",
+      "attributes": {
+        "post.logout.redirect.uris": "+",
+        "pkce.code.challenge.method": "S256"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "admin-user",
+      "email": "admin-user@esavi.gob.ec",
+      "firstName": "Admin",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Admin2025*", "temporary": false }],
+      "realmRoles": ["admin"]
+    },
+    {
+      "username": "analitic-user",
+      "email": "analitic-user@esavi.gob.ec",
+      "firstName": "Analitic",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Analitic2025*", "temporary": false }],
+      "realmRoles": ["analitic"]
+    },
+    {
+      "username": "arcsa-user",
+      "email": "arcsa-user@esavi.gob.ec",
+      "firstName": "Arcsa",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Arcsa2025*", "temporary": false }],
+      "realmRoles": ["arcsa"]
+    },
+    {
+      "username": "dhis2-user",
+      "email": "dhis2-user@esavi.gob.ec",
+      "firstName": "DHIS2",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Dhis2025*", "temporary": false }],
+      "realmRoles": ["dhis"]
+    },
+    {
+      "username": "paho-user",
+      "email": "paho-user@esavi.gob.ec",
+      "firstName": "PAHO",
+      "lastName": "User",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [{ "type": "password", "value": "Paho2025*", "temporary": false }],
+      "realmRoles": ["paho"]
+    }
+  ]
+}

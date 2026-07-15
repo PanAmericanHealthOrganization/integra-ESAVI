@@ -12,8 +12,10 @@ import { SyncService } from 'src/integrator/service/sync.service';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
+import { IWhodrugVaccineMatch } from 'src/whodrugs/models/dtos';
 import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
 import { DrugService } from 'src/whodrugs/services/drugs.service';
+import { IngredientTranslationService } from 'src/whodrugs/services/ingredientsTraslations.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import { read, utils, WorkBook } from 'xlsx';
 import {
@@ -79,6 +81,7 @@ export class VigiflowIntegradorService {
     private readonly drugService: DrugService,
     private readonly maholderService: MaholderService,
     private readonly activeIngredentService: ActiveIngredientsService,
+    private readonly ingredientTranslationService: IngredientTranslationService,
     private readonly syncService: SyncService,
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
@@ -181,8 +184,14 @@ export class VigiflowIntegradorService {
    * Pipeline de extracción común a todos los orígenes (remoto, archivo local, upload).
    */
   private async procesarWorkbooks(reportOne: WorkBook, reportTwo: WorkBook) {
+    // La hoja AEFI se procesa primero y NO contiene el código ATC (vive en la hoja Medicamentos).
+    // Se pre-calcula qué pacientes tienen al menos una vacuna J07 para no crear un dato-vacuna
+    // "mínimo" a pacientes cuyo reporte no incluye ninguna vacuna J07.
+    const codigosPacientesConVacunaJ07 = this.extraerPacientesConVacunaJ07(reportTwo);
+    this.logger.log(`Pacientes con vacuna J07 en hoja Medicamentos: ${codigosPacientesConVacunaJ07.size}`);
+
     this.logger.log('extractedFromExcelToPersist..................');
-    await this.extractedFromExcelToPersist(reportOne);
+    await this.extractedFromExcelToPersist(reportOne, codigosPacientesConVacunaJ07);
     await VigiflowUtils.sleep(8000);
     this.logger.log('extractedFromJsonReportToUpdate..................');
     await this.extractedFromJsonReportToUpdate(reportTwo);
@@ -260,10 +269,29 @@ export class VigiflowIntegradorService {
     };
   }
 
+  /**
+   * Devuelve el conjunto de "Número de identificación único mundial" (columna A de la hoja
+   * Medicamentos) que tienen al menos una fila con código ATC de vacuna J07 (columna G).
+   * Sirve para que la fase AEFI —que se ejecuta antes y no tiene el ATC— sepa a qué pacientes
+   * corresponde crear un dato-vacuna.
+   */
+  private extraerPacientesConVacunaJ07(workbook: WorkBook): Set<string> {
+    const ws = workbook.Sheets[workbook.SheetNames[2]];
+    const filas = utils.sheet_to_json(ws, { header: 'A', defval: '' }) as Record<string, any>[];
+    const codigos = new Set<string>();
+    for (const fila of filas) {
+      const codigo = fila['A'] ? fila['A'].toString().trim() : null;
+      if (!codigo) continue;
+      const atcVacuna = fila['G'] ? VigiflowUtils.extraerCodigoAtcVacuna(fila['G'].toString()) : null;
+      if (atcVacuna) codigos.add(codigo);
+    }
+    return codigos;
+  }
+
   //Extracción de los datos de la hoja [0], del libro
   //de Excel 'VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx'.
   //AEFI: Adverse Events Following Immunization (Eventos Adversos Después de la Vacunación).
-  private async extractedFromExcelToPersist(workBook: WorkBook) {
+  private async extractedFromExcelToPersist(workBook: WorkBook, codigosPacientesConVacunaJ07: Set<string>) {
     //Convert file to json
     const ws = workBook.Sheets[workBook.SheetNames[0]];
     const reports = utils.sheet_to_json(ws, {
@@ -419,7 +447,11 @@ export class VigiflowIntegradorService {
         create.gravedadEsavi = grave;
         create.desenlaceEsavi = desenlaceEsaviDto;
         create.datoVacunacion = datoVacunacionDto;
-        create.datoVacuna = datoVacunaDto;
+        //Solo se crea el dato-vacuna "mínimo" si el paciente tiene una vacuna J07 en la hoja Medicamentos.
+        //Sin J07 el reporte no contiene vacuna, así que no debe generarse ningún dato-vacuna.
+        if (paciente.codigoVigiflow && codigosPacientesConVacunaJ07.has(paciente.codigoVigiflow)) {
+          create.datoVacuna = datoVacunaDto;
+        }
         if (esEmbarazada) {
           create.pacienteEmbarazada = embarazada;
         }
@@ -542,6 +574,10 @@ export class VigiflowIntegradorService {
     await this.medicamentoService.preloadByNotificacionIds(notifIdsMed);
     await this.datoVacunaService.preloadByNotificacionIds(notifIdsMed);
 
+    // Caché por ejecución del lookup WHODrug (ingrediente|laboratorio), incluye resultados negativos.
+    // Varias filas de la hoja suelen repetir la misma vacuna/laboratorio.
+    const whodrugVaccineCache = new Map<string, IWhodrugVaccineMatch | null>();
+
     try {
       // Iterar con for...of, para esperar que cada operación asíncrona termine.
       // "toUpdate" es un arreglo de objetos JSON, cada uno representa una fila de la hoja "Medicamentos".
@@ -571,6 +607,14 @@ export class VigiflowIntegradorService {
         await this.medicamentoService.createOneToOne(notificacionMed, medicamento);
 
         const codigoAtcVacunaTransformado = reg['G'] ? VigiflowUtils.extraerCodigoAtcVacuna(reg['G'].toString()) : null;
+
+        // Un dato-vacuna solo se genera a partir de las filas cuya columna "Código(s) ATC" (col G)
+        // contiene un código de vacuna J07. Las filas de medicamentos no-vacuna ya quedaron
+        // registradas en TR_MEDICAMENTO (arriba) y no deben generar evento de vacunación ni dato-vacuna.
+        if (!codigoAtcVacunaTransformado) {
+          continue;
+        }
+
         for (const notificacion of notificacionList) {
           // Buscar datoVacuna existente. Se filtra por notificación.id y comprobando que sus campos principales sean NULL o vacíos.
           const datoVacunaList = await this.datoVacunaService.findByNotifIdDtoMinimo(notificacion.id);
@@ -584,36 +628,67 @@ export class VigiflowIntegradorService {
 
           //Este fragmento no solo actualiza registros, también crea nuevos registros de datoVacuna
           //cuando es necesario (ver datoVacunaService al final del bloque).
-          if (codigoAtcVacunaTransformado) {
-            const updateDatoVacuna = new UpdateDatoVacunaDto();
-            updateDatoVacuna.accionTomada = reg['M'];
-            updateDatoVacuna.dosis = reg['S'];
-            updateDatoVacuna.intervaloDosificacion = reg['T'];
-            updateDatoVacuna.dosis1 = reg['U'];
-            updateDatoVacuna.duracion = reg['V'];
-            updateDatoVacuna.formaFarmaceutica = reg['Y'];
-            updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
-            updateDatoVacuna.viaAdministracion = reg['AA'];
-            updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
-            //TODO: En caso de necesitar solo una lista fija de paises autorizados, lo más eficiente es
-            //implementar un diccionario con la equivalencia del código ISO3 alfa-3 o catálogo de países autorizados.
-            updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] ? countries.getAlpha3Code(reg['J'].toString().toUpperCase(), idiomaParaPaisIso3Code) : 'ECU';
-            updateDatoVacuna.numeroLote = reg['AE'] && VigiflowUtils.transformarLoteVacuna(reg['AE']);
-            updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
+          const updateDatoVacuna = new UpdateDatoVacunaDto();
+          updateDatoVacuna.accionTomada = reg['M'];
+          updateDatoVacuna.dosis = reg['S'];
+          updateDatoVacuna.intervaloDosificacion = reg['T'];
+          updateDatoVacuna.dosis1 = reg['U'];
+          updateDatoVacuna.duracion = reg['V'];
+          updateDatoVacuna.formaFarmaceutica = reg['Y'];
+          updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
+          updateDatoVacuna.viaAdministracion = reg['AA'];
+          updateDatoVacuna.viaAdministracionEDQM = reg['AB'];
+          //TODO: En caso de necesitar solo una lista fija de paises autorizados, lo más eficiente es
+          //implementar un diccionario con la equivalencia del código ISO3 alfa-3 o catálogo de países autorizados.
+          updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] ? countries.getAlpha3Code(reg['J'].toString().toUpperCase(), idiomaParaPaisIso3Code) : 'ECU';
+          updateDatoVacuna.numeroLote = reg['AE'] && VigiflowUtils.transformarLoteVacuna(reg['AE']);
+          updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
 
-            const nombreVacPatenteWHODrugVigiFlow = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
-            updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;
+          const nombreVacPatenteWHODrugVigiFlow = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
+          updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;
 
-            // Reemplaza comas o saltos de línea por punto y coma.
-            const principioActivoWHODrugVigiFlow = reg['F'] ? VigiflowUtils.limpiarCampoWHODrug(reg['F']) : reg['F'];
-            //Se asigna esta columna porque la mayoría ya viene con la traducción al español.
-            updateDatoVacuna.acIngredientTranslationJson = VigiflowUtils.parseIngredientsWithSemicolonsToJson(principioActivoWHODrugVigiFlow);
-            updateDatoVacuna.codigoAtc = codigoAtcVacunaTransformado;
-            updateDatoVacuna.rolVacuna = reg['C'];
+          // Reemplaza comas o saltos de línea por punto y coma.
+          const principioActivoWHODrugVigiFlow = reg['F'] ? VigiflowUtils.limpiarCampoWHODrug(reg['F']) : reg['F'];
+          //Se asigna esta columna porque la mayoría ya viene con la traducción al español.
+          updateDatoVacuna.acIngredientTranslationJson = VigiflowUtils.parseIngredientsWithSemicolonsToJson(principioActivoWHODrugVigiFlow);
+          updateDatoVacuna.codigoAtc = codigoAtcVacunaTransformado;
+          updateDatoVacuna.rolVacuna = reg['C'];
 
-            const utilizarSoloDiccionarioWhodrugGlobalUmc = this.configService.get<boolean>('VIGIFLOW_USE_WHODRUG_GLOBAL', false);
-            if (utilizarSoloDiccionarioWhodrugGlobalUmc) {
-              //Estandarización utilizando el diccionario oficial de WHODrug Global de Uppsala Monitoring Centre.
+          //ConfigService devuelve strings desde .env: 'false' sería truthy, por eso se compara explícitamente.
+          const whodrugGlobalFlag = this.configService.get('VIGIFLOW_USE_WHODRUG_GLOBAL', false);
+          const utilizarSoloDiccionarioWhodrugGlobalUmc = whodrugGlobalFlag === true || whodrugGlobalFlag === 'true' || whodrugGlobalFlag === '1';
+          if (utilizarSoloDiccionarioWhodrugGlobalUmc) {
+            //Estandarización primaria: buscar 1 solo registro WHODrug por principio activo (col F)
+            //+ laboratorio titular del registro (col I). Si col F trae varios ingredientes separados
+            //por ';', se itera en orden y gana el primer match.
+            const laboratorioTitular = reg['I'] ? reg['I'].toString().trim() : null;
+            let whodrugMatch: IWhodrugVaccineMatch | null = null;
+            if (laboratorioTitular && principioActivoWHODrugVigiFlow) {
+              const ingredientes = principioActivoWHODrugVigiFlow
+                .split(';')
+                .map((ing) => ing.trim())
+                .filter((ing) => ing !== '');
+              for (const ingrediente of ingredientes) {
+                const cacheKey = `${ingrediente}|${laboratorioTitular}`;
+                if (whodrugVaccineCache.has(cacheKey)) {
+                  whodrugMatch = whodrugVaccineCache.get(cacheKey);
+                } else {
+                  whodrugMatch = await this.ingredientTranslationService.findVaccineByIngredientAndMaholder(ingrediente, laboratorioTitular, country);
+                  whodrugVaccineCache.set(cacheKey, whodrugMatch);
+                }
+                if (whodrugMatch) break;
+              }
+            }
+
+            if (whodrugMatch) {
+              updateDatoVacuna.drugCode = whodrugMatch.drugCode;
+              updateDatoVacuna.drugName = whodrugMatch.drugName;
+              updateDatoVacuna.medicinalProductId = whodrugMatch.medicinalProductId;
+              updateDatoVacuna.maHolder = whodrugMatch.maHolder;
+              updateDatoVacuna.maHolderMedicinalProductId = whodrugMatch.maHolderMedicinalProductId;
+            } else {
+              //Fallback: estandarización por nombre de patente (col E), utilizando el diccionario
+              //oficial de WHODrug Global de Uppsala Monitoring Centre.
               const whodrug: any[] = await this.drugService.getDrugsOnly(nombreVacPatenteWHODrugVigiFlow, country);
               if (whodrug.length > 0) {
                 updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
@@ -625,6 +700,15 @@ export class VigiflowIntegradorService {
                   name: item.name,
                   medicinalProductID: item.medicinalProductID, // El MPID principal del medicamento es diferente al valor del MPID del maHolder.
                 }));
+
+                // Poblar también las columnas planas (igual que el lookup primario) tomando el primer titular.
+                // Sin esto, un match por fallback dejaba MA_HOLDER / MEDICINAL_PRODUCT_ID / MA_HOLDER_MEDI_PROD_ID vacíos.
+                const maHolderPrincipal = mah[0];
+                if (maHolderPrincipal) {
+                  updateDatoVacuna.maHolder = maHolderPrincipal.name;
+                  updateDatoVacuna.maHolderMedicinalProductId = maHolderPrincipal.medicinalProductID != null ? String(maHolderPrincipal.medicinalProductID) : null;
+                  updateDatoVacuna.medicinalProductId = maHolderPrincipal.countrySale?.medicinalProductID != null ? String(maHolderPrincipal.countrySale.medicinalProductID) : null;
+                }
 
                 const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
                 updateDatoVacuna.activeIngredientJson = ingredentActive.map((item) => ({
@@ -643,22 +727,22 @@ export class VigiflowIntegradorService {
                 }
               }
             }
+          }
 
-            if (datoVacunaList.length > 0) {
-              //Actualizar el datoVacuna 'mínimo' existente, asociado a la notificación. Se denomina "mínimo"
-              //porque no todas las columnas se encuentran en esta hoja Excel, y fue creado inicialmente con los
-              //datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones
-              //asociadas al paciente.
-              await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
-              // Invalidar caché mínimo para evitar doble-update si el mismo paciente tiene varios ATCs J07
-              this.datoVacunaService.invalidateMinimoEntry(notificacion.id, datoVacunaList[0].id);
-            } else {
-              //Crear un registro completamente nuevo de DatoVacuna asociado a la notificación.
-              //"createByNotificacion" utiliza filtros internos de TypeORM para evitar duplicados.
-              //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
-              //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
-              await this.datoVacunaService.createByNotificacion(notificacion, updateDatoVacuna as CreateDatoVacunaDto);
-            }
+          if (datoVacunaList.length > 0) {
+            //Actualizar el datoVacuna 'mínimo' existente, asociado a la notificación. Se denomina "mínimo"
+            //porque no todas las columnas se encuentran en esta hoja Excel, y fue creado inicialmente con los
+            //datos de la hoja AEFI. La cantidad de registros únicos será igual a la cantidad de notificaciones
+            //asociadas al paciente.
+            await this.datoVacunaService.update(datoVacunaList[0].id, updateDatoVacuna);
+            // Invalidar caché mínimo para evitar doble-update si el mismo paciente tiene varios ATCs J07
+            this.datoVacunaService.invalidateMinimoEntry(notificacion.id, datoVacunaList[0].id);
+          } else {
+            //Crear un registro completamente nuevo de DatoVacuna asociado a la notificación.
+            //"createByNotificacion" utiliza filtros internos de TypeORM para evitar duplicados.
+            //TODO: Evaluar si es necesario implementar una lógica para evitar la creación de registros duplicados en DatoVacuna.
+            //TODO: Solicitar indicaciones al personal funcional, sobre el manejo del número de dosis que normalmente viene de la hoja AEFI en un DTO mínimo.
+            await this.datoVacunaService.createByNotificacion(notificacion, updateDatoVacuna as CreateDatoVacunaDto);
           }
         }
       }

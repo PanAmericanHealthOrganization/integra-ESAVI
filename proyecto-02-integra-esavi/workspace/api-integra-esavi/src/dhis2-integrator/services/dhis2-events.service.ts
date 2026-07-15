@@ -25,6 +25,9 @@ const COLUMNA_ORG_UNIT_CODE = 'Organisation unit code';
 const COLUMNA_ORG_UNIT = 'Organisation unit';
 const COLUMNA_ENROLLMENT_DATE = 'Enrollment date';
 const COLUMNA_INCIDENT_DATE = 'Incident date';
+// Fecha del primer evento (etapa "Notificación"), que es como DHIS2 tracker capture
+// etiqueta genéricamente el campo "Fecha de reporte" del evento.
+const COLUMNA_REPORT_DATE = 'Fecha de reporte';
 
 const TAMANIO_PAGINA_TEI = 50;
 const TAMANIO_LOTE_METADATOS = 100;
@@ -270,6 +273,7 @@ export class Dhis2EventsService {
       this.crearHeader('ou', COLUMNA_ORG_UNIT, 'TEXT'),
       this.crearHeader('enrollmentdate', COLUMNA_ENROLLMENT_DATE, 'DATE'),
       this.crearHeader('incidentdate', COLUMNA_INCIDENT_DATE, 'DATE'),
+      this.crearHeader('reportdate', COLUMNA_REPORT_DATE, 'DATE'),
       ...atributos.map((attr) => this.crearHeader(attr.id, attr.name, attr.valueType ?? 'TEXT')),
       ...dataElements.map((de) => this.crearHeader(de.id, de.name, de.valueType ?? 'TEXT')),
     ];
@@ -310,6 +314,12 @@ export class Dhis2EventsService {
       const eventos = [...(enrollment.events ?? [])].sort((a, b) =>
         (a.eventDate ?? '').localeCompare(b.eventDate ?? ''),
       );
+
+      // "Fecha de reporte": fecha del primer evento del enrollment (etapa "Notificación").
+      if (eventos.length > 0) {
+        setValor(COLUMNA_REPORT_DATE, Dhis2ExtraccionUtils.normalizarFecha(eventos[0].eventDate));
+      }
+
       for (const evento of eventos) {
         for (const dataValue of evento.dataValues ?? []) {
           const metadato = mapaDataElements.get(dataValue.dataElement);

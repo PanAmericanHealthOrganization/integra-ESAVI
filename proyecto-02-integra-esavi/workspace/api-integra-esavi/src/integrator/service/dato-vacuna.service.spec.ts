@@ -22,8 +22,11 @@ const mockCatalogoPadreService = {
   buscarSubcategoriaPorSimilitud: jest.fn(),
 };
 
-const makeDatoVacunacion = (id = 'n1'): DatoVacunacion =>
-  ({ id, notificacion: { id } as Notificacion } as DatoVacunacion);
+const makeNotif = (id = 'n1'): Notificacion => ({ id } as Notificacion);
+
+// En el flujo VigiFlow el caché se precarga por notificacion.id y create() busca por
+// datoVacunacion.id, por eso en las pruebas ambos comparten el mismo identificador.
+const makeDatoVacunacion = (id = 'n1'): DatoVacunacion => ({ id } as DatoVacunacion);
 
 const makeDvMinimo = (id: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   id,
@@ -31,13 +34,13 @@ const makeDvMinimo = (id: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   rolVacuna: null,
   numeroLote: null,
   indicacionMeddra: null,
-  datoVacunacion: makeDatoVacunacion(notifId),
+  datoVacunacion: { id: notifId, notificacion: { id: notifId } } as DatoVacunacion,
 });
 
 const makeDvCompleto = (id: string, codigoAtc: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   id,
   codigoAtc,
-  datoVacunacion: makeDatoVacunacion(notifId),
+  datoVacunacion: { id: notifId, notificacion: { id: notifId } } as DatoVacunacion,
 });
 
 describe('DatoVacunaService', () => {
@@ -79,9 +82,9 @@ describe('DatoVacunaService', () => {
       expect(mockRepo.find).toHaveBeenCalledTimes(1);
     });
 
-    it('ignora registros sin notificacion.id', async () => {
+    it('ignora registros sin datoVacunacion/notificacion', async () => {
       mockRepo.find.mockResolvedValue([
-        { id: 'dv1', codigoAtc: null, rolVacuna: null, numeroLote: null, indicacionMeddra: null, notificacion: null },
+        { id: 'dv1', codigoAtc: null, rolVacuna: null, numeroLote: null, indicacionMeddra: null, datoVacunacion: null },
       ]);
 
       await expect(service.preloadByNotificacionIds(['n1'])).resolves.not.toThrow();
@@ -247,6 +250,7 @@ describe('DatoVacunaService', () => {
 
       await service.create(makeDatoVacunacion('n1'), { codigoAtc: 'J07ZZ99' } as any);
 
+      expect(mockRepo.findOne).not.toHaveBeenCalled();
       expect(mockRepo.save).toHaveBeenCalledTimes(1);
     });
 
@@ -273,6 +277,41 @@ describe('DatoVacunaService', () => {
       await service.create(makeDatoVacunacion('n1'), {} as any);
 
       expect(mockRepo.findOne).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  // ─── createByNotificacion ────────────────────────────────────────────────
+
+  describe('createByNotificacion', () => {
+    it('reutiliza el DatoVacunacion existente de la notificación', async () => {
+      const datoVacunacion = makeDatoVacunacion('dvz1');
+      mockDatoVacunacionRepo.findOne.mockResolvedValue(datoVacunacion);
+      mockRepo.findOne.mockResolvedValue(null);
+      mockRepo.save.mockResolvedValue(makeDvCompleto('dv-new', 'J07AA01', 'dvz1') as DatoVacuna);
+
+      await service.createByNotificacion(makeNotif('n1'), { codigoAtc: 'J07AA01' } as any);
+
+      expect(mockDatoVacunacionRepo.findOne).toHaveBeenCalledWith({
+        where: { notificacion: { id: 'n1' } },
+      });
+      expect(mockDatoVacunacionRepo.save).not.toHaveBeenCalled();
+      expect(mockRepo.save).toHaveBeenCalledTimes(1);
+    });
+
+    it('crea el DatoVacunacion intermedio cuando la notificación no tiene uno', async () => {
+      const notificacion = makeNotif('n1');
+      const nuevoDatoVacunacion = makeDatoVacunacion('dvz-new');
+      mockDatoVacunacionRepo.findOne.mockResolvedValue(null);
+      mockDatoVacunacionRepo.create.mockReturnValue(nuevoDatoVacunacion);
+      mockDatoVacunacionRepo.save.mockResolvedValue(nuevoDatoVacunacion);
+      mockRepo.findOne.mockResolvedValue(null);
+      mockRepo.save.mockResolvedValue(makeDvCompleto('dv-new', 'J07AA01', 'dvz-new') as DatoVacuna);
+
+      await service.createByNotificacion(notificacion, { codigoAtc: 'J07AA01' } as any);
+
+      expect(mockDatoVacunacionRepo.create).toHaveBeenCalledWith({ notificacion });
+      expect(mockDatoVacunacionRepo.save).toHaveBeenCalledTimes(1);
+      expect(mockRepo.save).toHaveBeenCalledTimes(1);
     });
   });
 

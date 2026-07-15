@@ -106,22 +106,29 @@ export class WhoDrugsSyncService {
    */
   @Cron(CronExpression.EVERY_DAY_AT_1AM, { name: 'askExistNewVersion' })
   async existNewVersion(): Promise<boolean> {
-    this.logger.log(
-      `Consultando si existe una nueva versión de whodrugs ${formatDate(
-        new Date(),
-        'yyyy-MM-dd HH:mm:ss',
-      )}`,
-    );
-    const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
-    const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
+    try {
+      this.logger.log(
+        `Consultando si existe una nueva versión de whodrugs ${formatDate(
+          new Date(),
+          'yyyy-MM-dd HH:mm:ss',
+        )}`,
+      );
+      const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
+      const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
 
-    if (await this.getDrugSyncBySHA(sha256)) {
+      if (await this.getDrugSyncBySHA(sha256)) {
+        this.logger.log('No hay nuevas actualizaciones');
+        return false;
+      }
       // TODO: IMPLEMENTAR UN ENVIADOR DE MAIL.
-      this.logger.log('Existe una nueva versión de whodrugs ${}');
+      this.logger.log('Existe una nueva versión de whodrugs');
       return true;
+    } catch (e) {
+      // El cron no debe terminar en una excepción no manejada (p. ej. si el
+      // parámetro WHD_UMC_* aún no está registrado en TC_PARAMETRO).
+      this.logger.error(`Error al consultar nueva versión de whodrugs: ${e.message}`);
+      return false;
     }
-    this.logger.log('No hay nuevas actualizaciones');
-    return false;
   }
 
   /**

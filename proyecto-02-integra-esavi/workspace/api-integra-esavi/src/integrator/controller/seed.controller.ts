@@ -1,4 +1,4 @@
-import { Controller, Delete, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { Controller, Delete, ForbiddenException, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SeedService } from '../service/seed.service';
 
@@ -38,6 +38,33 @@ export class SeedController {
     const { insertados } = await this.seedService.seedVacunometro(+registros, +dias);
     return {
       message: `${insertados} registros simulados de vacunómetro insertados exitosamente`,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  @Post('simulacion-vacunacion')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Simular vacunaciones diarias de todos los establecimientos (TR_VACUNOMETRO)',
+    description:
+      'Genera registros agregados por día, establecimiento, vacuna y grupo etario (1-7), con el mismo formato que entrega la entidad de vacunación (HCUE). Disponible solo en ambientes distintos de producción (variable de entorno ENV).',
+  })
+  @ApiQuery({ name: 'dias', required: false, description: 'Cantidad de días hacia atrás desde hoy a simular (default 7, máximo 365)' })
+  @ApiResponse({ status: 200, description: 'Simulación de vacunaciones generada exitosamente' })
+  @ApiResponse({ status: 403, description: 'No disponible en ambiente de producción' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  async seedSimulacionVacunacion(@Query('dias') dias = 7) {
+    const env = String(process.env.ENV ?? '').toUpperCase();
+    if (env.startsWith('PROD')) {
+      throw new ForbiddenException('La simulación de vacunaciones no está disponible en el ambiente de producción');
+    }
+    const { insertados, establecimientos, dias: diasSimulados } =
+      await this.seedService.seedSimulacionVacunacionDiaria(+dias);
+    return {
+      message: `Simulación de vacunaciones generada: ${insertados} registros para ${establecimientos} establecimientos en ${diasSimulados} días`,
+      insertados,
+      establecimientos,
+      dias: diasSimulados,
       timestamp: new Date().toISOString(),
     };
   }

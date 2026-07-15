@@ -47,6 +47,56 @@ export class DatoVacuna extends Auditoria {
    *
    */
   @Column({
+    name: 'DRUG_CODE',
+    nullable: true,
+    comment: 'Código WHODrug de la vacuna (DRUG.DRU_CODE)',
+  })
+  drugCode: string;// utilizado por vf.
+
+  /**
+   *
+   */
+  @Column({
+    name: 'DRUG_NAME',
+    nullable: true,
+    comment: 'Nombre WHODrug de la vacuna (DRUG.DRU_NAME)',
+  })
+  drugName: string;// utilizado por vf.
+
+  /**
+   *
+   */
+  @Column({
+    name: 'MEDICINAL_PRODUCT_ID',
+    nullable: true,
+    comment: 'Identificador del producto medicinal en el país de venta (COUNTRY_SALES.COS_MEDICINAL_PRODUCT_ID)',
+  })
+  medicinalProductId: string;// utilizado por vf.
+
+  /**
+   *
+   */
+  @Column({
+    name: 'MA_HOLDER',
+    nullable: true,
+    comment: 'Titular del registro sanitario. MAH (Marketing Authorization Holder), tomado de WHODrug (MAHOLDER.NAME)',
+  })
+  maHolder: string;// utilizado por vf.
+
+  /**
+   *
+   */
+  @Column({
+    name: 'MA_HOLDER_MEDI_PROD_ID',
+    nullable: true,
+    comment: 'Identificador del producto medicinal asociado al titular del registro (MAHOLDER.MEDICINAL_PRODUCT_ID)',
+  })
+  maHolderMedicinalProductId: string;// utilizado por vf.
+
+  /**
+   *
+   */
+  @Column({
     name: 'NUMERO_DOSIS_VACUNA',
     nullable: true,
     comment: 'Número de dosis de la vacuna administrada',

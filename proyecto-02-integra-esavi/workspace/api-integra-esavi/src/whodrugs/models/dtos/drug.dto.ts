@@ -56,3 +56,15 @@ export interface IATC {
   text: string;
   officialFlag: string;
 }
+
+/**
+ * Resultado de la búsqueda de una vacuna en WHODrug por principio activo
+ * (INGREDIENT_TRANSLATION.INT_INGREDIENT) + laboratorio titular (MAHOLDER.NAME).
+ */
+export interface IWhodrugVaccineMatch {
+  drugCode: string;
+  drugName: string;
+  medicinalProductId: string;
+  maHolder: string;
+  maHolderMedicinalProductId: string;
+}

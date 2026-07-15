@@ -27,6 +27,7 @@ integra-esavi-calidad
 # Tests
 /coverage
 /.nyc_output
+/reports
 
 # IDEs and editors
 /.idea
@@ -56,3 +57,4 @@ pnpm-lock.yaml
 pnpm-workspace.yaml
 
 integra-esavi.code-workspace/reports
+logs/

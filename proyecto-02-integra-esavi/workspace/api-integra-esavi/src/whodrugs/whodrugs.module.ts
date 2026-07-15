@@ -47,7 +47,7 @@ export const WHODRUGS_DS = 'WHO_DRUG';
         database: configService.get('WHD_DB_NAME'),
         schema: 'WHO_DRUG',
         entities: ['dist/**/models/*.entity{.ts,.js}'],
-        synchronize: configService.get<string>('ENV') !== 'DEV' ? true : false,
+        synchronize: configService.get<string>('ENV') === 'DEV',
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
@@ -59,22 +59,18 @@ export const WHODRUGS_DS = 'WHO_DRUG';
       [DrugSync, Drug, ActiveIngredient, IngredientTranslation, AnatomicalTherapeuticChemical, CountryOfSale, Maholder],
       WHODRUGS_DS,
     ),
-    HttpModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        timeout: 120000,
-        maxRedirects: 5,
-        baseURL: configService.get('WHD_API_URL'),
-        // se agrega infinity por el crecimiento del archivo
-        maxContentLength: Infinity,
-        withCredentials: true,
-        // 'umc-license-key'/'umc-client-key' ya no se fijan aquí: dependen de TC_PARAMETRO
-        // (vía ParametroService), que aún no tiene datos sembrados en el momento en que
-        // Nest construye este cliente HTTP (el seed corre en onApplicationBootstrap,
-        // después de instanciar todos los providers). Se agregan por request en
-        // WhoDrugsClientService, que sí puede esperar (await) al ParametroService.
-      }),
-      inject: [ConfigService],
+    HttpModule.register({
+      timeout: 120000,
+      maxRedirects: 5,
+      // se agrega infinity por el crecimiento del archivo
+      maxContentLength: Infinity,
+      withCredentials: true,
+      // baseURL (WHD_API_URL) y 'umc-license-key'/'umc-client-key' no se fijan aquí:
+      // dependen de TC_PARAMETRO (vía ParametroService), que aún no tiene datos
+      // sembrados en el momento en que Nest construye este cliente HTTP (el seed
+      // corre en onApplicationBootstrap, después de instanciar todos los providers).
+      // Se agregan por request en WhoDrugsClientService, que sí puede esperar
+      // (await) al ParametroService.
     }),
   ],
   providers: [
@@ -89,6 +85,6 @@ export const WHODRUGS_DS = 'WHO_DRUG';
     WhoDrugsAsAnyService,
   ],
   controllers: [WhodrugsController, WhodrugsSyncController, MaholderController, ActiveIngredientController],
-  exports: [ActiveIngredientsService, MaholderService, DrugService],
+  exports: [ActiveIngredientsService, MaholderService, DrugService, IngredientTranslationService],
 })
 export class WhodrugsModule {}

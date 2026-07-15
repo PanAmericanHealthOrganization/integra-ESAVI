@@ -102,6 +102,13 @@ export class SeedService implements OnApplicationBootstrap {
       const parametrosDev = [
         {
           modulo: 'DHIS2',
+          clave: 'DHIS2_URL',
+          valor: 'https://dev-ops-gss.msp.gob.ec',
+          descripcion: 'URL base del servidor DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
+          es_encriptado: false,
+        },
+        {
+          modulo: 'DHIS2',
           clave: 'DHIS2_USER_KEY',
           valor: 'CAMBIAR_DHIS2_USER_KEY',
           descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
@@ -134,6 +141,13 @@ export class SeedService implements OnApplicationBootstrap {
           valor: 'CAMBIAR_VIGIFLOW_PASSWD',
           descripcion: 'Contraseña de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
           es_encriptado: true,
+        },
+        {
+          modulo: 'WHODRUG',
+          clave: 'WHD_API_URL',
+          valor: 'https://api.who-umc.org/',
+          descripcion: 'URL base de la API de WHODrug (UMC)',
+          es_encriptado: false,
         },
         {
           modulo: 'WHODRUG',
@@ -1032,6 +1046,108 @@ export class SeedService implements OnApplicationBootstrap {
     });
 
     return { insertados };
+  }
+
+  /**
+   * Simula la carga diaria de vacunación tal como la entrega la entidad de vacunación (HCUE):
+   * registros agregados por día, establecimiento, vacuna y grupo etario, con totales por sexo
+   * (mismo formato que produce VacunacionNominalService.procesarVacunasAgregadas).
+   * Genera datos para TODOS los establecimientos existentes, un lote por cada día del rango.
+   * @param dias cantidad de días hacia atrás desde hoy a simular (1 a 365)
+   */
+  async seedSimulacionVacunacionDiaria(dias = 7): Promise<{ insertados: number; establecimientos: number; dias: number }> {
+    // Nombres en mayúsculas, igual que UPPER(NOMBRE_VACUNA) en la consulta a la entidad de vacunación
+    const VACUNAS = [
+      'BCG',
+      'HEPATITIS B PEDIÁTRICA',
+      'ROTAVIRUS',
+      'FIPV',
+      'BOPV',
+      'PENTAVALENTE (DPT-HB-HIB)',
+      'NEUMOCOCO CONJUGADA',
+      'SRP (SARAMPIÓN-RUBÉOLA-PAROTIDITIS)',
+      'FIEBRE AMARILLA',
+      'VARICELA',
+      'DPT REFUERZO',
+      'HPV',
+      'DT ADULTO',
+      'INFLUENZA ESTACIONAL',
+      'COVID-19',
+    ];
+    // Grupos etarios 1 a 7, igual que el CASE de grupo_etario del origen HCUE
+    const GRUPOS_ETARIOS = [1, 2, 3, 4, 5, 6, 7];
+
+    const aleatorio = (max: number) => Math.floor(Math.random() * max);
+    const diasRango = Math.min(Math.max(Math.trunc(dias) || 7, 1), 365);
+
+    let insertados = 0;
+    let totalEstablecimientos = 0;
+
+    await this.runSyncProcess(
+      `Simulación de vacunación diaria (${diasRango} días) para todos los establecimientos...`,
+      async () => {
+        const establecimientos = await this.establecimientoRepository.find({
+          select: { uniCodigo: true },
+        });
+        if (establecimientos.length === 0) {
+          throw new Error(
+            'No existen establecimientos registrados: cargue TR_ESTABLECIMIENTO antes de simular vacunaciones',
+          );
+        }
+        totalEstablecimientos = establecimientos.length;
+
+        const auditoriaDto: IAuditoria = {
+          createdAt: new Date(),
+          createdBy: 'System',
+          updatedAt: undefined,
+          updatedBy: '',
+          deletedAt: undefined,
+          deletedBy: '',
+          isEnabled: true,
+          isActive: true,
+        };
+
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        const CHUNK_SIZE = 1000;
+        for (let d = diasRango - 1; d >= 0; d--) {
+          const fechaAplicacion = new Date(hoy.getTime() - d * 24 * 60 * 60 * 1000);
+          const lote: Partial<Vacunometro>[] = [];
+
+          for (const { uniCodigo } of establecimientos) {
+            // Cada establecimiento reporta entre 1 y 3 vacunas distintas por día
+            const cantidadVacunas = 1 + aleatorio(3);
+            const inicio = aleatorio(VACUNAS.length);
+            for (let v = 0; v < cantidadVacunas; v++) {
+              const totalHombres = aleatorio(120);
+              const totalMujeres = aleatorio(120);
+              lote.push({
+                unicodigo: uniCodigo,
+                nombreVacuna: VACUNAS[(inicio + v) % VACUNAS.length],
+                grupoEtario: GRUPOS_ETARIOS[aleatorio(GRUPOS_ETARIOS.length)],
+                fechaAplicacion,
+                totalHombres,
+                totalMujeres,
+                total: totalHombres + totalMujeres,
+                ...auditoriaDto,
+              });
+            }
+          }
+
+          for (let i = 0; i < lote.length; i += CHUNK_SIZE) {
+            const chunk = lote.slice(i, i + CHUNK_SIZE);
+            await this.vacunometroRepository.insert(chunk);
+            insertados += chunk.length;
+          }
+          console.log(
+            `✅ TR_VACUNOMETRO: día ${fechaAplicacion.toISOString().slice(0, 10)} simulado para ${totalEstablecimientos} establecimientos (${insertados} registros acumulados).`,
+          );
+        }
+      },
+    );
+
+    return { insertados, establecimientos: totalEstablecimientos, dias: diasRango };
   }
 
   async truncateNotificacion() {

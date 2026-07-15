@@ -25,13 +25,15 @@ export class MaholderService {
   }
 
   public async getMaholderOfDrug(drugId: string, coutri: string)
-  :Promise<Maholder[]> 
+  :Promise<Maholder[]>
   {
+    // Se incluye countrySale.medicinalProductID (COS_MEDICINAL_PRODUCT_ID) para que los
+    // consumidores puedan obtener también el MPID del país de venta, no solo el del titular.
     const r = await this.maholder.find({
-      select: { id: true, name: true, medicinalProductID: true },
+      select: { id: true, name: true, medicinalProductID: true, countrySale: { id: true, medicinalProductID: true } },
       where: { countrySale: { drug: { id: drugId }, iso3Code: coutri } },
+      relations: { countrySale: true },
     });
-    console.log(r);
     return r;
   }
 }

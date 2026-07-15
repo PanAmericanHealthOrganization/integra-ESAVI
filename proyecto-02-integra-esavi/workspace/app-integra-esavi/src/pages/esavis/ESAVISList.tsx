@@ -65,10 +65,13 @@ const ocultarInformacion = (texto: string) => {
 
 const formatFecha = (valor?: string | null) => {
   if (!valor) return "—"
+  // Estas fechas se guardan como "solo fecha" a medianoche UTC (ver formatoFecha en el
+  // backend); forzar timeZone: "UTC" evita que se corran un día en husos negativos (ej. Ecuador).
   return new Date(valor).toLocaleDateString("es-ES", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
+    timeZone: "UTC",
   })
 }
 

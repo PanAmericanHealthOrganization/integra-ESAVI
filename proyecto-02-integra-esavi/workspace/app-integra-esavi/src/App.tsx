@@ -67,6 +67,7 @@ const App = () => {
 
   return (
     <Admin
+      requireAuth
       dataProvider={dataProvider}
       authProvider={keycloakAuthProvider(keycloak, {
         initOptions: { onLoad: 'login-required', checkLoginIframe: false },

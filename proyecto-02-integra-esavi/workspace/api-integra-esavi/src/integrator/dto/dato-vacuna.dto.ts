@@ -8,6 +8,8 @@ export class CreateDatoVacunaDto {
   drugName: string;
   drugCode: string;
   maHolderJsonb: any;
+  maHolder: string;
+  maHolderMedicinalProductId: string;
   activeIngredientJson: any;
   acIngredientTranslationJson: any;
   medicinalProductId: string;
