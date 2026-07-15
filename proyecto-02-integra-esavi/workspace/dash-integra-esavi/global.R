@@ -126,6 +126,9 @@ f_unidad_tasa <- function(var_unidad_tasa) {
 # Variable para ordenar el gupo etario
 
 orden_personalizado <- c("<18 años", "18-24 años", "25-49 años", "50-59 años", "60-69 años", "70-79 años", ">80 años", "Sin info")
+# Bucketing etario del vacunómetro (HCUE), usado en la pirámide poblacional para
+# que notificaciones y dosis se comparen con los mismos rangos (grupo_etario_hcue).
+orden_hcue <- c("0-1 años", "2-4 años", "5-9 años", "10-14 años", "15-19 años", "20-64 años", "65+ años", "Sin info")
 orden_personalizado_menores <- c("[0-1) años", "[1-5) años", "[5-10) años", "[10-15) años", "[15-18) años", "Sin info", "No aplica")
 orden_personalizado_días <- c(
   "0 días", "1 día", "2 días", "3 días", "4 días", "5 días", "6 días", "7 días", "8-15 días", "16-30 días",

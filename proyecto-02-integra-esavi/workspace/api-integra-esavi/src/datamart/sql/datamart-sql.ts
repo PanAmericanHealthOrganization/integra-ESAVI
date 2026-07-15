@@ -291,6 +291,13 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
             WHEN edad < 50 THEN '25-49 años' WHEN edad < 60 THEN '50-59 años'
             WHEN edad < 70 THEN '60-69 años' WHEN edad < 80 THEN '70-79 años'
             WHEN edad < 125 THEN '>80 años'  ELSE 'Sin info' END AS grupo_etario,
+       -- grupo etario con el bucketing del vacunómetro (HCUE), para comparar
+       -- notificaciones vs dosis en la pirámide poblacional (mismos rangos).
+       CASE WHEN edad IS NULL OR edad < 0 THEN 'Sin info'
+            WHEN edad < 2  THEN '0-1 años'   WHEN edad < 5  THEN '2-4 años'
+            WHEN edad < 10 THEN '5-9 años'   WHEN edad < 15 THEN '10-14 años'
+            WHEN edad < 20 THEN '15-19 años' WHEN edad < 65 THEN '20-64 años'
+            ELSE '65+ años' END AS grupo_etario_hcue,
        -- grupo etario menores
        CASE WHEN edad IS NULL THEN 'Sin info'
             WHEN edad < 0 THEN 'Sin info'
@@ -341,6 +348,12 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
                  WHEN sexo = 'Mujer'  THEN 'Femenino'
                  ELSE 'No epecificado' END AS sexo,
             grupo_etario,
+            -- etiqueta del bucketing HCUE (códigos 1-7 → rangos), para la pirámide
+            CASE CAST(grupo_etario AS VARCHAR)
+                 WHEN '1' THEN '0-1 años'   WHEN '2' THEN '2-4 años'
+                 WHEN '3' THEN '5-9 años'   WHEN '4' THEN '10-14 años'
+                 WHEN '5' THEN '15-19 años' WHEN '6' THEN '20-64 años'
+                 WHEN '7' THEN '65+ años'   ELSE 'Sin info' END AS grupo_etario_hcue,
             "NumDosis",
             CAST(extract(year FROM fecha_sem_epi) AS INT) AS "añoNoti",
             mes_es(CAST(extract(month FROM fecha_sem_epi) AS INT)) AS "mesNoti",
@@ -358,7 +371,7 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
      )
      SELECT DISTINCT
        u.report_id, r.caseid, r.fechanot, r."añoNoti", r."mesNoti", r."periodoNoti", r."semEpiNoti",
-       r.edad, r.grupo_etario, r.grupo_etario_menores, r.sexo, r.geo_pais, r.pais_iso, r.geonoti,
+       r.edad, r.grupo_etario, r.grupo_etario_menores, r.grupo_etario_hcue, r.sexo, r.geo_pais, r.pais_iso, r.geonoti,
        r.desenesv, r.marca_grave, r.marca_menores, r.marca_embarazo, r.marca_muerte,
        r.fvacunac, r.fecinesavi, r.dias_vac_ini_cat, r.dias_vac_ini,
        u.id_event_smq, ev.event_id, ev.pt, ev.hlt, ev.hlgt, ev.soc, ev.smq,

@@ -1315,10 +1315,12 @@
           if (is.null(datos_filtrados()$datos)) {return(NULL)
         }
           
+        # Pirámide: notificaciones y dosis se comparan con el MISMO bucketing
+        # etario (HCUE), vía la columna grupo_etario_hcue presente en ambas tablas.
         paso <- procesarDatosGraficos(datos_dosis = datos_filtrados$dosis,
                                       datos_noti  = datos_filtrados$datos,
-                                      agrup_dosis = c("sexo","grupo_etario"),
-                                      agrup_noti  = c("sexo","grupo_etario"),
+                                      agrup_dosis = c("sexo","grupo_etario_hcue"),
+                                      agrup_noti  = c("sexo","grupo_etario_hcue"),
                                       agrup_es_fecha = FALSE,
                                       formato_fecha  = NULL,
                                       calcular_dosis = TRUE,
@@ -3213,9 +3215,9 @@
         
       # unir
       paso <- merge(paso_h, paso_m, by = "grupo_etario", all = TRUE)
-      
-      # Ordenar
-      paso$grupo_etario <- factor(paso$grupo_etario, levels = orden_personalizado)
+
+      # Ordenar (bucketing HCUE del vacunómetro, no el de notificaciones)
+      paso$grupo_etario <- factor(paso$grupo_etario, levels = orden_hcue)
       paso <- paso[order(paso$grupo_etario, decreasing = TRUE), ]
       
       # Graficar
