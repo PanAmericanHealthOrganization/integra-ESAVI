@@ -10,7 +10,6 @@ import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoPadreService} from './catalogo-padre.service';
-import {CatalogoService} from './catalogo.service';
 import {NotificadorService} from './notificador.service';
 
 @Injectable()
@@ -24,7 +23,6 @@ export class NotificacionDhis2Service {
     private readonly parroquiaRepository: Repository<Parroquia>,
     @InjectRepository(Establecimiento, 'POSTGRES_INTEGRATOR_DS')
     private readonly establecimientoRepository: Repository<Establecimiento>,
-    private readonly catalogoService: CatalogoService,
     private readonly notificadorService: NotificadorService,
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}

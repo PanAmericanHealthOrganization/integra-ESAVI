@@ -11,7 +11,6 @@ import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoPadreService} from './catalogo-padre.service';
-import {CatalogoService} from './catalogo.service';
 
 @Injectable()
 export class NotificacionVigiflowService {
@@ -24,7 +23,6 @@ export class NotificacionVigiflowService {
     private readonly notificacionRepository: Repository<Notificacion>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
-    private readonly catalogoService: CatalogoService,
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
@@ -359,7 +357,6 @@ export class NotificacionVigiflowService {
   }
 
   async preloadBulk(): Promise<void> {
-    await this.catalogoService.preloadVigiflowMap();
     await this.catalogoPadreService.preloadSubcategoriasMap();
     this.establecimientosCache = await this.notificacionRepository.manager.query(
       `SELECT "ID" as id, "UNI_NOMBRE" as nombre FROM "DHI_ESAVI"."TR_ESTABLECIMIENTO" WHERE "AUD_HABILITADO" = true`,
@@ -373,18 +370,9 @@ export class NotificacionVigiflowService {
     );
   }
 
-  async preloadCatalogoVigiflow(): Promise<void> {
-    await this.catalogoService.preloadVigiflowMap();
-  }
-
   clearBulkCache(): void {
-    this.catalogoService.clearVigiflowCache();
     this.catalogoPadreService.clearSubcategoriasCache();
     this.establecimientosCache = null;
-  }
-
-  clearCatalogoVigiflow(): void {
-    this.catalogoService.clearVigiflowCache();
   }
 
   clearEstablecimientosCache(): void {

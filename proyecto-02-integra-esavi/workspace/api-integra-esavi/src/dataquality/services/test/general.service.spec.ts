@@ -5,8 +5,8 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DataQualityDimensions } from '../../entities/dataQualityDimensions.entity';
-import { DimCompletitudService } from '../dim-completitud.service';
-import { DimConsistenciaService } from '../dim-consitencia.service';
+import { DimCompletitudService } from '../dim-completitud';
+import { DimConsistenciaService } from '../dim-consitencia';
 import { DimExactitudService } from '../dim-exactitud.service';
 import { GeneralService } from '../general.service';
 // Load env vars manually to ensure they are available for ConfigModule if needed synchronously or for debugging

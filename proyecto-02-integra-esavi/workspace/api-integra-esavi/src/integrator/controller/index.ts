@@ -2,7 +2,6 @@ export * from './antecedente-embarazo.controller';
 export * from './antecedente-evento.controller';
 export * from './antecedente-medico.controller';
 export * from './antecedente-preexistencia.controller';
-export * from './catalogo.controller';
 export * from './dato-esavi.controller';
 export * from './desenlace-esavi.controller';
 export * from './gaceta.controller';

@@ -5,7 +5,6 @@ export * from './antecedente-preexistencia.entity';
 export * from './auditoria.entity';
 export * from './canton.entity';
 export * from './catalogo-padre.entity';
-export * from './catalogo.entity';
 export * from './parroquia.entity';
 export * from './provincia.entity';
 export * from './causalidad-esavi.entity';
@@ -23,7 +22,6 @@ export * from './paciente-embarazada.entity';
 export * from './paciente.entity';
 export * from './parametro.entity';
 export * from './sync.entity';
-export * from './tipo-catalogo.entity';
 export * from './vacunacion.entity';
 export * from './vacunometro.entity';
 

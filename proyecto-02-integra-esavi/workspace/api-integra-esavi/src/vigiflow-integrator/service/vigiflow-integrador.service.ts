@@ -279,8 +279,7 @@ export class VigiflowIntegradorService {
     const pacienteMap = await this.pacienteService.findByCodigosOrigen(codigos);
     const notificacionMap = await this.notificacionVigiflowService.findAllByCodigosOrigen(codigos);
 
-    // Precarga en bloque: catálogo y datoVacunas para evitar N+1 dentro del loop
-    await this.notificacionVigiflowService.preloadCatalogoVigiflow();
+    // Precarga en bloque: datoVacunas para evitar N+1 dentro del loop
     const notifIds = [...notificacionMap.values()].flat().map(n => n.id);
     await this.datoVacunaService.preloadByNotificacionIds(notifIds);
 
@@ -434,7 +433,6 @@ export class VigiflowIntegradorService {
         );
       }
     } finally {
-      this.notificacionVigiflowService.clearCatalogoVigiflow();
       this.datoVacunaService.clearDatoVacunaCache();
     }
   }
@@ -539,11 +537,10 @@ export class VigiflowIntegradorService {
     // Precargar notificaciones en bulk para evitar N queries individuales
     const notificacionMapMed = await this.notificacionVigiflowService.findAllByCodigosOrigen([...patientMap.keys()]);
 
-    // Precarga en bloque: medicamentos, datoVacunas y catálogo para evitar N+1 dentro del loop
+    // Precarga en bloque: medicamentos y datoVacunas para evitar N+1 dentro del loop
     const notifIdsMed = [...notificacionMapMed.values()].flat().map(n => n.id);
     await this.medicamentoService.preloadByNotificacionIds(notifIdsMed);
     await this.datoVacunaService.preloadByNotificacionIds(notifIdsMed);
-    await this.notificacionVigiflowService.preloadCatalogoVigiflow();
 
     try {
       // Iterar con for...of, para esperar que cada operación asíncrona termine.
@@ -668,7 +665,6 @@ export class VigiflowIntegradorService {
     } finally {
       this.medicamentoService.clearMedicamentosCache();
       this.datoVacunaService.clearDatoVacunaCache();
-      this.notificacionVigiflowService.clearCatalogoVigiflow();
     }
   }
 

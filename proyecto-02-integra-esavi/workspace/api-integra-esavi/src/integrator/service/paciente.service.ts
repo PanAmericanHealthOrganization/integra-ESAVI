@@ -2,11 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { In, QueryFailedError, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
+import { ResolutorService } from 'src/homologator/service/resolutor.service';
 import { CreatePacienteDhis2Dto, CreatePacienteVigiflowDto, UpdatePacienteDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
-import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
+import { CatalogoPadre } from '../entity/catalogo-padre.entity';
 
 const ETNIA_CODIGO_PADRE = 'ETNIA';
 const GENERO_CODIGO_PADRE = 'GENERO';
@@ -15,6 +16,20 @@ const GENERO_CODIGO_PADRE = 'GENERO';
 const SINONIMOS_SEXO: Record<string, string> = { MASCULINO: 'HOMBRE', FEMENINO: 'MUJER' };
 const normalizarSexo = (valor: string): string => SINONIMOS_SEXO[valor?.trim().toUpperCase()] ?? valor;
 
+// DHIS2 entrega la etnia en inglés y VigiFlow con variantes que no matchean por similitud
+// contra TC_CATALOGO_PADRE (ej. "Afroecuatoriano" vs "Afrodescendiente"), así que se homologan
+// los alias semánticos antes de buscar por similitud. Las variantes "/A" las resuelve
+// CatalogoPadreService.normalizar() cortando en el primer '/'.
+const SINONIMOS_ETNIA: Record<string, string> = {
+  AFROECUATORIANO: 'AFRODESCENDIENTE',
+  'AFRO-ECUADORIAN': 'AFRODESCENDIENTE',
+  INDIGENOUS: 'INDIGENA',
+};
+const normalizarEtnia = (valor: string): string => {
+  const clave = valor?.trim().toUpperCase().split('/')[0];
+  return SINONIMOS_ETNIA[clave] ?? valor;
+};
+
 @Injectable()
 export class PacienteService {
   private readonly logger = new Logger(PacienteService.name);
@@ -22,28 +37,57 @@ export class PacienteService {
   constructor(
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacientRepository: Repository<Paciente>,
-    private readonly catalogoService: CatalogoService,
     private readonly catalogoPadreService: CatalogoPadreService,
+    private readonly resolutorService: ResolutorService,
   ) {}
 
   /**
-   * Homologa el valor crudo de autoidentificación étnica (VigiFlow/DHIS2) al
-   * término estandarizado vía TC_CATALOGO y resuelve el registro correspondiente
-   * en TC_CATALOGO_PADRE (hijo de ETNIA) por similitud de nombre.
+   * Resuelve el valor crudo de autoidentificación étnica (VigiFlow/DHIS2) al
+   * registro correspondiente en TC_CATALOGO_PADRE (hijo de ETNIA) por similitud de nombre.
    */
-  private async resolveAutoIdentificacionEtnica(
-    raw: string,
-    homologar: (valor: string) => Promise<{ homologada: string }>,
-  ) {
-    const homologado = await homologar(raw);
+  private async resolveAutoIdentificacionEtnica(raw: string) {
     const etnia = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
       ETNIA_CODIGO_PADRE,
-      homologado.homologada,
+      normalizarEtnia(raw),
     );
     if (!etnia) {
-      this.logger.warn(`Autoidentificación étnica "${raw}" (homologada: "${homologado.homologada}") sin coincidencia en TC_CATALOGO_PADRE/ETNIA`);
+      this.logger.warn(`Autoidentificación étnica "${raw}" sin coincidencia en TC_CATALOGO_PADRE/ETNIA`);
     }
     return etnia;
+  }
+
+  /**
+   * Resuelve el sexo crudo (VigiFlow/DHIS2) usando primero TR_HOMOLOGADOR/TR_HOMOLOGACION_REGLA
+   * (entity="Paciente", field="sexo"), donde TARGET_VALUE guarda el id del registro correspondiente
+   * en TC_CATALOGO_PADRE. Si no hay regla configurada para ese sourceSystem (o el id referenciado
+   * ya no existe), cae al match por similitud de nombre contra TC_CATALOGO_PADRE/GENERO.
+   */
+  private async resolveSexo(sourceSystem: string, raw: string): Promise<CatalogoPadre | null> {
+    if (!raw?.trim()) return null;
+
+    const resultado = await this.resolutorService.resolver({
+      entity: 'Paciente',
+      field: 'sexo',
+      sourceSystem,
+      sourceValue: raw,
+    });
+
+    if (resultado.coincidio && resultado.valorDestino) {
+      const catalogo = await this.catalogoPadreService.findOne(resultado.valorDestino).catch(() => null);
+      if (catalogo) return catalogo;
+      this.logger.warn(
+        `Regla de homologación Paciente.sexo (${sourceSystem}) apunta a un TC_CATALOGO_PADRE inexistente: "${resultado.valorDestino}"`,
+      );
+    }
+
+    const sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
+      GENERO_CODIGO_PADRE,
+      normalizarSexo(raw),
+    );
+    if (!sexo) {
+      this.logger.warn(`Sexo "${raw}" (${sourceSystem}) sin coincidencia en homologación ni en TC_CATALOGO_PADRE/GENERO`);
+    }
+    return sexo;
   }
 
   async findByCodigosOrigen(codigos: string[]): Promise<Map<string, Paciente>> {
@@ -72,6 +116,26 @@ export class PacienteService {
           changed = true;
         }
       }
+      // El paciente pudo haberse creado sin sexo/etnia resueltos (p. ej. antes de que
+      // TC_CATALOGO_PADRE/GENERO tuviera los valores cargados, o porque la primera
+      // notificación no traía el dato). Se reintenta la homologación en cada sync
+      // mientras el campo siga vacío, para no dejarlo huérfano indefinidamente.
+      if (!existing.sexo && createDto.sexoPaciente) {
+        const sexo = await this.resolveSexo('VIGIFLOW', createDto.sexoPaciente);
+        if (sexo) {
+          existing.sexo = sexo;
+          changed = true;
+        }
+      }
+      if (!existing.autoIdentificacion && createDto.autoIdentificacionPaciente) {
+        const autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
+          createDto.autoIdentificacionPaciente,
+        );
+        if (autoIdentificacion) {
+          existing.autoIdentificacion = autoIdentificacion;
+          changed = true;
+        }
+      }
       if (changed) {
         return await this.pacientRepository.save(existing);
       }
@@ -80,15 +144,11 @@ export class PacienteService {
 
     const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
     if (createDto.sexoPaciente) {
-      paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
-        GENERO_CODIGO_PADRE,
-        normalizarSexo(createDto.sexoPaciente),
-      );
+      paciente.sexo = await this.resolveSexo('VIGIFLOW', createDto.sexoPaciente);
     }
     if (createDto.autoIdentificacionPaciente) {
       paciente.autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
         createDto.autoIdentificacionPaciente,
-        (v) => this.catalogoService.findByDescriptionToVigiflow(v),
       );
     }
     paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -119,16 +179,11 @@ export class PacienteService {
 
       const paciente = plainToClass(Paciente, { ...createDto, codigoOrigen: codigo }) as Paciente;
       if (createDto.sexoPaciente) {
-        paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
-          GENERO_CODIGO_PADRE,
-          normalizarSexo(createDto.sexoPaciente),
-        );
+        paciente.sexo = await this.resolveSexo('DHIS2', createDto.sexoPaciente);
       }
       if (createDto.autoIdentificacionPaciente) {
-        const autoId = createDto.autoIdentificacionPaciente.toUpperCase().replace('Í', 'I');
         paciente.autoIdentificacion = await this.resolveAutoIdentificacionEtnica(
-          autoId,
-          (v) => this.catalogoService.findByDescriptionToDhis2(v),
+          createDto.autoIdentificacionPaciente,
         );
       }
       paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -162,10 +217,7 @@ export class PacienteService {
   async update(uuid: string, updatePersonaDto: UpdatePacienteDto): Promise<Paciente> {
     const paciente = await this.findOne(uuid);
     if (updatePersonaDto.sexoPaciente) {
-      paciente.sexo = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
-        GENERO_CODIGO_PADRE,
-        normalizarSexo(updatePersonaDto.sexoPaciente),
-      );
+      paciente.sexo = await this.resolveSexo('DHIS2', updatePersonaDto.sexoPaciente);
     }
     this.pacientRepository.merge(paciente, updatePersonaDto);
     return this.pacientRepository.save(paciente);

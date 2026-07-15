@@ -7,7 +7,6 @@ import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.serv
 import { AntecedenteEventoService } from '../service/antecedente-evento.service';
 import { AntecedenteMedicoService } from '../service/antecedente-medico.service';
 import { AntecedentePreexistenciaService } from '../service/antecedente-preexistencia.service';
-import { CatalogoService } from '../service/catalogo.service';
 import { CausalidadEsaviService } from '../service/causalidad-esavi.service';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
@@ -42,7 +41,6 @@ export class IntegradorService {
     private readonly pacienteEmbarazadaService: PacienteEmbarazadaServive,
     private readonly datoVacunacionService: DatoVacunacionService,
     private readonly datoEsaviService: DatoEsaviService,
-    private readonly catalogoService: CatalogoService,
     private readonly investigacionService: InvestigacionService,
   ) {}
 

@@ -3,7 +3,6 @@ export * from './antecedente-evento.service';
 export * from './antecedente-medico.service';
 export * from './antecedente-preexistencia.service';
 export * from './catalogo-padre.service';
-export * from './catalogo.service';
 export * from './causalidad-esavi.service';
 export * from './dato-esavi.service';
 export * from './dato-vacuna.service';

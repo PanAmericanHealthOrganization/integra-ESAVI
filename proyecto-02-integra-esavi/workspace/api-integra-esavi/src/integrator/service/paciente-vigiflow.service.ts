@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UpdatePacienteDto, CreatePacienteVigiflowDto } from '../dto';
 import { Paciente } from '../entity/paciente.entity';
 import { plainToClass } from 'class-transformer';
-import { CatalogoService } from './catalogo.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 
 const ETNIA_CODIGO_PADRE = 'ETNIA';
@@ -14,6 +13,20 @@ const GENERO_CODIGO_PADRE = 'GENERO';
 const SINONIMOS_SEXO: Record<string, string> = { MASCULINO: 'HOMBRE', FEMENINO: 'MUJER' };
 const normalizarSexo = (valor: string): string => SINONIMOS_SEXO[valor?.trim().toUpperCase()] ?? valor;
 
+// DHIS2 entrega la etnia en inglés y VigiFlow con variantes que no matchean por similitud
+// contra TC_CATALOGO_PADRE (ej. "Afroecuatoriano" vs "Afrodescendiente"), así que se homologan
+// los alias semánticos antes de buscar por similitud. Las variantes "/A" las resuelve
+// CatalogoPadreService.normalizar() cortando en el primer '/'.
+const SINONIMOS_ETNIA: Record<string, string> = {
+  AFROECUATORIANO: 'AFRODESCENDIENTE',
+  'AFRO-ECUADORIAN': 'AFRODESCENDIENTE',
+  INDIGENOUS: 'INDIGENA',
+};
+const normalizarEtnia = (valor: string): string => {
+  const clave = valor?.trim().toUpperCase().split('/')[0];
+  return SINONIMOS_ETNIA[clave] ?? valor;
+};
+
 @Injectable()
 export class PacienteVigiflowService {
   private readonly logger = new Logger(PacienteVigiflowService.name);
@@ -21,7 +34,6 @@ export class PacienteVigiflowService {
   constructor(
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
     private readonly pacienteRepository: Repository<Paciente>,
-    private readonly catalogoService: CatalogoService,
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
@@ -43,12 +55,9 @@ export class PacienteVigiflowService {
           );
         }
         if (createDto.autoIdentificacionPaciente) {
-          const homologado = await this.catalogoService.findByDescriptionToVigiflow(
-            createDto.autoIdentificacionPaciente,
-          );
           paciente.autoIdentificacion = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
             ETNIA_CODIGO_PADRE,
-            homologado.homologada,
+            normalizarEtnia(createDto.autoIdentificacionPaciente),
           );
         }
         paciente.createdBy = process.env.USUARIO_INSERTA_REGISTRO;
@@ -106,13 +115,10 @@ export class PacienteVigiflowService {
       GENERO_CODIGO_PADRE,
       normalizarSexo(updatePersonaDto.sexoPaciente),
     );
-    const homologado = await this.catalogoService.findByDescriptionToVigiflow(
-      updatePersonaDto.autoIdentificacionPaciente,
-    );
     paciente.sexo = sexo;
     paciente.autoIdentificacion = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(
       ETNIA_CODIGO_PADRE,
-      homologado.homologada,
+      normalizarEtnia(updatePersonaDto.autoIdentificacionPaciente),
     );
     this.pacienteRepository.merge(paciente, updatePersonaDto);
     return this.pacienteRepository.save(paciente);

@@ -207,11 +207,7 @@ const TabNotificacion = () => {
 
 const esFemenino = (sexo: any): boolean => {
   if (!sexo) return false
-  const coincide = (s?: string) => {
-    const u = s?.toUpperCase() ?? ""
-    return u.includes("FEM") || u === "F"
-  }
-  return coincide(sexo.homologada) || coincide(sexo.vigiflow) || coincide(sexo.dhis2)
+  return sexo.codigo === "MUJER"
 }
 
 const TabPaciente = () => {
@@ -268,10 +264,7 @@ const TabPaciente = () => {
             <FieldRow label="Fecha de Nacimiento" value={formatDate(paciente.fechaNacimiento)} />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
-            <FieldRow
-              label="Sexo"
-              value={paciente.sexo?.vigiflow ?? paciente.sexo?.dhis2 ?? paciente.sexo?.homologada}
-            />
+            <FieldRow label="Sexo" value={paciente.sexo?.nombre} />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow

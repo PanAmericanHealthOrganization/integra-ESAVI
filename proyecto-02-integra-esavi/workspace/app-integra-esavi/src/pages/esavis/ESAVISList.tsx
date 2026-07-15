@@ -124,8 +124,7 @@ export const ESAVISList = () => {
                 "—"
               const identificacion = ocultarInformacion(p.identificacion)
               const fechaNac = formatFecha(p.fechaNacimiento)
-              const sexo =
-                p.sexo?.vigiflow ?? p.sexo?.dhis2 ?? p.sexo?.homologada ?? "—"
+              const sexo = p.sexo?.nombre ?? "—"
 
               return (
                 <Box sx={{ lineHeight: 1.6 }}>

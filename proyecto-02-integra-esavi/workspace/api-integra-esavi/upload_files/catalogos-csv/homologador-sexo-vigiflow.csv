@@ -1,5 +1,0 @@
-sourceSystem,sourceField,sourceValue,targetValue,comparisonType,caseSensitive,priority
-VIGIFLOW,sexo,,0,EQUALS,false,0
-VIGIFLOW,sexo,Femenino,1,EQUALS,false,1
-VIGIFLOW,sexo,Masculino,2,EQUALS,false,2
-VIGIFLOW,sexo,.*,3,REGEX,false,99

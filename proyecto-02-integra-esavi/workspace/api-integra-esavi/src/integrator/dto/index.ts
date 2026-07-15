@@ -5,7 +5,6 @@ export { CreateProvinciaDto, UpdateProvinciaDto } from './provincia.dto';
 export { CreateAntecedentePreexistenciaDto, UpdateAntecedentePreexistenciaDto } from './antecedente-preexistencia.dto';
 export { CreateAntecedenteMedicoDto, UpdateAntecedenteMedicoDto } from './antecedente-medico.dto';
 export { CreateAntecedenteEventoDto, UpdateAntecedenteEventoDto } from './antecedente-evento.dto';
-export { CreateCatalogoDto, UpdateCatalogoDto } from './catalogo.dto';
 export { CreateCatalogoPadreDto, UpdateCatalogoPadreDto } from './catalogo-padre.dto';
 export { CreateDatoEsaviDto, UpdateDatoEsaviDto } from './dato-esavi.dto';
 export { CreateDatoVacunacionDto, UpdateDatoVacunacionDto } from './dato-vacunacion.dto';
