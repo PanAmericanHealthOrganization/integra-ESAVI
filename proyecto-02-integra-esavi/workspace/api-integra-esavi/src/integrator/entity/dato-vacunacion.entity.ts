@@ -46,6 +46,17 @@ export class DatoVacunacion extends Auditoria {
   horaVacunacion: Date;
 
   /**
+   *
+   */
+  @Column({
+    name: 'DIAS_TRANSCURRIDOS_SINTOMAS',
+    type: 'int',
+    nullable: true,
+    comment: 'Número de días transcurridos entre la fecha de vacunación y el inicio de síntomas (dato calculado y provisto por DHIS2)',
+  })
+  diasTranscurridosSintomas: number;
+
+  /**
    * Establecimiento donde se administró la vacuna (referenciado por unicodigo).
    * Cuando el vacunatorio no está en el catálogo de establecimientos, usar otraDireccion.
    */

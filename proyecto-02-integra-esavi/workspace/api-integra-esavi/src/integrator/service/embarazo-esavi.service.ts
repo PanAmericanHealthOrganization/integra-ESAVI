@@ -21,6 +21,21 @@ export class EmbarazoEsaviService {
     createDto: CreateEmbarazoEsaviDto,
   ): Promise<EmbarazoEsavi> {
     try {
+      // Upsert por notificación: seguro de reprocesar tanto en la creación inicial
+      // como al reimportar un registro DHIS2 ya existente.
+      const existente = await this.embarazoEsaviRepository.findOne({
+        where: { notificacion: { id: notificacion.id } },
+      });
+
+      if (existente) {
+        Object.keys(createDto).forEach((key) => {
+          if (createDto[key] !== undefined && createDto[key] !== null) {
+            existente[key] = createDto[key];
+          }
+        });
+        return this.embarazoEsaviRepository.save(existente);
+      }
+
       const embarazoEsavi = plainToClass(EmbarazoEsavi, createDto);
       embarazoEsavi.notificacion = notificacion;
       embarazoEsavi.createdAt = new Date();
@@ -30,7 +45,7 @@ export class EmbarazoEsaviService {
       throw e;
     } finally {
       this.logger.log(
-        `EmbarazoEsavi has been created: ${JSON.stringify(createDto)}`,
+        `EmbarazoEsavi ha sido procesado: ${JSON.stringify(createDto)}`,
       );
     }
   }

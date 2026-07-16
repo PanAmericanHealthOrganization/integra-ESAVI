@@ -40,21 +40,20 @@ export class MedicamentoService {
 
   async createOneToMany(notificacion: Notificacion, createDto: CreateMedicamentoDto[]): Promise<Medicamento[]> {
     try {
-      const medicinaList = [];
-      createDto.forEach((item) => {
-        const medicamento = plainToClass(Medicamento, item);
-        medicamento.notificacion = notificacion;
-        medicinaList.push(this.medicamentoRepository.create(medicamento));
-      });
+      // Antes esto solo construía instancias en memoria (repository.create) sin
+      // llamar a save(): nada quedaba persistido. Reutiliza createOneToOne, que ya
+      // hace upsert por notificacion+codigoATC, así es seguro reprocesar en un
+      // reimport.
+      const medicinaList: Medicamento[] = [];
+      for (const item of createDto) {
+        medicinaList.push(await this.createOneToOne(notificacion, item));
+      }
       return medicinaList;
     } catch (e) {
-      console.log('*******************************************************');
-      console.log(e);
-      console.log('*******************************************************');
       this.logger.error(e);
       throw e;
     } finally {
-      this.logger.log(`Medicamento has been created(createOneToMany)`);//: ${JSON.stringify(createDto)}`);
+      this.logger.log(`Medicamento ha sido procesado (createOneToMany)`);
     }
   }
 

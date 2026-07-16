@@ -176,16 +176,24 @@ export class DatoVacunaService {
         }
 
         if (existingDatoVacuna) {
+          const { rolVacuna, ...otherFields } = dto;
+          if (rolVacuna) {
+            existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
+          }
           if (dto.codigoAtc) {
-            const { rolVacuna, ...otherFields } = dto;
-            if (rolVacuna) {
-              existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
-            }
+            // Origen VigiFlow (identificado por codigoAtc): se pisan todos los campos tal cual.
             Object.assign(existingDatoVacuna, otherFields);
           } else {
-            if (dto.numeroDosisVacuna != null) {
-              existingDatoVacuna.numeroDosisVacuna = dto.numeroDosisVacuna;
-            }
+            // Origen DHIS2 (sin codigoAtc): antes solo se refrescaba numeroDosisVacuna
+            // y el resto de campos (fabricante, lote, vía de administración, etc.)
+            // quedaban congelados con el valor de la primera importación en
+            // cualquier reimport posterior. Se actualiza cada campo presente en el
+            // DTO, sin pisar con null/undefined lo que ya hay guardado.
+            Object.keys(otherFields).forEach((key) => {
+              if (otherFields[key] !== undefined && otherFields[key] !== null) {
+                existingDatoVacuna[key] = otherFields[key];
+              }
+            });
           }
           await this.datoVacunaRepository.save(existingDatoVacuna);
           datoVacunaArray.push(existingDatoVacuna);

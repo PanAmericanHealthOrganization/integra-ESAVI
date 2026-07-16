@@ -21,6 +21,21 @@ export class AntecedenteMedicoService {
     createDto: CreateAntecedenteMedicoDto,
   ): Promise<AntecedenteMedico> {
     try {
+      // Upsert por notificación: seguro de reprocesar tanto en la creación inicial
+      // como al reimportar un registro DHIS2 ya existente.
+      const existente = await this.antecedenteMedicoRepository.findOne({
+        where: { notificacion: { id: notificacion.id } },
+      });
+
+      if (existente) {
+        Object.keys(createDto).forEach((key) => {
+          if (createDto[key] !== undefined && createDto[key] !== null) {
+            existente[key] = createDto[key];
+          }
+        });
+        return this.antecedenteMedicoRepository.save(existente);
+      }
+
       const antecedenteMedico = plainToClass(AntecedenteMedico, createDto);
       antecedenteMedico.notificacion = notificacion;
       antecedenteMedico.createdBy = 'AUTOMATICO';
@@ -28,7 +43,7 @@ export class AntecedenteMedicoService {
     } catch (e) {
       throw e;
     } finally {
-      this.logger.log(`AntecedenteMedico has been created: ${JSON.stringify(createDto)}`);
+      this.logger.log(`AntecedenteMedico ha sido procesado: ${JSON.stringify(createDto)}`);
     }
   }
 

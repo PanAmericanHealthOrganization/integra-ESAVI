@@ -14,10 +14,14 @@ import { CreateCompleteDto } from '../../integrator/dto';
 export class Dhis2DuplicateHandlerService {
   private readonly logger = new Logger(Dhis2DuplicateHandlerService.name);
   private readonly pendingDuplicates: Map<string, DuplicateRecordDto> = new Map();
+  // Guarda el CreateCompleteDto real (no el snapshot serializado de DuplicateRecordDto)
+  // para que /duplicates/confirm pueda aplicar la actualización sin que el cliente
+  // tenga que reconstruirlo a mano.
+  private readonly pendingRecords: Map<string, CreateCompleteDto> = new Map();
   private readonly duplicateConfigurations: Map<string, DuplicateAction> = new Map();
   private readonly globalConfiguration: DuplicateHandlingConfigDto = {
-    accionPorDefecto: DuplicateAction.ASK_CONFIRMATION,
-    confirmarAntesDeProcesar: true,
+    accionPorDefecto: DuplicateAction.UPDATE_INDIVIDUAL,
+    confirmarAntesDeProcesar: false,
     logDetallado: true
   };
 
@@ -108,7 +112,7 @@ export class Dhis2DuplicateHandlerService {
           return await this.updateAllDuplicates(duplicateRecord, newRecord, loteId);
 
         case DuplicateAction.ASK_CONFIRMATION:
-          return await this.askConfirmation(duplicateRecord, loteId);
+          return await this.askConfirmation(duplicateRecord, newRecord, loteId);
 
         default:
           return await this.skipDuplicate(duplicateRecord, loteId);
@@ -238,10 +242,14 @@ export class Dhis2DuplicateHandlerService {
    */
   private async askConfirmation(
     duplicateRecord: DuplicateRecordDto,
+    newRecord: CreateCompleteDto,
     loteId: string
   ): Promise<DuplicateHandlingResultDto> {
-    // Almacenar el duplicado pendiente para confirmación
+    // Almacenar el duplicado pendiente para confirmación, junto con el DTO real
+    // (no solo el snapshot serializado) para poder aplicarlo luego sin que el
+    // cliente tenga que reconstruirlo.
     this.pendingDuplicates.set(duplicateRecord.codigoDhis2Evento, duplicateRecord);
+    this.pendingRecords.set(duplicateRecord.codigoDhis2Evento, newRecord);
 
     this.processingLogService.logDuplicateDetected(
       loteId,
@@ -261,15 +269,20 @@ export class Dhis2DuplicateHandlerService {
   }
 
   /**
-   * Procesa la confirmación de un duplicado
+   * Procesa la confirmación de un duplicado. `newRecord` es opcional: si no se
+   * provee (caso normal desde el endpoint HTTP), se recupera el CreateCompleteDto
+   * real que quedó guardado al detectar el duplicado (ver askConfirmation), en vez
+   * de exigirle al cliente que lo reconstruya.
    */
   async processConfirmation(
     confirmation: DuplicateConfirmationDto,
-    newRecord: CreateCompleteDto,
+    newRecord: CreateCompleteDto | null,
     loteId: string
   ): Promise<DuplicateHandlingResultDto> {
     const duplicateRecord = this.pendingDuplicates.get(confirmation.codigoDhis2Evento);
-    if (!duplicateRecord) {
+    const record = newRecord ?? this.pendingRecords.get(confirmation.codigoDhis2Evento);
+
+    if (!duplicateRecord || !record) {
       return {
         codigoDhis2Evento: confirmation.codigoDhis2Evento,
         accionTomada: DuplicateAction.SKIP,
@@ -281,7 +294,7 @@ export class Dhis2DuplicateHandlerService {
     // Aplicar la acción seleccionada
     const result = await this.handleDuplicate(
       duplicateRecord,
-      newRecord,
+      record,
       loteId,
       { accionPorDefecto: confirmation.accion }
     );
@@ -293,6 +306,7 @@ export class Dhis2DuplicateHandlerService {
 
     // Remover de pendientes
     this.pendingDuplicates.delete(confirmation.codigoDhis2Evento);
+    this.pendingRecords.delete(confirmation.codigoDhis2Evento);
 
     return result;
   }
@@ -336,6 +350,7 @@ export class Dhis2DuplicateHandlerService {
       const duplicateTime = new Date(duplicate.fechaNotificacion).getTime();
       if (duplicateTime < cutoffTime) {
         this.pendingDuplicates.delete(codigo);
+        this.pendingRecords.delete(codigo);
         this.logger.warn(`Duplicado pendiente expirado removido: ${codigo}`);
       }
     }

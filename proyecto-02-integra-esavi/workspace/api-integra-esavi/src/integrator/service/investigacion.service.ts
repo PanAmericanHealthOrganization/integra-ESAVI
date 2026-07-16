@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BasesCRUD, Identificator, IGetManyParams } from 'src/utils/IController';
 //import { InvestigacionDto } from '../dto/investigacion.dto';
@@ -188,34 +188,23 @@ export class InvestigacionService
       notificacion: notificacion,
     });*/
     /**
-     * En teoría, no es necesario volver a validar registros duplicados antes de
-     * persistir, puesto que la relación es de UNO-A-UNO, y además al momento
-     * de la extracción general de datos, ya se filtra utilizando el 'codigoDhis2Evento'.
-     * Sin embargo, en ambiente de desarrollo, se va a implemetar la validación previa
-     * antes de utilizar el método "save" del repositorio.
-     * Para esto, se utilizará el propio repositorio de 'Investigacion'. Si se encuentra un 
-     * registro asociado a la notificación, se lanzará una excepción
-     * indicando que ya existe un registro de investigación para esa notificación. Si es nuevo se registra,
-     * si ya existe se intenta actualizar (esto ya lo hace de forma automática el método 'save').
-    */
+     * Relación UNO-A-UNO con Notificacion: upsert por notificacion.id. Antes esto
+     * lanzaba BadRequestException si ya existía un registro, lo cual rompía el
+     * reimport de un registro DHIS2 ya existente (la investigación nueva nunca se
+     * aplicaba y el error abortaba el resto del procesamiento).
+     */
+    const existingInvestigacion = await this.investigacionRepository.findOne({
+      where: { notificacion: { id: notificacion.id } }, // Esta notificación es de tipo ENTIDAD no es DTO, por lo que se puede usar directamente para la consulta
+    });
 
-   //------------inicio opcional----------------
-   try {
-      const existingInvestigacion = await this.investigacionRepository.findOne({
-        where: { notificacion: { id: notificacion.id } }, // Esta notificación es de tipo ENTIDAD no es DTO, por lo que se puede usar directamente para la consulta
+    if (existingInvestigacion) {
+      Object.keys(investigacionCreateDto).forEach((key) => {
+        if (investigacionCreateDto[key] !== undefined && investigacionCreateDto[key] !== null) {
+          existingInvestigacion[key] = investigacionCreateDto[key];
+        }
       });
-
-      if (existingInvestigacion) {
-        // Si ya existe una investigación asociada a la notificación, se lanza una excepción
-        throw new BadRequestException(
-          `Ya existe un registro de investigación asociado a la notificación con ID ${notificacion.id}.`,
-        );
-      }
-    } catch (error) {
-      this.logger.error(`Error al verificar existencia de investigación: ${error.message}`);
-      throw new BadRequestException('Hubo un problema al verificar la existencia de la investigación');
+      return this.investigacionRepository.save(withAuditOnUpdate(existingInvestigacion));
     }
-    //---fin opcional----------------
 
     const investigacion = this.investigacionRepository.create({
       ...investigacionCreateDto,

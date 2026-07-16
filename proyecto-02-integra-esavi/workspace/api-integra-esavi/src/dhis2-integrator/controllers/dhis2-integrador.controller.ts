@@ -51,7 +51,7 @@ export class Dhis2IntegradorController {
     };
   }
 
-  @Get('/bulk-with-duplicate-handling')
+  @Post('/bulk-with-duplicate-handling')
   @ApiOperation({ summary: 'Importación masiva con manejo de duplicados' })
   async createInBulkWithDuplicateHandling(
     @Query() aefiQuery: AefiQuery,
@@ -107,11 +107,12 @@ export class Dhis2IntegradorController {
   @ApiOperation({ summary: 'Confirmar acción para duplicado' })
   async confirmDuplicateAction(@Body() confirmation: DuplicateConfirmationDto) {
     try {
-      // En un escenario real, necesitarías reconstruir el CreateCompleteDto
-      // Por simplicidad, aquí se asume que ya está disponible
+      // El CreateCompleteDto real se recupera internamente a partir del duplicado
+      // pendiente (ver Dhis2DuplicateHandlerService.processConfirmation); no hace
+      // falta que el cliente lo reconstruya.
       const result = await this.duplicateHandlerService.processConfirmation(
         confirmation,
-        null, // En implementación real, esto debería ser el DTO completo
+        null,
         'MANUAL_CONFIRMATION',
       );
       return {
