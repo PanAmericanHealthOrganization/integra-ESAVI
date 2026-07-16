@@ -1,6 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined"
@@ -18,7 +17,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Divider,
   IconButton,
@@ -32,7 +30,7 @@ import {
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import { useMemo, useState } from "react"
-import { Title, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
+import { Title, useGetList, useNotify, useUpdate } from "react-admin"
 
 enum TipoDato {
   STRING = "STRING",
@@ -116,13 +114,11 @@ export const ParametrosList = () => {
   const notify = useNotify()
   const theme = useTheme()
   const [update, { isPending: updating }] = useUpdate()
-  const [deleteOne, { isPending: deleting }] = useDelete()
 
   const [revealedValues, setRevealedValues] = useState<Set<string>>(new Set())
 
   const [dialog, setDialog] = useState<{ open: boolean; id?: string }>({ open: false })
   const [form, setForm] = useState({ ...DEFAULT_FORM })
-  const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; id: string; label: string } | null>(null)
 
   const { data, isLoading, refetch } = useGetList<ParametroRecord>("parametros", {
     pagination: { page: 1, perPage: 1000 },
@@ -195,18 +191,6 @@ export const ParametrosList = () => {
       refetch()
     } catch {
       notify("Error al guardar el parámetro", { type: "error" })
-    }
-  }
-
-  const confirmDelete = async () => {
-    if (!deleteConfirm) return
-    try {
-      await deleteOne("parametros", { id: deleteConfirm.id }, { returnPromise: true })
-      notify("Parámetro eliminado", { type: "success" })
-      setDeleteConfirm(null)
-      refetch()
-    } catch {
-      notify("Error al eliminar el parámetro", { type: "error" })
     }
   }
 
@@ -343,15 +327,6 @@ export const ParametrosList = () => {
                               <Tooltip title="Editar">
                                 <IconButton size="small" onClick={() => openEdit(row)} sx={{ p: 0.5 }}>
                                   <EditOutlinedIcon sx={{ fontSize: 14 }} />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Eliminar">
-                                <IconButton
-                                  size="small"
-                                  color="error"
-                                  onClick={() => setDeleteConfirm({ open: true, id: row.id, label: row.clave })}
-                                  sx={{ p: 0.5 }}>
-                                  <DeleteOutlineIcon sx={{ fontSize: 14 }} />
                                 </IconButton>
                               </Tooltip>
                             </Stack>
@@ -503,26 +478,6 @@ export const ParametrosList = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      {/* Delete Confirm Dialog */}
-      {deleteConfirm && (
-        <Dialog open={deleteConfirm.open} onClose={() => setDeleteConfirm(null)} maxWidth="xs" fullWidth PaperProps={{ sx: { borderRadius: 2 } }}>
-          <DialogTitle>Confirmar eliminación</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              ¿Eliminar el parámetro <strong>{deleteConfirm.label}</strong>? Esta acción no se puede deshacer.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions sx={{ px: 3, pb: 2.5 }}>
-            <Button onClick={() => setDeleteConfirm(null)} disabled={deleting}>
-              Cancelar
-            </Button>
-            <Button color="error" variant="contained" onClick={confirmDelete} disabled={deleting} sx={{ borderRadius: 5, boxShadow: "none" }}>
-              {deleting ? <CircularProgress size={18} /> : "Eliminar"}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      )}
     </Box>
   )
 }
