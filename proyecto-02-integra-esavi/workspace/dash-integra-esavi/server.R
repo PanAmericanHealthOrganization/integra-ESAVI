@@ -6017,6 +6017,10 @@
     # 6.55 Gráfico de timeline ----
         
       output$timeline_ui <- renderUI({
+        if (nrow(timeline_data) == 0) {
+          return(tags$p("No hay eventos de línea de tiempo disponibles."))
+        }
+
         # Asegurar que las fechas sean Date
         timeline_data$fecha <- as.Date(timeline_data$fecha, format = "%d/%m/%Y")
       
