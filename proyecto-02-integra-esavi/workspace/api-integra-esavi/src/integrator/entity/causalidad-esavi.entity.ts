@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { Auditoria } from './auditoria.entity';
 import { DatoEsavi } from './dato-esavi.entity';
 import { DatoVacuna } from './dato-vacuna.entity';
+import { Notificacion } from './notificacion.entity';
 
 @Entity({ schema: 'DHI_ESAVI', name: 'TR_CAUSALIDAD_ESAVI', comment: 'Tabla de causalidad del ESAVI' })
 export class CausalidadEsavi extends Auditoria {
@@ -10,6 +11,15 @@ export class CausalidadEsavi extends Auditoria {
    */
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
+
+  /**
+   * Relación agregada para poder ubicar/actualizar la causalidad de una
+   * notificación en reimportaciones (antes no existía ningún FK hacia
+   * Notificacion, por lo que cada import creaba una fila húerfana nueva).
+   */
+  @ManyToOne(() => Notificacion, { nullable: true })
+  @JoinColumn({ name: 'NOTIFICACION_ID' })
+  notificacion: Notificacion;
 
   @ManyToOne(() => DatoEsavi)
   @JoinColumn({ name: 'DATOSESAVI_ID' })

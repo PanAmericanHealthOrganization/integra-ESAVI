@@ -269,24 +269,6 @@ export class NotificacionDhis2Service {
       .getMany();
   }
 
-  /**
-   * Actualiza una notificación por código DHIS2
-   */
-  async updateByCodigoDhis2Evento(codigoDhis2Evento: string, updateData: any) {
-    const notificacionExistente = await this.findByCodeDhis2(codigoDhis2Evento);
-
-    if (!notificacionExistente) {
-      throw new Error(`Notificación con código DHIS2 ${codigoDhis2Evento} no encontrada`);
-    }
-
-    // Actualizar los campos de la notificación
-    if (updateData.notificacion) {
-      Object.assign(notificacionExistente, updateData.notificacion);
-    }
-
-    return this.notificacionRepository.save(notificacionExistente);
-  }
-
   async update(notificacionExistente: Notificacion, createDto: CreateNotificacionDto, pacienteUUID: Paciente) {
     // Si la notificación existe, la actualizamos con los nuevos datos
     console.log('Notificación ya existe, actualizando...');

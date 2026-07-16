@@ -21,6 +21,21 @@ export class AntecedenteEventoService {
     createDto: CreateAntecedenteEventoDto,
   ): Promise<AntecedenteEvento> {
     try {
+      // Upsert por notificación: es seguro reprocesar este método tanto en la
+      // creación inicial como al reimportar un registro DHIS2 ya existente.
+      const existente = await this.antecedenteEventoRepository.findOne({
+        where: { notificacion: { id: notificacion.id } },
+      });
+
+      if (existente) {
+        Object.keys(createDto).forEach((key) => {
+          if (createDto[key] !== undefined && createDto[key] !== null) {
+            existente[key] = createDto[key];
+          }
+        });
+        return this.antecedenteEventoRepository.save(existente);
+      }
+
       const antecedenteEvento = plainToClass(AntecedenteEvento, createDto);
       antecedenteEvento.notificacion = notificacion;
       antecedenteEvento.createdBy = 'AUTOMATICO';
@@ -29,7 +44,7 @@ export class AntecedenteEventoService {
       throw e;
     } finally {
       this.logger.log(
-        `Antecedente Evento Adverso ha sido creado: ${JSON.stringify(createDto)}`,
+        `Antecedente Evento Adverso ha sido procesado: ${JSON.stringify(createDto)}`,
       );
     }
   }

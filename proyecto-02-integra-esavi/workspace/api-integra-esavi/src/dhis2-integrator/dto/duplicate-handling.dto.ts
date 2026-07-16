@@ -55,7 +55,7 @@ export class DuplicateConfirmationDto {
 
 export class DuplicateHandlingConfigDto {
   @IsEnum(DuplicateAction)
-  accionPorDefecto: DuplicateAction = DuplicateAction.ASK_CONFIRMATION;
+  accionPorDefecto: DuplicateAction = DuplicateAction.UPDATE_INDIVIDUAL;
 
   @IsBoolean()
   @IsOptional()

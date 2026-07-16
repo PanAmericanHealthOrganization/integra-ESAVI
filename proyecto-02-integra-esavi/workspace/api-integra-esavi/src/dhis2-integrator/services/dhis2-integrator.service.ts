@@ -358,9 +358,14 @@ export class Dhis2IntegratorService {
     loteId: string,
     duplicateConfig?: DuplicateHandlingConfigDto,
   ) => {
+    // Por defecto se actualiza el registro existente en vez de pedir confirmación:
+    // ASK_CONFIRMATION deja el duplicado en un mapa en memoria a la espera de una
+    // confirmación manual que en la práctica (import por /bulk, sin body) nunca
+    // llega, y los datos nuevos de DHIS2 (p.ej. vacunación agregada después de la
+    // primera importación) se pierden en silencio.
     const config = duplicateConfig || {
-      accionPorDefecto: DuplicateAction.ASK_CONFIRMATION,
-      confirmarAntesDeProcesar: true,
+      accionPorDefecto: DuplicateAction.UPDATE_INDIVIDUAL,
+      confirmarAntesDeProcesar: false,
       logDetallado: true,
     };
 
@@ -1052,15 +1057,27 @@ export class Dhis2IntegratorService {
           )
         ],
       );
+      // DHIS2 ya entrega este valor calculado (INTEGER), no se recalcula aquí.
+      const diasTranscurridosSintomasTexto =
+        row[
+          headers.findIndex(
+            (header) =>
+              header.column === `DNVE ESAVI TRK - Número de días vacuna ${i}`,
+          )
+        ];
+      datoVacunacion.diasTranscurridosSintomas = diasTranscurridosSintomasTexto
+        ? this.formatoInteger(diasTranscurridosSintomasTexto)
+        : null;
 
       if(
         datoVacunacion.nombreVacunatorio ||
         datoVacunacion.fechaReconstitucion ||
-        datoVacunacion.fechaVacunacion
+        datoVacunacion.fechaVacunacion ||
+        datoVacunacion.diasTranscurridosSintomas
       ){
         datoVacunaciones.push(datoVacunacion);
       }
-    }    
+    }
 
     // Paciente embarazada
     const embarazada = new CreatePacienteEmbarazadaDto();
@@ -1083,7 +1100,13 @@ export class Dhis2IntegratorService {
           (header) => header.column === 'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
         )
       ];
-    antecedenteEmbarazada.edadGestacional = semanaGestacion ? Number(semanaGestacion) : null;
+    const edadGestacionalNumero = semanaGestacion ? Number(semanaGestacion) : null;
+    // DHIS2 puede entregar texto no numérico en este campo (p.ej. la opción de un
+    // combo); si no es un número válido no se asigna, para no romper el insert
+    // ("invalid input syntax for type integer") y con eso abortar el resto del
+    // procesamiento de la notificación (vacunación incluida).
+    antecedenteEmbarazada.edadGestacional =
+      edadGestacionalNumero !== null && !Number.isNaN(edadGestacionalNumero) ? edadGestacionalNumero : null;
     if (antecedenteEmbarazada.edadGestacional && notificacion.fechaAtencion) {
       antecedenteEmbarazada.fechaUltimaMenstruacion = this.ajustarFecha(
         notificacion.fechaAtencion,
@@ -1114,7 +1137,10 @@ export class Dhis2IntegratorService {
           )
         ],
       );
-      datoVacuna.nombreFabricante =
+      // "nombreFabricante" no es una columna real de la entidad DatoVacuna (solo
+      // existe "maHolder", que es lo que expone el front como "Fabricante"); usar
+      // ese nombre no persistía el dato pese a que se leía correctamente de DHIS2.
+      datoVacuna.maHolder =
         row[
           headers.findIndex(
             (header) => header.column === `DNVE ESAVI TRK - Casa comercial vacuna ${i}`,
@@ -1162,7 +1188,7 @@ export class Dhis2IntegratorService {
 
       if (
         datoVacuna.drugName ||
-        datoVacuna.nombreFabricante ||
+        datoVacuna.maHolder ||
         datoVacuna.numeroLote ||
         datoVacuna.fechaVencimientoVacuna ||
         datoVacuna.viaAdministracion ||

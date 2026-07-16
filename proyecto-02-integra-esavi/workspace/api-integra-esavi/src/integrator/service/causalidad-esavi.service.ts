@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { plainToClass } from 'class-transformer';
 import { CausalidadEsavi } from '../entity/causalidad-esavi.entity';
+import { Notificacion } from '../entity/notificacion.entity';
 import { CreateCausalidadEsaviDto } from '../dto';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
 
@@ -16,10 +17,27 @@ export class CausalidadEsaviService {
   ) {}
 
   async create(
+    notificacion: Notificacion,
     createDto: CreateCausalidadEsaviDto,
   ): Promise<CausalidadEsavi> {
     try {
+      // Upsert por notificación: antes esta fila quedaba huérfana (sin FK a
+      // Notificacion) y cada reimport insertaba una copia nueva.
+      const existente = await this.causalidadEsaviRepository.findOne({
+        where: { notificacion: { id: notificacion.id } },
+      });
+
+      if (existente) {
+        Object.keys(createDto).forEach((key) => {
+          if (createDto[key] !== undefined && createDto[key] !== null) {
+            existente[key] = createDto[key];
+          }
+        });
+        return this.causalidadEsaviRepository.save(existente);
+      }
+
       const causalidadEsavi = plainToClass(CausalidadEsavi, createDto);
+      causalidadEsavi.notificacion = notificacion;
       causalidadEsavi.createdBy = 'AUTOMATICO';
       return this.causalidadEsaviRepository.save(causalidadEsavi);
     } catch (e) {
@@ -27,7 +45,7 @@ export class CausalidadEsaviService {
       throw e;
     } finally {
       this.logger.log(
-        `CausalidadEsavi has been created: ${JSON.stringify(createDto)}`,
+        `CausalidadEsavi ha sido procesada: ${JSON.stringify(createDto)}`,
       );
     }
   }
