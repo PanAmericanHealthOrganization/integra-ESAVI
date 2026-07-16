@@ -219,8 +219,12 @@ export class Dhis2IntegratorService {
     }));
 
     // Transformar las rows
+    // Antes "value !== '' ? String(value) : null" convertía un value null/undefined
+    // (columna sin dato en DHIS2) en el string literal "null" (String(null) ===
+    // 'null'), que luego pasaba cualquier chequeo de truthiness y podía pisar datos
+    // buenos en un reimport.
     const rows: (string | null)[][] = data.rows.map((row: any[]) =>
-      row.map((value) => (value !== '' ? String(value) : null)),
+      row.map((value) => (value === null || value === undefined || value === '' ? null : String(value))),
     );
 
     return { headers, rows };
