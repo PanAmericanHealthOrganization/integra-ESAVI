@@ -29,6 +29,9 @@ services:
       - ./datos:/app/datos
       - ./fuente_de_datos:/app/fuente_de_datos
       - ./logs:/app/logs
+      # datos/esavi.duckdb es un symlink relativo a ../../api-integra-esavi/datos/esavi.duckdb;
+      # dentro del contenedor ese destino no existe salvo que se monte también.
+      - ../api-integra-esavi/datos/esavi.duckdb:/app/datos/esavi.duckdb:ro
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:80/"]
       interval: 30s

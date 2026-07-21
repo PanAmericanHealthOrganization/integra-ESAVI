@@ -701,23 +701,13 @@ duckdb_path <- Sys.getenv("DUCKDB_PATH", paste0(path_datos, "esavi.duckdb"))
 load_data <- function() {
   cat("Cargando archivos de datos...\n")
 
-  # Verificar archivos/artefactos requeridos.
-  # datos_procesados y dosis_admin ahora vienen del DuckDB; geo_datos.rds y
-  # timeline.csv siguen siendo archivos estáticos (geometría y línea de tiempo).
-  archivos_requeridos <- c(
-    duckdb_path,
-    paste0(path_datos, "geo_datos.rds"),
-    paste0(path_datos, "timeline.csv")
-  )
-
-  archivos_faltantes <- archivos_requeridos[!file.exists(archivos_requeridos)]
-
-  if (length(archivos_faltantes) > 0) {
-    cat("ERROR: Los siguientes archivos de datos no se encuentran:\n")
-    for (archivo in archivos_faltantes) {
-      cat("  -", archivo, "\n")
-    }
-    stop("No se pueden cargar los datos. Verifica que exista el datamart DuckDB (esavi.duckdb) y los archivos estáticos en la carpeta 'datos/'.")
+  # El datamart DuckDB es la única fuente obligatoria; es el que produce
+  # datos_procesados y dosis_admin. geo_datos.rds y timeline.csv son archivos
+  # estáticos opcionales (geometría y línea de tiempo) que aún no se generan
+  # desde el datamart — si faltan, esas secciones quedan vacías en vez de
+  # impedir el arranque de la app.
+  if (!file.exists(duckdb_path)) {
+    stop("No se puede cargar el datamart DuckDB. Verifica que exista el archivo: ", duckdb_path)
   }
 
   # Cargar datos principales desde el datamart DuckDB (solo lectura).
@@ -731,15 +721,30 @@ load_data <- function() {
   cat("Cargando dosis_admin...\n")
   dosis <- setDT(DBI::dbReadTable(con, "dosis_admin"))
 
-  cat("Cargando datos geográficos...\n")
-  geodt <- readRDS(paste0(path_datos, "geo_datos.rds"))
+  geo_path <- paste0(path_datos, "geo_datos.rds")
+  if (file.exists(geo_path)) {
+    cat("Cargando datos geográficos...\n")
+    geodt <- readRDS(geo_path)
+  } else {
+    cat("Advertencia: no existe", geo_path, "— el mapa quedará deshabilitado.\n")
+    geodt <- NULL
+  }
 
-  cat("Cargando timeline...\n")
-  timeline_data <- fread(paste0(path_datos, "timeline.csv"), colClasses = list(
-    character = c("titulo", "descripcion", "imagen"),
-    Date = "fecha",
-    integer = "anio"
-  ))
+  timeline_path <- paste0(path_datos, "timeline.csv")
+  if (file.exists(timeline_path)) {
+    cat("Cargando timeline...\n")
+    timeline_data <- fread(timeline_path, colClasses = list(
+      character = c("titulo", "descripcion", "imagen"),
+      Date = "fecha",
+      integer = "anio"
+    ))
+  } else {
+    cat("Advertencia: no existe", timeline_path, "— el timeline quedará vacío.\n")
+    timeline_data <- data.table(
+      ord = integer(0), fecha = as.Date(character(0)), anio = integer(0),
+      titulo = character(0), descripcion = character(0), imagen = character(0)
+    )
+  }
 
   cat("Datos cargados exitosamente.\n")
   return(list(datos = datos, dosis = dosis, geodt = geodt, timeline_data = timeline_data))

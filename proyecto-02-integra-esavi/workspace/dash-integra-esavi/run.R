@@ -1,11 +1,16 @@
 
 #!/usr/bin/env Rscript
 
-# Activar renv para gestionar dependencias
-if (requireNamespace("renv", quietly = TRUE)) {
-  renv::activate()
-} else {
-  message("El paquete 'renv' no está instalado. Instálalo para gestionar dependencias.")
+# Activar renv para gestionar dependencias (solo si hay un proyecto renv real;
+# la imagen Docker instala los paquetes directamente en la librería del
+# sistema y no incluye la carpeta renv/, así que activarlo ahí rompería
+# .libPaths() con una librería de proyecto vacía).
+if (file.exists("renv/activate.R")) {
+  if (requireNamespace("renv", quietly = TRUE)) {
+    renv::activate()
+  } else {
+    message("El paquete 'renv' no está instalado. Instálalo para gestionar dependencias.")
+  }
 }
 
 # ---------------------------------------------------------------------------- -
