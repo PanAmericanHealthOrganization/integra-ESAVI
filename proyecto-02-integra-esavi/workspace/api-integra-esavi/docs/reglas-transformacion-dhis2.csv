@@ -1,0 +1,101 @@
+﻿variable_origen_dhis2,tipo_dato_origen,transformacion,tabla_destino,campo_destino
+"Nombres + Apellidos",Texto,Concatenación: nombres + ' ' + apellidos,TR_PACIENTE,NOMBRE
+"Nro. de identificación",Texto,Directo,TR_PACIENTE,IDENTIFICACION
+"Nro. de identificación",Texto,"trim(); usado como CODIGO_ORIGEN y como clave de deduplicación: si ya existe el paciente se actualiza en vez de crear uno nuevo",TR_PACIENTE,CODIGO_ORIGEN
+"Sexo",Option set (texto),"normalizarSexo() homologa sinónimos (MASCULINO→HOMBRE, FEMENINO→MUJER) y luego búsqueda por similitud en catálogo TC_CATALOGO_PADRE (subcategoría GENERO) → FK",TR_PACIENTE,CT_SEXO_ID
+"Autoidentificación",Option set (texto),"normalizarEtnia() homologa sinónimos (AFROECUATORIANO/AFRO-ECUADORIAN→AFRODESCENDIENTE, INDIGENOUS→INDIGENA; corta en '/' ) y búsqueda por similitud en catálogo (subcategoría ETNIA) → FK",TR_PACIENTE,CT_AUTO_IDENTIFICACION_ETNICA_ID
+"Fecha de nacimiento",Fecha,"formatoFecha(): admite formato ISO ('YYYY-MM-DD...') o compacto 'YYYYMMDD' → Date UTC; null si inválida",TR_PACIENTE,FECHA_NACIMIENTO
+"(constante)",-,Valor fijo 'Medio electrónico DHIS2',TR_NOTIFICACION,MEDIO_NOTIFICACION
+"DNVE ESAVI TRK - Edad",Entero,"formatoInteger(); válida solo si 0<edad<121 y existe unidad de edad; si no cumple, se guarda null y se recalcula en NotificacionDhis2Service a partir de fechaNotificacion − fechaNacimiento",TR_NOTIFICACION,EDAD
+"DNVE ESAVI TRK - Tipo edad",Option set (texto),"buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', valor) → FK catálogo; si la edad fue recalculada por fecha, se fuerza la unidad 'Años'",TR_NOTIFICACION,CTUNIDADEDAD_ID
+"Fecha de reporte",Fecha,"formatoFecha(); DHIS2 no tiene un data element 'Fecha de notificación': se usa la fecha del evento de la etapa Notificación, etiquetada por el tracker como 'Fecha de reporte'",TR_NOTIFICACION,FECHA_NOTIFICACION
+"Fecha de reporte",Fecha,"formatoFecha(); mismo valor que FECHA_NOTIFICACION (queda duplicado por recomendación del equipo funcional)",TR_NOTIFICACION,FECHA_REPORTE_NACIONAL
+"DNVE ESAVI TRK - Fecha de atención",Fecha,formatoFecha(),TR_NOTIFICACION,FECHA_ATENCION
+"Incident date",Fecha,formatoFecha(),TR_NOTIFICACION,FECHA_LLENADO_FICHA
+"DNVE ESAVI TRK - Código del caso",Texto,"Directo; clave de deduplicación de la notificación (si existe se actualiza); si viene vacío el registro completo se descarta",TR_NOTIFICACION,CODIGO_ORIGEN_NOTIFICACION
+"(constante)",-,"Valor fijo 'Profesional de la salud' → buscarSubcategoriaPorSimilitud('TIPO_EMISOR') → FK",TR_NOTIFICACION,CT_TIPO_EMISOR_ID
+"DNVE ESAVI TRK - Parroquia residencia",Option set (texto con código),"Extrae código de 6 dígitos entre paréntesis con regex \((\d{6})\); si no hay match, busca por nombre exacto en TC_PARROQUIA → FK",TR_NOTIFICACION,CTPARROQUIA_CODIGO
+"DNVE ESAVI TRK - Unicódigo",Texto,"trim() y búsqueda en TR_ESTABLECIMIENTO por UNI_CODIGO (solo habilitados) → FK",TR_NOTIFICACION,ESTABLECIMIENTO_ID
+"DNVE ESAVI TRK - Observaciones",Texto largo,Directo,TR_NOTIFICACION,CASO_NARRATIVO
+"(constante)",-,Valor fijo 'DHIS2',TR_NOTIFICACION,ORIGEN
+"DNVE ESAVI TRK - Provincia residencia / Canton residencia",Option set (texto),"Se capturan pero NO se persisten: TR_NOTIFICACION no tiene columnas de provincia/cantón, solo FK a parroquia",(no persistido),(no persistido)
+"Organisation unit name / code / unit",Texto,"Se capturan en el DTO pero NO se persisten: no existen columnas equivalentes en TR_NOTIFICACION (el establecimiento real se resuelve vía 'Unicódigo')",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Nombre de quien notifica",Texto,"Se captura en el DTO pero NO se persiste en el flujo actual (no hay creación de TR_NOTIFICADOR desde DHIS2)",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Profesión de quien notifica",Texto,"revisarValorNulo(): si viene vacío se fuerza 'DESCONOCIDO'; queda pendiente en el código (TODO) su persistencia final",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Evento adverso anterior",Option set (Si/No/No sabe),"obtenerValorNumerico(): 'si'→1, 'no'→0, 'no sabe'/'ignorado'/'desconoce'/otros→2; se captura como notificacion.antecedenteEventoPrevio pero NO existe columna equivalente en TR_NOTIFICACION (dato duplicado, el que sí persiste es TR_ANTECEDENTES_EVENTO_ADVERSO.ANTECEDENTES_ADVSIMILAR)",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Tiene antecedente vacunal",Option set (Si/No/No sabe),"obtenerValorNumerico(); se captura como notificacion.antecedenteVacunal pero NO existe columna equivalente en TR_NOTIFICACION",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Monitoreo del establecimiento de salud",Option set (Si/No/No sabe),"obtenerValorNumerico(); se captura como notificacion.monitorioEstablecimientoSalud pero NO existe columna equivalente en TR_NOTIFICACION",(no persistido),(no persistido)
+"DNVE ESAVI TRK - Diagnóstico inicial 1..3",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion(): regex ^([A-Za-z0-9]+)\s*(.*)$ separa código y descripción; genera una fila por cada diagnóstico con ambos valores presentes",TR_DATOS_ESAVI,"NOMBRE_ESAVI (descripción) / CODIGO_CIE10 (código)"
+"DNVE ESAVI TRK - Diagnostico final 1..3",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion(); genera una fila adicional por cada diagnóstico final con ambos valores presentes",TR_DATOS_ESAVI,"NOMBRE_ESAVI (descripción) / CODIGO_CIE10 (código)"
+"DNVE ESAVI TRK - Sintomatología 1..5",Option set (texto),"Directo (nombre de la opción); genera una fila por cada sintomatología no vacía",TR_DATOS_ESAVI,NOMBRE_ESAVI_REPORTADO
+"DNVE ESAVI TRK - Sintomatología Otro",Texto,Directo; genera una fila adicional si viene informado,TR_DATOS_ESAVI,NOMBRE_ESAVI_REPORTADO
+"DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI + Hora de Inicio de síntomas del ESAVI",Fecha + Hora,"Para diagnósticos: combina fecha (parte antes del espacio) + 'T' + hora + ':00Z' → Date UTC. Para sintomatologías: solo la fecha con formatoFecha()",TR_DATOS_ESAVI,FECHA_ESAVI
+"(constante)",-,"Etiqueta generada según el bloque: 'Diagnóstico inicial DHIS2 i' / 'Diagnóstico final DHIS2 i' / 'Sintomatología DHIS2 i' / 'Sintomatología Otro DHIS2'",TR_DATOS_ESAVI,DESCRIPCION
+"DNVE ESAVI TRK - Código del caso",Texto,Directo (mismo código de la notificación asociada),TR_DATOS_ESAVI,COGIDO_CASO
+"DNVE ESAVI TRK - Antecedente vacuna 1..5",Texto,Directo,TR_DATO_VACUNA,DRUG_NAME
+"DNVE ESAVI TRK - Dosis de la vacuna 1..5",Option set (texto),"transformarDosis(): mapa texto→número (DOSIS ÚNICA=0, PRIMERA DOSIS=1, SEGUNDA=2, TERCERA=3, CUARTA=4, QUINTA=5, PRIMER REFUERZO=6, SEGUNDO REFUERZO=7, REFUERZO ANUAL=8; valor no reconocido o vacío → null)",TR_DATO_VACUNA,NUMERO_DOSIS_VACUNA
+"DNVE ESAVI TRK - Casa comercial vacuna 1..5",Texto,Directo,TR_DATO_VACUNA,MA_HOLDER
+"DNVE ESAVI TRK - Lote de la vacuna 1..5",Texto,Directo,TR_DATO_VACUNA,NUMERO_LOTE
+"DNVE ESAVI TRK - Fecha de caducidad de la vacuna 1..5",Fecha,formatoFecha(),TR_DATO_VACUNA,FECHA_VENCIMIENTO_VACUNA
+"DNVE ESAVI TRK - Vía de aplicación vacuna 1..5",Option set (texto),Directo (nombre de la opción),TR_DATO_VACUNA,VIA_ADMINISTRACION
+"DNVE ESAVI TRK - Fecha de expiración del diluyente vacuna 1..5",Fecha,formatoFecha(),TR_DATO_VACUNA,FECHA_VENCIMIENTO_DILUYENTE
+"DNVE ESAVI TRK - Nombre del diluyente usado vacuna 1..5",Texto,Directo,TR_DATO_VACUNA,NOMBRE_DILUYENTE_VACUNA
+"DNVE ESAVI TRK - Es sospechosa vacuna 1..5",Option set (texto),"Directo; búsqueda en catálogo por descripción → FK. El registro de la vacuna i solo se crea si al menos uno de sus campos tiene valor",TR_DATO_VACUNA,CT_ROL_VACUNA_ID
+"DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1..5",Texto,"Directo; el registro de vacunación i solo se crea si al menos uno de sus campos tiene valor",TR_DATO_VACUNACION,NOMBRE_VACUNATORIO
+"DNVE ESAVI TRK - Fecha de la dilución vacuna 1..5",Fecha,formatoFecha(),TR_DATO_VACUNACION,FECHARECONSTITUCIONVACUNA
+"DNVE ESAVI TRK - Fecha de vacunación vacuna 1..5",Fecha,formatoFecha(),TR_DATO_VACUNACION,FECHA_VACUNACION
+"DNVE ESAVI TRK - Número de días vacuna 1..5",Entero (calculado por DHIS2),"formatoInteger() si viene informado, sino null. DHIS2 ya entrega el valor calculado, no se recalcula en la API",TR_DATO_VACUNACION,DIAS_TRANSCURRIDOS_SINTOMAS
+"(constante)",-,Valor fijo '1' (GRAVE): el programa DHIS2 importado es 'ESAVI-Graves',TR_GRAVEDAD_ESAVI,TIPO_GRAVEDAD
+"DNVE ESAVI TRK - Criterio de notificación - amenaza a la vida",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,RIESGO_VIDA
+"DNVE ESAVI TRK - Criterio de notificación - discapacidad",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,DISCAPACIDAD
+"DNVE ESAVI TRK - Criterio de notificación - hospitalización",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,HOSPITALIZACION
+"DNVE ESAVI TRK - Criterio de notificación - anomalía congénita",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,ANOMALIA_CONGENITA
+"DNVE ESAVI TRK - Criterio de notificación - aborto",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,ABORTO
+"DNVE ESAVI TRK - Criterio de notificación - muerte fetal",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,MUERTE_FETAL
+"DNVE ESAVI TRK - Criterio de notificación - muerte",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,MUERTE
+"DNVE ESAVI TRK - Criterio de investigación - parte de eventos preocupación",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,PARTE_EVENTOS_PREOCUPACION
+"DNVE ESAVI TRK - Criterio de investigación - nuevos eventos",Booleano (checkbox),"transformarTipoSoloSiDhis2(): '1' si el valor es '1', sino '0'",TR_GRAVEDAD_ESAVI,SON_EVENTOS_NUEVOS
+"DNVE ESAVI TRK - Evento nuevo - notificación",Texto,"Directo; se asigna solo si SON_EVENTOS_NUEVOS resultó afirmativo",TR_GRAVEDAD_ESAVI,DESCRI_EVENTOS_NUEVOS
+"DNVE ESAVI TRK - Condición de egreso",Option set (texto),Directo (nombre de la opción),TR_GRAVEDAD_ESAVI,CONDICION_EGRESO
+"DNVE ESAVI TRK - Se realizó autopsia",Option set (Si/No/No sabe),"obtenerValorNumerico(): 'si'→1, 'no'→0, 'no sabe'/desconocido→2",TR_DESENLACE_ESAVI,AUTOPSIA
+"DNVE ESAVI TRK - Fecha fallecimiento",Fecha,formatoFecha(),TR_DESENLACE_ESAVI,FECHAMUERTE
+"(derivado)",Fecha,"Se asigna el mismo valor de FECHA_NOTIFICACION, solo si el criterio 'muerte fetal' de TR_GRAVEDAD_ESAVI está marcado",TR_DESENLACE_ESAVI,FECHANOTIFICAMUERTEFETAL
+"DNVE ESAVI TRK - Fecha de investigación",Fecha,formatoFecha(),TR_DESENLACE_ESAVI,FECHAINICIOINVESTIGACION
+"DNVE ESAVI TRK - Clasificación final del caso",Option set (texto),Directo,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASO
+"DNVE ESAVI TRK - Clasificación final del caso A",Option set (texto),Directo,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASOA
+"DNVE ESAVI TRK - Clasificación final del caso B",Option set (texto),Directo,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASOB
+"DNVE ESAVI TRK - Diagnostico final 1",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes",TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_1
+"DNVE ESAVI TRK - Diagnostico final 2",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes",TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_2
+"DNVE ESAVI TRK - Diagnostico final 3",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes",TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_3
+"DNVE ESAVI TRK - Caso analizado por comité ESAVI?",Booleano (texto '1'/'0'),Directo,TR_CAUSALIDAD_ESAVI,CLASIFICACION_CAUSA_ESAVI
+"DNVE ESAVI TRK - Clasificación final del caso + Clasificación final del caso A o B",Option set (texto),"obtenerClasificacion(): mapea las 8 combinaciones categoría/subcategoría del formulario a la etiqueta WHO-AEFI (A1..A4, B1, B2, C, D); solo se calcula si 'Caso analizado por comité ESAVI?' es afirmativo",TR_CAUSALIDAD_ESAVI,CLASIFICACION_DE_CAUSALIDAD_WHO_AEFI
+"DNVE ESAVI TRK - Fecha cierre del evento",Fecha,formatoFecha(),TR_CAUSALIDAD_ESAVI,FECHA_CAUSALIDAD_ESAVI
+"DNVE ESAVI TRK - ¿Estaba participando o participa la persona vacunada en un ensayo clínico de vacunas contra la COVID-19?",Booleano (texto '1'/'0'/null),"Directo; DHIS2 ya entrega true=1/false=0 como texto; si no está marcada ninguna opción entrega null",TR_ANTECEDENTES_MEDICO,ENSAYO_CLINICO_COVID19
+"DNVE ESAVI TRK - Especificar la comorbilidad 1",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion() → código; la fila de TR_ANTECEDENTES_MEDICO solo se crea si la descripción no está vacía",TR_ANTECEDENTES_MEDICO,COMORBILIDAD_PRINCIPAL_CIE10
+"DNVE ESAVI TRK - Especificar la comorbilidad 1",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → descripción,TR_ANTECEDENTES_MEDICO,COMORBILIDAD_PRINCIPAL
+"DNVE ESAVI TRK - Especificar la comorbilidad 2",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → código,TR_ANTECEDENTES_MEDICO,COMORBILIDAD_DOS_CIE10
+"DNVE ESAVI TRK - Especificar la comorbilidad 2",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → descripción,TR_ANTECEDENTES_MEDICO,COMORBILIDAD_DOS
+"DNVE ESAVI TRK - Especificar la comorbilidad 3",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → código,TR_ANTECEDENTES_MEDICO,COMORBILIDAD_TRES_CIE10
+"DNVE ESAVI TRK - Especificar la comorbilidad 3",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → descripción,TR_ANTECEDENTES_MEDICO,COMORBILIDAD_TRES
+"DNVE ESAVI TRK - ¿Tiene antecedentes de diagnóstico de infección por SARS-CoV-2 antes de la vacunación?",Option set (SI/NO/SIN DATO),"Directo; no se trata como booleano porque el origen tiene 3 valores posibles",TR_ANTECEDENTES_MEDICO,ANTECEDENTE_DIAGNOSTICO_COVID19
+"DNVE ESAVI TRK - Evento adverso anterior",Option set (Si/No/No sabe),"obtenerValorNumerico(): 'si'→1, 'no'→0, desconocido→2",TR_ANTECEDENTES_EVENTO_ADVERSO,ANTECEDENTES_ADVSIMILAR
+"DNVE ESAVI TRK - Alergia Medicamentos",Booleano (checkbox),"esValorAfirmativo(): valor==='1' → true; DHIS2 entrega '1' si el check está marcado, null si no",TR_ANTECEDENTES_EVENTO_ADVERSO,ALERGIA_MEDICAMENTOS
+"DNVE ESAVI TRK - Alergia Alimentos",Booleano (checkbox),esValorAfirmativo(),TR_ANTECEDENTES_EVENTO_ADVERSO,ALERGIA_ALIMENTOS
+"DNVE ESAVI TRK - Alergia Insectos",Booleano (checkbox),esValorAfirmativo(),TR_ANTECEDENTES_EVENTO_ADVERSO,ALERGIA_INSECTOS
+"DNVE ESAVI TRK - Alergia Polvo",Booleano (checkbox),esValorAfirmativo(),TR_ANTECEDENTES_EVENTO_ADVERSO,ALERGIA_POLVO
+"DNVE ESAVI TRK - Otro Alergias",Texto,Directo,TR_ANTECEDENTES_EVENTO_ADVERSO,OTRAS_ALERGIAS
+"DNVE ESAVI TRK - Antecedente patológico personal 1",Texto (código CIE-10 + descripción),"separarCodigoYDescripcion() → código; la fila de TR_ANTECEDENTES_ENFERMEDADES_PREVIAS solo se crea si la descripción no está vacía",TR_ANTECEDENTES_ENFERMEDADES_PREVIAS,CODIGO_ESAVI_CIE10
+"DNVE ESAVI TRK - Antecedente patológico personal 1",Texto (código CIE-10 + descripción),separarCodigoYDescripcion() → descripción,TR_ANTECEDENTES_ENFERMEDADES_PREVIAS,DESCRIPCION_ENF_PREVIAS
+"(derivado)",-,"Búsqueda por similitud de la descripción anterior contra MED_LLT (esquema MEDDRA) → id resuelto por MeddraLLTService",TR_ANTECEDENTES_ENFERMEDADES_PREVIAS,CTLLTMEDDRA_ID
+"DNVE ESAVI TRK - Semanas gestación al recibir la vacuna",Numérico,"'1' si el campo tiene valor, sino '0'",TR_PACIENTE_EMBARAZADA,EMBARAZADA_MOMENTO_VACUNA
+"DNVE ESAVI TRK - Embarazada",Option set (texto),"Directo; el bloque de embarazo (TR_PACIENTE_EMBARAZADA y TR_ANTECEDENTES_EMBARAZO) solo se crea si este valor es verdadero",TR_PACIENTE_EMBARAZADA,EMBARAZADA_MOMENTO_ESAVI
+"DNVE ESAVI TRK - Semanas gestación al recibir la vacuna",Numérico,"Number(); si no es un número válido se guarda null (evita error de tipo en el insert)",TR_ANTECEDENTES_EMBARAZO,EDAD_GESTACIONAL
+"(derivado)",Fecha,"Calculada: FECHA_ATENCION − (edad gestacional × 7 días), vía ajustarFecha()",TR_ANTECEDENTES_EMBARAZO,FECHA_ULTIMA_MENSTRUACION
+"(derivado)",Fecha,"Calculada: FECHA_ULTIMA_MENSTRUACION + (43 semanas × 7 días); 43 es el valor fijo acordado con el personal funcional",TR_ANTECEDENTES_EMBARAZO,FECHA_PARTO
+"DNVE ESAVI TRK - Fecha en que se termina la investigación",Fecha,formatoFecha(),TR_INVESTIGACION,FECHA_INVESTIGACION
+"DNVE ESAVI TRK - El vacunatorio cumple con los estándares de calidad",Booleano (texto '1'/'0'),"transformarBooleanoSiNoDhis2(): conserva el valor tal cual (toString); null si no viene informado",TR_INVESTIGACION,VACUNATORIO_CALIDAD
+"DNVE ESAVI TRK - El personal de salud está capacitado en inmunizaciones",Booleano (texto '1'/'0'),transformarBooleanoSiNoDhis2(),TR_INVESTIGACION,PERSONAL_CAPACITADO
+"DNVE ESAVI TRK - Evidenció algún problema en el biológico",Booleano (texto '1'/'0'),transformarBooleanoSiNoDhis2(),TR_INVESTIGACION,PROBLEMA_BIOLOGICO
+"DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna",Booleano (texto '1'/'0'),transformarBooleanoSiNoDhis2(),TR_INVESTIGACION,BUSQUEDA_CASOS_SINTOMATOLOGIA_CON_VACUNA
+"DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna",Booleano (texto '1'/'0'),transformarBooleanoSiNoDhis2(),TR_INVESTIGACION,BUSQUEDA_CASOS_SINTOMATOLOGIA_SIN_VACUNA
+"DNVE ESAVI TRK - Muestra de Laboratorio",Booleano (texto '1'/'0'),transformarBooleanoSiNoDhis2(),TR_INVESTIGACION,MUESTRA_LABORATORIO

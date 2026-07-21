@@ -15,42 +15,29 @@ export class AntecedentePreexistenciaService {
     private readonly antecedentePreexistenciaRepository: Repository<AntecedentePreexistencia>,
   ) {}
 
-  // async create(
-  //   notificacion: Notificacion,
-  //   createDto: CreateAntecedentePreexistenciaDto,
-  // ): Promise<AntecedentePreexistencia> {
-  //   try {
-  //     const antecedentePreexistencia = plainToClass(
-  //       AntecedentePreexistencia,
-  //       createDto,
-  //     );
-  //     antecedentePreexistencia.notificacion = notificacion;
-  //     antecedentePreexistencia.createdBy = 'AUTOMATICO';
-  //     return this.antecedentePreexistenciaRepository.save(
-  //       antecedentePreexistencia,
-  //     );
-  //   } catch (e) {
-  //     throw e;
-  //   } finally {
-  //     this.logger.log(
-  //       `AntecedentePreexistencia has been created: ${JSON.stringify(
-  //         createDto,
-  //       )}`,
-  //     );
-  //   }
-  // }
-
   async create(
     notificacion: Notificacion,
     createDto: CreateAntecedentePreexistenciaDto,
   ): Promise<AntecedentePreexistencia> {
     try {
-      // 1. Eliminar todos los registros de AntecedentePreexistencia asociados a la misma notificación
-      await this.antecedentePreexistenciaRepository.delete({
-        notificacion: { id: notificacion.id }, // Eliminar registros con la misma notificación
-      });
+      // Upsert por notificación: antes este método borraba y volvía a crear el
+      // registro en cada reimport (perdiendo el id/auditoría y cualquier campo no
+      // incluido en el DTO nuevo). Se alinea con el patrón usado en el resto de
+      // antecedentes (embarazo, evento, médico): buscar el existente y actualizar
+      // solo los campos que vienen definidos en el DTO, sin pisar con null/undefined
+      // lo que ya hay guardado.
+      const [existente] = await this.findAntecedentePreexistenciaByNotificacionUUID(notificacion.id);
 
-      // 2. Crear un nuevo objeto de AntecedentePreexistencia a partir del DTO
+      if (existente) {
+        Object.keys(createDto).forEach((key) => {
+          if (createDto[key] !== undefined && createDto[key] !== null) {
+            existente[key] = createDto[key];
+          }
+        });
+        existente.notificacion = notificacion;
+        return this.antecedentePreexistenciaRepository.save(existente);
+      }
+
       const antecedentePreexistencia = plainToClass(
         AntecedentePreexistencia,
         createDto,
@@ -58,7 +45,6 @@ export class AntecedentePreexistenciaService {
       antecedentePreexistencia.notificacion = notificacion;
       antecedentePreexistencia.createdBy = 'AUTOMATICO'; // Asignamos el campo 'createdBy'
 
-      // 3. Guardar el nuevo registro
       return this.antecedentePreexistenciaRepository.save(
         antecedentePreexistencia,
       );
@@ -67,7 +53,7 @@ export class AntecedentePreexistenciaService {
         `Error al procesar AntecedentePreexistencia: ${e.message}`,
       );
       throw new Error(
-        'Hubo un problema al crear o eliminar AntecedentePreexistencia',
+        'Hubo un problema al crear o actualizar AntecedentePreexistencia',
       );
     } finally {
       this.logger.log(

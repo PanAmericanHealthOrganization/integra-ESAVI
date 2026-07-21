@@ -105,9 +105,21 @@
       "^src/(.*)$": "<rootDir>/src/$1"
     },
     "collectCoverageFrom": [
-      "src/**/*.(t|j)s"
+      "src/**/*.(t|j)s",
+      "!src/**/*.module.ts",
+      "src/vigiflow-integrator/utils/vigiflow-utils.module.ts",
+      "!src/**/*.dto.ts",
+      "!src/**/*.entity.ts",
+      "!src/**/*.interface.ts",
+      "!src/**/*.enum.ts",
+      "!src/main.ts"
     ],
     "coverageDirectory": "./coverage",
+    "coverageThreshold": {
+      "global": {
+        "statements": 60
+      }
+    },
     "testEnvironment": "node",
     "reporters": [
       "default",

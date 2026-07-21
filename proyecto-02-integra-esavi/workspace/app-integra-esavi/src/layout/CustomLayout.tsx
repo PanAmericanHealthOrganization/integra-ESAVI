@@ -4,7 +4,8 @@ import { CustomMenu } from './CustomMenu';
 import { CustomAppBar } from './CustomAppBar';
 import { CustomFooter } from './CustomFooter';
 
-// Altura del footer en px — usada aquí y en el padding-bottom del content
+// Altura del footer en px — usada aquí para reservarle espacio y evitar que se
+// superponga al contenido, y en la marca de agua para no quedar detrás de él.
 export const FOOTER_HEIGHT = 40;
 
 /*
@@ -21,20 +22,43 @@ const globalLayoutFix = `
     overflow: hidden;
   }
 
+  /*
+   * La altura se reduce aquí (en vez de con padding-bottom en .RaLayout-content)
+   * para reservar el espacio del footer fijo de forma estructural: así nunca se
+   * superpone al contenido, sin importar si el contenido llega a necesitar scroll
+   * o no. Con solo el padding-bottom, una página cuyo contenido termina justo al
+   * borde del viewport (sin activar scroll) quedaba tapada por el footer, porque
+   * el padding solo protege lo que queda "más allá" del contenido visible al
+   * hacer scroll hasta el final, no lo que ya cabe sin scrollear.
+   */
   .RaLayout-root {
-    height: 100% !important;
+    height: calc(100% - ${FOOTER_HEIGHT}px) !important;
     min-height: unset !important;
     overflow: hidden;
     display: flex;
     flex-direction: column;
   }
 
-  /* Contenedor horizontal: sidebar + content */
+  /* Contenedor vertical: AppBar + contentWithSidebar */
   .RaLayout-appFrame {
     flex: 1 1 0 !important;
     min-height: 0 !important;
     overflow: hidden;
     display: flex !important;
+  }
+
+  /*
+   * <main> horizontal: sidebar + content. React-admin no le da min-height:0,
+   * así que por el comportamiento por defecto de flexbox (min-height:auto en
+   * un flex item) crecía hasta la altura natural de su contenido en vez de
+   * quedar acotado al espacio disponible — esa era la fuga real que dejaba
+   * pasar el desborde hasta el footer, sin que el fix en .RaLayout-root o
+   * .RaLayout-content (un nivel más abajo) lo pudiera evitar.
+   */
+  .RaLayout-contentWithSidebar {
+    flex: 1 1 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
 
   /* Área de contenido: scrollable como fallback */
@@ -43,7 +67,6 @@ const globalLayoutFix = `
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
-    padding-bottom: ${FOOTER_HEIGHT}px !important;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
   }
@@ -59,17 +82,41 @@ const globalLayoutFix = `
     z-index: 2 !important;
   }
 
-  /* El contenedor de filas scrollea internamente;
-     la altura deja espacio para toolbar + paginación + footer */
+  /*
+   * El contenedor de filas scrollea internamente; la altura deja espacio para
+   * toolbar + paginación + footer. El presupuesto de 240px asumía un toolbar
+   * de una sola fila (~48px); en listas como ESAVIS, cuyo encabezado tiene
+   * título + varios filtros + botón, esa fila es más alta y la caja de la
+   * tabla terminaba reclamando más espacio del que quedaba libre, empujando
+   * la paginación fuera de la pantalla, tapada por el footer fijo. Se sube
+   * el presupuesto para dejar margen de sobra sin depender de medir cada
+   * encabezado por página.
+   */
   .RaDatagrid-tableWrapper {
-    max-height: calc(100vh - 240px) !important;
+    max-height: calc(100vh - 340px) !important;
     overflow-y: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
+    scrollbar-gutter: stable !important;
   }
 
+  /* Barra de scroll visible y delgada (antes iba oculta: sin esta barra no
+     había forma de saber, a simple vista, que había más filas debajo) */
   .RaDatagrid-tableWrapper::-webkit-scrollbar {
-    display: none !important;
+    width: 10px;
+  }
+
+  .RaDatagrid-tableWrapper::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .RaDatagrid-tableWrapper::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.25);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .RaDatagrid-tableWrapper::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.4);
   }
 
   /* Marca de agua: escudo del Ecuador fijo en la esquina inferior derecha,

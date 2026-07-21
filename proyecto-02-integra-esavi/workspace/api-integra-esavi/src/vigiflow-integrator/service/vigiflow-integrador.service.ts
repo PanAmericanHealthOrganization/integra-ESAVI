@@ -646,6 +646,10 @@ export class VigiflowIntegradorService {
 
           const nombreVacPatenteWHODrugVigiFlow = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
           updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;
+          // DatoVacuna no tiene columna NOMBRE_VAC_PATENTE_WHODRUG (dato-vacuna.service.ts descarta ese
+          // campo del DTO al guardar), así que se usa como valor por defecto de DRUG_NAME el nombre
+          // reportado por VigiFlow. Si el match WHODrug (más abajo) encuentra un nombre oficial, lo sobreescribe.
+          updateDatoVacuna.drugName = nombreVacPatenteWHODrugVigiFlow;
 
           // Reemplaza comas o saltos de línea por punto y coma.
           const principioActivoWHODrugVigiFlow = reg['F'] ? VigiflowUtils.limpiarCampoWHODrug(reg['F']) : reg['F'];

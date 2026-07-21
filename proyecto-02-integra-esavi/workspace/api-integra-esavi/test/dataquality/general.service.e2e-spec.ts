@@ -4,11 +4,11 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DataQualityDimensions } from '../../entities/dataQualityDimensions.entity';
-import { DimCompletitudService } from '../dim-completitud';
-import { DimConsistenciaService } from '../dim-consitencia';
-import { DimExactitudService } from '../dim-exactitud.service';
-import { GeneralService } from '../general.service';
+import { DataQualityDimensions } from '../../src/dataquality/entities/dataQualityDimensions.entity';
+import { DimCompletitudService } from '../../src/dataquality/services/dim-completitud';
+import { DimConsistenciaService } from '../../src/dataquality/services/dim-consitencia';
+import { DimExactitudService } from '../../src/dataquality/services/dim-exactitud.service';
+import { GeneralService } from '../../src/dataquality/services/general.service';
 // Load env vars manually to ensure they are available for ConfigModule if needed synchronously or for debugging
 dotenv.config();
 
