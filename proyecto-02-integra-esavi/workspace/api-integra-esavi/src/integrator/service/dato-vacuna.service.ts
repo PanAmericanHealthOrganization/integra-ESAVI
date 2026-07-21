@@ -283,7 +283,10 @@ export class DatoVacunaService {
       where: { notificacion: { id: notificacion.id } },
     });
     if (!datoVacunacion) {
-      datoVacunacion = this.datoVacunacionRepository.create({ notificacion });
+      datoVacunacion = this.datoVacunacionRepository.create({
+        notificacion,
+        createdBy: process.env.USUARIO_INSERTA_REGISTRO,
+      });
       datoVacunacion = await this.datoVacunacionRepository.save(datoVacunacion);
     }
     return this.create(datoVacunacion, createDto);
