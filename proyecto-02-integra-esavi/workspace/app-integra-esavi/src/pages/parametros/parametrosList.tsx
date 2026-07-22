@@ -83,6 +83,7 @@ const getValorEjemplo = (row: ParametroRecord): string => {
 // semántico de la clave (independiente del módulo), del más específico al más
 // genérico. Los sufijos más largos deben ir primero para tener prioridad.
 const ALIAS_SUFIJOS: [string, string][] = [
+  ["ROOT_ORG_UNIT", "Unidad organizativa raíz"],
   ["USER_NAME", "Usuario"],
   ["USER_KEY", "Clave de usuario"],
   ["URL_TOKEN", "URL de token"],
@@ -110,6 +111,52 @@ const getAliasClave = (clave: string): string => {
   return clave
 }
 
+// Cada módulo se dibuja sobre una grilla de 12 columnas. El orden y el ancho de
+// cada parámetro se resuelve por el sufijo de la clave (del más específico al
+// más genérico). Los que no coinciden se ubican al final, en media fila.
+const GRID_COLUMNS = 12
+const DEFAULT_ORDEN = 1000
+const DEFAULT_COLS = 6
+
+const LAYOUT_SUFIJOS: { sufijo: string; orden: number; cols: number }[] = [
+  { sufijo: "ROOT_ORG_UNIT", orden: 20, cols: 4 },
+  { sufijo: "URL_API", orden: 10, cols: 8 },
+  { sufijo: "API_URL", orden: 10, cols: 8 },
+  { sufijo: "URL", orden: 10, cols: 8 },
+  { sufijo: "USER_NAME", orden: 30, cols: 6 },
+  { sufijo: "USERNAME", orden: 30, cols: 6 },
+  { sufijo: "PASSWORD", orden: 40, cols: 6 },
+  { sufijo: "PASSWD", orden: 40, cols: 6 },
+  { sufijo: "USER_KEY", orden: 50, cols: 12 },
+]
+
+// Devuelve el orden y ancho (en columnas de la grilla de 12) para una clave.
+const getLayoutClave = (clave: string): { orden: number; cols: number } => {
+  const key = (clave || "").trim().toUpperCase()
+  for (const item of LAYOUT_SUFIJOS) {
+    if (key === item.sufijo || key.endsWith(`_${item.sufijo}`)) {
+      return { orden: item.orden, cols: item.cols }
+    }
+  }
+  return { orden: DEFAULT_ORDEN, cols: DEFAULT_COLS }
+}
+
+// Sufijos de clave que representan una URL de servidor.
+const URL_SUFIJOS = ["URL_API", "API_URL", "URL"]
+
+// Indica si una clave corresponde a un parámetro de tipo URL/servidor.
+const esClaveUrl = (clave: string): boolean => {
+  const key = (clave || "").trim().toUpperCase()
+  return URL_SUFIJOS.some((sufijo) => key === sufijo || key.endsWith(`_${sufijo}`))
+}
+
+// Normaliza el valor de un parámetro. Para las URLs de servidor se recorta el
+// espacio en blanco y las barras finales, ya que no se espera un "/" al final.
+const normalizarValor = (clave: string, valor: string): string => {
+  if (esClaveUrl(clave)) return (valor || "").trim().replace(/\/+$/, "")
+  return valor
+}
+
 export const ParametrosList = () => {
   const notify = useNotify()
   const theme = useTheme()
@@ -134,7 +181,15 @@ export const ParametrosList = () => {
     })
     return Array.from(map.entries())
       .sort(([a], [b]) => a.localeCompare(b, "es"))
-      .map(([modulo, rows]) => ({ modulo, rows }))
+      .map(([modulo, rows]) => ({
+        modulo,
+        // Ordena por el orden de layout y, a igualdad, alfabéticamente por clave.
+        rows: [...rows].sort((a, b) => {
+          const oa = getLayoutClave(a.clave).orden
+          const ob = getLayoutClave(b.clave).orden
+          return oa !== ob ? oa - ob : a.clave.localeCompare(b.clave, "es")
+        }),
+      }))
   }, [data])
 
   const moduloOptions = useMemo(() => {
@@ -185,7 +240,8 @@ export const ParametrosList = () => {
 
   const submit = async () => {
     try {
-      await update("parametros", { id: dialog.id!, data: { ...form } }, { returnPromise: true })
+      const data = { ...form, valor: normalizarValor(form.clave, form.valor) }
+      await update("parametros", { id: dialog.id!, data }, { returnPromise: true })
       notify("Parámetro actualizado", { type: "success" })
       closeDialog()
       refetch()
@@ -256,9 +312,10 @@ export const ParametrosList = () => {
                     </Typography>
                   </Box>
 
-                  <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2} pt={1}>
+                  <Box display="grid" gridTemplateColumns={`repeat(${GRID_COLUMNS}, 1fr)`} gap={2} pt={1}>
                       {group.rows.map((row) => {
                         const isMasked = row.es_encriptado && !revealedValues.has(row.id)
+                        const { cols } = getLayoutClave(row.clave)
                         const field = (
                           <TextField
                             fullWidth
@@ -306,7 +363,13 @@ export const ParametrosList = () => {
                           />
                         )
                         return (
-                          <Box key={row.id} sx={{ position: "relative", "&:hover .param-actions": { opacity: 1 } }}>
+                          <Box
+                            key={row.id}
+                            sx={{
+                              position: "relative",
+                              gridColumn: { xs: "span 12", sm: `span ${cols}` },
+                              "&:hover .param-actions": { opacity: 1 },
+                            }}>
                             <Stack
                               direction="row"
                               spacing={0.25}
@@ -402,11 +465,13 @@ export const ParametrosList = () => {
               label="Valor"
               value={form.valor}
               onChange={(e) => setForm((prev) => ({ ...prev, valor: e.target.value }))}
+              onBlur={() => setForm((prev) => ({ ...prev, valor: normalizarValor(prev.clave, prev.valor) }))}
               fullWidth
               size="small"
               multiline
               rows={3}
               inputProps={{ style: { fontFamily: "monospace", fontSize: 13 } }}
+              helperText={esClaveUrl(form.clave) ? "La barra final (/) se elimina automáticamente" : undefined}
             />
             <TextField
               label="Descripción"

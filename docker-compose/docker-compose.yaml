@@ -27,8 +27,8 @@ services:
     environment:
       PGPASSWORD: dhis
     volumes:
-      - ./scripts/init-db.sh:/init-db.sh
-    entrypoint: ["/bin/bash", "/init-db.sh"]
+      - ./scripts:/scripts:ro
+    entrypoint: ["/bin/bash", "/scripts/init-db.sh"]
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.6.3
@@ -199,6 +199,7 @@ volumes:
   postgres_data:
 
 networks:
+  default:
   esavi-internal:
     internal: true
   esavi-public:

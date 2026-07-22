@@ -1,5 +1,32 @@
 services:
 
+  # ── Pre-chequeo: el datamart DuckDB debe existir ─────────────────────────────
+  # El despliegue del dashboard es MANUAL y SEPARADO del de la API. La API genera
+  # ../api-integra-esavi/datos/esavi.duckdb (cron / POST /v1/datamart/regenerar).
+  # Este servicio verifica que el archivo exista ANTES de arrancar el dashboard;
+  # si no está, sale con código != 0 y el despliegue del dashboard FALLA.
+  # Monta el directorio (no el archivo) para no caer en el bug de podman que crea
+  # un directorio vacío cuando el archivo de origen no existe.
+  duckdb-check:
+    image: busybox:1.36
+    container_name: esavi-duckdb-check
+    volumes:
+      - ../api-integra-esavi/datos:/check:ro
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >
+        if [ -f /check/esavi.duckdb ] && [ -s /check/esavi.duckdb ]; then
+          echo "OK: esavi.duckdb encontrado; el dashboard puede desplegarse.";
+        else
+          echo "ERROR: falta ../api-integra-esavi/datos/esavi.duckdb." >&2;
+          echo "       Genera el datamart con la API (POST /v1/datamart/regenerar" >&2;
+          echo "       o el arranque de la API) antes de desplegar el dashboard." >&2;
+          exit 1;
+        fi
+    networks:
+      - esavi-internal
+
   # ── Dashboard Shiny ──────────────────────────────────────────────────────────
   dashboard:
     build:
@@ -11,7 +38,7 @@ services:
     environment:
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT:-5432}
-      DB_NAME: ${DB_NAME:-dhi_esavi}
+      DB_NAME: ${DB_NAME:-DHI_ESAVI}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       LOG_ACCESS_ATTEMPTS:       ${LOG_ACCESS_ATTEMPTS:-true}
@@ -40,6 +67,9 @@ services:
       start_period: 90s
     networks:
       - esavi-internal
+    depends_on:
+      duckdb-check:
+        condition: service_completed_successfully
 
   # ── Actualización de datos (RETIRADA) ───────────────────────────────────────
   # El pipeline R (preparar_datos.R + procesamiento_datos.R) fue reemplazado por
