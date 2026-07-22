@@ -1,18 +1,23 @@
 {
 	"folders": [
 		{
+			"name": "app-integra-esavi",
 			"path": "proyecto-02-integra-esavi/workspace/app-integra-esavi"
 		},
 		{
+			"name": "api-integra-esavi",
 			"path": "proyecto-02-integra-esavi/workspace/api-integra-esavi"
 		},
 		{
+			"name": "docker-compose",
 			"path": "docker-compose"
 		},
 		{
+			"name": "dash-integra-esavi",
 			"path": "proyecto-02-integra-esavi/workspace/dash-integra-esavi"
 		},
 		{
+			"name": "workspace",
 			"path": "proyecto-02-integra-esavi/workspace"
 		}
 	],

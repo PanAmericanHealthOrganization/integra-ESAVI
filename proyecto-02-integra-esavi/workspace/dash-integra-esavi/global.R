@@ -746,32 +746,62 @@ load_data <- function() {
     )
   }
 
+  # Momento de generación del datamart (no el de esta lectura), para mostrar
+  # en la UI cuándo se actualizaron los datos por última vez.
+  fecha_actualizacion <- file.info(duckdb_path)$mtime
+
   cat("Datos cargados exitosamente.\n")
-  return(list(datos = datos, dosis = dosis, geodt = geodt, timeline_data = timeline_data))
+  return(list(
+    datos = datos, dosis = dosis, geodt = geodt, timeline_data = timeline_data,
+    fecha_actualizacion = fecha_actualizacion
+  ))
 }
 
 
-# 2.3 Cargar datos globalmente ----
+# 2.3 Recarga reactiva al regenerarse el datamart ----
+
+# api-integra-esavi regenera datos/esavi.duckdb (cron diario o
+# POST /v1/datamart/regenerar) mientras este dashboard sigue corriendo.
+# reactivePoll sondea el mtime del archivo cada duckdb_poll_interval_ms y,
+# si cambió, vuelve a ejecutar load_data() e invalida a todas las sesiones
+# que dependan de datos_recargados() — sin reiniciar el contenedor.
+# session = NULL comparte un único sondeo/valor entre todas las sesiones.
+duckdb_poll_interval_ms <- as.numeric(Sys.getenv("DUCKDB_POLL_INTERVAL_MS", unset = "60000"))
+
+datos_recargados <- reactivePoll(
+  intervalMillis = duckdb_poll_interval_ms,
+  session = NULL,
+  checkFunc = function() {
+    if (file.exists(duckdb_path)) file.info(duckdb_path)$mtime else NA
+  },
+  valueFunc = load_data
+)
+
+
+# Extrae y valida el sf de país a partir del objeto geodt de load_data();
+# usado tanto en la carga inicial como en cada recarga vía datos_recargados().
+extraer_geodatos_pais <- function(geodt) {
+  geodatos <- geodt[["geo_data_pais"]]
+
+  if (!is.null(geodatos) &&
+    "ISO_3DIGIT" %in% names(geodatos) &&
+    nrow(geodatos) > 0) {
+    cat("Datos geográficos cargados: país", geodatos$NAME[1], "\n")
+    return(geodatos)
+  }
+
+  cat("Advertencia: No se encontraron datos geográficos válidos\n")
+  return(NULL)
+}
+
+
+# 2.4 Cargar datos globalmente ----
 
 datos_cargados <- load_data()
 
 # Carga datos de georreferencia
 
-geodatos_global <- datos_cargados$geodt
-geodatos_global <- geodatos_global[["geo_data_pais"]]
-
-# Verificar si los datos geográficos tienen la estructura esperada
-if (!is.null(geodatos_global) &&
-  "ISO_3DIGIT" %in% names(geodatos_global) &&
-  nrow(geodatos_global) > 0) {
-  # Los datos actuales solo contienen información del país, no regiones
-  # Si se necesitan datos geográficos detallados, se deben proporcionar
-  cat("Datos geográficos cargados: país", geodatos_global$NAME[1], "\n")
-} else {
-  # Si no hay datos geográficos válidos, crear un placeholder
-  geodatos_global <- NULL
-  cat("Advertencia: No se encontraron datos geográficos válidos\n")
-}
+geodatos_global <- extraer_geodatos_pais(datos_cargados$geodt)
 
 
 # Carga datos de ESAVI

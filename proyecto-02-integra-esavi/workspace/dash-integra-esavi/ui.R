@@ -155,7 +155,7 @@ ui <- dashboardPage(
               style = "color: black;",
               tags$h4(
                 tags$ul(
-                  tags$li(HTML(paste0("<strong>Fecha de actualización:</strong> ", format(Sys.Date(), "%d-%m-%Y")))),
+                  tags$li(uiOutput("fecha_actualizacion_ui", inline = TRUE)),
                   HTML("<br>"),
                   tags$li(HTML("<strong>País:</strong> Ecuador")),
                   HTML("<br>"),
