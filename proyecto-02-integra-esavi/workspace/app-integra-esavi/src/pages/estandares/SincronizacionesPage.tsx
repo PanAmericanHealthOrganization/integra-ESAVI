@@ -1,5 +1,6 @@
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import MedicationIcon from "@mui/icons-material/Medication"
+import StorageIcon from "@mui/icons-material/Storage"
 import SyncIcon from "@mui/icons-material/Sync"
 import {
   Alert,
@@ -46,6 +47,22 @@ interface DrugSync {
   startSyncDate: string
   endSyncDate: string
   syncStatus: string
+}
+
+interface DatamartBuildResult {
+  ok: boolean
+  outputPath: string
+  startedAt: string
+  finishedAt: string
+  durationMs: number
+  rowCounts: Record<string, number>
+  error?: string
+}
+
+interface DatamartStatus {
+  running: boolean
+  last?: DatamartBuildResult
+  outputPath: string
 }
 
 const STATUS_COLOR: Record<string, "default" | "warning" | "success" | "error"> = {
@@ -165,6 +182,14 @@ export const SincronizacionesPage = () => {
   const [whodConfirmOpen, setWhodConfirmOpen] = useState(false)
   const [whodSyncing, setWhodSyncing] = useState(false)
 
+  const [datamartStatus, setDatamartStatus] = useState<DatamartStatus | null>(null)
+  const [datamartLoading, setDatamartLoading] = useState(false)
+  const [datamartRefresh, setDatamartRefresh] = useState(0)
+
+  // Datamart confirm dialog
+  const [datamartConfirmOpen, setDatamartConfirmOpen] = useState(false)
+  const [datamartSyncing, setDatamartSyncing] = useState(false)
+
   // Snackbar feedback
   const [snack, setSnack] = useState<{ open: boolean; message: string; severity: "success" | "error" }>({
     open: false,
@@ -198,6 +223,23 @@ export const SincronizacionesPage = () => {
       .catch(() => setWhodData([]))
       .finally(() => setWhodLoading(false))
   }, [whodPage, whodRefresh])
+
+  const fetchDatamartStatus = () =>
+    intESAVIClient
+      .get("/datamart/estado")
+      .then((res) => setDatamartStatus(res.data))
+      .catch(() => {})
+
+  useEffect(() => {
+    setDatamartLoading(true)
+    fetchDatamartStatus().finally(() => setDatamartLoading(false))
+  }, [datamartRefresh])
+
+  // Polling: refleja si el cron diario u otro usuario está regenerando el datamart
+  useEffect(() => {
+    const interval = setInterval(fetchDatamartStatus, 10000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleMeddraSync = async () => {
     if (!meddraVersion.trim() || !meddraLang.trim()) return
@@ -235,6 +277,40 @@ export const SincronizacionesPage = () => {
       setWhodSyncing(false)
     }
   }
+
+  const handleDatamartSync = async () => {
+    setDatamartSyncing(true)
+    try {
+      const res = await intESAVIClient.post("/datamart/regenerar")
+      const result: DatamartBuildResult & { message?: string } = res.data
+      setDatamartStatus((prev) => ({
+        running: false,
+        last: result,
+        outputPath: result.outputPath ?? prev?.outputPath ?? "",
+      }))
+      if (result.ok) {
+        showSnack(result.message ?? "Datamart regenerado correctamente.", "success")
+      } else {
+        showSnack(result.message ?? result.error ?? "La regeneración del datamart falló.", "error")
+      }
+      setDatamartConfirmOpen(false)
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? e?.message ?? "Error al regenerar el datamart."
+      showSnack(msg, "error")
+      setDatamartConfirmOpen(false)
+    } finally {
+      setDatamartSyncing(false)
+      setDatamartRefresh((n) => n + 1)
+    }
+  }
+
+  const datamartChip = datamartStatus?.running
+    ? { label: "En proceso", color: "warning" as const }
+    : !datamartStatus?.last
+      ? { label: "Sin ejecuciones", color: "default" as const }
+      : datamartStatus.last.ok
+        ? { label: "Completado", color: "success" as const }
+        : { label: "Error", color: "error" as const }
 
   const meddraRows = meddraData.map((s) => [
     <Typography variant="body2" fontWeight={500}>{s.meddraVersion}</Typography>,
@@ -319,6 +395,95 @@ export const SincronizacionesPage = () => {
             }
           />
         </Grid>
+
+        <Grid item xs={12}>
+          <Paper elevation={2} sx={{ p: 2 }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" mb={2}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <StorageIcon color="action" />
+                <Typography variant="h6" fontWeight={600}>
+                  Datamart (DuckDB) — Estado
+                </Typography>
+              </Stack>
+              <Button
+                variant="contained"
+                size="small"
+                color="warning"
+                startIcon={<SyncIcon />}
+                onClick={() => setDatamartConfirmOpen(true)}
+                disabled={datamartSyncing || datamartStatus?.running}
+              >
+                Regenerar Datamart
+              </Button>
+            </Stack>
+
+            {datamartLoading && !datamartStatus ? (
+              <Box display="flex" justifyContent="center" py={4}>
+                <CircularProgress size={28} />
+              </Box>
+            ) : (
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Estado</Typography>
+                  <Box>
+                    <Chip label={datamartChip.label} size="small" color={datamartChip.color} />
+                  </Box>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Última ejecución (inicio)</Typography>
+                  <Typography variant="body2">{formatDate(datamartStatus?.last?.startedAt)}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Última ejecución (fin)</Typography>
+                  <Typography variant="body2">{formatDate(datamartStatus?.last?.finishedAt)}</Typography>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <Typography variant="caption" color="text.secondary">Duración</Typography>
+                  <Typography variant="body2">
+                    {datamartStatus?.last?.durationMs != null
+                      ? `${(datamartStatus.last.durationMs / 1000).toFixed(1)} s`
+                      : "—"}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Typography variant="caption" color="text.secondary">Archivo generado</Typography>
+                  <Typography
+                    variant="body2"
+                    fontFamily="monospace"
+                    fontSize="0.75rem"
+                    sx={{ wordBreak: "break-all" }}
+                  >
+                    {datamartStatus?.outputPath || "—"}
+                  </Typography>
+                </Grid>
+                {datamartStatus?.last?.error && (
+                  <Grid item xs={12}>
+                    <Alert severity="error" variant="outlined">
+                      {datamartStatus.last.error}
+                    </Alert>
+                  </Grid>
+                )}
+                {datamartStatus?.last?.rowCounts && Object.keys(datamartStatus.last.rowCounts).length > 0 && (
+                  <Grid item xs={12}>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 0.5 }}>
+                      Filas por tabla
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                      {Object.entries(datamartStatus.last.rowCounts).map(([table, count]) => (
+                        <Chip
+                          key={table}
+                          label={`${table}: ${count.toLocaleString("es-EC")}`}
+                          size="small"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Stack>
+                  </Grid>
+                )}
+              </Grid>
+            )}
+          </Paper>
+        </Grid>
       </Grid>
 
       {/* Diálogo MedDRA */}
@@ -395,6 +560,37 @@ export const SincronizacionesPage = () => {
             startIcon={whodSyncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}
           >
             {whodSyncing ? "Iniciando…" : "Confirmar"}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Diálogo confirmación Datamart */}
+      <Dialog
+        open={datamartConfirmOpen}
+        onClose={() => !datamartSyncing && setDatamartConfirmOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
+        <DialogTitle>Regenerar Datamart</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Este proceso reconstruye el archivo DuckDB que alimenta el dashboard analítico
+            (dash-integra-esavi) a partir de los datos actuales. La petición permanece en espera
+            hasta que la regeneración termina y puede tomar varios minutos. ¿Deseas continuar?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDatamartConfirmOpen(false)} disabled={datamartSyncing}>
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={handleDatamartSync}
+            disabled={datamartSyncing}
+            startIcon={datamartSyncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}
+          >
+            {datamartSyncing ? "Regenerando…" : "Confirmar"}
           </Button>
         </DialogActions>
       </Dialog>

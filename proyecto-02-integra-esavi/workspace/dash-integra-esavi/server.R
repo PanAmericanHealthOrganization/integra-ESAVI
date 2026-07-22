@@ -36,6 +36,15 @@
 
   # Observadores iniciales ─────────────────────────────────────────────────────
 
+    # Fecha/hora de generación del datamart DuckDB (fecha_actualizacion la
+    # calcula load_data() a partir del mtime de esavi.duckdb). Se recalcula
+    # sola cuando api-integra-esavi regenera el archivo.
+    output$fecha_actualizacion_ui <- renderUI({
+      fecha <- datos_recargados()$fecha_actualizacion
+      texto <- if (is.null(fecha)) "Sin información" else format(fecha, "%d-%m-%Y %H:%M:%S")
+      HTML(paste0("<strong>Fecha de actualización:</strong> ", texto))
+    })
+
     datos_mapa <- reactiveVal(NULL)
       
     # observe({
@@ -74,48 +83,49 @@
     # 1.1 Control línea de tiempo ----  
       
       output$time_control <- renderUI({
-        
-        req(datos_global) # Valida que datos_global existe
-          
+
+        datos_actuales <- datos_recargados()$datos # Depende del datamart; se recalcula si se regenera
+        req(datos_actuales)
+
         if (input$time_filter == "Año notificación") {
-          años <- unique(datos_global$añoNoti)
+          años <- unique(datos_actuales$añoNoti)
           años <- años[!is.na(años)]  # Remueve NAs
-          
+
           req(length(años) > 0)  # Valida que hay datos
-          
-          sliderInput("slider_anio", 
+
+          sliderInput("slider_anio",
                       "Año notificación:",
-                      min = min(años, na.rm = TRUE), 
+                      min = min(años, na.rm = TRUE),
                       max = max(años, na.rm = TRUE),
-                      value = c(min(años, na.rm = TRUE), 
+                      value = c(min(años, na.rm = TRUE),
                                 max(años, na.rm = TRUE)),
                       sep = "")
-          
+
         } else if (input$time_filter == "Periodo Notificación") {
-          periodos <- unique(datos_global$periodoNoti)
+          periodos <- unique(datos_actuales$periodoNoti)
           periodos <- periodos[!is.na(periodos)]
-          
+
           req(length(periodos) > 0)
-          
-          sliderInput("slider_periodo", 
+
+          sliderInput("slider_periodo",
                       "Periodo Notificación:",
-                      min = min(periodos, na.rm = TRUE), 
+                      min = min(periodos, na.rm = TRUE),
                       max = max(periodos, na.rm = TRUE),
-                      value = c(min(periodos, na.rm = TRUE), 
+                      value = c(min(periodos, na.rm = TRUE),
                                 max(periodos, na.rm = TRUE)),
                       sep = "")
-          
+
         } else {
-          semanas <- unique(datos_global$semEpiNoti)
+          semanas <- unique(datos_actuales$semEpiNoti)
           semanas <- semanas[!is.na(semanas)]
-          
+
           req(length(semanas) > 0)
-          
-          sliderInput("slider_semEpi", 
+
+          sliderInput("slider_semEpi",
                       "Semana epidemiológica:",
-                      min = min(semanas, na.rm = TRUE), 
+                      min = min(semanas, na.rm = TRUE),
                       max = max(semanas, na.rm = TRUE),
-                      value = c(min(semanas, na.rm = TRUE), 
+                      value = c(min(semanas, na.rm = TRUE),
                                 max(semanas, na.rm = TRUE)),
                       sep = "")
         }
@@ -140,9 +150,10 @@
       
       observe({
         if (length(rv$filtros_estado) == 0) {
+          datos_iniciales <- datos_recargados()$datos
           for (nombre_filtro in names(filtros_config)) {
             rv$filtros_estado[[nombre_filtro]] <- list(
-              valores_disponibles = obtener_valores_disponibles(nombre_filtro),
+              valores_disponibles = obtener_valores_disponibles(nombre_filtro, datos_iniciales),
               seleccionados = NULL
             )
           }
@@ -217,10 +228,14 @@
     # 3.1 Datos filtrados usando el estado reactivo ----
       
       datos_filtrados <- reactive({
-        datos <- datos_global
-        dosis <- dosis_global
-        geodatos <- geodatos_global
-        
+        # datos_recargados() depende del sondeo del datamart DuckDB: si
+        # api-integra-esavi regenera esavi.duckdb, este reactive (y todo lo
+        # que dependa de él) se recalcula automáticamente con los datos nuevos.
+        nuevos_datos <- datos_recargados()
+        datos <- nuevos_datos$datos
+        dosis <- nuevos_datos$dosis
+        geodatos <- extraer_geodatos_pais(nuevos_datos$geodt)
+
 
       # 3.1.1 Crear variables iniciales para los KPIs ----
         
@@ -406,14 +421,16 @@
       
     # 3.2 Actualización del observador para los filtros ----
       observe({
-        rv$reset_count  # Forzar reactividad con el contador de resets
-        
+        rv$reset_count       # Forzar reactividad con el contador de resets
+        datos_recargados()   # Forzar reactividad si el datamart se regeneró
+
         # Evitar errores de observador recursivo
         isolate({
+          datos_base <- datos_recargados()$datos
           for (nombre_filtro in names(filtros_config)) {
             # Clonar los datos originales para este proceso
-            datos_temp <- datos_global
-            
+            datos_temp <- datos_base
+
             # Aplicar todos los filtros excepto el actual
             for (otro_nombre in setdiff(names(filtros_config), nombre_filtro)) {
               valores_seleccionados <- rv$filtros_estado[[otro_nombre]]$seleccionados
