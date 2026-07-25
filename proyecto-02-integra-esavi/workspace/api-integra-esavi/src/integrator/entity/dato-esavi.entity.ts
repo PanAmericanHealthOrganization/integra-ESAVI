@@ -57,9 +57,9 @@ export class DatoEsavi extends Auditoria {
    *
    */
   @Column({
-    name: 'CODIGO_CIE10',
+    name: 'CODIGO_ESAVI_CIE10',
     nullable: true,
-    comment: 'Código del ESAVI según clasificación CIE-10',
+    comment: 'Código del ESAVI según clasificación CIE-10, mapeado a partir del LLT MedDRA',
   })
   codigoEsaviCie10: string;
 
@@ -67,7 +67,7 @@ export class DatoEsavi extends Auditoria {
    *
    */
   @Column({
-    name: 'CODIGO_LLT',
+    name: 'CODIGO_ESAVI_MEDDRA_LLT',
     nullable: true,
     comment: 'Código LLT MedDRA',
   })
@@ -105,16 +105,8 @@ export class DatoEsavi extends Auditoria {
   })
   duracion: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'RESULTADO_EVENTO',
-    nullable: true,
-    comment: 'Resultado o desenlace del evento adverso',
-  })
-  resultado: string;
-
+  // RESULTADO_EVENTO se eliminó de esta tabla por estar repetida: el estado final del evento
+  // queda únicamente en TR_DESENLACE_ESAVI.RESULTADO_EVENTO, ya homologado a códigos 0..5.
 
   /**
    *

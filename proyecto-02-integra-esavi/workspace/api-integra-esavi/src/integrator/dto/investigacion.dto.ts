@@ -1,6 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { IInvestigacion } from '../entity/investigacion.entity';
-import { DatoEsavi } from '../entity/dato-esavi.entity';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Auditoria } from '../entity';
 /**

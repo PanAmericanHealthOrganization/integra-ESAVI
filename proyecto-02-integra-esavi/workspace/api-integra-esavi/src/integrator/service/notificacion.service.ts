@@ -35,7 +35,7 @@ export class NotificacionService {
     return this.notificacionRepository.save(notificacion);
   }
 
-  delete(uuid: string): Promise<Notificacion> {
+  delete(_uuid: string): Promise<Notificacion> {
     return Promise.resolve(undefined);
   }
 

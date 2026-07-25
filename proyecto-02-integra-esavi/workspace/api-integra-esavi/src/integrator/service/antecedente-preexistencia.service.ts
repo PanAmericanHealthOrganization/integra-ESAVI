@@ -64,7 +64,7 @@ export class AntecedentePreexistenciaService {
     }
   }
 
-  delete(uuid: string): Promise<AntecedentePreexistencia> {
+  delete(_uuid: string): Promise<AntecedentePreexistencia> {
     return Promise.resolve(undefined);
   }
 

@@ -67,7 +67,7 @@ export class DimCompletitudService {
       { tabla: 'TR_DATO_VACUNACION', columnas: ['FECHA_VACUNACION'], fkColumn: 'ID', joinColumn: 'NOTIFICACION_ID' },
       {
         tabla: 'TR_DATOS_ESAVI',
-        columnas: ['CODIGO_LLT', 'COGIDOCASO'],
+        columnas: ['CODIGO_ESAVI_MEDDRA_LLT', 'COGIDO_CASO'],
         fkColumn: 'ID',
         joinColumn: 'NOTIFICACION_ID',
       },

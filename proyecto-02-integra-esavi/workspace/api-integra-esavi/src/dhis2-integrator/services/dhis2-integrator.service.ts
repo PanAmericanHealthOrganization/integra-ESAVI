@@ -75,7 +75,7 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error:any) {}
+    } catch {}
     return resultado;
   };
 
@@ -86,7 +86,7 @@ export class Dhis2IntegratorService {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error:any) {}
+    } catch {}
     return resultado;
   };
 
@@ -554,7 +554,7 @@ export class Dhis2IntegratorService {
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Nombre de quien notifica',
         )
-      ],
+      ];
     // Profesion quien notifica. Si es nulo, asignar 'DESCONOCIDO'
     notificacion.profesionNotificadorParam = this.revisarValorNulo(
       row[

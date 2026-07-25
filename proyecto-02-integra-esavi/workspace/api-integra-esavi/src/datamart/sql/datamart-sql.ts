@@ -85,12 +85,12 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
      LEFT JOIN ${S}."TC_CATALOGO_PADRE" cu ON cu."ID" = tn."CTUNIDADEDAD_ID"
      WHERE tn."FECHA_NOTIFICACION" IS NOT NULL`,
 
-    // 1.3 Eventos ESAVI (codmeddraesavip = CODIGO_LLT)
+    // 1.3 Eventos ESAVI (codmeddraesavip = CODIGO_ESAVI_MEDDRA_LLT, antes CODIGO_LLT)
     `CREATE OR REPLACE TABLE raw_event AS
-     SELECT tde."ID"::VARCHAR              AS id,
-            tde."NOTIFICACION_ID"::VARCHAR AS report_id,
-            tde."CODIGO_LLT"::VARCHAR      AS codmeddraesavip,
-            tde."FECHA_ESAVI"::DATE        AS fecinesavi
+     SELECT tde."ID"::VARCHAR                       AS id,
+            tde."NOTIFICACION_ID"::VARCHAR          AS report_id,
+            tde."CODIGO_ESAVI_MEDDRA_LLT"::VARCHAR  AS codmeddraesavip,
+            tde."FECHA_ESAVI"::DATE                 AS fecinesavi
      FROM ${S}."TR_DATOS_ESAVI" tde
      INNER JOIN ${S}."TR_NOTIFICACION" tn ON tn."ID" = tde."NOTIFICACION_ID"
      WHERE tde."FECHA_ESAVI" IS NOT NULL`,

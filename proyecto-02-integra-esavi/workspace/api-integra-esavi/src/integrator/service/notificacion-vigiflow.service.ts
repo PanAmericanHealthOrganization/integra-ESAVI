@@ -3,7 +3,6 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
 import {In,Repository} from 'typeorm';
 import {CreateNotificacionDto,UpdateNotificacionDto} from '../dto';
-import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Notificador} from '../entity/notificador.entity';
 import {Paciente} from '../entity/paciente.entity';
@@ -62,7 +61,7 @@ export class NotificacionVigiflowService {
           try {
             const parroquia = await this.findParroquiaByCodigo(createDto.residenciaPaciente.parroquia);
             if (parroquia) { notificacion.parroquiaResidencia = parroquia; changed = true; }
-          } catch (_) { /* parroquia no encontrada, se ignora */ }
+          } catch { /* parroquia no encontrada, se ignora */ }
         }
 
         if (changed) {
@@ -89,7 +88,7 @@ export class NotificacionVigiflowService {
             notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
               createDto.residenciaPaciente.parroquia,
             );
-          } catch (error) {
+          } catch {
             console.log('Parroquia no encontrada');
           }
         }
@@ -102,7 +101,7 @@ export class NotificacionVigiflowService {
         (createDto.fechaNotificacion >= createDto.fechaNacimiento) ){
           try{          
 
-            let resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);           
+            const resultadoUnidadYedad = this.calcularEdad(createDto.fechaNotificacion, createDto.fechaNacimiento);
             notificacion.edad = resultadoUnidadYedad.edadCalculada;
             notificacion.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', resultadoUnidadYedad.unidadEdadCalculada);
             /**
@@ -119,7 +118,7 @@ export class NotificacionVigiflowService {
               notificacion.edad = edadDias;
             }
 
-          }catch(error){
+          }catch{
             console.log('No se puede calcular edad');
           }
         } else {
@@ -133,52 +132,55 @@ export class NotificacionVigiflowService {
             try {
               // Aseguramos que la unidad de edad esté en mayúsculas
               let unidadEdad = createDto.unidadEdadPaciente.toUpperCase();
-              let edadFinal = createDto.edad;
+              // FIXME: `_edadFinal` y `unidadEdad` se calculan pero nunca se asignan a
+              // `notificacion`, así que toda esta conversión se descarta al salir del bloque.
+              // Se mantiene el prefijo `_` para no ocultar el hallazgo detrás de un disable.
+              let _edadFinal = createDto.edad;
 
               // Si la unidad no es "AÑO" o "AÑOS", realizar la conversión
               if (unidadEdad !== 'AÑO' && unidadEdad !== 'AÑOS') {
                 if (unidadEdad === 'DÉCADA') {
                   // Si la unidad es "DÉCADA", multiplicamos por 10 para obtener la edad real en años
-                  edadFinal = ~~(createDto.edad * 10);
+                  _edadFinal = ~~(createDto.edad * 10);
                   unidadEdad = 'AÑOS'; // Actualizamos la unidad a "AÑOS" después de la conversión
                 } else if (unidadEdad === 'SEMANA') {
                   if (createDto.edad >= 0 && createDto.edad <= 52) {
-                    edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
+                    _edadFinal = ~~(createDto.edad / 4.3452); // cte sugerida: 4.34524// Convertimos semanas a meses (1 mes = 4.34524 semanas)
                     unidadEdad = 'MESES';
                   } else {
                     // Convertimos semanas a años (1 semana = 1/52 años)
-                    edadFinal = ~~(createDto.edad / 52.1429);
+                    _edadFinal = ~~(createDto.edad / 52.1429);
                     unidadEdad = 'AÑOS';
                   }
                 } else if (unidadEdad === 'DÍA' || unidadEdad === 'DÍAS') {
                   if (createDto.edad >= 0 && createDto.edad <= 364) {
                     // Se convierte días a meses (1 mes = 30.44 días)
-                    edadFinal = ~~(createDto.edad / 30.44);
+                    _edadFinal = ~~(createDto.edad / 30.44);
                     unidadEdad = 'MESES';
                   } else {
                     // Convertimos días a años (1 día = 1/365 años)
-                    edadFinal = ~~(createDto.edad / 365);
+                    _edadFinal = ~~(createDto.edad / 365);
                     unidadEdad = 'AÑOS';
                   }
                   
                 } else if (unidadEdad === 'HORA') {
                   if (createDto.edad >= 0 && createDto.edad <= 8759) {
                     // Si la edad en horas es menor a 8760 (1 año), la convertimos a meses
-                    edadFinal = ~~(createDto.edad / 730); // cte sugerida: 730.001// Convertimos horas a meses (1 mes = 730.001 horas)
+                    _edadFinal = ~~(createDto.edad / 730); // cte sugerida: 730.001// Convertimos horas a meses (1 mes = 730.001 horas)
                     unidadEdad = 'MESES';
                   } else {
                     // Convertimos horas a años (1 hora = 1/8760 años)
-                    edadFinal = ~~(createDto.edad / 8760);
+                    _edadFinal = ~~(createDto.edad / 8760);
                     unidadEdad = 'AÑOS';
                   }                
                 } else if (unidadEdad === 'MES' || unidadEdad === 'MESES') {
                   if (createDto.edad >= 0 && createDto.edad <= 11) {
                     // Si la edad en meses es menor a 12, la dejamos como meses
-                    edadFinal = createDto.edad;
+                    _edadFinal = createDto.edad;
                     unidadEdad = 'MESES';
                   } else {
                     // Convertimos meses a años (1 mes = 1/12 años)
-                    edadFinal = ~~(createDto.edad / 12);
+                    _edadFinal = ~~(createDto.edad / 12);
                     unidadEdad = 'AÑOS';
                   }
                 }
@@ -247,7 +249,7 @@ export class NotificacionVigiflowService {
     notificacion: Notificacion,
     updateNotificacion: UpdateNotificacionDto,
     notificador?: Notificador,
-    establecimientoId?: string,
+    _establecimientoId?: string,
   ) {
     try {
       notificacion.casoNarrativo = updateNotificacion.casoNarrativo;
@@ -255,10 +257,9 @@ export class NotificacionVigiflowService {
       notificacion.fechaNotificacion = updateNotificacion.fechaNotificacion;
       notificacion.fechaReporteNacional = updateNotificacion.fechaReporteNacional;
       notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', updateNotificacion.tipoEmisor);
-      if (updateNotificacion.peso != null) notificacion.peso = updateNotificacion.peso;
-      if (updateNotificacion.altura != null) notificacion.altura = updateNotificacion.altura;
+      // PESO, ALTURA y TITULO_REPORTE se retiraron de TR_NOTIFICACION por no ser variables
+      // priorizadas para el análisis.
       if (updateNotificacion.fechaAtencion != null) notificacion.fechaAtencion = updateNotificacion.fechaAtencion;
-      if (updateNotificacion.tituloReporte) notificacion.tituloReporte = updateNotificacion.tituloReporte;
 
       if (notificador) {
         notificacion.notificador = notificador;
@@ -271,7 +272,7 @@ export class NotificacionVigiflowService {
     }
   }
 
-  delete(uuid: string): Promise<Notificacion> {
+  delete(_uuid: string): Promise<Notificacion> {
     return Promise.resolve(undefined);
   }
 
@@ -395,18 +396,17 @@ export class NotificacionVigiflowService {
 
     let bestId: string | null = null;
     let bestScore = 0;
-    let bestName = '';
 
     for (const row of rows) {
       const dbNorm = norm(row.nombre);
-      if (dbNorm === excelNorm) { bestId = row.id; bestScore = 1; bestName = row.nombre; break; }
+      if (dbNorm === excelNorm) { bestId = row.id; bestScore = 1; break; }
       const dbWords = dbNorm.split(/\s+/).filter(Boolean);
       const [smaller, largerArr] = excelWords.length <= dbWords.length ? [excelWords, dbWords] : [dbWords, excelWords];
       const largerSet = new Set(largerArr);
       let hits = 0;
       for (const w of smaller) if (largerSet.has(w)) hits++;
       const score = hits / smaller.length;
-      if (score > bestScore) { bestScore = score; bestId = row.id; bestName = row.nombre; }
+      if (score > bestScore) { bestScore = score; bestId = row.id; }
     }
 
     if (bestScore >= 0.9 && bestId) {

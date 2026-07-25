@@ -6,8 +6,6 @@ import {UbicacionDto} from './ubicacion.dto';
 
 export class CreateNotificacionDto {
   residenciaPaciente: UbicacionDto;
-  peso: number;
-  altura: number;
   @IsDate({ message: 'fechaNacimiento debe ser una fecha válida' })
   @Type(() => Date)
   fechaNacimiento: Date;
@@ -26,7 +24,6 @@ export class CreateNotificacionDto {
   residenciaNotificador: UbicacionDto;
   comentarioNotificador: string;
   casoNarrativo: string;
-  tituloReporte: string;
   tipoReporte: string;
   medioNotificacion: string;
   tipoEmisor: string;

@@ -24,12 +24,12 @@ DHI_ESAVI,TR_NOTIFICACION,CTPARROQUIA_CODIGO,dhis2,'DNVE ESAVI TRK - Parroquia r
 DHI_ESAVI,TR_NOTIFICACION,ESTABLECIMIENTO_ID,dhis2,'DNVE ESAVI TRK - Unicódigo',trim() y búsqueda en TR_ESTABLECIMIENTO por UNI_CODIGO (solo habilitados) → FK,,,
 DHI_ESAVI,TR_NOTIFICACION,CASO_NARRATIVO,dhis2,'DNVE ESAVI TRK - Observaciones',Directo,,,
 DHI_ESAVI,TR_NOTIFICACION,ORIGEN,dhis2,(constante),Valor fijo 'DHIS2',,,
-DHI_ESAVI,TR_NOTIFICACION,EDAD,vigiflow,Edad,"formatoInteger(); válida solo si 0<edad<121 y existe unidad; si no, se calcula de fechaNotificacion − fechaNacimiento (años; <1 año en meses; <1 mes en días)",VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),H
+DHI_ESAVI,TR_NOTIFICACION,EDAD,vigiflow,Edad,"formatoEnteroSinSeparadores(): descarta puntos y comas y convierte a entero; válida solo si 0<edad<121 y existe unidad",VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),H
 DHI_ESAVI,TR_NOTIFICACION,CTUNIDADEDAD_ID,vigiflow,Unidad de edad,toUpperCase() + buscarSubcategoriaPorSimilitud('UNIDAD_EDAD') → FK; si la edad fue calculada se asigna la unidad calculada (AÑOS/MESES/Dias),VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),I
 DHI_ESAVI,TR_NOTIFICACION,FECHA_NOTIFICACION,vigiflow,Fecha de notificación,analizarCadenaFecha(); luego SOBREESCRITA en la fase de actualización con la col J de la hoja Reportes,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AD
 DHI_ESAVI,TR_NOTIFICACION,FECHA_LLENADO_FICHA,vigiflow,Fecha de notificación,Mismo valor que la fecha de notificación de AEFI,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AD
 DHI_ESAVI,TR_NOTIFICACION,FECHA_REPORTE_NACIONAL,vigiflow,Fecha del reporte,analizarCadenaFecha(); luego sobreescrita con col J de la hoja Reportes,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AE
-DHI_ESAVI,TR_NOTIFICACION,MEDIO_NOTIFICACION,vigiflow,(constante),Valor fijo 'Medio electrónico VigiFlow' (recomendación funcional; no se toma de la col E de Reportes),VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),
+DHI_ESAVI,TR_NOTIFICACION,MEDIO_NOTIFICACION,vigiflow,(constante),Valor fijo 'Medio electrónico' — mismo literal para VigiFlow y DHIS2 (sin mencionar el sistema de origen),VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),
 DHI_ESAVI,TR_NOTIFICACION,CODIGO_ORIGEN_NOTIFICACION,vigiflow,Número de identificación único mundial,Directo; clave de deduplicación/actualización,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),B
 DHI_ESAVI,TR_NOTIFICACION,ORIGEN,vigiflow,(constante),Valor fijo 'VIGIFLOW',VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),
 DHI_ESAVI,TR_NOTIFICACION,ORIGEN_ORIGINAL,vigiflow,Valores crudos del paciente,"JSON con valores sin transformar (iniciales, identificación, sexo, fecha nacimiento, edad, unidad, reportadoPor)",VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),"C,E,F,G,H,I,AB"
@@ -39,8 +39,6 @@ DHI_ESAVI,TR_NOTIFICACION,FECHA_NOTIFICACION,vigiflow,Fecha de recepción inicia
 DHI_ESAVI,TR_NOTIFICACION,FECHA_REPORTE_NACIONAL,vigiflow,Fecha de recepción inicial,Mismo valor de col J (sobreescribe AEFI col AE),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),J
 DHI_ESAVI,TR_NOTIFICACION,FECHA_ATENCION,vigiflow,Fecha de recepción inicial,Mismo valor de col J,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),J
 DHI_ESAVI,TR_NOTIFICACION,CT_TIPO_EMISOR_ID,vigiflow,Tipo de emisor,trim() + buscarSubcategoriaPorSimilitud('TIPO_EMISOR') → FK,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),F
-DHI_ESAVI,TR_NOTIFICACION,PESO,vigiflow,Peso (kg),parseFloat(); nulo si vacío,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),AA
-DHI_ESAVI,TR_NOTIFICACION,ALTURA,vigiflow,Altura (cm),parseFloat(); nulo si vacío,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),AB
 DHI_ESAVI,TR_NOTIFICACION,NOTIFICADOR_ID,vigiflow,Número de identificación del especialista,trim(); crea/actualiza TR_NOTIFICADOR y asigna FK por identificación,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),W
 DHI_ESAVI,TR_NOTIFICACION,ESTABLECIMIENTO_ID,vigiflow,Organización (Emisor),"Columna detectada dinámicamente por encabezado; normalización (sin tildes, mayúsculas) y matching por palabras contra TR_ESTABLECIMIENTO.UNI_NOMBRE; se asigna FK solo si similitud ≥ 0.9",VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),D (dinámica)
 DHI_ESAVI,TR_NOTIFICADOR,IDENTIFICACION,vigiflow,Número de identificación del especialista,trim(); clave de upsert,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reportes (hoja 1),W
@@ -52,13 +50,11 @@ DHI_ESAVI,TR_DATOS_ESAVI,NOMBRE_ESAVI_REPORTADO,dhis2,'DNVE ESAVI TRK - Sintomat
 DHI_ESAVI,TR_DATOS_ESAVI,FECHA_ESAVI,dhis2,'DNVE ESAVI TRK - Fecha de inicio de síntomas del ESAVI' + 'Hora de Inicio de síntomas del ESAVI',Diagnósticos: combina fecha (parte antes del espacio) + 'T' + hora + ':00Z' → Date UTC; Sintomatologías: solo la fecha con formatoFecha(),,,
 DHI_ESAVI,TR_DATOS_ESAVI,DESCRIPCION,dhis2,(constante),Etiqueta generada: 'Diagnóstico inicial DHIS2 i' / 'Diagnóstico final DHIS2 i' / 'Sintomatología DHIS2 i' / 'Sintomatología Otro DHIS2',,,
 DHI_ESAVI,TR_DATOS_ESAVI,COGIDO_CASO,dhis2,'DNVE ESAVI TRK - Código del caso',Directo (mismo código de la notificación),,,
-DHI_ESAVI,TR_DATOS_ESAVI,NOMBRE_ESAVI,vigiflow,Reacción / evento (MedDRA) LLT,splitLineas() por \n (un evento ESAVI por línea de la celda) + toUpperCase(); upsert por notificación+fechaEsavi+nombre,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),D
-DHI_ESAVI,TR_DATOS_ESAVI,NOMBRE_ESAVI_REPORTADO,vigiflow,Reacción / evento tal como fue reportada por el notificador primario,splitLineas() + toUpperCase() + eliminarSaltoLinea(); si vacío usa el LLT (col D),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),C
-DHI_ESAVI,TR_DATOS_ESAVI,CODIGO_LLT,vigiflow,Reacción / evento (MedDRA) LLT,buscarCodigoPorSimilitud(): match contra MEDDRA.MED_LLT por nombre en mayúsculas con similitud ≥ 90%,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),D
+DHI_ESAVI,TR_DATOS_ESAVI,NOMBRE_ESAVI_REPORTADO,vigiflow,Reacción / evento (MedDRA) LLT,splitLineas() + toUpperCase() + eliminarSaltoLinea(); se toma el LLT MedDRA (col D) porque viene en español — la col C trae el texto libre del notificador en inglés,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),D
+DHI_ESAVI,TR_DATOS_ESAVI,CODIGO_ESAVI_MEDDRA_LLT,vigiflow,Reacción / evento (MedDRA) LLT,buscarPorSimilitud() contra MEDDRA.MED_LLT por nombre en mayúsculas con similitud ≥ 90% → LLT.code. Columna renombrada desde CODIGO_LLT,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),D
 DHI_ESAVI,TR_DATOS_ESAVI,FECHA_ESAVI,vigiflow,Fecha de comienzo / Horario,splitLineas() + formatoFecha() por evento,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),I
 DHI_ESAVI,TR_DATOS_ESAVI,FECHA_FINALIZACION,vigiflow,Fecha de finalización / Horario,splitLineas() + formatoFecha() por evento,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),J
 DHI_ESAVI,TR_DATOS_ESAVI,DURACION_EVENTO,vigiflow,Duración,splitLineas(); directo por evento,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),K
-DHI_ESAVI,TR_DATOS_ESAVI,RESULTADO_EVENTO,vigiflow,Resultado,splitLineas(); directo por evento,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),N
 DHI_ESAVI,TR_DATOS_ESAVI,COGIDO_CASO,vigiflow,Número de identificación único mundial,Código de origen de la notificación asociada,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),A
 DHI_ESAVI,TR_DATO_VACUNA,NUMERO_DOSIS_VACUNA,dhis2,'DNVE ESAVI TRK - Dosis de la vacuna 1..5',"transformarDosis(): mapa texto→número (DOSIS ÚNICA=0, PRIMERA=1, SEGUNDA=2, TERCERA=3, CUARTA=4, QUINTA=5, PRIMER REFUERZO=6, SEGUNDO REFUERZO=7, REFUERZO ANUAL=8; no reconocido→null)",,,
 DHI_ESAVI,TR_DATO_VACUNA,NUMERO_LOTE,dhis2,'DNVE ESAVI TRK - Lote de la vacuna 1..5',Directo,,,
@@ -67,13 +63,10 @@ DHI_ESAVI,TR_DATO_VACUNA,VIA_ADMINISTRACION,dhis2,'DNVE ESAVI TRK - Vía de apli
 DHI_ESAVI,TR_DATO_VACUNA,FECHA_VENCIMIENTO_DILUYENTE,dhis2,'DNVE ESAVI TRK - Fecha de expiración del diluyente vacuna 1..5',formatoFecha(),,,
 DHI_ESAVI,TR_DATO_VACUNA,NOMBRE_DILUYENTE_VACUNA,dhis2,'DNVE ESAVI TRK - Nombre del diluyente usado vacuna 1..5',Directo,,,
 DHI_ESAVI,TR_DATO_VACUNA,CT_ROL_VACUNA_ID,dhis2,'DNVE ESAVI TRK - Es sospechosa vacuna 1..5',Búsqueda en catálogo por descripción → FK; el registro se crea solo si al menos un campo de la vacuna i tiene valor,,,
-DHI_ESAVI,TR_DATO_VACUNA,NUMERO_DOSIS_VACUNA,vigiflow,Número de dosis,Regex extrae el primer número (\d+) y parseInt(); nulo si no hay dígitos,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),O
+DHI_ESAVI,TR_DATO_VACUNA,NUMERO_DOSIS_VACUNA,vigiflow,Número de dosis,formatoEnteroSinSeparadores(): entero sin puntos ni comas; nulo si no hay dígitos,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),O
 DHI_ESAVI,TR_DATO_VACUNA,CODIGO_ATC,vigiflow,Código(s) ATC,extraerCodigoAtcVacuna(); solo si el ATC corresponde a vacuna (J07) se actualiza/crea el registro,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),G
 DHI_ESAVI,TR_DATO_VACUNA,CT_ROL_VACUNA_ID,vigiflow,Rol del medicamento,Búsqueda en catálogo por descripción → FK,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),C
-DHI_ESAVI,TR_DATO_VACUNA,ACCION_TOMADA,vigiflow,Acción tomada,Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),M
 DHI_ESAVI,TR_DATO_VACUNA,DOSIS_ADMINISTRADA,vigiflow,Dosis (número y unidad),Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),S
-DHI_ESAVI,TR_DATO_VACUNA,INTERVALO_DOSIFICACION,vigiflow,Intervalo de dosificación,Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),T
-DHI_ESAVI,TR_DATO_VACUNA,DOSIS_DE_APLICACION,vigiflow,Dosis,Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),U
 DHI_ESAVI,TR_DATO_VACUNA,DURACION_TRATAMIENTO,vigiflow,Duración,Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),V
 DHI_ESAVI,TR_DATO_VACUNA,FORMA_FARMACEUTICA,vigiflow,Forma farmacéutica,Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),Y
 DHI_ESAVI,TR_DATO_VACUNA,FORMA_FARMACEUTICA_EDQM,vigiflow,Forma farmacéutica (EDQM),Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),Z
@@ -81,7 +74,6 @@ DHI_ESAVI,TR_DATO_VACUNA,VIA_ADMINISTRACION,vigiflow,Vía de administración,Dir
 DHI_ESAVI,TR_DATO_VACUNA,VIA_ADMINISTRACION_EDQM,vigiflow,Vía de administración (EDQM),Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),AB
 DHI_ESAVI,TR_DATO_VACUNA,PAIS_AUTORIZACION_ISO3CODE,vigiflow,País de autorización,"toUpperCase() + getAlpha3Code() (i18n-iso-countries, locale 'es') → código ISO 3166-1 alfa-3; por defecto 'ECU' si vacío",VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),J
 DHI_ESAVI,TR_DATO_VACUNA,NUMERO_LOTE,vigiflow,Número de lote,transformarLoteVacuna(),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),AE
-DHI_ESAVI,TR_DATO_VACUNA,INDICACION_MEDDRA,vigiflow,Indicación (MedDRA),Directo,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),Q
 DHI_ESAVI,TR_DATO_VACUNACION,NOMBRE_VACUNATORIO,dhis2,'DNVE ESAVI TRK - Establecimiento de salud donde recibió la vacuna 1..5',Directo; registro creado solo si algún campo de la vacunación i tiene valor,,,
 DHI_ESAVI,TR_DATO_VACUNACION,FECHARECONSTITUCIONVACUNA,dhis2,'DNVE ESAVI TRK - Fecha de la dilución vacuna 1..5',formatoFecha(),,,
 DHI_ESAVI,TR_DATO_VACUNACION,FECHA_VACUNACION,dhis2,'DNVE ESAVI TRK - Fecha de vacunación vacuna 1..5',formatoFecha(),,,
@@ -105,12 +97,12 @@ DHI_ESAVI,TR_GRAVEDAD_ESAVI,PARTE_EVENTOS_PREOCUPACION,dhis2,'DNVE ESAVI TRK - C
 DHI_ESAVI,TR_GRAVEDAD_ESAVI,SON_EVENTOS_NUEVOS,dhis2,'DNVE ESAVI TRK - Criterio de investigación - nuevos eventos',"transformarTipoSoloSiDhis2(): '1' si el check está marcado ('1'), sino '0'",,,
 DHI_ESAVI,TR_GRAVEDAD_ESAVI,DESCRI_EVENTOS_NUEVOS,dhis2,'DNVE ESAVI TRK - Evento nuevo - notificación',Directo; solo si SON_EVENTOS_NUEVOS es afirmativo,,,
 DHI_ESAVI,TR_GRAVEDAD_ESAVI,CONDICION_EGRESO,dhis2,'DNVE ESAVI TRK - Condición de egreso',Directo (nombre de opción),,,
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,TIPO_GRAVEDAD,vigiflow,Grave,'1' (GRAVE) si el texto en mayúsculas contiene 'S' (Sí); sino '0' (NO GRAVE),VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),X
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,MUERTE,vigiflow,Razón por la que se considera grave,Minúsculas sin tildes + includes('muerte') → booleano,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Y
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,RIESGO_VIDA,vigiflow,Razón por la que se considera grave,Minúsculas sin tildes + includes('amenaza') → booleano,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Y
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,DISCAPACIDAD,vigiflow,Razón por la que se considera grave,Minúsculas sin tildes + includes('discapacidad') → booleano,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Y
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,HOSPITALIZACION,vigiflow,Razón por la que se considera grave,Minúsculas sin tildes + includes('hospitalizacion') → booleano,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Y
-DHI_ESAVI,TR_GRAVEDAD_ESAVI,ANOMALIA_CONGENITA,vigiflow,Razón por la que se considera grave,Minúsculas sin tildes + includes('anomalia') → booleano,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Y
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,TIPO_GRAVEDAD,vigiflow,Grave,"'1' (GRAVE) si el texto en mayúsculas contiene 'S' (Sí); sino '0' (NO GRAVE). CRITERIO DE SELECCIÓN: solo se persisten los casos con TIPO_GRAVEDAD = 0; los casos graves se descartan por completo de la importación",VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),X
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,MUERTE,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'muerte' (sin tildes/minúsculas); '0' si no está presente o la celda está vacía,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,RIESGO_VIDA,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'amenaza' (sin tildes/minúsculas); '0' si no está presente o la celda está vacía,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,DISCAPACIDAD,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'discapacidad' (sin tildes/minúsculas); '0' si no está presente o la celda está vacía,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,HOSPITALIZACION,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'hospitalizacion' (sin tildes/minúsculas); '0' si no está presente o la celda está vacía,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,ANOMALIA_CONGENITA,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'anomalia' (sin tildes/minúsculas); '0' si no está presente o la celda está vacía,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
 DHI_ESAVI,TR_DESENLACE_ESAVI,AUTOPSIA,dhis2,'DNVE ESAVI TRK - Se realizó autopsia',"obtenerValorNumerico(): 'si'→1, 'no'→0, 'no sabe'/desconocido→2",,,
 DHI_ESAVI,TR_DESENLACE_ESAVI,FECHAMUERTE,dhis2,'DNVE ESAVI TRK - Fecha fallecimiento',formatoFecha(),,,
 DHI_ESAVI,TR_DESENLACE_ESAVI,FECHANOTIFICAMUERTEFETAL,dhis2,(derivado),Se asigna la FECHA_NOTIFICACION solo si el criterio muerte fetal está marcado,,,
@@ -119,8 +111,6 @@ DHI_ESAVI,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASO,dhis2,'DNVE ESAVI TRK - Clas
 DHI_ESAVI,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASOA,dhis2,'DNVE ESAVI TRK - Clasificación final del caso A',Directo,,,
 DHI_ESAVI,TR_DESENLACE_ESAVI,CLASIFICACIONFINALCASOB,dhis2,'DNVE ESAVI TRK - Clasificación final del caso B',Directo,,,
 DHI_ESAVI,TR_DESENLACE_ESAVI,AUTOPSIA,vigiflow,Autopsia,"Sin tildes + includes: 'si'→1, 'no'→0, otro→2",VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AA
-DHI_ESAVI,TR_DESENLACE_ESAVI,COMENTARIO_RESULTADO,vigiflow,Resultado,obtenerPrimerComentario(): conserva solo el texto hasta el primer salto de línea,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Z
-DHI_ESAVI,TR_DESENLACE_ESAVI,FECHAINICIOINVESTIGACION,vigiflow,Fecha de ejecución de la investigación,formatoFecha(),VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AM
 DHI_ESAVI,TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_1,dhis2,'DNVE ESAVI TRK - Diagnostico final 1',separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes,,,
 DHI_ESAVI,TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_2,dhis2,'DNVE ESAVI TRK - Diagnostico final 2',separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes,,,
 DHI_ESAVI,TR_CAUSALIDAD_ESAVI,CODIGO_CIE10_DXFINAL_3,dhis2,'DNVE ESAVI TRK - Diagnostico final 3',separarCodigoYDescripcion() → código; se asigna solo si código y descripción están presentes,,,
@@ -156,3 +146,15 @@ DHI_ESAVI,TR_INVESTIGACION,PROBLEMA_BIOLOGICO,dhis2,'DNVE ESAVI TRK - Evidenció
 DHI_ESAVI,TR_INVESTIGACION,BUSQUEDA_CASOS_SINTOMATOLOGIA_CON_VACUNA,dhis2,'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología y que recibió la vacuna',transformarBooleanoSiNoDhis2(): conserva '1'/'0' del booleano DHIS2; null si sin marcar,,,
 DHI_ESAVI,TR_INVESTIGACION,BUSQUEDA_CASOS_SINTOMATOLOGIA_SIN_VACUNA,dhis2,'DNVE ESAVI TRK - Se realizó búsqueda de casos con similar sintomatología sin antecedente de la vacuna',transformarBooleanoSiNoDhis2(): conserva '1'/'0' del booleano DHIS2; null si sin marcar,,,
 DHI_ESAVI,TR_INVESTIGACION,MUESTRA_LABORATORIO,dhis2,'DNVE ESAVI TRK - Muestra de Laboratorio',transformarBooleanoSiNoDhis2(): conserva '1'/'0' del booleano DHIS2; null si sin marcar,,,
+DHI_ESAVI,TR_DATOS_ESAVI,CODIGO_ESAVI_CIE10,vigiflow,Reacción / evento (MedDRA) LLT,Mapeo en BD del CIE-10 correspondiente al LLT: se reutiliza el LLT resuelto por similitud y se toma su columna ICD10_CODE. Columna renombrada desde CODIGO_CIE10,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),D
+DHI_ESAVI,TR_DESENLACE_ESAVI,RESULTADO_EVENTO,vigiflow,Resultado + Criterio (s) de Gravedad,"Homologación a código numérico: 1=Recuperado, 2=En recuperación, 3=No recuperado, 4=Recuperado con secuelas, 5=Muerte, 0=Desconocido. Un criterio de gravedad 'Muerte' o un resultado 'Fatal' fuerzan el 5. Con varios eventos en la fila gana el de mayor severidad (5>4>3>2>1>0). Sustituye a COMENTARIO_RESULTADO y a TR_DATOS_ESAVI.RESULTADO_EVENTO",VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),"N,M"
+DHI_ESAVI,TR_GRAVEDAD_ESAVI,PARTE_EVENTOS_PREOCUPACION,vigiflow,Criterio (s) de Gravedad,marcarCriterioGravedad(): '1' si el criterio contiene 'otra condición médica importante'; '0' en caso contrario,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),M
+DHI_ESAVI,TR_DATO_VACUNA,NOMBRE_DILUYENTE_VACUNA,vigiflow,Nombre del diluyente,trim(); nulo si vacío,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),Q
+DHI_ESAVI,TR_DATO_VACUNA,NUMERO_LOTE_DILUYENTE,vigiflow,Número de lote del diluyente,trim(); nulo si vacío. Variable nueva,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),R
+DHI_ESAVI,TR_MEDICAMENTO,SISTEMA_DE_CODIFICACION,vigiflow,(constante),Valor fijo 'WHODrug' (también es el default de la columna),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),
+DHI_ESAVI,TR_MEDICAMENTO,NOMBRE_FORMA_FARMACEUTICA,vigiflow,Forma farmacéutica (EDQM),trim(); se consigna sin modificaciones,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),Z
+DHI_ESAVI,TR_MEDICAMENTO,NOMBRE_VIA_ADMINISTRACION,vigiflow,Vía de administración (EDQM),trim(); se consigna sin modificaciones,VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),AB
+DHI_ESAVI,TR_INVESTIGACION,FECHA_INVESTIGACION,vigiflow,Fecha prevista de investigación,formatoFecha(). Reemplaza a TR_DESENLACE_ESAVI.FECHAINICIOINVESTIGACION,VigiFlow_AEFILinelisting_ddmmaaaa_hhmmss.xlsx,AEFI line listing (hoja 0),AL
+DHI_ESAVI,TR_ESAVI_DURANTE_EMBARAZO,EDAD_GESTACIONAL,vigiflow,Edad gestacional al momento de la exposición (si es un feto),"Number(); debe estar entre 1 y 43 semanas (inclusive) — fuera de rango o no numérico se guarda null; se toma la primera fila válida por notificación",VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Medicamentos (hoja 2),P
+DHI_ESAVI,TR_ESAVI_DURANTE_EMBARAZO,FECHAULTIMAMENSTRUACIONESAVI,vigiflow,(derivado),Calculada: fecha del ESAVI (inicio de síntomas más antiguo de la fila) − (EDAD_GESTACIONAL × 7 días),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),I
+DHI_ESAVI,TR_ESAVI_DURANTE_EMBARAZO,FECHAPARTOESAVI,vigiflow,(derivado),Calculada: FECHAULTIMAMENSTRUACIONESAVI + (40 semanas × 7 días),VigiFlow_Excel_ddmmaaaa_hhmmss.xlsx,Reacciones (hoja 3),I

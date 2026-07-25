@@ -1,0 +1,9 @@
+# Archivos que renv NO debe escanear al calcular dependencias (snapshot implícito).
+
+# Pipeline R retirado: fue reemplazado por el módulo `datamart` de
+# api-integra-esavi. Se conserva como referencia histórica, pero su
+# `library(RPostgres)` no debe arrastrar RPostgres (y libpq-dev) a la imagen.
+preparar_datos.R
+
+# Scripts de desarrollo local, no forman parte de la app desplegada.
+setup_project.R

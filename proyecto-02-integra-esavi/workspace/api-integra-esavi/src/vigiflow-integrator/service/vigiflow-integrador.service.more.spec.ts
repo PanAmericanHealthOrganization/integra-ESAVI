@@ -102,6 +102,9 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     createOneToOne: jest.fn().mockResolvedValue(undefined),
     clearMedicamentosCache: jest.fn(),
   };
+  const mockEmbarazoEsavi = { create: jest.fn().mockResolvedValue(undefined) };
+  const mockDesenlaceEsavi = { create: jest.fn().mockResolvedValue(undefined) };
+  const mockGravedadEsavi = { create: jest.fn().mockResolvedValue(undefined) };
   const mockDatoVacuna = {
     preloadByNotificacionIds: jest.fn().mockResolvedValue(undefined),
     clearDatoVacunaCache: jest.fn(),
@@ -125,7 +128,12 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     createSyncProcess: jest.fn().mockResolvedValue({ id: 'sync-id-1' }),
     update: jest.fn().mockResolvedValue(undefined),
   };
-  const mockMeddraLlt = { buscarCodigoPorSimilitud: jest.fn().mockResolvedValue(null) };
+  // buscarPorSimilitud devuelve la fila completa del LLT: de ahí salen CODIGO_ESAVI_MEDDRA_LLT
+  // (code) y CODIGO_ESAVI_CIE10 (icd10Code) en una sola consulta.
+  const mockMeddraLlt = {
+    buscarCodigoPorSimilitud: jest.fn().mockResolvedValue(null),
+    buscarPorSimilitud: jest.fn().mockResolvedValue(null),
+  };
   const mockMeddraPt = { searchPT: jest.fn().mockResolvedValue(null) };
   const mockMeddraSoc = { searchSOC: jest.fn().mockResolvedValue(null) };
 
@@ -141,6 +149,9 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       mockNotifVigiflow as any,
       mockNotificador as any,
       mockMedicamento as any,
+      mockEmbarazoEsavi as any,
+      mockDesenlaceEsavi as any,
+      mockGravedadEsavi as any,
       mockDatoVacuna as any,
       mockDatoVacunacion as any,
       mockDatoEsavi as any,
@@ -358,16 +369,17 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         J: 'Si',
         N: '20230510',
         O: 'Dosis 2',
-        X: 'Si',
-        Y: 'Hospitalización, muerte, amenaza a la vida, discapacidad, anomalia congénita',
-        Z: 'Buena evolución\nsegunda línea',
+        // Solo se conservan los casos "No grave": con X = 'Si' la notificación se descartaría.
+        X: 'No',
+        Q: 'Diluyente X',
+        R: 'LOTE-DIL-9',
         AA: 'si', // eliminarTildes no cambia mayúsculas/minúsculas; el código compara contra 'si' en minúscula
         AB: 'Dr. Reportador',
         AC: 'Provincia del Guayas',
         AD: '20230501',
         AE: '20230502',
         AF: 'Hospital Central',
-        AM: '202305',
+        AL: '202305',
       });
 
       await invoke(service, row, new Set(['EC-001']));
@@ -383,21 +395,31 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(createDto.notificacion.unidadEdadPaciente).toBe('AÑOS');
       expect(createDto.notificacion.fechaNotificacion).toEqual(new Date(Date.UTC(2023, 4, 1)));
       expect(createDto.notificacion.fechaReporteNacional).toEqual(new Date(Date.UTC(2023, 4, 2)));
-      expect(createDto.gravedadEsavi.tipo).toBe('1');
-      expect(createDto.gravedadEsavi.muerte).toBe(true);
-      expect(createDto.gravedadEsavi.riesgoVida).toBe(true);
-      expect(createDto.gravedadEsavi.discapacidad).toBe(true);
-      expect(createDto.gravedadEsavi.hospitalizacion).toBe(true);
-      expect(createDto.gravedadEsavi.anomaliaCongenita).toBe(true);
+      expect(createDto.gravedadEsavi.tipo).toBe('0');
+      // Las banderas de gravedad ya no salen de esta hoja: se resuelven desde "Criterio (s) de
+      // Gravedad" al procesar la hoja Reacciones.
+      expect(createDto.gravedadEsavi.muerte).toBeUndefined();
+      expect(createDto.gravedadEsavi.hospitalizacion).toBeUndefined();
       expect(createDto.desenlaceEsavi.autopsia).toBe(1);
-      expect(createDto.desenlaceEsavi.comentarioResultado).toBe('Buena evolución');
-      expect(createDto.desenlaceEsavi.fechaInicioInvestigacion).toEqual(new Date(Date.UTC(2023, 4, 15)));
+      // La fecha de investigación pasó a TR_INVESTIGACION (col AL, "Fecha prevista de investigación")
+      expect(createDto.investigacion.fechaInvestigacion).toEqual(new Date(Date.UTC(2023, 4, 15)));
       expect(createDto.datoVacunacion.nombreVacunatorio).toBe('Hospital Central');
       expect(createDto.datoVacuna.numeroDosisVacuna).toBe(2);
+      expect(createDto.datoVacuna.nombreDiluyenteVacuna).toBe('Diluyente X');
+      expect(createDto.datoVacuna.numeroLoteDiluyente).toBe('LOTE-DIL-9');
       expect(createDto.pacienteEmbarazada.momentoEsavi).toBe('1');
       expect(createDto.source).toBe('VIGIFLOW');
 
       expect(mockDatoVacuna.clearDatoVacunaCache).toHaveBeenCalled();
+    });
+
+    it('descarta por completo la notificación cuando el caso es grave (TIPO_GRAVEDAD = 1)', async () => {
+      const service: any = createService();
+      const row = rowFromCols({ B: 'EC-GRAVE', X: 'Si' });
+
+      await invoke(service, row, new Set(['EC-GRAVE']));
+
+      expect(mockIntegrador.create).not.toHaveBeenCalled();
     });
 
     it('rama de edad/fechas inválidas y valores por defecto', async () => {
@@ -500,8 +522,6 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
           profesionNotificadorParam: 'MEDICO',
           tipoReporte: 'Inicial',
           tipoEmisor: 'Público',
-          peso: 70.5,
-          altura: 1.75,
         }),
         { id: 'notificador-1' },
       );
@@ -561,6 +581,67 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       expect(mockMedicamento.createOneToOne).not.toHaveBeenCalled();
       expect(mockDatoVacunacion.create).not.toHaveBeenCalled();
+    });
+
+    it('retiene la edad gestacional (col P) cuando está en el rango 1..43', async () => {
+      const service: any = createService();
+      const notificacion = { id: 'n-1', codigoOrigenNotificacion: 'EC-001' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-001' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-001', [notificacion]]]));
+      const row = rowFromCols({ A: 'EC-001', D: 'Paracetamol', G: 'A02BC01', P: '20' });
+      const wb = sheetAt(2, [row]);
+
+      await service.extractedFromJsonReportToCreateMedicamento(wb);
+
+      // No se persiste aquí: las fechas derivadas requieren la fecha del ESAVI, que se
+      // conoce al procesar la hoja Reacciones.
+      expect(service.edadGestacionalPorNotificacion.get('n-1')).toBe(20);
+      expect(mockEmbarazoEsavi.create).not.toHaveBeenCalled();
+    });
+
+    it('no registra la edad gestacional si está fuera del rango o no es numérica', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-1', codigoOrigenNotificacion: 'EC-001' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-001' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-001', [notificacion]]]));
+      const wb = sheetAt(2, [
+        rowFromCols({ A: 'EC-001', G: 'A02BC01', P: '44' }),
+        rowFromCols({ A: 'EC-001', G: 'A02BC01', P: 'Desconocido' }),
+        rowFromCols({ A: 'EC-001', G: 'A02BC01', P: '' }),
+      ]);
+
+      await service.extractedFromJsonReportToCreateMedicamento(wb);
+
+      expect(mockEmbarazoEsavi.create).not.toHaveBeenCalled();
+    });
+
+    it('solo retiene la primera fila válida por notificación', async () => {
+      const service: any = createService();
+      const notificacion = { id: 'n-1', codigoOrigenNotificacion: 'EC-001' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-001' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-001', [notificacion]]]));
+      const wb = sheetAt(2, [
+        rowFromCols({ A: 'EC-001', G: 'A02BC01', P: '12' }),
+        rowFromCols({ A: 'EC-001', G: 'J07BX03', P: '30' }),
+      ]);
+
+      await service.extractedFromJsonReportToCreateMedicamento(wb);
+
+      expect(service.edadGestacionalPorNotificacion.get('n-1')).toBe(12);
+    });
+
+    it('continúa procesando la fila si falla el registro de la edad gestacional', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-1', codigoOrigenNotificacion: 'EC-001' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-001' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-001', [notificacion]]]));
+      mockEmbarazoEsavi.create.mockRejectedValueOnce(new Error('fallo antecedente'));
+      const row = rowFromCols({ A: 'EC-001', G: 'A02BC01', P: '20' });
+      const wb = sheetAt(2, [row]);
+
+      await expect(service.extractedFromJsonReportToCreateMedicamento(wb)).resolves.toBeUndefined();
+
+      expect(mockMedicamento.createOneToOne).toHaveBeenCalledTimes(1);
     });
 
     it('crea el medicamento pero no genera dato-vacuna si el ATC no es de vacuna', async () => {
@@ -742,7 +823,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     it('camino feliz: crea un dato-esavi por cada evento reportado en la fila', async () => {
       const service = createService();
       buildBaseMocks();
-      mockMeddraLlt.buscarCodigoPorSimilitud.mockResolvedValue('LLT01');
+      mockMeddraLlt.buscarPorSimilitud.mockResolvedValue({ code: 'LLT01', icd10Code: 'R50.9' });
       mockMeddraPt.searchPT.mockResolvedValue({ id: 'PT1', code: 'PTCODE1' });
       mockMeddraSoc.searchSOC.mockResolvedValue({ id: 'SOC1', code: 'SOCCODE1' });
 
@@ -763,16 +844,84 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDatoEsavi.createVigiflow).toHaveBeenCalledTimes(2);
       const [notifArg1, dto1] = mockDatoEsavi.createVigiflow.mock.calls[0];
       expect(notifArg1.id).toBe('n-1');
-      expect(dto1.nombre).toBe('FIEBRE');
-      expect(dto1.nombreReportado).toBe('REPORTADO1');
+      // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (col D), que viene en español,
+      // y no del texto libre del notificador (col C), habitualmente en inglés.
+      expect(dto1.nombreReportado).toBe('FIEBRE');
+      expect(dto1.nombre).toBeUndefined();
       expect(dto1.namePT).toBe('PYREXIA');
       expect(dto1.fechaEsavi).toEqual(new Date(Date.UTC(2023, 0, 1)));
       expect(dto1.duracion).toBe('5 dias');
-      expect(dto1.resultado).toBe('Recuperado');
+      expect(dto1.resultado).toBeUndefined();
       expect(dto1.codigoLLT).toBe('LLT01');
+      expect(dto1.codigoEsaviCie10).toBe('R50.9');
       expect(dto1.CTPTMEDDRA_ID).toBe('PT1');
       expect(dto1.codigoPT).toBe('PTCODE1');
       expect(dto1.codigoCaso).toBe('CASE-1');
+
+      // El estado final se consolida una sola vez por notificación, priorizando severidad:
+      // 'Recuperado' (1) vs 'En tratamiento' (0 desconocido) → gana 1.
+      expect(mockDesenlaceEsavi.create).toHaveBeenCalledTimes(1);
+      expect(mockDesenlaceEsavi.create).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'n-1' }),
+        expect.objectContaining({ resultadoEvento: 1 }),
+      );
+    });
+
+    it('consolida las banderas de gravedad y RESULTADO_EVENTO desde "Criterio (s) de Gravedad"', async () => {
+      const service = createService();
+      buildBaseMocks();
+
+      const row = rowFromCols({
+        A: 'EC-001',
+        D: 'fiebre\nshock',
+        I: '20230101\n20230102',
+        M: 'Hospitalización\nMuerte',
+        N: 'Recuperado\nFatal',
+      });
+      const wb = sheetAt(3, [rowFromCols({}), row]);
+
+      await service.extractedFromJsonReportToCreateReaccion(wb);
+
+      // Criterio "Muerte" fuerza el código 5 por encima de cualquier otro resultado.
+      expect(mockDesenlaceEsavi.create).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'n-1' }),
+        expect.objectContaining({ resultadoEvento: 5 }),
+      );
+      const [, graveDto] = mockGravedadEsavi.create.mock.calls[0];
+      expect(graveDto.muerte).toBe('1');
+      expect(graveDto.hospitalizacion).toBe('1');
+      expect(graveDto.discapacidad).toBe('0');
+      expect(graveDto.anomaliaCongenita).toBe('0');
+    });
+
+    it('registra TR_ESAVI_DURANTE_EMBARAZO con las fechas derivadas de la fecha del ESAVI', async () => {
+      const service: any = createService();
+      buildBaseMocks();
+      // La edad gestacional se captura en la hoja Medicamentos y se consume aquí.
+      service.edadGestacionalPorNotificacion.set('n-1', 12);
+
+      const row = rowFromCols({ A: 'EC-001', D: 'fiebre', I: '20241114' });
+      const wb = sheetAt(3, [rowFromCols({}), row]);
+
+      await service.extractedFromJsonReportToCreateReaccion(wb);
+
+      const [, embarazoDto] = mockEmbarazoEsavi.create.mock.calls[0];
+      expect(embarazoDto.edadGestacional).toBe(12);
+      // FUM = 2024-11-14 − (12 × 7 días) = 2024-08-22
+      expect(embarazoDto.fechaUltimaMenstruacion).toEqual(new Date(Date.UTC(2024, 7, 22)));
+      // Parto = FUM + (40 × 7 días) = 2025-05-29
+      expect(embarazoDto.fechaParto).toEqual(new Date(Date.UTC(2025, 4, 29)));
+    });
+
+    it('no registra embarazo si la notificación no tiene edad gestacional', async () => {
+      const service = createService();
+      buildBaseMocks();
+      const row = rowFromCols({ A: 'EC-001', D: 'fiebre', I: '20241114' });
+      const wb = sheetAt(3, [rowFromCols({}), row]);
+
+      await service.extractedFromJsonReportToCreateReaccion(wb);
+
+      expect(mockEmbarazoEsavi.create).not.toHaveBeenCalled();
     });
 
     it('omite la fila cuando el código de caso viene vacío', async () => {
@@ -823,9 +972,9 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     it('un error en un evento no detiene el procesamiento del resto', async () => {
       const service = createService();
       buildBaseMocks();
-      mockMeddraLlt.buscarCodigoPorSimilitud
+      mockMeddraLlt.buscarPorSimilitud
         .mockRejectedValueOnce(new Error('meddra caído'))
-        .mockResolvedValueOnce('LLT02');
+        .mockResolvedValueOnce({ code: 'LLT02', icd10Code: null });
 
       const row = rowFromCols({ A: 'EC-001', D: 'fiebre\ncefalea' });
       const wb = sheetAt(3, [rowFromCols({}), row]);

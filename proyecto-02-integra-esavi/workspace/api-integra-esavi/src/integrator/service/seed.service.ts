@@ -398,8 +398,12 @@ export class SeedService implements OnApplicationBootstrap {
         this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros ICD-10 MedDRA en el archivo Excel.`);
 
         // Usar for...of para esperar que cada operación asíncrona termine
+        // FIXME: el cuerpo del bucle está incompleto: arma `auditoria` y no persiste nada,
+        // así que el catálogo se lee y se descarta.
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const col of catalogoJson) {
           // TODO: colocar auditoria correcta
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const auditoria: IAuditoria = {
             createdAt: new Date(),
             createdBy: 'System',
@@ -435,8 +439,12 @@ export class SeedService implements OnApplicationBootstrap {
         this.logger.log(`📋 Se encontraron ${catalogoJson.length} registros SÍNTOMAS DHIS2 en el archivo Excel.`);
 
         // Usar for...of para esperar que cada operación asíncrona termine
+        // FIXME: el cuerpo del bucle está incompleto: arma `auditoria` y no persiste nada,
+        // así que el catálogo se lee y se descarta.
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         for (const col of catalogoJson) {
           // TODO: colocar auditoria correcta
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const auditoria: IAuditoria = {
             createdAt: new Date(),
             createdBy: 'System',

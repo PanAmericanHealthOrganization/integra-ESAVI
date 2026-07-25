@@ -82,7 +82,7 @@ export class AntecedenteEmbarazoService {
    * @param uuid
    * @returns
    */
-  public async delete(uuid: string): Promise<AntecedenteEmbarazo> {
+  public async delete(_uuid: string): Promise<AntecedenteEmbarazo> {
     return Promise.resolve(undefined);
   }
 

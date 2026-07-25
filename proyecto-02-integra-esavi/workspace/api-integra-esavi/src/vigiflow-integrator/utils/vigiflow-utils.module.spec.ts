@@ -254,6 +254,45 @@ describe('VigiflowUtils', () => {
     });
   });
 
+  describe('formatoEdadGestacional', () => {
+    it('convierte a número los valores enteros dentro del rango 1..43', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('12')).toBe(12);
+      expect(VigiflowUtils.formatoEdadGestacional(28)).toBe(28);
+    });
+
+    it('acepta valores flotantes dentro del rango', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('12.5')).toBe(12.5);
+    });
+
+    it('acepta los extremos del rango', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('1')).toBe(1);
+      expect(VigiflowUtils.formatoEdadGestacional('43')).toBe(43);
+    });
+
+    it('descarta los valores fuera del rango', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('0')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional('0.9')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional('44')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional('-5')).toBeNull();
+    });
+
+    it('descarta texto no numérico', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('Desconocido')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional('12 semanas')).toBeNull();
+    });
+
+    it('descarta celdas vacías, null y undefined', () => {
+      expect(VigiflowUtils.formatoEdadGestacional('')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional('   ')).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional(null)).toBeNull();
+      expect(VigiflowUtils.formatoEdadGestacional(undefined)).toBeNull();
+    });
+
+    it('ignora los espacios alrededor del valor', () => {
+      expect(VigiflowUtils.formatoEdadGestacional(' 20 ')).toBe(20);
+    });
+  });
+
   describe('sleep', () => {
     it('resuelve una promesa tras el tiempo indicado', async () => {
       await expect(VigiflowUtils.sleep(1)).resolves.toBeUndefined();

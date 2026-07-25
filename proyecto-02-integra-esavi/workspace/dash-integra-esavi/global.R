@@ -50,11 +50,9 @@ library(shiny) # Framework para crear aplicaciones web interactivas en R
 library(dplyr) # Manipulación y transformación eficiente de datos
 library(fresh) # Personalización de temas para aplicaciones Shiny
 library(ggplot2) # Sistema para crear gráficos estadísticos declarativos
-library(TTR) # Funciones para análisis técnico y trading
 library(purrr) # Para programación funcional, especialmente útil para operaciones map/reduce
 library(lubridate) # Manipulación y trabajo con fechas y horas
 library(highcharter) # Wrapper de Highcharts para R, permite crear gráficos interactivos avanzados
-library(shinyWidgets) # Widgets adicionales para aplicaciones Shiny
 library(shinydashboard) # Creación de dashboards en Shiny
 library(shinydashboardPlus) # Extensión de shinydashboard con componentes adicionales
 library(sf) # Manejo de datos espaciales y geográficos
@@ -64,14 +62,10 @@ library(data.table) # Manipulación de datos de alta performance
 library(duckdb) # Lectura del datamart (esavi.duckdb) generado por el API
 library(DBI) # Interfaz de base de datos (conexión a DuckDB)
 library(waiter) # Añade pantallas de carga y spinners a aplicaciones Shiny
-library(wordcloud) # Creación de nubes de palabras
-library(stringr) # Manipulación y procesamiento de cadenas de texto
+# Nota: las nubes de palabras se generan con highcharter (hchart(..., "wordcloud")),
+# no con el paquete `wordcloud`, por eso no se carga.
 library(leaflet) # Creación de mapas interactivos
-library(leaflet.extras) # Funcionalidades adicionales para leaflet
-library(RColorBrewer) # Paletas de colores para visualización de datos
 library(DT) # Tablas de datos interactivas
-library(sf) # Manejo de datos espaciales y geográficos
-library(ggthemes) # Temas adicionales para ggplot2
 library(patchwork) # Composición de múltiples gráficos ggplot2
 library(cowplot) # Creación de composiciones complejas de gráficos
 library(paletteer) # Colección comprehensiva de paletas de colores para R
@@ -80,10 +74,9 @@ library(shinyjs)
 library(tibble)
 library(htmlwidgets)
 
-# if (!requireNamespace("BiocManager", quietly = TRUE))
-#   install.packages("BiocManager")
-#   BiocManager::install(c("BiocVersion", "LBE"))
-
+# PhViD depende de LBE, que es un paquete de Bioconductor. No hay que instalarlo
+# a mano: está fijado en renv.lock y renv::restore() lo resuelve. Por eso
+# BiocManager/BiocVersion se mantienen en el lock aunque el código no los use.
 library(PhViD)
 
 select <- dplyr::select

@@ -112,7 +112,7 @@ export class MedicamentoService {
     }
   }
 
-  delete(uuid: string): Promise<Medicamento> {
+  delete(_uuid: string): Promise<Medicamento> {
     return Promise.resolve(undefined);
   }
 

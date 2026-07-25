@@ -47,7 +47,7 @@ export class AntecedenteMedicoService {
     }
   }
 
-  delete(uuid: string): Promise<AntecedenteMedico> {
+  delete(_uuid: string): Promise<AntecedenteMedico> {
     return Promise.resolve(undefined);
   }
 
@@ -73,8 +73,8 @@ export class AntecedenteMedicoService {
   }
 
   async update(
-    uuid: string,
-    updateAntecedenteMedicoDto: UpdateAntecedenteMedicoDto, // : Promise<AntecedenteMedico>
+    _uuid: string,
+    _updateAntecedenteMedicoDto: UpdateAntecedenteMedicoDto, // : Promise<AntecedenteMedico>
   ) {
     // const antecedenteMedico = await this.findOne(uuid);
     // this.antecedenteMedicoRepository.merge(

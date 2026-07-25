@@ -84,7 +84,7 @@ export class PacienteVigiflowService {
     throw new Error('Vigiflow code is a mandatory field');
   }
 
-  delete(uuid: string): Promise<Paciente> {
+  delete(_uuid: string): Promise<Paciente> {
     return Promise.resolve(undefined);
   }
 

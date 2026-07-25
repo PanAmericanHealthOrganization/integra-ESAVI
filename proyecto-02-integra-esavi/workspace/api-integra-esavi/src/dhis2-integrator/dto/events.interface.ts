@@ -11,7 +11,7 @@ export interface Event {
   orgUnitName: string;
   eventDate: string;
   trackedEntityInstance: string;
-  trackedEntityInstanceDetail?: {};
+  trackedEntityInstanceDetail?: object;
   lastUpdated: string;
   dataValues: DataValue[];
 }

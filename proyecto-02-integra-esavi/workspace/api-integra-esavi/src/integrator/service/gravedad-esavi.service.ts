@@ -90,7 +90,7 @@ export class GravedadEsaviService {
     }
   }
 
-  delete(uuid: string): Promise<GravedadEsavi> {
+  delete(_uuid: string): Promise<GravedadEsavi> {
     return Promise.resolve(undefined);
   }
 

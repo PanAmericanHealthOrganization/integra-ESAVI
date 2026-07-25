@@ -5,7 +5,7 @@ import { BasesCRUD, Identificator, IGetManyParams } from 'src/utils/IController'
 //import { Investigacion, InvestigacionUpdateDto } from '../entity/investigacion.entity';
 import { Auditoria } from 'src/integrator/entity/auditoria.entity';
 import { GetListParams, IPaginationResponse } from 'src/utils/interfaces/pagination';
-import { ILike, In, Raw, Repository } from 'typeorm';
+import { In, Raw, Repository } from 'typeorm';
 import {
   InvestigacionCreateDto,
   InvestigacionDto,

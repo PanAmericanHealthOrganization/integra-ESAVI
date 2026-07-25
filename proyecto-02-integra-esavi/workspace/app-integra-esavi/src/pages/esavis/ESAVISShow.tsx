@@ -128,9 +128,6 @@ const TabNotificacion = () => {
             <Divider sx={{ mb: 2 }} />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <FieldRow label="Título del Reporte" value={record.tituloReporte} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
                 <FieldRow label="Tipo de Reporte" value={record.tipoReporte?.nombre} />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -231,11 +228,15 @@ const TabPaciente = () => {
     Promise.all([
       intESAVIClient.get(`/integrator/notificacion/${record.id}/paciente-embarazada`),
       intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-embarazo`),
+      // VigiFlow registra el embarazo en TR_ESAVI_DURANTE_EMBARAZO; DHIS2 en TR_ANTECEDENTES_EMBARAZO.
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/embarazo-esavi`),
     ])
-      .then(([resEmb, resAnt]) => {
+      .then(([resEmb, resAnt, resEsavi]) => {
         setEmbarazada(resEmb.data ?? null)
         const antArr = Array.isArray(resAnt.data) ? resAnt.data : resAnt.data ? [resAnt.data] : []
-        setAntecedente(antArr[0] ?? null)
+        const esaviArr = Array.isArray(resEsavi.data) ? resEsavi.data : resEsavi.data ? [resEsavi.data] : []
+        // Prevalece el bloque de embarazo durante el ESAVI cuando existe.
+        setAntecedente(esaviArr[0] ?? antArr[0] ?? null)
       })
       .catch(() => {
         setEmbarazada(null)
@@ -487,8 +488,8 @@ const TabVacunacion = () => {
                       value={v.rolVacuna?.nombre ?? v.rolVacuna?.descripcion}
                     />
                   )}
-                  {v.accionTomada && (
-                    <FieldCell label="Acción Tomada" value={v.accionTomada} />
+                  {v.numeroLoteDiluyente && (
+                    <FieldCell label="N° Lote Diluyente" value={v.numeroLoteDiluyente} />
                   )}
                 </Box>
               </Paper>
@@ -595,9 +596,13 @@ const TabEsavi = () => {
       <Datagrid bulkActionButtons={false} rowClick={false}>
         <FunctionField
           label="Evento adverso"
+          // NOMBRE_ESAVI ya no se puebla desde VigiFlow: el término clínico está en
+          // NOMBRE_ESAVI_REPORTADO (LLT MedDRA en español).
           render={(rec: any) => (
             <Box>
-              <Typography variant="body2" fontWeight={600}>{rec.nombre ?? "—"}</Typography>
+              <Typography variant="body2" fontWeight={600}>
+                {rec.nombreReportado ?? rec.nameLLT ?? rec.nombre ?? "—"}
+              </Typography>
             </Box>
           )}
         />
@@ -606,8 +611,10 @@ const TabEsavi = () => {
           render={(rec: any) => formatDate(rec.fechaEsavi)}
         />
         <FunctionField
-          label="Resultado"
-          render={(rec: any) => rec.resultado ?? "—"}
+          label="CIE-10"
+          render={(rec: any) => (
+            <Typography variant="caption">{rec.codigoEsaviCie10 ?? "—"}</Typography>
+          )}
         />
         <FunctionField
           label="Código caso"
@@ -654,10 +661,14 @@ const TabAntecedentes = () => {
       intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-preexistencia`),
       intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-evento`),
       intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-medico`),
+      // VigiFlow registra el embarazo en TR_ESAVI_DURANTE_EMBARAZO; DHIS2 en TR_ANTECEDENTES_EMBARAZO.
+      intESAVIClient.get(`/integrator/notificacion/${record.id}/embarazo-esavi`),
     ])
-      .then(([resEmb, resPre, resEv, resMed]) => {
+      .then(([resEmb, resPre, resEv, resMed, resEsavi]) => {
         const embArr = Array.isArray(resEmb.data) ? resEmb.data : resEmb.data ? [resEmb.data] : []
-        setEmbarazo(embArr[0] ?? null)
+        const esaviArr = Array.isArray(resEsavi.data) ? resEsavi.data : resEsavi.data ? [resEsavi.data] : []
+        // Prevalece el bloque de embarazo durante el ESAVI cuando existe.
+        setEmbarazo(esaviArr[0] ?? embArr[0] ?? null)
         setPreexistencias(Array.isArray(resPre.data) ? resPre.data : resPre.data ? [resPre.data] : [])
         const evArr = Array.isArray(resEv.data) ? resEv.data : resEv.data ? [resEv.data] : []
         setEvento(evArr[0] ?? null)

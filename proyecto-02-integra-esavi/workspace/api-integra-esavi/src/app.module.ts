@@ -8,6 +8,7 @@ import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
 import { DataqualityModule } from './dataquality/dataquality.module';
 import { DatamartModule } from './datamart/datamart.module';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- se re-activa junto con el import comentado de abajo.
 import { VacunacionIntegratorModule } from './vacunacion-integrator/vacunacion-integrator.module';
 import { VigiflowIntegratorModule } from './vigiflow-integrator/vigiflow-integrator.module';
 import { WhodrugsModule } from './whodrugs/whodrugs.module';

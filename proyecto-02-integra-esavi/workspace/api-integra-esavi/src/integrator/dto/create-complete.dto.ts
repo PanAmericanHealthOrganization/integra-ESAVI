@@ -1,6 +1,5 @@
 import { SourceEnum } from '../enum/source-enum';
 import { ApiProperty } from '@nestjs/swagger';
-import { CreatePacienteDto } from './paciente.dto';
 import { CreateMedicamentoDto } from './medicamento.dto';
 import { CreateAntecedenteEmbarazoDto } from './antecedente-embarazo.dto';
 import { CreateAntecedenteEventoDto } from './antecedente-evento.dto';

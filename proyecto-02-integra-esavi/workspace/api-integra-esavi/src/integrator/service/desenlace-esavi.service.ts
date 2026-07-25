@@ -93,7 +93,7 @@ export class DesenlaceEsaviService {
     }
   }
 
-  delete(uuid: string): Promise<DesenlaceEsavi> {
+  delete(_uuid: string): Promise<DesenlaceEsavi> {
     return Promise.resolve(undefined);
   }
 

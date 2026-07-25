@@ -24,6 +24,7 @@ import {
   CreateDatoVacunacionDto,
   CreateDatoVacunaDto,
   CreateDesenlaceEsaviDto,
+  CreateEmbarazoEsaviDto,
   CreateGravedadEsaviDto,
   CreateMedicamentoDto,
   CreateNotificacionDto,
@@ -33,8 +34,12 @@ import {
   UpdateDatoVacunaDto,
   UpdateNotificacionDto,
 } from '../../integrator/dto';
+import { InvestigacionCreateDto } from '../../integrator/entity/investigacion.entity';
 import { SourceEnum } from '../../integrator/enum/source-enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
+import { DesenlaceEsaviService } from '../../integrator/service/desenlace-esavi.service';
+import { EmbarazoEsaviService } from '../../integrator/service/embarazo-esavi.service';
+import { GravedadEsaviService } from '../../integrator/service/gravedad-esavi.service';
 import { DatoVacunaService } from '../../integrator/service/dato-vacuna.service';
 import { DatoVacunacionService } from '../../integrator/service/dato-vacunacion.service';
 import { MedicamentoService } from '../../integrator/service/medicamento.service';
@@ -43,6 +48,9 @@ import { NotificadorService } from '../../integrator/service/notificador.service
 import { PacienteService } from '../../integrator/service/paciente.service';
 import { VigiflowUtils } from '../utils/vigiflow-utils.module';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
+
+/** Único tipo de gravedad que se conserva en la base, según el criterio funcional. */
+const TIPO_GRAVEDAD_NO_GRAVE = '0';
 
 const profesiones = [
   'AUXILIAR',
@@ -67,6 +75,13 @@ export class VigiflowIntegradorService {
   private originalFechaInicio: Date;
   private fechaInicio: Date;
 
+  /**
+   * Edad gestacional por notificación, capturada en la hoja Medicamentos y consumida al
+   * procesar la hoja Reacciones, que es donde se conoce la fecha del ESAVI necesaria para
+   * derivar FECHAULTIMAMENSTRUACIONESAVI y FECHAPARTOESAVI.
+   */
+  private readonly edadGestacionalPorNotificacion = new Map<string, number>();
+
   constructor(
     private readonly vigiflowCrawlerService: VigiflowCrawlerService,
     private readonly configService: ConfigService,
@@ -75,6 +90,9 @@ export class VigiflowIntegradorService {
     private readonly notificacionVigiflowService: NotificacionVigiflowService,
     private readonly notificadorService: NotificadorService,
     private readonly medicamentoService: MedicamentoService,
+    private readonly embarazoEsaviService: EmbarazoEsaviService,
+    private readonly desenlaceEsaviService: DesenlaceEsaviService,
+    private readonly gravedadEsaviService: GravedadEsaviService,
     private readonly datoVacunaService: DatoVacunaService,
     private readonly datoVacunacionService: DatoVacunacionService,
     private readonly datoEsaviService: DatoEsaviService,
@@ -347,7 +365,7 @@ export class VigiflowIntegradorService {
         // Al momento la edad y su unidad se toman directamente del excel. Los cálculos
         // que se hacen en el documento "notificacion-vigiflow.service.ts" son
         // únicamente para calcular el grupo etario.
-        const edad = VigiflowUtils.formatoInteger(reg['H']);
+        const edad = VigiflowUtils.formatoEnteroSinSeparadores(reg['H']) ?? 0;
         const unidadEdad = reg['I'] && reg['I'].toUpperCase();
         if ((edad > 0 && edad < 121) && unidadEdad) {
           notificacion.edad = edad;
@@ -372,8 +390,10 @@ export class VigiflowIntegradorService {
         }
 
         //Por recomendación del equipo funcional, se asigna un valor estático.
+        //Tanto VigiFlow como DHIS2 deben quedar codificados con el mismo literal, sin
+        //mencionar el sistema de origen.
         //Si se toma de la hoja Reportes reg['E'], se debe usar updateNotificacion.
-        notificacion.medioNotificacion = 'Medio electrónico VigiFlow';
+        notificacion.medioNotificacion = 'Medio electrónico';
         notificacion.organizacionNotificador = reg['AF']; //Más adelante se actualiza este campo.
         notificacion.codigoVigiflow = reg['B'];
         notificacion.nombreNotificador = reg['AB'];
@@ -398,15 +418,19 @@ export class VigiflowIntegradorService {
         }
         grave.tipo = gravedad;
 
-        const eventosImportantes = reg['Y'];
-        //Nota: el DTO declara estos campos como string, pero históricamente se les asigna el resultado
-        //booleano de includes(); se mantiene "any" para no alterar los datos persistidos.
-        const cadenaNormalizada: any = VigiflowUtils.eliminarTildes(eventosImportantes && eventosImportantes.toLowerCase());
-        grave.muerte = cadenaNormalizada && cadenaNormalizada.includes('muerte');
-        grave.riesgoVida = cadenaNormalizada && cadenaNormalizada.includes('amenaza');
-        grave.discapacidad = cadenaNormalizada && cadenaNormalizada.includes('discapacidad');
-        grave.hospitalizacion = cadenaNormalizada && cadenaNormalizada.includes('hospitalizacion');
-        grave.anomaliaCongenita = cadenaNormalizada && cadenaNormalizada.includes('anomalia');
+        // Criterio de selección acordado con el personal funcional: la base solo conserva los
+        // casos "No grave" (TIPO_GRAVEDAD = 0). Los casos graves se descartan por completo.
+        if (gravedad !== TIPO_GRAVEDAD_NO_GRAVE) {
+          this.logger.warn(
+            `[AEFI] Caso ${paciente.codigoVigiflow} descartado por TIPO_GRAVEDAD = ${gravedad} (solo se conservan los casos "No grave")`,
+          );
+          continue;
+        }
+
+        // Las banderas MUERTE, RIESGO_VIDA, DISCAPACIDAD, HOSPITALIZACION, ANOMALIA_CONGENITA y
+        // PARTE_EVENTOS_PREOCUPACION ya no se derivan de la columna Y de esta hoja: su origen es
+        // "Criterio (s) de Gravedad" (hoja Reacciones, columna M), donde los valores vienen
+        // separados por evento. Se resuelven en consolidarDesenlaceYGravedad().
 
         // Create Desenlace Esavi
         const desenlaceEsaviDto = new CreateDesenlaceEsaviDto();
@@ -417,11 +441,14 @@ export class VigiflowIntegradorService {
             : autopsia && VigiflowUtils.eliminarTildes(autopsia).includes('no')
             ? 0
             : 2;
-        desenlaceEsaviDto.comentarioResultado = reg['Z'] && VigiflowUtils.obtenerPrimerComentario(reg['Z']); // Guarda solo el primer comentario, hasta encontrar un salto de linea
-        const fechaInvestigacion = VigiflowUtils.formatoFecha(reg['AM']?.toString());
-        if (fechaInvestigacion) {
-          desenlaceEsaviDto.fechaInicioInvestigacion = fechaInvestigacion;
-        }
+        // COMENTARIO_RESULTADO se retiró de TR_DESENLACE_ESAVI por estar repetida; el estado
+        // final del evento se registra homologado en RESULTADO_EVENTO desde la hoja Reacciones.
+        // FECHAINICIOINVESTIGACION tampoco se puebla desde VigiFlow: la fecha de investigación
+        // vive en TR_INVESTIGACION.FECHA_INVESTIGACION (ver más abajo).
+
+        // Investigación: "Fecha prevista de investigación" (hoja AEFI, columna AL).
+        const investigacionDto = new InvestigacionCreateDto();
+        investigacionDto.fechaInvestigacion = VigiflowUtils.formatoFecha(reg['AL']?.toString());
 
         //Create Dato Vacunacion
         const datoVacunacionDto = new CreateDatoVacunacionDto();
@@ -430,9 +457,11 @@ export class VigiflowIntegradorService {
 
         //Create Dato Vacuna con numeroDosisVacuna. Tomar en cuenta que el resto de campos
         //de CreateDatoVacunaDto se completa en "extractedFromJsonReportToCreateMedicamento".
-        const numeroDosisVacuna = reg['O'] && reg['O'].match(/\d+/) ? parseInt(reg['O'].match(/\d+/)[0], 10) : null;
         const datoVacunaDto = new CreateDatoVacunaDto();
-        datoVacunaDto.numeroDosisVacuna = numeroDosisVacuna;
+        // El número de dosis debe quedar como entero, sin puntos ni comas.
+        datoVacunaDto.numeroDosisVacuna = VigiflowUtils.formatoEnteroSinSeparadores(reg['O']);
+        datoVacunaDto.nombreDiluyenteVacuna = reg['Q'] ? reg['Q'].toString().trim() : null;
+        datoVacunaDto.numeroLoteDiluyente = reg['R'] ? reg['R'].toString().trim() : null;
 
         //Paciente Embarazada
         const embarazada = new CreatePacienteEmbarazadaDto();
@@ -447,6 +476,9 @@ export class VigiflowIntegradorService {
         create.gravedadEsavi = grave;
         create.desenlaceEsavi = desenlaceEsaviDto;
         create.datoVacunacion = datoVacunacionDto;
+        if (investigacionDto.fechaInvestigacion) {
+          create.investigacion = investigacionDto;
+        }
         //Solo se crea el dato-vacuna "mínimo" si el paciente tiene una vacuna J07 en la hoja Medicamentos.
         //Sin J07 el reporte no contiene vacuna, así que no debe generarse ningún dato-vacuna.
         if (paciente.codigoVigiflow && codigosPacientesConVacunaJ07.has(paciente.codigoVigiflow)) {
@@ -524,8 +556,7 @@ export class VigiflowIntegradorService {
           updateNotificacion.fechaReporteNacional = fechaRecepcionInicial;
           updateNotificacion.fechaAtencion = fechaRecepcionInicial;
           updateNotificacion.tipoEmisor = reg['F'] ? reg['F'].toString().trim() : null;
-          updateNotificacion.peso = reg['AA'] ? parseFloat(reg['AA'].toString()) : null;
-          updateNotificacion.altura = reg['AB'] ? parseFloat(reg['AB'].toString()) : null;
+          // PESO y ALTURA se retiraron de TR_NOTIFICACION por no ser variables priorizadas.
 
           // Crear/actualizar notificador: identificacion=col W, nombres=origenOriginal.reportadoPor (AEFI AB)
           let notificador = null;
@@ -578,6 +609,10 @@ export class VigiflowIntegradorService {
     // Varias filas de la hoja suelen repetir la misma vacuna/laboratorio.
     const whodrugVaccineCache = new Map<string, IWhodrugVaccineMatch | null>();
 
+    // El bloque de embarazo es único por notificación, pero la edad gestacional viene a nivel de
+    // fila (una por medicamento): se retiene la primera fila con un valor válido.
+    this.edadGestacionalPorNotificacion.clear();
+
     try {
       // Iterar con for...of, para esperar que cada operación asíncrona termine.
       // "toUpdate" es un arreglo de objetos JSON, cada uno representa una fila de la hoja "Medicamentos".
@@ -600,11 +635,26 @@ export class VigiflowIntegradorService {
         medicamento.nombre = reg['D'];
         medicamento.nombreMedPatenteWHODrug = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
         medicamento.codigoATC = reg['G'];
+        // Los medicamentos de VigiFlow se codifican siempre con el diccionario WHODrug.
+        medicamento.sistemaCodificacion = 'WHODrug';
+        // Forma farmacéutica y vía de administración se toman de las columnas EDQM sin modificar.
+        medicamento.nombreFormaFarmaceutica = reg['Z'] ? reg['Z'].toString().trim() : null;
+        medicamento.nombreViaAdministracion = reg['AB'] ? reg['AB'].toString().trim() : null;
         medicamento = { ...medicamento, ...auditoria };
 
         // Crear medicamento. "medicamentoService.createOneToOne" filtra los posibles medicamentos
         // duplicados sobre la base de NOTIFICACION_ID, NOMBRE_MEDICAMENTO, y ATC
         await this.medicamentoService.createOneToOne(notificacionMed, medicamento);
+
+        // EDAD_GESTACIONAL (TR_ESAVI_DURANTE_EMBARAZO) desde la columna P "Edad gestacional al
+        // momento de la exposición (si es un feto)". Se procesa antes del filtro J07 porque la
+        // exposición reportada corresponde a la fila del medicamento, sea vacuna o no.
+        // Solo se retiene el valor: FECHAULTIMAMENSTRUACIONESAVI y FECHAPARTOESAVI se derivan de
+        // la fecha del ESAVI, que únicamente se conoce al procesar la hoja Reacciones.
+        const edadGestacional = VigiflowUtils.formatoEdadGestacional(reg['P']);
+        if (edadGestacional !== null && notificacionMed && !this.edadGestacionalPorNotificacion.has(notificacionMed.id)) {
+          this.edadGestacionalPorNotificacion.set(notificacionMed.id, edadGestacional);
+        }
 
         const codigoAtcVacunaTransformado = reg['G'] ? VigiflowUtils.extraerCodigoAtcVacuna(reg['G'].toString()) : null;
 
@@ -629,10 +679,9 @@ export class VigiflowIntegradorService {
           //Este fragmento no solo actualiza registros, también crea nuevos registros de datoVacuna
           //cuando es necesario (ver datoVacunaService al final del bloque).
           const updateDatoVacuna = new UpdateDatoVacunaDto();
-          updateDatoVacuna.accionTomada = reg['M'];
+          // ACCION_TOMADA, INTERVALO_DOSIFICACION y DOSIS_DE_APLICACION se retiraron de
+          // TR_DATO_VACUNA por no ser variables priorizadas para el análisis.
           updateDatoVacuna.dosis = reg['S'];
-          updateDatoVacuna.intervaloDosificacion = reg['T'];
-          updateDatoVacuna.dosis1 = reg['U'];
           updateDatoVacuna.duracion = reg['V'];
           updateDatoVacuna.formaFarmaceutica = reg['Y'];
           updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
@@ -642,7 +691,7 @@ export class VigiflowIntegradorService {
           //implementar un diccionario con la equivalencia del código ISO3 alfa-3 o catálogo de países autorizados.
           updateDatoVacuna.paisAutorizacionIso3Code = reg['J'] ? countries.getAlpha3Code(reg['J'].toString().toUpperCase(), idiomaParaPaisIso3Code) : 'ECU';
           updateDatoVacuna.numeroLote = reg['AE'] && VigiflowUtils.transformarLoteVacuna(reg['AE']);
-          updateDatoVacuna.indicacionMeddra = reg['Q']; // TODO: REVISAR si ya está transformado a Meddra LLT. Si está vacío debe ser NULL.
+          // INDICACION_MEDDRA se retiró de TR_DATO_VACUNA por no ser variable priorizada.
 
           const nombreVacPatenteWHODrugVigiFlow = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
           updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;
@@ -795,7 +844,7 @@ export class VigiflowIntegradorService {
 
       // Cada celda puede tener múltiples valores separados por \n (un evento ESAVI por línea)
       const nombresLLT        = VigiflowUtils.splitLineas(reg['D']?.toString() ?? '');
-      const nombresReportados = VigiflowUtils.splitLineas(reg['C']?.toString() ?? '');
+      const _nombresReportados = VigiflowUtils.splitLineas(reg['C']?.toString() ?? ''); // no se usa: ver nota sobre la columna C más abajo
       const nombresPT         = VigiflowUtils.splitLineas(reg['E']?.toString() ?? '');
       const nombresHLT        = VigiflowUtils.splitLineas(reg['F']?.toString() ?? '');
       const nombresHLGT       = VigiflowUtils.splitLineas(reg['G']?.toString() ?? '');
@@ -804,6 +853,7 @@ export class VigiflowIntegradorService {
       const fechasFin         = VigiflowUtils.splitLineas(reg['J']?.toString() ?? '');
       const duraciones        = VigiflowUtils.splitLineas(reg['K']?.toString() ?? '');
       const resultados        = VigiflowUtils.splitLineas(reg['N']?.toString() ?? '');
+      const criteriosGravedad = VigiflowUtils.splitLineas(reg['M']?.toString() ?? '');
 
       const totalEventos = nombresLLT.length;
       if (totalEventos === 0) {
@@ -819,21 +869,28 @@ export class VigiflowIntegradorService {
           let datoEsavi = new CreateDatoEsaviDto();
           datoEsavi = { ...datoEsavi, ...auditoria };
 
-          datoEsavi.nombre = nombreLLT.toUpperCase();
-          const nombreReportadoRaw = (nombresReportados[i] ?? nombreLLT).toUpperCase();
-          datoEsavi.nombreReportado = VigiflowUtils.eliminarSaltoLinea(nombreReportadoRaw);
+          // NOMBRE_ESAVI y DESCRIPCION dejaron de poblarse desde VigiFlow por no ser variables
+          // priorizadas (las columnas se conservan porque DHIS2 sí las utiliza).
+          // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (columna D), que viene en español; la
+          // columna C trae el texto libre del notificador, habitualmente en inglés.
+          datoEsavi.nombreReportado = VigiflowUtils.eliminarSaltoLinea(nombreLLT.toUpperCase());
           datoEsavi.fechaEsavi = VigiflowUtils.formatoFecha(fechasInicio[i] ?? '');
           datoEsavi.fechaFinalizacion = VigiflowUtils.formatoFecha(fechasFin[i] ?? '');
           datoEsavi.duracion = duraciones[i] ?? null;
-          datoEsavi.resultado = resultados[i] ?? null;
+          // RESULTADO_EVENTO se retiró de TR_DATOS_ESAVI; se consolida por notificación en
+          // TR_DESENLACE_ESAVI al terminar de recorrer los eventos de la fila.
           datoEsavi.nameLLT = nombreLLT.toUpperCase();
           datoEsavi.namePT = (nombresPT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameHLT = (nombresHLT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameHLGT = (nombresHLGT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameSOC = (nombresSOC[i] ?? '').toUpperCase() || null;
 
-          // Buscar CODE en MEDDRA.MED_LLT comparando NAME en mayúsculas (similitud >= 90%)
-          datoEsavi.codigoLLT = await this.meddraLltService.buscarCodigoPorSimilitud(nombreLLT);
+          // Buscar el LLT en MEDDRA.MED_LLT comparando NAME en mayúsculas (similitud >= 90%).
+          // Una sola búsqueda resuelve CODIGO_ESAVI_MEDDRA_LLT y CODIGO_ESAVI_CIE10, ya que el
+          // diccionario MedDRA trae el CIE-10 equivalente en la propia fila del LLT.
+          const meddraLlt = await this.meddraLltService.buscarPorSimilitud(nombreLLT);
+          datoEsavi.codigoLLT = meddraLlt?.code ?? null;
+          datoEsavi.codigoEsaviCie10 = meddraLlt?.icd10Code ?? null;
 
           const meddraPT = await this.meddraPtService.searchPT(nombresPT[i] ?? '');
           const meddraSOC = await this.meddraSocService.searchSOC(nombresSOC[i] ?? '');
@@ -853,6 +910,88 @@ export class VigiflowIntegradorService {
           // Continúa con el siguiente evento sin detener el procesamiento
         }
       }
+
+      // Consolidación por notificación (los datos de la fila aplican a todos sus eventos).
+      await this.consolidarDesenlaceYGravedad(notificacion, resultados, criteriosGravedad);
+      await this.registrarEmbarazoEsavi(notificacion, fechasInicio);
+    }
+  }
+
+  /**
+   * Registra en TR_DESENLACE_ESAVI el estado final homologado del evento y actualiza en
+   * TR_GRAVEDAD_ESAVI las banderas que dependen de "Criterio (s) de Gravedad".
+   * Cuando la fila reporta varios eventos, RESULTADO_EVENTO se resuelve por prioridad de
+   * severidad (5 > 4 > 3 > 2 > 1 > 0).
+   */
+  private async consolidarDesenlaceYGravedad(
+    notificacion: any,
+    resultados: string[],
+    criteriosGravedad: string[],
+  ): Promise<void> {
+    const criteriosUnidos = criteriosGravedad.join(' ');
+
+    try {
+      const desenlace = new CreateDesenlaceEsaviDto();
+      desenlace.resultadoEvento = VigiflowUtils.seleccionarResultadoPrioritario(resultados, criteriosGravedad);
+      await this.desenlaceEsaviService.create(notificacion, desenlace);
+    } catch (error) {
+      this.logger.warn(
+        `[Reacciones] No se pudo registrar RESULTADO_EVENTO para la notificación ${notificacion.codigoOrigenNotificacion}: ${error.message}`,
+      );
+    }
+
+    try {
+      const grave = new CreateGravedadEsaviDto();
+      grave.muerte = VigiflowUtils.marcarCriterioGravedad(criteriosUnidos, 'muerte');
+      grave.riesgoVida = VigiflowUtils.marcarCriterioGravedad(criteriosUnidos, 'amenaza');
+      grave.discapacidad = VigiflowUtils.marcarCriterioGravedad(criteriosUnidos, 'discapacidad');
+      grave.hospitalizacion = VigiflowUtils.marcarCriterioGravedad(criteriosUnidos, 'hospitalizacion');
+      grave.anomaliaCongenita = VigiflowUtils.marcarCriterioGravedad(criteriosUnidos, 'anomalia');
+      grave.parteEventosPreocupacion = VigiflowUtils.marcarCriterioGravedad(
+        criteriosUnidos,
+        'otra condicion medica importante',
+      );
+      // Regla de consistencia: criterio "Muerte" implica MUERTE = 1 y RESULTADO_EVENTO = 5.
+      await this.gravedadEsaviService.create(notificacion, grave);
+    } catch (error) {
+      this.logger.warn(
+        `[Reacciones] No se pudieron actualizar los criterios de gravedad de la notificación ${notificacion.codigoOrigenNotificacion}: ${error.message}`,
+      );
+    }
+  }
+
+  /**
+   * Registra en TR_ESAVI_DURANTE_EMBARAZO la edad gestacional capturada en la hoja Medicamentos
+   * junto con las fechas derivadas, que dependen de la fecha del ESAVI (inicio de síntomas).
+   * Se usa la fecha de inicio más antigua de la fila, por ser el comienzo del cuadro clínico.
+   */
+  private async registrarEmbarazoEsavi(notificacion: any, fechasInicio: string[]): Promise<void> {
+    const edadGestacional = this.edadGestacionalPorNotificacion.get(notificacion.id);
+    if (edadGestacional === undefined) return;
+
+    const fechaEsavi = fechasInicio
+      .map((fecha) => VigiflowUtils.formatoFecha(fecha))
+      .filter((fecha): fecha is Date => fecha !== null)
+      .sort((a, b) => a.getTime() - b.getTime())
+      .at(0);
+
+    if (!fechaEsavi) {
+      this.logger.warn(
+        `[Reacciones] Sin fecha de ESAVI para derivar las fechas de embarazo de la notificación ${notificacion.codigoOrigenNotificacion}`,
+      );
+      return;
+    }
+
+    try {
+      const embarazo = new CreateEmbarazoEsaviDto();
+      embarazo.edadGestacional = edadGestacional;
+      embarazo.fechaUltimaMenstruacion = VigiflowUtils.calcularFechaUltimaMenstruacion(fechaEsavi, edadGestacional);
+      embarazo.fechaParto = VigiflowUtils.calcularFechaParto(embarazo.fechaUltimaMenstruacion);
+      await this.embarazoEsaviService.create(notificacion, embarazo);
+    } catch (error) {
+      this.logger.warn(
+        `[Reacciones] No se pudo registrar el embarazo durante el ESAVI de la notificación ${notificacion.codigoOrigenNotificacion}: ${error.message}`,
+      );
     }
   }
 }

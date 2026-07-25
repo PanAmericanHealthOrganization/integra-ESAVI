@@ -34,7 +34,7 @@ export class WhoDrugsAsAnyService {
     };
   }
 
-  public async getDrugsCoutry(params: { country: string; atcCode: string }): Promise<any> {
+  public async getDrugsCoutry(_params: { country: string; atcCode: string }): Promise<any> {
     const r = this.drug
       .createQueryBuilder('drug')
       .select(['drug.drugName', 'drug.drugCode'])

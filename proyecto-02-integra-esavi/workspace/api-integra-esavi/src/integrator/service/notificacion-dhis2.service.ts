@@ -116,7 +116,7 @@ export class NotificacionDhis2Service {
       if (notificacionExistente) {
         try {
           return await this.update(notificacionExistente, createDto, pacienteUUID);
-        } catch (error:any) {
+        } catch {
           console.log('Error en actualización');
         }
       } else {
@@ -173,7 +173,7 @@ export class NotificacionDhis2Service {
               notificacion.edad = edad;
               notificacion.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', 'Años');
             }
-          } catch (error:any) {
+          } catch {
             console.log('No se puede calcular edad');
           }
         }
@@ -207,7 +207,7 @@ export class NotificacionDhis2Service {
     }
   }
 
-  delete(uuid: string): Promise<Notificacion> {
+  delete(_uuid: string): Promise<Notificacion> {
     return Promise.resolve(undefined);
   }
 
@@ -305,7 +305,7 @@ export class NotificacionDhis2Service {
           notificacionExistente.edad = edad;
           notificacionExistente.unidadEdad = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('UNIDAD_EDAD', 'Años');
         }
-      } catch (error:any) {
+      } catch {
         console.log('No se puede calcular edad');
       }
     }

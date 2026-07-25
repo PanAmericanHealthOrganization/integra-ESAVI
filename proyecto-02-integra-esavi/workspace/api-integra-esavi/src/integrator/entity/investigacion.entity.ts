@@ -15,7 +15,6 @@ Nombre: MUESTRA_LABORATORIO; Comentario: Muestra de Laboratorio; Nullable: true;
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Auditoria, IAuditoria } from './auditoria.entity';
-import { DatoEsavi } from './dato-esavi.entity';
 import { Notificacion } from './notificacion.entity';
 
 /**

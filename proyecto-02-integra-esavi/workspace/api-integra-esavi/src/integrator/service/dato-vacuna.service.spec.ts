@@ -33,7 +33,6 @@ const makeDvMinimo = (id: string, notifId = 'n1'): Partial<DatoVacuna> => ({
   codigoAtc: null,
   rolVacuna: null,
   numeroLote: null,
-  indicacionMeddra: null,
   datoVacunacion: { id: notifId, notificacion: { id: notifId } } as DatoVacunacion,
 });
 

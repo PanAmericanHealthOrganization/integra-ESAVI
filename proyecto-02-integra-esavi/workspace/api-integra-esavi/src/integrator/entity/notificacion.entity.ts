@@ -38,31 +38,7 @@ export class Notificacion extends Auditoria {
   @JoinColumn({ name: 'CTPARROQUIA_CODIGO', referencedColumnName: 'codigo' })
   parroquiaResidencia: Parroquia;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'PESO',
-    type: 'decimal',
-    precision: 6,
-    scale: 2,
-    nullable: true,
-    comment: 'Peso del paciente en kilogramos',
-  })
-  peso: number;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'ALTURA',
-    type: 'decimal',
-    precision: 6,
-    scale: 2,
-    nullable: true,
-    comment: 'Altura del paciente en centímetros',
-  })
-  altura: number;
 
   /**
    *
@@ -107,15 +83,6 @@ export class Notificacion extends Auditoria {
   })
   casoNarrativo: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'TITULO_REPORTE',
-    nullable: true,
-    comment: 'Título del reporte de ESAVI',
-  })
-  tituloReporte: string;
 
   @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
   @JoinColumn({ name: 'CT_TIPO_REPORTE_ID' })

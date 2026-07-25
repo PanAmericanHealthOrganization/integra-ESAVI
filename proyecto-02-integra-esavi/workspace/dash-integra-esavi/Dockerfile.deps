@@ -1,10 +1,27 @@
+# ── Imagen BASE del dashboard: sistema operativo + paquetes R ──────────────────
+# Esta imagen es lenta de construir (renv::restore) pero cambia muy poco: solo
+# hay que reconstruirla cuando cambia renv.lock o las librerías del sistema.
+# El Dockerfile de la aplicación parte de aquí y solo copia el código.
+#
+# Construcción (desde docker-compose/):
+#   ./scripts/build-dash-base.sh
+#
+# o manualmente:
+#   podman build -f Dockerfile.deps -t integra-esavi/dash-base:4.4.1 .
+#
+# OJO en arm64 (Apple Silicon / máquina podman arm64): los binarios de PPM son
+# solo x86_64, así que TODOS los paquetes se compilan desde fuente y el build
+# tarda muchísimo. Ver notas en docker-compose/DESPLIEGUE-PRODUCCION.md.
+
 FROM rocker/r-ver:4.4.1
 
+LABEL org.opencontainers.image.title="integra-esavi dash base"
+LABEL org.opencontainers.image.description="Base con dependencias de sistema y paquetes R (renv) para dash-integra-esavi"
+
 # ── Sistema operativo ─────────────────────────────────────────────────────────
+# Cada entrada está justificada por el SystemRequirements de algún paquete del
+# lock; ver docs/auditoria-dependencias.md. No añadir nada "por si acaso".
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpq-dev \
-    libcairo2-dev \
-    libxt-dev \
     libgdal-dev \
     libgeos-dev \
     libproj-dev \
@@ -17,9 +34,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libharfbuzz-dev \
     libfribidi-dev \
     libabsl-dev \
+    libglpk-dev \
     cmake \
     curl \
     && rm -rf /var/lib/apt/lists/*
+# Retirados tras la auditoría de dependencias:
+#   libpq-dev     -> solo lo necesitaba RPostgres (pipeline R retirado)
+#   libcairo2-dev -> solo lo necesitaba gdtools (via flextable, no usado)
+#   libxt-dev     -> ningún paquete del lock lo declara
 
 WORKDIR /app
 
@@ -27,6 +49,7 @@ WORKDIR /app
 ENV RENV_CONFIG_PPM_ENABLED=true
 ENV RENV_CONFIG_PPM_URL=https://packagemanager.posit.co/cran/__linux__/jammy/latest
 
+# ── Paquetes R ────────────────────────────────────────────────────────────────
 COPY renv.lock   renv.lock
 COPY .Rprofile   .Rprofile
 
@@ -35,3 +58,9 @@ RUN sed -i 's|https://cloud.r-project.org|https://packagemanager.posit.co/cran/_
       install.packages('renv', repos = 'https://packagemanager.posit.co/cran/__linux__/jammy/latest', quiet = TRUE); \
       renv::restore(prompt = FALSE) \
     "
+
+# Huella del renv.lock con el que se construyó esta base. El script de build la
+# compara para saber si hace falta reconstruir.
+ARG RENV_LOCK_SHA=unknown
+LABEL org.integraesavi.renv-lock-sha="${RENV_LOCK_SHA}"
+ENV RENV_LOCK_SHA=${RENV_LOCK_SHA}

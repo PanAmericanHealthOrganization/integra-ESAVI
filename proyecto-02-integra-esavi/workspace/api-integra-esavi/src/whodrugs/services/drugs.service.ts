@@ -15,8 +15,8 @@ export class DrugService {
     request: IPaginationRequest<Drug>,
     drugName: string,
     drugCode: number,
-    country: string,
-    atcCode: string,
+    _country: string,
+    _atcCode: string,
   ): Promise<IPaginationResponse<any>> {
     const drugPartial = await this.drugRepository.find({
       select: {
@@ -59,7 +59,7 @@ export class DrugService {
     };
   }
 
-  public async getDrugsOnly(drugName: string, country: string, atcCode?: string): Promise<any[]> {
+  public async getDrugsOnly(drugName: string, _country: string, _atcCode?: string): Promise<any[]> {
     const drugPartial = await this.drugRepository.find({
       select: {
         id: true,

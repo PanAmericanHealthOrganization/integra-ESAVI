@@ -1,12 +1,12 @@
 import {PartialType} from "@nestjs/swagger";
 
 export class CreateDesenlaceEsaviDto {
+  resultadoEvento: number;
   codigo: string;
   fechaMuerte: Date;
   autopsia: number;
   fechaNotificacionMuerte: Date;
   fechaNotififacionMuerteFetal: Date;
-  comentarioResultado: string;
   fechaInicioInvestigacion: Date;
   clasificacionFinalCaso: string;
   clasificacionFinalCasoA: string;

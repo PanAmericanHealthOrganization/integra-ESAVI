@@ -107,21 +107,50 @@ Desde el directorio `docker-compose/`:
 
 ```bash
 # 1. Verificar que la configuración es válida y ver la config final resuelta
-docker compose config
+podman-compose config
 
-# 2. Construir las imágenes (api, app-web, dashboard)
-docker compose build
+# 2a. Imagen BASE del dashboard (dependencias de sistema + paquetes R). Solo se
+#     construye la primera vez o cuando cambia renv.lock / Dockerfile.deps; el
+#     script lo detecta por hash y si no hace falta, no hace nada.
+#     Es la parte LENTA del build.
+./scripts/build-dash-base.sh
+#     equivalente sin script:  podman-compose --profile base build dash-base
+
+# 2b. Construir las imágenes de aplicación (api, app-web, dashboard).
+#     El dashboard parte de la base, así que aquí solo copia código: segundos.
+podman-compose build
 
 # 3. Levantar el stack en segundo plano
-docker compose up -d
+podman-compose up -d
 
 # 4. Seguir el arranque (db-init debe completar antes que keycloak/api)
-docker compose logs -f
+podman-compose logs -f
 ```
 
 El orden de arranque lo gestionan las dependencias del compose:
 `postgres` (healthy) → `db-init` (completa) → `keycloak` / `api` / `dashboard` →
 `oauth2-proxy` → `dash-nginx`.
+
+### Imagen base del dashboard y arquitectura
+
+La base (`localhost/integra-esavi/dash-base:4.4.1`) instala ~147 paquetes R con
+`renv::restore()`. El `Dockerfile` de la app solo hace `FROM` de esa base, por lo
+que un cambio de código NO reinstala nada de R.
+
+**El coste del build depende de la arquitectura del host:**
+
+| Arquitectura del motor | Qué pasa con los paquetes R | Coste |
+|------------------------|-----------------------------|-------|
+| `linux/amd64` (x86_64) | Posit PPM sirve binarios jammy precompilados | minutos |
+| `linux/arm64` (Apple Silicon, ARM) | PPM **no publica binarios arm64**: los 147 paquetes se compilan desde fuente | muy lento |
+
+En un host arm64, para usar binarios a costa de correr emulado:
+
+```bash
+BUILD_PLATFORM=linux/amd64 ./scripts/build-dash-base.sh
+```
+
+El servidor de producción es x86_64, así que allí el build usa binarios.
 
 ---
 
@@ -153,9 +182,10 @@ docker compose exec postgres pg_isready -U dhis -d DHI_ESAVI
 ### Actualizar una nueva versión
 ```bash
 git pull
-docker compose build api app-web dashboard   # rebuild de lo que cambió
-docker compose up -d                          # recrea solo lo necesario
-docker image prune -f                         # limpia imágenes viejas
+./scripts/build-dash-base.sh                   # no-op si renv.lock no cambió
+podman-compose build api app-web dashboard     # rebuild de lo que cambió
+podman-compose up -d                           # recrea solo lo necesario
+podman image prune -f                          # limpia imágenes viejas
 ```
 
 ### Backups de la base de datos

@@ -1,3 +1,3 @@
 export class LLTService {
-  constructor(LLT) {}
+  constructor() {}
 }

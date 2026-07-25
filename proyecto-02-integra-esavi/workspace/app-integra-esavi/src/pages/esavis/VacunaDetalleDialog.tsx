@@ -127,9 +127,6 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Medicinal Product ID del Titular" value={vacuna.maHolderMedicinalProductId} />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Ingrediente Sospechoso" value={vacuna.ingredienteSospechoso} />
-            </Grid>
           </Seccion>
 
           <Seccion titulo="Dosis y Administración">
@@ -140,16 +137,7 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
               <FieldRow label="Dosis Administrada" value={vacuna.dosis} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Dosis de Aplicación" value={vacuna.dosis1} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Intervalo de Dosificación" value={vacuna.intervaloDosificacion} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Duración del Tratamiento" value={vacuna.duracion} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Strength / Potencia" value={vacuna.strengthPotencia} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Vía de Administración" value={vacuna.viaAdministracion} />
@@ -162,9 +150,6 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Forma Farmacéutica (EDQM)" value={vacuna.formaFarmaceuticaEDQM} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Acción Tomada" value={vacuna.accionTomada} />
             </Grid>
           </Seccion>
 
@@ -182,19 +167,10 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
               <FieldRow label="Nombre del Diluyente" value={vacuna.nombreDiluyenteVacuna} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
+              <FieldRow label="N° de Lote del Diluyente" value={vacuna.numeroLoteDiluyente} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Vencimiento del Diluyente" value={formatDate(vacuna.fechaVencimientoDiluyente)} />
-            </Grid>
-          </Seccion>
-
-          <Seccion titulo="Indicación e Información Adicional">
-            <Grid item xs={12} sm={6}>
-              <FieldRow label="Indicación (MedDRA)" value={vacuna.indicacionMeddra} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FieldRow label="Indicación del Notificador Primario" value={vacuna.indicacionNotificadorPrimario} />
-            </Grid>
-            <Grid item xs={12}>
-              <FieldRow label="Información Adicional del Medicamento" value={vacuna.informacionAdicionalMedicamento} />
             </Grid>
           </Seccion>
         </Grid>

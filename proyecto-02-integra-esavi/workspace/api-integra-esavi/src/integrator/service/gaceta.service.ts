@@ -495,7 +495,7 @@ export class GacetaService implements IService<CreateGacetaDto, GacetaDto, Updat
       // Verificar si el archivo existe
       try {
         await fs.access(rutaCompleta);
-      } catch (error) {
+      } catch {
         this.logger.error(`Archivo no encontrado: ${rutaCompleta}`);
         throw new NotFoundException(`Informe no encontrado para ${ano}/${mesFormateado}`);
       }

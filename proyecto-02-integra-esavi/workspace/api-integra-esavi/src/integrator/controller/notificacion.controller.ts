@@ -13,6 +13,7 @@ import { GetListParams } from 'src/utils/interfaces/pagination';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
+import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
 import { NotificacionService } from '../service/notificacion.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 
@@ -25,6 +26,7 @@ export class NotificacionController {
     private datoVacunaService: DatoVacunaService,
     private pacienteEmbarazadaService: PacienteEmbarazadaServive,
     private datoEsaviService: DatoEsaviService,
+    private embarazoEsaviService: EmbarazoEsaviService,
   ) {}
 
   /************CRUD PARA MICROSERVICIOS************/
@@ -90,6 +92,15 @@ export class NotificacionController {
   @Get(':uuid/antecedente-embarazo')
   searchAntecedenteEmbarazoByUUID(@Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string) {
     return this.notificacionService.findAntecedenteEmbarazoByNotificacionUUID(uuidNotificacion);
+  }
+
+  /**
+   * Bloque de embarazo durante el ESAVI (TR_ESAVI_DURANTE_EMBARAZO). Es el origen que puebla
+   * VigiFlow; DHIS2 en cambio registra el embarazo en TR_ANTECEDENTES_EMBARAZO.
+   */
+  @Get(':uuid/embarazo-esavi')
+  searchEmbarazoEsaviByUUID(@Param('uuid', new ParseUUIDPipe()) uuidNotificacion: string) {
+    return this.embarazoEsaviService.findByNotificacionUUID(uuidNotificacion);
   }
 
   @Get(':uuid/antecedente-evento')

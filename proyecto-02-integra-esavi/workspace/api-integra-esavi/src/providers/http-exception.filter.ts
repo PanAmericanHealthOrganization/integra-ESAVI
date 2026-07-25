@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { EntityNotFoundException } from '../integrator/exception/enntity-not-found.exception';

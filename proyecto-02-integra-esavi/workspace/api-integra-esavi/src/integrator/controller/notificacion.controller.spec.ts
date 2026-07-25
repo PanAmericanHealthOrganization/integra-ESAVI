@@ -6,6 +6,7 @@ import { DatoVacunacionService } from '../service/dato-vacunacion.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { DatoEsaviService } from '../service/dato-esavi.service';
+import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
 
 const mockNotificacionService = {
   findAll: jest.fn(),
@@ -23,6 +24,7 @@ const mockDatoVacunacionService = { findByNotificacionId: jest.fn() };
 const mockDatoVacunaService = { findByNotificacionId: jest.fn() };
 const mockPacienteEmbarazadaService = { findByNotificacionId: jest.fn() };
 const mockDatoEsaviService = { findByNotificacionId: jest.fn() };
+const mockEmbarazoEsaviService = { findByNotificacionUUID: jest.fn() };
 
 // UUID válido para pasar el ParseUUIDPipe cuando el controller se prueba vía módulo (aquí se llama directo, no aplica).
 const UUID = '11111111-1111-1111-1111-111111111111';
@@ -40,6 +42,7 @@ describe('NotificacionController', () => {
         { provide: DatoVacunaService, useValue: mockDatoVacunaService },
         { provide: PacienteEmbarazadaServive, useValue: mockPacienteEmbarazadaService },
         { provide: DatoEsaviService, useValue: mockDatoEsaviService },
+        { provide: EmbarazoEsaviService, useValue: mockEmbarazoEsaviService },
       ],
     }).compile();
     controller = module.get<NotificacionController>(NotificacionController);

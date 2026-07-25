@@ -152,7 +152,7 @@ class MaxDateRangeConstraint implements ValidatorConstraintInterface {
     return diferencia >= 0 && diferencia <= unAnioEnMs;
   }
 
-  defaultMessage(args: ValidationArguments) {
+  defaultMessage(_args: ValidationArguments) {
     return 'El rango de fechas debe ser máximo de 1 año y la fecha "hasta" debe ser posterior a "desde"';
   }
 }

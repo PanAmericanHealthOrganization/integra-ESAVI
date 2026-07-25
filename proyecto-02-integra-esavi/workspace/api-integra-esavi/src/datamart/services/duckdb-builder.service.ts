@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DuckDBConnection, DuckDBInstance } from '@duckdb/node-api';
 import { promises as fs } from 'fs';
-import * as os from 'os';
 import * as path from 'path';
 import {
   CONFIG_KEYS,

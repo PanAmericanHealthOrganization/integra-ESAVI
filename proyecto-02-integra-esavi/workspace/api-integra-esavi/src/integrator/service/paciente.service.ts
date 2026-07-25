@@ -198,7 +198,7 @@ export class PacienteService {
     return (await this.pacientRepository.findOne({ where: { codigoOrigen: code?.trim() } })) ?? null;
   }
 
-  delete(uuid: string): Promise<Paciente> {
+  delete(_uuid: string): Promise<Paciente> {
     return Promise.resolve(undefined);
   }
 

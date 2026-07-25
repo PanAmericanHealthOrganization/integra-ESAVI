@@ -41,7 +41,7 @@ export class DatoVacunaService {
     for (const dv of all) {
       const dvid = dv.datoVacunacion?.id;
       if (!dvid) continue;
-      if (!dv.codigoAtc && !dv.rolVacuna && !dv.numeroLote && !dv.indicacionMeddra) {
+      if (!dv.codigoAtc && !dv.rolVacuna && !dv.numeroLote) {
         if (!this.datoVacunaMinimoCache.has(dvid)) this.datoVacunaMinimoCache.set(dvid, []);
         this.datoVacunaMinimoCache.get(dvid).push(dv);
       } else if (dv.codigoAtc) {
@@ -68,7 +68,7 @@ export class DatoVacunaService {
     for (const dv of all) {
       const nid = dv.datoVacunacion?.notificacion?.id;
       if (!nid) continue;
-      if (!dv.codigoAtc && !dv.rolVacuna && !dv.numeroLote && !dv.indicacionMeddra) {
+      if (!dv.codigoAtc && !dv.rolVacuna && !dv.numeroLote) {
         if (!this.datoVacunaMinimoCache.has(nid)) this.datoVacunaMinimoCache.set(nid, []);
         this.datoVacunaMinimoCache.get(nid).push(dv);
       } else if (dv.codigoAtc) {
@@ -244,7 +244,6 @@ export class DatoVacunaService {
           rolVacuna: IsNull(),
           numeroLote: IsNull(),
           codigoAtc: IsNull(),
-          indicacionMeddra: IsNull(),
         },
       }) ?? [];
     } catch (error) {
@@ -265,7 +264,6 @@ export class DatoVacunaService {
           rolVacuna: IsNull(),
           numeroLote: IsNull(),
           codigoAtc: IsNull(),
-          indicacionMeddra: IsNull(),
         },
       }) ?? [];
     } catch (error) {
@@ -298,7 +296,7 @@ export class DatoVacunaService {
    * @param createDto
    * @returns
    */
-  async delete(uuid: string): Promise<DatoVacuna> {
+  async delete(_uuid: string): Promise<DatoVacuna> {
     return Promise.resolve(undefined);
   }
 
@@ -338,7 +336,6 @@ export class DatoVacunaService {
         id: uuid, 
         numeroLote: IsNull(), 
         codigoAtc: IsNull(), 
-        indicacionMeddra: IsNull(), 
       },
     });
     if (datoVacuna) {

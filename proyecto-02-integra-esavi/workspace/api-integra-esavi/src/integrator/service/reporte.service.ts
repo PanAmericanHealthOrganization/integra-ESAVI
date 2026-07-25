@@ -1,10 +1,9 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { exec } from 'child_process';
+import * as fs from 'fs';
 import { Repository } from 'typeorm';
 import { Paciente } from '../entity/paciente.entity';
-
-const { exec } = require('child_process');
-const fs = require('fs');
 
 @Injectable()
 export class ReporteService {
@@ -31,7 +30,7 @@ export class ReporteService {
             console.log(`El archivo ${filePath} no existe, no es necesario eliminarlo.`);
             resolve(); // El archivo no existe, no hay nada que eliminar
           }
-        } catch (error) {
+        } catch {
           if (attempts < retries) {
             attempts++;
             console.log(`Intento ${attempts} fallido para eliminar el archivo ${filePath}. Reintentando...`);

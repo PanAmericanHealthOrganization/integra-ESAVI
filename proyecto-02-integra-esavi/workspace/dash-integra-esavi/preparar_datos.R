@@ -3,6 +3,10 @@
 # api-integra-esavi, que genera datos/esavi.duckdb (extracción + transformación
 # dentro de DuckDB). El dashboard ya no ejecuta este pipeline; lee el DuckDB.
 # Se conserva solo como referencia histórica.
+#
+# OJO: por estar retirado, está en .renvignore y RPostgres YA NO figura en
+# renv.lock ni se instala en la imagen. Para ejecutarlo hay que instalarlo a
+# mano: install.packages("RPostgres")  (requiere libpq-dev en el sistema).
 # =============================================================================
 
 # Cargar variables de entorno si existen

@@ -44,19 +44,11 @@ export class Medicamento extends Auditoria {
   @Column({
     name: 'SISTEMA_DE_CODIFICACION',
     nullable: true,
-    comment: 'Sistema de codificación utilizado para el medicamento',
+    default: 'WHODrug',
+    comment: 'Sistema de codificación utilizado para el medicamento. Por defecto WHODrug.',
   })
   sistemaCodificacion: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'CODIGO_MEDICAMENTO',
-    nullable: true,
-    comment: 'Código identificador del medicamento',
-  })
-  codigo: string;
 
   /**
    *
@@ -78,26 +70,7 @@ export class Medicamento extends Auditoria {
   })
   nombreMedPatenteWHODrug: string; // utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'NOMBRE_NORMALIZADO_MEDICAMENTO', // debe ser DRUG_NAME
-    nullable: true,
-    comment: 'Nombre normalizado del medicamento',
-  })
-  nombreNormalizado: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'CODIGO_FORMA_FARMACEUTICA',
-    nullable: true,
-    length: 64,
-    comment: 'Código de la forma farmacéutica',
-  })
-  codigoFormaFarmaceutica: string;
 
   /**
    *
@@ -110,16 +83,6 @@ export class Medicamento extends Auditoria {
   })
   nombreFormaFarmaceutica: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'CODIGO_VIA_ADMINISTRACION',
-    nullable: true,
-    length: 64,
-    comment: 'Código de la vía de administración',
-  })
-  codigoViaAdministracion: string;
 
   /**
    *

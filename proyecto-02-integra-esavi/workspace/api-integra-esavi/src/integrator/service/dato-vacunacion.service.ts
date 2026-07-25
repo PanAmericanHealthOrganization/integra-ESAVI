@@ -71,7 +71,7 @@ export class DatoVacunacionService {
     }
   }
 
-  delete(uuid: string): Promise<DatoVacunacion> {
+  delete(_uuid: string): Promise<DatoVacunacion> {
     return Promise.resolve(undefined);
   }
 

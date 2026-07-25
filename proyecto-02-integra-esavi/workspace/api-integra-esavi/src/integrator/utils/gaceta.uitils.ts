@@ -1,4 +1,5 @@
 import {format} from 'date-fns';
+import {es} from 'date-fns/locale';
 import { CreateGacetaDto, GacetaDto } from '../dto';
 import {ESTADO_GACETA} from '../entity/interfaces/gaceta.interface';
 
@@ -19,7 +20,7 @@ return {
     cargo: '',
     autorSecundario: '',
     cargoSecundario: '',
-    titulo: `Análisis de Eventos Adversos en el Mes de ${format(createGacetaDto.desde, 'MMMM yyyy', { locale: require('date-fns/locale/es') })}`,
+    titulo: `Análisis de Eventos Adversos en el Mes de ${format(createGacetaDto.desde, 'MMMM yyyy', { locale: es })}`,
     resumenContenido: '',
     analisisPoblacion: '',
     analisisDistribucionGeografica: '',

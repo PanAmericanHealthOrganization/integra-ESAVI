@@ -176,7 +176,7 @@ export class DatoEsaviService {
     }
   }
 
-  delete(uuid: string): Promise<DatoVacuna> {
+  delete(_uuid: string): Promise<DatoVacuna> {
     return Promise.resolve(undefined);
   }
 

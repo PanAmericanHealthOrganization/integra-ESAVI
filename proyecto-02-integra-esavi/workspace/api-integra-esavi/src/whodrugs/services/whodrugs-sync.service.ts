@@ -18,9 +18,8 @@ import {IngredientTranslation} from '../models/ingredientTranslation.entity';
 import {Maholder} from '../models/maholder.entity';
 import {SyncStateEnum} from '../utils/sycnstate.enum';
 import {uuidGenerator} from '../utils/utils';
+import * as cliProgress from 'cli-progress';
 import {WhoDrugsClientService} from './whodrugs-client.service';
-
-const cliProgress = require('cli-progress');
 
 /**
  * Esta clase se encargará de la sincronización del json proporcionado por whodrug en la base de datos postgres

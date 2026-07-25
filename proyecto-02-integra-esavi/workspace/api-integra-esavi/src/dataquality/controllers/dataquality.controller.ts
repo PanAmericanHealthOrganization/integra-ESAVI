@@ -80,22 +80,22 @@ export class DataqualityController implements IController<QualityDto, QualityDto
     return await this.generalService.getHistoryQuality(parsedStartDay, parsedEndDay);
   }
 
-  getMany(params: IGetManyParams): Promise<QualityDto[]> {
+  getMany(_params: IGetManyParams): Promise<QualityDto[]> {
     throw new Error('Method not implemented.');
   }
-  delete(id: Identificator, auditData: any): Promise<QualityDto> {
+  delete(_id: Identificator, _auditData: any): Promise<QualityDto> {
     throw new Error('Method not implemented.');
   }
-  getOne(id: Identificator): Promise<QualityDto> {
+  getOne(_id: Identificator): Promise<QualityDto> {
     throw new Error('Method not implemented.');
   }
-  getPaginated(params: GetListParams): Promise<{ data: QualityDto[]; total: number }> {
+  getPaginated(_params: GetListParams): Promise<{ data: QualityDto[]; total: number }> {
     throw new Error('Method not implemented.');
   }
-  create(data: QualityDto): Promise<QualityDto> {
+  create(_data: QualityDto): Promise<QualityDto> {
     throw new Error('Method not implemented.');
   }
-  update(id: Identificator, data: QualityDto): Promise<QualityDto> {
+  update(_id: Identificator, _data: QualityDto): Promise<QualityDto> {
     throw new Error('Method not implemented.');
   }
 }

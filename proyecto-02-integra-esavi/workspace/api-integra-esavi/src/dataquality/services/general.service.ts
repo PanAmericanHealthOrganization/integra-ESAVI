@@ -81,7 +81,7 @@ export class GeneralService {
       isEnabled: true,
       isActive: true,
     };
-    let dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
+    const dataQualityDimension = await this.dataQualityDimensionsRepository.findOne({
       where: {
         anio: Equal(year),
         mes: Equal(month),

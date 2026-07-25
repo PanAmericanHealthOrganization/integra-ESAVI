@@ -58,7 +58,7 @@ export class AntecedenteEventoService {
     return this.antecedenteEventoRepository.save(antecedenteEvento);
   }
 
-  delete(uuid: string): Promise<AntecedenteEvento> {
+  delete(_uuid: string): Promise<AntecedenteEvento> {
     return Promise.resolve(undefined);
   }
 

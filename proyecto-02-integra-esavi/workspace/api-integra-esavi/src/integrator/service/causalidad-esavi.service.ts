@@ -50,7 +50,7 @@ export class CausalidadEsaviService {
     }
   }
 
-  delete(uuid: string): Promise<CausalidadEsavi> {
+  delete(_uuid: string): Promise<CausalidadEsavi> {
     return Promise.resolve(undefined);
   }
 

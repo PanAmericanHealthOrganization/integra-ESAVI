@@ -46,7 +46,18 @@ export const WHODRUGS_DS = 'WHO_DRUG';
         password: configService.get('WHD_DB_PASS'),
         database: configService.get('WHD_DB_NAME'),
         schema: 'WHO_DRUG',
-        entities: ['dist/**/models/*.entity{.ts,.js}'],
+        // Clases explícitas en lugar de globs: 'dist/**/models/*.entity' también
+        // capturaba entidades de MEDDRA, y ambos datasources apuntan a la misma
+        // base, por lo que los dos sincronizaban las mismas tablas a la vez.
+        entities: [
+          DrugSync,
+          Drug,
+          ActiveIngredient,
+          IngredientTranslation,
+          AnatomicalTherapeuticChemical,
+          CountryOfSale,
+          Maholder,
+        ],
         synchronize: configService.get<string>('ENV') === 'DEV',
         subscribers: [AutoEncryptSubscriber],
         poolSize: 5,

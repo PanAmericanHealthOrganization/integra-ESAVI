@@ -7,7 +7,7 @@ export function getUsernameFromJwt(authHeader: string | undefined): string {
     const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(Buffer.from(base64, 'base64').toString('utf-8'));
     return payload.preferred_username || FALLBACK_USER;
-  } catch (e) {
+  } catch {
     return FALLBACK_USER;
   }
 }

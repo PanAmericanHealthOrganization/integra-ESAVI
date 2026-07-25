@@ -45,11 +45,10 @@ export const MEDDRA_DS = 'MEDDRA';
         username: configService.get('MDD_DB_USER'),
         password: configService.get('MDD_DB_PASS'),
         database: configService.get('MDD_DB_NAME'),
-        entities: [
-          'dist/**/models/*.entity{.ts,.js}',
-          'dist/**/models/mapping/*.entity{.ts,.js}',
-          'dist/**/models/standar/*.entity{.ts,.js}',
-        ],
+        // Clases explícitas en lugar de globs: 'dist/**/models/*.entity' también
+        // capturaba las entidades de WHO_DRUG, y ambos datasources apuntan a la
+        // misma base, por lo que los dos sincronizaban las mismas tablas a la vez.
+        entities: [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
         schema: 'MEDDRA',
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         subscribers: [AutoEncryptSubscriber],

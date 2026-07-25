@@ -27,11 +27,24 @@ services:
     networks:
       - esavi-internal
 
+  # ── Imagen base (dependencias de sistema + paquetes R) ───────────────────────
+  # No se levanta: existe solo para construir la base, que es la parte lenta del
+  # build (renv::restore) y se reutiliza en cada build de la app.
+  #   podman-compose --profile base build dash-base
+  dash-base:
+    profiles: ["base"]
+    image: ${DASH_BASE_IMAGE:-localhost/integra-esavi/dash-base:4.4.1}
+    build:
+      context: .
+      dockerfile: Dockerfile.deps
+
   # ── Dashboard Shiny ──────────────────────────────────────────────────────────
   dashboard:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${DASH_BASE_IMAGE:-localhost/integra-esavi/dash-base:4.4.1}
     image: dash-integra-esavi:latest
     container_name: esavi-dashboard
     restart: unless-stopped

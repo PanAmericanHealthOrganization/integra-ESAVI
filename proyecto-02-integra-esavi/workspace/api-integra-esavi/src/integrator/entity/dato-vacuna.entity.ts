@@ -113,25 +113,7 @@ export class DatoVacuna extends Auditoria {
   })
   dosis: string;// utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'DOSIS_DE_APLICACION',
-    nullable: true,
-    comment: 'Primera dosis administrada',
-  })
-  dosis1: string;//utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'INTERVALO_DOSIFICACION',
-    nullable: true,
-    comment: 'Intervalo entre dosis de vacunación. Variable utilizada solo por VigiFlow.',
-  })
-  intervaloDosificacion: string; // utilizado por vf.
 
   /**
    *
@@ -160,9 +142,19 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'NOMBRE_DILUYENTE_VACUNA',
     nullable: true,
-    comment: 'Nombre del diluyente utilizado para la vacuna',
+    comment: 'Nombre del diluyente utilizado para la vacuna. Origen VigiFlow: hoja AEFI, columna "Nombre del diluyente"',
   })
-  nombreDiluyenteVacuna: string; // utilizado por d2.
+  nombreDiluyenteVacuna: string; // utilizado por vf y d2.
+
+  /**
+   *
+   */
+  @Column({
+    name: 'NUMERO_LOTE_DILUYENTE',
+    nullable: true,
+    comment: 'Número de lote del diluyente. Origen VigiFlow: hoja AEFI, columna "Número de lote del diluyente"',
+  })
+  numeroLoteDiluyente: string; // utilizado por vf.
 
   /**
    *
@@ -185,67 +177,11 @@ export class DatoVacuna extends Auditoria {
   })
   paisAutorizacionIso3Code: string; //paisAutorizacion // utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'STRENGTH_POTENCIA', //'CONCENTRACION',
-    nullable: true,
-    comment: 'En WHODrug, el campo Strength o Potencia describe la cantidad del ingrediente activo por unidad de presentación, no siempre una concentración. Ejemplo, formas líquidas multidosis: Amoxicillin 250 mg/5 mL suspension, la concentración real sería 50 mg/mL. En WHODrug, la concentración se deduce, no se almacena como tal.',
-  })
-  strengthPotencia: string;//concentracion: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'INGREDIENTE_SOSPECHOSO',
-    nullable: true,
-    comment: 'Ingrediente sospechoso de causar el evento adverso',
-  })
-  ingredienteSospechoso: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'ACCION_TOMADA',
-    nullable: true,
-    comment: 'Acción tomada con respecto a la vacuna tras el evento',
-  })
-  accionTomada: string;// utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'INFORMACION_ADICIONAL_MEDICAMENTO',
-    nullable: true,
-    comment: 'Información adicional sobre el medicamento/vacuna',
-  })
-  informacionAdicionalMedicamento: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'INDICACION_MEDDRA',
-    type: 'text',
-    nullable: true,
-    comment: 'Indicación de la vacuna codificada en MedDRA',
-  })
-  indicacionMeddra: string; // utilizado por vf.
 
-  /**
-   *
-   */
-  @Column({
-    name: 'INDICACION_NOTIFICADOR_PRIMARIO',
-    type: 'text',
-    nullable: true,
-    comment: 'Indicación de la vacuna según el notificador primario',
-  })
-  indicacionNotificadorPrimario: string;
 
   /**
    *

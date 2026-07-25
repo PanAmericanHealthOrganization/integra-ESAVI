@@ -79,13 +79,20 @@ export class DesenlaceEsavi extends Auditoria {
   /**
    *
    */
+  // COMENTARIO_RESULTADO se eliminó por estar repetida con RESULTADO_EVENTO; el estado final
+  // del evento se almacena homologado a código numérico en RESULTADO_EVENTO.
+
+  /**
+   *
+   */
   @Column({
-    name: 'COMENTARIO_RESULTADO',
-    type: 'text',
+    name: 'RESULTADO_EVENTO',
+    type: 'integer',
     nullable: true,
-    comment: 'Comentarios adicionales sobre el desenlace. Campo utilizado por VigiFlow, en el origen se lo puede localizar en la hoja AEFI en la columna "Resultado"',
+    comment:
+      'Estado final del evento homologado. 0=Desconocido, 1=Recuperado, 2=En recuperación, 3=No recuperado, 4=Recuperado con secuelas, 5=Muerte. Origen VigiFlow: hoja Reacciones, columna "Resultado"; un criterio de gravedad "Muerte" fuerza el valor 5.',
   })
-  comentarioResultado: string;
+  resultadoEvento: number;
 
   /**
    *

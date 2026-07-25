@@ -50,7 +50,7 @@ describe('DuckDbBuilderService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
 
-    mockConfigService.get.mockImplementation((key: string) => undefined);
+    mockConfigService.get.mockImplementation((_key: string) => undefined);
     (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
     (fs.unlink as jest.Mock).mockResolvedValue(undefined);
     (fs.rename as jest.Mock).mockResolvedValue(undefined);

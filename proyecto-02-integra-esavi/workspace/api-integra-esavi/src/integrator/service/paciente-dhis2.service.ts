@@ -74,7 +74,7 @@ export class PacienteDhis2Service {
     }
   }
 
-  delete(uuid: string): Promise<Paciente> {
+  delete(_uuid: string): Promise<Paciente> {
     return Promise.resolve(undefined);
   }
 

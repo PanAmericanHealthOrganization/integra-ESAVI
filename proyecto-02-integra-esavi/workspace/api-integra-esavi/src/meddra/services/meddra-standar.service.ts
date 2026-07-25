@@ -90,7 +90,10 @@ export class MeddraStandarService {
       where: { meddra_llt_code: ILike(llt?.code) },
     });
 
-    const cie10Meddraespaniol = await this.CIE10ESRepository.findOne({
+    // TODO: la traducción al español del CIE-10 se consulta pero todavía no se vuelca en el DTO
+    // (ver la línea comentada `meddraStandar.cie10Name` más abajo). Mientras siga así, esta
+    // consulta es un viaje a la base de datos que no se aprovecha.
+    const _cie10Meddraespaniol = await this.CIE10ESRepository.findOne({
       where: { icd10Code: ILike(cie10Meddra?.icd10_code) },
     });
 
@@ -102,7 +105,6 @@ export class MeddraStandarService {
     meddraStandar.socCode = soc?.code;
     meddraStandar.socName = soc?.name;
     //meddraStandar.cie10Name = cie10Meddra?.icd10_term;
-    cie10Meddraespaniol;
     meddraStandar.cie10Code = cie10Meddra?.icd10_code;
     meddraStandar.cie10MeddraEquivalence = cie10Meddra?.equivalence;
 

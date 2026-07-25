@@ -50,12 +50,22 @@ export class EmbarazoEsaviService {
     }
   }
 
-  delete(uuid: string): Promise<EmbarazoEsavi> {
+  delete(_uuid: string): Promise<EmbarazoEsavi> {
     return Promise.resolve(undefined);
   }
 
   findAll(): Promise<EmbarazoEsavi[]> {
     return this.embarazoEsaviRepository.find();
+  }
+
+  /**
+   * Devuelve el bloque de embarazo durante el ESAVI asociado a una notificación.
+   * Retorna null cuando la notificación no tiene datos de embarazo registrados.
+   */
+  async findByNotificacionUUID(uuidNotificacion: string): Promise<EmbarazoEsavi | null> {
+    return this.embarazoEsaviRepository.findOne({
+      where: { notificacion: { id: uuidNotificacion } },
+    });
   }
 
   async findOne(uuid: string): Promise<EmbarazoEsavi> {

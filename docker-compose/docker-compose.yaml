@@ -115,11 +115,25 @@ services:
       api:
         condition: service_healthy
 
+  # ── Imagen base del dashboard (dependencias R) ────────────────────────────────
+  # No se levanta nunca: existe solo para poder construir la base con compose.
+  # Es la parte lenta del build y se reutiliza entre builds de la app.
+  #   ./scripts/build-dash-base.sh                        (recomendado)
+  #   podman-compose --profile base build dash-base       (equivalente)
+  dash-base:
+    profiles: ["base"]
+    image: ${DASH_BASE_IMAGE:-localhost/integra-esavi/dash-base:4.4.1}
+    build:
+      context: ../proyecto-02-integra-esavi/workspace/dash-integra-esavi
+      dockerfile: Dockerfile.deps
+
   # ── Dashboard Shiny ────────────────────────────────────────────────────────────
   dashboard:
     build:
       context: ../proyecto-02-integra-esavi/workspace/dash-integra-esavi
       dockerfile: Dockerfile
+      args:
+        BASE_IMAGE: ${DASH_BASE_IMAGE:-localhost/integra-esavi/dash-base:4.4.1}
     container_name: esavi-dashboard
     restart: unless-stopped
     environment:

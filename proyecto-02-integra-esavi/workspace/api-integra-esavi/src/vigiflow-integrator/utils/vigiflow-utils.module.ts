@@ -1,3 +1,44 @@
+/** Rango válido de semanas de gestación acordado con el personal funcional. */
+const EDAD_GESTACIONAL_MINIMA_SEMANAS = 1;
+const EDAD_GESTACIONAL_MAXIMA_SEMANAS = 43;
+
+/** Días que tiene una semana; usado en los cálculos obstétricos. */
+const DIAS_POR_SEMANA = 7;
+
+/** Duración estándar de una gestación a término, acordada con el personal funcional. */
+const SEMANAS_GESTACION_A_TERMINO = 40;
+
+/**
+ * Códigos homologados del estado final del evento (RESULTADO_EVENTO).
+ * El orden numérico representa la severidad: a mayor código, mayor severidad.
+ */
+export enum ResultadoEvento {
+  DESCONOCIDO = 0,
+  RECUPERADO = 1,
+  EN_RECUPERACION = 2,
+  NO_RECUPERADO = 3,
+  RECUPERADO_CON_SECUELAS = 4,
+  MUERTE = 5,
+}
+
+/**
+ * Términos (normalizados: sin tildes y en minúsculas) que identifican cada estado final
+ * en la columna "Resultado" de la hoja Reacciones. El orden importa: se evalúa de mayor
+ * a menor especificidad para que "no recuperado" no sea capturado por "recuperado", ni
+ * "recuperado con secuelas" por "recuperado".
+ */
+const TERMINOS_RESULTADO_EVENTO: { termino: string; codigo: ResultadoEvento }[] = [
+  { termino: 'fatal', codigo: ResultadoEvento.MUERTE },
+  { termino: 'muerte', codigo: ResultadoEvento.MUERTE },
+  { termino: 'secuelas', codigo: ResultadoEvento.RECUPERADO_CON_SECUELAS },
+  { termino: 'no recuperado', codigo: ResultadoEvento.NO_RECUPERADO },
+  { termino: 'no resuelto', codigo: ResultadoEvento.NO_RECUPERADO },
+  { termino: 'en recuperacion', codigo: ResultadoEvento.EN_RECUPERACION },
+  { termino: 'resolviendose', codigo: ResultadoEvento.EN_RECUPERACION },
+  { termino: 'recuperado', codigo: ResultadoEvento.RECUPERADO },
+  { termino: 'resuelto', codigo: ResultadoEvento.RECUPERADO },
+];
+
 /**
  * Clase utilitaria del integrador VigiFlow.
  * Es abstracta para impedir su instanciación: todos los métodos son estáticos y puros
@@ -55,7 +96,7 @@ export abstract class VigiflowUtils {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) {}
+    } catch {}
     return resultado;
   }
 
@@ -67,8 +108,131 @@ export abstract class VigiflowUtils {
       if (isNaN(resultado)) {
         resultado = 0;
       }
-    } catch (error) {}
+    } catch {}
     return resultado;
+  }
+
+  /**
+   * Convierte las semanas de gestación al momento de la exposición a un valor numérico
+   * general (entero o flotante) mediante Number(). Solo se acepta el rango de 1 a 43
+   * semanas (inclusive); cualquier otro valor —texto no numérico, celda vacía o fuera
+   * de rango— se descarta devolviendo null para no persistir datos inválidos.
+   */
+  static formatoEdadGestacional(valor?: unknown): number | null {
+    if (valor === null || valor === undefined || valor.toString().trim() === '') {
+      return null;
+    }
+
+    const edadGestacional = Number(valor.toString().trim());
+    if (!Number.isFinite(edadGestacional)) {
+      return null;
+    }
+
+    return edadGestacional >= EDAD_GESTACIONAL_MINIMA_SEMANAS && edadGestacional <= EDAD_GESTACIONAL_MAXIMA_SEMANAS
+      ? edadGestacional
+      : null;
+  }
+
+  /**
+   * Convierte el valor a número entero descartando separadores de miles y decimales
+   * (puntos, comas y espacios). Ejm: "1.234" → 1234, "2,0" → 20, "3 dosis" → 3.
+   * Retorna null si no queda ningún dígito.
+   */
+  static formatoEnteroSinSeparadores(valor?: unknown): number | null {
+    if (valor === null || valor === undefined) return null;
+
+    const digitos = valor.toString().replace(/[^\d]/g, '');
+    if (digitos === '') return null;
+
+    const entero = Number.parseInt(digitos, 10);
+    return Number.isNaN(entero) ? null : entero;
+  }
+
+  /**
+   * Calcula la fecha de última menstruación restando a la fecha del ESAVI (inicio de
+   * síntomas) las semanas de gestación transcurridas.
+   * FUM = fechaEsavi − (edadGestacional × 7 días)
+   */
+  static calcularFechaUltimaMenstruacion(fechaEsavi?: Date | null, edadGestacional?: number | null): Date | null {
+    if (!fechaEsavi || edadGestacional === null || edadGestacional === undefined) {
+      return null;
+    }
+    return VigiflowUtils.ajustarFecha(fechaEsavi, -edadGestacional * DIAS_POR_SEMANA);
+  }
+
+  /**
+   * Calcula la fecha probable de parto sumando a la fecha de última menstruación una
+   * gestación a término.
+   * FECHA_PARTO = FUM + (40 × 7 días)
+   */
+  static calcularFechaParto(fechaUltimaMenstruacion?: Date | null): Date | null {
+    if (!fechaUltimaMenstruacion) return null;
+    return VigiflowUtils.ajustarFecha(fechaUltimaMenstruacion, SEMANAS_GESTACION_A_TERMINO * DIAS_POR_SEMANA);
+  }
+
+  /** Devuelve una nueva fecha desplazada la cantidad de días indicada (positiva o negativa). */
+  static ajustarFecha(fecha: Date, dias: number): Date {
+    const resultado = new Date(fecha.getTime());
+    resultado.setUTCDate(resultado.getUTCDate() + dias);
+    return resultado;
+  }
+
+  /**
+   * Homologa el estado final reportado en la columna "Resultado" (hoja Reacciones) a los
+   * códigos numéricos acordados. Si el criterio de gravedad indica muerte o el resultado
+   * es "Fatal", prevalece el código 5 sobre cualquier otro valor.
+   * Retorna 0 (Desconocido) cuando no hay valor o no coincide con ningún término conocido.
+   */
+  static mapearResultadoEvento(resultado?: string, criterioGravedad?: string): ResultadoEvento {
+    // Regla de consistencia: la muerte reportada en los criterios de gravedad prevalece.
+    if (VigiflowUtils.contieneCriterioGravedad(criterioGravedad, 'muerte')) {
+      return ResultadoEvento.MUERTE;
+    }
+
+    const normalizado = VigiflowUtils.normalizarTexto(resultado ?? '');
+    if (normalizado.trim() === '') {
+      return ResultadoEvento.DESCONOCIDO;
+    }
+
+    const coincidencia = TERMINOS_RESULTADO_EVENTO.find(({ termino }) => normalizado.includes(termino));
+    return coincidencia ? coincidencia.codigo : ResultadoEvento.DESCONOCIDO;
+  }
+
+  /**
+   * Cuando una notificación reporta varios resultados (uno por evento ESAVI), selecciona
+   * uno solo aplicando la prioridad por severidad: 5 > 4 > 3 > 2 > 1 > 0.
+   * Los criterios de gravedad se evalúan en paralelo, posición a posición.
+   */
+  static seleccionarResultadoPrioritario(resultados: string[], criteriosGravedad: string[] = []): ResultadoEvento {
+    if (!resultados || resultados.length === 0) {
+      // Aun sin resultados, un criterio de gravedad "Muerte" debe reflejarse.
+      return criteriosGravedad.some((criterio) => VigiflowUtils.contieneCriterioGravedad(criterio, 'muerte'))
+        ? ResultadoEvento.MUERTE
+        : ResultadoEvento.DESCONOCIDO;
+    }
+
+    return resultados.reduce<ResultadoEvento>((prioritario, resultado, indice) => {
+      const codigo = VigiflowUtils.mapearResultadoEvento(resultado, criteriosGravedad[indice]);
+      return codigo > prioritario ? codigo : prioritario;
+    }, ResultadoEvento.DESCONOCIDO);
+  }
+
+  /**
+   * Indica si la celda "Criterio (s) de Gravedad" contiene el término buscado.
+   * La comparación ignora tildes y mayúsculas, y admite celdas multilínea.
+   */
+  static contieneCriterioGravedad(criterios?: string, termino?: string): boolean {
+    if (!criterios || !termino) return false;
+    return VigiflowUtils.normalizarTexto(criterios).includes(VigiflowUtils.normalizarTexto(termino));
+  }
+
+  /**
+   * Traduce a '1' (presente) o '0' (ausente) la presencia de un término dentro de la
+   * columna "Criterio (s) de Gravedad". Las columnas de TR_GRAVEDAD_ESAVI se almacenan
+   * como texto '1'/'0', no como booleanos.
+   */
+  static marcarCriterioGravedad(criterios?: string, termino?: string): string {
+    return VigiflowUtils.contieneCriterioGravedad(criterios, termino) ? '1' : '0';
   }
 
   /** Divide una celda multilínea en un arreglo de líneas limpias (sin vacías). */
@@ -86,7 +250,7 @@ export abstract class VigiflowUtils {
   static eliminarTildes(str?: string): string | undefined {
     try {
       return str.normalize('NFD').replace(/[̀-ͯ]/g, '');
-    } catch (error) {}
+    } catch {}
   }
 
   /** Elimina acentos y convierte todo a minúsculas. */
