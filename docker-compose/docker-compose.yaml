@@ -87,6 +87,15 @@ services:
       WHD_DB_USER: dhis
       WHD_DB_PASS: dhis
       TZ: America/Guayaquil
+      # ── Validación de tokens Keycloak (KeycloakAuthGuard) ─────────────────────
+      # Solo lo usa /v1/integrator/reports/*; el resto de controllers no lleva guard.
+      # KEYCLOAK_URL debe coincidir LITERALMENTE con el claim `iss` de los tokens,
+      # que Keycloak firma con su KC_HOSTNAME (localhost:8080, el que ve el navegador).
+      # KEYCLOAK_INTERNAL_URL es de dónde este contenedor descarga el JWKS: aquí
+      # `localhost` sería el propio API, así que se usa el nombre de servicio.
+      KEYCLOAK_URL: http://localhost:8080
+      KEYCLOAK_INTERNAL_URL: http://keycloak:8080
+      KEYCLOAK_REALM: integra-esavi
       # Datamart DuckDB: el API lo genera en el volumen compartido con el dashboard.
       DATAMART_DUCKDB_PATH: /app/datamart-out/esavi.duckdb
       DATAMART_TMP_DIR: /app/datamart-out
