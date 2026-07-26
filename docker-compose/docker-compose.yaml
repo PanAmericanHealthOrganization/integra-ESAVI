@@ -44,6 +44,11 @@ services:
       KC_DB_PASSWORD: password123
       KC_HTTP_ENABLED: "true"
       KC_HEALTH_ENABLED: "true"
+      # URL pública fija. Sin esto, start-dev deriva el frontend URL del Host de
+      # cada petición: el navegador (localhost:8080) y oauth2-proxy (keycloak:8080)
+      # obtendrían un claim `iss` distinto y la validación del token fallaría.
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
     ports:
       - "8080:8080"
     volumes:
@@ -136,6 +141,13 @@ services:
         BASE_IMAGE: ${DASH_BASE_IMAGE:-localhost/integra-esavi/dash-base:4.4.1}
     container_name: esavi-dashboard
     restart: unless-stopped
+    # ⚠ ACCESO DIRECTO SIN AUTENTICACIÓN — SOLO DESARROLLO LOCAL.
+    # Es el destino de VITE_DASH_APP en app-integra-esavi/.env. Este puerto
+    # entra al Shiny saltándose nginx y oauth2-proxy, así que NO se aplica el
+    # login de Keycloak ni los --allowed-role. En producción hay que quitar
+    # este mapeo y acceder solo por https://localhost/ (nginx → oauth2-proxy).
+    ports:
+      - "3838:80"
     environment:
       DB_HOST: postgres
       DB_PORT: "5432"
@@ -146,6 +158,20 @@ services:
       LOG_FILE_PATH: /app/logs/access.log
       # Datamart DuckDB generado por el API (reemplaza los RDS de datos).
       DUCKDB_PATH: /app/datos/esavi.duckdb
+      # ── Autenticación Keycloak en el propio dashboard ─────────────────────────
+      # Activa www/js/keycloak-auth.js (global.R: kc_enabled exige las tres). Es
+      # lo que protege el acceso directo por :3838, donde no hay oauth2-proxy.
+      # Mismo realm y MISMO cliente que app-integra-esavi: así la sesión de
+      # Keycloak se comparte y no se vuelve a pedir login al saltar entre ambas.
+      # Estas URLs las abre el NAVEGADOR, por eso localhost y no keycloak.
+      VITE_KEYCLOAK_URL: http://localhost:8080
+      VITE_KEYCLOAK_REALM: integra-esavi
+      VITE_KEYCLOAK_CLIENT_ID: integra-esavi-client
+      # Roles de realm admitidos (basta con tener uno).
+      KC_REQUIRED_ROLE: "analitic,arcsa,dhis,paho"
+      # Destino del enlace "Ir a Integra App" del sidebar. El valor por defecto
+      # en global.R es http://localhost:8080, que es Keycloak, no la app.
+      INTEGRA_APP_URL: http://localhost:5173
     volumes:
       - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/datos:/app/datos
       - ../proyecto-02-integra-esavi/workspace/dash-integra-esavi/fuente_de_datos:/app/fuente_de_datos
@@ -171,8 +197,22 @@ services:
     command:
       - --provider=keycloak-oidc
       - --client-id=dash-integra-esavi-client
+      # Coincide con el secret del cliente en scripts/keycloak-realm.json.
+      # Para producción hay que cambiarlo EN AMBOS SITIOS.
       - --client-secret=CAMBIAR_POR_SECRET_REAL
-      - --oidc-issuer-url=https://auth-kk.kuyacode.com/realms/integra-esavi
+      # Keycloak local (el que levanta este compose), no el remoto: el realm
+      # importado ya trae este cliente con la redirect URI de localhost y los roles.
+      #
+      # El navegador y este contenedor ven Keycloak en hostnames distintos, así que
+      # se desactiva el discovery automático y se declara cada endpoint por su lado:
+      #   - login-url  -> lo abre el NAVEGADOR      => localhost:8080
+      #   - redeem/jwks-> los llama ESTE CONTENEDOR => keycloak:8080
+      # issuer-url debe coincidir literalmente con el claim `iss` (ver KC_HOSTNAME).
+      - --skip-oidc-discovery=true
+      - --oidc-issuer-url=http://localhost:8080/realms/integra-esavi
+      - --login-url=http://localhost:8080/realms/integra-esavi/protocol/openid-connect/auth
+      - --redeem-url=http://keycloak:8080/realms/integra-esavi/protocol/openid-connect/token
+      - --oidc-jwks-url=http://keycloak:8080/realms/integra-esavi/protocol/openid-connect/certs
       - --redirect-url=https://localhost/oauth2/callback
       - --upstream=http://dashboard:80
       - --http-address=0.0.0.0:4180
@@ -182,15 +222,24 @@ services:
       - --cookie-secure=true
       - --cookie-name=_esavi_session
       - --email-domain=*
-      - --allowed-role=integra-esavi:analitic
-      - --allowed-role=integra-esavi:arcsa
-      - --allowed-role=integra-esavi:dhis
-      - --allowed-role=integra-esavi:paho
+      # Roles de REALM (así están definidos en scripts/keycloak-realm.json), que
+      # oauth2-proxy expone sin prefijo. El prefijo 'cliente:' es solo para roles
+      # de cliente (resource_access), que este realm no usa.
+      - --allowed-role=analitic
+      - --allowed-role=arcsa
+      - --allowed-role=dhis
+      - --allowed-role=paho
       - --set-xauthrequest=true
       - --pass-user-headers=true
+      # Permite que /oauth2/sign_out?rd=... redirija al end-session de Keycloak.
+      # Sin este dominio en la lista, oauth2-proxy ignora el rd por seguridad y
+      # el logout cerraría su cookie pero dejaría viva la sesión SSO.
+      - --whitelist-domain=localhost:8080
     networks:
       - esavi-internal
       - esavi-public
+      # keycloak vive en la red default; sin esto no se alcanza redeem/jwks.
+      - default
     depends_on:
       dashboard:
         condition: service_healthy

@@ -81,10 +81,11 @@ ui <- dashboardPage(
             'window.KEYCLOAK_CONFIG={url:"%s",realm:"%s",clientId:"%s",requiredRole:"%s"};',
             kc_url, kc_realm, kc_client, kc_role
           ))),
-          # 2. Adapter JS oficial de Keycloak (servido por el propio servidor Keycloak)
-          tags$script(src = paste0(kc_url, "/js/keycloak.js")),
-          # 3. Lógica de autenticación de la app
-          tags$script(src = "js/keycloak-auth.js")
+          # 2. Lógica de autenticación. Importa el adapter desde
+          #    www/js/keycloak.js (keycloak-js 26.2.4, versionado aquí porque
+          #    Keycloak ya no lo publica en /js/keycloak.js). Es ESM, así que
+          #    tiene que cargarse como módulo.
+          tags$script(src = "js/keycloak-auth.js", type = "module")
         )
       ),
       tags$a(
@@ -114,9 +115,23 @@ ui <- dashboardPage(
       #menuSubItem("Eventos parte 2", tabName = "esavi2", icon = icon(vIcon_line, class = "menu-icon"))
       # ),
       menuItem("Detección de señales", tabName = "senales", icon = icon(vIcon_senl, class = "menu-icon")),
-      menuItem("Acerca de", tabName = "about", icon = icon(vIcon_abou, class = "menu-icon")) # ,
+      menuItem("Acerca de", tabName = "about", icon = icon(vIcon_abou, class = "menu-icon")), # ,
       # menuItem("Antecedentes", tabName = "antecedentes", icon = icon(vIcon_antc, class = "menu-icon"))#,
       # menuItem("Pruebas", tabName = "test", icon = icon(vIcon_test, class = "menu-icon"))
+
+      # Cierra la sesión en Keycloak (no solo en el dashboard): keycloakLogout()
+      # llama a kc.logout(), que redirige al end-session del realm. Solo se
+      # muestra si la autenticación está activa.
+      if (kc_enabled) {
+        tags$li(
+          tags$a(
+            href = "#",
+            onclick = "if (window.keycloakLogout) { window.keycloakLogout(); } return false;",
+            icon("sign-out-alt", class = "menu-icon"),
+            tags$span("Cerrar sesión")
+          )
+        )
+      }
     )
   ),
 

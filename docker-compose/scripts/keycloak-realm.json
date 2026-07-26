@@ -39,7 +39,7 @@
       ],
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "+",
+        "post.logout.redirect.uris": "+##https://localhost##https://localhost/*",
         "pkce.code.challenge.method": "S256"
       }
     },
@@ -64,7 +64,21 @@
       "protocol": "openid-connect",
       "attributes": {
         "post.logout.redirect.uris": "https://dashboard.dominio.org"
-      }
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-dash-integra-esavi",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "dash-integra-esavi-client",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
     }
   ],
   "users": [
