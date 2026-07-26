@@ -56,7 +56,6 @@ library(highcharter) # Wrapper de Highcharts para R, permite crear gráficos int
 library(shinydashboard) # Creación de dashboards en Shiny
 library(shinydashboardPlus) # Extensión de shinydashboard con componentes adicionales
 library(sf) # Manejo de datos espaciales y geográficos
-library(flextable) # Creación y formateo de tablas flexibles
 library(htmltools) # Herramientas para generar y manipular contenido HTML
 library(data.table) # Manipulación de datos de alta performance
 library(duckdb) # Lectura del datamart (esavi.duckdb) generado por el API
@@ -236,14 +235,9 @@ vTamano_marker <- 1
 
 # 1.6 Formato general de tablas	----
 
-set_flextable_defaults(
-  font.family = "calibri",
-  font.size = 11,
-  theme_fun = theme_vanilla, # theme_zebra
-  padding = 1,
-  background.color = "#FFFFFF",
-  font.color = "#404040"
-) # "#454545")
+# Retirado tras la auditoría de dependencias: set_flextable_defaults() fijaba
+# defaults para tablas flextable que nunca se construyen. Ver
+# docs/auditoria-dependencias.md.
 border_style <- officer::fp_border(color = "white", width = 1)
 
 

@@ -176,7 +176,9 @@ services:
       - --redirect-url=https://localhost/oauth2/callback
       - --upstream=http://dashboard:80
       - --http-address=0.0.0.0:4180
-      - --cookie-secret=RtHzFPFkutUi6eU0f8N1UDQ3Xb3aK8Y9Q+GBrd+uw34=
+      # Base64 URL-safe de 32 bytes: oauth2-proxy decodifica con el alfabeto
+      # URL-safe, así que '+' y '/' hacen fallar el decode y toma la cadena literal.
+      - --cookie-secret=RtHzFPFkutUi6eU0f8N1UDQ3Xb3aK8Y9Q-GBrd-uw34=
       - --cookie-secure=true
       - --cookie-name=_esavi_session
       - --email-domain=*

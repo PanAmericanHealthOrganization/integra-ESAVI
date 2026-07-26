@@ -1,0 +1,8 @@
+# Los certificados TLS NO se versionan: privkey.pem es una clave privada.
+# Producción: los coloca el despliegue (Let's Encrypt o el cert corporativo).
+# Local: generar un par self-signed con
+#   openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
+#     -keyout privkey.pem -out fullchain.pem \
+#     -subj "/CN=localhost" -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+*.pem
+!.gitignore

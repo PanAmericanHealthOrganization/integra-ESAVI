@@ -131,6 +131,33 @@ El orden de arranque lo gestionan las dependencias del compose:
 `postgres` (healthy) → `db-init` (completa) → `keycloak` / `api` / `dashboard` →
 `oauth2-proxy` → `dash-nginx`.
 
+### ⚠ Reconstruir una imagen NO basta: hay que recrear el contenedor
+
+`podman-compose up -d` solo **crea** los contenedores que no existen. A los que ya
+existen los **reinicia con la imagen a la que quedaron vinculados al crearse**, aunque
+después hayas reconstruido esa imagen. El síntoma es desconcertante: `build` termina
+bien, `podman images` muestra la imagen nueva, y el contenedor sigue fallando con el
+error viejo — porque está corriendo la capa anterior.
+
+Para comprobarlo, compara el ID que usa el contenedor con el de la imagen actual:
+
+```bash
+podman inspect api_integra_esavi --format '{{.Image}}' | cut -c1-12
+podman images --format '{{.ID}}' localhost/docker-compose_api:latest
+```
+
+Si difieren, el contenedor está corriendo código viejo. Tras cualquier `build`, usa:
+
+```bash
+podman-compose up -d --force-recreate        # recrea sin parar el resto del stack
+```
+
+o, si prefieres partir de cero:
+
+```bash
+podman-compose down && podman-compose up -d  # SIN -v: conserva postgres_data
+```
+
 ### Imagen base del dashboard y arquitectura
 
 La base (`localhost/integra-esavi/dash-base:4.4.1`) instala ~147 paquetes R con
@@ -184,7 +211,9 @@ docker compose exec postgres pg_isready -U dhis -d DHI_ESAVI
 git pull
 ./scripts/build-dash-base.sh                   # no-op si renv.lock no cambió
 podman-compose build api app-web dashboard     # rebuild de lo que cambió
-podman-compose up -d                           # recrea solo lo necesario
+podman-compose up -d --force-recreate          # OBLIGATORIO: sin --force-recreate
+                                               # los contenedores existentes siguen
+                                               # con la imagen vieja (ver sección 4)
 podman image prune -f                          # limpia imágenes viejas
 ```
 
