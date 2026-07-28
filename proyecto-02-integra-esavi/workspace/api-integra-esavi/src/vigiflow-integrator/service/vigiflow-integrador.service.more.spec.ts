@@ -369,7 +369,6 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         J: 'Si',
         N: '20230510',
         O: 'Dosis 2',
-        // Solo se conservan los casos "No grave": con X = 'Si' la notificación se descartaría.
         X: 'No',
         Q: 'Diluyente X',
         R: 'LOTE-DIL-9',
@@ -413,13 +412,26 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDatoVacuna.clearDatoVacunaCache).toHaveBeenCalled();
     });
 
-    it('descarta por completo la notificación cuando el caso es grave (TIPO_GRAVEDAD = 1)', async () => {
+    it('procesa también los casos graves, registrando TIPO_GRAVEDAD = 1', async () => {
       const service: any = createService();
-      const row = rowFromCols({ B: 'EC-GRAVE', X: 'Si' });
+      // Valor real de la columna X en la hoja AEFI: "Sí" con tilde, repetido por evento.
+      const row = rowFromCols({ B: 'EC-GRAVE', X: 'Sí\r\nSí' });
 
       await invoke(service, row, new Set(['EC-GRAVE']));
 
-      expect(mockIntegrador.create).not.toHaveBeenCalled();
+      expect(mockIntegrador.create).toHaveBeenCalledTimes(1);
+      const [createDto] = mockIntegrador.create.mock.calls[0];
+      expect(createDto.gravedadEsavi.tipo).toBe('1');
+    });
+
+    it('un valor de gravedad que no es "Sí"/"No" no marca el caso como grave', async () => {
+      const service: any = createService();
+      const row = rowFromCols({ B: 'EC-SIN-DATO', X: 'Sin dato' });
+
+      await invoke(service, row, new Set(['EC-SIN-DATO']));
+
+      const [createDto] = mockIntegrador.create.mock.calls[0];
+      expect(createDto.gravedadEsavi.tipo).toBe('0');
     });
 
     it('rama de edad/fechas inválidas y valores por defecto', async () => {
@@ -437,7 +449,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         J: 'No',
       });
 
-      await invoke(service, row, new Set());
+      await invoke(service, row, new Set(['EC-002']));
 
       const [createDto] = mockIntegrador.create.mock.calls[0];
       expect(createDto.notificacion.edad).toBeNull();
@@ -447,14 +459,31 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(createDto.gravedadEsavi.tipo).toBe('0');
       expect(createDto.desenlaceEsavi.autopsia).toBe(2);
       expect(createDto.pacienteEmbarazada).toBeUndefined();
-      expect(createDto.datoVacuna).toBeUndefined();
+    });
+
+    it('descarta por completo el caso cuando el paciente no tiene ninguna vacuna J07', async () => {
+      const service: any = createService();
+      const row = rowFromCols({ B: 'EC-SIN-J07', X: 'No' });
+
+      await invoke(service, row, new Set(['EC-OTRO']));
+
+      expect(mockIntegrador.create).not.toHaveBeenCalled();
+    });
+
+    it('descarta el caso cuando la fila no trae código VigiFlow (no verificable contra Medicamentos)', async () => {
+      const service: any = createService();
+      const row = rowFromCols({ B: '', X: 'No' });
+
+      await invoke(service, row, new Set(['EC-001']));
+
+      expect(mockIntegrador.create).not.toHaveBeenCalled();
     });
 
     it('autopsia "No" se traduce a 0', async () => {
       const service: any = createService();
       const row = rowFromCols({ B: 'EC-003', AA: 'no' });
 
-      await invoke(service, row, new Set());
+      await invoke(service, row, new Set(['EC-003']));
 
       const [createDto] = mockIntegrador.create.mock.calls[0];
       expect(createDto.desenlaceEsavi.autopsia).toBe(0);
@@ -470,7 +499,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       );
       const row = rowFromCols({ B: 'EC-004' });
 
-      await invoke(service, row, new Set());
+      await invoke(service, row, new Set(['EC-004']));
 
       expect(mockIntegrador.create).toHaveBeenCalledWith(
         expect.anything(),
@@ -484,7 +513,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       mockIntegrador.create.mockRejectedValueOnce(new Error('fallo de persistencia'));
       const row = rowFromCols({ B: 'EC-005' });
 
-      await expect(invoke(service, row, new Set())).rejects.toThrow('fallo de persistencia');
+      await expect(invoke(service, row, new Set(['EC-005']))).rejects.toThrow('fallo de persistencia');
       expect(mockDatoVacuna.clearDatoVacunaCache).toHaveBeenCalled();
     });
   });
@@ -797,9 +826,24 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       );
     });
 
+    it('omite la fila cuando el paciente existe en BD pero su caso fue descartado (sin notificación)', async () => {
+      const service = createService();
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-006' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map());
+
+      const row = rowFromCols({ A: 'EC-006', C: 'Vacuna', G: 'J07BX03' });
+      const wb = sheetAt(2, [row]);
+
+      await service.extractedFromJsonReportToCreateMedicamento(wb);
+
+      expect(mockMedicamento.createOneToOne).not.toHaveBeenCalled();
+      expect(mockDatoVacuna.createByNotificacion).not.toHaveBeenCalled();
+    });
+
     it('limpia las cachés en el finally incluso si createOneToOne falla', async () => {
       const service = createService();
       mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-005' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-005', [{ id: 'n-5' }]]]));
       mockMedicamento.createOneToOne.mockRejectedValueOnce(new Error('fallo medicamento'));
       const row = rowFromCols({ A: 'EC-005', G: 'J07BX03' });
       const wb = sheetAt(2, [row]);
@@ -865,6 +909,44 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         expect.objectContaining({ id: 'n-1' }),
         expect.objectContaining({ resultadoEvento: 1 }),
       );
+    });
+
+    it('registra el evento con el texto del notificador (col C) cuando VigiFlow no lo codificó en MedDRA (col D vacía)', async () => {
+      const service = createService();
+      buildBaseMocks();
+
+      const row = rowFromCols({
+        A: 'EC-001',
+        C: 'PRESENTA DEBUT DE CRISIS CONVULSIVAS, CIANOSIS PERIBUCAL, ATONIA.',
+        D: '',
+        I: '20260606',
+        N: 'Recuperando/resolviendo',
+      });
+      const wb = sheetAt(3, [rowFromCols({}), row]);
+
+      await service.extractedFromJsonReportToCreateReaccion(wb);
+
+      expect(mockDatoEsavi.createVigiflow).toHaveBeenCalledTimes(1);
+      const [, dto] = mockDatoEsavi.createVigiflow.mock.calls[0];
+      expect(dto.nombreReportado).toBe('PRESENTA DEBUT DE CRISIS CONVULSIVAS, CIANOSIS PERIBUCAL, ATONIA.');
+      // Sin LLT no hay codificación MedDRA: no se consulta el diccionario.
+      expect(dto.nameLLT).toBeNull();
+      expect(dto.codigoLLT).toBeNull();
+      expect(dto.codigoEsaviCie10).toBeNull();
+      expect(mockMeddraLlt.buscarPorSimilitud).not.toHaveBeenCalled();
+      expect(dto.fechaEsavi).toEqual(new Date(Date.UTC(2026, 5, 6)));
+    });
+
+    it('omite la fila solo cuando no hay ni LLT (col D) ni texto reportado (col C)', async () => {
+      const service = createService();
+      buildBaseMocks();
+
+      const row = rowFromCols({ A: 'EC-001', C: '', D: '', I: '20260606' });
+      const wb = sheetAt(3, [rowFromCols({}), row]);
+
+      await service.extractedFromJsonReportToCreateReaccion(wb);
+
+      expect(mockDatoEsavi.createVigiflow).not.toHaveBeenCalled();
     });
 
     it('consolida las banderas de gravedad y RESULTADO_EVENTO desde "Criterio (s) de Gravedad"', async () => {

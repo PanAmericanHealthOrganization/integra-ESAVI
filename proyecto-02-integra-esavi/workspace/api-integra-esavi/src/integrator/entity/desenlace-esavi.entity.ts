@@ -1,6 +1,6 @@
-import { BeforeInsert, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Auditoria } from './auditoria.entity';
-import { Notificacion } from './notificacion.entity';
+import {BeforeInsert,Column,Entity,JoinColumn,ManyToOne,PrimaryGeneratedColumn} from 'typeorm';
+import {Auditoria} from './auditoria.entity';
+import {Notificacion} from './notificacion.entity';
 
 @Entity({
   schema: 'DHI_ESAVI',
@@ -93,16 +93,6 @@ export class DesenlaceEsavi extends Auditoria {
       'Estado final del evento homologado. 0=Desconocido, 1=Recuperado, 2=En recuperación, 3=No recuperado, 4=Recuperado con secuelas, 5=Muerte. Origen VigiFlow: hoja Reacciones, columna "Resultado"; un criterio de gravedad "Muerte" fuerza el valor 5.',
   })
   resultadoEvento: number;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'FECHAINICIOINVESTIGACION',
-    nullable: true,
-    comment: 'Fecha de inicio de la investigación del caso',
-  })
-  fechaInicioInvestigacion: Date;
 
   /**
    *

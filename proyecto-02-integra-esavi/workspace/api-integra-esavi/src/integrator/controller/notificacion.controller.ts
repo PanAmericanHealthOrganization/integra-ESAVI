@@ -13,7 +13,9 @@ import { GetListParams } from 'src/utils/interfaces/pagination';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
+import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
+import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { NotificacionService } from '../service/notificacion.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 
@@ -27,6 +29,8 @@ export class NotificacionController {
     private pacienteEmbarazadaService: PacienteEmbarazadaServive,
     private datoEsaviService: DatoEsaviService,
     private embarazoEsaviService: EmbarazoEsaviService,
+    private desenlaceEsaviService: DesenlaceEsaviService,
+    private gravedadEsaviService: GravedadEsaviService,
   ) {}
 
   /************CRUD PARA MICROSERVICIOS************/
@@ -144,6 +148,18 @@ export class NotificacionController {
   @ApiResponse({ status: 200, description: 'Eventos ESAVI de la notificación.' })
   findDatoEsaviByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
     return this.datoEsaviService.findByNotificacionId(uuid);
+  }
+
+  @Get(':uuid/desenlace-esavi')
+  @ApiResponse({ status: 200, description: 'Desenlace del ESAVI (TR_DESENLACE_ESAVI).' })
+  findDesenlaceEsaviByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return this.desenlaceEsaviService.findByNotificacionId(uuid);
+  }
+
+  @Get(':uuid/gravedad-esavi')
+  @ApiResponse({ status: 200, description: 'Gravedad del ESAVI (TR_GRAVEDAD_ESAVI).' })
+  findGravedadEsaviByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
+    return this.gravedadEsaviService.findByNotificacionId(uuid);
   }
 
   /**

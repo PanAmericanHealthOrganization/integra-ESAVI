@@ -272,9 +272,17 @@ export abstract class VigiflowUtils {
     return lista.find((item) => VigiflowUtils.normalizarTexto(item).includes(entradaNormalizada));
   }
 
-  /** Retorna true para 'si', false para 'no' y null para cualquier otro valor. */
+  /**
+   * Retorna true para 'sí'/'si', false para 'no' y null para cualquier otro valor.
+   * La comparación es exacta contra el valor normalizado (sin tildes ni mayúsculas): un
+   * "contains" marcaría como afirmativo cualquier texto con la letra "s" ("Sin dato",
+   * "Desconocido"). Una celda multilínea ("Sí\r\nSí") se resuelve por su primera línea:
+   * VigiFlow repite el mismo valor una vez por evento del caso.
+   */
   static esAfirmativo(valor: unknown): boolean | null {
-    const val = (valor || '').toString().trim().toLowerCase();
+    if (valor === null || valor === undefined) return null;
+    const primeraLinea = valor.toString().split(/\r?\n/)[0];
+    const val = VigiflowUtils.normalizarTexto(primeraLinea).trim();
     return val === 'si' ? true : val === 'no' ? false : null;
   }
 

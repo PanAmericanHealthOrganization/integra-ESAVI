@@ -49,9 +49,6 @@ import { PacienteService } from '../../integrator/service/paciente.service';
 import { VigiflowUtils } from '../utils/vigiflow-utils.module';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 
-/** Único tipo de gravedad que se conserva en la base, según el criterio funcional. */
-const TIPO_GRAVEDAD_NO_GRAVE = '0';
-
 const profesiones = [
   'AUXILIAR',
   'ENFERMERA',
@@ -203,8 +200,8 @@ export class VigiflowIntegradorService {
    */
   private async procesarWorkbooks(reportOne: WorkBook, reportTwo: WorkBook) {
     // La hoja AEFI se procesa primero y NO contiene el código ATC (vive en la hoja Medicamentos).
-    // Se pre-calcula qué pacientes tienen al menos una vacuna J07 para no crear un dato-vacuna
-    // "mínimo" a pacientes cuyo reporte no incluye ninguna vacuna J07.
+    // Se pre-calcula qué pacientes tienen al menos una vacuna J07 para descartar por completo
+    // (sin crear notificación) los casos cuyo reporte no incluye ninguna vacuna.
     const codigosPacientesConVacunaJ07 = this.extraerPacientesConVacunaJ07(reportTwo);
     this.logger.log(`Pacientes con vacuna J07 en hoja Medicamentos: ${codigosPacientesConVacunaJ07.size}`);
 
@@ -290,8 +287,8 @@ export class VigiflowIntegradorService {
   /**
    * Devuelve el conjunto de "Número de identificación único mundial" (columna A de la hoja
    * Medicamentos) que tienen al menos una fila con código ATC de vacuna J07 (columna G).
-   * Sirve para que la fase AEFI —que se ejecuta antes y no tiene el ATC— sepa a qué pacientes
-   * corresponde crear un dato-vacuna.
+   * Sirve para que la fase AEFI —que se ejecuta antes y no tiene el ATC— sepa qué casos
+   * corresponde registrar: sin vacuna J07 no se crea ningún registro para ese paciente.
    */
   private extraerPacientesConVacunaJ07(workbook: WorkBook): Set<string> {
     const ws = workbook.Sheets[workbook.SheetNames[2]];
@@ -340,6 +337,17 @@ export class VigiflowIntegradorService {
         paciente.sexoPaciente = reg['F'];
         paciente.codigoVigiflow = reg['B'] ? reg['B'].toString().trim() : null; // Viene desde la hoja AEFI columna B
         paciente.inicialesNombre = reg['C'] ? reg['C'].toString().trim().toUpperCase() : null;
+
+        // Criterio funcional: solo se registran casos ESAVI, es decir, con al menos una vacuna
+        // (ATC J07*) en la hoja Medicamentos. Sin J07 el reporte no corresponde a una vacuna, así
+        // que no debe crearse NINGÚN registro (ni notificación ni paciente ni sub-entidades).
+        // Un registro sin código VigiFlow tampoco es verificable contra la hoja Medicamentos.
+        if (!paciente.codigoVigiflow || !codigosPacientesConVacunaJ07.has(paciente.codigoVigiflow)) {
+          this.logger.warn(
+            `[AEFI] Caso ${paciente.codigoVigiflow ?? '(sin código VigiFlow)'} descartado: no tiene ninguna vacuna J07 en la hoja Medicamentos`,
+          );
+          continue;
+        }
 
         const origenOriginal = {
           iniciales: reg['C'] ?? null,
@@ -411,21 +419,14 @@ export class VigiflowIntegradorService {
 
         //Create Gravedad
         const grave = new CreateGravedadEsaviDto();
-        let gravedad = '0'; //'NO GRAVE'
-        const tipoGravedad = reg['X'];
-        if (tipoGravedad && tipoGravedad.toUpperCase().includes('S')) {
-          gravedad = '1'; //'GRAVE'
-        }
+        // Comparación exacta contra "Sí"/"No" normalizado (sin tildes ni mayúsculas). Cualquier
+        // otro valor ("Sin dato", "Desconocido", celda vacía) se trata como NO GRAVE.
+        const gravedad = VigiflowUtils.esAfirmativo(reg['X']) ? '1' /*GRAVE*/ : '0' /*NO GRAVE*/;
         grave.tipo = gravedad;
 
-        // Criterio de selección acordado con el personal funcional: la base solo conserva los
-        // casos "No grave" (TIPO_GRAVEDAD = 0). Los casos graves se descartan por completo.
-        if (gravedad !== TIPO_GRAVEDAD_NO_GRAVE) {
-          this.logger.warn(
-            `[AEFI] Caso ${paciente.codigoVigiflow} descartado por TIPO_GRAVEDAD = ${gravedad} (solo se conservan los casos "No grave")`,
-          );
-          continue;
-        }
+        // La gravedad NO filtra: se procesan todos los casos, graves y no graves. TIPO_GRAVEDAD
+        // queda registrado en TR_GRAVEDAD_ESAVI para que el análisis distinga unos de otros.
+        // El único criterio de exclusión es la ausencia de vacuna J07 (filtro al inicio del bucle).
 
         // Las banderas MUERTE, RIESGO_VIDA, DISCAPACIDAD, HOSPITALIZACION, ANOMALIA_CONGENITA y
         // PARTE_EVENTOS_PREOCUPACION ya no se derivan de la columna Y de esta hoja: su origen es
@@ -479,11 +480,9 @@ export class VigiflowIntegradorService {
         if (investigacionDto.fechaInvestigacion) {
           create.investigacion = investigacionDto;
         }
-        //Solo se crea el dato-vacuna "mínimo" si el paciente tiene una vacuna J07 en la hoja Medicamentos.
-        //Sin J07 el reporte no contiene vacuna, así que no debe generarse ningún dato-vacuna.
-        if (paciente.codigoVigiflow && codigosPacientesConVacunaJ07.has(paciente.codigoVigiflow)) {
-          create.datoVacuna = datoVacunaDto;
-        }
+        //El dato-vacuna "mínimo" siempre aplica: las filas sin vacuna J07 ya se descartaron
+        //al inicio del bucle, así que aquí todo caso tiene al menos una vacuna en Medicamentos.
+        create.datoVacuna = datoVacunaDto;
         if (esEmbarazada) {
           create.pacienteEmbarazada = embarazada;
         }
@@ -629,6 +628,16 @@ export class VigiflowIntegradorService {
         //RECORDAR que un código vigiflow puede tener varios ATC asociados además del J07, y un J07
         //no siempre aparece en la primera posición del array notificacionList.
         const notificacionMed = notificacionList.at(0);
+        // El paciente puede existir en BD (de importaciones anteriores) sin que este lote le haya
+        // creado notificación: la fase AEFI descarta los casos sin vacuna J07 y los graves. Sin
+        // notificación no hay a qué colgar el medicamento ni el dato-vacuna, así que se omite la
+        // fila en vez de reventar con "Cannot read properties of undefined (reading 'id')".
+        if (!notificacionMed) {
+          this.logger.warn(
+            `[Medicamentos] Sin notificación para el código: "${medNumIdUnicoMundial}" (caso descartado en la hoja AEFI) — se omite la fila`,
+          );
+          continue;
+        }
 
         let medicamento = new CreateMedicamentoDto();
         medicamento.rolMedicamento = reg['C'];
@@ -844,7 +853,7 @@ export class VigiflowIntegradorService {
 
       // Cada celda puede tener múltiples valores separados por \n (un evento ESAVI por línea)
       const nombresLLT        = VigiflowUtils.splitLineas(reg['D']?.toString() ?? '');
-      const _nombresReportados = VigiflowUtils.splitLineas(reg['C']?.toString() ?? ''); // no se usa: ver nota sobre la columna C más abajo
+      const nombresReportados = VigiflowUtils.splitLineas(reg['C']?.toString() ?? '');
       const nombresPT         = VigiflowUtils.splitLineas(reg['E']?.toString() ?? '');
       const nombresHLT        = VigiflowUtils.splitLineas(reg['F']?.toString() ?? '');
       const nombresHLGT       = VigiflowUtils.splitLineas(reg['G']?.toString() ?? '');
@@ -855,15 +864,24 @@ export class VigiflowIntegradorService {
       const resultados        = VigiflowUtils.splitLineas(reg['N']?.toString() ?? '');
       const criteriosGravedad = VigiflowUtils.splitLineas(reg['M']?.toString() ?? '');
 
-      const totalEventos = nombresLLT.length;
+      // El evento se cuenta por la columna D (LLT MedDRA), pero VigiFlow no siempre alcanza a
+      // codificar la reacción: en esos casos D viene vacía y el evento solo existe como texto
+      // libre del notificador (columna C). Antes la fila se descartaba y el caso quedaba sin
+      // ningún ESAVI en la app; ahora se registra con el nombre reportado y sin codificación
+      // MedDRA, que puede completarse después.
+      const eventos = nombresLLT.length > 0 ? nombresLLT : nombresReportados;
+      const totalEventos = eventos.length;
       if (totalEventos === 0) {
-        this.logger.warn(`[Reacciones] Fila sin eventos LLT para notificación ${notificacion.codigoOrigenNotificacion}`);
+        this.logger.warn(
+          `[Reacciones] Fila sin evento (columnas C y D vacías) para notificación ${notificacion.codigoOrigenNotificacion}`,
+        );
         continue;
       }
 
       for (let i = 0; i < totalEventos; i++) {
         const nombreLLT = nombresLLT[i]?.trim() ?? '';
-        if (!nombreLLT) continue;
+        const nombreReportado = nombresReportados[i]?.trim() ?? '';
+        if (!nombreLLT && !nombreReportado) continue;
 
         try {
           let datoEsavi = new CreateDatoEsaviDto();
@@ -871,15 +889,18 @@ export class VigiflowIntegradorService {
 
           // NOMBRE_ESAVI y DESCRIPCION dejaron de poblarse desde VigiFlow por no ser variables
           // priorizadas (las columnas se conservan porque DHIS2 sí las utiliza).
-          // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (columna D), que viene en español; la
-          // columna C trae el texto libre del notificador, habitualmente en inglés.
-          datoEsavi.nombreReportado = VigiflowUtils.eliminarSaltoLinea(nombreLLT.toUpperCase());
+          // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (columna D), que viene en español; si el
+          // evento aún no está codificado se usa el texto libre del notificador (columna C), que
+          // es lo único que describe la reacción en ese caso.
+          datoEsavi.nombreReportado = VigiflowUtils.eliminarSaltoLinea(
+            (nombreLLT || nombreReportado).toUpperCase(),
+          );
           datoEsavi.fechaEsavi = VigiflowUtils.formatoFecha(fechasInicio[i] ?? '');
           datoEsavi.fechaFinalizacion = VigiflowUtils.formatoFecha(fechasFin[i] ?? '');
           datoEsavi.duracion = duraciones[i] ?? null;
           // RESULTADO_EVENTO se retiró de TR_DATOS_ESAVI; se consolida por notificación en
           // TR_DESENLACE_ESAVI al terminar de recorrer los eventos de la fila.
-          datoEsavi.nameLLT = nombreLLT.toUpperCase();
+          datoEsavi.nameLLT = nombreLLT ? nombreLLT.toUpperCase() : null;
           datoEsavi.namePT = (nombresPT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameHLT = (nombresHLT[i] ?? '').toUpperCase() || null;
           datoEsavi.nameHLGT = (nombresHLGT[i] ?? '').toUpperCase() || null;
@@ -888,7 +909,8 @@ export class VigiflowIntegradorService {
           // Buscar el LLT en MEDDRA.MED_LLT comparando NAME en mayúsculas (similitud >= 90%).
           // Una sola búsqueda resuelve CODIGO_ESAVI_MEDDRA_LLT y CODIGO_ESAVI_CIE10, ya que el
           // diccionario MedDRA trae el CIE-10 equivalente en la propia fila del LLT.
-          const meddraLlt = await this.meddraLltService.buscarPorSimilitud(nombreLLT);
+          // Sin LLT no hay nada que buscar: el evento queda sin codificación MedDRA.
+          const meddraLlt = nombreLLT ? await this.meddraLltService.buscarPorSimilitud(nombreLLT) : null;
           datoEsavi.codigoLLT = meddraLlt?.code ?? null;
           datoEsavi.codigoEsaviCie10 = meddraLlt?.icd10Code ?? null;
 
@@ -905,7 +927,7 @@ export class VigiflowIntegradorService {
           await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
         } catch (err) {
           this.logger.error(
-            `[Reacciones] Error procesando evento "${nombreLLT}" [i=${i}] para notificación ${notificacion.codigoOrigenNotificacion}: ${err.message}`,
+            `[Reacciones] Error procesando evento "${nombreLLT || nombreReportado}" [i=${i}] para notificación ${notificacion.codigoOrigenNotificacion}: ${err.message}`,
           );
           // Continúa con el siguiente evento sin detener el procesamiento
         }

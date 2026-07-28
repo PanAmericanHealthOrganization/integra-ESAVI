@@ -162,18 +162,35 @@ describe('VigiflowUtils', () => {
   });
 
   describe('esAfirmativo', () => {
-    it('retorna true para "si"', () => {
+    it('retorna true para "si", con o sin tilde', () => {
       expect(VigiflowUtils.esAfirmativo('si')).toBe(true);
       expect(VigiflowUtils.esAfirmativo(' SI ')).toBe(true);
+      expect(VigiflowUtils.esAfirmativo('Sí')).toBe(true);
+      expect(VigiflowUtils.esAfirmativo('SÍ')).toBe(true);
     });
 
     it('retorna false para "no"', () => {
       expect(VigiflowUtils.esAfirmativo('no')).toBe(false);
+      expect(VigiflowUtils.esAfirmativo(' No ')).toBe(false);
+    });
+
+    it('resuelve las celdas multilínea por su primera línea', () => {
+      expect(VigiflowUtils.esAfirmativo('Sí\r\nSí')).toBe(true);
+      expect(VigiflowUtils.esAfirmativo('Sí\r\nSí\r\nSí\r\nSí')).toBe(true);
+      expect(VigiflowUtils.esAfirmativo('No\r\nNo')).toBe(false);
     });
 
     it('retorna null para cualquier otro valor', () => {
       expect(VigiflowUtils.esAfirmativo('tal vez')).toBeNull();
       expect(VigiflowUtils.esAfirmativo(undefined)).toBeNull();
+      expect(VigiflowUtils.esAfirmativo(null)).toBeNull();
+      expect(VigiflowUtils.esAfirmativo('')).toBeNull();
+    });
+
+    it('no marca como afirmativo los textos que solo contienen la letra "s"', () => {
+      expect(VigiflowUtils.esAfirmativo('Sin dato')).toBeNull();
+      expect(VigiflowUtils.esAfirmativo('Desconocido')).toBeNull();
+      expect(VigiflowUtils.esAfirmativo('No se sabe')).toBeNull();
     });
   });
 

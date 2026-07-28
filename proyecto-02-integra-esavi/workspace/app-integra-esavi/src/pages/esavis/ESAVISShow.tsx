@@ -1,9 +1,10 @@
 import AssignmentIcon from "@mui/icons-material/Assignment"
-import HistoryIcon from "@mui/icons-material/History"
+import FactCheckIcon from "@mui/icons-material/FactCheck"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import PersonIcon from "@mui/icons-material/Person"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
 import VisibilityIcon from "@mui/icons-material/Visibility"
+import WarningAmberIcon from "@mui/icons-material/WarningAmber"
 import {
   Box,
   Chip,
@@ -67,6 +68,16 @@ const formatDate = (value?: string | null) => {
 
 const val = (v?: string | number | null) => (v != null && v !== "" ? String(v) : "—")
 
+// La app no tiene i18nProvider, así que react-admin rotula la paginación con su diccionario
+// inglés por defecto ("Rows per page:"). Estas props llegan a MUI TablePagination y lo
+// sobreescriben; el cast es necesario porque react-admin tipa <Pagination> con TableCellProps,
+// que no las declara aunque sí las reenvía.
+const etiquetasPaginacion = {
+  labelRowsPerPage: "Filas por página:",
+  labelDisplayedRows: ({ from, to, count }: { from: number; to: number; count: number }) =>
+    `${from}–${to} de ${count !== -1 ? count : `más de ${to}`}`,
+} as Record<string, unknown>
+
 interface FieldRowProps {
   label: string
   value?: string | number | null
@@ -91,6 +102,45 @@ const FieldCell = ({ label, value }: FieldRowProps) => (
     </Typography>
   </Box>
 )
+
+// RESULTADO_EVENTO se guarda homologado a código numérico (ver TR_DESENLACE_ESAVI).
+const RESULTADO_EVENTO: Record<string, string> = {
+  "0": "Desconocido",
+  "1": "Recuperado",
+  "2": "En recuperación",
+  "3": "No recuperado",
+  "4": "Recuperado con secuelas",
+  "5": "Muerte",
+}
+
+// AUTOPSIA: si=1, no=0, desconocido=2 (misma convención en DHIS2 y VigiFlow).
+const AUTOPSIA: Record<string, string> = { "0": "No", "1": "Sí", "2": "Desconocido" }
+
+const etiqueta = (mapa: Record<string, string>, valor?: string | number | null) =>
+  valor == null || valor === "" ? "—" : (mapa[String(valor)] ?? String(valor))
+
+/** Banderas de gravedad: se persisten como texto "1"/"0". */
+const SiNoChip = ({ label, value }: FieldRowProps) => {
+  const v = value == null || value === "" ? null : String(value)
+  const esSi = v === "1" || v?.toLowerCase() === "true"
+  return (
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+        {label}
+      </Typography>
+      {v == null ? (
+        <Typography variant="body1">—</Typography>
+      ) : (
+        <Chip
+          size="small"
+          label={esSi ? "Sí" : "No"}
+          color={esSi ? "error" : "default"}
+          variant={esSi ? "filled" : "outlined"}
+        />
+      )}
+    </Box>
+  )
+}
 
 // ─── Tab Notificación ─────────────────────────────────────────────────────────
 
@@ -637,45 +687,26 @@ const TabEsavi = () => {
           }}
         />
       </Datagrid>
-      <Pagination rowsPerPageOptions={[10, 25, 50]} />
+      <Pagination rowsPerPageOptions={[10, 25, 50]} {...etiquetasPaginacion} />
     </ListContextProvider>
   )
 }
 
-// ─── Tab Antecedentes ─────────────────────────────────────────────────────────
+// ─── Tab Desenlace ────────────────────────────────────────────────────────────
 
-const TabAntecedentes = () => {
+const TabDesenlace = () => {
   const { record } = useShowContext()
-  const [subTab, setSubTab] = useState(0)
-  const [embarazo, setEmbarazo] = useState<any>(null)
-  const [preexistencias, setPreexistencias] = useState<any[]>([])
-  const [evento, setEvento] = useState<any>(null)
-  const [medico, setMedico] = useState<any>(null)
+  const [desenlace, setDesenlace] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!record?.id) return
     setLoading(true)
-    Promise.all([
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-embarazo`),
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-preexistencia`),
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-evento`),
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-medico`),
-      // VigiFlow registra el embarazo en TR_ESAVI_DURANTE_EMBARAZO; DHIS2 en TR_ANTECEDENTES_EMBARAZO.
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/embarazo-esavi`),
-    ])
-      .then(([resEmb, resPre, resEv, resMed, resEsavi]) => {
-        const embArr = Array.isArray(resEmb.data) ? resEmb.data : resEmb.data ? [resEmb.data] : []
-        const esaviArr = Array.isArray(resEsavi.data) ? resEsavi.data : resEsavi.data ? [resEsavi.data] : []
-        // Prevalece el bloque de embarazo durante el ESAVI cuando existe.
-        setEmbarazo(esaviArr[0] ?? embArr[0] ?? null)
-        setPreexistencias(Array.isArray(resPre.data) ? resPre.data : resPre.data ? [resPre.data] : [])
-        const evArr = Array.isArray(resEv.data) ? resEv.data : resEv.data ? [resEv.data] : []
-        setEvento(evArr[0] ?? null)
-        const medArr = Array.isArray(resMed.data) ? resMed.data : resMed.data ? [resMed.data] : []
-        setMedico(medArr[0] ?? null)
-      })
-      .catch(() => {})
+    intESAVIClient
+      .get(`/integrator/notificacion/${record.id}/desenlace-esavi`)
+      // El endpoint devuelve el registro 1:1 o null; se normaliza por si llega envuelto en arreglo.
+      .then((res) => setDesenlace(Array.isArray(res.data) ? (res.data[0] ?? null) : (res.data || null)))
+      .catch(() => setDesenlace(null))
       .finally(() => setLoading(false))
   }, [record?.id])
 
@@ -687,184 +718,162 @@ const TabAntecedentes = () => {
     )
   }
 
+  if (!desenlace) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Sin desenlace registrado.
+      </Typography>
+    )
+  }
+
   return (
-    <Box>
-      <Tabs value={subTab} onChange={(_e, v) => setSubTab(v)} sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
-        <Tab label="Embarazo" />
-        <Tab label="Enfermedades Previas" />
-        <Tab label="Evento Adverso" />
-        <Tab label="Médico" />
-      </Tabs>
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Resultado del evento" value={etiqueta(RESULTADO_EVENTO, desenlace.resultadoEvento)} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Autopsia" value={etiqueta(AUTOPSIA, desenlace.autopsia)} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Código de desenlace" value={desenlace.codigo} />
+      </Grid>
 
-      {/* ── Sub-tab: Embarazo ── */}
-      {subTab === 0 && (
-        embarazo ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Edad gestacional (semanas)" value={embarazo.edadGestacional} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Fecha última menstruación" value={formatDate(embarazo.fechaUltimaMenstruacion)} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Fecha probable de parto" value={formatDate(embarazo.fechaParto)} />
-            </Grid>
-            {embarazo.descripcionAntecedente && (
-              <Grid item xs={12}>
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
-                  Descripción del antecedente
-                </Typography>
-                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap" }}>
-                  {embarazo.descripcionAntecedente}
-                </Typography>
-              </Grid>
-            )}
-          </Grid>
-        ) : (
-          <Typography variant="body2" color="text.secondary">Sin antecedentes de embarazo registrados.</Typography>
-        )
-      )}
+      <Grid item xs={12}>
+        <Divider sx={{ my: 1 }} />
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Fallecimiento
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Fecha de fallecimiento" value={formatDate(desenlace.fechaMuerte)} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Fecha notificación de muerte" value={formatDate(desenlace.fechaNotificacionMuerte)} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow
+          label="Fecha notificación de muerte fetal"
+          value={formatDate(desenlace.fechaNotififacionMuerteFetal)}
+        />
+      </Grid>
 
-      {/* ── Sub-tab: Enfermedades Previas ── */}
-      {subTab === 1 && (
-        preexistencias.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">Sin enfermedades previas registradas.</Typography>
-        ) : (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {preexistencias.map((p, idx) => (
-              <Paper variant="outlined" sx={{ p: 2 }} key={p.id ?? idx}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={8}>
-                    <FieldRow label="Descripción" value={p.descripcion} />
-                  </Grid>
-                  <Grid item xs={12} sm={4}>
-                    <FieldRow label="Código CIE-10" value={p.codigoEsaviCIE10} />
-                  </Grid>
-                </Grid>
-              </Paper>
-            ))}
-          </Box>
-        )
-      )}
+      <Grid item xs={12}>
+        <Divider sx={{ my: 1 }} />
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Clasificación final
+        </Typography>
+      </Grid>
+      <Grid item xs={12}>
+        <FieldRow label="Clasificación final del caso" value={desenlace.clasificacionFinalCaso} />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <FieldRow label="Clasificación final — Opción A" value={desenlace.clasificacionFinalCasoA} />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <FieldRow label="Clasificación final — Opción B" value={desenlace.clasificacionFinalCasoB} />
+      </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FieldRow label="Causalidad del ESAVI" value={desenlace.causalidadEsavi} />
+      </Grid>
+    </Grid>
+  )
+}
 
-      {/* ── Sub-tab: Evento Adverso ── */}
-      {subTab === 2 && (
-        evento ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Antecedentes adversos similares" value={evento.antecedente} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow
-                label="Alergia a medicamentos"
-                value={evento.alergiaMedicamento?.nombre ?? evento.alergiaMedicamento?.descripcion}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow
-                label="Alergia a alimentos"
-                value={evento.alergiaAlimentos?.nombre ?? evento.alergiaAlimentos?.descripcion}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow
-                label="Alergia a insectos"
-                value={evento.alergiaInsectos?.nombre ?? evento.alergiaInsectos?.descripcion}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow
-                label="Alergia al polvo"
-                value={evento.alergiaPolvo?.nombre ?? evento.alergiaPolvo?.descripcion}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FieldRow label="Otras alergias" value={evento.otrasAlergias} />
-            </Grid>
-          </Grid>
-        ) : (
-          <Typography variant="body2" color="text.secondary">Sin antecedentes de evento adverso registrados.</Typography>
-        )
-      )}
+// ─── Tab Gravedad ─────────────────────────────────────────────────────────────
 
-      {/* ── Sub-tab: Médico ── */}
-      {subTab === 3 && (
-        medico ? (
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Ensayo clínico COVID-19" value={medico.ensayoClinicoCovid19 === "1" ? "Sí" : medico.ensayoClinicoCovid19 === "0" ? "No" : medico.ensayoClinicoCovid19} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Diagnóstico COVID-19 previo" value={medico.antecedenteDiagnosticoCovid19} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Síntomas COVID-19" value={medico.sintomasCovid19} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Fecha síntomas COVID-19" value={formatDate(medico.fechaSintomasCovid19)} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Método diagnóstico COVID-19" value={medico.metodoDiagnosticoCovid19} />
-            </Grid>
-            <Divider sx={{ width: "100%", mt: 1, mb: 1 }} />
-            <Grid item xs={12} sm={6}>
-              <FieldRow label="Comorbilidad principal" value={medico.descripcionPrincipal} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="CIE-10 comorbilidad principal" value={medico.comorbilidadPrincipalCIE10} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="MedDRA LLT comorbilidad principal" value={medico.codMeddraLltComorbilidadPrincipal} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FieldRow label="Comorbilidad 2" value={medico.descripcionDos} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="CIE-10 comorbilidad 2" value={medico.comorbilidadDosCIE10} />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FieldRow label="Comorbilidad 3" value={medico.descripcionTres} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="CIE-10 comorbilidad 3" value={medico.comorbilidadTresCIE10} />
-            </Grid>
-            <Divider sx={{ width: "100%", mt: 1, mb: 1 }} />
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. patológico agudo (CIE-10)" value={medico.codCie10PatologicoAgudo} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. patológico agudo (MedDRA)" value={medico.codMeddraLltPatologicoAgudo} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. familiar (CIE-10)" value={medico.codCie10Familiar} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. familiar (MedDRA)" value={medico.codMeddraLltFamiliar} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. quirúrgico (CIE-10)" value={medico.antecedenteQuirurgicoCIE10} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Ant. quirúrgico (MedDRA)" value={medico.antecedenteQuirurgicoMeddraLlt} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Ant. farmacológico (WHODrug)" value={medico.antecedenteFarmacologicoWhodrug} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Ant. farmacológico previo a síntomas (WHODrug)" value={medico.antecedenteFarmacologicoPrevioSintomasWhodrug} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Enf. previas (CIE-10)" value={medico.codigoEnfPreviasCIE10} />
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <FieldRow label="Enf. previas (MedDRA)" value={medico.codigoEnfPreviasMeddraLlt} />
-            </Grid>
-          </Grid>
-        ) : (
-          <Typography variant="body2" color="text.secondary">Sin antecedentes médicos registrados.</Typography>
-        )
-      )}
-    </Box>
+const TabGravedad = () => {
+  const { record } = useShowContext()
+  const [gravedad, setGravedad] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!record?.id) return
+    setLoading(true)
+    intESAVIClient
+      .get(`/integrator/notificacion/${record.id}/gravedad-esavi`)
+      .then((res) => setGravedad(Array.isArray(res.data) ? (res.data[0] ?? null) : (res.data || null)))
+      .catch(() => setGravedad(null))
+      .finally(() => setLoading(false))
+  }, [record?.id])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
+        <CircularProgress size={32} />
+      </Box>
+    )
+  }
+
+  if (!gravedad) {
+    return (
+      <Typography variant="body2" color="text.secondary">
+        Sin gravedad registrada.
+      </Typography>
+    )
+  }
+
+  const esGrave = String(gravedad.tipo) === "1"
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 0.5 }}>
+          Tipo de gravedad
+        </Typography>
+        <Chip
+          label={esGrave ? "Grave" : "No grave"}
+          color={esGrave ? "error" : "success"}
+          size="small"
+        />
+      </Grid>
+
+      <Grid item xs={12}>
+        <Divider sx={{ my: 1 }} />
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Criterios de gravedad
+        </Typography>
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Muerte" value={gravedad.muerte} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Riesgo de vida" value={gravedad.riesgoVida} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Hospitalización" value={gravedad.hospitalizacion} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Discapacidad" value={gravedad.discapacidad} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Anomalía congénita" value={gravedad.anomaliaCongenita} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Aborto" value={gravedad.aborto} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Muerte fetal" value={gravedad.muerteFetal} />
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="Evento de especial preocupación" value={gravedad.parteEventosPreocupacion} />
+      </Grid>
+
+      <Grid item xs={12}>
+        <Divider sx={{ my: 1 }} />
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+          Evento nuevo y egreso
+        </Typography>
+      </Grid>
+      <Grid item xs={6} sm={4} md={3}>
+        <SiNoChip label="¿Es un evento nuevo?" value={gravedad.sonEventosNuevos} />
+      </Grid>
+      <Grid item xs={12} sm={8} md={9}>
+        <FieldRow label="Descripción del evento nuevo" value={gravedad.descripcionEventoNuevo} />
+      </Grid>
+      <Grid item xs={12}>
+        <FieldRow label="Condición al egreso" value={gravedad.condicionEgreso} />
+      </Grid>
+    </Grid>
   )
 }
 
@@ -921,10 +930,16 @@ const ESAVISShowContent = () => {
               {...a11yProps(3)}
             />
             <Tab
-              icon={<HistoryIcon />}
+              icon={<FactCheckIcon />}
               iconPosition="start"
-              label="Antecedentes"
+              label="Desenlace"
               {...a11yProps(4)}
+            />
+            <Tab
+              icon={<WarningAmberIcon />}
+              iconPosition="start"
+              label="Gravedad"
+              {...a11yProps(5)}
             />
           </Tabs>
         </Box>
@@ -942,7 +957,10 @@ const ESAVISShowContent = () => {
           <TabEsavi />
         </TabPanel>
         <TabPanel value={currentTab} index={4}>
-          <TabAntecedentes />
+          <TabDesenlace />
+        </TabPanel>
+        <TabPanel value={currentTab} index={5}>
+          <TabGravedad />
         </TabPanel>
       </Paper>
     </Box>

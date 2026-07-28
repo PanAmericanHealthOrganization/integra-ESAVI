@@ -6,7 +6,9 @@ import { DatoVacunacionService } from '../service/dato-vacunacion.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
 import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { DatoEsaviService } from '../service/dato-esavi.service';
+import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
+import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 
 const mockNotificacionService = {
   findAll: jest.fn(),
@@ -25,6 +27,8 @@ const mockDatoVacunaService = { findByNotificacionId: jest.fn() };
 const mockPacienteEmbarazadaService = { findByNotificacionId: jest.fn() };
 const mockDatoEsaviService = { findByNotificacionId: jest.fn() };
 const mockEmbarazoEsaviService = { findByNotificacionUUID: jest.fn() };
+const mockDesenlaceEsaviService = { findByNotificacionId: jest.fn() };
+const mockGravedadEsaviService = { findByNotificacionId: jest.fn() };
 
 // UUID válido para pasar el ParseUUIDPipe cuando el controller se prueba vía módulo (aquí se llama directo, no aplica).
 const UUID = '11111111-1111-1111-1111-111111111111';
@@ -43,6 +47,8 @@ describe('NotificacionController', () => {
         { provide: PacienteEmbarazadaServive, useValue: mockPacienteEmbarazadaService },
         { provide: DatoEsaviService, useValue: mockDatoEsaviService },
         { provide: EmbarazoEsaviService, useValue: mockEmbarazoEsaviService },
+        { provide: DesenlaceEsaviService, useValue: mockDesenlaceEsaviService },
+        { provide: GravedadEsaviService, useValue: mockGravedadEsaviService },
       ],
     }).compile();
     controller = module.get<NotificacionController>(NotificacionController);
@@ -170,6 +176,24 @@ describe('NotificacionController', () => {
       const result = controller.findDatoEsaviByUUID(UUID);
       expect(mockDatoEsaviService.findByNotificacionId).toHaveBeenCalledWith(UUID);
       expect(result).toEqual([{ id: 'de1' }]);
+    });
+  });
+
+  describe('findDesenlaceEsaviByUUID', () => {
+    it('delega en desenlaceEsaviService', () => {
+      mockDesenlaceEsaviService.findByNotificacionId.mockReturnValue({ id: 'des1', resultadoEvento: 1 });
+      const result = controller.findDesenlaceEsaviByUUID(UUID);
+      expect(mockDesenlaceEsaviService.findByNotificacionId).toHaveBeenCalledWith(UUID);
+      expect(result).toEqual({ id: 'des1', resultadoEvento: 1 });
+    });
+  });
+
+  describe('findGravedadEsaviByUUID', () => {
+    it('delega en gravedadEsaviService', () => {
+      mockGravedadEsaviService.findByNotificacionId.mockReturnValue({ id: 'g1', tipo: '1' });
+      const result = controller.findGravedadEsaviByUUID(UUID);
+      expect(mockGravedadEsaviService.findByNotificacionId).toHaveBeenCalledWith(UUID);
+      expect(result).toEqual({ id: 'g1', tipo: '1' });
     });
   });
 
