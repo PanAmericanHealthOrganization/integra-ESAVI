@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Checkbox, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControlLabel, TextField } from '@mui/material';
-import { useRefresh } from 'react-admin';
+import { useNotify, useRefresh } from 'react-admin';
 import { integradorDataProvider } from '../../dataProviders/integrador.dataprovider';
 
 interface BulkDialogProps {
@@ -8,8 +8,15 @@ interface BulkDialogProps {
     onClose: () => void;
 }
 
+/** Respuesta común de los endpoints de importación del backend. */
+interface RespuestaImportacion {
+    status: string;
+    msg: string;
+}
+
 const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
     const refresh = useRefresh();
+    const notify = useNotify();
     const [loading, setLoading] = useState(false);
     const [response, setResponse] = useState<string | null>(null);
     const [selectedOption, setSelectedOption] = useState<string | null>(null); // Usamos un solo estado para controlar el checkbox seleccionado
@@ -21,9 +28,48 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
         setSelectedOption(prevState => (prevState === option ? null : option)); // Cambiar entre uno u otro checkbox
     };
 
+    /**
+     * El diálogo permanece montado entre aperturas, así que su estado se limpia al cerrar:
+     * de lo contrario la siguiente importación arrancaría con el resultado y las fechas de
+     * la anterior ya cargados.
+     */
+    const cerrarYReiniciar = () => {
+        setResponse(null);
+        setDateError('');
+        setSelectedOption(null);
+        setStartDate('');
+        setEndDate('');
+        onClose();
+    };
+
+    /**
+     * Resultado de una importación: en caso de éxito se avisa y se cierra el diálogo —el
+     * usuario no tiene nada más que hacer aquí—; si hubo error o el proceso terminó parcial,
+     * el diálogo sigue abierto con el detalle para poder reintentar el rango.
+     */
+    const procesarRespuesta = (respuesta: RespuestaImportacion) => {
+        if (respuesta.status === 'OK') {
+            notify(respuesta.msg || 'Datos procesados exitosamente', { type: 'success' });
+            refresh();
+            cerrarYReiniciar();
+            return;
+        }
+
+        if (respuesta.status === 'PARTIAL') {
+            notify(respuesta.msg, { type: 'warning', autoHideDuration: 8000 });
+            setResponse(respuesta.msg);
+            refresh(); // Algunos periodos sí se importaron.
+            return;
+        }
+
+        const mensajeError = `Error: ${respuesta.msg ?? 'no se pudo completar la importación'}`;
+        notify(mensajeError, { type: 'error' });
+        setResponse(mensajeError);
+    };
+
     const handleBulk = async () => {
         setLoading(true);
-        let respuesta;
+        setResponse(null);
 
         // Validación de fechas
         if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
@@ -38,47 +84,46 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
         const startDateFormatted = startDate.replace(/-/g, ''); // Convierte la fecha 'YYYY-MM-DD' a 'YYYYMMDD'
         const endDateFormatted = endDate.replace(/-/g, ''); // Convierte la fecha 'YYYY-MM-DD' a 'YYYYMMDD'
 
-        if (selectedOption === 'vigiflow') {
-            respuesta = await integradorDataProvider.importDataVigiflow(startDateFormatted, endDateFormatted);
-            console.log('respuesta:: ', respuesta);
-            if (respuesta.status === 'OK') {
-                setResponse(`${respuesta.msg}`);
-                refresh();
-            } else {
-                setResponse(`Error: ${respuesta.msg}`);
-            }
-        }
+        try {
+            let respuesta: RespuestaImportacion | undefined;
 
-        if (selectedOption === 'vigiflow-file') {
-            respuesta = await integradorDataProvider.importDataVigiflowFromFile();
-            console.log('respuesta:: ', respuesta);
-            if (respuesta.status === 'OK') {
-                setResponse(`${respuesta.msg}`);
-                refresh();
-            } else {
-                setResponse(`Error: ${respuesta.msg}`);
+            if (selectedOption === 'vigiflow') {
+                respuesta = await integradorDataProvider.importDataVigiflow(startDateFormatted, endDateFormatted);
             }
-        }
 
-        if (selectedOption === 'dhis2') {
-            respuesta = await integradorDataProvider.importDataDHIS2(startDateFormatted, endDateFormatted);
-            console.log('respuesta:: ', respuesta);
-            if (respuesta.status === 'OK') {
-                setResponse(`${respuesta.msg}`);
-                refresh();
-            } else {
-                setResponse(`Error: ${respuesta.status}`);
+            if (selectedOption === 'vigiflow-file') {
+                respuesta = await integradorDataProvider.importDataVigiflowFromFile();
             }
-        }
 
-        setLoading(false);
+            if (selectedOption === 'dhis2') {
+                respuesta = await integradorDataProvider.importDataDHIS2(startDateFormatted, endDateFormatted);
+            }
+
+            if (respuesta) {
+                procesarRespuesta(respuesta);
+            }
+        } catch (error) {
+            // Fallo de red o respuesta no-JSON: el diálogo queda abierto para reintentar.
+            const mensajeError = `Error: ${error instanceof Error ? error.message : 'no se pudo contactar al servidor'}`;
+            notify(mensajeError, { type: 'error' });
+            setResponse(mensajeError);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const needsDates = selectedOption === 'vigiflow' || selectedOption === 'dhis2';
     const isButtonDisabled = !selectedOption || (needsDates && (startDate === '' || endDate === ''));
 
+    /** El backend parte los rangos de VigiFlow que cruzan meses en importaciones mensuales. */
+    const cruzaVariosMeses =
+        selectedOption === 'vigiflow' &&
+        startDate !== '' &&
+        endDate !== '' &&
+        startDate.slice(0, 7) !== endDate.slice(0, 7);
+
     return (
-        <Dialog open={open} onClose={onClose}>
+        <Dialog open={open} onClose={cerrarYReiniciar}>
             <DialogTitle>Importar datos</DialogTitle>
             <DialogContent>
                 <DialogContentText>
@@ -142,6 +187,11 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
                                 {dateError}
                             </DialogContentText>
                         )}
+                        {cruzaVariosMeses && (
+                            <DialogContentText variant="body2" style={{ marginTop: 10 }}>
+                                El rango abarca más de un mes: se importará mes a mes y puede tardar varios minutos.
+                            </DialogContentText>
+                        )}
                     </div>
                 )}
 
@@ -159,7 +209,7 @@ const BulkDialog: React.FC<BulkDialogProps> = ({ open, onClose }) => {
                 >
                     {loading ? 'Cargando...' : 'Importar'}
                 </Button>
-                <Button onClick={onClose} color="primary">
+                <Button onClick={cerrarYReiniciar} color="primary" disabled={loading}>
                     Cerrar
                 </Button>
             </DialogActions>

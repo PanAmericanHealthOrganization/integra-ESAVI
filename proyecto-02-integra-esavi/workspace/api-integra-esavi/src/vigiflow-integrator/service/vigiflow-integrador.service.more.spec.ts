@@ -280,6 +280,72 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         }),
       );
     });
+
+    it('un rango dentro de un mismo mes se procesa en una sola descarga', async () => {
+      const service = createService();
+
+      const resumen = await service.createInBulk(new Date(Date.UTC(2024, 0, 5)), new Date(Date.UTC(2024, 0, 20)));
+
+      expect(resumen).toEqual({ totalPeriodos: 1, completados: 1, fallidos: [] });
+      expect(mockCrawler.retrieveExcelReport).toHaveBeenCalledTimes(1);
+      expect(mockSync.createSyncProcess).toHaveBeenCalledTimes(1);
+    });
+
+    it('parte en tramos mensuales un rango que abarca varios meses, respetando los extremos', async () => {
+      const service = createService();
+
+      const resumen = await service.createInBulk(
+        new Date(Date.UTC(2024, 0, 15)),
+        new Date(Date.UTC(2024, 3, 10)),
+        'J07',
+      );
+
+      expect(resumen).toEqual({ totalPeriodos: 4, completados: 4, fallidos: [] });
+      // Enero arranca el 15 (extremo original) y abril termina el 10; los meses intermedios
+      // van completos, incluido el 29 de febrero por ser año bisiesto.
+      expect(mockCrawler.retrieveExcelReport.mock.calls.map((c) => [c[0], c[1]])).toEqual([
+        ['20240115', '20240131'],
+        ['20240201', '20240229'],
+        ['20240301', '20240331'],
+        ['20240401', '20240410'],
+      ]);
+      // Cada tramo deja su propio registro de sincronización con sus fechas de datos.
+      expect(mockSync.createSyncProcess).toHaveBeenCalledTimes(4);
+      expect(mockSync.createSyncProcess).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          name: 'VIGIFLOW_BULK',
+          dataStartDate: new Date(Date.UTC(2024, 1, 1, 0, 0, 0, 0)),
+          dataEndDate: new Date(Date.UTC(2024, 1, 29, 23, 59, 59, 999)),
+        }),
+      );
+    });
+
+    it('si un mes falla continúa con los siguientes y lo reporta en el resumen', async () => {
+      const service = createService();
+      // Falla el segundo tramo (febrero); enero y marzo deben completarse igual.
+      mockCrawler.retrieveExcelReport
+        .mockResolvedValueOnce(emptyReportOne())
+        .mockRejectedValueOnce(new Error('VigiFlow no responde'));
+
+      const resumen = await service.createInBulk(new Date(Date.UTC(2024, 0, 1)), new Date(Date.UTC(2024, 2, 31)));
+
+      expect(resumen.totalPeriodos).toBe(3);
+      expect(resumen.completados).toBe(2);
+      expect(resumen.fallidos).toEqual([
+        { periodo: '20240201 – 20240229', error: 'VigiFlow no responde' },
+      ]);
+      expect(mockCrawler.retrieveExcelReport).toHaveBeenCalledTimes(3);
+    });
+
+    it('relanza el error si ningún tramo mensual prospera', async () => {
+      const service = createService();
+      mockCrawler.retrieveExcelReport.mockRejectedValue(new Error('VigiFlow caído'));
+
+      await expect(
+        service.createInBulk(new Date(Date.UTC(2024, 0, 1)), new Date(Date.UTC(2024, 2, 31))),
+      ).rejects.toThrow('VigiFlow caído');
+    });
   });
 
   // ---------------------------------------------------------------------------------------
@@ -1068,7 +1134,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       jest.setSystemTime(new Date('2024-12-15T23:00:00.000Z'));
 
       const service = createService();
-      const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue(undefined);
+      const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue({ totalPeriodos: 1, completados: 1, fallidos: [] });
 
       await (service as any).handleCron();
 
@@ -1084,7 +1150,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       jest.setSystemTime(new Date('2025-03-01T23:00:00.000Z'));
 
       const service = createService();
-      const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue(undefined);
+      const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue({ totalPeriodos: 1, completados: 1, fallidos: [] });
 
       await (service as any).handleCron();
 

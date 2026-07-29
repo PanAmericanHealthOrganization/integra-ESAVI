@@ -66,6 +66,17 @@ countries.registerLocale(enLocale);
 countries.registerLocale(esLocale);
 const idiomaParaPaisIso3Code = 'es';
 
+/**
+ * Resultado de una importación por rango de fechas. Un rango de más de un mes se ejecuta como
+ * varias importaciones mensuales independientes, así que el resultado es un agregado: cuántos
+ * periodos se intentaron, cuántos terminaron bien y el detalle de los que fallaron.
+ */
+export interface ResumenImportacionVigiflow {
+  totalPeriodos: number;
+  completados: number;
+  fallidos: { periodo: string; error: string }[];
+}
+
 @Injectable()
 export class VigiflowIntegradorService {
   private readonly logger = new Logger(VigiflowIntegradorService.name);
@@ -127,10 +138,65 @@ export class VigiflowIntegradorService {
   }
 
   /* ARCHIVOS ORIGEN REMOTO */
-  async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC = 'J07') {
+  /**
+   * Importa desde VigiFlow el rango solicitado. Un rango que abarca más de un mes NO se pide
+   * de una sola vez: se parte en tramos mensuales y cada mes se descarga y procesa por
+   * separado, con su propio registro de sincronización (dataStartDate/dataEndDate del tramo).
+   *
+   * Así una importación larga no depende de una única descarga gigante de VigiFlow, y el fallo
+   * de un mes no invalida los demás: se continúa con los siguientes y se reporta cuáles
+   * fallaron. Un rango dentro de un mismo mes se comporta exactamente como antes (un tramo).
+   */
+  async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC = 'J07'): Promise<ResumenImportacionVigiflow> {
     if (fechaFin <= fechaInicio) {
       throw new BadRequestException();
     }
+
+    const tramos = RangoFechasUtils.dividirEnMeses(fechaInicio, fechaFin);
+    const resumen: ResumenImportacionVigiflow = {
+      totalPeriodos: tramos.length,
+      completados: 0,
+      fallidos: [],
+    };
+
+    if (tramos.length > 1) {
+      this.logger.log(
+        `VigiFlow: el rango ${VigiflowUtils.formatoYYYYMMDD(fechaInicio)} – ${VigiflowUtils.formatoYYYYMMDD(
+          fechaFin,
+        )} supera el mes; se procesará en ${tramos.length} tramos mensuales`,
+      );
+    }
+
+    let primerError: unknown = null;
+
+    for (const tramo of tramos) {
+      const periodo = `${VigiflowUtils.formatoYYYYMMDD(tramo.fechaInicio)} – ${VigiflowUtils.formatoYYYYMMDD(
+        tramo.fechaFin,
+      )}`;
+      try {
+        await this.importarPeriodo(tramo.fechaInicio, tramo.fechaFin, codigoATC);
+        resumen.completados++;
+      } catch (error: any) {
+        // Se continúa con los meses restantes: cada tramo es independiente y ya quedó
+        // registrado como FAILED en su propio sync. El detalle se devuelve al llamador.
+        primerError ??= error;
+        resumen.fallidos.push({ periodo, error: error?.message ?? String(error) });
+        this.logger.error(`VigiFlow: falló la importación del periodo ${periodo}: ${error?.message}`, error?.stack);
+      }
+    }
+
+    // Si ningún tramo prosperó, la importación fracasó como un todo y debe propagarse.
+    if (resumen.completados === 0 && primerError) {
+      throw primerError;
+    }
+
+    return resumen;
+  }
+
+  /**
+   * Descarga y procesa un único periodo (a lo sumo un mes) desde VigiFlow.
+   */
+  private async importarPeriodo(fechaInicio: Date, fechaFin: Date, codigoATC: string) {
     // Las fechas se envían con el formato YYYYMMDD, ejm: 20230113
     const fechaInicioFmrt = VigiflowUtils.formatoYYYYMMDD(fechaInicio);
     const fechaFinFmrt = VigiflowUtils.formatoYYYYMMDD(fechaFin);

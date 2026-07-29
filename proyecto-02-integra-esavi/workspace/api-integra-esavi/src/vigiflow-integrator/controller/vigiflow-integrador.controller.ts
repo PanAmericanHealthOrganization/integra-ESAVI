@@ -66,7 +66,30 @@ export class VigiflowIntegradorController {
       )}-${aefiQuery.fechaFin.slice(6)}`,
     );
     try {
-      await this.vigiflowIntegradorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);
+      const resumen = await this.vigiflowIntegradorService.createInBulk(
+        fechaInicio,
+        fechaFin,
+        aefiQuery.codigoATC,
+      );
+
+      // Un rango de más de un mes se procesa mes a mes; el detalle importa porque algunos
+      // periodos pueden haber fallado mientras el resto se importó correctamente.
+      const detallePeriodos =
+        resumen.totalPeriodos > 1 ? ` (${resumen.completados} de ${resumen.totalPeriodos} periodos mensuales)` : '';
+
+      if (resumen.fallidos.length > 0) {
+        return {
+          status: 'PARTIAL',
+          msg: `Importación parcial${detallePeriodos}. Periodos con error: ${resumen.fallidos
+            .map((f) => f.periodo)
+            .join(', ')}`,
+        };
+      }
+
+      return {
+        status: 'OK',
+        msg: `Datos importados exitosamente desde Vigiflow${detallePeriodos}`,
+      };
     } catch (error) {
       this.logger.error(error);
       return {
@@ -74,10 +97,6 @@ export class VigiflowIntegradorController {
         msg: 'Error al importar datos del sistema Vigiflow',
       };
     }
-    return {
-      status: 'OK',
-      msg: 'Éxito',
-    };
   }
 
   /**
