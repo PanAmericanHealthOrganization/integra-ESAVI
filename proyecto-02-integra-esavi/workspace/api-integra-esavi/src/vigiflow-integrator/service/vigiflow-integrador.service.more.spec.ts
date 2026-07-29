@@ -412,19 +412,17 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDatoVacuna.clearDatoVacunaCache).toHaveBeenCalled();
     });
 
-    it('procesa también los casos graves, registrando TIPO_GRAVEDAD = 1', async () => {
+    it('descarta por completo los casos graves: desde VigiFlow solo se procesan los no graves', async () => {
       const service: any = createService();
       // Valor real de la columna X en la hoja AEFI: "Sí" con tilde, repetido por evento.
       const row = rowFromCols({ B: 'EC-GRAVE', X: 'Sí\r\nSí' });
 
       await invoke(service, row, new Set(['EC-GRAVE']));
 
-      expect(mockIntegrador.create).toHaveBeenCalledTimes(1);
-      const [createDto] = mockIntegrador.create.mock.calls[0];
-      expect(createDto.gravedadEsavi.tipo).toBe('1');
+      expect(mockIntegrador.create).not.toHaveBeenCalled();
     });
 
-    it('un valor de gravedad que no es "Sí"/"No" no marca el caso como grave', async () => {
+    it('un valor de gravedad que no es "Sí"/"No" no marca el caso como grave y sí se procesa', async () => {
       const service: any = createService();
       const row = rowFromCols({ B: 'EC-SIN-DATO', X: 'Sin dato' });
 

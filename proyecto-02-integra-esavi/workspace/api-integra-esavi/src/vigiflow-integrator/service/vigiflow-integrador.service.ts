@@ -349,6 +349,19 @@ export class VigiflowIntegradorService {
           continue;
         }
 
+        // Comparación exacta contra "Sí"/"No" normalizado (sin tildes ni mayúsculas). Cualquier
+        // otro valor ("Sin dato", "Desconocido", celda vacía) se trata como NO GRAVE.
+        const gravedad = VigiflowUtils.esAfirmativo(reg['X']) ? '1' /*GRAVE*/ : '0' /*NO GRAVE*/;
+
+        // Criterio funcional: desde VigiFlow solo se procesan los casos NO GRAVES. Los casos
+        // graves llegan por DHIS2 (programa "ESAVI-Graves"), así que registrarlos también desde
+        // VigiFlow duplicaría el mismo evento en dos orígenes. El descarte es total —igual que
+        // el filtro J07—: no se crea notificación ni paciente ni sub-entidades.
+        if (gravedad === '1') {
+          this.logger.warn(`[AEFI] Caso ${paciente.codigoVigiflow} descartado: es un caso GRAVE (se procesa desde DHIS2)`);
+          continue;
+        }
+
         const origenOriginal = {
           iniciales: reg['C'] ?? null,
           identificacion: reg['E'] ?? null,
@@ -419,14 +432,9 @@ export class VigiflowIntegradorService {
 
         //Create Gravedad
         const grave = new CreateGravedadEsaviDto();
-        // Comparación exacta contra "Sí"/"No" normalizado (sin tildes ni mayúsculas). Cualquier
-        // otro valor ("Sin dato", "Desconocido", celda vacía) se trata como NO GRAVE.
-        const gravedad = VigiflowUtils.esAfirmativo(reg['X']) ? '1' /*GRAVE*/ : '0' /*NO GRAVE*/;
+        // Siempre '0': los casos graves ya fueron descartados al inicio del bucle. TIPO_GRAVEDAD
+        // se sigue registrando en TR_GRAVEDAD_ESAVI para dejar explícito el origen del dato.
         grave.tipo = gravedad;
-
-        // La gravedad NO filtra: se procesan todos los casos, graves y no graves. TIPO_GRAVEDAD
-        // queda registrado en TR_GRAVEDAD_ESAVI para que el análisis distinga unos de otros.
-        // El único criterio de exclusión es la ausencia de vacuna J07 (filtro al inicio del bucle).
 
         // Las banderas MUERTE, RIESGO_VIDA, DISCAPACIDAD, HOSPITALIZACION, ANOMALIA_CONGENITA y
         // PARTE_EVENTOS_PREOCUPACION ya no se derivan de la columna Y de esta hoja: su origen es
