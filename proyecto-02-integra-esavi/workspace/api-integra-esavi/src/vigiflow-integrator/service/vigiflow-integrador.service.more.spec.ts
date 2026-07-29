@@ -207,15 +207,11 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
   // ---------------------------------------------------------------------------------------
   describe('constructor', () => {
-    it('usa la fecha de inicio por defecto cuando no hay configuración', () => {
+    it('se instancia sin estado de fechas: el cron resuelve el rango en cada ejecución', () => {
       const service = createService();
-      expect((service as any).originalFechaInicio).toEqual(new Date('2024-11-01T00:00:00.000Z'));
-      expect((service as any).fechaInicio).toEqual((service as any).originalFechaInicio);
-    });
-
-    it('usa la fecha de inicio configurada por variable de entorno', () => {
-      const service = createService({ VIGIFLOW_FECHA_INICIO_CRON: '2025-02-01' });
-      expect((service as any).originalFechaInicio).toEqual(new Date('2025-02-01T00:00:00.000Z'));
+      expect(service).toBeDefined();
+      expect((service as any).originalFechaInicio).toBeUndefined();
+      expect((service as any).fechaInicio).toBeUndefined();
     });
   });
 
@@ -1067,40 +1063,45 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
   // ---------------------------------------------------------------------------------------
   describe('handleCron', () => {
-    it('procesa mes a mes hasta alcanzar la fecha actual y luego reinicia fechaInicio', async () => {
+    it('procesa únicamente el día anterior completo en UTC', async () => {
       jest.useFakeTimers({ advanceTimers: false });
-      jest.setSystemTime(new Date('2024-12-15T00:00:00.000Z'));
+      jest.setSystemTime(new Date('2024-12-15T23:00:00.000Z'));
 
-      const service = createService({ VIGIFLOW_FECHA_INICIO_CRON: '2024-11-01' });
+      const service = createService();
       const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue(undefined);
 
       await (service as any).handleCron();
 
-      expect(createInBulkSpy).toHaveBeenCalledTimes(2);
-      expect(createInBulkSpy).toHaveBeenNthCalledWith(
-        1,
-        new Date(Date.UTC(2024, 10, 1)),
-        new Date(Date.UTC(2024, 10, 30, 23, 59, 59, 999)),
+      expect(createInBulkSpy).toHaveBeenCalledTimes(1);
+      expect(createInBulkSpy).toHaveBeenCalledWith(
+        new Date(Date.UTC(2024, 11, 14, 0, 0, 0, 0)),
+        new Date(Date.UTC(2024, 11, 14, 23, 59, 59, 999)),
       );
-      expect(createInBulkSpy).toHaveBeenNthCalledWith(
-        2,
-        new Date(Date.UTC(2024, 11, 1)),
-        new Date(Date.UTC(2024, 11, 31, 23, 59, 59, 999)),
-      );
-      expect((service as any).fechaInicio).toEqual((service as any).originalFechaInicio);
     });
 
-    it('no procesa nada si la fecha de inicio configurada ya alcanzó la fecha actual', async () => {
+    it('cruza correctamente el cambio de mes', async () => {
       jest.useFakeTimers({ advanceTimers: false });
-      jest.setSystemTime(new Date('2024-01-01T00:00:00.000Z'));
+      jest.setSystemTime(new Date('2025-03-01T23:00:00.000Z'));
 
-      const service = createService({ VIGIFLOW_FECHA_INICIO_CRON: '2025-01-01' });
+      const service = createService();
       const createInBulkSpy = jest.spyOn(service, 'createInBulk').mockResolvedValue(undefined);
 
       await (service as any).handleCron();
 
-      expect(createInBulkSpy).not.toHaveBeenCalled();
-      expect((service as any).fechaInicio).toEqual((service as any).originalFechaInicio);
+      expect(createInBulkSpy).toHaveBeenCalledWith(
+        new Date(Date.UTC(2025, 1, 28, 0, 0, 0, 0)),
+        new Date(Date.UTC(2025, 1, 28, 23, 59, 59, 999)),
+      );
+    });
+
+    it('no propaga el error si la importación programada falla', async () => {
+      jest.useFakeTimers({ advanceTimers: false });
+      jest.setSystemTime(new Date('2024-12-15T23:00:00.000Z'));
+
+      const service = createService();
+      jest.spyOn(service, 'createInBulk').mockRejectedValue(new Error('VigiFlow caído'));
+
+      await expect((service as any).handleCron()).resolves.toBeUndefined();
     });
   });
 });

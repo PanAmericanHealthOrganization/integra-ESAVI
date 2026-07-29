@@ -561,4 +561,28 @@ describe('Dhis2IntegratorService', () => {
       );
     });
   });
+
+  // ─── handleCron (importación programada) ─────────────────────────────────
+  describe('handleCron', () => {
+    afterEach(() => jest.useRealTimers());
+
+    it('importa únicamente el día anterior completo en UTC', async () => {
+      jest.useFakeTimers().setSystemTime(new Date('2026-07-28T23:30:00.000Z'));
+      const createInBulk = jest.spyOn(service, 'createInBulk').mockResolvedValue(undefined);
+
+      await service.handleCron();
+
+      expect(createInBulk).toHaveBeenCalledTimes(1);
+      const [fechaInicio, fechaFin, codigoATC] = createInBulk.mock.calls[0];
+      expect(fechaInicio.toISOString()).toBe('2026-07-27T00:00:00.000Z');
+      expect(fechaFin.toISOString()).toBe('2026-07-27T23:59:59.999Z');
+      expect(codigoATC).toBe('J07');
+    });
+
+    it('no propaga el error si la importación programada falla', async () => {
+      jest.spyOn(service, 'createInBulk').mockRejectedValue(new Error('DHIS2 caído'));
+
+      await expect(service.handleCron()).resolves.toBeUndefined();
+    });
+  });
 });

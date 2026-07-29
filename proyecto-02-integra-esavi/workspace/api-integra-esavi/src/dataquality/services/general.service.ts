@@ -106,8 +106,9 @@ export class GeneralService {
 
   /**
    * Cron job to process data quality every day at 3 AM
+   * Formato de 6 campos (segundo minuto hora díaMes mes díaSemana): '0 0 3 * * *'.
    */
-  @Cron('0 0 3 1 * *')
+  @Cron('0 0 3 * * *')
   async processQualityCron() {
     await this.processQualityDay(new Date());
   }

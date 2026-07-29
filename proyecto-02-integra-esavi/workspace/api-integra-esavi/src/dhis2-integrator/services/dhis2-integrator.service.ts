@@ -1,7 +1,9 @@
 import {HttpService} from '@nestjs/axios';
-import {Injectable} from '@nestjs/common';
+import {Injectable, Logger} from '@nestjs/common';
+import {Cron} from '@nestjs/schedule';
 import * as fs from 'fs';
 import * as path from 'path';
+import {RangoFechasUtils} from 'src/utils/rango-fechas.util';
 import {CausalidadEsavi} from 'src/integrator/entity';
 import {IAuditoria} from 'src/integrator/entity/auditoria.entity';
 import {MeddraLLTService} from 'src/meddra/services/meddra-lt.service';
@@ -40,6 +42,8 @@ import {Dhis2ProgramStageService} from './dhis2-program-stage.service';
 import {Dhis2ProgramService} from './dhis2-program.service';
 @Injectable()
 export class Dhis2IntegratorService {
+  private readonly logger = new Logger(Dhis2IntegratorService.name);
+
   constructor(
     private readonly httpService: HttpService,
     private readonly integradorService: IntegradorService,
@@ -51,6 +55,31 @@ export class Dhis2IntegratorService {
     private readonly processingLogService: Dhis2ProcessingLogService,
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
   ) {}
+
+  /**
+   * Importación programada de DHIS2: todos los días a las 23:30 (zona horaria del servidor),
+   * media hora después del cron de VigiFlow ('0 23 * * *') para que ambos orígenes no compitan
+   * por la base ni por la ventana de red.
+   *
+   * Cada corrida procesa ÚNICAMENTE el día anterior completo (UTC). Para recargar un rango
+   * histórico se usan los endpoints GET /integrator/dhis2/bulk o
+   * POST /integrator/dhis2/bulk-with-duplicate-handling, que aceptan fechas arbitrarias.
+   */
+  @Cron('30 23 * * *', { name: 'dhis2-import-diario' })
+  async handleCron(): Promise<void> {
+    const { fechaInicio, fechaFin } = RangoFechasUtils.diaAnterior();
+
+    this.logger.log(`Cron DHIS2: procesando el día ${fechaInicio.toISOString().slice(0, 10)}`);
+
+    try {
+      await this.createInBulk(fechaInicio, fechaFin, 'J07');
+      this.logger.log('Cron DHIS2: importación programada completada');
+    } catch (error: any) {
+      // Se registra y se traga el error: una excepción sin capturar dejaría el log del scheduler
+      // sin contexto y, en Node, puede tumbar el proceso por unhandled rejection.
+      this.logger.error(`Cron DHIS2: la importación programada falló: ${error?.message}`, error?.stack);
+    }
+  }
 
   // Acepta 'YYYY-MM-DD...' (formato ISO que entrega Dhis2ExtraccionUtils.normalizarFecha()/
   // normalizarValor() desde el tracker API) y, por compatibilidad, el 'YYYYMMDD' compacto

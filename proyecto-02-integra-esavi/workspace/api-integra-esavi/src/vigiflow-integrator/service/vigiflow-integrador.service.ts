@@ -17,6 +17,7 @@ import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredient
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { IngredientTranslationService } from 'src/whodrugs/services/ingredientsTraslations.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
+import { RangoFechasUtils } from 'src/utils/rango-fechas.util';
 import { read, utils, WorkBook } from 'xlsx';
 import {
   CreateCompleteDto,
@@ -69,9 +70,6 @@ const idiomaParaPaisIso3Code = 'es';
 export class VigiflowIntegradorService {
   private readonly logger = new Logger(VigiflowIntegradorService.name);
 
-  private originalFechaInicio: Date;
-  private fechaInicio: Date;
-
   /**
    * Edad gestacional por notificación, capturada en la hoja Medicamentos y consumida al
    * procesar la hoja Reacciones, que es donde se conoce la fecha del ESAVI necesaria para
@@ -101,42 +99,30 @@ export class VigiflowIntegradorService {
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
     private readonly meddraSocService: MeddraSocService,
-  ) {
-    const fechaInicioStr = this.configService.get<string>('VIGIFLOW_FECHA_INICIO_CRON', '2024-11-01');
-    this.originalFechaInicio = new Date(`${fechaInicioStr}T00:00:00.000Z`);
-    this.fechaInicio = this.originalFechaInicio;
-  }
+  ) {}
 
-  // 0 23 L * * -- Ejecución fin de mes
-  // 0 23 1 * * -- Ejecucion inicio de mes
-  @Cron('0 23 1 * *')
+  /**
+   * Importación programada de VigiFlow: todos los días a las 23:00 (zona horaria del servidor).
+   * Cada corrida procesa ÚNICAMENTE el día anterior completo (UTC), no el histórico: antes se
+   * recorría mes a mes desde VIGIFLOW_FECHA_INICIO_CRON, lo que con periodicidad diaria habría
+   * repetido todo el histórico cada noche.
+   *
+   * Para recargar un rango histórico se usa el endpoint GET /vigiflow/bulk, que sigue aceptando
+   * fechas arbitrarias.
+   */
+  @Cron('0 23 * * *', { name: 'vigiflow-import-diario' })
   private async handleCron() {
-    const now = new Date();
+    const { fechaInicio, fechaFin } = RangoFechasUtils.diaAnterior();
 
-    // Procesar mes a mes mientras fechaInicio sea menor que la fecha actual
-    while (this.fechaInicio < now) {
-      // Fecha de fin: último día del mes de fechaInicio (UTC)
-      const fechaFin = new Date(Date.UTC(
-        this.fechaInicio.getUTCFullYear(),
-        this.fechaInicio.getUTCMonth() + 1,
-        0, 23, 59, 59, 999,
-      ));
-      await this.createInBulk(this.fechaInicio, fechaFin);
+    this.logger.log(`Cron VigiFlow: procesando el día ${fechaInicio.toISOString().slice(0, 10)}`);
 
-      this.logger.log(
-        `Procesado desde ${this.fechaInicio.toISOString()} hasta ${fechaFin.toISOString()}`,
-      );
-      // Avanzar fechaInicio al primer día del siguiente mes (UTC)
-      this.fechaInicio = new Date(Date.UTC(
-        this.fechaInicio.getUTCFullYear(),
-        this.fechaInicio.getUTCMonth() + 1,
-        1, 0, 0, 0, 0,
-      ));
-    }
-
-    // Al alcanzar la fecha actual, reiniciar fechaInicio a la fecha original
-    if (this.fechaInicio >= now) {
-      this.fechaInicio = this.originalFechaInicio;
+    try {
+      await this.createInBulk(fechaInicio, fechaFin);
+      this.logger.log('Cron VigiFlow: importación programada completada');
+    } catch (error: any) {
+      // ejecutarConRegistroSync ya deja el registro en FAILED; aquí se evita que la excepción
+      // escape del scheduler como unhandled rejection.
+      this.logger.error(`Cron VigiFlow: la importación programada falló: ${error?.message}`, error?.stack);
     }
   }
 
