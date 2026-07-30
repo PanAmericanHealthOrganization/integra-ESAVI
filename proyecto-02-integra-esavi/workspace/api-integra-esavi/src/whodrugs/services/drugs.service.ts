@@ -40,7 +40,7 @@ export class DrugService {
       ],
     });
 
-    const final = drugPartial
+    const coincidencias = drugPartial
       .map((drug) => {
         drug.drugName = `${drug.drugName}`.toUpperCase();
         return drug;
@@ -50,12 +50,19 @@ export class DrugService {
           (!drugName && !drugCode) ||
           (drugName && `${drug.drugName}`.toUpperCase().includes(`${drugName}`.toUpperCase())) ||
           (drugCode && `${drug.drugCode}`.toUpperCase().includes(`${drugCode}`.toUpperCase())),
-      )
-      .slice(request.page * request.size, request.size);
+      );
+
+    // Los argumentos de slice son (inicio, fin), no (inicio, cantidad): antes se pasaba `size`
+    // como fin, así que a partir de la página 1 el inicio ya superaba al fin y la respuesta
+    // salía vacía (page=1,size=10 -> slice(10, 10)).
+    const inicio = request.page * request.size;
+    const pagina = coincidencias.slice(inicio, inicio + request.size);
 
     return {
-      data: final,
-      total: final.length,
+      data: pagina,
+      // El total es el universo filtrado, no el tamaño de la página; de lo contrario el cliente
+      // no puede calcular cuántas páginas existen.
+      total: coincidencias.length,
     };
   }
 

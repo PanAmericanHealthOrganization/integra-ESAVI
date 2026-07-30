@@ -54,6 +54,7 @@ describe('WhoDrugsSyncService', () => {
       set: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       orWhere: jest.fn().mockReturnThis(),
+      execute: jest.fn().mockResolvedValue({ affected: 3 }),
     };
     [
       drugRepository,
@@ -217,16 +218,48 @@ describe('WhoDrugsSyncService', () => {
   // ─── disableEntities ─────────────────────────────────────────────────────
 
   describe('disableEntities', () => {
-    it('actualiza el estado de todas las entidades del esquema WHO_DRUG', async () => {
+    it('deshabilita todas las entidades del diccionario WHO_DRUG', async () => {
       await service.disableEntities();
 
-      expect(drugSyncRepository.createQueryBuilder).toHaveBeenCalled();
       expect(drugRepository.createQueryBuilder).toHaveBeenCalled();
       expect(activeIngredientsRepository.createQueryBuilder).toHaveBeenCalled();
       expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalled();
       expect(countrySaleRepository.createQueryBuilder).toHaveBeenCalled();
       expect(maholderRepository.createQueryBuilder).toHaveBeenCalled();
       expect(anatomicalTherapeuticChemicalRepository.createQueryBuilder).toHaveBeenCalled();
+    });
+
+    it('no deshabilita DRUG_SYNC: la fila de la corrida en curso ya está creada', async () => {
+      await service.disableEntities();
+
+      expect(drugSyncRepository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it('ejecuta el update apagando isEnabled/isActive, no las propiedades inexistentes', async () => {
+      await service.disableEntities();
+
+      const builder = drugRepository.createQueryBuilder.mock.results[0].value;
+      expect(builder.set).toHaveBeenCalledWith({ isEnabled: false, isActive: false });
+      // El bug original construía el query pero nunca lo ejecutaba.
+      expect(builder.execute).toHaveBeenCalled();
+    });
+
+    it('espera a que terminen los updates antes de resolver (antes no se hacía await)', async () => {
+      let terminados = 0;
+      drugRepository.createQueryBuilder.mockReturnValue({
+        update: jest.fn().mockReturnThis(),
+        set: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        execute: jest.fn(async () => {
+          await new Promise((resolve) => setTimeout(resolve, 5));
+          terminados++;
+          return { affected: 1 };
+        }),
+      });
+
+      await service.disableEntities();
+
+      expect(terminados).toBe(1);
     });
   });
 

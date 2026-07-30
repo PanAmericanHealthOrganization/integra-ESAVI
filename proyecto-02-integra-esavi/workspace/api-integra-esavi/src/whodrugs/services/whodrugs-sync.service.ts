@@ -7,6 +7,7 @@ import {withAuditOnCreate,withAuditOnUpdate} from 'src/common/utils/audit.util';
 import {Auditoria} from 'src/integrator/entity';
 import {SyncService} from 'src/integrator/service/sync.service';
 import {Repository} from 'typeorm';
+import {QueryDeepPartialEntity} from 'typeorm/query-builder/QueryPartialEntity';
 import {ActiveIngredient} from '../models/activeIngredient.entity';
 import {AnatomicalTherapeuticChemical} from '../models/atomicTerapeutalChemical.entity';
 import {DrugSchemaAdapter} from '../models/builders/drug.build';
@@ -283,27 +284,34 @@ export class WhoDrugsSyncService {
     return fullEntitiesSaved;
   }
   /**
+   * Deshabilita TODAS las filas del diccionario antes de guardar la nueva versión.
    *
+   * Cada corrida genera identificadores nuevos (`uuidGenerator`), así que `save()` inserta
+   * filas en lugar de sobrescribir las anteriores: este barrido es lo único que retira de
+   * circulación la versión previa, porque todas las consultas del módulo filtran por
+   * `isEnabled`/`isActive`. Las filas que sí vienen en la nueva descarga se guardan a
+   * continuación con `withAuditOnCreate`, que las deja habilitadas otra vez.
+   *
+   * DRUG_SYNC queda fuera a propósito: es la bitácora de sincronizaciones y su fila en curso
+   * ya fue creada por `createDrugSync`, de modo que incluirla marcaría como inactiva la propia
+   * corrida que está ejecutándose.
    */
   public async disableEntities() {
-    this.logger.log('Actualizando estados');
-    this.updateEntitiesStates<DrugSync>(this.drugSyncRepository, DrugSync.name);
-    this.updateEntitiesStates<Drug>(this.drugRepository, Drug.name);
-    this.updateEntitiesStates<ActiveIngredient>(
-      this.activeIngredientsRepository,
-      ActiveIngredient.name,
-    );
-    this.updateEntitiesStates<IngredientTranslation>(
-      this.ingredientTranslationRepository,
-      IngredientTranslation.name,
-    );
-    this.updateEntitiesStates<CountryOfSale>(this.countrySaleRepository, CountryOfSale.name);
-    this.updateEntitiesStates<Maholder>(this.maholderRepository, Maholder.name);
-
-    this.updateEntitiesStates<AnatomicalTherapeuticChemical>(
-      this.anatomicalTherapeuticChemicalRepository,
-      AnatomicalTherapeuticChemical.name,
-    );
+    this.logger.log('Deshabilitando las entidades de la sincronización anterior');
+    await Promise.all([
+      this.updateEntitiesStates<Drug>(this.drugRepository, Drug.name),
+      this.updateEntitiesStates<ActiveIngredient>(this.activeIngredientsRepository, ActiveIngredient.name),
+      this.updateEntitiesStates<IngredientTranslation>(
+        this.ingredientTranslationRepository,
+        IngredientTranslation.name,
+      ),
+      this.updateEntitiesStates<CountryOfSale>(this.countrySaleRepository, CountryOfSale.name),
+      this.updateEntitiesStates<Maholder>(this.maholderRepository, Maholder.name),
+      this.updateEntitiesStates<AnatomicalTherapeuticChemical>(
+        this.anatomicalTherapeuticChemicalRepository,
+        AnatomicalTherapeuticChemical.name,
+      ),
+    ]);
   }
 
   /**
@@ -344,17 +352,27 @@ export class WhoDrugsSyncService {
   }
 
   /**
+   * Marca como no habilitadas/no activas todas las filas de la entidad indicada.
    *
-   * @param repositoryUpdater
-   * @param entityName
+   * Antes este método construía el query builder pero nunca lo ejecutaba (faltaba
+   * `.execute()`), y además seteaba propiedades inexistentes —`enabled`/`state` en lugar de
+   * `isEnabled`/`isActive`, que son las que declara `Auditoria`—, de modo que no tenía ningún
+   * efecto: el diccionario acumulaba todas las versiones históricas habilitadas a la vez.
    */
-  public async updateEntitiesStates<T>(repositoryUpdater: Repository<T>, entityName: string) {
-    this.logger.log('Actualizando estados de ' + entityName);
-    repositoryUpdater
+  public async updateEntitiesStates<T extends Auditoria>(
+    repositoryUpdater: Repository<T>,
+    entityName: string,
+  ): Promise<void> {
+    const resultado = await repositoryUpdater
       .createQueryBuilder()
-      .update(entityName)
-      .set({ enabled: true, state: true })
-      .where('enabled = :enabled', { enabled: false })
-      .orWhere('state =:state', { state: false });
+      .update()
+      // El doble cast es necesario porque T es genérico: TypeScript no puede probar que un
+      // parcial de Auditoria encaje en QueryDeepPartialEntity<T> sin conocer T.
+      .set({ isEnabled: false, isActive: false } as unknown as QueryDeepPartialEntity<T>)
+      // Criterio explícito: TypeORM rechaza un UPDATE sin WHERE para evitar barridos accidentales.
+      .where('1 = 1')
+      .execute();
+
+    this.logger.log(`|---- ${resultado?.affected ?? 0} filas de ${entityName} deshabilitadas`);
   }
 }
