@@ -10,8 +10,7 @@ import {Repository} from 'typeorm';
 import {read,utils} from 'xlsx';
 
 // Entidades
-import {ISync} from '../dto/sync.dto';
-import {IAuditoria,SyncProcess,SyncStatus} from '../entity';
+import {IAuditoria,SyncSource} from '../entity';
 import {Canton} from '../entity/canton.entity';
 import {CatalogoPadre} from '../entity/catalogo-padre.entity';
 import {Establecimiento} from '../entity/establecimiento.entity';
@@ -29,6 +28,7 @@ import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {Vacunometro} from '../entity/vacunometro.entity';
 import {encryptValue} from '../utils/parametro-crypto.util';
+import {SyncService} from './sync.service';
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -52,8 +52,6 @@ export class SeedService implements OnApplicationBootstrap {
     private datoVacunaRepository: Repository<DatoVacuna>,
     @InjectRepository(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS')
     private datoVacunacionRepository: Repository<DatoVacunacion>,
-    @InjectRepository(SyncProcess, 'POSTGRES_INTEGRATOR_DS')
-    private syncProcessRepository: Repository<SyncProcess>,
     @InjectRepository(CatalogoPadre, 'POSTGRES_INTEGRATOR_DS')
     private catalogoPadreRepository: Repository<CatalogoPadre>,
     @InjectRepository(Provincia, 'POSTGRES_INTEGRATOR_DS')
@@ -72,6 +70,8 @@ export class SeedService implements OnApplicationBootstrap {
     private vacunometroRepository: Repository<Vacunometro>,
     @InjectRepository(Parametro, 'POSTGRES_INTEGRATOR_DS')
     private parametroRepository: Repository<Parametro>,
+
+    private readonly syncService: SyncService,
   ) {}
 
   async onApplicationBootstrap() {
@@ -296,88 +296,18 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   //----------inicio de definición de la creación del proceso de sync (SINCRONIZACIÓN) para registrar la carga de datos en catálogo de homologación--------------------------------------------------------------
-  private async createSyncProcess(
-    name: string,
-    status: SyncStatus,
-    message?: string,
-    errorMessage?: string,
-    errorStack?: string,
-    errorTrace?: string,
-    createdBy: string = 'System',
-    startTime: Date = new Date(),
-  ): Promise<ISync> {
-    const syncProcess: ISync = {
-      id: undefined,
-      name,
-      status,
-      startTime,
-      endTime: new Date(),
-      message,
-      errorMessage,
-      errorStack,
-      errorTrace,
-      createdAt: new Date(),
-      createdBy,
-      updatedAt: undefined,
-      updatedBy: '',
-      deletedAt: undefined,
-      deletedBy: '',
-      isEnabled: true,
-      isActive: true,
-    };
-  
-    return await this.syncProcessRepository.save(syncProcess);
-  }
-
-  private async runSyncProcess(
-    name: string,
-    action: () => Promise<void>,
-    createdBy: string = 'System',
-  ): Promise<void> {
-    const startTime = new Date();
-  
-    try {
-      // Registrar inicio con auditoría
-      await this.createSyncProcess(
-        name,
-        SyncStatus.RUNNING,
-        `Proceso ${name} iniciado`,
-        null,
-        null,
-        null,
-        createdBy,
-        startTime,
-      );
-  
-      // Ejecutar la acción principal
+  /**
+   * Ejecuta una carga del seed dejándola registrada en TR_SYNC_PROCESS.
+   *
+   * El registro lo hace `SyncService.ejecutarConRegistro`, el mismo camino que
+   * usan MedDRA, WHODrug, el datamart y el resto: antes este servicio abría y
+   * cerraba las filas por su cuenta, duplicando la lógica.
+   */
+  private async runSyncProcess(name: string, action: () => Promise<void>): Promise<void> {
+    await this.syncService.ejecutarConRegistro(SyncSource.SEED, name, async () => {
       await action();
-  
-      // Registrar éxito con auditoría
-      await this.createSyncProcess(
-        name,
-        SyncStatus.COMPLETED,
-        `Proceso ${name} completado exitosamente`,
-        null,
-        null,
-        null,
-        createdBy,
-        startTime,
-      );
-    } catch (error) {
-      const err = error as Error;
-      // Registrar fallo con auditoría
-      await this.createSyncProcess(
-        name,
-        SyncStatus.FAILED,
-        null,
-        err.message,
-        err.stack,
-        JSON.stringify(error),
-        createdBy,
-        startTime,
-      );
-      throw error;
-    }
+      return { mensaje: `Proceso ${name} completado exitosamente` };
+    });
   }
 
   //--inicio de la carga del catálogo para el mapeo de ICD-10 MedDRA desde el documento Excel------------------------------------------------------------------------------------------------------

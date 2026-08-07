@@ -29,7 +29,6 @@ import {HomologadoresPage} from "./pages/homologators/HomologadoresPage"
 import {AdminPage} from "./pages/admin/AdminPage"
 import {MeddraPage} from "./pages/estandares/MeddraPage"
 import {WhodrugPage} from "./pages/estandares/WhodrugPage"
-import {SincronizacionesPage} from "./pages/estandares/SincronizacionesPage"
 import {theme} from "./theme"
 
 const AdminGuard = ({ component: Component }: { component: React.ComponentType }) => {
@@ -110,7 +109,6 @@ const App = () => {
       <Resource name="admin" options={{ label: "Administración" }} list={AdminGuardedPage} />
       <Resource name="meddra" options={{ label: "MedDRA" }} list={MeddraPage} />
       <Resource name="whodrug" options={{ label: "WHODrug" }} list={WhodrugPage} />
-      <Resource name="estandar-syncs" options={{ label: "Sincronizaciones" }} list={SincronizacionesPage} />
     </Admin>
   )
 }

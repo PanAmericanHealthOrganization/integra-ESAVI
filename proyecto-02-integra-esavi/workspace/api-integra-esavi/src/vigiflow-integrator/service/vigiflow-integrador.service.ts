@@ -5,7 +5,7 @@ import * as fs from 'fs/promises';
 import * as countries from 'i18n-iso-countries';
 import * as enLocale from 'i18n-iso-countries/langs/en.json';
 import * as esLocale from 'i18n-iso-countries/langs/es.json';
-import { SyncStatus } from 'src/integrator/entity';
+import { SyncSource } from 'src/integrator/entity';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
 import { SyncService } from 'src/integrator/service/sync.service';
@@ -268,8 +268,9 @@ export class VigiflowIntegradorService {
   }
 
   /**
-   * Crea el registro de sincronización, ejecuta el proceso y actualiza el registro
-   * a COMPLETED o FAILED según el resultado.
+   * Envoltorio sobre el registro común. Sólo adapta la forma de llamar (aquí el
+   * mensaje de éxito se conoce de antemano); el registro en TR_SYNC_PROCESS lo
+   * hace `SyncService.ejecutarConRegistro`, igual que el resto de las fuentes.
    */
   private async ejecutarConRegistroSync(
     syncName: string,
@@ -278,43 +279,15 @@ export class VigiflowIntegradorService {
     dataStartDate: Date | null = null,
     dataEndDate: Date | null = null,
   ) {
-    const syncRecord = await this.syncService.createSyncProcess({
-      name: syncName,
-      status: SyncStatus.RUNNING,
-      startTime: new Date(),
-      endTime: null,
-      dataStartDate,
-      dataEndDate,
-      message: null,
-      errorMessage: null,
-      errorStack: null,
-      errorTrace: null,
-      createdAt: new Date(),
-      createdBy: 'System',
-      updatedAt: new Date(),
-      updatedBy: 'System',
-      deletedAt: null,
-      deletedBy: null,
-      isEnabled: true,
-      isActive: true,
-    });
-
-    try {
-      await proceso();
-      await this.syncService.update(syncRecord.id, {
-        status: SyncStatus.COMPLETED,
-        endTime: new Date(),
-        message: mensajeExito,
-      });
-    } catch (error) {
-      await this.syncService.update(syncRecord.id, {
-        status: SyncStatus.FAILED,
-        endTime: new Date(),
-        errorMessage: error?.message ?? String(error),
-        errorStack: error?.stack ?? null,
-      });
-      throw error;
-    }
+    await this.syncService.ejecutarConRegistro(
+      SyncSource.VIGIFLOW,
+      syncName,
+      async () => {
+        await proceso();
+        return { mensaje: mensajeExito };
+      },
+      { dataStartDate, dataEndDate },
+    );
   }
 
   // TODO: colocar auditoria correcta

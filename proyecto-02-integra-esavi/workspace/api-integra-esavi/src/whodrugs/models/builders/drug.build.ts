@@ -1,7 +1,6 @@
 import { uuidGenerator } from 'src/whodrugs/utils/utils';
 import { ActiveIngredient } from '../activeIngredient.entity';
 import { Drug } from '../drug.entity';
-import { DrugSync } from '../drugSync.entity';
 import { IATC, IActiveIngredient, ICountryOfSale, IDrugResponse, IIngredientTranslation, IMaHolder } from '../dtos';
 import { IngredientTranslation } from '../ingredientTranslation.entity';
 import { CountryOfSale } from '../countryOfSale.entity';
@@ -20,7 +19,7 @@ export class DrugSchemaAdapter {
   private atcs: AnatomicalTherapeuticChemical[];
 
   //
-  constructor(drug: IDrugResponse, drugSync: DrugSync) {
+  constructor(drug: IDrugResponse, syncId: string) {
     this.drug = null;
     //1
     this.activeIngredients = [];
@@ -30,10 +29,10 @@ export class DrugSchemaAdapter {
     this.maholders = [];
     //3
     this.atcs = [];
-    this.buildDrug(drug, drugSync);
+    this.buildDrug(drug, syncId);
   }
 
-  private buildDrug(drug: IDrugResponse, drugSync: DrugSync) {
+  private buildDrug(drug: IDrugResponse, syncId: string) {
     this.drug = new Drug();
     this.drug.id = uuidGenerator(11);
     this.drug.drugCode = drug.drugCode;
@@ -42,7 +41,7 @@ export class DrugSchemaAdapter {
     this.drug.isGeneric = drug.isGeneric;
     this.drug.isPreferred = drug.isPreferred;
 
-    this.drug.drugSync = drugSync;
+    this.drug.syncId = syncId;
     // 1
     this.buildActiveIngredients(this.drug, drug.activeIngredients);
     // 2

@@ -8,8 +8,12 @@ import {
   ParseFilePipe,
   Post,
   UploadedFile,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { ProcessVersionReqDTO } from '../models/dto';
 import { MeddraProcessFilesService } from '../services/meddra-process.service';
 /**
@@ -25,6 +29,9 @@ export class MeddraVersionController {
     description: 'Procesa los archivos de versión de MedDRA',
   })
   @Post('process')
+  @UseGuards(KeycloakAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('keycloak-jwt')
   async processVersionFiles(@Body() processsVersionReqDto: ProcessVersionReqDTO): Promise<any[]> {
     const { version, lang } = processsVersionReqDto;
     try {

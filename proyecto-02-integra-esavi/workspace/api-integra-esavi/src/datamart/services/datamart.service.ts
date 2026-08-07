@@ -2,6 +2,8 @@ import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
 import { existsSync } from 'fs';
+import { SyncSource } from 'src/integrator/entity';
+import { SyncService } from 'src/integrator/service/sync.service';
 import {
   CONFIG_KEYS,
   DEFAULT_DATAMART_CRON,
@@ -24,6 +26,7 @@ export class DatamartService implements OnApplicationBootstrap {
   constructor(
     private readonly config: ConfigService,
     private readonly builder: DuckDbBuilderService,
+    private readonly syncService: SyncService,
   ) {}
 
   /**
@@ -86,13 +89,58 @@ export class DatamartService implements OnApplicationBootstrap {
       );
     }
     this.running = true;
+    let result: DatamartBuildResult | undefined;
     try {
-      const result = await this.builder.build();
+      // Cada generación queda registrada en TR_SYNC_PROCESS, igual que las
+      // sincronizaciones de WHODrug y MedDRA.
+      //
+      // `build()` no lanza: captura el error y devuelve ok:false. Como
+      // `ejecutarConRegistro` sólo marca FAILED cuando el proceso lanza, aquí se
+      // relanza el error del build; el catch de abajo lo absorbe para conservar el
+      // contrato de `regenerate` (devuelve el resultado, no lanza) del que dependen
+      // el controller y el arranque.
+      await this.syncService.ejecutarConRegistro(
+        SyncSource.DATAMART,
+        `Generación Datamart (${trigger})`,
+        async () => {
+          result = await this.builder.build();
+          this.lastResult = result;
+          if (!result.ok) {
+            throw new Error(result.error ?? 'Fallo generando el datamart');
+          }
+          return {
+            mensaje:
+              `Datamart generado en ${result.outputPath} ` +
+              `(${JSON.stringify(result.rowCounts)}) en ${result.durationMs} ms`,
+            metadata: {
+              trigger,
+              outputPath: result.outputPath,
+              rowCounts: result.rowCounts,
+              durationMs: result.durationMs,
+            },
+          };
+        },
+        { metadata: { trigger } },
+      );
+    } catch (err: any) {
+      // El registro ya quedó en FAILED. Si el build sí terminó, se devuelve su
+      // resultado; si el fallo vino del propio registro (bitácora inaccesible), se
+      // sintetiza uno para no romper a quien llama.
+      this.logger.error(`Regeneración (${trigger}) falló: ${err?.message}`);
+      result ??= {
+        ok: false,
+        outputPath: this.builder.getOutputPath(),
+        startedAt: new Date().toISOString(),
+        finishedAt: new Date().toISOString(),
+        durationMs: 0,
+        rowCounts: {},
+        error: err?.message ?? String(err),
+      };
       this.lastResult = result;
-      return result;
     } finally {
       this.running = false;
     }
+    return result;
   }
 
   isRunning(): boolean {

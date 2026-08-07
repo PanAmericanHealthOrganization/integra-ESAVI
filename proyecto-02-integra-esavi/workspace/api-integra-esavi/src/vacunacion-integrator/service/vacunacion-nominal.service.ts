@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { add, format } from 'date-fns';
-import { SyncProcess, SyncStatus } from 'src/integrator/entity/sync.entity';
+import { SyncSource } from 'src/integrator/entity/sync.entity';
 import { SyncService, VacunometroService } from 'src/integrator/service';
 import { DataSource } from 'typeorm';
 @Injectable()
@@ -20,8 +20,14 @@ export class VacunacionNominalService {
   async procesarVacunasAgregadasCron() {
     // procesar dia anterior
     const dia = add(new Date(), { days: -1 });
-    // procesar vacunas agregadas
-    await this.procesarVacunasAgregadas(dia, dia);
+    // procesar vacunas agregadas. El fallo ya quedó registrado como FAILED en
+    // TR_SYNC_PROCESS; aquí sólo se evita que el cron termine en una excepción
+    // no manejada.
+    try {
+      await this.procesarVacunasAgregadas(dia, dia);
+    } catch (error) {
+      this.logger.error(`Cron del vacunómetro falló: ${error?.message ?? error}`);
+    }
   }
 
   /**
@@ -30,17 +36,24 @@ export class VacunacionNominalService {
    * @returns
    */
   async procesarVacunasAgregadas(desde: Date, hasta: Date): Promise<void> {
-    try {
-      const desdeStr = format(desde, 'yyyy-MM-dd');
-      const hastaStr = format(hasta, 'yyyy-MM-dd');
-      this.logger.log(
-        `Iniciando proceso de VacunacionNominalService.procesarVacunasAgregadas para el rango ${desdeStr} - ${hastaStr}`,
-      );
-      const startTime = new Date();
-      // EXTRACT, extracción de datos
+    const desdeStr = format(desde, 'yyyy-MM-dd');
+    const hastaStr = format(hasta, 'yyyy-MM-dd');
 
-      // Ejecutar consulta consolidada directamente
-      const query = `
+    // Antes el registro se escribía una sola vez, al final y sólo en caso de
+    // éxito, y el catch se limitaba a loguear: una corrida fallida no dejaba
+    // rastro en TR_SYNC_PROCESS. Ahora se abre en RUNNING y se cierra en
+    // COMPLETED o FAILED como el resto de las fuentes.
+    await this.syncProcessService.ejecutarConRegistro(
+      SyncSource.VACUNOMETRO,
+      `Vacunómetro ${desdeStr} a ${hastaStr}`,
+      async () => {
+        this.logger.log(
+          `Iniciando proceso de VacunacionNominalService.procesarVacunasAgregadas para el rango ${desdeStr} - ${hastaStr}`,
+        );
+        // EXTRACT, extracción de datos
+
+        // Ejecutar consulta consolidada directamente
+        const query = `
         WITH DatosBase AS (
               SELECT
               r.FECHAVACUNACION AS FECHA_APLICACION,
@@ -88,40 +101,19 @@ export class VacunacionNominalService {
         ELSE 7
           END
       `;
-      const vacunas = await this.oracleDataSource.query(query);
-      //
-      this.logger.log(
-        `Encontradas ${vacunas.length} registros, para el rango ${format(desde, 'yyyy-MM-dd')} - ${format(
-          hasta,
-          'yyyy-MM-dd',
-        )}`,
-      );
-      // LOAD, ALMACENAMIENTO DE LOS DATOS
-      await this.vacunometroService.createMany(vacunas);
 
-      // SYNC, registro de proceso de sincronización
-      const syncProcess = new SyncProcess();
-      syncProcess.name = `VacunacionNominalService.procesarVacunasAgregadas ${format(desde, 'yyyy-MM-dd')} to ${format(
-        hasta,
-        'yyyy-MM-dd',
-      )}`;
-      syncProcess.status = SyncStatus.COMPLETED;//'COMPLETED';
-      syncProcess.startTime = startTime;
-      syncProcess.endTime = new Date();
-      syncProcess.errorMessage = '';
-      syncProcess.errorStack = '';
-      syncProcess.errorTrace = '';
+        const vacunas = await this.oracleDataSource.query(query);
+        //
+        this.logger.log(`Encontradas ${vacunas.length} registros, para el rango ${desdeStr} - ${hastaStr}`);
+        // LOAD, ALMACENAMIENTO DE LOS DATOS
+        await this.vacunometroService.createMany(vacunas);
 
-      // Auditoría: si no tienes usuario real, usa 'SYSTEM'
-      syncProcess.createdBy = 'SYSTEM';
-      syncProcess.createdAt = new Date();
-      syncProcess.isEnabled = true;
-      syncProcess.isActive = true;
-
-      await this.syncProcessService.createSyncProcess(syncProcess);
-      return;
-    } catch (error) {
-      this.logger.error(error);
-    }
+        return {
+          mensaje: `Vacunómetro actualizado: ${vacunas.length} registros del rango ${desdeStr} - ${hastaStr}`,
+          metadata: { registros: vacunas.length },
+        };
+      },
+      { dataStartDate: desde, dataEndDate: hasta },
+    );
   }
 }

@@ -1,65 +1,39 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
-import { IAuditoria, SyncStatus } from '../entity';
+import { IAuditoria, SyncSource, SyncStatus } from '../entity';
 
 /**
- *
+ * Una corrida de sincronización, tal como se registra en TR_SYNC_PROCESS.
  */
 export interface ISync extends IAuditoria {
-  /**
-   * Identificador único del proceso de sincronización
-   */
+  /** Identificador único de la corrida */
   id?: string;
-  /**
-   * Nombre del proceso de sincronización
-   */
+  /** Fuente sincronizada */
+  source: SyncSource;
+  /** Descripción legible de la corrida */
   name: string;
-  /**
-   * Estado del proceso de sincronización
-   */
-  //status: string;
-  status: SyncStatus;//Se podría utilizar un tipo enumerado "enum"
-  /**
-   * Fecha y hora de inicio del proceso de sincronización
-   */
+  /** Estado: RUNNING, COMPLETED o FAILED */
+  status: SyncStatus;
+  /** Fecha y hora de inicio */
   startTime: Date;
-  /**
-   * Fecha y hora de fin del proceso de sincronización
-   */
+  /** Fecha y hora de fin. Nulo mientras sigue en curso */
   endTime: Date;
-  /**
-   * Mensaje de éxito del proceso de sincronización
-   */
+  /** Resumen del resultado cuando termina en COMPLETED */
   message?: string;
-  /**
-   * Mensaje de error del proceso de sincronización
-   */  
+  /** Mensaje del error que dejó la corrida en FAILED */
   errorMessage: string;
-  /**
-   * Stack del error del proceso de sincronización
-   */
+  /** Stack trace del error */
   errorStack: string;
-  /**
-   * Trace del error del proceso de sincronización
-   */
-  errorTrace: string;
-  /**
-   * Fecha de inicio del rango de datos importados
-   */
+  /** Inicio del rango de datos importados */
   dataStartDate?: Date;
-  /**
-   * Fecha de fin del rango de datos importados
-   */
+  /** Fin del rango de datos importados */
   dataEndDate?: Date;
+  /** Datos específicos de la fuente (versión, sha256, conteos, ...) */
+  metadata?: Record<string, any>;
 }
-/*export enum SyncStatus {
-  PENDING = 'PENDING',
-  RUNNING = 'RUNNING',
-  COMPLETED = 'COMPLETED',
-  FAILED = 'FAILED',
-}*/
 
 export class SyncDto {
   id: string;
+  source: SyncSource;
   name: string;
   status: SyncStatus;
   startTime: Date;
@@ -67,9 +41,9 @@ export class SyncDto {
   message?: string;
   errorMessage: string;
   errorStack: string;
-  errorTrace: string;
   dataStartDate?: Date;
   dataEndDate?: Date;
+  metadata?: Record<string, any>;
 }
 
 export class CreateSyncDto extends OmitType(SyncDto, ['id'] as const) {}

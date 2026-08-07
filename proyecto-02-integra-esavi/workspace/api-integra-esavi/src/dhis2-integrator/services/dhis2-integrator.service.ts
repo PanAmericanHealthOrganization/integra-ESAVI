@@ -4,7 +4,8 @@ import {Cron} from '@nestjs/schedule';
 import * as fs from 'fs';
 import * as path from 'path';
 import {RangoFechasUtils} from 'src/utils/rango-fechas.util';
-import {CausalidadEsavi} from 'src/integrator/entity';
+import {CausalidadEsavi,SyncSource} from 'src/integrator/entity';
+import {SyncService} from 'src/integrator/service/sync.service';
 import {IAuditoria} from 'src/integrator/entity/auditoria.entity';
 import {MeddraLLTService} from 'src/meddra/services/meddra-lt.service';
 import {MeddraPtService} from 'src/meddra/services/meddra-pt.service';
@@ -58,6 +59,7 @@ export class Dhis2IntegratorService {
     private readonly dhis2EventsService: Dhis2EventsService,
     private readonly processingLogService: Dhis2ProcessingLogService,
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
+    private readonly syncService: SyncService,
   ) {}
 
   /**
@@ -157,6 +159,11 @@ export class Dhis2IntegratorService {
   }
   
 
+  /**
+   * Importación masiva desde DHIS2. Queda registrada en TR_SYNC_PROCESS igual
+   * que el resto de las fuentes: antes DHIS2 era el único integrador que no
+   * dejaba rastro en el log de sincronizaciones, sólo en los logs de proceso.
+   */
   async createInBulk(
     fechaInicio: Date,
     fechaFin: Date,
@@ -165,6 +172,21 @@ export class Dhis2IntegratorService {
   ) {
     const loteId = `DHIS2_${Date.now()}_${codigoATC}`;
 
+    return this.syncService.ejecutarConRegistro(
+      SyncSource.DHIS2,
+      `Importación DHIS2 ${codigoATC}`,
+      () => this.ejecutarImportacion(loteId, fechaInicio, fechaFin, codigoATC, duplicateConfig),
+      { dataStartDate: fechaInicio, dataEndDate: fechaFin, metadata: { loteId, codigoATC } },
+    );
+  }
+
+  private async ejecutarImportacion(
+    loteId: string,
+    fechaInicio: Date,
+    fechaFin: Date,
+    codigoATC: string,
+    duplicateConfig?: DuplicateHandlingConfigDto,
+  ): Promise<{ mensaje: string; metadata: Record<string, any> }> {
     try {
       // Log de inicio de importación
       this.processingLogService.logImportStart(
@@ -223,6 +245,11 @@ export class Dhis2IntegratorService {
         finalSummary.duracionProcesamiento = this.calculateProcessingDuration(summary.fechaInicio);
         this.processingLogService.logImportEnd(loteId, finalSummary, 'SYSTEM');
       }
+
+      return {
+        mensaje: `Importación DHIS2 completada: ${totalRegistros} registros (lote ${loteId})`,
+        metadata: { loteId, codigoATC, registros: totalRegistros },
+      };
     } catch (error:any) {
       this.processingLogService.logError(
         loteId,

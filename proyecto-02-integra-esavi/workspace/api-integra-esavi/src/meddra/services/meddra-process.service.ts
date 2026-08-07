@@ -6,11 +6,10 @@ import {InjectDataSource,InjectRepository} from '@nestjs/typeorm';
 import * as fs from 'fs';
 import {join} from 'path';
 import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {SyncSource} from 'src/integrator/entity';
 import {SyncService} from 'src/integrator/service/sync.service';
 import * as XLSX from 'xlsx';
 import {cie10Meddra} from '../models/mapping/cie19meddra.entity';
-import {MeddraSync} from '../models/standar/meddraSync.entity';
-import {SyncStateEnum} from '../models/enums/sycnstate.enum';
 import {PT} from '../models/standar/pt.entity';
 import {SOC} from '../models/standar/soc.entity';
 import {MeddraUtils} from '../utils/meddra.utils';
@@ -29,9 +28,6 @@ export class MeddraProcessFilesService {
 
     @InjectRepository(LLT, 'MEDDRA')
     private readonly lltRepository: Repository<LLT>,
-
-    @InjectRepository(MeddraSync, 'MEDDRA')
-    private readonly meddraSuncRepository: Repository<MeddraSync>,
 
     @InjectRepository(cie10Meddra, 'MEDDRA')
     private readonly cie10MeddraRepository: Repository<cie10Meddra>,
@@ -74,9 +70,12 @@ export class MeddraProcessFilesService {
       );
     }
 
+    // La versión, el idioma y la descripción viajan como metadatos de la corrida:
+    // es lo que antes guardaba MED_SYNC y lo que `validarVersion` vuelve a leer.
     return this.syncService.ejecutarConRegistro(
+      SyncSource.MEDDRA,
       `Sincronización MedDRA ${versionStr}/${langStr}`,
-      async () => {
+      async (syncId) => {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -84,14 +83,10 @@ export class MeddraProcessFilesService {
         let ptDB = [];
         let llDB = [];
 
-        const syncRecord = withAuditOnCreate(new MeddraSync(versionStr, langStr, description));
-        syncRecord.startSyncDate = new Date();
-        const versionEntity = await this.meddraSuncRepository.save(syncRecord);
-
         try {
           // Nivel superior
           const soc = await MeddraUtils.readFileContent(versionStr, langStr, 'soc.asc');
-          socDB = await this.processSOC(soc, versionEntity);
+          socDB = await this.processSOC(soc, syncId);
 
           // Nivel intermedio, requiere soc por pt
           const ptDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'pt.asc');
@@ -100,17 +95,8 @@ export class MeddraProcessFilesService {
           // Nivel inferior, requiere pt por llt
           const lltDataFile = await MeddraUtils.readFileContent(versionStr, langStr, 'llt.asc');
           llDB = await this.processLLT(lltDataFile, ptDB);
-
-          await this.meddraSuncRepository.update(versionEntity.id, {
-            syncStatus: SyncStateEnum.FINISHED,
-            endSyncDate: new Date(),
-          });
         } catch (e) {
           await queryRunner.rollbackTransaction();
-          await this.meddraSuncRepository.update(versionEntity.id, {
-            syncStatus: SyncStateEnum.ERROR,
-            endSyncDate: new Date(),
-          });
           throw e;
         } finally {
           await queryRunner.release();
@@ -119,25 +105,27 @@ export class MeddraProcessFilesService {
         return {
           resultado: { soc: socDB, pt: ptDB, llt: llDB },
           mensaje: `Versión MedDRA ${versionStr}/${langStr} procesada exitosamente`,
+          metadata: { socs: socDB.length, pts: ptDB.length },
         };
       },
+      { metadata: { version: versionStr, lang: langStr, description } },
     );
   }
 
   /**
    * Permite procesar los SOC y guardarlos en la base de datos
    * @param soc contenido soc de la base de datos
-   * @param meddraSync
+   * @param syncId corrida de TR_SYNC_PROCESS que está cargando esta versión
    * @returns
    */
-  private async processSOC(soc: string[][], meddraSync: MeddraSync): Promise<SOC[]> {
+  private async processSOC(soc: string[][], syncId: string): Promise<SOC[]> {
     const lltList = [];
     soc.forEach((line) => {
       const soc = withAuditOnCreate(new SOC());
       soc.code = line[0];
       soc.name = line[1];
       soc.abbrev = line[2];
-      soc.meddraSync = meddraSync;
+      soc.syncId = syncId;
       lltList.push(soc);
     });
     const inserted = await this.socRepository.insert(lltList);
@@ -255,10 +243,16 @@ export class MeddraProcessFilesService {
     return true;
   }
 
+  /**
+   * ¿Ya se cargó esa versión/idioma? Se resuelve contra el log único de
+   * sincronizaciones (antes contra MED_SYNC). Sólo cuentan las corridas
+   * COMPLETED: una carga que falló a medias debe poder reintentarse.
+   */
   async validarVersion(meddraVersion: string, lang: string): Promise<boolean> {
-    const versionExist = await this.meddraSuncRepository.findOne({
-      where: { meddraVersion, lang, isEnabled: true },
+    const corrida = await this.syncService.buscarPorMetadatos(SyncSource.MEDDRA, {
+      version: meddraVersion,
+      lang,
     });
-    return versionExist ? true : false;
+    return corrida !== null;
   }
 }

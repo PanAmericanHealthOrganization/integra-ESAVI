@@ -2,7 +2,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { utils, WorkBook } from 'xlsx';
 import * as fsPromises from 'fs/promises';
 import * as xlsxModule from 'xlsx';
-import { SyncStatus } from 'src/integrator/entity';
+import { SyncSource } from 'src/integrator/entity';
 import { VigiflowUtils } from '../utils/vigiflow-utils.module';
 import { VigiflowIntegradorService } from './vigiflow-integrador.service';
 
@@ -124,9 +124,16 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
   const mockIngredientTranslation = {
     findVaccineByIngredientAndMaholder: jest.fn().mockResolvedValue(null),
   };
+  // VigiFlow ya no abre y cierra la bitácora por su cuenta: delega en
+  // SyncService.ejecutarConRegistro, igual que el resto de las fuentes. El mock
+  // ejecuta el proceso y guarda el mensaje de éxito que le devuelve.
+  const mensajesRegistrados: string[] = [];
   const mockSync = {
-    createSyncProcess: jest.fn().mockResolvedValue({ id: 'sync-id-1' }),
-    update: jest.fn().mockResolvedValue(undefined),
+    ejecutarConRegistro: jest.fn(async (_source: string, _name: string, proceso: any) => {
+      const salida = await proceso('sync-id-1');
+      if (salida?.mensaje) mensajesRegistrados.push(salida.mensaje);
+      return salida?.resultado;
+    }),
   };
   // buscarPorSimilitud devuelve la fila completa del LLT: de ahí salen CODIGO_ESAVI_MEDDRA_LLT
   // (code) y CODIGO_ESAVI_CIE10 (icd10Code) en una sola consulta.
@@ -182,7 +189,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     mockCrawler.retrieveJWT.mockResolvedValue({ jwt: 'token-abc' });
     mockCrawler.retrieveExcelReport.mockResolvedValue(emptyReportOne());
     mockCrawler.retrieveJsonReport.mockResolvedValue(emptyReportTwo());
-    mockSync.createSyncProcess.mockResolvedValue({ id: 'sync-id-1' });
+    mensajesRegistrados.length = 0;
     mockPaciente.findByCodigosOrigen.mockResolvedValue(new Map());
     mockPaciente.findAll.mockResolvedValue([]);
     mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValue(new Map());
@@ -222,29 +229,33 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       await expect(
         service.createInBulk(new Date('2024-02-01'), new Date('2024-01-01')),
       ).rejects.toBeInstanceOf(BadRequestException);
-      expect(mockSync.createSyncProcess).not.toHaveBeenCalled();
+      expect(mockSync.ejecutarConRegistro).not.toHaveBeenCalled();
     });
 
-    it('camino feliz: formatea fechas, descarga reportes y marca el sync como COMPLETED', async () => {
+    it('camino feliz: formatea fechas, descarga reportes y registra la corrida', async () => {
       const service = createService();
       const fechaInicio = new Date(Date.UTC(2024, 0, 1));
       const fechaFin = new Date(Date.UTC(2024, 0, 31));
 
       await service.createInBulk(fechaInicio, fechaFin, 'J07');
 
-      expect(mockSync.createSyncProcess).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'VIGIFLOW_BULK', status: SyncStatus.RUNNING }),
+      expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
+        SyncSource.VIGIFLOW,
+        'VIGIFLOW_BULK',
+        expect.any(Function),
+        expect.objectContaining({ dataStartDate: fechaInicio, dataEndDate: fechaFin }),
       );
       expect(mockCrawler.retrieveJWT).toHaveBeenCalled();
       expect(mockCrawler.retrieveExcelReport).toHaveBeenCalledWith('20240101', '20240131', 'J07', 'token-abc');
       expect(mockCrawler.retrieveJsonReport).toHaveBeenCalledWith('20240101', '20240131', 'J07', 'token-abc');
-      expect(mockSync.update).toHaveBeenCalledWith(
-        'sync-id-1',
-        expect.objectContaining({ status: SyncStatus.COMPLETED }),
-      );
+      expect(mensajesRegistrados).toEqual([
+        'Importación VigiFlow completada: 20240101 – 20240131',
+      ]);
     });
 
-    it('marca el sync como FAILED y relanza el error cuando falla el pipeline (Error real)', async () => {
+    // Marcar la corrida como FAILED es responsabilidad de SyncService.ejecutarConRegistro
+    // (probado en sync.service.spec.ts); aquí sólo se verifica que el error se propague.
+    it('propaga el error cuando falla el pipeline (Error real)', async () => {
       const service = createService();
       const err = new Error('fallo de red');
       mockCrawler.retrieveExcelReport.mockRejectedValueOnce(err);
@@ -253,17 +264,10 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         service.createInBulk(new Date(Date.UTC(2024, 0, 1)), new Date(Date.UTC(2024, 0, 31))),
       ).rejects.toThrow('fallo de red');
 
-      expect(mockSync.update).toHaveBeenCalledWith(
-        'sync-id-1',
-        expect.objectContaining({
-          status: SyncStatus.FAILED,
-          errorMessage: 'fallo de red',
-          errorStack: err.stack,
-        }),
-      );
+      expect(mensajesRegistrados).toEqual([]);
     });
 
-    it('usa fallbacks de mensaje/stack cuando se lanza un valor que no es Error', async () => {
+    it('propaga también los valores lanzados que no son Error', async () => {
       const service = createService();
       mockCrawler.retrieveJWT.mockRejectedValueOnce('cadena de error plana');
 
@@ -271,14 +275,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         service.createInBulk(new Date(Date.UTC(2024, 0, 1)), new Date(Date.UTC(2024, 0, 31))),
       ).rejects.toBe('cadena de error plana');
 
-      expect(mockSync.update).toHaveBeenCalledWith(
-        'sync-id-1',
-        expect.objectContaining({
-          status: SyncStatus.FAILED,
-          errorMessage: 'cadena de error plana',
-          errorStack: null,
-        }),
-      );
+      expect(mensajesRegistrados).toEqual([]);
     });
 
     it('un rango dentro de un mismo mes se procesa en una sola descarga', async () => {
@@ -288,7 +285,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       expect(resumen).toEqual({ totalPeriodos: 1, completados: 1, fallidos: [] });
       expect(mockCrawler.retrieveExcelReport).toHaveBeenCalledTimes(1);
-      expect(mockSync.createSyncProcess).toHaveBeenCalledTimes(1);
+      expect(mockSync.ejecutarConRegistro).toHaveBeenCalledTimes(1);
     });
 
     it('parte en tramos mensuales un rango que abarca varios meses, respetando los extremos', async () => {
@@ -310,11 +307,13 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         ['20240401', '20240410'],
       ]);
       // Cada tramo deja su propio registro de sincronización con sus fechas de datos.
-      expect(mockSync.createSyncProcess).toHaveBeenCalledTimes(4);
-      expect(mockSync.createSyncProcess).toHaveBeenNthCalledWith(
+      expect(mockSync.ejecutarConRegistro).toHaveBeenCalledTimes(4);
+      expect(mockSync.ejecutarConRegistro).toHaveBeenNthCalledWith(
         2,
+        SyncSource.VIGIFLOW,
+        'VIGIFLOW_BULK',
+        expect.any(Function),
         expect.objectContaining({
-          name: 'VIGIFLOW_BULK',
           dataStartDate: new Date(Date.UTC(2024, 1, 1, 0, 0, 0, 0)),
           dataEndDate: new Date(Date.UTC(2024, 1, 29, 23, 59, 59, 999)),
         }),
@@ -364,16 +363,13 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       expect(fsPromises.readFile).toHaveBeenCalledWith('/ruta/aefi.xlsx');
       expect(fsPromises.readFile).toHaveBeenCalledWith('/ruta/report.xlsx');
-      expect(mockSync.createSyncProcess).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'VIGIFLOW_BULK_FILE' }),
+      expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
+        SyncSource.VIGIFLOW,
+        'VIGIFLOW_BULK_FILE',
+        expect.any(Function),
+        expect.anything(),
       );
-      expect(mockSync.update).toHaveBeenCalledWith(
-        'sync-id-1',
-        expect.objectContaining({
-          status: SyncStatus.COMPLETED,
-          message: 'Importación VigiFlow desde archivo completada',
-        }),
-      );
+      expect(mensajesRegistrados).toEqual(['Importación VigiFlow desde archivo completada']);
     });
   });
 
@@ -386,13 +382,13 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       await service.createInBulkFromUploadedFiles(Buffer.from('a'), Buffer.from('b'));
 
-      expect(mockSync.createSyncProcess).toHaveBeenCalledWith(
-        expect.objectContaining({ name: 'VIGIFLOW_BULK_UPLOAD' }),
+      expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
+        SyncSource.VIGIFLOW,
+        'VIGIFLOW_BULK_UPLOAD',
+        expect.any(Function),
+        expect.anything(),
       );
-      expect(mockSync.update).toHaveBeenCalledWith(
-        'sync-id-1',
-        expect.objectContaining({ status: SyncStatus.COMPLETED }),
-      );
+      expect(mensajesRegistrados).toEqual(['Importación VigiFlow desde archivo completada']);
     });
   });
 

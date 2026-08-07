@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { SeedService } from './seed.service';
+import { SyncService } from './sync.service';
 import { ReglaHomologacion } from 'src/homologator/entity/regla-homologacion.entity';
 import { Homologador } from 'src/homologator/entity/homologador.entity';
-import { SyncProcess } from '../entity';
 import { Canton } from '../entity/canton.entity';
 import { CatalogoPadre } from '../entity/catalogo-padre.entity';
 import { Establecimiento } from '../entity/establecimiento.entity';
@@ -59,7 +59,13 @@ const mockGravedadEsaviRepo: any = {};
 const mockDesenlaceEsaviRepo: any = {};
 const mockDatoVacunaRepo: any = {};
 const mockDatoVacunacionRepo: any = { manager: { connection: { createQueryRunner: jest.fn() } } };
-const mockSyncProcessRepo: any = { save: jest.fn().mockResolvedValue({}) };
+// El seed ya no escribe la bitácora a mano: delega en SyncService.ejecutarConRegistro.
+const mockSyncService: any = {
+  ejecutarConRegistro: jest.fn(async (_source: string, _name: string, proceso: any) => {
+    const salida = await proceso('seed-sync-id');
+    return salida?.resultado;
+  }),
+};
 const mockCatalogoPadreRepo: any = { findOne: jest.fn(), save: jest.fn(), find: jest.fn() };
 const mockProvinciaRepo: any = { count: jest.fn(), findOne: jest.fn(), save: jest.fn() };
 const mockCantonRepo: any = { count: jest.fn(), findOne: jest.fn(), save: jest.fn(), find: jest.fn() };
@@ -78,7 +84,6 @@ describe('SeedService', () => {
     jest.clearAllMocks();
     process.env.ENV = ORIGINAL_ENV;
 
-    mockSyncProcessRepo.save.mockResolvedValue({});
     mockEstablecimientoRepo.create.mockImplementation((data: any) => ({ ...data }));
     mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(makeQueryRunner());
     mockDatoVacunacionRepo.manager.connection.createQueryRunner.mockReturnValue(makeQueryRunner());
@@ -95,7 +100,7 @@ describe('SeedService', () => {
         { provide: getRepositoryToken(DesenlaceEsavi, 'POSTGRES_INTEGRATOR_DS'), useValue: mockDesenlaceEsaviRepo },
         { provide: getRepositoryToken(DatoVacuna, 'POSTGRES_INTEGRATOR_DS'), useValue: mockDatoVacunaRepo },
         { provide: getRepositoryToken(DatoVacunacion, 'POSTGRES_INTEGRATOR_DS'), useValue: mockDatoVacunacionRepo },
-        { provide: getRepositoryToken(SyncProcess, 'POSTGRES_INTEGRATOR_DS'), useValue: mockSyncProcessRepo },
+        { provide: SyncService, useValue: mockSyncService },
         { provide: getRepositoryToken(CatalogoPadre, 'POSTGRES_INTEGRATOR_DS'), useValue: mockCatalogoPadreRepo },
         { provide: getRepositoryToken(Provincia, 'POSTGRES_INTEGRATOR_DS'), useValue: mockProvinciaRepo },
         { provide: getRepositoryToken(Canton, 'POSTGRES_INTEGRATOR_DS'), useValue: mockCantonRepo },

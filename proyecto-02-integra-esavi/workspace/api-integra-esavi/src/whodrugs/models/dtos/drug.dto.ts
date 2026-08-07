@@ -1,5 +1,4 @@
 import { Drug } from '../drug.entity';
-import { DrugSync } from '../drugSync.entity';
 export interface IDrug {
   id?: string;
   drugName: string;
@@ -7,7 +6,7 @@ export interface IDrug {
   medicinalProductID: number;
   isGeneric: boolean;
   isPreferred: boolean;
-  drugSync: DrugSync;
+  syncId: string;
 }
 
 export interface IDrugPaginated {

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { IntegratorModule } from 'src/integrator/integrator.module';
 import { DatamartController } from './controllers/datamart.controller';
 import { DatamartService } from './services/datamart.service';
 import { DuckDbBuilderService } from './services/duckdb-builder.service';
@@ -14,9 +15,12 @@ import { DuckDbBuilderService } from './services/duckdb-builder.service';
  * No importa ScheduleModule.forRoot(): en este proyecto el scheduler se registra
  * una sola vez (WhodrugsModule) y el @Cron de DatamartService lo descubre el
  * explorer global (mismo patrón que DataqualityModule/VigiflowIntegratorModule).
+ *
+ * Importa IntegratorModule sólo por SyncService: cada generación se registra en
+ * TR_SYNC_PROCESS, igual que las sincronizaciones de WHODrug y MedDRA.
  */
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, IntegratorModule],
   controllers: [DatamartController],
   providers: [DatamartService, DuckDbBuilderService],
   exports: [DatamartService],

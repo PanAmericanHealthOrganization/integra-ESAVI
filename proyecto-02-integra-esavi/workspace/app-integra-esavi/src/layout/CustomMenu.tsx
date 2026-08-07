@@ -117,11 +117,6 @@ sx={{ pl: "16px", minHeight: 48 }}>
             primaryText="WHODrug"
             leftIcon={<MedicationIcon />}
           />
-          <Menu.Item
-            to="/estandar-syncs"
-            primaryText="Sincronizaciones"
-            leftIcon={<SyncIcon />}
-          />
         </SubMenu>
       </Menu>
     </>

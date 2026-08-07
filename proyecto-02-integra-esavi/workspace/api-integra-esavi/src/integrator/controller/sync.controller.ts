@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post, Put } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { CreateSyncDto, SyncDto, UpdateSyncDto } from '../dto/sync.dto';
+import { SyncSource } from '../entity';
 import { SyncService } from '../service';
 /**
  *
@@ -21,6 +22,28 @@ export class SyncController implements IController<CreateSyncDto, SyncDto, Updat
   @Get('getMany')
   public async getMany(@Body() params: IGetManyParams): Promise<SyncDto[]> {
     return this.syncService.getMany(params);
+  }
+
+  /**
+   * Historial de corridas, opcionalmente acotado a una fuente. Es lo que
+   * consultan las pantallas de MedDRA, WHODrug y ESAVIS para mostrar su propia
+   * tabla desde este log único.
+   */
+  @Get('list')
+  @ApiOperation({ summary: 'Historial de sincronizaciones, filtrable por fuente' })
+  @ApiQuery({ name: 'source', required: false, enum: SyncSource })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'size', required: false })
+  public async list(
+    @Query('source') source?: SyncSource,
+    @Query('page') page = 0,
+    @Query('size') size = 10,
+  ): Promise<{ data: SyncDto[]; total: number }> {
+    return this.syncService.getPaginated({
+      pagination: { page: +page + 1, perPage: +size },
+      sort: { field: 'startTime', order: 'DESC' },
+      filter: source ? { source } : {},
+    });
   }
 
   /**

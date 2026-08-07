@@ -13,6 +13,7 @@ import { Dhis2IntegratorService } from './dhis2-integrator.service';
 import { Dhis2ProcessingLogService } from './dhis2-processing-log.service';
 import { Dhis2ProgramStageService } from './dhis2-program-stage.service';
 import { Dhis2ProgramService } from './dhis2-program.service';
+import { SyncService } from 'src/integrator/service/sync.service';
 
 jest.mock('fs');
 
@@ -50,6 +51,14 @@ const mockDuplicateHandlerService = {
   detectDuplicate: jest.fn(),
   handleDuplicate: jest.fn(),
 };
+// DHIS2 pasó a registrar sus importaciones en TR_SYNC_PROCESS; el mock ejecuta el
+// proceso tal como lo hace SyncService.ejecutarConRegistro.
+const mockSyncService = {
+  ejecutarConRegistro: jest.fn(async (_source: string, _name: string, proceso: any) => {
+    const salida = await proceso('dhis2-sync-id');
+    return salida?.resultado;
+  }),
+};
 
 describe('Dhis2IntegratorService', () => {
   let service: Dhis2IntegratorService;
@@ -74,6 +83,7 @@ describe('Dhis2IntegratorService', () => {
         { provide: Dhis2EventsService, useValue: mockDhis2EventsService },
         { provide: Dhis2ProcessingLogService, useValue: mockProcessingLogService },
         { provide: Dhis2DuplicateHandlerService, useValue: mockDuplicateHandlerService },
+        { provide: SyncService, useValue: mockSyncService },
       ],
     }).compile();
     service = module.get<Dhis2IntegratorService>(Dhis2IntegratorService);

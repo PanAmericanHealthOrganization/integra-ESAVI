@@ -1,9 +1,9 @@
-import { DrugSync } from '../drugSync.entity';
 import { IDrugResponse } from '../dtos';
 import { DrugSchemaAdapter } from './drug.build';
 
 describe('DrugSchemaAdapter', () => {
-  const drugSync = { id: 'SYNC-1' } as DrugSync;
+  // Id de la corrida en TR_SYNC_PROCESS: ahora Drug guarda sólo el uuid, sin FK.
+  const syncId = 'a3f1c2d4-0000-4000-8000-000000000001';
 
   const makeDrugResponse = (overrides: Partial<IDrugResponse> = {}): IDrugResponse => ({
     drugCode: 'DRU001',
@@ -19,7 +19,7 @@ describe('DrugSchemaAdapter', () => {
 
   it('arma el drug principal a partir de la respuesta de WHODrug', () => {
     const drugResponse = makeDrugResponse();
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
 
     const { drug, activeIngredients, countryOfSales, atcs } = adapter.getEntities();
 
@@ -31,7 +31,7 @@ describe('DrugSchemaAdapter', () => {
     expect(drug.medicinalProductID).toBe(123);
     expect(drug.isGeneric).toBe(false);
     expect(drug.isPreferred).toBe(true);
-    expect(drug.drugSync).toBe(drugSync);
+    expect(drug.syncId).toBe(syncId);
     expect(activeIngredients).toEqual([]);
     expect(countryOfSales).toEqual([]);
     expect(atcs).toEqual([]);
@@ -50,7 +50,7 @@ describe('DrugSchemaAdapter', () => {
       ],
     });
 
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
     const { drug, activeIngredients, ingredientTranslations } = adapter.getEntities();
 
     expect(activeIngredients).toHaveLength(1);
@@ -68,7 +68,7 @@ describe('DrugSchemaAdapter', () => {
       activeIngredients: [{ ingredient: 'IBUPROFENO' }],
     });
 
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
     const { activeIngredients, ingredientTranslations } = adapter.getEntities();
 
     expect(activeIngredients).toHaveLength(1);
@@ -89,7 +89,7 @@ describe('DrugSchemaAdapter', () => {
       ],
     });
 
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
     const { drug, countryOfSales, maholders } = adapter.getEntities();
 
     expect(countryOfSales).toHaveLength(1);
@@ -109,7 +109,7 @@ describe('DrugSchemaAdapter', () => {
       ],
     });
 
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
     const { drug, atcs } = adapter.getEntities();
 
     expect(atcs).toHaveLength(1);
@@ -135,7 +135,7 @@ describe('DrugSchemaAdapter', () => {
       ],
     });
 
-    const adapter = new DrugSchemaAdapter(drugResponse, drugSync);
+    const adapter = new DrugSchemaAdapter(drugResponse, syncId);
     const entities = adapter.getEntities();
 
     expect(entities.activeIngredients).toHaveLength(2);

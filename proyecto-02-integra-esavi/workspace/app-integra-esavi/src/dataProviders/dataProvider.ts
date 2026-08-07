@@ -57,7 +57,6 @@ export const dataProvider = combineDataProviders((resource) => {
       return noopDataProvider
     case "meddra":
     case "whodrug":
-    case "estandar-syncs":
       return noopDataProvider
     default:
       throw new Error(`Unknown resource: ${resource}`)

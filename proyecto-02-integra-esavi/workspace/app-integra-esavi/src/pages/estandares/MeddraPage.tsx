@@ -22,6 +22,8 @@ import {
 import { TreeItem, TreeView } from "@mui/x-tree-view"
 import { useEffect, useRef, useState } from "react"
 import { Title } from "react-admin"
+import { SincronizarMeddraButton } from "../../components/SyncActions"
+import { SyncPanel } from "../../components/SyncPanel"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -124,6 +126,8 @@ export const MeddraPage = () => {
   const [ptsBySoc, setPtsBySoc] = useState<Record<string, ChildrenState<PT>>>({})
   const [lltsByPt, setLltsByPt] = useState<Record<string, ChildrenState<LLT>>>({})
   const [expandedItems, setExpandedItems] = useState<string[]>([])
+  // Se incrementa al lanzar una sincronización para recargar el historial.
+  const [syncRefresh, setSyncRefresh] = useState(0)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -385,6 +389,32 @@ export const MeddraPage = () => {
           </>
         )}
       </Paper>
+
+      {/* ── Sincronización: el botón y su historial viven junto al diccionario ── */}
+      <Box mt={3}>
+        <SyncPanel
+          title="MedDRA — Historial de Sincronizaciones"
+          source="MEDDRA"
+          icon={<LocalHospitalIcon color="primary" />}
+          refreshKey={syncRefresh}
+          extraColumns={[
+            {
+              header: "Versión",
+              render: (row) =>
+                row.metadata?.version ? (
+                  <Chip
+                    label={`${row.metadata.version} / ${row.metadata.lang ?? "—"}`}
+                    size="small"
+                    variant="outlined"
+                  />
+                ) : (
+                  "—"
+                ),
+            },
+          ]}
+          action={<SincronizarMeddraButton onDone={() => setSyncRefresh((n) => n + 1)} />}
+        />
+      </Box>
     </Box>
   )
 }

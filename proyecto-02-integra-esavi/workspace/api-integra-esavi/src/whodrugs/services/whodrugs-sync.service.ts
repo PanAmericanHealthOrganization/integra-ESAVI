@@ -3,8 +3,8 @@ import {Cron,CronExpression} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
 import {formatDate} from 'date-fns';
 import {createHash} from 'node:crypto';
-import {withAuditOnCreate,withAuditOnUpdate} from 'src/common/utils/audit.util';
-import {Auditoria} from 'src/integrator/entity';
+import {withAuditOnCreate} from 'src/common/utils/audit.util';
+import {Auditoria,SyncSource} from 'src/integrator/entity';
 import {SyncService} from 'src/integrator/service/sync.service';
 import {Repository} from 'typeorm';
 import {QueryDeepPartialEntity} from 'typeorm/query-builder/QueryPartialEntity';
@@ -13,12 +13,9 @@ import {AnatomicalTherapeuticChemical} from '../models/atomicTerapeutalChemical.
 import {DrugSchemaAdapter} from '../models/builders/drug.build';
 import {CountryOfSale} from '../models/countryOfSale.entity';
 import {Drug} from '../models/drug.entity';
-import {DrugSync,DrugSyncBuilder} from '../models/drugSync.entity';
 import {IDrugResponse} from '../models/dtos';
 import {IngredientTranslation} from '../models/ingredientTranslation.entity';
 import {Maholder} from '../models/maholder.entity';
-import {SyncStateEnum} from '../utils/sycnstate.enum';
-import {uuidGenerator} from '../utils/utils';
 import * as cliProgress from 'cli-progress';
 import {WhoDrugsClientService} from './whodrugs-client.service';
 
@@ -32,9 +29,6 @@ export class WhoDrugsSyncService {
 
     @InjectRepository(Drug, 'WHO_DRUG')
     private readonly drugRepository: Repository<Drug>,
-
-    @InjectRepository(DrugSync, 'WHO_DRUG')
-    private readonly drugSyncRepository: Repository<DrugSync>,
 
     @InjectRepository(ActiveIngredient, 'WHO_DRUG')
     private readonly activeIngredientsRepository: Repository<ActiveIngredient>,
@@ -56,47 +50,49 @@ export class WhoDrugsSyncService {
 
   private readonly logger = new Logger(WhoDrugsSyncService.name);
 
-  async listSyncs(page: number, size: number): Promise<{ data: DrugSync[]; total: number }> {
-    const [data, total] = await this.drugSyncRepository.findAndCount({
-      order: { startSyncDate: 'DESC' },
-      skip: page * size,
-      take: size,
-    });
-    return { data, total };
-  }
-
   /**
    * Este método se encarga de sincronizar el json proporcionado por whodrug en la base de datos postgres
    * @returns
    */
   public async sync(): Promise<void> {
-    await this.syncService.ejecutarConRegistro('Sincronización WHODrug', async () => {
-      try {
-        // Obtener la sincronización
-        this.logger.log('Iniciando sincronización, descargando archivo de whodrugs');
-        //
-        const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
-        const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
+    await this.syncService.ejecutarConRegistro(
+      SyncSource.WHODRUG,
+      'Sincronización WHODrug',
+      async (syncId) => {
+        try {
+          // Obtener la sincronización
+          this.logger.log('Iniciando sincronización, descargando archivo de whodrugs');
+          //
+          const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
+          const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
 
-        // Verificar si hay actualizaciones
-        const existe = await this.getDrugSyncBySHA(sha256);
-        if (existe) {
-          return { mensaje: 'Sin cambios: la versión de WHODrug ya se encontraba sincronizada' };
+          // Verificar si hay actualizaciones
+          const existe = await this.existeSincronizacionConSHA(sha256);
+          if (existe) {
+            return {
+              mensaje: 'Sin cambios: la versión de WHODrug ya se encontraba sincronizada',
+              metadata: { sha256, sinCambios: true },
+            };
+          }
+
+          // Procesar la sincronización. El id de la corrida queda estampado en
+          // cada fila del diccionario (Drug.syncId), que es lo que antes hacía
+          // la FK a DRUG_SYNC.
+          this.logger.log(`Sincronización ${syncId} iniciada`);
+          await this.saveDrugs(drugsResponse, syncId);
+          this.logger.log(`Sincronización ${syncId} finalizada`);
+          return {
+            mensaje: `Sincronización WHODrug completada (${drugsResponse?.length ?? 0} medicamentos)`,
+            metadata: { sha256, drugs: drugsResponse?.length ?? 0 },
+          };
+        } catch (e) {
+          this.logger.error(`Error al procesar la sincronización ${e.message}`);
+          throw e;
+        } finally {
+          this.logger.log('Proceso Finalizado');
         }
-
-        // Procesar la sincronización
-        const drugSync = await this.createDrugSync(sha256);
-        this.logger.log(`Syncronización iniciada ${drugSync.id} a las ${drugSync.startSyncDate}`);
-        await this.saveDrugs(drugsResponse, drugSync);
-        this.logger.log(`Syncronización finalizada ${drugSync.id} a las ${drugSync.endSyncDate}`);
-        return { mensaje: `Sincronización WHODrug completada (drug sync ${drugSync.id})` };
-      } catch (e) {
-        this.logger.error(`Error al procesar la sincronización ${e.message}`);
-        throw e;
-      } finally {
-        this.logger.log('Proceso Finalizado');
-      }
-    });
+      },
+    );
   }
 
   /**
@@ -116,7 +112,7 @@ export class WhoDrugsSyncService {
       const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
       const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
 
-      if (await this.getDrugSyncBySHA(sha256)) {
+      if (await this.existeSincronizacionConSHA(sha256)) {
         this.logger.log('No hay nuevas actualizaciones');
         return false;
       }
@@ -136,7 +132,7 @@ export class WhoDrugsSyncService {
    * @param drugs
    * @param drugSync
    */
-  private async saveDrugs(drugs: IDrugResponse[], drugSync: DrugSync): Promise<void> {
+  private async saveDrugs(drugs: IDrugResponse[], syncId: string): Promise<void> {
     await this.disableEntities();
 
     const drugsEntities = [];
@@ -153,7 +149,7 @@ export class WhoDrugsSyncService {
     bar1.start(drugs.length, 1);
     (drugs || []).forEach((drugR, index) => {
       bar1.update(index);
-      const drugAdapter = new DrugSchemaAdapter(drugR, drugSync);
+      const drugAdapter = new DrugSchemaAdapter(drugR, syncId);
       const { drug, activeIngredients, ingredientTranslations, countryOfSales, maholders, atcs } =
         drugAdapter.getEntities();
       drugsEntities.push(drug);
@@ -195,65 +191,24 @@ export class WhoDrugsSyncService {
       atcsEntities,
       AnatomicalTherapeuticChemical.name,
     );
-    //
-    await this.updateDrugSync(drugSync);
-  }
-  /*
-   *
-   */
-  private async createDrugSync(sha256: string): Promise<DrugSync> {
-    try {
-      const drugSync = new DrugSyncBuilder()
-        .setEnabled(true)
-        .setState(true)
-        .setStartSyncDate(new Date())
-        .setId(uuidGenerator(11))
-        .setProccesId(uuidGenerator(11))
-        .setEndSyncDate(null)
-        .setSha256(sha256)
-        .setSyncStatus(SyncStateEnum.STARTED)
-        .build();
-      return await this.drugSyncRepository.save(withAuditOnCreate(drugSync));
-    } catch (e) {
-      this.logger.error(e);
-      throw e;
-    }
   }
 
   /**
+   * ¿Esta descarga ya está sincronizada? El SHA-256 vive ahora como metadato de
+   * la corrida en TR_SYNC_PROCESS (antes en DRUG_SYNC.DRS_SHA_256). Sólo cuentan
+   * las corridas COMPLETED: si una descarga falló a medias, la siguiente debe
+   * volver a intentarla en vez de darla por hecha.
    *
-   * @param drugSync
-   * @returns
+   * Además se exige que el diccionario tenga filas. Antes `truncate()` borraba
+   * DRUG_SYNC junto con los datos, y con ello el SHA; ahora el log vive en otro
+   * esquema y sobrevive al truncado, así que sin esta comprobación una BD vacía
+   * con SHA idéntico se quedaría vacía para siempre.
    */
-  private async updateDrugSync(drugSync: DrugSync) {
-    try {
-      drugSync.endSyncDate = new Date();
-      drugSync.syncStatus = SyncStateEnum.FINISHED;
-      withAuditOnUpdate(drugSync);
-      return await this.drugSyncRepository.save(drugSync);
-    } catch (e) {
-      this.logger.error(e);
-      throw e;
-    } finally {
-      this.logger.log('Sincronización Finalizada');
-    }
-  }
-
-  /**
-   *
-   * @param sha256
-   * @returns
-   */
-  // private async getDrugSyncBySHA(sha256: string): Promise<boolean> {
-  //   return await this.drugSyncRepository.exists({
-  //     where: { sha256: sha256 },
-  //   });
-  // }
-  private async getDrugSyncBySHA(sha256: string): Promise<boolean> {
-    const count = await this.drugSyncRepository.count({
-      where: { sha256: sha256 },
-    });
-    return count > 0; // Devuelve true si hay al menos un registro
+  private async existeSincronizacionConSHA(sha256: string): Promise<boolean> {
+    const corrida = await this.syncService.buscarPorMetadatos(SyncSource.WHODRUG, { sha256 });
+    if (!corrida) return false;
+    const drogasCargadas = await this.drugRepository.count({ where: { isEnabled: true } });
+    return drogasCargadas > 0;
   }
 
   /**
@@ -291,10 +246,6 @@ export class WhoDrugsSyncService {
    * circulación la versión previa, porque todas las consultas del módulo filtran por
    * `isEnabled`/`isActive`. Las filas que sí vienen en la nueva descarga se guardan a
    * continuación con `withAuditOnCreate`, que las deja habilitadas otra vez.
-   *
-   * DRUG_SYNC queda fuera a propósito: es la bitácora de sincronizaciones y su fila en curso
-   * ya fue creada por `createDrugSync`, de modo que incluirla marcaría como inactiva la propia
-   * corrida que está ejecutándose.
    */
   public async disableEntities() {
     this.logger.log('Deshabilitando las entidades de la sincronización anterior');
@@ -315,8 +266,11 @@ export class WhoDrugsSyncService {
   }
 
   /**
-   * Trunca todas las tablas del esquema WHO_DRUG en cascada,
-   * incluyendo DRUG_SYNC para que una nueva sincronización no se omita por SHA repetido.
+   * Trunca todas las tablas del esquema WHO_DRUG en cascada.
+   *
+   * El log de sincronizaciones no se toca: vive en DHI_ESAVI.TR_SYNC_PROCESS y es
+   * histórico. Que la siguiente corrida no se omita por SHA repetido lo garantiza
+   * `existeSincronizacionConSHA`, que exige además que el diccionario tenga filas.
    */
   public async truncate(): Promise<void> {
     this.logger.log('Truncando tablas del esquema WHO_DRUG...');
@@ -329,7 +283,6 @@ export class WhoDrugsSyncService {
       CountryOfSale,
       Maholder,
       AnatomicalTherapeuticChemical,
-      DrugSync,
     ]
       .map((entity) => {
         const metadata = connection.getMetadata(entity);

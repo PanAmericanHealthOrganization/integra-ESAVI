@@ -1,8 +1,7 @@
 import { Auditoria } from 'src/integrator/entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Column, Entity, OneToMany } from 'typeorm';
 import { AnatomicalTherapeuticChemical } from './atomicTerapeutalChemical.entity';
 import { CountryOfSale } from './countryOfSale.entity';
-import { DrugSync } from './drugSync.entity';
 import { IDrug } from './dtos';
 
 /**
@@ -55,11 +54,17 @@ export class Drug extends Auditoria implements IDrug {
   isPreferred: boolean;
 
   /**
-   *
+   * Corrida de TR_SYNC_PROCESS que cargó esta fila. Es una columna simple, sin
+   * FK: TR_SYNC_PROCESS vive en el esquema DHI_ESAVI y en otro datasource de
+   * TypeORM, que no puede declarar la relación aunque físicamente sea la misma
+   * base. Obligatoria: toda fila del diccionario procede de una carga conocida.
    */
-  @ManyToOne(() => DrugSync)
-  @JoinColumn({ name: 'DRS_ID', referencedColumnName: 'id' })
-  drugSync: DrugSync;
+  @Column({
+    name: 'SYNC_ID',
+    type: 'uuid',
+    comment: 'ID de la corrida en DHI_ESAVI.TR_SYNC_PROCESS que cargó esta fila',
+  })
+  syncId: string;
 
   /**
    *

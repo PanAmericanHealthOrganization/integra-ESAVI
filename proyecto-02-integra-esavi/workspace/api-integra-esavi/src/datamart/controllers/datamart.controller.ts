@@ -1,5 +1,8 @@
-import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { DatamartService } from '../services/datamart.service';
 
 /**
@@ -14,6 +17,9 @@ export class DatamartController {
 
   @Post('regenerar')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(KeycloakAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('keycloak-jwt')
   @ApiOperation({
     summary: 'Regenera el archivo DuckDB (esavi.duckdb) que consume el dashboard',
   })

@@ -14,7 +14,6 @@ import {ActiveIngredient} from './models/activeIngredient.entity';
 import {AnatomicalTherapeuticChemical} from './models/atomicTerapeutalChemical.entity';
 import {CountryOfSale} from './models/countryOfSale.entity';
 import {Drug} from './models/drug.entity';
-import {DrugSync} from './models/drugSync.entity';
 import {IngredientTranslation} from './models/ingredientTranslation.entity';
 import {Maholder} from './models/maholder.entity';
 import {ActiveIngredientsService} from './services/activeIngredients.service';
@@ -49,7 +48,6 @@ export const WHODRUGS_DS = 'WHO_DRUG';
         // capturaba entidades de MEDDRA, y ambos datasources apuntan a la misma
         // base, por lo que los dos sincronizaban las mismas tablas a la vez.
         entities: [
-          DrugSync,
           Drug,
           ActiveIngredient,
           IngredientTranslation,
@@ -65,7 +63,7 @@ export const WHODRUGS_DS = 'WHO_DRUG';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature(
-      [DrugSync, Drug, ActiveIngredient, IngredientTranslation, AnatomicalTherapeuticChemical, CountryOfSale, Maholder],
+      [Drug, ActiveIngredient, IngredientTranslation, AnatomicalTherapeuticChemical, CountryOfSale, Maholder],
       WHODRUGS_DS,
     ),
     HttpModule.register({

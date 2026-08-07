@@ -5,7 +5,6 @@ import * as fs from 'fs';
 import * as XLSX from 'xlsx';
 import { SyncService } from 'src/integrator/service/sync.service';
 import { cie10Meddra } from '../models/mapping/cie19meddra.entity';
-import { MeddraSync } from '../models/standar/meddraSync.entity';
 import { LLT } from '../models/standar/llt.entity';
 import { PT } from '../models/standar/pt.entity';
 import { SOC } from '../models/standar/soc.entity';
@@ -14,12 +13,14 @@ import { MeddraProcessFilesService } from './meddra-process.service';
 
 jest.mock('xlsx');
 
+/** Id de la corrida en TR_SYNC_PROCESS que el helper entrega al proceso. */
+const SYNC_ID = 'b7d2e1a0-0000-4000-8000-000000000002';
+
 describe('MeddraProcessFilesService', () => {
   let service: MeddraProcessFilesService;
   let socRepository: any;
   let ptRepository: any;
   let lltRepository: any;
-  let meddraSyncRepository: any;
   let cie10MeddraRepository: any;
   let dataSource: any;
   let syncService: any;
@@ -36,15 +37,17 @@ describe('MeddraProcessFilesService', () => {
     socRepository = { insert: jest.fn(), find: jest.fn() };
     ptRepository = { insert: jest.fn(), find: jest.fn() };
     lltRepository = { insert: jest.fn() };
-    meddraSyncRepository = { save: jest.fn(), update: jest.fn(), findOne: jest.fn() };
     cie10MeddraRepository = { save: jest.fn() };
     dataSource = { createQueryRunner: jest.fn().mockReturnValue(queryRunner) };
     // Por defecto ejecuta el proceso directamente y retorna su "resultado", igual que el SyncService real.
     syncService = {
-      ejecutarConRegistro: jest.fn(async (_name: string, proceso: () => Promise<any>) => {
-        const { resultado } = await proceso();
-        return resultado;
-      }),
+      ejecutarConRegistro: jest.fn(
+        async (_source: string, _name: string, proceso: (syncId: string) => Promise<any>) => {
+          const { resultado } = await proceso(SYNC_ID);
+          return resultado;
+        },
+      ),
+      buscarPorMetadatos: jest.fn().mockResolvedValue(null),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -53,7 +56,6 @@ describe('MeddraProcessFilesService', () => {
         { provide: getRepositoryToken(SOC, 'MEDDRA'), useValue: socRepository },
         { provide: getRepositoryToken(PT, 'MEDDRA'), useValue: ptRepository },
         { provide: getRepositoryToken(LLT, 'MEDDRA'), useValue: lltRepository },
-        { provide: getRepositoryToken(MeddraSync, 'MEDDRA'), useValue: meddraSyncRepository },
         { provide: getRepositoryToken(cie10Meddra, 'MEDDRA'), useValue: cie10MeddraRepository },
         { provide: getDataSourceToken('MEDDRA'), useValue: dataSource },
         { provide: SyncService, useValue: syncService },
@@ -85,21 +87,19 @@ describe('MeddraProcessFilesService', () => {
     });
 
     it('lanza ConflictException si la versión/idioma ya existe', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue({ id: 1 });
+      syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
 
       await expect(service.processVersionFiles('27.0', 'ES', 'desc')).rejects.toThrow(ConflictException);
     });
 
     it('crea el directorio y lanza NotFoundException si no existe', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue(null);
       jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(false);
 
       await expect(service.processVersionFiles('27.0', 'ES', 'desc')).rejects.toThrow(NotFoundException);
       expect(fs.mkdirSync).toHaveBeenCalledWith(expect.any(String), { recursive: true });
     });
 
-    it('procesa SOC, PT y LLT exitosamente y marca la sincronización como FINISHED', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue(null);
+    it('procesa SOC, PT y LLT exitosamente y estampa el id de la corrida en los SOC', async () => {
       jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(true);
       jest.spyOn(MeddraUtils, 'readFileContent').mockImplementation(async (_v, _l, file) => {
         if (file === 'soc.asc') return [['SOC1', 'Nombre SOC', 'ABBR']];
@@ -108,13 +108,11 @@ describe('MeddraProcessFilesService', () => {
         return [];
       });
 
-      meddraSyncRepository.save.mockResolvedValue({ id: 99 });
       socRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
       socRepository.find.mockResolvedValue([{ id: 1, code: 'SOC1', name: 'Nombre SOC' }]);
       ptRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
       ptRepository.find.mockResolvedValue([{ id: 1, code: 'PT1', name: 'Nombre PT', socCode: 'SOC1' }]);
       lltRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
-      meddraSyncRepository.update.mockResolvedValue({ affected: 1 });
 
       const result = await service.processVersionFiles('27.0', 'ES', 'desc');
 
@@ -125,34 +123,28 @@ describe('MeddraProcessFilesService', () => {
       expect(socRepository.insert).toHaveBeenCalledTimes(1);
       expect(ptRepository.insert).toHaveBeenCalledTimes(1);
       expect(lltRepository.insert).toHaveBeenCalledTimes(1);
-      expect(meddraSyncRepository.update).toHaveBeenCalledWith(
-        99,
-        expect.objectContaining({ syncStatus: 'FINISHED' }),
-      );
+      // Cada SOC guarda el uuid de la corrida de TR_SYNC_PROCESS, que es lo que
+      // antes hacía la FK a MED_SYNC.
+      const socsInsertados = socRepository.insert.mock.calls[0][0];
+      expect(socsInsertados[0].syncId).toBe(SYNC_ID);
       expect(result.soc).toHaveLength(1);
       expect(result.pt).toHaveLength(1);
     });
 
-    it('hace rollback y marca la sincronización como ERROR cuando falla el procesamiento', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue(null);
+    it('hace rollback y propaga el error cuando falla el procesamiento', async () => {
       jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(true);
       jest.spyOn(MeddraUtils, 'readFileContent').mockImplementation(async (_v, _l, file) => {
         if (file === 'soc.asc') return [['SOC1', 'Nombre SOC', 'ABBR']];
         return [];
       });
 
-      meddraSyncRepository.save.mockResolvedValue({ id: 5 });
       socRepository.insert.mockRejectedValue(new Error('fallo de insercion'));
-      meddraSyncRepository.update.mockResolvedValue({ affected: 1 });
 
       await expect(service.processVersionFiles('27.0', 'ES', 'desc')).rejects.toThrow('fallo de insercion');
 
       expect(queryRunner.rollbackTransaction).toHaveBeenCalled();
-      expect(meddraSyncRepository.update).toHaveBeenCalledWith(
-        5,
-        expect.objectContaining({ syncStatus: 'ERROR' }),
-      );
       expect(queryRunner.release).toHaveBeenCalled();
+      // El error se propaga al helper, que es quien deja la corrida en FAILED.
     });
   });
 
@@ -192,15 +184,26 @@ describe('MeddraProcessFilesService', () => {
 
   describe('validarVersion', () => {
     it('retorna true si la versión/idioma ya está registrada', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue({ id: 1 });
+      syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
 
       expect(await service.validarVersion('27.0', 'ES')).toBe(true);
     });
 
     it('retorna false si la versión/idioma no existe', async () => {
-      meddraSyncRepository.findOne.mockResolvedValue(null);
+      syncService.buscarPorMetadatos.mockResolvedValue(null);
 
       expect(await service.validarVersion('27.0', 'ES')).toBe(false);
+    });
+
+    it('consulta el log único por los metadatos version/lang de la fuente MEDDRA', async () => {
+      syncService.buscarPorMetadatos.mockResolvedValue(null);
+
+      await service.validarVersion('27.0', 'ES');
+
+      expect(syncService.buscarPorMetadatos).toHaveBeenCalledWith('MEDDRA', {
+        version: '27.0',
+        lang: 'ES',
+      });
     });
   });
 });

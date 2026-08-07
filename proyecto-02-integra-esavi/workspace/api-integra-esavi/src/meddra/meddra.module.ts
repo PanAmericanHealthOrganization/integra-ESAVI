@@ -9,7 +9,6 @@ import {MeddraController} from './controllers/meddra.controller';
 import {MeddraLltController} from './controllers/meddra.llt.controller';
 import {MeddraPtController} from './controllers/meddra.pt.controller';
 import {MeddraSocController} from './controllers/meddra.soc.controller';
-import {MeddraSyncController} from './controllers/meddra.sync.controller';
 import {MeddraVersionController} from './controllers/meddra.version.controller';
 import {cie10Meddra} from './models/mapping/cie19meddra.entity';
 import {MappingDefinition} from './models/mapping/mappingDefinition.entity';
@@ -17,7 +16,6 @@ import {Mappings} from './models/mapping/mappings.entity';
 import {MeddraQuery} from './models/meddraquerys.entity';
 import {CIE10ES} from './models/standar/cie_10_meddra.entity';
 import {LLT} from './models/standar/llt.entity';
-import {MeddraSync} from './models/standar/meddraSync.entity';
 import {PT} from './models/standar/pt.entity';
 import {SOC} from './models/standar/soc.entity';
 import {MeddraClientService} from './services/meddra-client.service';
@@ -27,7 +25,6 @@ import {MeddraProcessFilesService} from './services/meddra-process.service';
 import {MeddraPtService} from './services/meddra-pt.service';
 import {MeddraSocService} from './services/meddra-soc.service';
 import {MeddraStandarService} from './services/meddra-standar.service';
-import {MeddraSyncService} from './services/meddra-sync.service';
 
 export const MEDDRA_DS = 'MEDDRA';
 @Module({
@@ -47,7 +44,7 @@ export const MEDDRA_DS = 'MEDDRA';
         // Clases explícitas en lugar de globs: 'dist/**/models/*.entity' también
         // capturaba las entidades de WHO_DRUG, y ambos datasources apuntan a la
         // misma base, por lo que los dos sincronizaban las mismas tablas a la vez.
-        entities: [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
+        entities: [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES],
         schema: 'MEDDRA',
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
         poolSize: 5,
@@ -57,7 +54,7 @@ export const MEDDRA_DS = 'MEDDRA';
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature(
-      [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
+      [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES],
       MEDDRA_DS,
     ),
     HttpModule,
@@ -70,7 +67,6 @@ export const MEDDRA_DS = 'MEDDRA';
     MeddraSocService,
     MeddraPtService,
     MeddraLLTService,
-    MeddraSyncService,
   ],
   controllers: [
     MeddraController,
@@ -78,7 +74,6 @@ export const MEDDRA_DS = 'MEDDRA';
     MeddraSocController,
     MeddraPtController,
     MeddraLltController,
-    MeddraSyncController,
   ],
   exports: [MeddraSocService, MeddraPtService, MeddraLLTService, MeddraStandarService],
 })

@@ -1,6 +1,8 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { DrugSync } from '../models/drugSync.entity';
+import { Controller, Delete, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { WhoDrugsAsAnyService } from '../services/whodrugasany.service';
 import { WhoDrugsSyncService } from '../services/whodrugs-sync.service';
 
@@ -15,21 +17,17 @@ export class WhodrugsSyncController {
     private readonly whoDrugAsAnyService: WhoDrugsAsAnyService,
   ) {}
 
-  @Get('/list')
-  @ApiOperation({ summary: 'Lista el historial de sincronizaciones de WHODrug' })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'size', required: false })
-  public async listSyncs(
-    @Query('page') page = 0,
-    @Query('size') size = 10,
-  ): Promise<{ data: DrugSync[]; total: number }> {
-    return this.whoDrugsSincService.listSyncs(+page, +size);
-  }
+  // El historial de sincronizaciones ya no vive aquí: todas las fuentes se
+  // registran en DHI_ESAVI.TR_SYNC_PROCESS y se consultan en
+  // GET /v1/integrator/syncs/list?source=WHODRUG
 
   /**
    *
    */
   @Post('/sync')
+  @UseGuards(KeycloakAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('keycloak-jwt')
   @ApiOperation({
     summary: 'Dispara el proceso de sincronización de whodrugs,',
     description:
@@ -44,6 +42,9 @@ export class WhodrugsSyncController {
    */
   @Delete('/truncate')
   @HttpCode(HttpStatus.OK)
+  @UseGuards(KeycloakAuthGuard, RolesGuard)
+  @Roles('admin')
+  @ApiBearerAuth('keycloak-jwt')
   @ApiOperation({
     summary: 'Trunca todas las tablas del esquema WHO_DRUG (TRUNCATE CASCADE)',
     description:

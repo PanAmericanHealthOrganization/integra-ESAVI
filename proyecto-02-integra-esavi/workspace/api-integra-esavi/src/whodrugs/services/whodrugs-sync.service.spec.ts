@@ -5,18 +5,19 @@ import { ActiveIngredient } from '../models/activeIngredient.entity';
 import { AnatomicalTherapeuticChemical } from '../models/atomicTerapeutalChemical.entity';
 import { CountryOfSale } from '../models/countryOfSale.entity';
 import { Drug } from '../models/drug.entity';
-import { DrugSync } from '../models/drugSync.entity';
 import { IDrugResponse } from '../models/dtos';
 import { IngredientTranslation } from '../models/ingredientTranslation.entity';
 import { Maholder } from '../models/maholder.entity';
 import { WhoDrugsClientService } from './whodrugs-client.service';
 import { WhoDrugsSyncService } from './whodrugs-sync.service';
 
+/** Id de la corrida en TR_SYNC_PROCESS que el helper entrega al proceso. */
+const SYNC_ID = 'a3f1c2d4-0000-4000-8000-000000000001';
+
 describe('WhoDrugsSyncService', () => {
   let service: WhoDrugsSyncService;
   let whoDrugsClientService: any;
   let drugRepository: any;
-  let drugSyncRepository: any;
   let activeIngredientsRepository: any;
   let ingredientTranslationRepository: any;
   let countrySaleRepository: any;
@@ -38,15 +39,26 @@ describe('WhoDrugsSyncService', () => {
 
   beforeEach(async () => {
     whoDrugsClientService = { getDrugs: jest.fn() };
-    drugRepository = { save: jest.fn(), createQueryBuilder: jest.fn(), manager: { connection: {} } };
-    drugSyncRepository = { save: jest.fn(), count: jest.fn(), findAndCount: jest.fn(), createQueryBuilder: jest.fn() };
+    drugRepository = {
+      save: jest.fn(),
+      count: jest.fn().mockResolvedValue(0),
+      createQueryBuilder: jest.fn(),
+      manager: { connection: {} },
+    };
     activeIngredientsRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
     ingredientTranslationRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
     countrySaleRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
     anatomicalTherapeuticChemicalRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
     maholderRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
-    // Ejecuta el proceso directamente y propaga el resultado (equivalente a SyncService real).
-    syncService = { ejecutarConRegistro: jest.fn(async (_name: string, proceso: () => Promise<any>) => proceso()) };
+    // Ejecuta el proceso directamente y propaga el resultado (equivalente a SyncService real),
+    // pasándole el id de la corrida como hace el helper real.
+    syncService = {
+      ejecutarConRegistro: jest.fn(
+        async (_source: string, _name: string, proceso: (syncId: string) => Promise<any>) =>
+          (await proceso(SYNC_ID))?.resultado,
+      ),
+      buscarPorMetadatos: jest.fn().mockResolvedValue(null),
+    };
 
     // Todas las llamadas a createQueryBuilder() usadas en disableEntities/updateEntitiesStates
     const chainable: any = {
@@ -58,7 +70,6 @@ describe('WhoDrugsSyncService', () => {
     };
     [
       drugRepository,
-      drugSyncRepository,
       activeIngredientsRepository,
       ingredientTranslationRepository,
       countrySaleRepository,
@@ -71,7 +82,6 @@ describe('WhoDrugsSyncService', () => {
         WhoDrugsSyncService,
         { provide: WhoDrugsClientService, useValue: whoDrugsClientService },
         { provide: getRepositoryToken(Drug, 'WHO_DRUG'), useValue: drugRepository },
-        { provide: getRepositoryToken(DrugSync, 'WHO_DRUG'), useValue: drugSyncRepository },
         { provide: getRepositoryToken(ActiveIngredient, 'WHO_DRUG'), useValue: activeIngredientsRepository },
         { provide: getRepositoryToken(IngredientTranslation, 'WHO_DRUG'), useValue: ingredientTranslationRepository },
         { provide: getRepositoryToken(CountryOfSale, 'WHO_DRUG'), useValue: countrySaleRepository },
@@ -98,14 +108,34 @@ describe('WhoDrugsSyncService', () => {
   // ─── sync ────────────────────────────────────────────────────────────────
 
   describe('sync', () => {
-    it('no procesa nada si el SHA-256 ya está sincronizado (sin cambios)', async () => {
+    it('no procesa nada si el SHA-256 ya está sincronizado y el diccionario tiene datos', async () => {
       whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
-      drugSyncRepository.count.mockResolvedValue(1);
+      syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
+      drugRepository.count.mockResolvedValue(5000);
 
       await service.sync();
 
-      expect(drugSyncRepository.save).not.toHaveBeenCalled();
       expect(drugRepository.save).not.toHaveBeenCalled();
+    });
+
+    it('vuelve a sincronizar si el SHA-256 coincide pero el diccionario quedó vacío tras un truncate', async () => {
+      // El log de sincronizaciones vive en otro esquema y sobrevive al TRUNCATE de
+      // WHO_DRUG: sin la comprobación de filas, la base se quedaría vacía para siempre.
+      whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
+      syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
+      drugRepository.count.mockResolvedValue(0);
+      [
+        drugRepository,
+        activeIngredientsRepository,
+        ingredientTranslationRepository,
+        countrySaleRepository,
+        maholderRepository,
+        anatomicalTherapeuticChemicalRepository,
+      ].forEach((repo) => repo.save.mockImplementation((entities) => Promise.resolve(entities)));
+
+      await service.sync();
+
+      expect(drugRepository.save).toHaveBeenCalled();
     });
 
     it('sincroniza y guarda todas las entidades cuando hay una nueva versión', async () => {
@@ -119,8 +149,7 @@ describe('WhoDrugsSyncService', () => {
         atcs: [{ code: 'J07BM03', text: 'HPV vaccine', officialFlag: 'Y' }],
       });
       whoDrugsClientService.getDrugs.mockResolvedValue([drugResponse]);
-      drugSyncRepository.count.mockResolvedValue(0);
-      drugSyncRepository.save.mockImplementation((entity) => Promise.resolve({ ...entity, id: 'SYNC-1' }));
+      syncService.buscarPorMetadatos.mockResolvedValue(null);
       drugRepository.save.mockImplementation((entities) => Promise.resolve(entities));
       activeIngredientsRepository.save.mockImplementation((entities) => Promise.resolve(entities));
       ingredientTranslationRepository.save.mockImplementation((entities) => Promise.resolve(entities));
@@ -136,10 +165,10 @@ describe('WhoDrugsSyncService', () => {
       expect(countrySaleRepository.save).toHaveBeenCalled();
       expect(maholderRepository.save).toHaveBeenCalled();
       expect(anatomicalTherapeuticChemicalRepository.save).toHaveBeenCalled();
-      // Se guarda dos veces el DrugSync: al crearlo y al finalizarlo (FINISHED)
-      expect(drugSyncRepository.save).toHaveBeenCalledTimes(2);
-      const finalSyncSave = drugSyncRepository.save.mock.calls[1][0];
-      expect(finalSyncSave.syncStatus).toBe('FINISHED');
+      // Cada fila del diccionario queda estampada con el id de la corrida, que es
+      // lo que antes hacía la FK a DRUG_SYNC.
+      const drugsGuardados = drugRepository.save.mock.calls[0][0];
+      expect(drugsGuardados[0].syncId).toBe(SYNC_ID);
     });
 
     it('propaga el error si falla la descarga de WHODrug', async () => {
@@ -154,14 +183,15 @@ describe('WhoDrugsSyncService', () => {
   describe('existNewVersion', () => {
     it('retorna true si hay una nueva versión disponible', async () => {
       whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
-      drugSyncRepository.count.mockResolvedValue(0);
+      syncService.buscarPorMetadatos.mockResolvedValue(null);
 
       expect(await service.existNewVersion()).toBe(true);
     });
 
     it('retorna false si no hay cambios', async () => {
       whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
-      drugSyncRepository.count.mockResolvedValue(1);
+      syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
+      drugRepository.count.mockResolvedValue(5000);
 
       expect(await service.existNewVersion()).toBe(false);
     });
@@ -170,24 +200,6 @@ describe('WhoDrugsSyncService', () => {
       whoDrugsClientService.getDrugs.mockRejectedValue(new Error('parámetro no configurado'));
 
       expect(await service.existNewVersion()).toBe(false);
-    });
-  });
-
-  // ─── listSyncs ───────────────────────────────────────────────────────────
-
-  describe('listSyncs', () => {
-    it('retorna la lista paginada con skip/take y orden DESC', async () => {
-      const data = [{ id: 'SYNC-1' }];
-      drugSyncRepository.findAndCount.mockResolvedValue([data, 1]);
-
-      const result = await service.listSyncs(1, 20);
-
-      expect(drugSyncRepository.findAndCount).toHaveBeenCalledWith({
-        order: { startSyncDate: 'DESC' },
-        skip: 20,
-        take: 20,
-      });
-      expect(result).toEqual({ data, total: 1 });
     });
   });
 
@@ -227,12 +239,6 @@ describe('WhoDrugsSyncService', () => {
       expect(countrySaleRepository.createQueryBuilder).toHaveBeenCalled();
       expect(maholderRepository.createQueryBuilder).toHaveBeenCalled();
       expect(anatomicalTherapeuticChemicalRepository.createQueryBuilder).toHaveBeenCalled();
-    });
-
-    it('no deshabilita DRUG_SYNC: la fila de la corrida en curso ya está creada', async () => {
-      await service.disableEntities();
-
-      expect(drugSyncRepository.createQueryBuilder).not.toHaveBeenCalled();
     });
 
     it('ejecuta el update apagando isEnabled/isActive, no las propiedades inexistentes', async () => {

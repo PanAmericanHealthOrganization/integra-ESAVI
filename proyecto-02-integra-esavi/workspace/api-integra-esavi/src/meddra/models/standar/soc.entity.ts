@@ -1,6 +1,5 @@
 import { Auditoria } from 'src/integrator/entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { MeddraSync } from './meddraSync.entity';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'MED_SOC', schema: 'MEDDRA' })
 export class SOC extends Auditoria {
@@ -131,9 +130,15 @@ export class SOC extends Auditoria {
   jart_code: string;
 
   /**
-   *
+   * Corrida de TR_SYNC_PROCESS que cargó esta fila. Es una columna simple, sin
+   * FK: TR_SYNC_PROCESS vive en el esquema DHI_ESAVI y en otro datasource de
+   * TypeORM, que no puede declarar la relación aunque físicamente sea la misma
+   * base. Obligatoria: toda fila del diccionario procede de una carga conocida.
    */
-  @ManyToOne(() => MeddraSync)
-  @JoinColumn({ name: 'SYNC_ID', referencedColumnName: 'id' })
-  meddraSync: MeddraSync;
+  @Column({
+    name: 'SYNC_ID',
+    type: 'uuid',
+    comment: 'ID de la corrida en DHI_ESAVI.TR_SYNC_PROCESS que cargó esta fila',
+  })
+  syncId: string;
 }
