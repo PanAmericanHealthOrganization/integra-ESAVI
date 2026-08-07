@@ -8,7 +8,7 @@ import { Between, DataSource, Equal, Repository } from 'typeorm';
 import { HistoryQualityDto, DimensionCalidadDatosDto, IDataQualityDimensions, QualityDto } from '../controllers/dto';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { convertirAHistoryQualityDto } from '../utils/dataQualityUtils';
-import { DimCompletitudService } from './dim-completitud';
+import { DimCompletitudService } from './dim-completitud.service';
 import { DimConsistenciaService } from './dim-consitencia';
 import { DimExactitudService } from './dim-exactitud.service';
 

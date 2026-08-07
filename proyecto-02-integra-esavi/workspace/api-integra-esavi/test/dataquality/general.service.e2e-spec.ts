@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
 import { DataQualityDimensions } from '../../src/dataquality/entities/dataQualityDimensions.entity';
-import { DimCompletitudService } from '../../src/dataquality/services/dim-completitud';
+import { DimCompletitudService } from '../../src/dataquality/services/dim-completitud.service';
 import { DimConsistenciaService } from '../../src/dataquality/services/dim-consitencia';
 import { DimExactitudService } from '../../src/dataquality/services/dim-exactitud.service';
 import { GeneralService } from '../../src/dataquality/services/general.service';

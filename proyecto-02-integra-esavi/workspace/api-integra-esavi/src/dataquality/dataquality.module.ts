@@ -5,7 +5,7 @@ import { dataSourceFactory } from 'src/utils/ensure-schemas.util';
 import { DataqualityMaintenanceController } from './controllers/dataquality-maintenance.controller';
 import { DataqualityController } from './controllers/dataquality.controller';
 import { DataQualityDimensions } from './entities/dataQualityDimensions.entity';
-import { DimCompletitudService } from './services/dim-completitud';
+import { DimCompletitudService } from './services/dim-completitud.service';
 import { DimConsistenciaService } from './services/dim-consitencia';
 import { DimExactitudService } from './services/dim-exactitud.service';
 import { GeneralService } from './services/general.service';

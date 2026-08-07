@@ -4,7 +4,7 @@ import { getDataSourceToken, getRepositoryToken } from '@nestjs/typeorm';
 import { GeneralService } from './general.service';
 import { DimConsistenciaService } from './dim-consitencia';
 import { DimExactitudService } from './dim-exactitud.service';
-import { DimCompletitudService } from './dim-completitud';
+import { DimCompletitudService } from './dim-completitud.service';
 import { DataQualityDimensions } from '../entities/dataQualityDimensions.entity';
 import { DIMENSION_CALIDAD } from '../controllers/dto';
 
