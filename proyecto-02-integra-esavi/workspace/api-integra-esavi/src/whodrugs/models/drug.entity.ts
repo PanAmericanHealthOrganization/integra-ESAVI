@@ -1,6 +1,5 @@
 import { Auditoria } from 'src/integrator/entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
-import { encriptionTransformer } from '../utils/whodrug.encript';
 import { AnatomicalTherapeuticChemical } from './atomicTerapeutalChemical.entity';
 import { CountryOfSale } from './countryOfSale.entity';
 import { DrugSync } from './drugSync.entity';
@@ -24,22 +23,17 @@ export class Drug extends Auditoria implements IDrug {
   })
   id: string;
 
-  /**
-   *
-   */
-  @Column({
-    name: 'DRU_NAME',
-    transformer: encriptionTransformer,
-  })
+  // DRU_NAME y DRU_CODE se guardaban cifradas (AES-256-CBC) con un transformer. Se retiró el
+  // cifrado: son datos públicos del diccionario WHODrug —no información sensible de pacientes—
+  // y cifrarlas impedía filtrar e indexar en SQL, obligando a hidratar la tabla completa en
+  // memoria para cualquier búsqueda por nombre.
+  @Column({ name: 'DRU_NAME' })
   drugName: string;
 
   /**
    *
    */
-  @Column({
-    name: 'DRU_CODE',
-    transformer: encriptionTransformer,
-  })
+  @Column({ name: 'DRU_CODE' })
   drugCode: string;
 
   /**

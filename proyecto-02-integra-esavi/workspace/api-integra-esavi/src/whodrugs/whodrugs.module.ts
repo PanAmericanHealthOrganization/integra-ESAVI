@@ -6,7 +6,6 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {IntegratorModule} from 'src/integrator/integrator.module';
 import {SettingsModule} from 'src/settings/settings.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
-import {AutoEncryptSubscriber} from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
 import {ActiveIngredientController} from './controllers/activeingredents.controller';
 import {MaholderController} from './controllers/maholder.controller';
 import {WhodrugsController} from './controllers/whodrugs.controller';
@@ -59,7 +58,6 @@ export const WHODRUGS_DS = 'WHO_DRUG';
           Maholder,
         ],
         synchronize: configService.get<string>('ENV') === 'DEV',
-        subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
       dataSourceFactory: dataSourceFactory(['WHO_DRUG']),

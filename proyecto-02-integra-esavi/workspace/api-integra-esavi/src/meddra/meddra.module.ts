@@ -5,7 +5,6 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {IntegratorModule} from 'src/integrator/integrator.module';
 import {SettingsModule} from 'src/settings/settings.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
-import {AutoEncryptSubscriber} from 'typeorm-encrypted/lib/subscribers/AutoEncryptSubscriber';
 import {MeddraController} from './controllers/meddra.controller';
 import {MeddraLltController} from './controllers/meddra.llt.controller';
 import {MeddraPtController} from './controllers/meddra.pt.controller';
@@ -51,7 +50,6 @@ export const MEDDRA_DS = 'MEDDRA';
         entities: [MeddraQuery, LLT, PT, SOC, MappingDefinition, Mappings, cie10Meddra, CIE10ES, MeddraSync],
         schema: 'MEDDRA',
         synchronize: configService.get<string>('ENV') === 'DEV' ? true : false,
-        subscribers: [AutoEncryptSubscriber],
         poolSize: 5,
       }),
       dataSourceFactory: dataSourceFactory(['MEDDRA']),

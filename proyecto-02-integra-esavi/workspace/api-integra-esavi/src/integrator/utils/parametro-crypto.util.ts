@@ -30,7 +30,7 @@ export function encryptValue(plainText: string): string {
   const key = getMasterKey();
   const iv = randomBytes(IV_LENGTH);
   // `as any`: @types/node modela Buffer como Uint8Array<ArrayBufferLike>, incompatible en
-  // strict mode con el CipherKey/BinaryLike esperado (mismo workaround que typeorm-encrypted).
+  // strict mode con el CipherKey/BinaryLike que espera createCipheriv.
   const cipher = (createCipheriv as any)(ALGORITHM, key, iv);
   const encrypted = Buffer.concat([cipher.update(plainText, 'utf8'), cipher.final()]);
   return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString('base64');

@@ -93,8 +93,8 @@ export class IngredientTranslationService {
     }
 
     //Paso 1: obtener los DRUG.ID cuyo principio activo tiene la traducción buscada.
-    //DRU_NAME y DRU_CODE están cifrados en BD (encriptionTransformer), por lo que la
-    //búsqueda se hace por columnas no cifradas y las lecturas via repositorio (descifra al hidratar).
+    //La búsqueda arranca por el ingrediente y no por DRU_NAME porque el dato de entrada es el
+    //principio activo. DRU_NAME y DRU_CODE ya no se cifran, así que también admiten filtro SQL.
     const traducciones = await this.ingredientTranslationRepository.find({
       select: { id: true, activeIngredient: { id: true, drug: { id: true } } },
       where: {
