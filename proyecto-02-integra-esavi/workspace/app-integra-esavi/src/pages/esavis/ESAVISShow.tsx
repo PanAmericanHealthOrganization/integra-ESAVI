@@ -276,14 +276,16 @@ const TabPaciente = () => {
     if (!record?.id || !mujer) return
     setLoadingEmb(true)
     Promise.all([
-      intESAVIClient.get(`/integrator/notificacion/${record.id}/paciente-embarazada`),
+      // TR_PACIENTE_EMBARAZADA se unificó en TR_ANTECEDENTES_EMBARAZO: el endpoint
+      // /paciente-embarazada ya no existe y antecedente-embarazo trae ahora tanto el estado
+      // (momentoVacuna, momentoEsavi) como los datos clínicos del embarazo.
       intESAVIClient.get(`/integrator/notificacion/${record.id}/antecedente-embarazo`),
       // VigiFlow registra el embarazo en TR_ESAVI_DURANTE_EMBARAZO; DHIS2 en TR_ANTECEDENTES_EMBARAZO.
       intESAVIClient.get(`/integrator/notificacion/${record.id}/embarazo-esavi`),
     ])
-      .then(([resEmb, resAnt, resEsavi]) => {
-        setEmbarazada(resEmb.data ?? null)
+      .then(([resAnt, resEsavi]) => {
         const antArr = Array.isArray(resAnt.data) ? resAnt.data : resAnt.data ? [resAnt.data] : []
+        setEmbarazada(antArr[0] ?? null)
         const esaviArr = Array.isArray(resEsavi.data) ? resEsavi.data : resEsavi.data ? [resEsavi.data] : []
         // Prevalece el bloque de embarazo durante el ESAVI cuando existe.
         setAntecedente(esaviArr[0] ?? antArr[0] ?? null)
@@ -515,7 +517,9 @@ const TabVacunacion = () => {
               <Paper variant="outlined" sx={{ p: 2 }} key={v.id ?? idx}>
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1 }}>
                   <Typography variant="subtitle2" fontWeight={600}>
-                    Vacuna {idx + 1}{v.drugName ? ` — ${v.drugName}` : ""}
+                    {/* DRUG_NAME es ahora exclusivamente el nombre WHODrug: si la vacuna no se
+                        homologó queda vacío y se usa el nombre con que fue reportada. */}
+                    Vacuna {idx + 1}{v.drugName || v.nombreVacunaReportado ? ` — ${v.drugName ?? v.nombreVacunaReportado}` : ""}
                   </Typography>
                   <Tooltip title="Ver detalle completo" arrow>
                     <IconButton size="small" color="primary" onClick={() => setVacunaDetalle(v)}>
@@ -524,7 +528,8 @@ const TabVacunacion = () => {
                   </Tooltip>
                 </Box>
                 <Box sx={{ display: "flex", gap: 2, overflowX: "auto" }}>
-                  <FieldCell label="Nombre (WHODrug)" value={v.nombreVacPatenteWHODrug ?? v.drugName} />
+                  <FieldCell label="Nombre (WHODrug)" value={v.drugName} />
+                  <FieldCell label="Nombre reportado" value={v.nombreVacunaReportado} />
                   <FieldCell label="Fabricante" value={v.maHolder ?? v.nombreFabricante ?? v.nombreFabricanteWhoDrug} />
                   <FieldCell label="N° Lote" value={v.numeroLote} />
                   <FieldCell label="N° Dosis" value={v.numeroDosisVacuna} />
@@ -646,12 +651,13 @@ const TabEsavi = () => {
       <Datagrid bulkActionButtons={false} rowClick={false}>
         <FunctionField
           label="Evento adverso"
-          // NOMBRE_ESAVI ya no se puebla desde VigiFlow: el término clínico está en
-          // NOMBRE_ESAVI_REPORTADO (LLT MedDRA en español).
+          // Se muestra primero el término estandarizado: NOMBRE_ESAVI ahora guarda el LLT
+          // MedDRA homologado en ambos orígenes. NOMBRE_ESAVI_REPORTADO queda como respaldo
+          // para los eventos que no lograron homologarse.
           render={(rec: any) => (
             <Box>
               <Typography variant="body2" fontWeight={600}>
-                {rec.nombreReportado ?? rec.nameLLT ?? rec.nombre ?? "—"}
+                {rec.nombre ?? rec.nameLLT ?? rec.nombreReportado ?? "—"}
               </Typography>
             </Box>
           )}

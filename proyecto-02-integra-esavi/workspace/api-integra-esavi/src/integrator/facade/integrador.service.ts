@@ -17,7 +17,6 @@ import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { MedicamentoService } from '../service/medicamento.service';
 import { NotificacionDhis2Service } from '../service/notificacion-dhis2.service';
 import { NotificacionVigiflowService } from '../service/notificacion-vigiflow.service';
-import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { PacienteService } from '../service/paciente.service';
 import { InvestigacionService } from '../service/investigacion.service';
 
@@ -38,7 +37,6 @@ export class IntegradorService {
     private readonly embarazoEsaviService: EmbarazoEsaviService,
     private readonly gravedadEsaviService: GravedadEsaviService,
     private readonly datoVacunaService: DatoVacunaService,
-    private readonly pacienteEmbarazadaService: PacienteEmbarazadaServive,
     private readonly datoVacunacionService: DatoVacunacionService,
     private readonly datoEsaviService: DatoEsaviService,
     private readonly investigacionService: InvestigacionService,
@@ -119,9 +117,8 @@ export class IntegradorService {
     if (createDto.desenlaceEsavi) {
       await intentar('desenlaceEsavi', () => this.desenlaceEsaviService.create(notificacion, createDto.desenlaceEsavi));
     }
-    if (createDto.pacienteEmbarazada) {
-      await intentar('pacienteEmbarazada', () => this.pacienteEmbarazadaService.create(notificacion, createDto.pacienteEmbarazada));
-    }
+    // pacienteEmbarazada se eliminó: TR_PACIENTE_EMBARAZADA se unificó en
+    // TR_ANTECEDENTES_EMBARAZO, que ya se procesa arriba con antecedenteEmbarazo.
     if (createDto.gravedadEsavi) {
       await intentar('gravedadEsavi', () => this.gravedadEsaviService.create(notificacion, createDto.gravedadEsavi));
     }

@@ -95,7 +95,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     matchYGrabarEstablecimiento: jest.fn().mockResolvedValue(undefined),
   };
   const mockNotificador = {
-    createOrUpdateFromVigiflow: jest.fn().mockResolvedValue({ id: 'notificador-1' }),
+    createOrUpdate: jest.fn().mockResolvedValue({ id: 'notificador-1' }),
   };
   const mockMedicamento = {
     preloadByNotificacionIds: jest.fn().mockResolvedValue(undefined),
@@ -468,7 +468,9 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(createDto.datoVacuna.numeroDosisVacuna).toBe(2);
       expect(createDto.datoVacuna.nombreDiluyenteVacuna).toBe('Diluyente X');
       expect(createDto.datoVacuna.numeroLoteDiluyente).toBe('LOTE-DIL-9');
-      expect(createDto.pacienteEmbarazada.momentoEsavi).toBe('1');
+      // TR_PACIENTE_EMBARAZADA se unificó en TR_ANTECEDENTES_EMBARAZO: ambas eran 1:1 con la
+      // notificación y describían el mismo hecho partido en dos.
+      expect(createDto.antecedenteEmbarazo.momentoEsavi).toBe('1');
       expect(createDto.source).toBe('VIGIFLOW');
 
       expect(mockDatoVacuna.clearDatoVacunaCache).toHaveBeenCalled();
@@ -582,8 +584,12 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
   describe('extractedFromJsonReportToUpdate (hoja Reportes)', () => {
     it('detecta dinámicamente la columna de organización y actualiza notificación + notificador + establecimiento', async () => {
       const service = createService();
-      const notificacion = { id: 'n-1', origenOriginal: { reportadoPor: 'Dr X' } };
-      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-001' }]);
+      const notificacion = { id: 'n-1' };
+      // El snapshot crudo dejó de duplicarse en TR_NOTIFICACION: vive solo en
+      // TR_PACIENTE.PAYLOAD_ORIGEN, así que el nombre del notificador se lee del paciente.
+      mockPaciente.findAll.mockResolvedValueOnce([
+        { id: 1, codigoOrigen: 'EC-001', payloadOrigen: { reportadoPor: 'Dr X' } },
+      ]);
       mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-001', [notificacion]]]));
 
       const headerRow = rowFromCols({ K: 'Organización (Emisor)' });
@@ -614,7 +620,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         }),
         { id: 'notificador-1' },
       );
-      expect(mockNotificador.createOrUpdateFromVigiflow).toHaveBeenCalledWith('12345', 'MEDICO', 'Dr X');
+      expect(mockNotificador.createOrUpdate).toHaveBeenCalledWith('12345', 'MEDICO', 'Dr X');
       expect(mockNotifVigiflow.matchYGrabarEstablecimiento).toHaveBeenCalledWith('n-1', 'Hospital ABC');
       expect(mockNotifVigiflow.preloadBulk).toHaveBeenCalled();
       expect(mockNotifVigiflow.clearBulkCache).toHaveBeenCalled();
@@ -648,7 +654,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       const notificacion = { id: 'n-3', origenOriginal: {} };
       mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-003' }]);
       mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-003', [notificacion]]]));
-      mockNotificador.createOrUpdateFromVigiflow.mockRejectedValueOnce(new Error('boom'));
+      mockNotificador.createOrUpdate.mockRejectedValueOnce(new Error('boom'));
       const dataRow = rowFromCols({ G: 'EC-003', W: '999' });
       const wb = sheetAt(1, [[], dataRow]);
 
@@ -788,7 +794,6 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         notificacion,
         expect.objectContaining({
           inicioAdministracion: new Date(Date.UTC(2023, 0, 1)),
-          finAdministracion: new Date(Date.UTC(2023, 0, 2)),
         }),
       );
       expect(mockDatoVacuna.createByNotificacion).toHaveBeenCalledWith(
@@ -948,10 +953,11 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDatoEsavi.createVigiflow).toHaveBeenCalledTimes(2);
       const [notifArg1, dto1] = mockDatoEsavi.createVigiflow.mock.calls[0];
       expect(notifArg1.id).toBe('n-1');
-      // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (col D), que viene en español,
-      // y no del texto libre del notificador (col C), habitualmente en inglés.
-      expect(dto1.nombreReportado).toBe('FIEBRE');
-      expect(dto1.nombre).toBeUndefined();
+      // Semántica corregida: NOMBRE_ESAVI guarda el término estandarizado (LLT MedDRA, col D) y
+      // NOMBRE_ESAVI_REPORTADO el texto libre del notificador (col C). Antes ambos valores
+      // caían en el campo "reportado" y NOMBRE_ESAVI quedaba siempre vacío.
+      expect(dto1.nombre).toBe('FIEBRE');
+      expect(dto1.nombreReportado).toBe('REPORTADO1');
       expect(dto1.namePT).toBe('PYREXIA');
       expect(dto1.fechaEsavi).toEqual(new Date(Date.UTC(2023, 0, 1)));
       expect(dto1.duracion).toBe('5 dias');
@@ -960,7 +966,10 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(dto1.codigoEsaviCie10).toBe('R50.9');
       expect(dto1.CTPTMEDDRA_ID).toBe('PT1');
       expect(dto1.codigoPT).toBe('PTCODE1');
-      expect(dto1.codigoCaso).toBe('CASE-1');
+      // COGIDO_CASO se retiró de TR_DATOS_ESAVI: era una copia del código de la notificación
+      // repetida en cada evento. El caso se identifica por la FK NOTIFICACION_ID.
+      expect(dto1.codigoCaso).toBeUndefined();
+      expect(dto1.tipoRegistro).toBe('REACCION');
 
       // El estado final se consolida una sola vez por notificación, priorizando severidad:
       // 'Recuperado' (1) vs 'En tratamiento' (0 desconocido) → gana 1.

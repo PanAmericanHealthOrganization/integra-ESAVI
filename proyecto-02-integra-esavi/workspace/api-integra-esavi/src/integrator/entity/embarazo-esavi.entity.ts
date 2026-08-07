@@ -78,21 +78,22 @@ export class EmbarazoEsavi extends Auditoria {
   @JoinColumn({ name: 'NOTIFICACION_ID' })
   notificacion: Notificacion;
 
-  //TODO: ralopez, aplicar clean-code
+  // Las propiedades se renombraron a camelCase; los nombres de columna no cambian.
   @Column({
     name: 'CODIGOMEDDRACOMPLICACIONEMBARAZOESAVI',
     length: 16,
     nullable: true,
     comment: 'Código MedDRA de la complicación del embarazo durante el ESAVI',
   })
-  CODIGOMEDDRACOMPLICACIONEMBARAZOESAVI: string;
+  codigoMeddraComplicacion: string;
+
   @Column({
     name: 'OTROSCODIGOSCOMPLICACIONEMBARAZOESAVI',
     length: 16,
     nullable: true,
     comment: 'Otros códigos de complicación del embarazo durante el ESAVI',
   })
-  OTROSCODIGOSCOMPLICACIONEMBARAZOESAVI: string;
+  otrosCodigosComplicacion: string;
 
   @BeforeInsert()
   beforeInsert() {

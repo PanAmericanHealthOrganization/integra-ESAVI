@@ -6,6 +6,7 @@ import {CreateDatoVacunaDto,UpdateDatoVacunaDto} from '../dto';
 import {DatoVacuna} from '../entity/dato-vacuna.entity';
 import {DatoVacunacion} from '../entity/dato-vacunacion.entity';
 import {Notificacion} from '../entity/notificacion.entity';
+import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoPadreService} from './catalogo-padre.service';
 
@@ -113,14 +114,15 @@ export class DatoVacunaService {
       });
 
       if (existingDatoVacuna) {
-        const { rolVacuna, ...otherFields } = createDto;
+        const { rolVacuna, origen: _origen, ...otherFields } = createDto;
         if (rolVacuna) {
           existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
         }
         Object.assign(existingDatoVacuna, otherFields);
         return this.datoVacunaRepository.save(existingDatoVacuna);
       } else {
-        const nuevoDatoVacuna = plainToClass(DatoVacuna, createDto);
+        const { origen: _origenNuevo, ...camposNuevos } = createDto;
+        const nuevoDatoVacuna = plainToClass(DatoVacuna, camposNuevos);
         if (createDto.rolVacuna) {
           nuevoDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, createDto.rolVacuna);
         }
@@ -151,23 +153,28 @@ export class DatoVacunaService {
       const datoVacunaArray: DatoVacuna[] = [];
 
       for (const dto of createDtos) {
+        const { origen: _origenDto, ...camposDto } = dto;
         const datoVacuna = plainToClass(DatoVacuna, {
           createdBy: process.env.USUARIO_INSERTA_REGISTRO,
-          ...dto,
+          ...camposDto,
         });
         if (dto.rolVacuna) {
           datoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, dto.rolVacuna);
         }
         datoVacuna.datoVacunacion = datoVacunacion;
 
-        let existingDatoVacuna: DatoVacuna | null;
+        let existingDatoVacuna: DatoVacuna | null = null;
         if (dto.codigoAtc) {
           existingDatoVacuna = this.datoVacunaCompletoCache !== null
             ? (this.datoVacunaCompletoCache.get(datoVacunacion.id)?.get(dto.codigoAtc) ?? null)
             : await this.datoVacunaRepository.findOne({
                 where: { datoVacunacion: { id: datoVacunacion.id }, codigoAtc: dto.codigoAtc },
               });
-        } else {
+        }
+        if (!existingDatoVacuna) {
+          // Respaldo necesario desde que DHIS2 también deriva CODIGO_ATC vía WHODrug: sus
+          // registros históricos se guardaron con ATC nulo, así que buscar solo por ATC no
+          // los encontraría y cada reimport crearía un duplicado.
           existingDatoVacuna = this.datoVacunaMinimoCache !== null
             ? (this.datoVacunaMinimoCache.get(datoVacunacion.id)?.[0] ?? null)
             : await this.datoVacunaRepository.findOne({
@@ -176,19 +183,26 @@ export class DatoVacunaService {
         }
 
         if (existingDatoVacuna) {
-          const { rolVacuna, ...otherFields } = dto;
+          // `origen` es solo de transporte: indica la estrategia de mezcla, no es una columna.
+          // El origen de un dato de vacuna ya se conoce por la notificación a la que cuelga
+          // (TR_NOTIFICACION.ORIGEN); duplicarlo aquí sería repetir el problema que se está
+          // corrigiendo en otras tablas.
+          const { rolVacuna, origen: _origen, ...otherFields } = dto;
           if (rolVacuna) {
             existingDatoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
           }
-          if (dto.codigoAtc) {
-            // Origen VigiFlow (identificado por codigoAtc): se pisan todos los campos tal cual.
+          // La estrategia de mezcla depende del origen, no de la presencia del ATC. Antes se
+          // infería con `if (dto.codigoAtc)` bajo el supuesto de que solo VigiFlow traía ATC;
+          // ese supuesto dejó de ser cierto al homologar también las vacunas de DHIS2.
+          if (dto.origen === SourceEnum.VIGIFLOW) {
+            // VigiFlow es la fuente autoritativa de su propio registro: se pisa tal cual.
             Object.assign(existingDatoVacuna, otherFields);
           } else {
-            // Origen DHIS2 (sin codigoAtc): antes solo se refrescaba numeroDosisVacuna
-            // y el resto de campos (fabricante, lote, vía de administración, etc.)
-            // quedaban congelados con el valor de la primera importación en
-            // cualquier reimport posterior. Se actualiza cada campo presente en el
-            // DTO, sin pisar con null/undefined lo que ya hay guardado.
+            // DHIS2: antes solo se refrescaba numeroDosisVacuna y el resto de campos
+            // (fabricante, lote, vía de administración, etc.) quedaban congelados con el
+            // valor de la primera importación en cualquier reimport posterior. Se actualiza
+            // cada campo presente en el DTO, sin pisar con null/undefined lo que ya hay
+            // guardado.
             Object.keys(otherFields).forEach((key) => {
               if (otherFields[key] !== undefined && otherFields[key] !== null) {
                 existingDatoVacuna[key] = otherFields[key];
@@ -352,8 +366,12 @@ export class DatoVacunaService {
    */
   async update(uuid: string, vacunaDto: UpdateDatoVacunaDto): Promise<DatoVacuna> {
     const datoVacuna = await this.findOne(uuid);
-    const { rolVacuna, nombreVacPatenteWHODrug, ...otherFields } = vacunaDto;
-    
+    // nombreVacPatenteWHODrug se descartaba aquí porque la entidad no tenía columna donde
+    // guardarlo. Ahora existe NOMBRE_VACUNA_REPORTADO, así que el nombre reportado viaja en
+    // otherFields y se persiste como cualquier otro campo.
+    const { rolVacuna, ...otherFields } = vacunaDto;
+
+
     if (rolVacuna) {
       datoVacuna.rolVacuna = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud(CODIGO_PADRE_ROL_VACUNA, rolVacuna);
     }

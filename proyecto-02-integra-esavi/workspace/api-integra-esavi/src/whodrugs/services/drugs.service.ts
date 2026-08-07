@@ -66,6 +66,29 @@ export class DrugService {
     };
   }
 
+  /**
+   * Devuelve el código ATC oficial de un medicamento. Un medicamento puede tener varios ATC;
+   * se prefiere el marcado como oficial (OFFICIALFLAG) y, si no hay ninguno, el primero.
+   *
+   * Lo usa el integrador DHIS2 para poblar CODIGO_ATC, que antes solo llegaba desde VigiFlow
+   * porque su Excel ya trae la columna "Código(s) ATC". DHIS2 no la entrega, así que el código
+   * se deriva del medicamento homologado contra WHODrug.
+   */
+  public async getAtcCodeOfDrug(drugId: string): Promise<string | null> {
+    if (!drugId) return null;
+
+    const drug = await this.drugRepository.findOne({
+      where: { id: drugId },
+      relations: { anatomicalTherapeuticChemical: true },
+    });
+
+    const atcs = drug?.anatomicalTherapeuticChemical ?? [];
+    if (atcs.length === 0) return null;
+
+    const oficial = atcs.find((atc) => `${atc.officialFlag}`.toUpperCase() === 'Y');
+    return (oficial ?? atcs[0]).code ?? null;
+  }
+
   public async getDrugsOnly(drugName: string, _country: string, _atcCode?: string): Promise<any[]> {
     const drugPartial = await this.drugRepository.find({
       select: {

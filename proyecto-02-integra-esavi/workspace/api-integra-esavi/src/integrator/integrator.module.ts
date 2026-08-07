@@ -19,7 +19,6 @@ import {IntegradorController} from './controller/integrador.controller';
 import {InvestigacionController} from './controller/investigacion.controller';
 import {NotificacionController} from './controller/notificacion.controller';
 import {NotificadorController} from './controller/notificador.controller';
-import {PacienteEmbarazadaController} from './controller/paciente-embarazada.controller';
 import {PacienteVigiflowController} from './controller/paciente-vigiflow.controller';
 import {PacienteController} from './controller/paciente.controller';
 import {ParametroController} from './controller/parametro.controller';
@@ -47,10 +46,8 @@ import {
   Notificacion,
   Notificador,
   Paciente,
-  PacienteEmbarazada,
   Parametro,
   SyncProcess,
-  Vacunacion,
   Vacunometro,
 } from './entity';
 import {Canton} from './entity/canton.entity';
@@ -77,7 +74,6 @@ import {
   NotificacionDhis2Service,
   NotificacionService,
   NotificacionVigiflowService,
-  PacienteEmbarazadaServive,
   ParametroService,
   ReporteService,
   SeedService,
@@ -137,9 +133,7 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
         Notificacion,
         Notificador,
         Paciente,
-        PacienteEmbarazada,
         Parametro,
-        Vacunacion,
         Vacunometro,
         SyncProcess,
         Gaceta,
@@ -166,7 +160,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     PacienteVigiflowController,
     NotificacionController,
     ReporteController,
-    PacienteEmbarazadaController,
     DatoEsaviController,
     AntecedenteEmbarazoController,
     SeedController,
@@ -204,7 +197,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     ParametroService,
     IntegradorService,
     ReporteService,
-    PacienteEmbarazadaServive,
     DatoEsaviService,
     AntecedenteEmbarazoService,
     SeedService,
@@ -226,7 +218,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     DatoVacunaService,
     DatoVacunacionService,
     ReporteService,
-    PacienteEmbarazadaServive,
     DatoEsaviService,
     AntecedenteEmbarazoService,
     VacunometroService,

@@ -25,7 +25,6 @@ export { CreateCtSymptom2lltDto, UpdateCtSymptom2lltDto } from './ct-symptom2llt
 export { CreateWhodrugHomologaVacsDto, UpdateWhodrugHomologavacsDto } from './whodrug-homologavacs.dto';
 export { CreateWhodrugVacsTempDto, UpdateWhodrugVacsTempDto } from './whodrug-vacstemp.dto';
 export { CreateCompleteDto } from './create-complete.dto';
-export { CreatePacienteEmbarazadaDto } from './create-paciente-embarazada.dto';
 export { CreatePacienteDhis2Dto } from './create-paciente-dhis2.dto';
 export { CreatePacienteVigiflowDto } from './create-paciente-vigiflow.dto';
 export { UbicacionDto } from './ubicacion.dto';

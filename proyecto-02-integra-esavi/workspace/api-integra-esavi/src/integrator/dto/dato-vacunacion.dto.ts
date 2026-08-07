@@ -12,8 +12,9 @@ export class CreateDatoVacunacionDto {
   fechaReconstitucion: Date;
   horaConstitucion: Date;
   usuarioCreacion: string;
+  /** Respaldo de fechaVacunacion cuando el origen no la entrega. */
   inicioAdministracion: Date;
-  finAdministracion: Date;
+  // finAdministracion se retiró: FIN_ADMINISTRACION se eliminó de TR_DATO_VACUNACION.
 }
 
 export class UpdateDatoVacunacionDto extends PartialType(CreateDatoVacunacionDto) {}

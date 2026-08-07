@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToClass } from 'class-transformer';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { CreateDatoEsaviDto, UpdateDatoEsaviDto } from '../dto';
 import { DatoEsavi } from '../entity/dato-esavi.entity';
 import { DatoVacuna } from '../entity/dato-vacuna.entity';
@@ -28,11 +28,17 @@ export class DatoEsaviService {
       // Verificar si ya existe un DatoEsavi con los mismos datos
       const notificacionExistente = new Notificacion();
       notificacionExistente.id = notificacion.id;
+      // La identidad de un evento es (notificación, fecha, término). Se comparan los dos
+      // nombres porque NOMBRE_ESAVI queda null cuando VigiFlow no alcanzó a codificar la
+      // reacción; sin NOMBRE_ESAVI_REPORTADO en la clave, todos los eventos sin codificar de
+      // una misma fecha colapsarían en un solo registro.
       const existingDatoEsavi = await this.datoEsaviRepository.findOne({
         where: {
           notificacion: notificacionExistente,
           fechaEsavi: createDto.fechaEsavi,
-          nombre: createDto.nombre,
+          nombre: createDto.nombre ?? IsNull(),
+          nombreReportado: createDto.nombreReportado ?? IsNull(),
+          tipoRegistro: createDto.tipoRegistro ?? IsNull(),
         },
       });
 
@@ -144,13 +150,19 @@ export class DatoEsaviService {
         });
         datoEsavi.notificacion = notificacion;
 
-        // Buscar si ya existe un DatoEsavi con la misma notificación, fechaEsavi y nombre
+        // Identidad del evento: notificación + fecha + término + bloque de la ficha.
+        // TIPO_REGISTRO_ESAVI sustituye al antiguo DESCRIPCION en la clave y sigue siendo
+        // necesario: un mismo término en la misma fecha puede aparecer como diagnóstico
+        // inicial y como diagnóstico final, y son dos registros legítimos.
+        // Se comparan los dos nombres porque NOMBRE_ESAVI queda null cuando el evento no
+        // logró homologarse contra MedDRA.
         const existingDatoEsavi = await this.datoEsaviRepository.findOne({
           where: {
             notificacion: { id: notificacion.id },
             fechaEsavi: dto.fechaEsavi,
-            nombre: dto.nombre,
-            descripcion: dto.descripcion,
+            nombre: dto.nombre ?? IsNull(),
+            nombreReportado: dto.nombreReportado ?? IsNull(),
+            tipoRegistro: dto.tipoRegistro ?? IsNull(),
           },
         });
 

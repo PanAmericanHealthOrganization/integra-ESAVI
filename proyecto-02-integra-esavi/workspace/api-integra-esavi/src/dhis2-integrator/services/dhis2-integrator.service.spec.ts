@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import * as fs from 'fs';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
+import { DrugService } from 'src/whodrugs/services/drugs.service';
+import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DuplicateAction, ProcessingStatus } from '../dto';
 import { Dhis2DuplicateHandlerService } from './dhis2-duplicate-handler.service';
@@ -22,6 +24,14 @@ const mockMeddraLltService = {
   buscarPorSimilitud: jest.fn(),
 };
 const mockMeddraPtService = {};
+// Homologación WHODrug de las vacunas de DHIS2: antes solo la hacía el integrador VigiFlow.
+const mockDrugService = {
+  getDrugsOnly: jest.fn().mockResolvedValue([]),
+  getAtcCodeOfDrug: jest.fn().mockResolvedValue(null),
+};
+const mockMaholderService = {
+  getMaholderOfDrug: jest.fn().mockResolvedValue([]),
+};
 const mockDhis2ProgramService = {};
 const mockDhis2ProgramStageService = {};
 const mockDhis2EventsService = {
@@ -57,6 +67,8 @@ describe('Dhis2IntegratorService', () => {
         { provide: IntegradorService, useValue: mockIntegradorService },
         { provide: MeddraLLTService, useValue: mockMeddraLltService },
         { provide: MeddraPtService, useValue: mockMeddraPtService },
+        { provide: DrugService, useValue: mockDrugService },
+        { provide: MaholderService, useValue: mockMaholderService },
         { provide: Dhis2ProgramService, useValue: mockDhis2ProgramService },
         { provide: Dhis2ProgramStageService, useValue: mockDhis2ProgramStageService },
         { provide: Dhis2EventsService, useValue: mockDhis2EventsService },

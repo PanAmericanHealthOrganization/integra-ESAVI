@@ -1,10 +1,19 @@
 import {PartialType} from "@nestjs/swagger";
+import {SourceEnum} from '../enum/source-enum';
 
 export class CreateDatoVacunaDto {
+  /**
+   * Origen del registro. Es explícito a propósito: antes la estrategia de mezcla en un
+   * reimport se decidía por la presencia de `codigoAtc` ("si tiene ATC es VigiFlow"), lo que
+   * dejaba de ser cierto en cuanto DHIS2 también empezó a poblar el ATC vía WHODrug.
+   */
+  origen: SourceEnum;
   codigoAtc: string;
   rolVacuna: string;
   sistemaDeCodificacion: string;
-  nombreVacPatenteWHODrug: string;
+  /** Nombre original de la fuente, sin homologar. Persiste en NOMBRE_VACUNA_REPORTADO. */
+  nombreVacunaReportado: string;
+  /** Nombre estandarizado WHODrug. Null si la homologación no encontró coincidencia. */
   drugName: string;
   drugCode: string;
   maHolderJsonb: any;
@@ -26,7 +35,6 @@ export class CreateDatoVacunaDto {
   numeroLoteDiluyente: string;
   fechaVencimientoDiluyente: Date;
   paisAutorizacionIso3Code: string;
-  duracion: string;
   formaFarmaceutica: string;
   formaFarmaceuticaEDQM: string;
   viaAdministracion: string;

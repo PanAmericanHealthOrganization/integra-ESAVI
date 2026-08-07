@@ -13,7 +13,6 @@ import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
 import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
-import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { InvestigacionService } from '../service/investigacion.service';
@@ -41,7 +40,6 @@ const mockDesenlaceEsaviService = { create: jest.fn() };
 const mockEmbarazoEsaviService = { create: jest.fn() };
 const mockGravedadEsaviService = { create: jest.fn() };
 const mockDatoVacunaService = { create: jest.fn(), createByNotificacion: jest.fn() };
-const mockPacienteEmbarazadaService = { create: jest.fn() };
 const mockDatoVacunacionService = { create: jest.fn() };
 const mockDatoEsaviService = { create: jest.fn() };
 const mockInvestigacionService = { create: jest.fn() };
@@ -68,7 +66,6 @@ describe('IntegradorService', () => {
         { provide: EmbarazoEsaviService, useValue: mockEmbarazoEsaviService },
         { provide: GravedadEsaviService, useValue: mockGravedadEsaviService },
         { provide: DatoVacunaService, useValue: mockDatoVacunaService },
-        { provide: PacienteEmbarazadaServive, useValue: mockPacienteEmbarazadaService },
         { provide: DatoVacunacionService, useValue: mockDatoVacunacionService },
         { provide: DatoEsaviService, useValue: mockDatoEsaviService },
         { provide: InvestigacionService, useValue: mockInvestigacionService },

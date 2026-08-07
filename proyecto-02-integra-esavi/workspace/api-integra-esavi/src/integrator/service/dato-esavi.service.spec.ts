@@ -52,10 +52,10 @@ describe('DatoEsaviService', () => {
       const result = await service.createVigiflow(notificacion, {
         fechaEsavi: new Date('2021-01-01'),
         nombre: 'Fiebre',
-        descripcion: 'actualizado',
+        nombreReportado: 'FIEBRE ALTA',
       } as any);
 
-      expect(result.descripcion).toBe('actualizado');
+      expect(result.nombreReportado).toBe('FIEBRE ALTA');
       expect(result.notificacion).toEqual(notificacion);
     });
 

@@ -43,7 +43,7 @@ export class CreateNotificacionDto {
   ultimaEdicionRegistrada: string;
   codigoUnidadSalud: string;
   monitorioEstablecimientoSalud: number;
-  origenOriginal: Record<string, any>;
+  // origenOriginal se retiró: el snapshot crudo se guarda una sola vez, en el DTO de paciente.
   constructor() {
     this.residenciaNotificador = new UbicacionDto();
     this.residenciaPaciente = new UbicacionDto();

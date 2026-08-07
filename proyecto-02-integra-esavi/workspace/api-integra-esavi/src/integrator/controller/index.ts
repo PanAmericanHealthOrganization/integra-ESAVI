@@ -9,7 +9,6 @@ export * from './integrador.controller';
 export * from './notificacion.controller';
 export * from './notificador.controller';
 export * from './paciente-dhis2.controller';
-export * from './paciente-embarazada.controller';
 export * from './paciente-vigiflow.controller';
 export * from './reporte.controller';
 export * from './seed.controller';

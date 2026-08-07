@@ -117,26 +117,20 @@ export class DatoVacunacion extends Auditoria {
   horaReconstitucion: Date;
 
   /**
-   *
+   * Se conserva únicamente como respaldo de FECHA_VACUNACION: cuando el origen no entrega la
+   * fecha de vacunación, este es el único dato que sitúa el acto vacunal en el tiempo, y sin él
+   * no se puede calcular el intervalo vacunación–inicio de síntomas.
+   * FIN_ADMINISTRACION se eliminó: una vacuna no tiene duración de administración relevante
+   * para el análisis y el campo no se usaba en ningún indicador.
    */
   @Column({
     name: 'INICIO_ADMINISTRACION',
     type: 'timestamptz',
     nullable: true,
-    comment: 'Fecha y hora de inicio de administración de la vacuna',
+    comment:
+      'Fecha y hora de inicio de administración de la vacuna. Respaldo de FECHA_VACUNACION cuando el origen no la entrega; para el análisis se usa FECHA_VACUNACION.',
   })
   inicioAdministracion: Date;
-
-  /**
-   *
-   */
-  @Column({
-    name: 'FIN_ADMINISTRACION',
-    type: 'timestamptz',
-    nullable: true,
-    comment: 'Fecha y hora de fin de administración de la vacuna',
-  })
-  finAdministracion: Date;
 
   /**
    *

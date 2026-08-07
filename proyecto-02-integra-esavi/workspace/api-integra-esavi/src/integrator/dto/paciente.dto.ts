@@ -30,8 +30,9 @@ export class CreatePacienteDto {
   @IsOptional()
   fechaNacimiento: Date;
 
+  /** Snapshot del registro crudo de la fuente. Persiste en TR_PACIENTE.PAYLOAD_ORIGEN. */
   @IsOptional()
-  origenOriginal: Record<string, any>;
+  payloadOrigen: Record<string, any>;
 }
 
 export class UpdatePacienteDto extends PartialType(CreatePacienteDto) {}

@@ -29,7 +29,7 @@ import {
   CreateGravedadEsaviDto,
   CreateMedicamentoDto,
   CreateNotificacionDto,
-  CreatePacienteEmbarazadaDto,
+  CreateAntecedenteEmbarazoDto,
   CreatePacienteVigiflowDto,
   UbicacionDto,
   UpdateDatoVacunaDto,
@@ -37,6 +37,7 @@ import {
 } from '../../integrator/dto';
 import { InvestigacionCreateDto } from '../../integrator/entity/investigacion.entity';
 import { SourceEnum } from '../../integrator/enum/source-enum';
+import { TipoRegistroEsaviEnum } from '../../integrator/enum/tipo-registro-esavi.enum';
 import { IntegradorService } from '../../integrator/facade/integrador.service';
 import { DesenlaceEsaviService } from '../../integrator/service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../../integrator/service/embarazo-esavi.service';
@@ -50,16 +51,10 @@ import { PacienteService } from '../../integrator/service/paciente.service';
 import { VigiflowUtils } from '../utils/vigiflow-utils.module';
 import { VigiflowCrawlerService } from './vigiflow-crawler.service';
 
-const profesiones = [
-  'AUXILIAR',
-  'ENFERMERA',
-  'ESTUDIANTE',
-  'FARMACEUTICO',
-  'INTERNO',
-  'MEDICO',
-  'CONSUMIDOR U OTRO PROFESIONAL',
-  'OTRO PROFESIONAL DE LA SALUD',
-];
+// La lista fija de profesiones se eliminó: filtraba el valor de VigiFlow contra 8 literales
+// antes de homologarlo, así que cualquier profesión fuera de esa lista se perdía aunque sí
+// existiera en el catálogo. La homologación es ahora única para ambos orígenes y se resuelve
+// en NotificadorService contra TC_CATALOGO_PADRE (código OCUPACION).
 
 //--- Registrar idiomas
 countries.registerLocale(enLocale);
@@ -414,7 +409,10 @@ export class VigiflowIntegradorService {
           continue;
         }
 
-        const origenOriginal = {
+        // El snapshot crudo se guarda una sola vez, en TR_PACIENTE.PAYLOAD_ORIGEN. Antes este
+        // mismo objeto se asignaba también a notificacion.origenOriginal, duplicando en
+        // TR_NOTIFICACION un contenido que es enteramente demográfico del paciente.
+        paciente.payloadOrigen = {
           iniciales: reg['C'] ?? null,
           identificacion: reg['E'] ?? null,
           sexo: reg['F'] ?? null,
@@ -423,11 +421,9 @@ export class VigiflowIntegradorService {
           unidadEdad: reg['I'] ?? null,
           reportadoPor: reg['AB'] ? reg['AB'].toString().trim() : null,
         };
-        paciente.origenOriginal = origenOriginal;
 
         // Create Notificacion
         const notificacion = new CreateNotificacionDto();
-        notificacion.origenOriginal = origenOriginal;
         const fechaNacimiento = VigiflowUtils.analizarCadenaFecha(reg['G']?.toString());
         if (fechaNacimiento) {
           notificacion.fechaNacimiento = fechaNacimiento;
@@ -525,7 +521,9 @@ export class VigiflowIntegradorService {
         datoVacunaDto.numeroLoteDiluyente = reg['R'] ? reg['R'].toString().trim() : null;
 
         //Paciente Embarazada
-        const embarazada = new CreatePacienteEmbarazadaDto();
+        // El estado de embarazo pasó de TR_PACIENTE_EMBARAZADA a TR_ANTECEDENTES_EMBARAZO,
+        // donde ya vivían los datos clínicos del embarazo (ambas eran 1:1 con la notificación).
+        const embarazada = new CreateAntecedenteEmbarazoDto();
         const esEmbarazada = reg['J'] && VigiflowUtils.eliminarTildes(reg['J']).toLowerCase().includes('si');
         embarazada.momentoEsavi = esEmbarazada ? '1' : '0';
 
@@ -544,7 +542,7 @@ export class VigiflowIntegradorService {
         //al inicio del bucle, así que aquí todo caso tiene al menos una vacuna en Medicamentos.
         create.datoVacuna = datoVacunaDto;
         if (esEmbarazada) {
-          create.pacienteEmbarazada = embarazada;
+          create.antecedenteEmbarazo = embarazada;
         }
         create = { ...create, ...auditoria };
 
@@ -608,7 +606,7 @@ export class VigiflowIntegradorService {
           updateNotificacion.id = notificacion.id;
           updateNotificacion.casoNarrativo = reg['AC'];
           const profesionNotificador = reg['AQ'] && VigiflowUtils.obtenerPrimerComentario(reg['AQ']);
-          updateNotificacion.profesionNotificadorParam = VigiflowUtils.encontrarCoincidencia(profesionNotificador, profesiones);
+          updateNotificacion.profesionNotificadorParam = profesionNotificador || null;
           updateNotificacion.tipoReporte = reg['N'];
           const fechaRecepcionInicial = VigiflowUtils.analizarCadenaFecha(reg['J']?.toString());
           updateNotificacion.fechaNotificacion = fechaRecepcionInicial;
@@ -617,13 +615,14 @@ export class VigiflowIntegradorService {
           updateNotificacion.tipoEmisor = reg['F'] ? reg['F'].toString().trim() : null;
           // PESO y ALTURA se retiraron de TR_NOTIFICACION por no ser variables priorizadas.
 
-          // Crear/actualizar notificador: identificacion=col W, nombres=origenOriginal.reportadoPor (AEFI AB)
+          // Crear/actualizar notificador: identificacion=col W, nombres=payloadOrigen.reportadoPor (AEFI AB).
+          // El snapshot se lee del paciente: dejó de duplicarse en la notificación.
           let notificador = null;
           const especialistaId = reg['W']?.toString().trim();
           if (especialistaId) {
             try {
-              const nombresNotificador = notificacion.origenOriginal?.reportadoPor ?? null;
-              notificador = await this.notificadorService.createOrUpdateFromVigiflow(especialistaId, profesionNotificador, nombresNotificador);
+              const nombresNotificador = paciente.payloadOrigen?.reportadoPor ?? null;
+              notificador = await this.notificadorService.createOrUpdate(especialistaId, profesionNotificador, nombresNotificador);
             } catch (error) {
               this.logger.warn(`No se pudo registrar notificador ${especialistaId}: ${error.message}`);
             }
@@ -742,16 +741,19 @@ export class VigiflowIntegradorService {
           // create() tiene lógica upsert: actualiza si ya existe, crea si no existe.
           const dtoDatoVacunacion = new CreateDatoVacunacionDto();
           dtoDatoVacunacion.inicioAdministracion = VigiflowUtils.formatoFecha(reg['W']?.toString());
-          dtoDatoVacunacion.finAdministracion = VigiflowUtils.formatoFecha(reg['X']?.toString());
+          // FIN_ADMINISTRACION (col X) se dejó de mapear: la columna se eliminó por no aportar
+          // valor al análisis.
           await this.datoVacunacionService.create(notificacion, dtoDatoVacunacion);
 
           //Este fragmento no solo actualiza registros, también crea nuevos registros de datoVacuna
           //cuando es necesario (ver datoVacunaService al final del bloque).
           const updateDatoVacuna = new UpdateDatoVacunaDto();
+          updateDatoVacuna.origen = SourceEnum.VIGIFLOW;
           // ACCION_TOMADA, INTERVALO_DOSIFICACION y DOSIS_DE_APLICACION se retiraron de
           // TR_DATO_VACUNA por no ser variables priorizadas para el análisis.
           updateDatoVacuna.dosis = reg['S'];
-          updateDatoVacuna.duracion = reg['V'];
+          // DURACION_TRATAMIENTO (col V) se dejó de mapear: la columna se retiró de
+          // TR_DATO_VACUNA por no aportar valor al análisis.
           updateDatoVacuna.formaFarmaceutica = reg['Y'];
           updateDatoVacuna.formaFarmaceuticaEDQM = reg['Z'];
           updateDatoVacuna.viaAdministracion = reg['AA'];
@@ -763,11 +765,12 @@ export class VigiflowIntegradorService {
           // INDICACION_MEDDRA se retiró de TR_DATO_VACUNA por no ser variable priorizada.
 
           const nombreVacPatenteWHODrugVigiFlow = reg['E'] ? VigiflowUtils.limpiarCampoWHODrug(reg['E']) : reg['E'];
-          updateDatoVacuna.nombreVacPatenteWHODrug = nombreVacPatenteWHODrugVigiFlow;
-          // DatoVacuna no tiene columna NOMBRE_VAC_PATENTE_WHODRUG (dato-vacuna.service.ts descarta ese
-          // campo del DTO al guardar), así que se usa como valor por defecto de DRUG_NAME el nombre
-          // reportado por VigiFlow. Si el match WHODrug (más abajo) encuentra un nombre oficial, lo sobreescribe.
-          updateDatoVacuna.drugName = nombreVacPatenteWHODrugVigiFlow;
+          // El nombre con el que VigiFlow reporta la vacuna se persiste aparte, en
+          // NOMBRE_VACUNA_REPORTADO. Antes se usaba como valor por defecto de DRUG_NAME y el
+          // match WHODrug lo sobrescribía, así que el nombre original se perdía y DRUG_NAME
+          // mezclaba valores homologados con texto libre. DRUG_NAME queda ahora reservado al
+          // nombre oficial WHODrug: si no hay match, se queda null y eso es información útil.
+          updateDatoVacuna.nombreVacunaReportado = nombreVacPatenteWHODrugVigiFlow;
 
           // Reemplaza comas o saltos de línea por punto y coma.
           const principioActivoWHODrugVigiFlow = reg['F'] ? VigiflowUtils.limpiarCampoWHODrug(reg['F']) : reg['F'];
@@ -947,14 +950,20 @@ export class VigiflowIntegradorService {
           let datoEsavi = new CreateDatoEsaviDto();
           datoEsavi = { ...datoEsavi, ...auditoria };
 
-          // NOMBRE_ESAVI y DESCRIPCION dejaron de poblarse desde VigiFlow por no ser variables
-          // priorizadas (las columnas se conservan porque DHIS2 sí las utiliza).
-          // NOMBRE_ESAVI_REPORTADO se toma del LLT MedDRA (columna D), que viene en español; si el
-          // evento aún no está codificado se usa el texto libre del notificador (columna C), que
-          // es lo único que describe la reacción en ese caso.
-          datoEsavi.nombreReportado = VigiflowUtils.eliminarSaltoLinea(
-            (nombreLLT || nombreReportado).toUpperCase(),
-          );
+          // NOMBRE_ESAVI guarda el término estandarizado (LLT MedDRA, columna D) y
+          // NOMBRE_ESAVI_REPORTADO el texto libre del notificador (columna C). Antes ambos
+          // valores caían en NOMBRE_ESAVI_REPORTADO, lo que dejaba el dato estandarizado en el
+          // campo "reportado" y NOMBRE_ESAVI vacío: la semántica quedaba invertida.
+          // VigiFlow no siempre alcanza a codificar la reacción; cuando D viene vacía el evento
+          // queda sin término estandarizado y solo con el texto reportado, que puede homologarse
+          // después.
+          datoEsavi.nombre = nombreLLT
+            ? VigiflowUtils.eliminarSaltoLinea(nombreLLT.toUpperCase())
+            : null;
+          datoEsavi.nombreReportado = nombreReportado
+            ? VigiflowUtils.eliminarSaltoLinea(nombreReportado.toUpperCase())
+            : null;
+          datoEsavi.tipoRegistro = TipoRegistroEsaviEnum.REACCION;
           datoEsavi.fechaEsavi = VigiflowUtils.formatoFecha(fechasInicio[i] ?? '');
           datoEsavi.fechaFinalizacion = VigiflowUtils.formatoFecha(fechasFin[i] ?? '');
           datoEsavi.duracion = duraciones[i] ?? null;
@@ -983,7 +992,8 @@ export class VigiflowIntegradorService {
           datoEsavi.codigoPT = meddraPT?.code ?? null;
           datoEsavi.codigoSOC = meddraSOC?.code ?? null;
 
-          datoEsavi.codigoCaso = notificacion.codigoOrigenNotificacion;
+          // COGIDO_CASO se retiró de TR_DATOS_ESAVI: era una copia del código de la
+          // notificación en cada evento. El caso se identifica por la FK NOTIFICACION_ID.
           await this.datoEsaviService.createVigiflow(notificacion, datoEsavi);
         } catch (err) {
           this.logger.error(

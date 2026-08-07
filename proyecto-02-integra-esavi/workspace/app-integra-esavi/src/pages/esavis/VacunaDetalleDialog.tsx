@@ -80,9 +80,9 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
         <Typography variant="h6" component="span" sx={{ flexShrink: 0 }}>
           Detalle de Vacuna
         </Typography>
-        {(vacuna.drugName || vacuna.nombreVacPatenteWHODrug) && (
+        {(vacuna.drugName || vacuna.nombreVacunaReportado) && (
           <Chip
-            label={vacuna.drugName ?? vacuna.nombreVacPatenteWHODrug}
+            label={vacuna.drugName ?? vacuna.nombreVacunaReportado}
             color="primary"
             variant="outlined"
             size="small"
@@ -116,6 +116,10 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
               <FieldRow label="Nombre (WHODrug)" value={vacuna.drugName} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
+              {/* Nombre original de la fuente, previo a la homologación WHODrug. */}
+              <FieldRow label="Nombre reportado" value={vacuna.nombreVacunaReportado} />
+            </Grid>
+            <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Código (WHODrug)" value={vacuna.drugCode} />
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
@@ -136,9 +140,7 @@ const VacunaDetalleDialog: React.FC<VacunaDetalleDialogProps> = ({ open, onClose
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Dosis Administrada" value={vacuna.dosis} />
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-              <FieldRow label="Duración del Tratamiento" value={vacuna.duracion} />
-            </Grid>
+            {/* DURACION_TRATAMIENTO se eliminó de TR_DATO_VACUNA: no aporta al análisis. */}
             <Grid item xs={12} sm={6} md={4}>
               <FieldRow label="Vía de Administración" value={vacuna.viaAdministracion} />
             </Grid>

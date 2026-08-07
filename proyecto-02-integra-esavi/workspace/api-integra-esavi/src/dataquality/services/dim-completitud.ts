@@ -66,8 +66,12 @@ export class DimCompletitudService {
       },
       { tabla: 'TR_DATO_VACUNACION', columnas: ['FECHA_VACUNACION'], fkColumn: 'ID', joinColumn: 'NOTIFICACION_ID' },
       {
+        // COGIDO_CASO se retiró de TR_DATOS_ESAVI por ser una copia del código de la
+        // notificación; medir su completitud era medir dos veces el mismo dato. NOMBRE_ESAVI
+        // ocupa su lugar: es el término homologado y su completitud sí informa sobre la
+        // calidad de la codificación MedDRA.
         tabla: 'TR_DATOS_ESAVI',
-        columnas: ['CODIGO_ESAVI_MEDDRA_LLT', 'COGIDO_CASO'],
+        columnas: ['CODIGO_ESAVI_MEDDRA_LLT', 'NOMBRE_ESAVI'],
         fkColumn: 'ID',
         joinColumn: 'NOTIFICACION_ID',
       },

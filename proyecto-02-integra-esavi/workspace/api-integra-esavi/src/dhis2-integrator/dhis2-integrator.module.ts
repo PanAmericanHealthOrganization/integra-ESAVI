@@ -11,6 +11,7 @@ import { Dhis2ProcessingLogService } from './services/dhis2-processing-log.servi
 import { Dhis2ProgramStageService } from './services/dhis2-program-stage.service';
 import { Dhis2ProgramService } from './services/dhis2-program.service';
 import { MeddraModule } from 'src/meddra/meddra.module';
+import { WhodrugsModule } from 'src/whodrugs/whodrugs.module';
 
 @Module({
   imports: [
@@ -20,6 +21,9 @@ import { MeddraModule } from 'src/meddra/meddra.module';
     }),
     IntegratorModule,
     MeddraModule,
+    // Necesario para homologar las vacunas de DHIS2 contra WHODrug, igual que ya lo hacía el
+    // integrador de VigiFlow.
+    WhodrugsModule,
   ],
   providers: [
     Dhis2DataElementService,

@@ -5,6 +5,7 @@ import {Repository} from 'typeorm';
 import {CreateNotificacionDto} from '../dto';
 import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
+import {Notificador} from '../entity/notificador.entity';
 import {Paciente} from '../entity/paciente.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
@@ -178,18 +179,11 @@ export class NotificacionDhis2Service {
           }
         }
 
-        if (createDto.profesionNotificadorParam) {
-          try {
-            // TODO\
-            /*
-            notificacion.profe profesionNotificador = await this.catalogoService.findByDescriptionToDhis2(
-              createDto.profesionNotificadorParam,
-            );
-            */
-          } catch (error:any) {
-            console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
-          }
-        }
+        // La profesión de quien notifica se extrae de DHIS2 pero nunca llegaba a persistirse:
+        // este bloque estaba comentado y el flujo DHIS2 tampoco creaba un TR_NOTIFICADOR, así
+        // que el update() posterior —que sí la asigna— nunca encontraba a quién asignársela.
+        // La profesión no es exclusiva de VigiFlow: DHIS2 también la registra.
+        notificacion.notificador = await this.crearNotificador(createDto);
 
         // Asignamos el paciente y el creador de la notificación
         notificacion.paciente = pacienteUUID;
@@ -204,6 +198,28 @@ export class NotificacionDhis2Service {
       // Si ocurre un error, lo registramos
       console.error('Error en la creación o actualización de la notificación:', error);
       throw new Error('Hubo un problema al crear o actualizar la notificación');
+    }
+  }
+
+  /**
+   * Crea o actualiza el TR_NOTIFICADOR de una notificación DHIS2 con el nombre y la profesión
+   * de quien notifica. DHIS2 no entrega cédula, así que NotificadorService deriva la clave del
+   * nombre; si tampoco hay nombre, no hay a quién registrar y se devuelve null.
+   */
+  private async crearNotificador(createDto: CreateNotificacionDto): Promise<Notificador | null> {
+    if (!createDto.nombreNotificador?.trim() && !createDto.identificacionNotificador?.trim()) {
+      return null;
+    }
+
+    try {
+      return await this.notificadorService.createOrUpdate(
+        createDto.identificacionNotificador,
+        createDto.profesionNotificadorParam,
+        createDto.nombreNotificador,
+      );
+    } catch (error: any) {
+      this.logger.warn(`No se pudo registrar el notificador DHIS2: ${error.message}`);
+      return null;
     }
   }
 
@@ -310,14 +326,11 @@ export class NotificacionDhis2Service {
       }
     }
 
-    if (createDto.profesionNotificadorParam && notificacionExistente.notificador) {
-      try {
-        const profesion = await this.notificadorService.buscarProfesionPorNombre(createDto.profesionNotificadorParam);
-        if (profesion) notificacionExistente.notificador.profesion = profesion;
-      } catch (error:any) {
-        console.error(`Error al buscar profesionNotificadorParam: ${error.message}`);
-      }
-    }
+    // Antes esto exigía que la notificación ya tuviese notificador, cosa que en DHIS2 nunca
+    // ocurría, así que la profesión se descartaba en cada reimport. Ahora se crea o actualiza
+    // el notificador con los datos frescos del origen.
+    const notificador = await this.crearNotificador(createDto);
+    if (notificador) notificacionExistente.notificador = notificador;
 
     if (createDto.tipoEmisor) {
       try {

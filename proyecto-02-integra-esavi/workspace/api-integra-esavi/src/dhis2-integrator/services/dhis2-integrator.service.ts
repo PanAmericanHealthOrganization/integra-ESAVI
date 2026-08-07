@@ -8,6 +8,8 @@ import {CausalidadEsavi} from 'src/integrator/entity';
 import {IAuditoria} from 'src/integrator/entity/auditoria.entity';
 import {MeddraLLTService} from 'src/meddra/services/meddra-lt.service';
 import {MeddraPtService} from 'src/meddra/services/meddra-pt.service';
+import {DrugService} from 'src/whodrugs/services/drugs.service';
+import {MaholderService} from 'src/whodrugs/services/maholder.service';
 import {
   CreateAntecedenteEmbarazoDto,
   CreateAntecedenteEventoDto,
@@ -22,11 +24,11 @@ import {
   CreateGravedadEsaviDto,
   CreateNotificacionDto,
   CreatePacienteDhis2Dto,
-  CreatePacienteEmbarazadaDto,
   InvestigacionCreateDto,
   UbicacionDto,
 } from '../../integrator/dto';
 import {SourceEnum} from '../../integrator/enum/source-enum';
+import {TipoRegistroEsaviEnum} from '../../integrator/enum/tipo-registro-esavi.enum';
 import {IntegradorService} from '../../integrator/facade/integrador.service';
 import {
   DuplicateAction,
@@ -49,6 +51,8 @@ export class Dhis2IntegratorService {
     private readonly integradorService: IntegradorService,
     private readonly meddraLltService: MeddraLLTService,
     private readonly meddraPtService: MeddraPtService,
+    private readonly drugService: DrugService,
+    private readonly maholderService: MaholderService,
     private readonly dhis2ProgramService: Dhis2ProgramService,
     private readonly dhis2ProgramStageService: Dhis2ProgramStageService,
     private readonly dhis2EventsService: Dhis2EventsService,
@@ -257,6 +261,91 @@ export class Dhis2IntegratorService {
     );
 
     return { headers, rows };
+  }
+
+  /**
+   * Homologa un evento de DHIS2 contra el diccionario MedDRA y completa NOMBRE_ESAVI y
+   * CODIGO_ESAVI_MEDDRA_LLT.
+   *
+   * Antes CODIGO_ESAVI_MEDDRA_LLT solo se poblaba desde VigiFlow, que recibe la reacción ya
+   * codificada por la UMC. DHIS2 entrega texto libre (diagnósticos CIE-10 y sintomatología),
+   * así que el código LLT se resuelve aquí con el mismo servicio y el mismo umbral de
+   * similitud (>= 90%) que usa el integrador VigiFlow, para que ambos orígenes produzcan
+   * datos comparables.
+   *
+   * El evento se conserva aunque no haya coincidencia: queda con NOMBRE_ESAVI_REPORTADO y sin
+   * codificación, que puede completarse después con una re-homologación.
+   */
+  private async homologarEventoMeddra(datoEsavi: CreateDatoEsaviDto): Promise<void> {
+    const textoReportado = datoEsavi.nombreReportado;
+    if (!textoReportado?.trim()) return;
+
+    try {
+      const meddraLlt = await this.meddraLltService.buscarPorSimilitud(textoReportado);
+      if (!meddraLlt) {
+        this.logger.warn(`[MedDRA] Sin coincidencia >= 90% para el evento DHIS2 "${textoReportado}"`);
+        return;
+      }
+
+      datoEsavi.nombre = meddraLlt.name ? meddraLlt.name.toUpperCase() : null;
+      datoEsavi.codigoLLT = meddraLlt.code ?? null;
+      datoEsavi.nameLLT = datoEsavi.nombre;
+      // El CIE-10 del diagnóstico lo entrega DHIS2 y es el dato autoritativo; solo se completa
+      // desde MedDRA cuando el origen no lo trae (caso de la sintomatología).
+      datoEsavi.codigoEsaviCie10 = datoEsavi.codigoEsaviCie10 ?? meddraLlt.icd10Code ?? null;
+    } catch (error: any) {
+      this.logger.error(`[MedDRA] Error homologando el evento DHIS2 "${textoReportado}": ${error?.message}`);
+    }
+  }
+
+  /**
+   * Homologa una vacuna reportada en DHIS2 contra el diccionario WHODrug y completa DRUG_CODE,
+   * DRUG_NAME, MEDICINAL_PRODUCT_ID, MA_HOLDER y CODIGO_ATC.
+   *
+   * Hasta ahora estos campos solo se poblaban desde VigiFlow, cuyo Excel ya llega codificado
+   * por la UMC: los registros de DHIS2 quedaban con el nombre en texto libre y sin ningún
+   * identificador de catálogo, de modo que las dos fuentes no eran comparables. Se usa el
+   * mismo diccionario y el mismo país que el integrador VigiFlow.
+   *
+   * Si no hay coincidencia el registro se conserva con NOMBRE_VACUNA_REPORTADO y sin
+   * codificación: es información válida y homologable después, no un error.
+   */
+  private async homologarVacunaWhodrug(datoVacuna: CreateDatoVacunaDto): Promise<void> {
+    const nombreReportado = datoVacuna.nombreVacunaReportado?.trim();
+    if (!nombreReportado) return;
+
+    const country = 'ECU';
+
+    try {
+      const coincidencias = await this.drugService.getDrugsOnly(nombreReportado, country);
+      const drug = coincidencias[0];
+      if (!drug) {
+        this.logger.warn(`[WHODrug] Sin coincidencia para la vacuna DHIS2 "${nombreReportado}"`);
+        return;
+      }
+
+      datoVacuna.drugCode = drug.drugCode ?? null;
+      datoVacuna.drugName = drug.drugName ?? null;
+      datoVacuna.codigoAtc = await this.drugService.getAtcCodeOfDrug(drug.id);
+
+      // El MPID sale del catálogo oficial: MAHOLDER.MEDICINAL_PRODUCT_ID para el titular y
+      // COUNTRY_SALES.COS_MEDICINAL_PRODUCT_ID para el producto en el país de venta.
+      const titulares = await this.maholderService.getMaholderOfDrug(drug.id, country);
+      const titularPrincipal = titulares[0];
+      if (titularPrincipal) {
+        // MA_HOLDER se sobreescribe solo si WHODrug lo resuelve: si no, se conserva la casa
+        // comercial que reportó DHIS2, que es mejor que dejar el campo vacío.
+        datoVacuna.maHolder = titularPrincipal.name ?? datoVacuna.maHolder;
+        datoVacuna.maHolderMedicinalProductId =
+          titularPrincipal.medicinalProductID != null ? String(titularPrincipal.medicinalProductID) : null;
+        datoVacuna.medicinalProductId =
+          titularPrincipal.countrySale?.medicinalProductID != null
+            ? String(titularPrincipal.countrySale.medicinalProductID)
+            : null;
+      }
+    } catch (error: any) {
+      this.logger.error(`[WHODrug] Error homologando la vacuna DHIS2 "${nombreReportado}": ${error?.message}`);
+    }
   }
 
   revisarValorNulo(profesion: any): string {
@@ -946,11 +1035,11 @@ export class Dhis2IntegratorService {
         // Verifica que nombre y código no estén vacíos
       if (dato.descripcion && dato.codigo) {
         const datoEsaviInicial = new CreateDatoEsaviDto();
-        datoEsaviInicial.nombre = dato.descripcion;
+        datoEsaviInicial.nombreReportado = dato.descripcion.toUpperCase();
         datoEsaviInicial.codigoEsaviCie10 = dato.codigo;
         datoEsaviInicial.fechaEsavi = fechaEsavi;
-        datoEsaviInicial.descripcion = `Diagnóstico inicial DHIS2 ${i}`;
-        datoEsaviInicial.codigoCaso = notificacion.codigoDhis2Evento;
+        datoEsaviInicial.tipoRegistro = TipoRegistroEsaviEnum.DIAGNOSTICO_INICIAL;
+        await this.homologarEventoMeddra(datoEsaviInicial);
         datoEsavis.push(datoEsaviInicial);
       }
     }
@@ -979,15 +1068,15 @@ export class Dhis2IntegratorService {
       const fechaEsavi =
         fechaInicio && horaInicio ? new Date(`${fechaInicio}T${horaInicio}:00Z`) : null;
 
-      // Verifica que nombre y código no estén vacíos      
+      // Verifica que nombre y código no estén vacíos
         if (dato.descripcion && dato.codigo) {
           const datoEsaviFinal = new CreateDatoEsaviDto();
-          datoEsaviFinal.nombre = dato.descripcion;
+          datoEsaviFinal.nombreReportado = dato.descripcion.toUpperCase();
           datoEsaviFinal.codigoEsaviCie10 = dato.codigo;
           datoEsaviFinal.fechaEsavi = fechaEsavi;
-          datoEsaviFinal.descripcion = `Diagnóstico final DHIS2 ${i}`;
-          datoEsaviFinal.codigoCaso = notificacion.codigoDhis2Evento;
-  
+          datoEsaviFinal.tipoRegistro = TipoRegistroEsaviEnum.DIAGNOSTICO_FINAL;
+          await this.homologarEventoMeddra(datoEsaviFinal);
+
           datoEsavis.push(datoEsaviFinal);
         }
     }
@@ -1007,8 +1096,8 @@ export class Dhis2IntegratorService {
         ];
       if (setOpciones) {
         const datoEsaviSintomatologiai = new CreateDatoEsaviDto();
-        datoEsaviSintomatologiai.nombreReportado = setOpciones;
-        
+        datoEsaviSintomatologiai.nombreReportado = setOpciones.toUpperCase();
+
         datoEsaviSintomatologiai.fechaEsavi = this.formatoFecha(
           row[
             headers.findIndex(
@@ -1016,8 +1105,8 @@ export class Dhis2IntegratorService {
             )
           ]?.split(' ')[0],
         );
-        datoEsaviSintomatologiai.descripcion = `Sintomatología DHIS2 ${i}`;
-        datoEsaviSintomatologiai.codigoCaso = notificacion.codigoDhis2Evento;
+        datoEsaviSintomatologiai.tipoRegistro = TipoRegistroEsaviEnum.SINTOMATOLOGIA;
+        await this.homologarEventoMeddra(datoEsaviSintomatologiai);
 
         datoEsavis.push(datoEsaviSintomatologiai); //agregar al array principal
       }
@@ -1031,7 +1120,7 @@ export class Dhis2IntegratorService {
         ];
       if (setOpcionesOtro) {
         const datoEsaviSintomatologiaOtro = new CreateDatoEsaviDto();
-        datoEsaviSintomatologiaOtro.nombreReportado = setOpcionesOtro;
+        datoEsaviSintomatologiaOtro.nombreReportado = setOpcionesOtro.toUpperCase();
         datoEsaviSintomatologiaOtro.fechaEsavi = this.formatoFecha(
           row[
             headers.findIndex(
@@ -1039,8 +1128,8 @@ export class Dhis2IntegratorService {
             )
           ]?.split(' ')[0],
         );
-        datoEsaviSintomatologiaOtro.descripcion = `Sintomatología Otro DHIS2`;
-        datoEsaviSintomatologiaOtro.codigoCaso = notificacion.codigoDhis2Evento;
+        datoEsaviSintomatologiaOtro.tipoRegistro = TipoRegistroEsaviEnum.SINTOMATOLOGIA;
+        await this.homologarEventoMeddra(datoEsaviSintomatologiaOtro);
         datoEsavis.push(datoEsaviSintomatologiaOtro);
       }
 
@@ -1112,21 +1201,20 @@ export class Dhis2IntegratorService {
       }
     }
 
-    // Paciente embarazada
-    const embarazada = new CreatePacienteEmbarazadaDto();
+    // Antecedentes de embarazo: estado + datos clínicos en un solo registro. Antes el estado
+    // (embarazada al vacunarse / al presentar el ESAVI) iba a TR_PACIENTE_EMBARAZADA y el
+    // resto a TR_ANTECEDENTES_EMBARAZO, dos tablas 1:1 con la misma notificación.
+    const antecedenteEmbarazada = new CreateAntecedenteEmbarazoDto();
     const embarazadaMomentoVacuna =
       row[
         headers.findIndex(
           (header) => header.column === 'DNVE ESAVI TRK - Semanas gestación al recibir la vacuna',
         )
       ];
-    embarazada.momentoVacuna = embarazadaMomentoVacuna ? '1' : '0';//true : false;
-    embarazada.momentoEsavi = //this.esValorAfirmativo(
-      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')]//,
-    ;//).toString();
+    antecedenteEmbarazada.momentoVacuna = embarazadaMomentoVacuna ? '1' : '0';
+    antecedenteEmbarazada.momentoEsavi =
+      row[headers.findIndex((header) => header.column === 'DNVE ESAVI TRK - Embarazada')];
 
-    // Antecedentes embarazo
-    const antecedenteEmbarazada = new CreateAntecedenteEmbarazoDto();
     const semanaGestacion =
       row[
         headers.findIndex(
@@ -1157,12 +1245,15 @@ export class Dhis2IntegratorService {
 
     for (let i = 1; i <= numeroVacunas; i++) {
       const datoVacuna = new CreateDatoVacunaDto();
-      datoVacuna.drugName =
+      // DHIS2 entrega el nombre de la vacuna como texto libre, sin codificar. Va a
+      // NOMBRE_VACUNA_REPORTADO; DRUG_NAME queda reservado al nombre oficial WHODrug, que
+      // resuelve homologarVacunaWhodrug() más abajo.
+      datoVacuna.nombreVacunaReportado =
         row[
           headers.findIndex(
             (header) => header.column === `DNVE ESAVI TRK - Antecedente vacuna ${i}`,
           )
-        ];        
+        ];
       datoVacuna.numeroDosisVacuna = this.transformarDosis(
         row[
           headers.findIndex(
@@ -1220,7 +1311,7 @@ export class Dhis2IntegratorService {
       // inicioAdministracion se gestiona desde DatoVacunacion (movido del DTO de vacuna)
 
       if (
-        datoVacuna.drugName ||
+        datoVacuna.nombreVacunaReportado ||
         datoVacuna.maHolder ||
         datoVacuna.numeroLote ||
         datoVacuna.fechaVencimientoVacuna ||
@@ -1228,6 +1319,8 @@ export class Dhis2IntegratorService {
         datoVacuna.fechaVencimientoDiluyente ||
         datoVacuna.nombreDiluyenteVacuna
       ) {
+        datoVacuna.origen = SourceEnum.DHIS2;
+        await this.homologarVacunaWhodrug(datoVacuna);
         datoVacunas.push(datoVacuna);
       }
     }
@@ -1319,8 +1412,7 @@ export class Dhis2IntegratorService {
     create.investigacion = investigacion;
 
     //Validar para crear
-    if (embarazada.momentoEsavi) {
-      create.pacienteEmbarazada = embarazada;
+    if (antecedenteEmbarazada.momentoEsavi) {
       create.antecedenteEmbarazo = antecedenteEmbarazada;
     }
 

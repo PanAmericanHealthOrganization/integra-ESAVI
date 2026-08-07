@@ -17,7 +17,6 @@ import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
 import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { NotificacionService } from '../service/notificacion.service';
-import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 
 @ApiTags('Notificacion')
 @Controller({ path: 'integrator/notificacion', version: '1' })
@@ -26,7 +25,6 @@ export class NotificacionController {
     private notificacionService: NotificacionService,
     private datoVacunacionService: DatoVacunacionService,
     private datoVacunaService: DatoVacunaService,
-    private pacienteEmbarazadaService: PacienteEmbarazadaServive,
     private datoEsaviService: DatoEsaviService,
     private embarazoEsaviService: EmbarazoEsaviService,
     private desenlaceEsaviService: DesenlaceEsaviService,
@@ -138,11 +136,10 @@ export class NotificacionController {
     return this.datoVacunaService.findByNotificacionId(uuid);
   }
 
-  @Get(':uuid/paciente-embarazada')
-  @ApiResponse({ status: 200, description: 'Datos de embarazo de la paciente.' })
-  findPacienteEmbarazadaByUUID(@Param('uuid', new ParseUUIDPipe()) uuid: string) {
-    return this.pacienteEmbarazadaService.findByNotificacionId(uuid);
-  }
+  // :uuid/paciente-embarazada se eliminó. TR_PACIENTE_EMBARAZADA se unificó en
+  // TR_ANTECEDENTES_EMBARAZO, así que su contenido (momentoVacuna, momentoEsavi) lo devuelve
+  // ahora :uuid/antecedente-embarazo, que ya existía y expone además FUM, fecha de parto y
+  // edad gestacional.
 
   @Get(':uuid/dato-esavi')
   @ApiResponse({ status: 200, description: 'Eventos ESAVI de la notificación.' })

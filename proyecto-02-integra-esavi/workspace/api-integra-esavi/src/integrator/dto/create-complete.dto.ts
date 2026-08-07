@@ -14,7 +14,6 @@ import { CreateDatoVacunaDto } from './dato-vacuna.dto';
 import { CreateDatoVacunacionDto } from './dato-vacunacion.dto';
 import { CreatePacienteVigiflowDto } from './create-paciente-vigiflow.dto';
 import { CreatePacienteDhis2Dto } from './create-paciente-dhis2.dto';
-import { CreatePacienteEmbarazadaDto } from './create-paciente-embarazada.dto';
 import { CreateDatoEsaviDto } from './dato-esavi.dto';
 //import { InvestigacionDto } from './investigacion.dto';
 import { InvestigacionCreateDto } from '../entity/investigacion.entity';
@@ -39,7 +38,6 @@ export class CreateCompleteDto {
   desenlaceEsavi: CreateDesenlaceEsaviDto;
   embarazoEsavi: CreateEmbarazoEsaviDto;
   gravedadEsavi: CreateGravedadEsaviDto;
-  pacienteEmbarazada : CreatePacienteEmbarazadaDto;
   //
   datoVacuna: CreateDatoVacunaDto | CreateDatoVacunaDto[];
   datoEsavi : CreateDatoEsaviDto | CreateDatoEsaviDto[];

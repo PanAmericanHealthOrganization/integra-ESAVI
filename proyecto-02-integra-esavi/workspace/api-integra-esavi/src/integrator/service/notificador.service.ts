@@ -18,13 +18,25 @@ export class NotificadorService {
     private readonly catalogoPadreRepository: Repository<CatalogoPadre>,
   ) {}
 
-  async createOrUpdateFromVigiflow(
-    identificacion: string,
+  /**
+   * Registra o actualiza el notificador de una notificación, sea cual sea el origen.
+   *
+   * VigiFlow entrega la identificación del especialista; DHIS2 no la tiene y solo aporta el
+   * nombre de quien notifica. Para que la profesión reportada en DHIS2 no se perdiera —antes
+   * se extraía del origen y nunca se persistía— se admite crear el notificador con una clave
+   * derivada del nombre. La clave derivada lleva prefijo para que sea evidente que no es una
+   * cédula real y no se confunda con las de VigiFlow.
+   *
+   * El catálogo de profesiones es el mismo para ambos orígenes (TC_CATALOGO_PADRE, código
+   * OCUPACION), así que la homologación es única: similitud Levenshtein >= 90%.
+   */
+  async createOrUpdate(
+    identificacion: string | null,
     profesionDescripcion: string | null,
     nombres?: string,
   ): Promise<Notificador> {
-    if (!identificacion?.trim()) return null;
-    const id = identificacion.trim();
+    const id = identificacion?.trim() || this.derivarIdentificacionDesdeNombre(nombres);
+    if (!id) return null;
 
     let notificador = await this.notificadorRepository.findOne({
       where: { identificacion: id },
@@ -47,28 +59,12 @@ export class NotificadorService {
 
     if (profesionDescripcion?.trim()) {
       try {
-        const subcategorias = await this.catalogoPadreRepository.find({
-          where: { padre: { codigo: 'OCUPACION' }, isEnabled: true },
-          relations: ['padre'],
-        });
-
-        const profesionNorm = this.normalizar(profesionDescripcion.trim());
-        let mejorMatch: CatalogoPadre | null = null;
-        let mejorSimilitud = 0;
-
-        for (const sub of subcategorias) {
-          const similitud = this.calcularSimilitud(profesionNorm, this.normalizar(sub.nombre));
-          if (similitud > mejorSimilitud) {
-            mejorSimilitud = similitud;
-            mejorMatch = sub;
-          }
-        }
-
-        if (mejorMatch && mejorSimilitud >= 0.9) {
-          notificador.profesion = mejorMatch;
-          this.logger.log(`Profesión "${profesionDescripcion}" → "${mejorMatch.nombre}" (${(mejorSimilitud * 100).toFixed(1)}%)`);
+        const profesion = await this.buscarProfesionPorNombre(profesionDescripcion);
+        if (profesion) {
+          notificador.profesion = profesion;
+          this.logger.log(`Profesión "${profesionDescripcion}" → "${profesion.nombre}"`);
         } else {
-          this.logger.warn(`Profesión "${profesionDescripcion}" sin coincidencia ≥90% en OCUPACION (mejor: ${(mejorSimilitud * 100).toFixed(1)}%)`);
+          this.logger.warn(`Profesión "${profesionDescripcion}" sin coincidencia ≥90% en OCUPACION`);
         }
       } catch (err) {
         this.logger.warn(`Error buscando profesión en catálogo OCUPACION: ${err.message}`);
@@ -77,6 +73,30 @@ export class NotificadorService {
 
     notificador.updatedBy = FALLBACK_USER;
     return this.notificadorRepository.save(notificador);
+  }
+
+  /**
+   * @deprecated Usar {@link createOrUpdate}, que sirve a ambos orígenes.
+   */
+  async createOrUpdateFromVigiflow(
+    identificacion: string,
+    profesionDescripcion: string | null,
+    nombres?: string,
+  ): Promise<Notificador> {
+    if (!identificacion?.trim()) return null;
+    return this.createOrUpdate(identificacion, profesionDescripcion, nombres);
+  }
+
+  /**
+   * DHIS2 no entrega cédula del notificador, pero TR_NOTIFICADOR se identifica por
+   * IDENTIFICACION. Se deriva una clave estable a partir del nombre normalizado para que las
+   * notificaciones del mismo profesional converjan en un solo registro en lugar de perderse.
+   */
+  private derivarIdentificacionDesdeNombre(nombres?: string): string | null {
+    const nombre = nombres?.trim();
+    if (!nombre) return null;
+    const normalizado = this.normalizar(nombre).replace(/\s+/g, '_');
+    return `SIN_ID:${normalizado}`.substring(0, 50);
   }
 
   private normalizar(texto: string): string {

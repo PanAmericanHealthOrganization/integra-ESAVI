@@ -169,12 +169,8 @@ export class Notificacion extends Auditoria {
   })
   origen: SourceEnum;
 
-  @Column({
-    name: 'ORIGEN_ORIGINAL',
-    type: 'jsonb',
-    nullable: true,
-    comment: 'Registro original en formato JSON de la fuente de datos (campos procesados)',
-  })
-  origenOriginal: Record<string, any>;
-
+  // ORIGEN_ORIGINAL se eliminó de esta tabla: el integrador escribía exactamente el mismo
+  // objeto en TR_PACIENTE y en TR_NOTIFICACION, y su contenido es demográfico del paciente.
+  // El snapshot crudo queda una sola vez, en TR_PACIENTE.PAYLOAD_ORIGEN. La fuente de la
+  // notificación se identifica con ORIGEN y CODIGO_ORIGEN_NOTIFICACION, arriba.
 }

@@ -4,7 +4,6 @@ import { NotificacionController } from './notificacion.controller';
 import { NotificacionService } from '../service/notificacion.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
-import { PacienteEmbarazadaServive } from '../service/paciente-embarazada.service';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { DesenlaceEsaviService } from '../service/desenlace-esavi.service';
 import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
@@ -24,7 +23,6 @@ const mockNotificacionService = {
 
 const mockDatoVacunacionService = { findByNotificacionId: jest.fn() };
 const mockDatoVacunaService = { findByNotificacionId: jest.fn() };
-const mockPacienteEmbarazadaService = { findByNotificacionId: jest.fn() };
 const mockDatoEsaviService = { findByNotificacionId: jest.fn() };
 const mockEmbarazoEsaviService = { findByNotificacionUUID: jest.fn() };
 const mockDesenlaceEsaviService = { findByNotificacionId: jest.fn() };
@@ -44,7 +42,6 @@ describe('NotificacionController', () => {
         { provide: NotificacionService, useValue: mockNotificacionService },
         { provide: DatoVacunacionService, useValue: mockDatoVacunacionService },
         { provide: DatoVacunaService, useValue: mockDatoVacunaService },
-        { provide: PacienteEmbarazadaServive, useValue: mockPacienteEmbarazadaService },
         { provide: DatoEsaviService, useValue: mockDatoEsaviService },
         { provide: EmbarazoEsaviService, useValue: mockEmbarazoEsaviService },
         { provide: DesenlaceEsaviService, useValue: mockDesenlaceEsaviService },
@@ -161,14 +158,9 @@ describe('NotificacionController', () => {
     });
   });
 
-  describe('findPacienteEmbarazadaByUUID', () => {
-    it('delega en pacienteEmbarazadaService', () => {
-      mockPacienteEmbarazadaService.findByNotificacionId.mockReturnValue([{ id: 'pe1' }]);
-      const result = controller.findPacienteEmbarazadaByUUID(UUID);
-      expect(mockPacienteEmbarazadaService.findByNotificacionId).toHaveBeenCalledWith(UUID);
-      expect(result).toEqual([{ id: 'pe1' }]);
-    });
-  });
+  // findPacienteEmbarazadaByUUID se eliminó junto con TR_PACIENTE_EMBARAZADA: sus dos campos
+  // se unificaron en TR_ANTECEDENTES_EMBARAZO y los cubre ya el test de
+  // searchAntecedenteEmbarazoByUUID, más arriba.
 
   describe('findDatoEsaviByUUID', () => {
     it('delega en datoEsaviService', () => {

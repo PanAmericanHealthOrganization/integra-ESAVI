@@ -1,13 +1,14 @@
 import {PartialType} from "@nestjs/swagger";
+import {TipoRegistroEsaviEnum} from '../enum/tipo-registro-esavi.enum';
 
 export class CreateDatoEsaviDto {
   sistemaCodififacion: string;
-  // NOMBRE_ESAVI y DESCRIPCION dejaron de poblarse desde VigiFlow por no ser variables
-  // priorizadas, pero se conservan porque el integrador DHIS2 sí las utiliza para los
-  // diagnósticos inicial/final y la sintomatología.
+  /** Término estandarizado (LLT MedDRA). Null si el evento no pudo homologarse. */
   nombre: string;
-  descripcion: string;
+  /** Texto original de quien notifica, sin homologar. */
   nombreReportado: string;
+  /** Bloque de la ficha que originó el evento. Reemplaza al antiguo campo `descripcion`. */
+  tipoRegistro: TipoRegistroEsaviEnum;
   CTLLTMEDDRA_ID: number;
   CTPTMEDDRA_ID: number;
   CTHLTMEDDRA_ID: number;
@@ -27,7 +28,6 @@ export class CreateDatoEsaviDto {
   fechaEsavi: Date;
   fechaFinalizacion: Date;
   duracion: string;
-  codigoCaso: string;
   codigoDxInicialCie10: string;
   codigoDxInicialMeddraLlt: string;
 }

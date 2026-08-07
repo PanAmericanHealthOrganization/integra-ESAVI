@@ -101,12 +101,18 @@ export class Paciente extends Auditoria {
   })
   codigoOrigen: string;
 
+  /**
+   * Antes se llamaba ORIGEN_ORIGINAL, nombre que sugería identificar la fuente de datos —eso
+   * ya lo hacen TR_NOTIFICACION.ORIGEN y CODIGO_ORIGEN. Lo que guarda en realidad es el
+   * payload crudo del registro tal como llegó, para poder auditar la transformación.
+   */
   @Column({
-    name: 'ORIGEN_ORIGINAL',
+    name: 'PAYLOAD_ORIGEN',
     type: 'jsonb',
     nullable: true,
-    comment: 'Registro original en formato JSON de la fuente de datos (campos procesados)',
+    comment:
+      'Snapshot del registro crudo del paciente tal como lo entregó la fuente, antes de transformarlo. Sirve para auditar la trazabilidad del dato, no para identificar el origen (para eso está TR_NOTIFICACION.ORIGEN).',
   })
-  origenOriginal: Record<string, any>;
+  payloadOrigen: Record<string, any>;
 
 }

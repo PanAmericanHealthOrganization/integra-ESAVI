@@ -37,6 +37,13 @@ export class DatoVacunacionService {
         return null;
       }
 
+      // FECHA_VACUNACION es la variable de análisis (de ella sale el intervalo hasta el inicio
+      // de síntomas). Cuando el origen no la entrega pero sí registró el inicio de la
+      // administración, se usa ese valor: es el mismo acto vacunal y evita perder el caso.
+      if (!dto.fechaVacunacion && dto.inicioAdministracion) {
+        dto.fechaVacunacion = dto.inicioAdministracion;
+      }
+
       // Verificar si ya existe un DatoVacunacion con la misma notificación
       const existingDatoVacunacion = await this.datoVacunacionRepository.findOne({
         where: { notificacion: { id: notificacion.id } }, // Buscamos por el ID de la notificación

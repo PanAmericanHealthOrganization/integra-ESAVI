@@ -32,6 +32,7 @@ const mockEstablecimientoRepo = {
 
 const mockNotificadorService = {
   buscarProfesionPorNombre: jest.fn(),
+  createOrUpdate: jest.fn(),
 };
 
 const mockCatalogoPadreService = {
@@ -249,30 +250,48 @@ describe('NotificacionDhis2Service', () => {
       expect(result.paciente).toEqual({ id: 'p1' });
     });
 
-    it('resuelve profesión del notificador cuando ya existe uno asociado', async () => {
-      const existente: any = { id: 'n1', notificador: { id: 'not-1' } };
-      mockNotificadorService.buscarProfesionPorNombre.mockResolvedValue({ id: 'prof-1' });
+    // Antes la profesión solo se asignaba si la notificación YA tenía notificador, cosa que en
+    // DHIS2 nunca ocurría porque ese flujo no creaba ninguno: el dato se descartaba en cada
+    // importación. Ahora el notificador se crea o actualiza con los datos frescos del origen.
+    it('crea el notificador con la profesión reportada en DHIS2', async () => {
+      const existente: any = { id: 'n1' };
+      mockNotificadorService.createOrUpdate.mockResolvedValue({
+        identificacion: 'SIN_ID:JUAN_PEREZ',
+        profesion: { id: 'prof-1' },
+      });
       mockNotificacionRepo.save.mockImplementation((n) => Promise.resolve(n));
 
       const result = await service.update(
         existente,
-        { residenciaPaciente: {}, profesionNotificadorParam: 'Medico general' } as any,
+        {
+          residenciaPaciente: {},
+          profesionNotificadorParam: 'Medico general',
+          nombreNotificador: 'Juan Perez',
+        } as any,
         { id: 'p1' } as any,
       );
 
-      expect(mockNotificadorService.buscarProfesionPorNombre).toHaveBeenCalledWith('Medico general');
+      expect(mockNotificadorService.createOrUpdate).toHaveBeenCalledWith(
+        undefined,
+        'Medico general',
+        'Juan Perez',
+      );
       expect(result.notificador.profesion).toEqual({ id: 'prof-1' });
     });
 
-    it('no falla si buscarProfesionPorNombre lanza error', async () => {
-      const existente: any = { id: 'n1', notificador: { id: 'not-1' } };
-      mockNotificadorService.buscarProfesionPorNombre.mockRejectedValue(new Error('fail'));
+    it('no falla si el registro del notificador lanza error', async () => {
+      const existente: any = { id: 'n1' };
+      mockNotificadorService.createOrUpdate.mockRejectedValue(new Error('fail'));
       mockNotificacionRepo.save.mockImplementation((n) => Promise.resolve(n));
 
       await expect(
         service.update(
           existente,
-          { residenciaPaciente: {}, profesionNotificadorParam: 'Medico' } as any,
+          {
+            residenciaPaciente: {},
+            profesionNotificadorParam: 'Medico',
+            nombreNotificador: 'Juan Perez',
+          } as any,
           { id: 'p1' } as any,
         ),
       ).resolves.toBeDefined();

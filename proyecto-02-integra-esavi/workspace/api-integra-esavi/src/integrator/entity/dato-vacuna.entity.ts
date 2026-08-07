@@ -59,9 +59,23 @@ export class DatoVacuna extends Auditoria {
   @Column({
     name: 'DRUG_NAME',
     nullable: true,
-    comment: 'Nombre WHODrug de la vacuna (DRUG.DRU_NAME)',
+    comment:
+      'Nombre ESTANDARIZADO de la vacuna según WHODrug (DRUG.DRU_NAME). Solo se puebla cuando la homologación WHODrug encuentra coincidencia; el nombre con el que se reportó la vacuna vive en NOMBRE_VACUNA_REPORTADO.',
   })
   drugName: string;// utilizado por vf.
+
+  /**
+   * Nombre original de la vacuna, previo a la homologación WHODrug. Antes DRUG_NAME se
+   * inicializaba con este valor y luego el match WHODrug lo sobrescribía, de modo que el dato
+   * tal como lo reportó la fuente se perdía y no quedaba forma de auditar la homologación.
+   */
+  @Column({
+    name: 'NOMBRE_VACUNA_REPORTADO',
+    nullable: true,
+    comment:
+      'Nombre de la vacuna tal como lo entrega la fuente, sin homologar. VigiFlow: columna "Patente WHODrug". DHIS2: "Antecedente vacuna N".',
+  })
+  nombreVacunaReportado: string;// utilizado por vf y d2.
 
   /**
    *
@@ -183,15 +197,8 @@ export class DatoVacuna extends Auditoria {
 
 
 
-  /**
-   *
-   */
-  @Column({
-    name: 'DURACION_TRATAMIENTO',
-    nullable: true,
-    comment: 'Duración del tratamiento con la vacuna',
-  })
-  duracion: string; // utilizado por vf.
+  // DURACION_TRATAMIENTO se eliminó: no aporta valor al análisis (una vacuna se administra en
+  // un acto único, no es un tratamiento con duración) y solo lo poblaba VigiFlow.
 
   /**
    *

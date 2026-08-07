@@ -16,7 +16,6 @@ export * from './notificacion-dhis2.service';
 export * from './notificador.service';
 export * from './notificacion-vigiflow.service';
 export * from './notificacion.service';
-export * from './paciente-embarazada.service';
 export * from './parametro.service';
 export * from './reporte.service';
 export * from './seed.service';
