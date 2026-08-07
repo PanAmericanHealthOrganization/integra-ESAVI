@@ -129,13 +129,21 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
      INNER JOIN ${S}."TR_DATOS_ESAVI" tde    ON tde."NOTIFICACION_ID" = tn."ID"
      WHERE tge."TIPO_GRAVEDAD" IS NOT NULL`,
 
-    // 1.6 Embarazo
+    // 1.6 Embarazo — TR_PACIENTE_EMBARAZADA se unificó en TR_ANTECEDENTES_EMBARAZO.
+    //     La existencia de la fila ya no implica embarazo: los integradores (DHIS2)
+    //     insertan un antecedente por notificación con las banderas en '0', así que
+    //     el estado se deriva de EMBARAZADA_MOMENTO_VACUNA / EMBARAZADA_MOMENTO_ESAVI
+    //     (1=Sí, 2=No, 3=Desconocido; rep_embarazo toma el MIN por reporte).
     `CREATE OR REPLACE TABLE raw_pregnancy AS
-     SELECT tpe."ID"::VARCHAR              AS id,
+     SELECT tae."ID"::VARCHAR              AS id,
             tn."ID"::VARCHAR               AS report_id,
-            1                              AS embesavi
+            CASE WHEN tae."EMBARAZADA_MOMENTO_VACUNA" IN ('1','true')
+                    OR tae."EMBARAZADA_MOMENTO_ESAVI"  IN ('1','true') THEN 1
+                  WHEN tae."EMBARAZADA_MOMENTO_VACUNA" IN ('0','false')
+                    OR tae."EMBARAZADA_MOMENTO_ESAVI"  IN ('0','false') THEN 2
+                  ELSE 3 END               AS embesavi
      FROM ${S}."TR_NOTIFICACION" tn
-     INNER JOIN ${S}."TR_PACIENTE_EMBARAZADA" tpe ON tn."ID" = tpe."NOTIFICACION_ID"`,
+     INNER JOIN ${S}."TR_ANTECEDENTES_EMBARAZO" tae ON tn."ID" = tae."NOTIFICACION_ID"`,
 
     // 1.7 MedDRA (solo Postgres: LLT→PT→SOC). HLT/HLGT/SMQ no existen.
     `CREATE OR REPLACE TABLE ref_meddra AS
