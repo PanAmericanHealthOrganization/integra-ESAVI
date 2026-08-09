@@ -140,29 +140,44 @@ export class MeddraProcessFilesService {
    * @returns
    */
   private async processPT(pt: string[][], socs: SOC[]): Promise<PT[]> {
-    const ptList = [];
+    // Índice por código en lugar de un find() por fila: son ~27 SOC contra ~26.600 PT.
+    const socsPorCodigo = new Map(socs.map((soc) => [soc.code, soc]));
+
+    const ptList: PT[] = [];
     pt.forEach((line) => {
-      const pt = withAuditOnCreate(new PT());
-      pt.code = line[0];
-      pt.name = line[1];
-      pt.socCode = line[3];//line[3];
-      pt.soc = socs.find((soc) => soc.code === line[3]);//socs.find((soc) => soc.code === line[3]);
-      ptList.push(pt);
+      const nuevo = withAuditOnCreate(new PT());
+      nuevo.code = line[0];
+      nuevo.name = line[1];
+      nuevo.socCode = line[3];
+      nuevo.soc = socsPorCodigo.get(line[3]);
+      ptList.push(nuevo);
     });
-    const insertedResultIds = [];
+
     // procesar de 5000 en 5000
     const chunkSize = 5000;
     for (let i = 0; i < ptList.length; i += chunkSize) {
-      // Extraer un "chunk" o trozo de la lista
       const chunkList = ptList.slice(i, i + chunkSize);
-
-      // Procesa el chunk aquí
       const inserted = await this.ptRepository.insert(chunkList);
-      const ids = inserted.identifiers.map((id) => id.id);
-      this.logger.log(`Insertados PT ${i + chunkSize} de ${ptList.length}`);
-      insertedResultIds.concat(ids);
+
+      // El id generado se copia sobre la entidad que ya está en memoria. Antes los
+      // identificadores se acumulaban con `insertedResultIds.concat(ids)`, y `concat` no
+      // muta: devuelve un array nuevo que se descartaba. La lista quedaba vacía, el
+      // `find({ id: In([]) })` no traía nada y processLLT recibía cero PT, de modo que
+      // `llt.pt` quedaba undefined y MED_LLT.ID_PT_CODE se guardaba en null en las 88.985
+      // filas. Esa era la causa de que la jerarquía SOC→PT→LLT saliera incompleta.
+      chunkList.forEach((entidad, indice) => {
+        const id = inserted.identifiers[indice]?.id;
+        if (id != null) entidad.id = id as number;
+      });
+
+      this.logger.log(
+        `Insertados PT ${Math.min(i + chunkSize, ptList.length)} de ${ptList.length}`,
+      );
     }
-    return this.ptRepository.find({ where: { id: In(insertedResultIds) } });
+
+    // Se devuelven las entidades en memoria, ya con su id: releerlas suponía un IN con
+    // ~26.600 identificadores para recuperar lo que ya se tenía.
+    return ptList;
   }
   /**
    *
@@ -170,24 +185,38 @@ export class MeddraProcessFilesService {
    * @param version
    * @returns
    */
-  private async processLLT(socs: string[][], pts: PT[]): Promise<InsertResult[]> {
-    const lltList = [];
-    socs.forEach((line) => {
+  private async processLLT(lltData: string[][], pts: PT[]): Promise<InsertResult[]> {
+    // Índice por código: un find() por fila serían ~89.000 × ~26.600 comparaciones.
+    const ptsPorCodigo = new Map(pts.map((pt) => [pt.code, pt]));
+
+    const lltList: LLT[] = [];
+    lltData.forEach((line) => {
       const llt = withAuditOnCreate(new LLT());
       llt.code = line[0];
       llt.name = line[1];
-      llt.ptCode = line[2];//line[3];
-      llt.pt = pts.find((pt) => pt.code === line[2]);//pts.find((pt) => pt.code === line[3]);
+      llt.ptCode = line[2];
+      llt.pt = ptsPorCodigo.get(line[2]);
       llt.icd10Code = line[9];
       lltList.push(llt);
     });
+
+    const sinPt = lltList.filter((llt) => !llt.pt).length;
+    if (sinPt > 0) {
+      // No aborta la carga: un LLT sin PT sigue siendo utilizable por su código. Pero
+      // conviene que quede en el log, porque significa que el archivo trae códigos de PT
+      // que no existen en el propio archivo de PT.
+      this.logger.warn(`${sinPt} de ${lltList.length} LLT no encontraron su PT por código`);
+    }
+
     // procesar de 5000 en 5000
     const batchSize = 5000;
     const insertedResult = [];
     for (let i = 0; i < lltList.length; i += batchSize) {
       const batch = lltList.slice(i, i + batchSize);
       insertedResult.push(await this.lltRepository.insert(batch));
-      this.logger.log(`Insertados LLT ${i + batchSize} de ${lltList.length}`);
+      this.logger.log(
+        `Insertados LLT ${Math.min(i + batchSize, lltList.length)} de ${lltList.length}`,
+      );
     }
     return insertedResult;
   }

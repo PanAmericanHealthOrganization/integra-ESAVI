@@ -139,7 +139,7 @@ export const WhodrugPage = () => {
 
 
         {/* ── Tabla ── */}
-        <TableContainer sx={{ maxHeight: 480 }}>
+        <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
           <Table size="small" stickyHeader>
             <TableHead>
               <TableRow>

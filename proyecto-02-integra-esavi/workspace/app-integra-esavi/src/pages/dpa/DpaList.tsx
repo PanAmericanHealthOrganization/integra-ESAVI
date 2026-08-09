@@ -319,7 +319,7 @@ export const DpaList = () => {
               </Button>
             </Stack>
           </PanelHeader>
-          <TableContainer sx={{ maxHeight: 480 }}>
+          <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
@@ -462,7 +462,7 @@ export const DpaList = () => {
               </Button>
             </Stack>
           </PanelHeader>
-          <TableContainer sx={{ maxHeight: 480 }}>
+          <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
@@ -614,7 +614,7 @@ export const DpaList = () => {
               </Button>
             </Stack>
           </PanelHeader>
-          <TableContainer sx={{ maxHeight: 480 }}>
+          <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>

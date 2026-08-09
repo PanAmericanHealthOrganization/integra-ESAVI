@@ -20,6 +20,22 @@ export const LAYOUT = {
   gapCabecera: 1.5,
   /** Radio de las tarjetas que enmarcan tablas y paneles. */
   radioTarjeta: 2,
+  /**
+   * Tope de altura del área scrollable de una tabla o árbol dentro de un panel.
+   *
+   * Antes era un número fijo (460 o 480 px según el archivo): en una pantalla alta la
+   * tarjeta se cortaba a media altura y dejaba un vacío enorme debajo, y en una baja
+   * empujaba la paginación fuera de la vista.
+   *
+   * Al ser relativo al viewport, el contenido crece hasta llenar la pantalla sin pasarse.
+   * Como es `maxHeight` y no `height`, una tabla con pocas filas sigue encogiendo.
+   *
+   * El descuento cubre: barra superior (64) + pie fijo (40) + padding de página (24) +
+   * banda de acciones (~64) + paginación del panel (~76), más holgura.
+   */
+  alturaTabla: "calc(100vh - 300px)",
+  /** Piso para que en pantallas bajas el área no se reduzca a una o dos filas. */
+  alturaTablaMinima: 220,
 } as const
 
 /** Radio de los botones, en px. Equivale al `borderRadius: 5` que se repetía en 10 archivos. */

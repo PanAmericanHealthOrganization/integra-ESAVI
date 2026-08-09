@@ -131,6 +131,62 @@ describe('MeddraProcessFilesService', () => {
       expect(result.pt).toHaveLength(1);
     });
 
+    it('enlaza cada LLT con su PT y cada PT con su SOC', async () => {
+      // MED_LLT.ID_PT_CODE quedaba en null en las 88.985 filas del diccionario: processPT
+      // acumulaba los ids con `insertedResultIds.concat(ids)` y `concat` no muta, así que
+      // devolvía la lista vacía y processLLT no encontraba ningún PT al que enlazar.
+      jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(true);
+      jest.spyOn(MeddraUtils, 'readFileContent').mockImplementation(async (_v, _l, file) => {
+        if (file === 'soc.asc') return [['SOC1', 'Nombre SOC', 'ABBR']];
+        if (file === 'pt.asc') return [['PT1', 'Nombre PT', '', 'SOC1']];
+        if (file === 'llt.asc') return [['LLT1', 'Nombre LLT', 'PT1', '', '', '', '', '', '', 'ICD10-1']];
+        return [];
+      });
+
+      socRepository.insert.mockResolvedValue({ identifiers: [{ id: 7 }] });
+      socRepository.find.mockResolvedValue([{ id: 7, code: 'SOC1', name: 'Nombre SOC' }]);
+      ptRepository.insert.mockResolvedValue({ identifiers: [{ id: 42 }] });
+      // Se deja vacío a propósito: el resultado ya no debe depender de releer los PT.
+      ptRepository.find.mockResolvedValue([]);
+      lltRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
+
+      await service.processVersionFiles('27.0', 'ES', 'desc');
+
+      const ptsInsertados = ptRepository.insert.mock.calls[0][0];
+      expect(ptsInsertados[0].soc).toMatchObject({ id: 7, code: 'SOC1' });
+
+      const lltsInsertados = lltRepository.insert.mock.calls[0][0];
+      expect(lltsInsertados[0].ptCode).toBe('PT1');
+      // El id que devolvió el insert de PT tiene que haber llegado a la entidad enlazada:
+      // es lo que termina escribiéndose en MED_LLT.ID_PT_CODE.
+      expect(lltsInsertados[0].pt).toMatchObject({ id: 42, code: 'PT1' });
+    });
+
+    it('no enlaza el LLT cuyo PT no existe en el archivo, y lo advierte', async () => {
+      const warn = jest.spyOn((service as any).logger, 'warn').mockImplementation();
+      jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(true);
+      jest.spyOn(MeddraUtils, 'readFileContent').mockImplementation(async (_v, _l, file) => {
+        if (file === 'soc.asc') return [['SOC1', 'Nombre SOC', 'ABBR']];
+        if (file === 'pt.asc') return [['PT1', 'Nombre PT', '', 'SOC1']];
+        // Apunta a un PT que no viene en pt.asc.
+        if (file === 'llt.asc') return [['LLT1', 'Nombre LLT', 'PT-INEXISTENTE', '', '', '', '', '', '', '']];
+        return [];
+      });
+
+      socRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
+      socRepository.find.mockResolvedValue([{ id: 1, code: 'SOC1' }]);
+      ptRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
+      lltRepository.insert.mockResolvedValue({ identifiers: [{ id: 1 }] });
+
+      await service.processVersionFiles('27.0', 'ES', 'desc');
+
+      const lltsInsertados = lltRepository.insert.mock.calls[0][0];
+      expect(lltsInsertados[0].pt).toBeUndefined();
+      // La carga no aborta: el LLT sigue siendo utilizable por su código.
+      expect(lltsInsertados[0].ptCode).toBe('PT-INEXISTENTE');
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('no encontraron su PT'));
+    });
+
     it('hace rollback y propaga el error cuando falla el procesamiento', async () => {
       jest.spyOn(MeddraUtils, 'directoryExists').mockReturnValue(true);
       jest.spyOn(MeddraUtils, 'readFileContent').mockImplementation(async (_v, _l, file) => {

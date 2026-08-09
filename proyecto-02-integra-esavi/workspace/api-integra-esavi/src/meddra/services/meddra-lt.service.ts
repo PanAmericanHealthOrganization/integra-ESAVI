@@ -2,6 +2,8 @@ import {Injectable,Logger} from '@nestjs/common';
 import {InjectRepository} from '@nestjs/typeorm';
 import {Repository} from 'typeorm';
 import {LLT} from '../models/standar/llt.entity';
+import {PT} from '../models/standar/pt.entity';
+import {SOC} from '../models/standar/soc.entity';
 
 const SIMILITUD_MINIMA = 0.9;
 
@@ -115,9 +117,16 @@ export class MeddraLLTService {
   }
 
   /**
+   * Retorna el término LLT con sus ancestros PT y SOC.
    *
-   * @param code // llt code
-   * @returns // Retorna el término LLT (todo el objeto) correspondiente al código proporcionado.
+   * Los joins van por el **código** y no por las relaciones declaradas en las entidades.
+   * `LLT.pt` se une por `ID_PT_CODE` y esa columna está vacía en las 88.985 filas del
+   * diccionario: el proceso de carga sólo llena `PT_CODE`, el código en texto. Con
+   * `leftJoinAndSelect('llt.pt')` el PT salía siempre en null y, con él, el SOC — de ahí
+   * que la jerarquía de un evento se mostrara incompleta aunque el dato existiera.
+   *
+   * En PT→SOC la FK sí está poblada, pero se une igual por código para no depender de que
+   * una carga futura la vuelva a dejar vacía.
    */
   async searchLltByCode(code: string): Promise<LLT> {
     if (!code || code.trim() === '') {
@@ -128,8 +137,8 @@ export class MeddraLLTService {
     const normalized = code.trim().toLowerCase();
     const t = await this.lltRepository
       .createQueryBuilder('llt')
-      .leftJoinAndSelect('llt.pt', 'pt')
-      .leftJoinAndSelect('pt.soc', 'soc')
+      .leftJoinAndMapOne('llt.pt', PT, 'pt', 'pt.code = llt.ptCode')
+      .leftJoinAndMapOne('pt.soc', SOC, 'soc', 'soc.code = pt.socCode')
       .where('LOWER(llt.code) = :code', { code: normalized })
       .getOne();
 

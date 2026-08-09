@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { LLT } from '../models/standar/llt.entity';
+import { PT } from '../models/standar/pt.entity';
+import { SOC } from '../models/standar/soc.entity';
 import { MeddraLLTService } from './meddra-lt.service';
 
 describe('MeddraLLTService', () => {
@@ -25,6 +27,7 @@ describe('MeddraLLTService', () => {
       skip: jest.fn().mockReturnThis(),
       take: jest.fn().mockReturnThis(),
       leftJoinAndSelect: jest.fn().mockReturnThis(),
+      leftJoinAndMapOne: jest.fn().mockReturnThis(),
       getOne: jest.fn(),
       getMany: jest.fn(),
       getManyAndCount: jest.fn(),
@@ -174,14 +177,28 @@ describe('MeddraLLTService', () => {
       expect(lltRepository.createQueryBuilder).not.toHaveBeenCalled();
     });
 
-    it('retorna el LLT con sus joins (pt, soc) cuando existe', async () => {
+    it('une los ancestros por código y no por la relación de la entidad', async () => {
+      // MED_LLT.ID_PT_CODE está vacía en todo el diccionario: la carga sólo llena PT_CODE.
+      // Unir por la relación devolvía el PT en null y, en cascada, también el SOC.
       const llt = makeLLT();
       queryBuilder.getOne.mockResolvedValue(llt);
 
       const result = await service.searchLltByCode('LLT001');
 
-      expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('llt.pt', 'pt');
-      expect(queryBuilder.leftJoinAndSelect).toHaveBeenCalledWith('pt.soc', 'soc');
+      expect(queryBuilder.leftJoinAndMapOne).toHaveBeenCalledWith(
+        'llt.pt',
+        PT,
+        'pt',
+        'pt.code = llt.ptCode',
+      );
+      expect(queryBuilder.leftJoinAndMapOne).toHaveBeenCalledWith(
+        'pt.soc',
+        SOC,
+        'soc',
+        'soc.code = pt.socCode',
+      );
+      // Ninguna unión debe seguir dependiendo de la FK.
+      expect(queryBuilder.leftJoinAndSelect).not.toHaveBeenCalled();
       expect(queryBuilder.where).toHaveBeenCalledWith('LOWER(llt.code) = :code', { code: 'llt001' });
       expect(result).toEqual(llt);
     });

@@ -211,7 +211,7 @@ export const CatalogosConfigList = () => {
               </>
             }
           />
-          <TableContainer sx={{ maxHeight: 460 }}>
+          <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>
@@ -375,7 +375,7 @@ export const CatalogosConfigList = () => {
               </>
             }
           />
-          <TableContainer sx={{ maxHeight: 460 }}>
+          <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
             <Table size="small" stickyHeader>
               <TableHead>
                 <TableRow>

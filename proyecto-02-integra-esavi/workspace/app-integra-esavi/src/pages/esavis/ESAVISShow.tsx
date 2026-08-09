@@ -21,6 +21,7 @@ import {
 import React,{useEffect,useState} from "react"
 import {Datagrid,FunctionField,ListContextProvider,Pagination,Show,useList,useShowContext} from "react-admin"
 import intESAVIClient from "../../dataProviders/axios.client"
+import { MeddraJerarquiaDialog, MeddraNode } from "./MeddraJerarquiaDialog"
 import VacunaDetalleDialog from "./VacunaDetalleDialog"
 
 // ─── TabPanel ─────────────────────────────────────────────────────────────────
@@ -565,24 +566,24 @@ const TabVacunacion = () => {
 
 // ─── MedDRA tree ──────────────────────────────────────────────────────────────
 
-interface MeddraNode {
-  code: string
-  name: string
-  level: "LLT" | "PT" | "SOC"
-}
-
 interface MeddraTreeChipProps {
   node: MeddraNode
+  onClick: () => void
 }
 
-const MeddraTreeChip = ({ node }: MeddraTreeChipProps) => (
-  <Tooltip title={node.code} arrow placement="top">
+const MeddraTreeChip = ({ node, onClick }: MeddraTreeChipProps) => (
+  <Tooltip title={`${node.code} · Ver jerarquía SOC → PT → LLT`} arrow placement="top">
     <Chip
       label={`${node.name} (${node.level})`}
       size="small"
       variant="outlined"
+      onClick={onClick}
       color={node.level === "LLT" ? "primary" : node.level === "PT" ? "default" : "secondary"}
-      sx={{ maxWidth: 320, ".MuiChip-label": { whiteSpace: "normal", lineHeight: 1.3 } }}
+      sx={{
+        maxWidth: 320,
+        cursor: "pointer",
+        ".MuiChip-label": { whiteSpace: "normal", lineHeight: 1.3 },
+      }}
     />
   </Tooltip>
 )
@@ -594,6 +595,8 @@ const TabEsavi = () => {
   const [esavis, setEsavis] = useState<any[]>([])
   const [meddraMap, setMeddraMap] = useState<Record<string, MeddraNode[]>>({})
   const [loading, setLoading] = useState(true)
+  /** Evento cuya jerarquía se está mostrando; `null` con el diálogo cerrado. */
+  const [jerarquia, setJerarquia] = useState<{ nodos: MeddraNode[]; evento?: string } | null>(null)
 
   useEffect(() => {
     if (!record?.id) return
@@ -673,27 +676,37 @@ const TabEsavi = () => {
           )}
         />
         <FunctionField
-          label="Código caso"
-          render={(rec: any) => (
-            <Typography variant="caption" title={rec.codigoCaso}>{rec.codigoCaso ?? "—"}</Typography>
-          )}
-        />
-        <FunctionField
           label="MedDRA"
           render={(rec: any) => {
             const nodes: MeddraNode[] = rec.codigoLLT ? (meddraMap[rec.codigoLLT] ?? []) : []
             if (nodes.length === 0) return null
+            // Sólo se muestra el LLT, que es el término registrado en la notificación; los
+            // otros dos niveles se consultan en el diálogo para no saturar la celda.
+            const llt = nodes.find((n) => n.level === "LLT") ?? nodes[0]
             return (
               <Box sx={{ display: "flex", gap: 0.5, flexWrap: "wrap", py: 0.5 }}>
-                {nodes.map((node) => (
-                  <MeddraTreeChip key={node.level} node={node} />
-                ))}
+                <MeddraTreeChip
+                  node={llt}
+                  onClick={() =>
+                    setJerarquia({
+                      nodos: nodes,
+                      evento: rec.nombre ?? rec.nameLLT ?? rec.nombreReportado,
+                    })
+                  }
+                />
               </Box>
             )
           }}
         />
       </Datagrid>
       <Pagination rowsPerPageOptions={[10, 25, 50]} {...etiquetasPaginacion} />
+
+      <MeddraJerarquiaDialog
+        open={jerarquia !== null}
+        onClose={() => setJerarquia(null)}
+        nodos={jerarquia?.nodos ?? []}
+        evento={jerarquia?.evento}
+      />
     </ListContextProvider>
   )
 }

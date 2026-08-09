@@ -509,7 +509,7 @@ export const MeddraPage = () => {
 
 
         {/* ── Árbol ── */}
-        <Box sx={{ maxHeight: 480, overflow: "auto" }} px={2} py={1.5}>
+        <Box sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima, overflow: "auto" }} px={2} py={1.5}>
           {loading ? (
             <Box display="flex" justifyContent="center" py={6}>
               <CircularProgress size={28} />
