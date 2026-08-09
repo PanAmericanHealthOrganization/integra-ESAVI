@@ -1,23 +1,16 @@
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import MedicationIcon from "@mui/icons-material/Medication"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Badge,
   Box,
   Button,
   Chip,
   CircularProgress,
-  Collapse,
-  Divider,
   FormControl,
-  IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -26,12 +19,13 @@ import {
   TablePagination,
   TableRow,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import { Title } from "react-admin"
 import { SincronizarWhodrugButton } from "../../components/SyncActions"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 interface Drug {
@@ -62,7 +56,6 @@ export const WhodrugPage = () => {
   const [loading, setLoading] = useState(false)
   const [country, setCountry] = useState("EC")
   const [searchName, setSearchName] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
   const [debouncedName, setDebouncedName] = useState("")
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -95,46 +88,25 @@ export const WhodrugPage = () => {
   }, [page, rowsPerPage, country, debouncedName])
 
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="WHODrug — Diccionario de Medicamentos" />
 
-      <Paper elevation={2}>
-        {/* ── Cabecera ── */}
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <MedicationIcon color="primary" />
-            <Typography variant="h6" fontWeight={600}>
-              WHODrug — Medicamentos
-            </Typography>
-          </Stack>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <SincronizarWhodrugButton />
-            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-              <IconButton
-                size="small"
-                onClick={() => setShowFilter((v) => !v)}
-                color={showFilter ? "primary" : "default"}>
-                <Badge variant="dot" color="primary" invisible={!searchName}>
-                  <FilterListIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Box>
-
-        <Box px={2} pb={1.5}>
-          <Typography variant="body2" color="text.secondary">
-            Diccionario internacional de medicamentos de la OMS (WHO Drug Dictionary)
-          </Typography>
-        </Box>
-
-        {/* ── Filtros ── */}
-        <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
+      <PanelTabla>
+        <PanelHeader
+          icono={<MedicationIcon fontSize="small" />}
+          titulo="WHODrug — Medicamentos"
+          subtitulo={
+            loading
+              ? "Cargando..."
+              : `${total} medicamento${total === 1 ? "" : "s"} · Diccionario de la OMS`
+          }
+          acciones={<SincronizarWhodrugButton />}>
+          {/* Los filtros van visibles en la banda, como en el resto de pantallas. Antes
+              vivían tras un <Collapse> que se abría con un icono de embudo: era la única
+              pantalla —junto con MedDRA— donde había que descubrir dónde estaba el buscador. */}
+          <Box display="flex" gap={1.5} alignItems="center" flexWrap="wrap">
             <TextField
               placeholder="Buscar por nombre de medicamento…"
-              size="small"
-              autoFocus={showFilter}
               value={searchName}
               onChange={(e) => setSearchName(e.target.value)}
               sx={{ width: 280 }}
@@ -146,7 +118,7 @@ export const WhodrugPage = () => {
                 ),
               }}
             />
-            <FormControl size="small" sx={{ width: 280 }}>
+            <FormControl sx={{ width: 200 }}>
               <InputLabel>País</InputLabel>
               <Select
                 label="País"
@@ -159,13 +131,12 @@ export const WhodrugPage = () => {
                 ))}
               </Select>
             </FormControl>
-            <Button size="small" sx={{ ml: "auto" }} onClick={() => { setSearchName(""); setPage(0) }}>
+            <Button onClick={() => { setSearchName(""); setPage(0) }} disabled={!searchName}>
               Limpiar
             </Button>
           </Box>
-        </Collapse>
+        </PanelHeader>
 
-        <Divider />
 
         {/* ── Tabla ── */}
         <TableContainer sx={{ maxHeight: 480 }}>
@@ -248,7 +219,7 @@ export const WhodrugPage = () => {
           onPageChange={(_, p) => setPage(p)}
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
         />
-      </Paper>
+      </PanelTabla>
     </Box>
   )
 }
