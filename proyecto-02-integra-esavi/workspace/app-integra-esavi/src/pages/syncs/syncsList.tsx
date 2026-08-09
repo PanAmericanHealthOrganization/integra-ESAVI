@@ -30,14 +30,25 @@ export const SyncsList = () => {
     <List filters={syncFilters}>
       <Datagrid
         rowClick="show"
+        bulkActionButtons={false}
         sx={{
-          tableLayout: "fixed",
-          width: "100%",
+          // El sx del Datagrid se aplica al div raiz, la tabla debe fijarse por su propia clase.
+          "& .RaDatagrid-table": {
+            tableLayout: "fixed",
+            width: "100%",
+          },
           "& .MuiTableCell-root": {
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
           },
+          "& .column-source": { width: "10%" },
+          "& .column-name": { width: "16%" },
+          "& .column-status": { width: "10%" },
+          "& .column-startTime": { width: "13%" },
+          "& .column-endTime": { width: "13%" },
+          "& .column-message": { width: "22%" },
+          "& .column-errorMessage": { width: "16%" },
         }}>
         <TextField source="source" label="Fuente" />
         <TextField source="name" />
@@ -69,7 +80,7 @@ export const SyncsList = () => {
           locales="sv-SE"
         />
         <TextField source="message" label="Resultado" />
-        <TextField source="errorMessage" />
+        <TextField source="errorMessage" label="Mensaje de error" />
       </Datagrid>
     </List>
   )

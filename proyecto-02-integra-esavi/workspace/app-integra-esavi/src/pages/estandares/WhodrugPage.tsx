@@ -32,7 +32,6 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { Title } from "react-admin"
 import { SincronizarWhodrugButton } from "../../components/SyncActions"
-import { SyncPanel } from "../../components/SyncPanel"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 interface Drug {
@@ -66,8 +65,6 @@ export const WhodrugPage = () => {
   const [showFilter, setShowFilter] = useState(false)
   const [debouncedName, setDebouncedName] = useState("")
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // Se incrementa al lanzar una sincronización para recargar el historial.
-  const [syncRefresh, setSyncRefresh] = useState(0)
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
@@ -110,16 +107,19 @@ export const WhodrugPage = () => {
               WHODrug — Medicamentos
             </Typography>
           </Stack>
-          <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-            <IconButton
-              size="small"
-              onClick={() => setShowFilter((v) => !v)}
-              color={showFilter ? "primary" : "default"}>
-              <Badge variant="dot" color="primary" invisible={!searchName}>
-                <FilterListIcon />
-              </Badge>
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SincronizarWhodrugButton />
+            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+              <IconButton
+                size="small"
+                onClick={() => setShowFilter((v) => !v)}
+                color={showFilter ? "primary" : "default"}>
+                <Badge variant="dot" color="primary" invisible={!searchName}>
+                  <FilterListIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Box>
 
         <Box px={2} pb={1.5}>
@@ -249,26 +249,6 @@ export const WhodrugPage = () => {
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
         />
       </Paper>
-
-      {/* ── Sincronización: el botón y su historial viven junto al diccionario ── */}
-      <Box mt={3}>
-        <SyncPanel
-          title="WHODrug — Historial de Sincronizaciones"
-          source="WHODRUG"
-          icon={<MedicationIcon color="secondary" />}
-          refreshKey={syncRefresh}
-          extraColumns={[
-            {
-              header: "Medicamentos",
-              render: (row) =>
-                row.metadata?.drugs != null
-                  ? Number(row.metadata.drugs).toLocaleString("es-EC")
-                  : "—",
-            },
-          ]}
-          action={<SincronizarWhodrugButton onDone={() => setSyncRefresh((n) => n + 1)} />}
-        />
-      </Box>
     </Box>
   )
 }

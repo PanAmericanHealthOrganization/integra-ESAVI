@@ -54,7 +54,7 @@ const mensajeError = (e: any, fallback: string) =>
     : (e?.response?.data?.message ?? e?.message ?? fallback)
 
 /** MedDRA: pide versión e idioma de los archivos ya cargados en el servidor. */
-export const SincronizarMeddraButton = ({ onDone }: { onDone: () => void }) => {
+export const SincronizarMeddraButton = ({ onDone }: { onDone?: () => void }) => {
   const [open, setOpen] = useState(false)
   const [version, setVersion] = useState("")
   const [lang, setLang] = useState("")
@@ -73,7 +73,7 @@ export const SincronizarMeddraButton = ({ onDone }: { onDone: () => void }) => {
       setOpen(false)
       setVersion("")
       setLang("")
-      onDone()
+      onDone?.()
     } catch (e: any) {
       show(mensajeError(e, "Error al sincronizar MedDRA."), "error")
     } finally {
@@ -133,7 +133,7 @@ export const SincronizarMeddraButton = ({ onDone }: { onDone: () => void }) => {
 }
 
 /** WHODrug: descarga completa del diccionario, sólo confirmación. */
-export const SincronizarWhodrugButton = ({ onDone }: { onDone: () => void }) => {
+export const SincronizarWhodrugButton = ({ onDone }: { onDone?: () => void }) => {
   const [open, setOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const { show, node } = useFeedback()
@@ -143,7 +143,7 @@ export const SincronizarWhodrugButton = ({ onDone }: { onDone: () => void }) => 
     try {
       await intESAVIClient.post("/whodrug/sync")
       show("Sincronización WHODrug iniciada correctamente.", "success")
-      onDone()
+      onDone?.()
     } catch (e: any) {
       show(mensajeError(e, "Error al sincronizar WHODrug."), "error")
     } finally {
@@ -191,7 +191,7 @@ export const SincronizarWhodrugButton = ({ onDone }: { onDone: () => void }) => 
 }
 
 /** Datamart: regenera el DuckDB que alimenta el dashboard analítico. */
-export const RegenerarDatamartButton = ({ onDone }: { onDone: () => void }) => {
+export const RegenerarDatamartButton = ({ onDone }: { onDone?: () => void }) => {
   const [open, setOpen] = useState(false)
   const [syncing, setSyncing] = useState(false)
   const { show, node } = useFeedback()
@@ -212,7 +212,7 @@ export const RegenerarDatamartButton = ({ onDone }: { onDone: () => void }) => {
     } finally {
       setSyncing(false)
       setOpen(false)
-      onDone()
+      onDone?.()
     }
   }
 

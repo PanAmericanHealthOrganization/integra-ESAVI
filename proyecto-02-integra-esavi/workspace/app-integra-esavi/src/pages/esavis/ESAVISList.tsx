@@ -1,5 +1,4 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
-import StorageIcon from "@mui/icons-material/Storage"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
 import {
   Avatar,
@@ -22,7 +21,6 @@ import {
   useListContext,
 } from "react-admin"
 import { RegenerarDatamartButton } from "../../components/SyncActions"
-import { SyncPanel } from "../../components/SyncPanel"
 import BulkDialog from "./BulkDialog"
 
 const origenChoices = [
@@ -98,13 +96,16 @@ const ESAVISListHeader = () => {
           <FilterForm filters={postFilters} />
         </Box>
 
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => setOpen(true)}
-          sx={{ borderRadius: 5, px: 2, boxShadow: "none", flexShrink: 0, "&:hover": { boxShadow: "none" } }}>
-          Importar datos
-        </Button>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
+          <RegenerarDatamartButton />
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => setOpen(true)}
+            sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+            Importar datos
+          </Button>
+        </Stack>
       </Box>
 
       <Divider />
@@ -152,9 +153,6 @@ const listSx = {
 }
 
 export const ESAVISList = () => {
-  // Se incrementa al regenerar el datamart para recargar su historial.
-  const [syncRefresh, setSyncRefresh] = useState(0)
-
   return (
     <Box p={2}>
       <List
@@ -244,39 +242,6 @@ export const ESAVISList = () => {
           />
         </Datagrid>
       </List>
-
-      {/* ── Datamart: el botón y su historial viven junto a los ESAVIS, que son
-          los datos que alimenta el DuckDB del dashboard analítico ── */}
-      <Box mt={3}>
-        <SyncPanel
-          title="Datamart (DuckDB) — Historial de Generaciones"
-          source="DATAMART"
-          icon={<StorageIcon color="action" />}
-          refreshKey={syncRefresh}
-          extraColumns={[
-            {
-              header: "Filas generadas",
-              render: (row) => {
-                const counts = row.metadata?.rowCounts as Record<string, number> | undefined
-                if (!counts || Object.keys(counts).length === 0) return "—"
-                return (
-                  <Stack direction="row" flexWrap="wrap" gap={0.5}>
-                    {Object.entries(counts).map(([tabla, n]) => (
-                      <Chip
-                        key={tabla}
-                        label={`${tabla}: ${Number(n).toLocaleString("es-EC")}`}
-                        size="small"
-                        variant="outlined"
-                      />
-                    ))}
-                  </Stack>
-                )
-              },
-            },
-          ]}
-          action={<RegenerarDatamartButton onDone={() => setSyncRefresh((n) => n + 1)} />}
-        />
-      </Box>
     </Box>
   )
 }
