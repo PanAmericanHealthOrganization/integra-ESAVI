@@ -1,15 +1,6 @@
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import VaccinesIcon from "@mui/icons-material/Vaccines"
-import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  Divider,
-  Stack,
-  Typography,
-} from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
+import { Box, Button, Chip, Typography } from "@mui/material"
 import { useState } from "react"
 import {
   Datagrid,
@@ -20,7 +11,9 @@ import {
   TextInput,
   useListContext,
 } from "react-admin"
+import { PanelHeader } from "../../components/PanelTabla"
 import { RegenerarDatamartButton } from "../../components/SyncActions"
+import { LAYOUT } from "../../theme"
 import BulkDialog from "./BulkDialog"
 
 const origenChoices = [
@@ -54,61 +47,29 @@ const postFilters = [
   <TextInput label="Código Origen" source="codigoOrigenNotificacion" alwaysOn />,
 ]
 
-// Cabecera al estilo de las tablas de catálogos: banda con avatar + título +
-// conteo y acción a la derecha, luego una fila de filtros y un divisor.
+// La composición de la banda vive en <PanelHeader>; aquí sólo se elige qué va en cada
+// ranura. El estilo (paddings, avatar, tipografía, botones) lo pone el tema.
 const ESAVISListHeader = () => {
-  const theme = useTheme()
   const { total, isLoading } = useListContext()
   const [open, setOpen] = useState(false)
   return (
     <>
-      <Box
-        px={2.5}
-        py={2}
-        display="flex"
-        alignItems="center"
-        gap={2}
-        flexWrap="wrap"
-        sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-        <Box display="flex" alignItems="center" gap={1.5} sx={{ flexShrink: 0 }}>
-          <Avatar sx={{ bgcolor: "primary.main", width: 34, height: 34 }}>
-            <VaccinesIcon fontSize="small" />
-          </Avatar>
-          <Box>
-            <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2}>
-              ESAVIS
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {isLoading
-                ? "Cargando..."
-                : `${total ?? 0} registro${total === 1 ? "" : "s"}`}
-            </Typography>
-          </Box>
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            "& .RaFilterForm-form": { flexWrap: "wrap", alignItems: "center", gap: 1, pt: 0 },
-            "& .MuiFormHelperText-root": { display: "none" },
-          }}>
-          <FilterForm filters={postFilters} />
-        </Box>
-
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
-          <RegenerarDatamartButton />
-          <Button
-            variant="contained"
-            size="small"
-            onClick={() => setOpen(true)}
-            sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
-            Importar datos
-          </Button>
-        </Stack>
-      </Box>
-
-      <Divider />
+      <PanelHeader
+        icono={<VaccinesIcon fontSize="small" />}
+        titulo="ESAVIS"
+        subtitulo={
+          isLoading ? "Cargando..." : `${total ?? 0} registro${total === 1 ? "" : "s"}`
+        }
+        acciones={
+          <>
+            <RegenerarDatamartButton />
+            <Button variant="contained" onClick={() => setOpen(true)}>
+              Importar datos
+            </Button>
+          </>
+        }>
+        <FilterForm filters={postFilters} />
+      </PanelHeader>
       <BulkDialog open={open} onClose={() => setOpen(false)} />
     </>
   )
@@ -132,34 +93,12 @@ const formatFecha = (valor?: string | null) => {
   })
 }
 
-// Estilos de tabla alineados con las tablas de catálogos: contenedor con borde
-// redondeado sin sombra y encabezados de columna en mayúsculas, pequeños y grises.
-const listSx = {
-  "& .RaList-content": {
-    borderRadius: 2,
-    border: "1px solid",
-    borderColor: "divider",
-    boxShadow: "none",
-    overflow: "hidden",
-  },
-  "& .RaDatagrid-headerCell": {
-    bgcolor: "background.paper",
-    fontSize: 11,
-    fontWeight: 700,
-    letterSpacing: 0.6,
-    textTransform: "uppercase",
-    color: "text.secondary",
-  },
-}
-
+// El marco de la lista y la tipografía de los encabezados ahora salen del tema
+// (RaList / MuiTableCell), así que aquí no queda ningún sx de estilo.
 export const ESAVISList = () => {
   return (
-    <Box p={2}>
-      <List
-        actions={false}
-        empty={false}
-        storeKey={false}
-        sx={listSx}>
+    <Box p={LAYOUT.paddingPagina}>
+      <List actions={false} empty={false} storeKey={false}>
         <ESAVISListHeader />
         <Datagrid bulkActionButtons={false} rowClick="show">
           {/* ── ID ── */}

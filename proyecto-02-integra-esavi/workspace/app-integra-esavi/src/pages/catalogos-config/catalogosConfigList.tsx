@@ -5,7 +5,6 @@ import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import SegmentIcon from "@mui/icons-material/Segment"
 import {
-  Avatar,
   Box,
   Button,
   Chip,
@@ -15,10 +14,8 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   IconButton,
   InputAdornment,
-  Paper,
   Stack,
   Table,
   TableBody,
@@ -30,8 +27,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
 import { useState } from "react"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 interface CatalogoPadreRecord {
@@ -48,7 +46,6 @@ const DEFAULT_FORM = { codigo: "", nombre: "", descripcion: "" }
 
 export const CatalogosConfigList = () => {
   const notify = useNotify()
-  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -176,64 +173,44 @@ export const CatalogosConfigList = () => {
 
 
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="Catálogos" />
       <Box display="flex" gap={2} alignItems="flex-start">
 
         {/* ── Panel: Categorías ── */}
-        <Paper elevation={0} sx={{ flex: 2, minWidth: 0, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2.5}
-            py={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={1.5}
-            flexWrap="wrap"
-            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-            <Box display="flex" alignItems="center" gap={1.5}>
-              <Avatar sx={{ bgcolor: "primary.main", width: 34, height: 34 }}>
-                <SegmentIcon fontSize="small" />
-              </Avatar>
-              <Box>
-                <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2}>
-                  Categorías
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {isLoading ? "Cargando..." : `${categorias.length} categoría${categorias.length === 1 ? "" : "s"}`}
-                </Typography>
-              </Box>
-            </Box>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <TextField
-                placeholder="Buscar..."
-                size="small"
-                sx={{ width: 200, bgcolor: "background.paper" }}
-                value={searchCategoria}
-                onChange={(e) => setSearchCategoria(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <Button size="small" onClick={() => setSearchCategoria("")} disabled={!searchCategoria}>
-                Limpiar
-              </Button>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={openNuevaCategoria}
-                sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
-                Nuevo
-              </Button>
-            </Stack>
-          </Box>
-
-          <Divider />
+        <PanelTabla sx={{ flex: 2, minWidth: 0 }}>
+          <PanelHeader
+            icono={<SegmentIcon fontSize="small" />}
+            titulo="Categorías"
+            subtitulo={
+              isLoading
+                ? "Cargando..."
+                : `${categorias.length} categoría${categorias.length === 1 ? "" : "s"}`
+            }
+            acciones={
+              <>
+                <TextField
+                  placeholder="Buscar..."
+                  sx={{ width: 200 }}
+                  value={searchCategoria}
+                  onChange={(e) => setSearchCategoria(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <Button onClick={() => setSearchCategoria("")} disabled={!searchCategoria}>
+                  Limpiar
+                </Button>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
+                  Nuevo
+                </Button>
+              </>
+            }
+          />
           <TableContainer sx={{ maxHeight: 460 }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -244,11 +221,6 @@ export const CatalogosConfigList = () => {
                       align={idx === 2 ? "right" : "left"}
                       sx={{
                         bgcolor: "background.paper",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: 0.6,
-                        textTransform: "uppercase",
-                        color: "text.secondary",
                       }}>
                       {head}
                     </TableCell>
@@ -346,50 +318,35 @@ export const CatalogosConfigList = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </PanelTabla>
 
         {/* ── Panel: Subcategorías ── */}
-        <Paper elevation={0} sx={{ flex: 3, minWidth: 0, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2.5}
-            py={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={1.5}
-            flexWrap="wrap"
-            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
-            <Box display="flex" alignItems="center" gap={1.5} sx={{ minWidth: 0, overflow: "hidden" }}>
-              <Avatar sx={{ bgcolor: "secondary.main", width: 34, height: 34 }}>
-                <SegmentIcon fontSize="small" />
-              </Avatar>
-              <Box sx={{ minWidth: 0 }}>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
-                    Subcategorías
-                  </Typography>
-                  {selectedCategoria && (
-                    <Chip
-                      label={selectedCategoria.nombre}
-                      size="small"
-                      color="secondary"
-                      variant="outlined"
-                      sx={{ maxWidth: 140, overflow: "hidden", height: 20, fontSize: 11 }}
-                    />
-                  )}
-                </Box>
-                <Typography variant="caption" color="text.secondary">
-                  {!selectedCategoria
-                    ? "Selecciona una categoría"
-                    : `${subcategorias.length} subcategoría${subcategorias.length === 1 ? "" : "s"}`}
-                </Typography>
-              </Box>
-            </Box>
-            <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }} alignItems="center">
+        <PanelTabla sx={{ flex: 3, minWidth: 0 }}>
+          <PanelHeader
+            color="secondary"
+            icono={<SegmentIcon fontSize="small" />}
+            titulo="Subcategorías"
+            adorno={
+              selectedCategoria && (
+                <Chip
+                  label={selectedCategoria.nombre}
+                  size="small"
+                  color="secondary"
+                  variant="outlined"
+                  sx={{ maxWidth: 140, overflow: "hidden", height: 20, fontSize: 11 }}
+                />
+              )
+            }
+            subtitulo={
+              !selectedCategoria
+                ? "Selecciona una categoría"
+                : `${subcategorias.length} subcategoría${subcategorias.length === 1 ? "" : "s"}`
+            }
+            acciones={
+              <>
               <TextField
                 placeholder="Buscar..."
-                size="small"
-                sx={{ width: 200, bgcolor: "background.paper" }}
+                sx={{ width: 200 }}
                 value={searchSubcategoria}
                 onChange={(e) => setSearchSubcategoria(e.target.value)}
                 disabled={!selectedCategoria}
@@ -401,26 +358,23 @@ export const CatalogosConfigList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchSubcategoria("")} disabled={!searchSubcategoria}>
+              <Button onClick={() => setSearchSubcategoria("")} disabled={!searchSubcategoria}>
                 Limpiar
               </Button>
               <Tooltip title={!selectedCategoria ? "Selecciona una categoría primero" : ""} placement="left">
                 <span>
                   <Button
                     variant="contained"
-                    size="small"
                     startIcon={<AddIcon />}
                     disabled={!selectedCategoria}
-                    onClick={openNuevaSubcategoria}
-                    sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+                    onClick={openNuevaSubcategoria}>
                     Nuevo
                   </Button>
                 </span>
               </Tooltip>
-            </Stack>
-          </Box>
-
-          <Divider />
+              </>
+            }
+          />
           <TableContainer sx={{ maxHeight: 460 }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -431,11 +385,6 @@ export const CatalogosConfigList = () => {
                       align={idx === 3 ? "right" : "left"}
                       sx={{
                         bgcolor: "background.paper",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: 0.6,
-                        textTransform: "uppercase",
-                        color: "text.secondary",
                       }}>
                       {head}
                     </TableCell>
@@ -528,7 +477,7 @@ export const CatalogosConfigList = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </PanelTabla>
       </Box>
 
       {/* ── Diálogo Crear / Editar ── */}

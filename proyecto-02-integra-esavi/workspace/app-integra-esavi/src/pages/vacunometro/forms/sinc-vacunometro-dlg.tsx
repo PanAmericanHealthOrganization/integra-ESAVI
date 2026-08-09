@@ -89,6 +89,7 @@ export const SyncVacunometroDialog = ({
   return (
     <>
       <Button
+        variant="contained"
         startIcon={<SyncIcon />}
         onClick={() => setOpen(true)}
         label="Sincronizar"

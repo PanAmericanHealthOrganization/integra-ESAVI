@@ -109,7 +109,10 @@ export const SimularVacunacionDialog = ({
 
   return (
     <>
+      {/* `variant` explícito: el Button de react-admin es de texto por defecto y quedaba
+          desalineado con los botones contenidos del resto de cabeceras. */}
       <Button
+        variant="contained"
         startIcon={<ScienceIcon />}
         onClick={() => setOpen(true)}
         label="Simular"

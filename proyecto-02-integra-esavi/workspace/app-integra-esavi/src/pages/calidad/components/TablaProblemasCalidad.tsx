@@ -32,14 +32,9 @@ const numberFormatter = new Intl.NumberFormat("es-ES")
 
 // Estilo de celda de encabezado alineado con las tablas de catálogos:
 // mayúsculas, letra pequeña, gris y con tracking.
-const headCellSx = {
-  bgcolor: "background.paper",
-  fontSize: 11,
-  fontWeight: 700,
-  letterSpacing: 0.6,
-  textTransform: "uppercase" as const,
-  color: "text.secondary",
-}
+// Tipografía y color del encabezado vienen del tema (MuiTableCell.head); aquí sólo queda
+// el fondo, necesario porque la tabla usa stickyHeader.
+const headCellSx = { bgcolor: "background.paper" }
 
 export const TablaProblemasCalidad: React.FC<TablaProblemasCalidadProps> = ({
   dimension,

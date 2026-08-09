@@ -5,7 +5,6 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline"
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Avatar,
   Box,
   Button,
   Chip,
@@ -22,7 +21,6 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   Switch,
@@ -39,6 +37,8 @@ import {
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import { useState } from "react"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -486,71 +486,49 @@ export const HomologadoresPage = () => {
 
   // ── Render ──
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="Homologación ESAVI" />
 
       {/* ── HOMOLOGATORS TABLE ── */}
-      <Paper elevation={0} sx={{ mb: 2, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-        <Box
-          px={2.5}
-          py={2}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          gap={1.5}
-          flexWrap="wrap"
-          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
-              <CompareArrowsIcon fontSize="small" />
-            </Avatar>
-            <Box>
-              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-                Homologadores
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {homLoading ? "Cargando..." : `${homTotal ?? 0} homologador${homTotal === 1 ? "" : "es"}`}
-              </Typography>
-            </Box>
-          </Box>
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
-            <TextField
-              placeholder="Filtrar entidad..."
-              size="small"
-              value={filterEntity}
-              onChange={(e) => { setFilterEntity(e.target.value); setHomPage(0) }}
-              sx={{ width: 170, bgcolor: "background.paper" }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <TextField
-              placeholder="Filtrar campo..."
-              size="small"
-              value={filterField}
-              onChange={(e) => { setFilterField(e.target.value); setHomPage(0) }}
-              sx={{ width: 170, bgcolor: "background.paper" }}
-            />
-            <Button
-              size="small"
-              onClick={() => { setFilterEntity(""); setFilterField(""); setHomPage(0) }}
-              disabled={!filterEntity && !filterField}>
-              Limpiar
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={openCreateHom}
-              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
-              Nuevo
-            </Button>
-          </Stack>
-        </Box>
+      <PanelTabla sx={{ mb: 2 }}>
+        <PanelHeader
+          icono={<CompareArrowsIcon fontSize="small" />}
+          titulo="Homologadores"
+          subtitulo={
+            homLoading ? "Cargando..." : `${homTotal ?? 0} homologador${homTotal === 1 ? "" : "es"}`
+          }
+          acciones={
+            <>
+              <TextField
+                placeholder="Filtrar entidad..."
+                value={filterEntity}
+                onChange={(e) => { setFilterEntity(e.target.value); setHomPage(0) }}
+                sx={{ width: 170 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <TextField
+                placeholder="Filtrar campo..."
+                value={filterField}
+                onChange={(e) => { setFilterField(e.target.value); setHomPage(0) }}
+                sx={{ width: 170 }}
+              />
+              <Button
+                onClick={() => { setFilterEntity(""); setFilterField(""); setHomPage(0) }}
+                disabled={!filterEntity && !filterField}>
+                Limpiar
+              </Button>
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateHom}>
+                Nuevo
+              </Button>
+            </>
+          }
+        />
 
         <TableContainer>
           <Table size="small">
@@ -561,11 +539,6 @@ export const HomologadoresPage = () => {
                     key={head || idx}
                     align={idx === 6 ? "right" : "left"}
                     sx={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: 0.6,
-                      textTransform: "uppercase",
-                      color: "text.secondary",
                     }}>
                     {head}
                   </TableCell>
@@ -691,45 +664,30 @@ export const HomologadoresPage = () => {
           onPageChange={(_, p) => setHomPage(p)}
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
         />
-      </Paper>
+      </PanelTabla>
 
       {/* ── HOMOLOGATIONS TABLE ── */}
       <Collapse in={!!selectedHom} unmountOnExit>
-        <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2.5}
-            py={2}
-            display="flex"
-            alignItems="center"
-            justifyContent="space-between"
-            gap={1.5}
-            flexWrap="wrap"
-            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
-            <Box display="flex" alignItems="center" gap={1.5}>
-              <Avatar sx={{ bgcolor: "secondary.main", width: 38, height: 38 }}>
-                <CompareArrowsIcon fontSize="small" />
-              </Avatar>
-              <Box>
-                <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-                  Reglas de Homologación
-                </Typography>
-                {selectedHom && (
-                  <Typography variant="caption" color="text.secondary">
-                    {selectedHom.entity}.<strong>{selectedHom.field}</strong> → tipo{" "}
-                    <strong>{selectedHom.targetType}</strong> · {honTotal ?? 0} regla{honTotal === 1 ? "" : "s"}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={openCreateHon}
-              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
-              Nuevo
-            </Button>
-          </Box>
+        <PanelTabla>
+          <PanelHeader
+            color="secondary"
+            icono={<CompareArrowsIcon fontSize="small" />}
+            titulo="Reglas de Homologación"
+            subtitulo={
+              selectedHom && (
+                <>
+                  {selectedHom.entity}.<strong>{selectedHom.field}</strong> → tipo{" "}
+                  <strong>{selectedHom.targetType}</strong> · {honTotal ?? 0} regla
+                  {honTotal === 1 ? "" : "s"}
+                </>
+              )
+            }
+            acciones={
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateHon}>
+                Nuevo
+              </Button>
+            }
+          />
 
           <TableContainer>
             <Table size="small">
@@ -741,11 +699,6 @@ export const HomologadoresPage = () => {
                         key={head || idx}
                         align={idx === 8 ? "right" : "left"}
                         sx={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          letterSpacing: 0.6,
-                          textTransform: "uppercase",
-                          color: "text.secondary",
                         }}>
                         {head}
                       </TableCell>
@@ -861,7 +814,7 @@ export const HomologadoresPage = () => {
             onPageChange={(_, p) => setHonPage(p)}
             labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
           />
-        </Paper>
+        </PanelTabla>
       </Collapse>
 
       {/* ── DIALOGS ── */}

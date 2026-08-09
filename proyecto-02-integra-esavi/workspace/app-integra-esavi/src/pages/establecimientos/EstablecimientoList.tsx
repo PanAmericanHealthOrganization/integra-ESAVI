@@ -5,7 +5,6 @@ import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Avatar,
   Box,
   Button,
   CircularProgress,
@@ -21,7 +20,6 @@ import {
   InputAdornment,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   Table,
@@ -35,8 +33,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
 import { useEffect, useMemo, useRef, useState } from "react"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 interface ParroquiaRecord {
@@ -76,7 +75,6 @@ const EMPTY_FORM = {
 
 export const EstablecimientoList = () => {
   const notify = useNotify()
-  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -256,62 +254,39 @@ export const EstablecimientoList = () => {
   const isBusy = creating || updating
 
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="Establecimientos" />
-      <Paper elevation={0} sx={{ borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-        {/* ── Cabecera ── */}
-        <Box
-          px={2.5}
-          py={2}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          gap={1.5}
-          flexWrap="wrap"
-          sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-          <Box display="flex" alignItems="center" gap={1.5}>
-            <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
-              <LocalHospitalIcon fontSize="small" />
-            </Avatar>
-            <Box>
-              <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-                Establecimientos
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                {isLoading ? "Cargando..." : `${total ?? 0} establecimiento${total === 1 ? "" : "s"}`}
-              </Typography>
-            </Box>
-          </Box>
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <TextField
-              placeholder="Buscar..."
-              size="small"
-              sx={{ width: 280, bgcolor: "background.paper" }}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Button size="small" onClick={() => { setSearch(""); setDebouncedSearch(""); setPage(0) }} disabled={!search}>
-              Limpiar
-            </Button>
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={<AddIcon />}
-              onClick={openCreate}
-              sx={{ borderRadius: 5, px: 2, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
-              Nuevo
-            </Button>
-          </Stack>
-        </Box>
-
-        <Divider />
+      <PanelTabla>
+        <PanelHeader
+          icono={<LocalHospitalIcon fontSize="small" />}
+          titulo="Establecimientos"
+          subtitulo={
+            isLoading ? "Cargando..." : `${total ?? 0} establecimiento${total === 1 ? "" : "s"}`
+          }
+          acciones={
+            <>
+              <TextField
+                placeholder="Buscar..."
+                sx={{ width: 280 }}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <Button onClick={() => { setSearch(""); setDebouncedSearch(""); setPage(0) }} disabled={!search}>
+                Limpiar
+              </Button>
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
+                Nuevo
+              </Button>
+            </>
+          }
+        />
 
         {/* ── Tabla ── */}
         <TableContainer sx={{ maxHeight: 480 }}>
@@ -324,11 +299,6 @@ export const EstablecimientoList = () => {
                     align={idx === 8 ? "right" : "left"}
                     sx={{
                       minWidth: idx === 0 ? 80 : idx === 2 ? 140 : [3, 4, 5].includes(idx) ? 110 : idx === 6 ? 160 : idx === 7 ? 140 : undefined,
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: 0.6,
-                      textTransform: "uppercase",
-                      color: "text.secondary",
                     }}>
                     {head}
                   </TableCell>
@@ -454,7 +424,7 @@ export const EstablecimientoList = () => {
           onPageChange={(_, p) => setPage(p)}
           labelDisplayedRows={({ from, to, count }) => `${from}–${to} de ${count}`}
         />
-      </Paper>
+      </PanelTabla>
 
       {/* ── Diálogo Crear / Editar ── */}
       <Dialog open={dlg.open} onClose={closeDialog} maxWidth="sm" fullWidth>

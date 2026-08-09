@@ -1,4 +1,17 @@
-import { Datagrid, DateField, List, SelectInput, TextField, TextInput } from "react-admin"
+import SyncIcon from "@mui/icons-material/Sync"
+import { Box } from "@mui/material"
+import {
+  Datagrid,
+  DateField,
+  FilterForm,
+  List,
+  SelectInput,
+  TextField,
+  TextInput,
+  useListContext,
+} from "react-admin"
+import { PanelHeader } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 
 // Deben coincidir con el enum SyncSource del API.
 const sourceChoices = [
@@ -25,14 +38,27 @@ const syncFilters = [
   <TextInput source="name" label="Nombre" />,
 ]
 
+const SyncsListHeader = () => {
+  const { total, isLoading } = useListContext()
+  return (
+    <PanelHeader
+      icono={<SyncIcon fontSize="small" />}
+      titulo="Sincronizaciones"
+      subtitulo={isLoading ? "Cargando..." : `${total ?? 0} proceso${total === 1 ? "" : "s"}`}>
+      <FilterForm filters={syncFilters} />
+    </PanelHeader>
+  )
+}
+
 export const SyncsList = () => {
   return (
-    <List filters={syncFilters}>
+    <Box p={LAYOUT.paddingPagina}>
+    <List actions={false}>
+      <SyncsListHeader />
       <Datagrid
         rowClick="show"
         bulkActionButtons={false}
         sx={{
-          // El sx del Datagrid se aplica al div raiz, la tabla debe fijarse por su propia clase.
           "& .RaDatagrid-table": {
             tableLayout: "fixed",
             width: "100%",
@@ -83,5 +109,6 @@ export const SyncsList = () => {
         <TextField source="errorMessage" label="Mensaje de error" />
       </Datagrid>
     </List>
+    </Box>
   )
 }

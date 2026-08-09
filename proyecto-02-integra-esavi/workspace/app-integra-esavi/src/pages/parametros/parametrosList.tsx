@@ -9,7 +9,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility"
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff"
 import {
   Autocomplete,
-  Avatar,
   Box,
   Button,
   Chip,
@@ -30,6 +29,8 @@ import {
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import { useMemo, useState } from "react"
+import { PanelHeader } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import { Title, useGetList, useNotify, useUpdate } from "react-admin"
 
 enum TipoDato {
@@ -251,29 +252,20 @@ export const ParametrosList = () => {
   }
 
   return (
-    <Box p={2} pb={4}>
+    <Box p={LAYOUT.paddingPagina} pb={4}>
       <Title title="Parámetros" />
-      <Box
-        px={2.5}
-        py={2}
-        display="flex"
-        alignItems="center"
-        gap={1.5}
-        sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04), borderRadius: 2 }}>
-        <Avatar sx={{ bgcolor: "primary.main", width: 38, height: 38 }}>
-          <TuneIcon fontSize="small" />
-        </Avatar>
-        <Box>
-          <Typography variant="h6" fontWeight={700} lineHeight={1.2}>
-            Parámetros
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            {isLoading
-              ? "Cargando..."
-              : `${data?.length ?? 0} parámetro${data?.length === 1 ? "" : "s"} en ${moduleGroups.length} módulo${moduleGroups.length === 1 ? "" : "s"}`}
-          </Typography>
-        </Box>
-      </Box>
+      {/* Banda suelta: no hay tabla pegada debajo, así que va redondeada y sin divisor. */}
+      <PanelHeader
+        divisor={false}
+        sx={{ borderRadius: LAYOUT.radioTarjeta }}
+        icono={<TuneIcon fontSize="small" />}
+        titulo="Parámetros"
+        subtitulo={
+          isLoading
+            ? "Cargando..."
+            : `${data?.length ?? 0} parámetro${data?.length === 1 ? "" : "s"} en ${moduleGroups.length} módulo${moduleGroups.length === 1 ? "" : "s"}`
+        }
+      />
 
       <Box mt={2}>
         {isLoading ? (
@@ -381,7 +373,6 @@ export const ParametrosList = () => {
                                 opacity: 0,
                                 transition: "opacity 0.12s ease",
                                 bgcolor: "background.paper",
-                                borderRadius: 5,
                                 border: "1px solid",
                                 borderColor: "divider",
                                 px: 0.25,
@@ -509,7 +500,6 @@ export const ParametrosList = () => {
                 border: "1px solid",
                 borderColor: form.es_encriptado ? "success.main" : "divider",
                 bgcolor: form.es_encriptado ? alpha(theme.palette.success.main, 0.08) : "transparent",
-                borderRadius: 5,
                 transition: "all 0.15s ease",
               }}>
               <Stack direction="row" alignItems="center" spacing={0.5}>

@@ -5,7 +5,6 @@ import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LocationCityIcon from "@mui/icons-material/LocationCity"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Avatar,
   Box,
   Button,
   Chip,
@@ -15,13 +14,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Divider,
   FormControl,
   IconButton,
   InputAdornment,
   InputLabel,
   MenuItem,
-  Paper,
   Select,
   Stack,
   Table,
@@ -34,8 +31,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
 import { useMemo, useState } from "react"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import { Title, useCreate, useDelete, useGetList, useNotify, useUpdate } from "react-admin"
 
 interface ProvinciaRecord {
@@ -64,7 +62,6 @@ const EMPTY_PARROQUIA = { codigo: "", nombre: "", cantonCodigo: "" }
 
 export const DpaList = () => {
   const notify = useNotify()
-  const theme = useTheme()
   const [create, { isPending: creating }] = useCreate()
   const [update, { isPending: updating }] = useUpdate()
   const [deleteOne, { isPending: deleting }] = useDelete()
@@ -286,48 +283,27 @@ export const DpaList = () => {
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="DPA" />
       <Box display="flex" gap={2} alignItems="flex-start" sx={{ overflowX: "auto" }}>
 
         {/* ── Panel Provincias ── */}
-        <Paper elevation={0} sx={{ flex: 1, minWidth: 220, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2}
-            py={1.75}
-            display="flex"
-            flexDirection="column"
-            gap={1.25}
-            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
-              <Box display="flex" alignItems="center" gap={1}>
-                <Avatar sx={{ bgcolor: "primary.main", width: 30, height: 30 }}>
-                  <LocationCityIcon sx={{ fontSize: 16 }} />
-                </Avatar>
-                <Box>
-                  <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2}>
-                    Provincias
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {loadingProvincias ? "..." : `${provincias?.length ?? 0}`}
-                  </Typography>
-                </Box>
-              </Box>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<AddIcon />}
-                onClick={openCreateProvincia}
-                sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+        <PanelTabla sx={{ flex: 1, minWidth: 220 }}>
+          <PanelHeader
+            apilado
+            densidad="compacta"
+            icono={<LocationCityIcon sx={{ fontSize: 16 }} />}
+            titulo="Provincias"
+            subtitulo={loadingProvincias ? "..." : `${provincias?.length ?? 0}`}
+            acciones={
+              <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateProvincia}>
                 Nueva
               </Button>
-            </Box>
+            }>
             <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
-                size="small"
                 fullWidth
-                sx={{ bgcolor: "background.paper" }}
                 value={searchProvincia}
                 onChange={(e) => setSearchProvincia(e.target.value)}
                 InputProps={{
@@ -338,13 +314,11 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchProvincia("")} disabled={!searchProvincia} sx={{ minWidth: "auto", px: 1 }}>
+              <Button onClick={() => setSearchProvincia("")} disabled={!searchProvincia} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
             </Stack>
-          </Box>
-
-          <Divider />
+          </PanelHeader>
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -352,8 +326,7 @@ export const DpaList = () => {
                   {["Cód", "Nombre", ""].map((head, idx) => (
                     <TableCell
                       key={head || idx}
-                      align={idx === 2 ? "right" : "left"}
-                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      align={idx === 2 ? "right" : "left"}>
                       {head}
                     </TableCell>
                   ))}
@@ -440,56 +413,39 @@ export const DpaList = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </PanelTabla>
 
         {/* ── Panel Cantones ── */}
-        <Paper elevation={0} sx={{ flex: 1.2, minWidth: 240, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2}
-            py={1.75}
-            display="flex"
-            flexDirection="column"
-            gap={1.25}
-            sx={{ bgcolor: alpha(theme.palette.secondary.main, 0.04) }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
-              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden" }}>
-                <Avatar sx={{ bgcolor: "secondary.main", width: 30, height: 30 }}>
-                  <LocationCityIcon sx={{ fontSize: 16 }} />
-                </Avatar>
-                <Box sx={{ minWidth: 0 }}>
-                  <Box display="flex" alignItems="center" gap={0.75}>
-                    <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
-                      Cantones
-                    </Typography>
-                    {selectedProvincia && (
-                      <Chip label={selectedProvincia.nombre} size="small" color="secondary" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
-                    )}
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {!selectedProvincia ? "Selecciona provincia" : `${cantonesOfProvincia.length}`}
-                  </Typography>
-                </Box>
-              </Box>
+        <PanelTabla sx={{ flex: 1.2, minWidth: 240 }}>
+          <PanelHeader
+            apilado
+            densidad="compacta"
+            color="secondary"
+            icono={<LocationCityIcon sx={{ fontSize: 16 }} />}
+            titulo="Cantones"
+            adorno={
+              selectedProvincia && (
+                <Chip label={selectedProvincia.nombre} size="small" color="secondary" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
+              )
+            }
+            subtitulo={!selectedProvincia ? "Selecciona provincia" : `${cantonesOfProvincia.length}`}
+            acciones={
               <Tooltip title={!selectedProvincia ? "Selecciona una provincia primero" : ""} placement="left">
                 <span>
                   <Button
                     variant="contained"
-                    size="small"
                     startIcon={<AddIcon />}
                     disabled={!selectedProvincia}
-                    onClick={openCreateCanton}
-                    sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+                    onClick={openCreateCanton}>
                     Nuevo
                   </Button>
                 </span>
               </Tooltip>
-            </Box>
+            }>
             <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
-                size="small"
                 fullWidth
-                sx={{ bgcolor: "background.paper" }}
                 value={searchCanton}
                 onChange={(e) => setSearchCanton(e.target.value)}
                 disabled={!selectedProvincia}
@@ -501,13 +457,11 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchCanton("")} disabled={!searchCanton} sx={{ minWidth: "auto", px: 1 }}>
+              <Button onClick={() => setSearchCanton("")} disabled={!searchCanton} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
             </Stack>
-          </Box>
-
-          <Divider />
+          </PanelHeader>
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -515,8 +469,7 @@ export const DpaList = () => {
                   {["Cód", "Nombre", ""].map((head, idx) => (
                     <TableCell
                       key={head || idx}
-                      align={idx === 2 ? "right" : "left"}
-                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      align={idx === 2 ? "right" : "left"}>
                       {head}
                     </TableCell>
                   ))}
@@ -612,56 +565,39 @@ export const DpaList = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </PanelTabla>
 
         {/* ── Panel Parroquias ── */}
-        <Paper elevation={0} sx={{ flex: 1.2, minWidth: 240, borderRadius: 2, border: "1px solid", borderColor: "divider", overflow: "hidden" }}>
-          <Box
-            px={2}
-            py={1.75}
-            display="flex"
-            flexDirection="column"
-            gap={1.25}
-            sx={{ bgcolor: alpha(theme.palette.success.main, 0.04) }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
-              <Box display="flex" alignItems="center" gap={1} sx={{ minWidth: 0, overflow: "hidden" }}>
-                <Avatar sx={{ bgcolor: "success.main", width: 30, height: 30 }}>
-                  <LocationCityIcon sx={{ fontSize: 16 }} />
-                </Avatar>
-                <Box sx={{ minWidth: 0 }}>
-                  <Box display="flex" alignItems="center" gap={0.75}>
-                    <Typography variant="subtitle2" fontWeight={700} lineHeight={1.2} sx={{ whiteSpace: "nowrap" }}>
-                      Parroquias
-                    </Typography>
-                    {selectedCanton && (
-                      <Chip label={selectedCanton.nombre} size="small" color="success" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
-                    )}
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {!selectedCanton ? "Selecciona cantón" : `${parroquiasOfCanton.length}`}
-                  </Typography>
-                </Box>
-              </Box>
+        <PanelTabla sx={{ flex: 1.2, minWidth: 240 }}>
+          <PanelHeader
+            apilado
+            densidad="compacta"
+            color="success"
+            icono={<LocationCityIcon sx={{ fontSize: 16 }} />}
+            titulo="Parroquias"
+            adorno={
+              selectedCanton && (
+                <Chip label={selectedCanton.nombre} size="small" color="success" variant="outlined" sx={{ maxWidth: 100, overflow: "hidden", height: 18, fontSize: 10 }} />
+              )
+            }
+            subtitulo={!selectedCanton ? "Selecciona cantón" : `${parroquiasOfCanton.length}`}
+            acciones={
               <Tooltip title={!selectedCanton ? "Selecciona un cantón primero" : ""} placement="left">
                 <span>
                   <Button
                     variant="contained"
-                    size="small"
                     startIcon={<AddIcon />}
                     disabled={!selectedCanton}
-                    onClick={openCreateParroquia}
-                    sx={{ borderRadius: 5, boxShadow: "none", "&:hover": { boxShadow: "none" } }}>
+                    onClick={openCreateParroquia}>
                     Nueva
                   </Button>
                 </span>
               </Tooltip>
-            </Box>
+            }>
             <Stack direction="row" spacing={1} alignItems="center">
               <TextField
                 placeholder="Buscar…"
-                size="small"
                 fullWidth
-                sx={{ bgcolor: "background.paper" }}
                 value={searchParroquia}
                 onChange={(e) => setSearchParroquia(e.target.value)}
                 disabled={!selectedCanton}
@@ -673,13 +609,11 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button size="small" onClick={() => setSearchParroquia("")} disabled={!searchParroquia} sx={{ minWidth: "auto", px: 1 }}>
+              <Button onClick={() => setSearchParroquia("")} disabled={!searchParroquia} sx={{ minWidth: "auto", px: 1 }}>
                 Limpiar
               </Button>
             </Stack>
-          </Box>
-
-          <Divider />
+          </PanelHeader>
           <TableContainer sx={{ maxHeight: 480 }}>
             <Table size="small" stickyHeader>
               <TableHead>
@@ -687,8 +621,7 @@ export const DpaList = () => {
                   {["Cód", "Nombre", ""].map((head, idx) => (
                     <TableCell
                       key={head || idx}
-                      align={idx === 2 ? "right" : "left"}
-                      sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: "uppercase", color: "text.secondary" }}>
+                      align={idx === 2 ? "right" : "left"}>
                       {head}
                     </TableCell>
                   ))}
@@ -770,7 +703,7 @@ export const DpaList = () => {
               </TableBody>
             </Table>
           </TableContainer>
-        </Paper>
+        </PanelTabla>
       </Box>
 
       {/* ── Diálogo Provincia ── */}
