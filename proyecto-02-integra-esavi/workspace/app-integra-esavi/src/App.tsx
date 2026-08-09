@@ -12,10 +12,8 @@ import {dataProvider} from "./dataProviders/dataProvider"
 import keycloak from "./keycloak"
 import {CustomLayout} from "./layout/CustomLayout"
 import {CustomLoginPage} from "./layout/CustomLogin"
-import analisis from "./pages/analisis"
 import {CatalogosConfigList} from "./pages/catalogos-config/catalogosConfigList"
 import dashboard from "./pages/dashboard"
-import {EsaviDashboardList} from "./pages/esavi-dashboard/esavi-dashboard"
 import esavis from "./pages/esavis"
 import gaceta from "./pages/gaceta"
 import {ParametrosList} from "./pages/parametros/parametrosList"
@@ -89,7 +87,6 @@ const App = () => {
       theme={theme}>
       <Resource name="dashboard" options={{ label: "Dashboard" }} list={dashboard.list} />
       <Resource name="esavis" list={esavis.list} show={esavis.show} />
-      <Resource name="analisis" list={analisis.list} />
       <Resource name="vacunometro" {...vacunometro} />
       <Resource name="configuraciones" {...configuraciones} />
       <Resource name="parametros" list={ParametrosPage} />
@@ -102,7 +99,6 @@ const App = () => {
       <Resource name="provincias" />
       <Resource name="cantones" />
       <Resource name="parroquias" />
-      <Resource name="esavis-dashboard" list={EsaviDashboardList} />
       <Resource name="gaceta" {...gaceta} />
       <Resource name="homologators" list={HomologadoresGuarded} />
       <Resource name="homologations" />
