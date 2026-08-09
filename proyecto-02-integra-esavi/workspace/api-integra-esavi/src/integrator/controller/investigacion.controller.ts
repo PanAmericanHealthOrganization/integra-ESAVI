@@ -1,14 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
-import { ApiTags} from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags} from '@nestjs/swagger';
 import { Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto } from '../entity/investigacion.entity';//'../dto/investigacion.dto';
 import { InvestigacionService, IControllerCreateOmit } from '../service/investigacion.service';
 import { Notificacion } from '../entity/notificacion.entity';
 
 //--Se recomienda usar las interfaces icontroller y la iservice,
 //que se encuentran en src/utils/IController.ts
+/**
+ * Investigación de casos ESAVI. El rol se anota endpoint por endpoint y no por verbo: aquí
+ * `getMany` y `paginated` son consultas que usan POST sólo para mandar los filtros en el
+ * cuerpo, así que quedan como lectura.
+ */
 @ApiTags('Investigacion')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/investigacion', version: '1' })
 export class InvestigacionController 
   implements IControllerCreateOmit<InvestigacionCreateDto, InvestigacionDto, InvestigacionUpdateDto>
@@ -48,6 +58,7 @@ export class InvestigacionController
   public create(@Body() data: any): Promise<any> {
     return this.investigacionService.create(data);
   }*/
+  @Roles('admin')
   @Post('create')
   public create(
     @Body() investigacionCreateDto: InvestigacionCreateDto,
@@ -59,6 +70,7 @@ export class InvestigacionController
   /**
    *
    */
+  @Roles('admin')
   @Put('update/:id')
   public update(@Param('id') id: Identificator, @Body() data: any): Promise<any> {
     return this.investigacionService.update(id, data);
@@ -67,6 +79,7 @@ export class InvestigacionController
   /**
    *
    */
+  @Roles('admin')
   @Delete('delete/:id')
   public delete(id: Identificator, auditData: any): Promise<InvestigacionDto> {
     return this.investigacionService.delete(id, auditData);

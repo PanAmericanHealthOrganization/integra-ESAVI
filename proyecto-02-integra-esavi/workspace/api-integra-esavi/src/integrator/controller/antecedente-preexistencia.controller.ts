@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { UpdateAntecedentePreexistenciaDto } from '../dto';
 import { AntecedentePreexistenciaService } from '../service/antecedente-preexistencia.service';
 
 @ApiTags('Antecedente Pre-existencia')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/antecedente-preexistencia', version: '1' })
 export class AntecedentePreexistenciaController {
   constructor(private antecedentePreexistenciaService: AntecedentePreexistenciaService) {}
@@ -31,6 +36,7 @@ export class AntecedentePreexistenciaController {
   }
 
   //ACTUALIZAR DATOS
+  @Roles('admin')
   @Put(':uuid')
   @ApiResponse({
     status: 200,

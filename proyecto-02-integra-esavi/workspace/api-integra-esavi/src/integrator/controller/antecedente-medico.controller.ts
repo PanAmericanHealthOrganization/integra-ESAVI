@@ -1,10 +1,15 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseFilters } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseFilters, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { HttpExceptionFilter } from '../../providers/http-exception.filter';
 import { UpdateAntecedenteMedicoDto } from '../dto';
 import { AntecedenteMedicoService } from '../service/antecedente-medico.service';
 
 @ApiTags('Antecedente Medico')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/antecedente-medico', version: '1' })
 @UseFilters(new HttpExceptionFilter())
 export class AntecedenteMedicoController {
@@ -33,6 +38,7 @@ export class AntecedenteMedicoController {
   }
 
   //ACTUALIZAR DATOS
+  @Roles('admin')
   @Put(':uuid')
   @ApiResponse({
     status: 200,

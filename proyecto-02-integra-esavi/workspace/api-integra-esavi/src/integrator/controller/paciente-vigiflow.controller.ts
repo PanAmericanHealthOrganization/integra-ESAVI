@@ -1,10 +1,16 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreatePacienteVigiflowDto } from '../dto';
 import { UpdatePacienteDto } from '../dto';
 import { PacienteService } from '../service/paciente.service';
 
 @ApiTags('Paciente')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller({ path: 'integrator/paciente/vigiflow', version: '1' })
 export class PacienteVigiflowController {
   constructor(private pacienteService: PacienteService) {}

@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { UpdateDatoEsaviDto } from '../dto';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 
 @ApiTags('Esavi')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/esavi/dato', version: '1' })
 export class DatoEsaviController {
   constructor(private datoEsaviService: DatoEsaviService) {}
@@ -31,6 +36,7 @@ export class DatoEsaviController {
   }
 
   //ACTUALIZAR DATOS
+  @Roles('admin')
   @Put(':uuid')
   @ApiResponse({
     status: 200,

@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreateAntecedenteEmbarazoDto, UpdateAntecedenteEmbarazoDto } from '../dto';
 import { AntecedenteEmbarazoService } from '../service/antecedente-embarazo.service';
 
 @ApiTags('Antecedente Embarazo')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/antecedente-embarazo', version: '1' })
 export class AntecedenteEmbarazoController {
   constructor(private antecedenteEmbarazoService: AntecedenteEmbarazoService) {}
@@ -31,6 +36,7 @@ export class AntecedenteEmbarazoController {
   }
 
   //INSERTAR DATOS
+  @Roles('admin')
   @Post('/create')
   @ApiResponse({
     status: 201,
@@ -45,6 +51,7 @@ export class AntecedenteEmbarazoController {
   }
 
   //ACTUALIZAR DATOS
+  @Roles('admin')
   @Put(':uuid')
   @ApiResponse({
     status: 200,

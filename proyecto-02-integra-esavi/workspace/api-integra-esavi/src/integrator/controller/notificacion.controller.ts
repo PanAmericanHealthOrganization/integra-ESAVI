@@ -7,9 +7,11 @@ import {
   ParseUUIDPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetListParams } from 'src/utils/interfaces/pagination';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import { DatoEsaviService } from '../service/dato-esavi.service';
 import { DatoVacunaService } from '../service/dato-vacuna.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
@@ -18,7 +20,15 @@ import { EmbarazoEsaviService } from '../service/embarazo-esavi.service';
 import { GravedadEsaviService } from '../service/gravedad-esavi.service';
 import { NotificacionService } from '../service/notificacion.service';
 
+/**
+ * Historia clínica del ESAVI: paciente, antecedentes, vacunas aplicadas, desenlace y
+ * gravedad. Todos los endpoints son de lectura, así que basta con exigir token —no rol—,
+ * porque la ficha del ESAVI la consulta cualquier usuario autenticado desde la pantalla
+ * /esavis. Las escrituras viven en los controladores por bloque, donde sí piden `admin`.
+ */
 @ApiTags('Notificacion')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard)
 @Controller({ path: 'integrator/notificacion', version: '1' })
 export class NotificacionController {
   constructor(

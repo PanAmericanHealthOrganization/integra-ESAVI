@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import { NotificacionController } from './notificacion.controller';
 import { NotificacionService } from '../service/notificacion.service';
 import { DatoVacunacionService } from '../service/dato-vacunacion.service';
@@ -47,7 +48,14 @@ describe('NotificacionController', () => {
         { provide: DesenlaceEsaviService, useValue: mockDesenlaceEsaviService },
         { provide: GravedadEsaviService, useValue: mockGravedadEsaviService },
       ],
-    }).compile();
+    })
+      // El controlador exige token de Keycloak. Estas pruebas ejercitan la delegación en los
+      // servicios, no la autenticación (que se cubre en proteccion-clinicos.spec.ts), así que
+      // se reemplaza el guard: instanciarlo de verdad exigiría un ConfigService y descargar
+      // las claves JWKS.
+      .overrideGuard(KeycloakAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
     controller = module.get<NotificacionController>(NotificacionController);
   });
 

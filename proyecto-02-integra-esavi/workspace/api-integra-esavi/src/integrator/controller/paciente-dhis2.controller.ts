@@ -1,10 +1,16 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreatePacienteDhis2Dto } from '../dto';
 import { UpdatePacienteDto } from '../dto';
 import { PacienteDhis2Service } from '../service/paciente-dhis2.service';
 
 @ApiTags('Paciente')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller({ path: 'integrator/paciente/dhis2', version: '1' })
 export class PacienteDhis2Controller {
   constructor(private pacienteDhis2Service: PacienteDhis2Service) {}

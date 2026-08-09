@@ -1,9 +1,14 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Put } from '@nestjs/common';
-import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Put, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { UpdateAntecedenteEventoDto } from '../dto';
 import { AntecedenteEventoService } from '../service/antecedente-evento.service';
 
 @ApiTags('Antecedente Evento')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/antecedente-evento', version: '1' })
 export class AntecedenteEventoController {
   constructor(private antecedenteEventoService: AntecedenteEventoService) {}
@@ -31,6 +36,7 @@ export class AntecedenteEventoController {
   }
 
   //ACTUALIZAR DATOS
+  @Roles('admin')
   @Put(':uuid')
   @ApiResponse({
     status: 200,
