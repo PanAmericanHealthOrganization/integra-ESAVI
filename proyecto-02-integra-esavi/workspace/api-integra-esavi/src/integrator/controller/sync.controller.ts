@@ -1,5 +1,8 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { CreateSyncDto, SyncDto, UpdateSyncDto } from '../dto/sync.dto';
@@ -9,6 +12,8 @@ import { SyncService } from '../service';
  *
  */
 @ApiTags('Procesos de sincronización Sync')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/syncs', version: '1' })
 export class SyncController implements IController<CreateSyncDto, SyncDto, UpdateSyncDto> {
   constructor(private readonly syncService: SyncService) {}
@@ -51,6 +56,7 @@ export class SyncController implements IController<CreateSyncDto, SyncDto, Updat
    * @param params
    * @returns
    */
+  @Roles('admin')
   @Delete(':id')
   public async delete(@Param('id') id: Identificator, auditData: any): Promise<SyncDto> {
     return this.syncService.delete(id, auditData);
@@ -83,6 +89,7 @@ export class SyncController implements IController<CreateSyncDto, SyncDto, Updat
    * @param params
    * @returns
    */
+  @Roles('admin')
   @Post('create')
   public async create(data: CreateSyncDto): Promise<SyncDto> {
     return this.syncService.create(data);
@@ -93,6 +100,7 @@ export class SyncController implements IController<CreateSyncDto, SyncDto, Updat
    * @param params
    * @returns
    */
+  @Roles('admin')
   @Put(':id')
   public async update(id: Identificator, data: UpdateSyncDto): Promise<SyncDto> {
     return this.syncService.update(id, data);

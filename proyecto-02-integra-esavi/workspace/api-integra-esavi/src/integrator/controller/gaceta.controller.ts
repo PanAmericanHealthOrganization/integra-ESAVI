@@ -9,9 +9,13 @@ import {
   Put,
   Query,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { IController, Identificator, IGetManyParams } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { CreateGacetaDto, GacetaDto, UpdateGacetaDto } from '../dto';
@@ -22,6 +26,8 @@ import { GacetaService } from '../service/gaceta.service';
  * Controlador para la gestión de gacetas de eventos adversos
  */
 @ApiTags('Gaceta')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/gaceta', version: '1' })
 export class GacetaController implements IController<CreateGacetaDto, GacetaDto, UpdateGacetaDto> {
   constructor(private readonly gacetaService: GacetaService) {}
@@ -129,6 +135,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   /**
    * Crear nueva gaceta
    */
+  @Roles('admin')
   @Post('create')
   @ApiOperation({ summary: 'Crear nueva gaceta' })
   @ApiResponse({
@@ -145,6 +152,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   /**
    * Actualizar gaceta existente
    */
+  @Roles('admin')
   @Put('update/:id')
   @ApiOperation({ summary: 'Actualizar gaceta existente' })
   @ApiParam({
@@ -167,6 +175,7 @@ export class GacetaController implements IController<CreateGacetaDto, GacetaDto,
   /**
    * Eliminar gaceta (soft delete)
    */
+  @Roles('admin')
   @Delete(':id')
   @ApiOperation({ summary: 'Eliminar gaceta (marcado como cancelado)' })
   @ApiParam({

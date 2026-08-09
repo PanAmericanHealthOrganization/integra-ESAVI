@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreateCantonDto, UpdateCantonDto } from '../dto/canton.dto';
 import { CantonService } from '../service/canton.service';
 
 @ApiTags('Canton')
 @ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/cantones', version: '1' })
 export class CantonController {
   constructor(private readonly cantonService: CantonService) {}
@@ -28,6 +32,7 @@ export class CantonController {
     return this.cantonService.findOne(codigo);
   }
 
+  @Roles('admin')
   @Post()
   @ApiResponse({ status: 201, description: 'Cantón creado exitosamente.' })
   @ApiResponse({ status: 400, description: 'Error al crear el cantón.' })
@@ -35,6 +40,7 @@ export class CantonController {
     return this.cantonService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Put(':codigo')
   @ApiResponse({ status: 200, description: 'Cantón actualizado exitosamente.' })
   @ApiResponse({ status: 404, description: 'Cantón no encontrado.' })
@@ -46,6 +52,7 @@ export class CantonController {
     return this.cantonService.update(codigo, body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Delete(':codigo')
   @ApiResponse({ status: 200, description: 'Cantón eliminado exitosamente.' })
   @ApiResponse({ status: 404, description: 'Cantón no encontrado.' })

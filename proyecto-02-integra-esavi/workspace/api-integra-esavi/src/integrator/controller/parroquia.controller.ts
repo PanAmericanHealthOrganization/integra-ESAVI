@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreateParroquiaDto, UpdateParroquiaDto } from '../dto/parroquia.dto';
 import { ParroquiaService } from '../service/parroquia.service';
 
 @ApiTags('Parroquia')
 @ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/parroquias', version: '1' })
 export class ParroquiaController {
   constructor(private readonly parroquiaService: ParroquiaService) {}
@@ -28,6 +32,7 @@ export class ParroquiaController {
     return this.parroquiaService.findOne(codigo);
   }
 
+  @Roles('admin')
   @Post()
   @ApiResponse({ status: 201, description: 'Parroquia creada exitosamente.' })
   @ApiResponse({ status: 400, description: 'Error al crear la parroquia.' })
@@ -35,6 +40,7 @@ export class ParroquiaController {
     return this.parroquiaService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Put(':codigo')
   @ApiResponse({ status: 200, description: 'Parroquia actualizada exitosamente.' })
   @ApiResponse({ status: 404, description: 'Parroquia no encontrada.' })
@@ -46,6 +52,7 @@ export class ParroquiaController {
     return this.parroquiaService.update(codigo, body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Delete(':codigo')
   @ApiResponse({ status: 200, description: 'Parroquia eliminada exitosamente.' })
   @ApiResponse({ status: 404, description: 'Parroquia no encontrada.' })

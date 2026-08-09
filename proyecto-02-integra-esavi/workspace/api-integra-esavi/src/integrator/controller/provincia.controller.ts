@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreateProvinciaDto, UpdateProvinciaDto } from '../dto/provincia.dto';
 import { ProvinciaService } from '../service/provincia.service';
 
 @ApiTags('Provincia')
 @ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/provincias', version: '1' })
 export class ProvinciaController {
   constructor(private readonly provinciaService: ProvinciaService) {}
@@ -24,6 +28,7 @@ export class ProvinciaController {
     return this.provinciaService.findOne(codigo);
   }
 
+  @Roles('admin')
   @Post()
   @ApiResponse({ status: 201, description: 'Provincia creada exitosamente.' })
   @ApiResponse({ status: 400, description: 'Error al crear la provincia.' })
@@ -31,6 +36,7 @@ export class ProvinciaController {
     return this.provinciaService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Put(':codigo')
   @ApiResponse({ status: 200, description: 'Provincia actualizada exitosamente.' })
   @ApiResponse({ status: 404, description: 'Provincia no encontrada.' })
@@ -42,6 +48,7 @@ export class ProvinciaController {
     return this.provinciaService.update(codigo, body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Delete(':codigo')
   @ApiResponse({ status: 200, description: 'Provincia eliminada exitosamente.' })
   @ApiResponse({ status: 404, description: 'Provincia no encontrada.' })

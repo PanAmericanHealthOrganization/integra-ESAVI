@@ -1,12 +1,16 @@
-import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { getUsernameFromJwt } from 'src/common/utils/jwt.util';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { CreateEstablecimientoDto, UpdateEstablecimientoDto } from '../dto/establecimiento.dto';
 import { EstablecimientosService } from '../service/establecimientos.service';
 
 @ApiTags('Establecimiento')
 @ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
 @Controller({ path: 'integrator/establecimientos', version: '1' })
 export class EstablecimientoController {
   private readonly logger = new Logger(EstablecimientoController.name);
@@ -33,6 +37,7 @@ export class EstablecimientoController {
     return this.establecimientosService.findOne(id);
   }
 
+  @Roles('admin')
   @Post()
   @ApiResponse({ status: 201, description: 'Establecimiento creado exitosamente.' })
   create(@Body() body: CreateEstablecimientoDto, @Req() req: Request) {
@@ -40,6 +45,7 @@ export class EstablecimientoController {
     return this.establecimientosService.create(body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Put(':id')
   @ApiResponse({ status: 200, description: 'Establecimiento actualizado exitosamente.' })
   update(
@@ -51,6 +57,7 @@ export class EstablecimientoController {
     return this.establecimientosService.update(id, body, getUsernameFromJwt(req.headers.authorization));
   }
 
+  @Roles('admin')
   @Delete(':id')
   @ApiResponse({ status: 200, description: 'Establecimiento eliminado exitosamente.' })
   delete(@Param('id') id: string, @Req() req: Request) {
