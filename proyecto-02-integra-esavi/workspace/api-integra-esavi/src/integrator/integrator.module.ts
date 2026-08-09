@@ -15,7 +15,6 @@ import {CatalogoPadreController} from './controller/catalogo-padre.controller';
 import {DatoEsaviController} from './controller/dato-esavi.controller';
 import {DesenlaceEsaviController} from './controller/desenlace-esavi.controller';
 import {EstablecimientoController} from './controller/establecimiento.controller';
-import {IntegradorController} from './controller/integrador.controller';
 import {InvestigacionController} from './controller/investigacion.controller';
 import {NotificacionController} from './controller/notificacion.controller';
 import {NotificadorController} from './controller/notificador.controller';
@@ -156,7 +155,6 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
     AntecedentePreexistenciaController,
     DatoEsaviController,
     DesenlaceEsaviController,
-    IntegradorController,
     PacienteVigiflowController,
     NotificacionController,
     ReporteController,
