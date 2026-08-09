@@ -20,30 +20,29 @@ import {
   Typography,
 } from "@mui/material"
 import { TreeItem, TreeView } from "@mui/x-tree-view"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Title } from "react-admin"
 import { SincronizarMeddraButton } from "../../components/SyncActions"
-import { SyncPanel } from "../../components/SyncPanel"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface SOC {
-  id: number
+  id?: number
   code: string
   name: string
   abbrev: string
 }
 
 interface PT {
-  id: number
+  id?: number
   code: string
   name: string
   socCode: string
 }
 
 interface LLT {
-  id: number
+  id?: number
   code: string
   name: string
   ptCode: string
@@ -52,10 +51,59 @@ interface LLT {
 
 type ChildrenState<T> = "unloaded" | "loading" | T[]
 
+type NivelMeddra = "SOC" | "PT" | "LLT"
+
+/**
+ * Coincidencia devuelta por /meddra/busqueda: el elemento encontrado más su camino hasta
+ * la raíz, para poder pintar el árbol ya expandido hasta él. Los ancestros vienen en `null`
+ * si el diccionario tiene filas huérfanas.
+ */
+interface Coincidencia {
+  nivel: NivelMeddra
+  soc: SOC | null
+  pt: PT | null
+  llt: LLT | null
+}
+
+interface TotalPorNivel {
+  soc: number
+  pt: number
+  llt: number
+}
+
+/** Ramas del árbol derivadas de las coincidencias de una búsqueda. */
+interface ArbolBusqueda {
+  socs: SOC[]
+  ptsPorSoc: Record<string, PT[]>
+  lltsPorPt: Record<string, LLT[]>
+  ptsHuerfanos: PT[]
+  lltsHuerfanos: LLT[]
+  /** nodeIds del elemento que coincidió, para resaltarlo. */
+  resaltados: Set<string>
+  /** nodeIds de los ancestros que deben abrirse para dejar visible cada coincidencia. */
+  expandidos: string[]
+}
+
+const ARBOL_VACIO: ArbolBusqueda = {
+  socs: [],
+  ptsPorSoc: {},
+  lltsPorPt: {},
+  ptsHuerfanos: [],
+  lltsHuerfanos: [],
+  resaltados: new Set(),
+  expandidos: [],
+}
+
 // ─── Label sub-components ─────────────────────────────────────────────────────
 
-const SocLabel = ({ soc }: { soc: SOC }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
+/** Fondo del nodo que coincidió con la búsqueda, para ubicarlo dentro del árbol. */
+const sxResaltado = (resaltado?: boolean) =>
+  resaltado
+    ? { bgcolor: "warning.light", borderRadius: 1, px: 0.75, mx: -0.75 }
+    : undefined
+
+const SocLabel = ({ soc, resaltado }: { soc: SOC; resaltado?: boolean }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
     <Chip label="SOC" size="small" color="primary" sx={{ height: 18, fontSize: "0.65rem", minWidth: 38 }} />
     <Typography variant="caption" fontFamily="monospace" color="text.secondary" sx={{ minWidth: 72 }}>
       {soc.code}
@@ -71,8 +119,8 @@ const SocLabel = ({ soc }: { soc: SOC }) => (
   </Stack>
 )
 
-const PtLabel = ({ pt }: { pt: PT }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
+const PtLabel = ({ pt, resaltado }: { pt: PT; resaltado?: boolean }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
     <Chip label="PT" size="small" color="secondary" sx={{ height: 18, fontSize: "0.65rem", minWidth: 38 }} />
     <Typography variant="caption" fontFamily="monospace" color="text.secondary" sx={{ minWidth: 72 }}>
       {pt.code}
@@ -81,8 +129,8 @@ const PtLabel = ({ pt }: { pt: PT }) => (
   </Stack>
 )
 
-const LltLabel = ({ llt }: { llt: LLT }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
+const LltLabel = ({ llt, resaltado }: { llt: LLT; resaltado?: boolean }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
     <Chip
       label="LLT"
       size="small"
@@ -110,6 +158,75 @@ const LoadingItem = ({ nodeId }: { nodeId: string }) => (
   <TreeItem nodeId={nodeId} label={<CircularProgress size={14} sx={{ my: 0.5, ml: 1 }} />} />
 )
 
+// ─── Derivación del árbol de resultados ───────────────────────────────────────
+
+/**
+ * Agrupa las coincidencias en las ramas SOC → PT → LLT que hay que pintar, junto con los
+ * nodos a resaltar y a expandir. Cada coincidencia trae su camino completo, así que basta
+ * con recorrerlas una vez sin pedir nada más al API.
+ */
+const construirArbol = (coincidencias: Coincidencia[]): ArbolBusqueda => {
+  const socs = new Map<string, SOC>()
+  const ptsPorSoc = new Map<string, Map<string, PT>>()
+  const lltsPorPt = new Map<string, Map<string, LLT>>()
+  const ptsHuerfanos = new Map<string, PT>()
+  const lltsHuerfanos = new Map<string, LLT>()
+  const resaltados = new Set<string>()
+  const expandidos = new Set<string>()
+
+  const agregar = <T,>(mapa: Map<string, Map<string, T>>, padre: string, clave: string, valor: T) => {
+    if (!mapa.has(padre)) mapa.set(padre, new Map())
+    mapa.get(padre)!.set(clave, valor)
+  }
+
+  for (const c of coincidencias) {
+    if (c.soc) socs.set(c.soc.code, c.soc)
+
+    if (c.pt) {
+      if (c.soc) agregar(ptsPorSoc, c.soc.code, c.pt.code, c.pt)
+      else ptsHuerfanos.set(c.pt.code, c.pt)
+    }
+
+    if (c.llt) {
+      if (c.pt) agregar(lltsPorPt, c.pt.code, c.llt.code, c.llt)
+      else lltsHuerfanos.set(c.llt.code, c.llt)
+    }
+
+    // Se abren los ancestros, no el nodo coincidente: si el usuario quiere ver sus hijos
+    // los despliega él y ahí se cargan completos desde el API.
+    if (c.nivel === "SOC" && c.soc) resaltados.add(`soc-${c.soc.code}`)
+    if (c.nivel === "PT" && c.pt) {
+      resaltados.add(`pt-${c.pt.code}`)
+      if (c.soc) expandidos.add(`soc-${c.soc.code}`)
+    }
+    if (c.nivel === "LLT" && c.llt) {
+      resaltados.add(`llt-${c.llt.code}`)
+      if (c.soc) expandidos.add(`soc-${c.soc.code}`)
+      if (c.pt) expandidos.add(`pt-${c.pt.code}`)
+    }
+  }
+
+  const porNombre = <T extends { name: string }>(valores: Iterable<T>): T[] =>
+    Array.from(valores).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""))
+
+  const aRegistro = <T extends { name: string }>(
+    mapa: Map<string, Map<string, T>>
+  ): Record<string, T[]> =>
+    Object.fromEntries(
+      Array.from(mapa).map(([padre, hijos]): [string, T[]] => [padre, porNombre(hijos.values())])
+    )
+
+  return {
+    socs: porNombre(socs.values()),
+    ptsPorSoc: aRegistro(ptsPorSoc),
+    lltsPorPt: aRegistro(lltsPorPt),
+    ptsHuerfanos: porNombre(ptsHuerfanos.values()),
+    lltsHuerfanos: porNombre(lltsHuerfanos.values()),
+    resaltados,
+    expandidos: Array.from(expandidos),
+  }
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 const PAGE_SIZE = 20
@@ -118,25 +235,33 @@ export const MeddraPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [showFilter, setShowFilter] = useState(false)
-  const [socPage, setSocPage] = useState(1)
+  const [page, setPage] = useState(1)
   const [socs, setSocs] = useState<SOC[]>([])
-  const [socTotal, setSocTotal] = useState(0)
-  const [socsLoading, setSocsLoading] = useState(false)
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+
+  // Coincidencias de la búsqueda; vacías cuando se está navegando el árbol sin filtro.
+  const [coincidencias, setCoincidencias] = useState<Coincidencia[]>([])
+  const [totalPorNivel, setTotalPorNivel] = useState<TotalPorNivel>({ soc: 0, pt: 0, llt: 0 })
 
   const [ptsBySoc, setPtsBySoc] = useState<Record<string, ChildrenState<PT>>>({})
   const [lltsByPt, setLltsByPt] = useState<Record<string, ChildrenState<LLT>>>({})
   const [expandedItems, setExpandedItems] = useState<string[]>([])
-  // Se incrementa al lanzar una sincronización para recargar el historial.
-  const [syncRefresh, setSyncRefresh] = useState(0)
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const enBusqueda = debouncedSearch.trim().length > 0
+  const arbol = useMemo(
+    () => (enBusqueda ? construirArbol(coincidencias) : ARBOL_VACIO),
+    [enBusqueda, coincidencias]
+  )
 
   // ── Debounced search ──
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(() => {
       setDebouncedSearch(searchTerm)
-      setSocPage(1)
+      setPage(1)
       setPtsBySoc({})
       setLltsByPt({})
       setExpandedItems([])
@@ -146,24 +271,42 @@ export const MeddraPage = () => {
     }
   }, [searchTerm])
 
-  // ── Load SOC page ──
+  // ── Carga de la página: búsqueda en los tres niveles o listado de SOCs ──
   useEffect(() => {
-    setSocsLoading(true)
-    intESAVIClient
-      .get("/meddra/soc/list", {
-        params: {
-          page: socPage - 1,
-          size: PAGE_SIZE,
-          ...(debouncedSearch ? { term: debouncedSearch } : {}),
-        },
+    const term = debouncedSearch.trim()
+    setLoading(true)
+
+    // Con término se consulta el buscador transversal (código/nombre de SOC, PT y LLT);
+    // sin término se listan los SOC raíz y el árbol se recorre expandiendo a demanda.
+    const peticion = term
+      ? intESAVIClient
+          .get("/meddra/busqueda", { params: { term, page: page - 1, size: PAGE_SIZE } })
+          .then((res) => {
+            const encontradas: Coincidencia[] = res.data.data ?? []
+            setCoincidencias(encontradas)
+            setSocs([])
+            setTotal(res.data.total ?? 0)
+            setTotalPorNivel(res.data.totalPorNivel ?? { soc: 0, pt: 0, llt: 0 })
+            // El árbol se abre hasta cada elemento encontrado.
+            setExpandedItems(construirArbol(encontradas).expandidos)
+          })
+      : intESAVIClient
+          .get("/meddra/soc/list", { params: { page: page - 1, size: PAGE_SIZE } })
+          .then((res) => {
+            setSocs(res.data.data ?? [])
+            setTotal(res.data.total ?? 0)
+            setCoincidencias([])
+            setTotalPorNivel({ soc: 0, pt: 0, llt: 0 })
+          })
+
+    peticion
+      .catch(() => {
+        setSocs([])
+        setCoincidencias([])
+        setTotal(0)
       })
-      .then((res) => {
-        setSocs(res.data.data ?? [])
-        setSocTotal(res.data.total ?? 0)
-      })
-      .catch(() => setSocs([]))
-      .finally(() => setSocsLoading(false))
-  }, [socPage, debouncedSearch])
+      .finally(() => setLoading(false))
+  }, [page, debouncedSearch])
 
   // ── Lazy load PTs for a SOC ──
   const loadPts = async (socCode: string) => {
@@ -210,6 +353,23 @@ export const MeddraPage = () => {
   // ── Render PT children of a SOC ──
   const renderPtChildren = (socCode: string) => {
     const state = ptsBySoc[socCode]
+
+    // Mientras no se hayan traído todos los PT del SOC se muestran los que coincidieron con
+    // la búsqueda; al desplegar el nodo se cargan completos y estos quedan reemplazados.
+    if (!Array.isArray(state)) {
+      const coincidentes = arbol.ptsPorSoc[socCode]
+      if (coincidentes?.length) {
+        return coincidentes.map((pt) => (
+          <TreeItem
+            key={pt.code}
+            nodeId={`pt-${pt.code}`}
+            label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
+            {renderLltChildren(pt.code)}
+          </TreeItem>
+        ))
+      }
+    }
+
     if (!state || state === "unloaded") {
       // Hidden placeholder → TreeItem shows expand arrow
       return <TreeItem nodeId={`ph-soc-${socCode}`} label="" sx={{ display: "none" }} />
@@ -230,7 +390,10 @@ export const MeddraPage = () => {
       )
     }
     return state.map((pt) => (
-      <TreeItem key={pt.code} nodeId={`pt-${pt.code}`} label={<PtLabel pt={pt} />}>
+      <TreeItem
+        key={pt.code}
+        nodeId={`pt-${pt.code}`}
+        label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
         {renderLltChildren(pt.code)}
       </TreeItem>
     ))
@@ -239,6 +402,20 @@ export const MeddraPage = () => {
   // ── Render LLT children of a PT ──
   const renderLltChildren = (ptCode: string) => {
     const state = lltsByPt[ptCode]
+
+    if (!Array.isArray(state)) {
+      const coincidentes = arbol.lltsPorPt[ptCode]
+      if (coincidentes?.length) {
+        return coincidentes.map((llt) => (
+          <TreeItem
+            key={llt.code}
+            nodeId={`llt-${llt.code}`}
+            label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+          />
+        ))
+      }
+    }
+
     if (!state || state === "unloaded") {
       return <TreeItem nodeId={`ph-pt-${ptCode}`} label="" sx={{ display: "none" }} />
     }
@@ -258,11 +435,28 @@ export const MeddraPage = () => {
       )
     }
     return state.map((llt) => (
-      <TreeItem key={llt.code} nodeId={`llt-${llt.code}`} label={<LltLabel llt={llt} />} />
+      <TreeItem
+        key={llt.code}
+        nodeId={`llt-${llt.code}`}
+        label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+      />
     ))
   }
 
-  const totalPages = Math.ceil(socTotal / PAGE_SIZE)
+  // Raíces del árbol: los SOC de la página, más los PT/LLT cuyos ancestros no existen en el
+  // diccionario y que si no quedarían fuera del resultado.
+  const socsVisibles = enBusqueda ? arbol.socs : socs
+  const hayResultados =
+    socsVisibles.length > 0 || arbol.ptsHuerfanos.length > 0 || arbol.lltsHuerfanos.length > 0
+  const totalPages = Math.ceil(total / PAGE_SIZE)
+
+  const resumenNiveles = [
+    totalPorNivel.soc ? `${totalPorNivel.soc} SOC` : null,
+    totalPorNivel.pt ? `${totalPorNivel.pt} PT` : null,
+    totalPorNivel.llt ? `${totalPorNivel.llt} LLT` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ")
 
   return (
     <Box p={2}>
@@ -277,21 +471,26 @@ export const MeddraPage = () => {
               MedDRA — Árbol de Terminología Médica
             </Typography>
           </Stack>
-          <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-            <IconButton
-              size="small"
-              onClick={() => setShowFilter((v) => !v)}
-              color={showFilter ? "primary" : "default"}>
-              <Badge variant="dot" color="primary" invisible={!searchTerm}>
-                <FilterListIcon />
-              </Badge>
-            </IconButton>
-          </Tooltip>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <SincronizarMeddraButton />
+            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
+              <IconButton
+                size="small"
+                onClick={() => setShowFilter((v) => !v)}
+                color={showFilter ? "primary" : "default"}>
+                <Badge variant="dot" color="primary" invisible={!searchTerm}>
+                  <FilterListIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+          </Stack>
         </Box>
 
         <Box px={2} pb={1.5}>
           <Typography variant="body2" color="text.secondary">
-            SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo
+            {enBusqueda
+              ? "Coincidencias por código o nombre en cualquier nivel · El árbol se abre hasta cada elemento encontrado"
+              : "SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo"}
           </Typography>
         </Box>
 
@@ -299,7 +498,7 @@ export const MeddraPage = () => {
         <Collapse in={showFilter}>
           <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
             <TextField
-              placeholder="Buscar SOC por nombre o abreviatura…"
+              placeholder="Buscar por código o nombre de SOC, PT o LLT…"
               size="small"
               sx={{ flex: 1 }}
               autoFocus={showFilter}
@@ -323,11 +522,11 @@ export const MeddraPage = () => {
 
         {/* ── Árbol ── */}
         <Box sx={{ maxHeight: 480, overflow: "auto" }} px={2} py={1.5}>
-          {socsLoading ? (
+          {loading ? (
             <Box display="flex" justifyContent="center" py={6}>
               <CircularProgress size={28} />
             </Box>
-          ) : socs.length === 0 ? (
+          ) : !hayResultados ? (
             <Box display="flex" flexDirection="column" alignItems="center" gap={1} py={6}>
               <InboxOutlinedIcon sx={{ fontSize: 40, color: "text.disabled" }} />
               <Typography variant="body2" color="text.secondary">
@@ -355,25 +554,45 @@ export const MeddraPage = () => {
                   pl: 1,
                 },
               }}>
-              {socs.map((soc) => (
-                <TreeItem key={soc.code} nodeId={`soc-${soc.code}`} label={<SocLabel soc={soc} />}>
+              {socsVisibles.map((soc) => (
+                <TreeItem
+                  key={soc.code}
+                  nodeId={`soc-${soc.code}`}
+                  label={<SocLabel soc={soc} resaltado={arbol.resaltados.has(`soc-${soc.code}`)} />}>
                   {renderPtChildren(soc.code)}
                 </TreeItem>
+              ))}
+
+              {arbol.ptsHuerfanos.map((pt) => (
+                <TreeItem
+                  key={`huerfano-pt-${pt.code}`}
+                  nodeId={`pt-${pt.code}`}
+                  label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
+                  {renderLltChildren(pt.code)}
+                </TreeItem>
+              ))}
+
+              {arbol.lltsHuerfanos.map((llt) => (
+                <TreeItem
+                  key={`huerfano-llt-${llt.code}`}
+                  nodeId={`llt-${llt.code}`}
+                  label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+                />
               ))}
             </TreeView>
           )}
         </Box>
 
-        {!socsLoading && socs.length > 0 && (
+        {!loading && hayResultados && (
           <>
             <Divider />
             <Box display="flex" flexDirection="column" alignItems="center" gap={0.5} py={1.5}>
               {totalPages > 1 && (
                 <Pagination
                   count={totalPages}
-                  page={socPage}
+                  page={page}
                   onChange={(_, p) => {
-                    setSocPage(p)
+                    setPage(p)
                     setPtsBySoc({})
                     setLltsByPt({})
                     setExpandedItems([])
@@ -383,38 +602,14 @@ export const MeddraPage = () => {
                 />
               )}
               <Typography variant="caption" color="text.secondary">
-                {socTotal} SOC{socTotal !== 1 ? "s" : ""} encontrado{socTotal !== 1 ? "s" : ""}
+                {enBusqueda
+                  ? `${total} coincidencia${total !== 1 ? "s" : ""}${resumenNiveles ? ` · ${resumenNiveles}` : ""}`
+                  : `${total} SOC${total !== 1 ? "s" : ""} encontrado${total !== 1 ? "s" : ""}`}
               </Typography>
             </Box>
           </>
         )}
       </Paper>
-
-      {/* ── Sincronización: el botón y su historial viven junto al diccionario ── */}
-      <Box mt={3}>
-        <SyncPanel
-          title="MedDRA — Historial de Sincronizaciones"
-          source="MEDDRA"
-          icon={<LocalHospitalIcon color="primary" />}
-          refreshKey={syncRefresh}
-          extraColumns={[
-            {
-              header: "Versión",
-              render: (row) =>
-                row.metadata?.version ? (
-                  <Chip
-                    label={`${row.metadata.version} / ${row.metadata.lang ?? "—"}`}
-                    size="small"
-                    variant="outlined"
-                  />
-                ) : (
-                  "—"
-                ),
-            },
-          ]}
-          action={<SincronizarMeddraButton onDone={() => setSyncRefresh((n) => n + 1)} />}
-        />
-      </Box>
     </Box>
   )
 }

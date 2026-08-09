@@ -5,6 +5,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {IntegratorModule} from 'src/integrator/integrator.module';
 import {SettingsModule} from 'src/settings/settings.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
+import {MeddraBusquedaController} from './controllers/meddra.busqueda.controller';
 import {MeddraController} from './controllers/meddra.controller';
 import {MeddraLltController} from './controllers/meddra.llt.controller';
 import {MeddraPtController} from './controllers/meddra.pt.controller';
@@ -18,6 +19,7 @@ import {CIE10ES} from './models/standar/cie_10_meddra.entity';
 import {LLT} from './models/standar/llt.entity';
 import {PT} from './models/standar/pt.entity';
 import {SOC} from './models/standar/soc.entity';
+import {MeddraBusquedaService} from './services/meddra-busqueda.service';
 import {MeddraClientService} from './services/meddra-client.service';
 import {MeddraHistoryService} from './services/meddra-history.service';
 import {MeddraLLTService} from './services/meddra-lt.service';
@@ -36,11 +38,14 @@ export const MEDDRA_DS = 'MEDDRA';
       useFactory: (configService: ConfigService) => ({
         name: MEDDRA_DS,
         type: 'postgres',
-        host: configService.get('MDD_DB_HOST'),
-        port: +configService.get('MDD_DB_PORT'),
-        username: configService.get('MDD_DB_USER'),
-        password: configService.get('MDD_DB_PASS'),
-        database: configService.get('MDD_DB_NAME'),
+        // Misma base que DHI_ESAVI y WHO_DRUG: sólo cambia el esquema. Antes había un
+        // juego propio de variables (MDD_DB_*) que duplicaba esta conexión y permitía
+        // apuntar el diccionario a una base distinta de la de los datos ESAVI.
+        host: configService.get('HOST_DATABASE'),
+        port: +configService.get('PORT_DATABASE'),
+        username: configService.get('USER_DATABASE'),
+        password: configService.get('PASS_DATABASE'),
+        database: configService.get('NAME_DATABASE'),
         // Clases explícitas en lugar de globs: 'dist/**/models/*.entity' también
         // capturaba las entidades de WHO_DRUG, y ambos datasources apuntan a la
         // misma base, por lo que los dos sincronizaban las mismas tablas a la vez.
@@ -67,6 +72,7 @@ export const MEDDRA_DS = 'MEDDRA';
     MeddraSocService,
     MeddraPtService,
     MeddraLLTService,
+    MeddraBusquedaService,
   ],
   controllers: [
     MeddraController,
@@ -74,6 +80,7 @@ export const MEDDRA_DS = 'MEDDRA';
     MeddraSocController,
     MeddraPtController,
     MeddraLltController,
+    MeddraBusquedaController,
   ],
   exports: [MeddraSocService, MeddraPtService, MeddraLLTService, MeddraStandarService],
 })
