@@ -1,28 +1,25 @@
-import FilterListIcon from "@mui/icons-material/FilterList"
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital"
 import SearchIcon from "@mui/icons-material/Search"
 import {
-  Badge,
   Box,
   Button,
   Chip,
-  CircularProgress,
-  Collapse,
   Divider,
-  IconButton,
+  CircularProgress,
   InputAdornment,
   Pagination,
-  Paper,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material"
+import { ReactNode } from "react"
 import { TreeItem, TreeView } from "@mui/x-tree-view"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Title } from "react-admin"
 import { SincronizarMeddraButton } from "../../components/SyncActions"
+import { PanelHeader, PanelTabla } from "../../components/PanelTabla"
+import { LAYOUT } from "../../theme"
 import intESAVIClient from "../../dataProviders/axios.client"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -78,8 +75,6 @@ interface ArbolBusqueda {
   lltsPorPt: Record<string, LLT[]>
   ptsHuerfanos: PT[]
   lltsHuerfanos: LLT[]
-  /** nodeIds del elemento que coincidió, para resaltarlo. */
-  resaltados: Set<string>
   /** nodeIds de los ancestros que deben abrirse para dejar visible cada coincidencia. */
   expandidos: string[]
 }
@@ -90,47 +85,72 @@ const ARBOL_VACIO: ArbolBusqueda = {
   lltsPorPt: {},
   ptsHuerfanos: [],
   lltsHuerfanos: [],
-  resaltados: new Set(),
   expandidos: [],
 }
 
 // ─── Label sub-components ─────────────────────────────────────────────────────
 
-/** Fondo del nodo que coincidió con la búsqueda, para ubicarlo dentro del árbol. */
-const sxResaltado = (resaltado?: boolean) =>
-  resaltado
-    ? { bgcolor: "warning.light", borderRadius: 1, px: 0.75, mx: -0.75 }
-    : undefined
+/** Escapa los metacaracteres para poder buscar el término como texto literal. */
+const escaparRegExp = (texto: string) => texto.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
-const SocLabel = ({ soc, resaltado }: { soc: SOC; resaltado?: boolean }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
+/**
+ * Resalta las apariciones del término dentro del texto.
+ *
+ * Antes se pintaba de naranja la fila completa del nodo coincidente, lo que tapaba el
+ * contenido y no decía *por qué* había coincidido. Marcando sólo la porción que empata se
+ * ve de inmediato qué parte del nombre —o del código— disparó el resultado.
+ *
+ * La comparación es insensible a mayúsculas, igual que la del API (`LOWER(...) LIKE`), para
+ * que lo resaltado sea exactamente lo que hizo entrar a la fila en el resultado.
+ */
+const resaltar = (texto: string, termino: string): ReactNode => {
+  const limpio = (termino ?? "").trim()
+  if (!limpio || !texto) return texto
+
+  const partes = texto.split(new RegExp(`(${escaparRegExp(limpio)})`, "gi"))
+  return partes.map((parte, i) =>
+    parte.toLowerCase() === limpio.toLowerCase() ? (
+      <Box
+        key={i}
+        component="mark"
+        sx={{ bgcolor: "warning.light", color: "inherit", px: 0.25, borderRadius: 0.5 }}>
+        {parte}
+      </Box>
+    ) : (
+      parte
+    )
+  )
+}
+
+const SocLabel = ({ soc, termino = "" }: { soc: SOC; termino?: string }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
     <Chip label="SOC" size="small" color="primary" sx={{ height: 18, fontSize: "0.65rem", minWidth: 38 }} />
     <Typography variant="caption" fontFamily="monospace" color="text.secondary" sx={{ minWidth: 72 }}>
-      {soc.code}
+      {resaltar(soc.code, termino)}
     </Typography>
     <Typography variant="body2" fontWeight={600}>
-      {soc.name}
+      {resaltar(soc.name, termino)}
     </Typography>
     {soc.abbrev && (
       <Typography variant="caption" color="text.secondary">
-        ({soc.abbrev})
+        ({resaltar(soc.abbrev, termino)})
       </Typography>
     )}
   </Stack>
 )
 
-const PtLabel = ({ pt, resaltado }: { pt: PT; resaltado?: boolean }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
+const PtLabel = ({ pt, termino = "" }: { pt: PT; termino?: string }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
     <Chip label="PT" size="small" color="secondary" sx={{ height: 18, fontSize: "0.65rem", minWidth: 38 }} />
     <Typography variant="caption" fontFamily="monospace" color="text.secondary" sx={{ minWidth: 72 }}>
-      {pt.code}
+      {resaltar(pt.code, termino)}
     </Typography>
-    <Typography variant="body2">{pt.name}</Typography>
+    <Typography variant="body2">{resaltar(pt.name, termino)}</Typography>
   </Stack>
 )
 
-const LltLabel = ({ llt, resaltado }: { llt: LLT; resaltado?: boolean }) => (
-  <Stack direction="row" alignItems="center" spacing={1} py={0.25} sx={sxResaltado(resaltado)}>
+const LltLabel = ({ llt, termino = "" }: { llt: LLT; termino?: string }) => (
+  <Stack direction="row" alignItems="center" spacing={1} py={0.25}>
     <Chip
       label="LLT"
       size="small"
@@ -138,10 +158,10 @@ const LltLabel = ({ llt, resaltado }: { llt: LLT; resaltado?: boolean }) => (
       sx={{ height: 16, fontSize: "0.6rem", minWidth: 38 }}
     />
     <Typography variant="caption" fontFamily="monospace" color="text.secondary" sx={{ minWidth: 72 }}>
-      {llt.code}
+      {resaltar(llt.code, termino)}
     </Typography>
     <Typography variant="body2" color="text.secondary">
-      {llt.name}
+      {resaltar(llt.name, termino)}
     </Typography>
     {llt.currency && (
       <Chip
@@ -162,7 +182,7 @@ const LoadingItem = ({ nodeId }: { nodeId: string }) => (
 
 /**
  * Agrupa las coincidencias en las ramas SOC → PT → LLT que hay que pintar, junto con los
- * nodos a resaltar y a expandir. Cada coincidencia trae su camino completo, así que basta
+ * nodos que hay que expandir para dejar visible cada coincidencia. Cada coincidencia trae su camino completo, así que basta
  * con recorrerlas una vez sin pedir nada más al API.
  */
 const construirArbol = (coincidencias: Coincidencia[]): ArbolBusqueda => {
@@ -171,7 +191,6 @@ const construirArbol = (coincidencias: Coincidencia[]): ArbolBusqueda => {
   const lltsPorPt = new Map<string, Map<string, LLT>>()
   const ptsHuerfanos = new Map<string, PT>()
   const lltsHuerfanos = new Map<string, LLT>()
-  const resaltados = new Set<string>()
   const expandidos = new Set<string>()
 
   const agregar = <T,>(mapa: Map<string, Map<string, T>>, padre: string, clave: string, valor: T) => {
@@ -194,13 +213,10 @@ const construirArbol = (coincidencias: Coincidencia[]): ArbolBusqueda => {
 
     // Se abren los ancestros, no el nodo coincidente: si el usuario quiere ver sus hijos
     // los despliega él y ahí se cargan completos desde el API.
-    if (c.nivel === "SOC" && c.soc) resaltados.add(`soc-${c.soc.code}`)
     if (c.nivel === "PT" && c.pt) {
-      resaltados.add(`pt-${c.pt.code}`)
       if (c.soc) expandidos.add(`soc-${c.soc.code}`)
     }
     if (c.nivel === "LLT" && c.llt) {
-      resaltados.add(`llt-${c.llt.code}`)
       if (c.soc) expandidos.add(`soc-${c.soc.code}`)
       if (c.pt) expandidos.add(`pt-${c.pt.code}`)
     }
@@ -222,7 +238,6 @@ const construirArbol = (coincidencias: Coincidencia[]): ArbolBusqueda => {
     lltsPorPt: aRegistro(lltsPorPt),
     ptsHuerfanos: porNombre(ptsHuerfanos.values()),
     lltsHuerfanos: porNombre(lltsHuerfanos.values()),
-    resaltados,
     expandidos: Array.from(expandidos),
   }
 }
@@ -234,7 +249,6 @@ const PAGE_SIZE = 20
 export const MeddraPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
-  const [showFilter, setShowFilter] = useState(false)
   const [page, setPage] = useState(1)
   const [socs, setSocs] = useState<SOC[]>([])
   const [total, setTotal] = useState(0)
@@ -363,7 +377,7 @@ export const MeddraPage = () => {
           <TreeItem
             key={pt.code}
             nodeId={`pt-${pt.code}`}
-            label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
+            label={<PtLabel pt={pt} termino={debouncedSearch} />}>
             {renderLltChildren(pt.code)}
           </TreeItem>
         ))
@@ -393,7 +407,7 @@ export const MeddraPage = () => {
       <TreeItem
         key={pt.code}
         nodeId={`pt-${pt.code}`}
-        label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
+        label={<PtLabel pt={pt} termino={debouncedSearch} />}>
         {renderLltChildren(pt.code)}
       </TreeItem>
     ))
@@ -410,7 +424,7 @@ export const MeddraPage = () => {
           <TreeItem
             key={llt.code}
             nodeId={`llt-${llt.code}`}
-            label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+            label={<LltLabel llt={llt} termino={debouncedSearch} />}
           />
         ))
       }
@@ -438,7 +452,7 @@ export const MeddraPage = () => {
       <TreeItem
         key={llt.code}
         nodeId={`llt-${llt.code}`}
-        label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+        label={<LltLabel llt={llt} termino={debouncedSearch} />}
       />
     ))
   }
@@ -459,49 +473,24 @@ export const MeddraPage = () => {
     .join(" · ")
 
   return (
-    <Box p={2}>
+    <Box p={LAYOUT.paddingPagina}>
       <Title title="MedDRA — Estándar Internacional" />
 
-      <Paper elevation={2}>
-        {/* ── Cabecera ── */}
-        <Box px={2} py={1.5} display="flex" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <LocalHospitalIcon color="primary" />
-            <Typography variant="h6" fontWeight={600}>
-              MedDRA — Árbol de Terminología Médica
-            </Typography>
-          </Stack>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <SincronizarMeddraButton />
-            <Tooltip title={showFilter ? "Ocultar filtros" : "Mostrar filtros"}>
-              <IconButton
-                size="small"
-                onClick={() => setShowFilter((v) => !v)}
-                color={showFilter ? "primary" : "default"}>
-                <Badge variant="dot" color="primary" invisible={!searchTerm}>
-                  <FilterListIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Box>
-
-        <Box px={2} pb={1.5}>
-          <Typography variant="body2" color="text.secondary">
-            {enBusqueda
+      <PanelTabla>
+        <PanelHeader
+          icono={<LocalHospitalIcon fontSize="small" />}
+          titulo="MedDRA — Árbol de Terminología Médica"
+          subtitulo={
+            enBusqueda
               ? "Coincidencias por código o nombre en cualquier nivel · El árbol se abre hasta cada elemento encontrado"
-              : "SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo"}
-          </Typography>
-        </Box>
-
-        {/* ── Filtro ── */}
-        <Collapse in={showFilter}>
-          <Box px={2} pb={1.5} display="flex" gap={2} alignItems="center">
+              : "SOC → PT → LLT · Los hijos se cargan bajo demanda al expandir cada nodo"
+          }
+          acciones={<SincronizarMeddraButton />}>
+          {/* Filtro visible en la banda, igual que en el resto de pantallas. */}
+          <Box display="flex" gap={1.5} alignItems="center">
             <TextField
               placeholder="Buscar por código o nombre de SOC, PT o LLT…"
-              size="small"
               sx={{ flex: 1 }}
-              autoFocus={showFilter}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               InputProps={{
@@ -512,13 +501,12 @@ export const MeddraPage = () => {
                 ),
               }}
             />
-            <Button size="small" onClick={() => setSearchTerm("")}>
+            <Button onClick={() => setSearchTerm("")} disabled={!searchTerm}>
               Limpiar
             </Button>
           </Box>
-        </Collapse>
+        </PanelHeader>
 
-        <Divider />
 
         {/* ── Árbol ── */}
         <Box sx={{ maxHeight: 480, overflow: "auto" }} px={2} py={1.5}>
@@ -558,7 +546,7 @@ export const MeddraPage = () => {
                 <TreeItem
                   key={soc.code}
                   nodeId={`soc-${soc.code}`}
-                  label={<SocLabel soc={soc} resaltado={arbol.resaltados.has(`soc-${soc.code}`)} />}>
+                  label={<SocLabel soc={soc} termino={debouncedSearch} />}>
                   {renderPtChildren(soc.code)}
                 </TreeItem>
               ))}
@@ -567,7 +555,7 @@ export const MeddraPage = () => {
                 <TreeItem
                   key={`huerfano-pt-${pt.code}`}
                   nodeId={`pt-${pt.code}`}
-                  label={<PtLabel pt={pt} resaltado={arbol.resaltados.has(`pt-${pt.code}`)} />}>
+                  label={<PtLabel pt={pt} termino={debouncedSearch} />}>
                   {renderLltChildren(pt.code)}
                 </TreeItem>
               ))}
@@ -576,7 +564,7 @@ export const MeddraPage = () => {
                 <TreeItem
                   key={`huerfano-llt-${llt.code}`}
                   nodeId={`llt-${llt.code}`}
-                  label={<LltLabel llt={llt} resaltado={arbol.resaltados.has(`llt-${llt.code}`)} />}
+                  label={<LltLabel llt={llt} termino={debouncedSearch} />}
                 />
               ))}
             </TreeView>
@@ -609,7 +597,7 @@ export const MeddraPage = () => {
             </Box>
           </>
         )}
-      </Paper>
+      </PanelTabla>
     </Box>
   )
 }
