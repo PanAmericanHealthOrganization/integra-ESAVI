@@ -52,8 +52,8 @@ export class WhoDrugsClientService {
             // petición en el borde si no trae su cabecera de suscripción: responde
             // "Access denied due to invalid subscription key" sin llegar siquiera a validar
             // la licencia. La subscription key de APIM es el hexadecimal de 32 caracteres,
-            // que es lo que UMC entrega como license key.
-            'Ocp-Apim-Subscription-Key': umcLicenseKey,
+            // que es lo que UMC entrega como client key.
+            'Ocp-Apim-Subscription-Key': umcClientKey,
             // Las conserva el backend detrás del APIM para identificar licencia y cliente.
             'umc-license-key': umcLicenseKey,
             'umc-client-key': umcClientKey,

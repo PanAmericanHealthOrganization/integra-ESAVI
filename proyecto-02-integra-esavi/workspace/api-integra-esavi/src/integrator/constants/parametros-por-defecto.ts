@@ -84,14 +84,16 @@ export const PARAMETROS_POR_DEFECTO: ParametroPorDefecto[] = [
     modulo: 'WHODRUG',
     clave: 'WHD_UMC_LICENSE_KEY',
     valor: 'CAMBIAR_WHD_UMC_LICENSE_KEY',
-    descripcion: 'License key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+    descripcion:
+      'License key de WHODrug: viaja en la cabecera umc-license-key (valor dummy de desarrollo, reemplazar antes de usar)',
     es_encriptado: true,
   },
   {
     modulo: 'WHODRUG',
     clave: 'WHD_UMC_CLIENT_KEY',
     valor: 'CAMBIAR_WHD_UMC_CLIENT_KEY',
-    descripcion: 'Client key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
+    descripcion:
+      'Client key de WHODrug: viaja en la cabecera umc-client-key y como Ocp-Apim-Subscription-Key del APIM que publica la API (valor dummy de desarrollo, reemplazar antes de usar)',
     es_encriptado: true,
   },
   {

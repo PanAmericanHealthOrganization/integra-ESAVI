@@ -49,7 +49,7 @@ describe('WhoDrugsClientService', () => {
       {
         baseURL: 'https://api.who-umc.org/',
         headers: {
-          'Ocp-Apim-Subscription-Key': 'licencia-real-1234',
+          'Ocp-Apim-Subscription-Key': 'cliente-real-5678',
           'umc-license-key': 'licencia-real-1234',
           'umc-client-key': 'cliente-real-5678',
         },
@@ -57,13 +57,13 @@ describe('WhoDrugsClientService', () => {
     );
   });
 
-  it('manda la license key también como subscription key del APIM que publica la API', async () => {
+  it('manda la client key también como subscription key del APIM que publica la API', async () => {
     // Sin esta cabecera Azure API Management corta en el borde con
     // "Access denied due to invalid subscription key", aunque la licencia sea válida.
     await service.getDrugs(3, 'es-ES', true);
 
     const { headers } = httpGet.mock.calls[0][1];
-    expect(headers['Ocp-Apim-Subscription-Key']).toBe('licencia-real-1234');
+    expect(headers['Ocp-Apim-Subscription-Key']).toBe('cliente-real-5678');
   });
 
   it('toma las credenciales de TC_PARAMETRO, no del entorno', async () => {
