@@ -116,3 +116,77 @@ describe('RangoFechasUtils.dividirEnMeses', () => {
     expect(RangoFechasUtils.dividirEnMeses(inicio, fin)).toEqual([{ fechaInicio: inicio, fechaFin: fin }]);
   });
 });
+
+describe('RangoFechasUtils.parsearFechaLocal', () => {
+  it('interpreta YYYY-MM-DD como medianoche local, no UTC', () => {
+    const fecha = RangoFechasUtils.parsearFechaLocal('2026-08-01')!;
+
+    expect(fecha.getFullYear()).toBe(2026);
+    expect(fecha.getMonth()).toBe(7);
+    expect(fecha.getDate()).toBe(1);
+    expect(fecha.getHours()).toBe(0);
+    expect(fecha.getMinutes()).toBe(0);
+  });
+
+  it('acepta el 29 de febrero de un año bisiesto', () => {
+    expect(RangoFechasUtils.parsearFechaLocal('2024-02-29')?.getDate()).toBe(29);
+  });
+
+  it('rechaza una fecha que no existe en el calendario', () => {
+    expect(RangoFechasUtils.parsearFechaLocal('2026-02-30')).toBeNull();
+    expect(RangoFechasUtils.parsearFechaLocal('2026-13-01')).toBeNull();
+  });
+
+  it('rechaza formatos distintos de YYYY-MM-DD y valores vacíos', () => {
+    expect(RangoFechasUtils.parsearFechaLocal('01/08/2026')).toBeNull();
+    expect(RangoFechasUtils.parsearFechaLocal('2026-8-1')).toBeNull();
+    expect(RangoFechasUtils.parsearFechaLocal('2026-08-01T00:00:00Z')).toBeNull();
+    expect(RangoFechasUtils.parsearFechaLocal('')).toBeNull();
+    expect(RangoFechasUtils.parsearFechaLocal(undefined)).toBeNull();
+  });
+});
+
+describe('RangoFechasUtils.enumerarDiasLocales', () => {
+  const dia = (valor: string) => RangoFechasUtils.parsearFechaLocal(valor)!;
+  const aIsoLocal = (fechas: Date[]) =>
+    fechas.map((f) => `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, '0')}-${String(f.getDate()).padStart(2, '0')}`);
+
+  it('incluye ambos extremos del rango', () => {
+    const dias = RangoFechasUtils.enumerarDiasLocales(dia('2026-08-01'), dia('2026-08-04'));
+
+    expect(aIsoLocal(dias)).toEqual(['2026-08-01', '2026-08-02', '2026-08-03', '2026-08-04']);
+  });
+
+  it('un rango de un solo día devuelve ese día', () => {
+    expect(aIsoLocal(RangoFechasUtils.enumerarDiasLocales(dia('2026-08-01'), dia('2026-08-01')))).toEqual([
+      '2026-08-01',
+    ]);
+  });
+
+  it('cruza el cambio de mes y de año sin saltarse días', () => {
+    expect(aIsoLocal(RangoFechasUtils.enumerarDiasLocales(dia('2026-12-30'), dia('2027-01-02')))).toEqual([
+      '2026-12-30',
+      '2026-12-31',
+      '2027-01-01',
+      '2027-01-02',
+    ]);
+  });
+
+  it('resuelve el 29 de febrero en año bisiesto', () => {
+    expect(aIsoLocal(RangoFechasUtils.enumerarDiasLocales(dia('2024-02-28'), dia('2024-03-01')))).toEqual([
+      '2024-02-28',
+      '2024-02-29',
+      '2024-03-01',
+    ]);
+  });
+
+  it('todos los días quedan a medianoche local', () => {
+    const dias = RangoFechasUtils.enumerarDiasLocales(dia('2026-08-01'), dia('2026-08-03'));
+
+    expect(dias.every((f) => f.getHours() === 0 && f.getMinutes() === 0 && f.getSeconds() === 0)).toBe(true);
+  });
+
+  it('devuelve un arreglo vacío si el rango viene invertido', () => {
+    expect(RangoFechasUtils.enumerarDiasLocales(dia('2026-08-10'), dia('2026-08-01'))).toEqual([]);
+  });
+});

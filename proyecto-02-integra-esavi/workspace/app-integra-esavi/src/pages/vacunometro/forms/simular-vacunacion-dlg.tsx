@@ -5,11 +5,13 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Grid,
 } from "@mui/material"
+import { startOfDay, subDays } from "date-fns"
 import {
   Button,
+  DateInput,
   Form,
-  NumberInput,
   SaveButton,
   useDataProvider,
   useNotify,
@@ -18,23 +20,54 @@ import {
 } from "react-admin"
 import { IVacunometroDataProvider } from "../../../dataProviders/vacunometro.dataprovider"
 import ENV_CONFIG from "../../../utils/env_utils"
+import { FechaUtils } from "../../../utils/fecha_utils"
 
+/**
+ * Mismo tope que aplica el API (MAX_DIAS_SIMULACION en seed.controller.ts). Se valida
+ * también aquí para no disparar una petición que el backend va a rechazar con 400.
+ */
+const MAX_DIAS_SIMULACION = 365
+
+// Los valores por defecto se guardan ya normalizados a "YYYY-MM-DD", que es el mismo
+// formato que <DateInput> escribe en el formulario al editarlo: así el valor tiene un
+// único formato, se toque o no el campo.
 const defaultValues = {
-  dias: 7,
+  desde: FechaUtils.aFechaIso(subDays(startOfDay(new Date()), 6)),
+  hasta: FechaUtils.aFechaIso(startOfDay(new Date())),
 }
 
 /**
- * Validación para la cantidad de días a simular
+ * Validación para la fecha inicial del rango a simular
  */
-const validateDias = (value: any) => {
-  if (!value) return "La cantidad de días es requerida"
-  if (value < 1 || value > 365) return "La cantidad de días debe estar entre 1 y 365"
+const validateDesde = (value: any, allValues: any) => {
+  if (!value) return "La fecha desde es requerida"
+  if (!allValues.hasta) return undefined
+  const dias = FechaUtils.diasDelRango(value, allValues.hasta)
+  if (dias < 1) return "La fecha desde debe ser menor o igual a la fecha hasta"
+  if (dias > MAX_DIAS_SIMULACION) {
+    return `El rango no puede superar ${MAX_DIAS_SIMULACION} días (seleccionados: ${dias})`
+  }
+  return undefined
+}
+
+/**
+ * Validación para la fecha final del rango a simular
+ */
+const validateHasta = (value: any, allValues: any) => {
+  if (!value) return "La fecha hasta es requerida"
+  if (!allValues.desde) return undefined
+  const dias = FechaUtils.diasDelRango(allValues.desde, value)
+  if (dias < 1) return "La fecha hasta debe ser mayor o igual a la fecha desde"
+  if (dias > MAX_DIAS_SIMULACION) {
+    return `El rango no puede superar ${MAX_DIAS_SIMULACION} días (seleccionados: ${dias})`
+  }
   return undefined
 }
 
 /**
  * Botón y diálogo para generar una simulación de vacunaciones diarias de todos
  * los establecimientos, con el mismo formato que entrega la entidad de vacunación.
+ * Se simula un lote por cada día del rango indicado, ambos extremos incluidos.
  * Solo visible para usuarios con rol "admin" y en ambientes distintos de producción.
  */
 export const SimularVacunacionDialog = ({
@@ -55,7 +88,8 @@ export const SimularVacunacionDialog = ({
   const onSubmitHandler = async (values: any) => {
     try {
       const result = await dataProvider.simularVacunacion!("vacunometro", {
-        dias: Number(values.dias),
+        desde: FechaUtils.aFechaIso(values.desde),
+        hasta: FechaUtils.aFechaIso(values.hasta),
       })
       setOpen(false)
       notify(
@@ -84,25 +118,39 @@ export const SimularVacunacionDialog = ({
       <Dialog
         open={open}
         onClose={() => setOpen(false)}
-        maxWidth="xs"
+        maxWidth="sm"
         fullWidth>
         <DialogTitle>Simular Vacunaciones</DialogTitle>
         <Form onSubmit={onSubmitHandler} defaultValues={defaultValues}>
           <DialogContent>
             <DialogContentText sx={{ mb: 2 }}>
-              Genera registros agregados de vacunación por día para todos los
+              Genera registros agregados de vacunación por cada día del rango
+              seleccionado (ambas fechas incluidas) para todos los
               establecimientos existentes, con el mismo formato que entrega la
               entidad de vacunación. Uso exclusivo para pruebas y demos.
             </DialogContentText>
-            <NumberInput
-              source="dias"
-              label="Días a simular (hacia atrás desde hoy)"
-              min={1}
-              max={365}
-              required
-              fullWidth
-              validate={validateDias}
-            />
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <DateInput
+                  source="desde"
+                  label="Fecha desde"
+                  required
+                  fullWidth
+                  validate={validateDesde}
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <DateInput
+                  source="hasta"
+                  label="Fecha hasta"
+                  required
+                  fullWidth
+                  validate={validateHasta}
+                  sx={{ mb: 2 }}
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
             <Button

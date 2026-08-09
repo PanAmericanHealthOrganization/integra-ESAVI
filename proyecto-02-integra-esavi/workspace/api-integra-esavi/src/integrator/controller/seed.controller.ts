@@ -1,11 +1,35 @@
-import { Controller, Delete, ForbiddenException, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { BadRequestException, Controller, Delete, ForbiddenException, HttpCode, HttpStatus, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { RangoFechasUtils } from 'src/utils/rango-fechas.util';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
 import { SeedService } from '../service/seed.service';
 
 /**
+ * Tope de días que puede abarcar una simulación de vacunación. Cada día genera entre uno y
+ * tres registros por establecimiento, así que un rango abierto llenaría TR_VACUNOMETRO con
+ * millones de filas en una sola llamada.
+ */
+const MAX_DIAS_SIMULACION = 365;
+
+/**
+ * Todo lo que hay aquí es destructivo o masivo: truncar TR_NOTIFICACION en cascada, vaciar
+ * todas las tablas TR o insertar cientos de miles de filas simuladas. Nada de eso puede
+ * quedar al alcance de una petición anónima, así que la clase entera exige token de Keycloak
+ * y rol `admin`.
  *
+ * Los dos consumidores del frontend ya son de admin: la pantalla /admin (bajo `AdminGuard`)
+ * y el diálogo de simulación del vacunómetro, que comprueba el rol antes de renderizarse.
+ *
+ * El guard es independiente del corte por ambiente que hace `seedSimulacionVacunacion`: ese
+ * mira la variable ENV y protege de correr una simulación en producción, no de que la llame
+ * alguien sin credenciales.
  */
 @ApiTags('Seed')
+@ApiBearerAuth('keycloak-jwt')
+@UseGuards(KeycloakAuthGuard, RolesGuard)
+@Roles('admin')
 @Controller({ path: 'seed', version: '1' })
 export class SeedController {
   constructor(private readonly seedService: SeedService) {}
@@ -47,24 +71,45 @@ export class SeedController {
   @ApiOperation({
     summary: 'Simular vacunaciones diarias de todos los establecimientos (TR_VACUNOMETRO)',
     description:
-      'Genera registros agregados por día, establecimiento, vacuna y grupo etario (1-7), con el mismo formato que entrega la entidad de vacunación (HCUE). Disponible solo en ambientes distintos de producción (variable de entorno ENV).',
+      'Genera registros agregados por día, establecimiento, vacuna y grupo etario (1-7), con el mismo formato que entrega la entidad de vacunación (HCUE), para cada día del rango indicado. Disponible solo en ambientes distintos de producción (variable de entorno ENV).',
   })
-  @ApiQuery({ name: 'dias', required: false, description: 'Cantidad de días hacia atrás desde hoy a simular (default 7, máximo 365)' })
+  @ApiQuery({ name: 'desde', required: true, description: 'Primer día del rango a simular, formato YYYY-MM-DD (incluido)' })
+  @ApiQuery({ name: 'hasta', required: true, description: `Último día del rango a simular, formato YYYY-MM-DD (incluido). El rango no puede superar ${MAX_DIAS_SIMULACION} días` })
   @ApiResponse({ status: 200, description: 'Simulación de vacunaciones generada exitosamente' })
+  @ApiResponse({ status: 400, description: 'Rango de fechas ausente, mal formado, invertido o demasiado amplio' })
   @ApiResponse({ status: 403, description: 'No disponible en ambiente de producción' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  async seedSimulacionVacunacion(@Query('dias') dias = 7) {
+  async seedSimulacionVacunacion(@Query('desde') desde: string, @Query('hasta') hasta: string) {
     const env = String(process.env.ENV ?? '').toUpperCase();
     if (env.startsWith('PROD')) {
       throw new ForbiddenException('La simulación de vacunaciones no está disponible en el ambiente de producción');
     }
+
+    const fechaInicio = RangoFechasUtils.parsearFechaLocal(desde);
+    const fechaFin = RangoFechasUtils.parsearFechaLocal(hasta);
+    if (!fechaInicio || !fechaFin) {
+      throw new BadRequestException('Los parámetros "desde" y "hasta" son obligatorios y deben ser fechas válidas con formato YYYY-MM-DD');
+    }
+    if (fechaFin < fechaInicio) {
+      throw new BadRequestException('La fecha "desde" debe ser anterior o igual a la fecha "hasta"');
+    }
+
+    const diasSolicitados = RangoFechasUtils.enumerarDiasLocales(fechaInicio, fechaFin).length;
+    if (diasSolicitados > MAX_DIAS_SIMULACION) {
+      throw new BadRequestException(
+        `El rango no puede superar ${MAX_DIAS_SIMULACION} días: se solicitaron ${diasSolicitados}`,
+      );
+    }
+
     const { insertados, establecimientos, dias: diasSimulados } =
-      await this.seedService.seedSimulacionVacunacionDiaria(+dias);
+      await this.seedService.seedSimulacionVacunacionDiaria(fechaInicio, fechaFin);
     return {
-      message: `Simulación de vacunaciones generada: ${insertados} registros para ${establecimientos} establecimientos en ${diasSimulados} días`,
+      message: `Simulación de vacunaciones generada: ${insertados} registros para ${establecimientos} establecimientos en ${diasSimulados} días (${desde} a ${hasta})`,
       insertados,
       establecimientos,
       dias: diasSimulados,
+      desde,
+      hasta,
       timestamp: new Date().toISOString(),
     };
   }

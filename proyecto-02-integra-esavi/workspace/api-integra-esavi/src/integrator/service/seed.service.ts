@@ -6,8 +6,10 @@ import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entit
 import {Homologador} from 'src/homologator/entity/homologador.entity';
 import {TipoComparacion} from 'src/homologator/enum/tipo-comparacion.enum';
 import {TipoDato} from 'src/homologator/enum/tipo-dato.enum';
+import {format} from 'date-fns';
 import {Repository} from 'typeorm';
 import {read,utils} from 'xlsx';
+import {RangoFechasUtils} from 'src/utils/rango-fechas.util';
 
 // Entidades
 import {IAuditoria,SyncSource} from '../entity';
@@ -27,8 +29,27 @@ import {Parametro} from '../entity/parametro.entity';
 import {Parroquia} from '../entity/parroquia.entity';
 import {Provincia} from '../entity/provincia.entity';
 import {Vacunometro} from '../entity/vacunometro.entity';
-import {encryptValue} from '../utils/parametro-crypto.util';
+import {PARAMETROS_POR_DEFECTO,ParametroPorDefecto} from '../constants/parametros-por-defecto';
+import {decryptValue,encryptValue} from '../utils/parametro-crypto.util';
 import {SyncService} from './sync.service';
+
+/** Resumen que una tarea del seed puede devolver para su registro en TR_SYNC_PROCESS. */
+interface ResumenSeed {
+  mensaje: string;
+  metadata?: Record<string, any>;
+}
+
+/** Qué se hizo con cada clave durante la carga de TC_PARAMETRO. */
+interface ResumenCargaParametros {
+  /** Se escribió el valor de la variable de entorno. */
+  escritos: string[];
+  /** Se conservó el valor propio ya configurado; no se sobrescribió. */
+  omitidos: string[];
+  /** Se creó con el valor predeterminado por no haber variable de entorno. */
+  predeterminados: string[];
+  /** No se pudo procesar (p. ej. PROD_ENCRYPTION_KEY ausente o inválida). */
+  fallidos: string[];
+}
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
@@ -80,172 +101,151 @@ export class SeedService implements OnApplicationBootstrap {
     await this.loadTiposEntidadCatalogoPadre();
     await this.loadEstablecimientosFromCSV();
     await this.migrarTipoEmisor();
-    await this.seedParametrosDev();
+    await this.cargarParametros();
   }
 
-  // ── Seed TC_PARAMETRO: valores dummy solo para entornos de desarrollo ──────
-  // Evita que un despliegue nuevo en DEV falle por falta de parámetros
-  // (DHIS2, VIGIFLOW, WHODRUG, MEDDRA) que ParametroService.getValor() exige.
-  // En PROD estos valores deben reemplazarse manualmente desde el módulo de
-  // Parámetros; por eso solo se insertan si ENV=DEV y la clave no existe aún.
-  private async seedParametrosDev() {
-    if ((process.env.ENV || '').toUpperCase() !== 'DEV') {
-      return;
-    }
-
-    await this.runSyncProcess('Carga de parámetros dummy de desarrollo (TC_PARAMETRO)...', async () => {
-      console.log('🔧 Verificando parámetros de desarrollo en TC_PARAMETRO...');
-
-      // es_encriptado: true únicamente para contraseñas y llaves/tokens sensibles
-      // (DHIS2_USER_KEY, *_PASSWD, WHD_UMC_*_KEY). El resto (URLs, usuarios,
-      // client id, grant type, scope) no son secretos y viajan en texto plano.
-      const parametrosDev = [
-        {
-          modulo: 'DHIS2',
-          clave: 'DHIS2_URL',
-          valor: 'https://dev-ops-gss.msp.gob.ec',
-          descripcion: 'URL base del servidor DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'DHIS2',
-          clave: 'DHIS2_ROOT_ORG_UNIT',
-          valor: 'CcPKoI4rpPZ',
-          descripcion: 'Unidad organizativa raíz sobre la que se consultan las instancias del tracker',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'DHIS2',
-          clave: 'DHIS2_USER_KEY',
-          valor: 'CAMBIAR_DHIS2_USER_KEY',
-          descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'DHIS2',
-          clave: 'DHIS2_USERNAME',
-          valor: 'CAMBIAR_DHIS2_USERNAME',
-          descripcion: 'Usuario de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'DHIS2',
-          clave: 'DHIS2_PASSWD',
-          valor: 'CAMBIAR_DHIS2_PASSWD',
-          descripcion: 'Contraseña de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'VIGIFLOW',
-          clave: 'VIGIFLOW_USERNAME',
-          valor: 'CAMBIAR_VIGIFLOW_USERNAME',
-          descripcion: 'Usuario de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'VIGIFLOW',
-          clave: 'VIGIFLOW_PASSWD',
-          valor: 'CAMBIAR_VIGIFLOW_PASSWD',
-          descripcion: 'Contraseña de VigiFlow (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'WHODRUG',
-          clave: 'WHD_API_URL',
-          valor: 'https://api.who-umc.org/',
-          descripcion: 'URL base de la API de WHODrug (UMC)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'WHODRUG',
-          clave: 'WHD_UMC_LICENSE_KEY',
-          valor: 'CAMBIAR_WHD_UMC_LICENSE_KEY',
-          descripcion: 'License key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'WHODRUG',
-          clave: 'WHD_UMC_CLIENT_KEY',
-          valor: 'CAMBIAR_WHD_UMC_CLIENT_KEY',
-          descripcion: 'Client key de WHODrug (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_URL_TOKEN',
-          valor: 'https://mid.meddra.org/connect/token',
-          descripcion: 'URL del endpoint OAuth (token) de MedDRA',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_URL_API',
-          valor: 'https://mapisbx.meddra.org/api/search',
-          descripcion: 'URL del endpoint de búsqueda (API) de MedDRA',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_GRANT_TYPE',
-          valor: 'password',
-          descripcion: 'Grant type OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_CLIENT_ID',
-          valor: 'CAMBIAR_MED_CLIENT_ID',
-          descripcion: 'Client ID de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_USER_NAME',
-          valor: 'CAMBIAR_MED_USER_NAME',
-          descripcion: 'Usuario de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_PASSWORD',
-          valor: 'CAMBIAR_MED_PASSWORD',
-          descripcion: 'Contraseña de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: true,
-        },
-        {
-          modulo: 'MEDDRA',
-          clave: 'MED_SCOPE',
-          valor: 'CAMBIAR_MED_SCOPE',
-          descripcion: 'Scope OAuth de MedDRA (valor dummy de desarrollo, reemplazar antes de usar)',
-          es_encriptado: false,
-        },
-      ];
-
-      const auditoria: IAuditoria = {
-        createdAt: new Date(),
-        createdBy: 'System',
-        updatedAt: undefined,
-        updatedBy: '',
-        deletedAt: undefined,
-        deletedBy: '',
-        isEnabled: true,
-        isActive: true,
+  /**
+   * Siembra TC_PARAMETRO al desplegar, para evitar tener que ingresar los valores
+   * a mano después de cada despliegue.
+   *
+   * La clave del parámetro es el nombre de la variable de entorno que lo alimenta:
+   * `WHD_UMC_LICENSE_KEY` del entorno va a `WHD_UMC_LICENSE_KEY` de la tabla. Si la
+   * variable no está definida se usa el valor predeterminado del catálogo, de modo
+   * que un despliegue nuevo nunca queda sin la fila (ParametroService.getValor()
+   * lanza si falta).
+   *
+   * Nunca pisa un valor ya configurado: sólo escribe si el parámetro no existe o si
+   * todavía conserva su valor predeterminado. Si alguien lo cambió desde el módulo
+   * de Parámetros, la actualización se omite y queda constancia en el log.
+   *
+   * Reemplaza al antiguo seed dummy, que sólo corría con ENV=DEV y nunca
+   * actualizaba. Ahora corre en todos los entornos.
+   */
+  private async cargarParametros() {
+    await this.runSyncProcess('Carga de TC_PARAMETRO desde variables de entorno...', async () => {
+      const resumen: ResumenCargaParametros = {
+        escritos: [],
+        omitidos: [],
+        predeterminados: [],
+        fallidos: [],
       };
 
-      for (const parametro of parametrosDev) {
-        const existing = await this.parametroRepository.findOne({ where: { clave: parametro.clave } });
-        if (!existing) {
-          await this.parametroRepository.save({
-            ...parametro,
-            valor: parametro.es_encriptado ? encryptValue(parametro.valor) : parametro.valor,
-            tipo_dato: TipoDato.STRING,
-            ...auditoria,
-          } as Parametro);
+      for (const definicion of PARAMETROS_POR_DEFECTO) {
+        try {
+          await this.cargarParametro(definicion, resumen);
+        } catch (error) {
+          // Los valores sensibles se cifran con PROD_ENCRYPTION_KEY: si falta o es
+          // inválida, encryptValue lanza. Un parámetro que falla no debe impedir el
+          // arranque del servicio ni bloquear a los demás.
+          resumen.fallidos.push(definicion.clave);
+          this.logger.error(`TC_PARAMETRO[${definicion.clave}]: no se pudo cargar (${error?.message ?? error}).`);
         }
       }
 
-      console.log('✅ Parámetros dummy de desarrollo verificados en TC_PARAMETRO');
+      const lista = (claves: string[]) => (claves.length ? ` [${claves.join(', ')}]` : '');
+      const mensaje =
+        `TC_PARAMETRO: ${resumen.escritos.length} escrito(s) desde el entorno${lista(resumen.escritos)}, ` +
+        `${resumen.omitidos.length} omitido(s) por tener valor propio${lista(resumen.omitidos)}, ` +
+        `${resumen.predeterminados.length} con valor predeterminado${lista(resumen.predeterminados)}` +
+        `${resumen.fallidos.length ? `, ${resumen.fallidos.length} con error${lista(resumen.fallidos)}` : ''}.`;
+      this.logger.log(mensaje);
+
+      return { mensaje, metadata: { ...resumen } };
     });
+  }
+
+  /** Resuelve un único parámetro. Las reglas están documentadas en `cargarParametros`. */
+  private async cargarParametro(definicion: ParametroPorDefecto, resumen: ResumenCargaParametros) {
+    const valorEntorno = (process.env[definicion.clave] ?? '').trim();
+    const vieneDelEntorno = valorEntorno.length > 0;
+
+    const existente = await this.parametroRepository.findOne({ where: { clave: definicion.clave } });
+
+    // No existe: se crea con el valor del entorno o, en su defecto, el predeterminado.
+    if (!existente) {
+      await this.insertarParametro(definicion, vieneDelEntorno ? valorEntorno : definicion.valor);
+      if (vieneDelEntorno) {
+        resumen.escritos.push(definicion.clave);
+        this.logger.log(
+          `TC_PARAMETRO[${definicion.clave}]: no existía, se creó con el valor de la variable de entorno.`,
+        );
+      } else {
+        resumen.predeterminados.push(definicion.clave);
+        this.logger.warn(
+          `TC_PARAMETRO[${definicion.clave}]: no existía y no hay variable de entorno, se creó con el valor ` +
+            `predeterminado (debe configurarse antes de usar el módulo).`,
+        );
+      }
+      return;
+    }
+
+    // Sin variable de entorno no hay nada que proponer: la fila ya existe y su valor
+    // —predeterminado o propio— se respeta.
+    if (!vieneDelEntorno) {
+      return;
+    }
+
+    // Los valores sensibles se guardan cifrados: hay que descifrarlos para saber si
+    // siguen siendo el predeterminado.
+    let valorActual: string;
+    try {
+      valorActual = existente.es_encriptado ? decryptValue(existente.valor) : (existente.valor ?? '');
+    } catch (error) {
+      // Si no se puede leer (PROD_ENCRYPTION_KEY ausente o valor corrupto) se deja como
+      // está: sobrescribir a ciegas podría destruir una credencial válida.
+      resumen.omitidos.push(definicion.clave);
+      this.logger.warn(
+        `TC_PARAMETRO[${definicion.clave}]: se omitió la actualización, no se pudo descifrar el valor actual ` +
+          `para compararlo (${error?.message ?? error}).`,
+      );
+      return;
+    }
+
+    // Ya tiene un valor propio: es justo lo que no se debe sobrescribir.
+    if (valorActual !== definicion.valor) {
+      resumen.omitidos.push(definicion.clave);
+      this.logger.log(
+        `TC_PARAMETRO[${definicion.clave}]: se omitió la actualización, ya tiene un valor propio distinto del ` +
+          `predeterminado (la variable de entorno no lo sobrescribe).`,
+      );
+      return;
+    }
+
+    // El entorno trae exactamente el predeterminado: no hay nada que cambiar.
+    if (valorEntorno === valorActual) {
+      return;
+    }
+
+    await this.parametroRepository.update(existente.id, {
+      valor: definicion.es_encriptado ? encryptValue(valorEntorno) : valorEntorno,
+      updatedAt: new Date(),
+      updatedBy: 'System',
+    });
+    resumen.escritos.push(definicion.clave);
+    this.logger.log(
+      `TC_PARAMETRO[${definicion.clave}]: tenía el valor predeterminado, se escribió el valor de la variable ` +
+        `de entorno.`,
+    );
+  }
+
+  /** Inserta un parámetro nuevo con el valor indicado (del entorno o el predeterminado). */
+  private async insertarParametro(definicion: ParametroPorDefecto, valor: string) {
+    await this.parametroRepository.save({
+      modulo: definicion.modulo,
+      clave: definicion.clave,
+      descripcion: definicion.descripcion,
+      es_encriptado: definicion.es_encriptado,
+      valor: definicion.es_encriptado ? encryptValue(valor) : valor,
+      tipo_dato: TipoDato.STRING,
+      createdAt: new Date(),
+      createdBy: 'System',
+      updatedAt: undefined,
+      updatedBy: '',
+      deletedAt: undefined,
+      deletedBy: '',
+      isEnabled: true,
+      isActive: true,
+    } as Parametro);
   }
 
   async seedData() {
@@ -303,10 +303,15 @@ export class SeedService implements OnApplicationBootstrap {
    * usan MedDRA, WHODrug, el datamart y el resto: antes este servicio abría y
    * cerraba las filas por su cuenta, duplicando la lógica.
    */
-  private async runSyncProcess(name: string, action: () => Promise<void>): Promise<void> {
+  private async runSyncProcess(
+    name: string,
+    action: () => Promise<void | ResumenSeed>,
+  ): Promise<void> {
     await this.syncService.ejecutarConRegistro(SyncSource.SEED, name, async () => {
-      await action();
-      return { mensaje: `Proceso ${name} completado exitosamente` };
+      // La acción puede devolver su propio resumen; si no, se registra uno genérico.
+      // El cast es necesario porque `void` no se estrecha solo con `??`.
+      const salida = (await action()) as ResumenSeed | undefined;
+      return salida ?? { mensaje: `Proceso ${name} completado exitosamente` };
     });
   }
 
@@ -998,9 +1003,17 @@ export class SeedService implements OnApplicationBootstrap {
    * registros agregados por día, establecimiento, vacuna y grupo etario, con totales por sexo
    * (mismo formato que produce VacunacionNominalService.procesarVacunasAgregadas).
    * Genera datos para TODOS los establecimientos existentes, un lote por cada día del rango.
-   * @param dias cantidad de días hacia atrás desde hoy a simular (1 a 365)
+   *
+   * El rango llega ya parseado y validado por el controlador (formato, orden y tope de días):
+   * aquí se asume que `fechaInicio` <= `fechaFin` y que ambas son medianoche local.
+   *
+   * @param fechaInicio primer día del rango a simular (incluido)
+   * @param fechaFin último día del rango a simular (incluido)
    */
-  async seedSimulacionVacunacionDiaria(dias = 7): Promise<{ insertados: number; establecimientos: number; dias: number }> {
+  async seedSimulacionVacunacionDiaria(
+    fechaInicio: Date,
+    fechaFin: Date,
+  ): Promise<{ insertados: number; establecimientos: number; dias: number }> {
     // Nombres en mayúsculas, igual que UPPER(NOMBRE_VACUNA) en la consulta a la entidad de vacunación
     const VACUNAS = [
       'BCG',
@@ -1023,13 +1036,14 @@ export class SeedService implements OnApplicationBootstrap {
     const GRUPOS_ETARIOS = [1, 2, 3, 4, 5, 6, 7];
 
     const aleatorio = (max: number) => Math.floor(Math.random() * max);
-    const diasRango = Math.min(Math.max(Math.trunc(dias) || 7, 1), 365);
+    const diasASimular = RangoFechasUtils.enumerarDiasLocales(fechaInicio, fechaFin);
+    const comoIso = (fecha: Date) => format(fecha, 'yyyy-MM-dd');
 
     let insertados = 0;
     let totalEstablecimientos = 0;
 
     await this.runSyncProcess(
-      `Simulación de vacunación diaria (${diasRango} días) para todos los establecimientos...`,
+      `Simulación de vacunación diaria (${comoIso(fechaInicio)} a ${comoIso(fechaFin)}, ${diasASimular.length} días) para todos los establecimientos...`,
       async () => {
         const establecimientos = await this.establecimientoRepository.find({
           select: { uniCodigo: true },
@@ -1052,12 +1066,8 @@ export class SeedService implements OnApplicationBootstrap {
           isActive: true,
         };
 
-        const hoy = new Date();
-        hoy.setHours(0, 0, 0, 0);
-
         const CHUNK_SIZE = 1000;
-        for (let d = diasRango - 1; d >= 0; d--) {
-          const fechaAplicacion = new Date(hoy.getTime() - d * 24 * 60 * 60 * 1000);
+        for (const fechaAplicacion of diasASimular) {
           const lote: Partial<Vacunometro>[] = [];
 
           for (const { uniCodigo } of establecimientos) {
@@ -1086,13 +1096,13 @@ export class SeedService implements OnApplicationBootstrap {
             insertados += chunk.length;
           }
           console.log(
-            `✅ TR_VACUNOMETRO: día ${fechaAplicacion.toISOString().slice(0, 10)} simulado para ${totalEstablecimientos} establecimientos (${insertados} registros acumulados).`,
+            `✅ TR_VACUNOMETRO: día ${comoIso(fechaAplicacion)} simulado para ${totalEstablecimientos} establecimientos (${insertados} registros acumulados).`,
           );
         }
       },
     );
 
-    return { insertados, establecimientos: totalEstablecimientos, dias: diasRango };
+    return { insertados, establecimientos: totalEstablecimientos, dias: diasASimular.length };
   }
 
   async truncateNotificacion() {

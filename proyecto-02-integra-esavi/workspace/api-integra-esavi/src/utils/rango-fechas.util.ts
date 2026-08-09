@@ -66,4 +66,55 @@ export abstract class RangoFechasUtils {
 
     return rangos;
   }
+
+  /**
+   * Interpreta una fecha `YYYY-MM-DD` como medianoche **local**, no UTC.
+   *
+   * `new Date('2026-08-01')` la interpretaría como medianoche UTC, que en Ecuador (UTC-5)
+   * cae el 31 de julio a las 19:00 y desplazaría un día entero cada fecha del rango. Los
+   * datos simulados de vacunación se guardan con la fecha local del día que representan,
+   * así que el parseo tiene que ser local.
+   *
+   * @returns La fecha, o `null` si el valor está vacío, mal formado o no existe en el
+   *          calendario (por ejemplo `2026-02-30`). Validar y reportar el error es
+   *          responsabilidad del llamador.
+   */
+  static parsearFechaLocal(valor?: string): Date | null {
+    const coincidencia = /^(\d{4})-(\d{2})-(\d{2})$/.exec((valor ?? '').trim());
+    if (!coincidencia) return null;
+
+    const [, anio, mes, dia] = coincidencia.map(Number);
+    const fecha = new Date(anio, mes - 1, dia, 0, 0, 0, 0);
+
+    // Date normaliza los desbordes (31 de febrero pasa a marzo): si los componentes no
+    // sobreviven el viaje de ida y vuelta, la fecha no existía.
+    const esReal =
+      fecha.getFullYear() === anio && fecha.getMonth() === mes - 1 && fecha.getDate() === dia;
+
+    return esReal ? fecha : null;
+  }
+
+  /**
+   * Enumera un día por cada jornada del rango, ambos extremos incluidos, a medianoche local.
+   *
+   * Avanza por componentes de calendario (`new Date(anio, mes, dia + i)`) en lugar de sumar
+   * 86 400 000 ms, para que un eventual cambio de horario de verano no corra la hora ni
+   * duplique o pierda un día.
+   *
+   * Un rango invertido (`fechaFin` < `fechaInicio`) devuelve un arreglo vacío.
+   */
+  static enumerarDiasLocales(fechaInicio: Date, fechaFin: Date): Date[] {
+    const dias: Date[] = [];
+    const anio = fechaInicio.getFullYear();
+    const mes = fechaInicio.getMonth();
+    const primerDia = fechaInicio.getDate();
+
+    for (let i = 0; ; i++) {
+      const dia = new Date(anio, mes, primerDia + i, 0, 0, 0, 0);
+      if (dia > fechaFin) break;
+      dias.push(dia);
+    }
+
+    return dias;
+  }
 }

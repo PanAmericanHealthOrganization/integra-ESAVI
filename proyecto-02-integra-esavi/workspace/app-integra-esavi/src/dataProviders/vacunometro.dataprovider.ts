@@ -23,9 +23,18 @@ import {
 } from "ra-core"
 import intESAVIClient from "./axios.client"
 
+/** Rango de días a simular, ambos extremos incluidos, en formato `yyyy-MM-dd`. */
+export interface ISimulacionVacunacionParams {
+  desde: string
+  hasta: string
+}
+
 export interface IVacunometroDataProvider extends DataProvider {
   syncVacunometro(resource: string, params: any): Promise<any>
-  simularVacunacion?(resource: string, params: { dias: number }): Promise<any>
+  simularVacunacion?(
+    resource: string,
+    params: ISimulacionVacunacionParams
+  ): Promise<any>
 }
 
 export const vacunometroDataProvider: IVacunometroDataProvider = {
@@ -154,16 +163,28 @@ export const vacunometroDataProvider: IVacunometroDataProvider = {
       throw new Error("Error al sincronizar el vacunometro")
     }
   },
-  simularVacunacion: async function (resource: string, params: { dias: number }) {
+  simularVacunacion: async function (
+    resource: string,
+    params: ISimulacionVacunacionParams
+  ) {
     try {
       const response = await intESAVIClient.post(
-        `seed/simulacion-vacunacion?dias=${params.dias}`
+        `seed/simulacion-vacunacion`,
+        undefined,
+        { params: { desde: params.desde, hasta: params.hasta } }
       )
       return {
         data: response.data,
       }
     } catch (error) {
-      throw new Error("Error al generar la simulación de vacunaciones")
+      // El API responde 400 con el detalle de por qué el rango no sirve (invertido,
+      // demasiado amplio, mal formado); ese texto es lo único accionable para el usuario.
+      const detalle = (error as any)?.response?.data?.message
+      throw new Error(
+        detalle
+          ? `Error al generar la simulación de vacunaciones: ${detalle}`
+          : "Error al generar la simulación de vacunaciones"
+      )
     }
   },
 }

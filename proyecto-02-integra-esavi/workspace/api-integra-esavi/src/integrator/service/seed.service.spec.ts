@@ -20,6 +20,7 @@ import { Parametro } from '../entity/parametro.entity';
 import { Parroquia } from '../entity/parroquia.entity';
 import { Provincia } from '../entity/provincia.entity';
 import { Vacunometro } from '../entity/vacunometro.entity';
+import { PARAMETROS_POR_DEFECTO } from '../constants/parametros-por-defecto';
 
 jest.mock('fs', () => {
   const actual = jest.requireActual('fs');
@@ -40,6 +41,11 @@ jest.mock('xlsx', () => ({
 
 jest.mock('../utils/parametro-crypto.util', () => ({
   encryptValue: jest.fn((v: string) => `ENC(${v})`),
+  decryptValue: jest.fn((v: string) => {
+    const match = /^ENC\(([\s\S]*)\)$/.exec(v ?? '');
+    if (!match) throw new Error('valor no descifrable');
+    return match[1];
+  }),
 }));
 
 const fs = require('fs');
@@ -74,7 +80,7 @@ const mockEstablecimientoRepo: any = { count: jest.fn(), findOne: jest.fn(), sav
 const mockHomologadorRepo: any = { findOne: jest.fn(), save: jest.fn() };
 const mockReglaHomologacionRepo: any = { findOne: jest.fn(), save: jest.fn() };
 const mockVacunometroRepo: any = { insert: jest.fn().mockResolvedValue(undefined) };
-const mockParametroRepo: any = { findOne: jest.fn(), save: jest.fn() };
+const mockParametroRepo: any = { findOne: jest.fn(), save: jest.fn(), update: jest.fn() };
 
 describe('SeedService', () => {
   let service: SeedService;
@@ -133,7 +139,7 @@ describe('SeedService', () => {
       const loadTipos = jest.spyOn(service as any, 'loadTiposEntidadCatalogoPadre').mockResolvedValue(undefined);
       const loadEstablecimientos = jest.spyOn(service as any, 'loadEstablecimientosFromCSV').mockResolvedValue(undefined);
       const migrarTipoEmisor = jest.spyOn(service as any, 'migrarTipoEmisor').mockResolvedValue(undefined);
-      const seedParametrosDev = jest.spyOn(service as any, 'seedParametrosDev').mockResolvedValue(undefined);
+      const cargarParametros = jest.spyOn(service as any, 'cargarParametros').mockResolvedValue(undefined);
 
       await service.onApplicationBootstrap();
 
@@ -142,45 +148,152 @@ describe('SeedService', () => {
       expect(loadTipos).toHaveBeenCalledTimes(1);
       expect(loadEstablecimientos).toHaveBeenCalledTimes(1);
       expect(migrarTipoEmisor).toHaveBeenCalledTimes(1);
-      expect(seedParametrosDev).toHaveBeenCalledTimes(1);
+      expect(cargarParametros).toHaveBeenCalledTimes(1);
     });
   });
 
-  // ─── seedParametrosDev ──────────────────────────────────────────────────────
+  // ─── cargarParametros ───────────────────────────────────────────────────────
 
-  describe('seedParametrosDev', () => {
-    it('no hace nada si ENV no es DEV', async () => {
-      process.env.ENV = 'PROD';
-      await (service as any).seedParametrosDev();
-      expect(mockParametroRepo.findOne).not.toHaveBeenCalled();
+  describe('cargarParametros', () => {
+    const guardado = (clave: string) =>
+      mockParametroRepo.save.mock.calls.find((c: any[]) => c[0].clave === clave)?.[0];
+
+    beforeEach(() => {
+      mockParametroRepo.save.mockResolvedValue({});
+      mockParametroRepo.update.mockResolvedValue({ affected: 1 });
+      // Las claves del catálogo son también nombres de variables de entorno: se
+      // limpian para que el entorno real de la máquina no filtre en las pruebas.
+      for (const clave of PARAMETROS_POR_DEFECTO.map((p) => p.clave)) {
+        delete process.env[clave];
+      }
+    });
+
+    it('crea el parámetro con el valor de la variable de entorno cuando no existe', async () => {
+      process.env.WHD_UMC_LICENSE_KEY = 'licencia-real';
+      mockParametroRepo.findOne.mockResolvedValue(null);
+
+      await (service as any).cargarParametros();
+
+      // Es sensible: se persiste cifrado.
+      expect(guardado('WHD_UMC_LICENSE_KEY').valor).toBe('ENC(licencia-real)');
+    });
+
+    it('crea el parámetro con el valor predeterminado cuando no hay variable de entorno', async () => {
+      mockParametroRepo.findOne.mockResolvedValue(null);
+
+      await (service as any).cargarParametros();
+
+      expect(guardado('DHIS2_URL').valor).toBe('https://dev-ops-gss.msp.gob.ec');
+      expect(guardado('WHD_UMC_LICENSE_KEY').valor).toBe('ENC(CAMBIAR_WHD_UMC_LICENSE_KEY)');
+    });
+
+    it('sustituye el valor predeterminado por el de la variable de entorno', async () => {
+      process.env.DHIS2_URL = 'https://produccion.msp.gob.ec';
+      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
+        Promise.resolve(
+          where.clave === 'DHIS2_URL'
+            ? { id: 'p-1', clave: 'DHIS2_URL', valor: 'https://dev-ops-gss.msp.gob.ec', es_encriptado: false }
+            : null,
+        ),
+      );
+
+      await (service as any).cargarParametros();
+
+      expect(mockParametroRepo.update).toHaveBeenCalledWith(
+        'p-1',
+        expect.objectContaining({ valor: 'https://produccion.msp.gob.ec' }),
+      );
+    });
+
+    it('no sobrescribe un valor propio distinto del predeterminado', async () => {
+      process.env.DHIS2_URL = 'https://otra.msp.gob.ec';
+      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
+        Promise.resolve(
+          where.clave === 'DHIS2_URL'
+            ? { id: 'p-1', clave: 'DHIS2_URL', valor: 'https://configurada-a-mano.gob.ec', es_encriptado: false }
+            : null,
+        ),
+      );
+
+      await (service as any).cargarParametros();
+
+      expect(mockParametroRepo.update).not.toHaveBeenCalled();
+    });
+
+    it('tampoco sobrescribe un valor propio cifrado', async () => {
+      process.env.WHD_UMC_LICENSE_KEY = 'licencia-del-entorno';
+      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
+        Promise.resolve(
+          where.clave === 'WHD_UMC_LICENSE_KEY'
+            ? { id: 'p-2', clave: 'WHD_UMC_LICENSE_KEY', valor: 'ENC(licencia-ya-configurada)', es_encriptado: true }
+            : null,
+        ),
+      );
+
+      await (service as any).cargarParametros();
+
+      expect(mockParametroRepo.update).not.toHaveBeenCalled();
+    });
+
+    it('omite el parámetro si el valor cifrado no se puede descifrar para compararlo', async () => {
+      process.env.WHD_UMC_LICENSE_KEY = 'licencia-del-entorno';
+      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
+        Promise.resolve(
+          where.clave === 'WHD_UMC_LICENSE_KEY'
+            ? { id: 'p-2', clave: 'WHD_UMC_LICENSE_KEY', valor: 'valor-corrupto', es_encriptado: true }
+            : null,
+        ),
+      );
+
+      await (service as any).cargarParametros();
+
+      // Sobrescribir a ciegas podría destruir una credencial válida.
+      expect(mockParametroRepo.update).not.toHaveBeenCalled();
+    });
+
+    it('no toca la fila existente cuando no hay variable de entorno', async () => {
+      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
+        Promise.resolve({ id: 'p-1', clave: where.clave, valor: 'lo-que-sea', es_encriptado: false }),
+      );
+
+      await (service as any).cargarParametros();
+
+      expect(mockParametroRepo.update).not.toHaveBeenCalled();
       expect(mockParametroRepo.save).not.toHaveBeenCalled();
     });
 
-    it('inserta los parámetros dummy faltantes y encripta los sensibles cuando ENV=DEV', async () => {
-      process.env.ENV = 'DEV';
+    it('ignora variables de entorno vacías o en blanco', async () => {
+      process.env.DHIS2_URL = '   ';
       mockParametroRepo.findOne.mockResolvedValue(null);
-      mockParametroRepo.save.mockResolvedValue({});
 
-      await (service as any).seedParametrosDev();
+      await (service as any).cargarParametros();
 
-      expect(mockParametroRepo.save).toHaveBeenCalled();
-      const savedEncrypted = mockParametroRepo.save.mock.calls.find((c: any[]) => c[0].clave === 'DHIS2_USER_KEY');
-      expect(savedEncrypted[0].valor).toBe('ENC(CAMBIAR_DHIS2_USER_KEY)');
-      const savedPlain = mockParametroRepo.save.mock.calls.find((c: any[]) => c[0].clave === 'DHIS2_URL');
-      expect(savedPlain[0].valor).toBe('https://dev-ops-gss.msp.gob.ec');
+      expect(guardado('DHIS2_URL').valor).toBe('https://dev-ops-gss.msp.gob.ec');
     });
 
-    it('omite los parámetros que ya existen', async () => {
-      process.env.ENV = 'dev';
-      mockParametroRepo.findOne.mockImplementation(({ where }: any) =>
-        Promise.resolve(where.clave === 'DHIS2_URL' ? { clave: 'DHIS2_URL' } : null),
-      );
-      mockParametroRepo.save.mockResolvedValue({});
+    it('no tumba el arranque si falta PROD_ENCRYPTION_KEY: omite el cifrado y sigue con el resto', async () => {
+      const { encryptValue } = require('../utils/parametro-crypto.util');
+      // encryptValue lanza cuando la llave maestra no está configurada.
+      encryptValue.mockImplementation((v: string) => {
+        if (v.includes('LICENSE')) throw new Error('PROD_ENCRYPTION_KEY no está configurada en el entorno');
+        return `ENC(${v})`;
+      });
+      mockParametroRepo.findOne.mockResolvedValue(null);
 
-      await (service as any).seedParametrosDev();
+      await expect((service as any).cargarParametros()).resolves.not.toThrow();
 
-      const savedDhis2Url = mockParametroRepo.save.mock.calls.find((c: any[]) => c[0].clave === 'DHIS2_URL');
-      expect(savedDhis2Url).toBeUndefined();
+      // El parámetro que falló se salta, pero los demás sí se siembran.
+      expect(guardado('WHD_UMC_LICENSE_KEY')).toBeUndefined();
+      expect(guardado('DHIS2_URL').valor).toBe('https://dev-ops-gss.msp.gob.ec');
+    });
+
+    it('corre en cualquier entorno, no sólo en DEV', async () => {
+      process.env.ENV = 'PROD';
+      mockParametroRepo.findOne.mockResolvedValue(null);
+
+      await (service as any).cargarParametros();
+
+      expect(mockParametroRepo.save).toHaveBeenCalled();
     });
   });
 
@@ -507,22 +620,47 @@ describe('SeedService', () => {
   // ─── seedSimulacionVacunacionDiaria ─────────────────────────────────────────
 
   describe('seedSimulacionVacunacionDiaria', () => {
+    /** Medianoche local, igual que lo que entrega RangoFechasUtils.parsearFechaLocal. */
+    const fecha = (anio: number, mes: number, dia: number) => new Date(anio, mes - 1, dia, 0, 0, 0, 0);
+
     it('simula vacunación diaria para todos los establecimientos', async () => {
       mockEstablecimientoRepo.find.mockResolvedValue([{ uniCodigo: '170150' }]);
 
-      const result = await service.seedSimulacionVacunacionDiaria(2);
+      const result = await service.seedSimulacionVacunacionDiaria(fecha(2026, 3, 1), fecha(2026, 3, 2));
 
       expect(result.establecimientos).toBe(1);
       expect(result.dias).toBe(2);
       expect(mockVacunometroRepo.insert).toHaveBeenCalled();
     });
 
+    it('incluye ambos extremos del rango y respeta el cambio de mes', async () => {
+      mockEstablecimientoRepo.find.mockResolvedValue([{ uniCodigo: '170150' }]);
+
+      // Febrero de 2026 no es bisiesto: 27 y 28 de febrero más el 1 de marzo.
+      const result = await service.seedSimulacionVacunacionDiaria(fecha(2026, 2, 27), fecha(2026, 3, 1));
+
+      expect(result.dias).toBe(3);
+
+      const fechasInsertadas = mockVacunometroRepo.insert.mock.calls
+        .flatMap(([chunk]: [any[]]) => chunk)
+        .map((registro: any) => registro.fechaAplicacion.toISOString().slice(0, 10));
+      expect(new Set(fechasInsertadas).size).toBe(3);
+    });
+
+    it('un rango de un solo día simula ese día', async () => {
+      mockEstablecimientoRepo.find.mockResolvedValue([{ uniCodigo: '170150' }]);
+
+      const result = await service.seedSimulacionVacunacionDiaria(fecha(2026, 3, 5), fecha(2026, 3, 5));
+
+      expect(result.dias).toBe(1);
+    });
+
     it('lanza error si no existen establecimientos registrados', async () => {
       mockEstablecimientoRepo.find.mockResolvedValue([]);
 
-      await expect(service.seedSimulacionVacunacionDiaria(1)).rejects.toThrow(
-        'No existen establecimientos registrados',
-      );
+      await expect(
+        service.seedSimulacionVacunacionDiaria(fecha(2026, 3, 1), fecha(2026, 3, 1)),
+      ).rejects.toThrow('No existen establecimientos registrados');
     });
   });
 
