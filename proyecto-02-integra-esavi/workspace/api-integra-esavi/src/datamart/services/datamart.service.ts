@@ -8,6 +8,7 @@ import {
   CONFIG_KEYS,
   DEFAULT_DATAMART_CRON,
   DatamartBuildResult,
+  DatamartTrigger,
 } from '../datamart.constants';
 import { DuckDbBuilderService } from './duckdb-builder.service';
 
@@ -50,7 +51,7 @@ export class DatamartService implements OnApplicationBootstrap {
     this.logger.log(
       'Datamart no existe: generando en segundo plano al arranque...',
     );
-    void this.regenerate('on-demand').catch((err) =>
+    void this.regenerate('startup').catch((err) =>
       this.logger.error(`Generación de arranque falló: ${err?.message}`),
     );
   }
@@ -70,23 +71,31 @@ export class DatamartService implements OnApplicationBootstrap {
     await this.regenerate('cron');
   }
 
-  /** Genera el datamart. Devuelve el resultado; ignora si ya hay uno en curso. */
-  async regenerate(trigger: 'cron' | 'on-demand'): Promise<DatamartBuildResult> {
+  /**
+   * Genera el datamart. Devuelve el resultado; si ya hay una generación en curso
+   * no encola ni espera: devuelve un resultado marcado como `skipped`.
+   */
+  async regenerate(trigger: DatamartTrigger): Promise<DatamartBuildResult> {
     if (this.running) {
       this.logger.warn(
         `Regeneración (${trigger}) omitida: ya hay una en curso.`,
       );
-      return (
-        this.lastResult ?? {
-          ok: false,
-          outputPath: this.builder.getOutputPath(),
-          startedAt: new Date().toISOString(),
-          finishedAt: new Date().toISOString(),
-          durationMs: 0,
-          rowCounts: {},
-          error: 'Ya hay una regeneración en curso.',
-        }
-      );
+      // Antes se devolvía `lastResult`, es decir el resultado de la generación
+      // ANTERIOR, con su ok:true intacto: quien llamaba recibía "Datamart
+      // regenerado correctamente" sin que se hubiera generado nada ni quedara
+      // registro en TR_SYNC_PROCESS. Se devuelve un resultado propio, marcado
+      // como omitido para distinguirlo de un fallo.
+      const ahora = new Date().toISOString();
+      return {
+        ok: false,
+        skipped: true,
+        outputPath: this.builder.getOutputPath(),
+        startedAt: ahora,
+        finishedAt: ahora,
+        durationMs: 0,
+        rowCounts: {},
+        error: 'Ya hay una regeneración del datamart en curso.',
+      };
     }
     this.running = true;
     let result: DatamartBuildResult | undefined;

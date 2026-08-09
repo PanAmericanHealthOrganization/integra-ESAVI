@@ -25,11 +25,15 @@ import intESAVIClient from "../dataProviders/axios.client"
  */
 const ROLES_SINCRONIZACION = ["admin"]
 
-type Feedback = { open: boolean; message: string; severity: "success" | "error" }
+// "warning" cubre los desenlaces que no son ni éxito ni error: por ejemplo una
+// regeneración de datamart que se descarta porque ya hay otra en curso.
+type Severidad = "success" | "error" | "warning"
+
+type Feedback = { open: boolean; message: string; severity: Severidad }
 
 const useFeedback = () => {
   const [snack, setSnack] = useState<Feedback>({ open: false, message: "", severity: "success" })
-  const show = (message: string, severity: "success" | "error") =>
+  const show = (message: string, severity: Severidad) =>
     setSnack({ open: true, message, severity })
   const node = (
     <Snackbar
@@ -201,11 +205,11 @@ export const RegenerarDatamartButton = ({ onDone }: { onDone?: () => void }) => 
     try {
       const res = await intESAVIClient.post("/datamart/regenerar")
       const result = res.data
-      // El endpoint responde 200 incluso cuando la generación falla: el
-      // resultado viene en el cuerpo (ok / error).
+      // El endpoint responde 200 incluso cuando la generación falla o se omite:
+      // el desenlace viene en el cuerpo (ok / skipped / error).
       show(
         result.message ?? result.error ?? "Datamart regenerado.",
-        result.ok ? "success" : "error",
+        result.skipped ? "warning" : result.ok ? "success" : "error",
       )
     } catch (e: any) {
       show(mensajeError(e, "Error al regenerar el datamart."), "error")

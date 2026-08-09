@@ -27,9 +27,14 @@ export class DatamartController {
   async regenerar() {
     const result = await this.datamart.regenerate('on-demand');
     return {
-      message: result.ok
-        ? 'Datamart regenerado correctamente'
-        : 'La regeneración del datamart falló',
+      // Tres desenlaces, no dos: omitida no es lo mismo que fallida. Anunciar
+      // "regenerado correctamente" cuando en realidad se descartó la petición
+      // dejaba al usuario creyendo que había un datamart nuevo.
+      message: result.skipped
+        ? 'Regeneración omitida: ya hay una generación del datamart en curso'
+        : result.ok
+          ? 'Datamart regenerado correctamente'
+          : 'La regeneración del datamart falló',
       ...result,
     };
   }

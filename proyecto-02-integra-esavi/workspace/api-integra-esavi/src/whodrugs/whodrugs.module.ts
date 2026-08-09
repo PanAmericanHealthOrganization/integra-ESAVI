@@ -38,11 +38,14 @@ export const WHODRUGS_DS = 'WHO_DRUG';
       useFactory: (configService: ConfigService) => ({
         name: WHODRUGS_DS, // a
         type: 'postgres',
-        host: configService.get('WHD_DB_HOST'),
-        port: +configService.get('WHD_DB_PORT'),
-        username: configService.get('WHD_DB_USER'),
-        password: configService.get('WHD_DB_PASS'),
-        database: configService.get('WHD_DB_NAME'),
+        // Misma base que DHI_ESAVI y MEDDRA: sólo cambia el esquema. Antes había un
+        // juego propio de variables (WHD_DB_*) que duplicaba esta conexión y permitía
+        // apuntar el diccionario a una base distinta de la de los datos ESAVI.
+        host: configService.get('HOST_DATABASE'),
+        port: +configService.get('PORT_DATABASE'),
+        username: configService.get('USER_DATABASE'),
+        password: configService.get('PASS_DATABASE'),
+        database: configService.get('NAME_DATABASE'),
         schema: 'WHO_DRUG',
         // Clases explícitas en lugar de globs: 'dist/**/models/*.entity' también
         // capturaba entidades de MEDDRA, y ambos datasources apuntan a la misma

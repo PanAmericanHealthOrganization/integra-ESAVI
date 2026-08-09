@@ -29,6 +29,13 @@ export const CONFIG_KEYS = {
   enabled: 'DATAMART_CRON_ENABLED',
 } as const;
 
+/**
+ * Qué originó una generación. Se registra en TR_SYNC_PROCESS para poder
+ * distinguir en el historial una corrida manual de la programada o la que se
+ * dispara al arrancar cuando falta el archivo.
+ */
+export type DatamartTrigger = 'cron' | 'on-demand' | 'startup';
+
 /** Resultado de una generación del datamart. */
 export interface DatamartBuildResult {
   ok: boolean;
@@ -38,4 +45,10 @@ export interface DatamartBuildResult {
   durationMs: number;
   rowCounts: Record<string, number>;
   error?: string;
+  /**
+   * La generación no llegó a ejecutarse porque ya había otra en curso. Se
+   * distingue de un fallo: no hay nada roto, pero tampoco se generó nada nuevo
+   * ni quedó registro en TR_SYNC_PROCESS.
+   */
+  skipped?: boolean;
 }
