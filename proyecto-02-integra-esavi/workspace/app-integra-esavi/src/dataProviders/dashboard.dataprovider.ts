@@ -12,20 +12,17 @@ import {
   UpdateResult,
 } from "react-admin"
 import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
-import keycloak from "../keycloak"
+import { TokenUtils } from "../utils/token_utils"
 
 // Refresca el token si está por expirar y arma los headers de la petición.
-// El backend ahora valida el JWT de Keycloak (firma/issuer) en los endpoints de reportes.
+// El backend valida el JWT de Keycloak (firma/issuer) en los endpoints de reportes.
+// Este dataProvider usa fetch, no la instancia de axios, así que no pasa por su
+// interceptor: la renovación se pide aquí explícitamente, con la misma utilidad.
 const authHeaders = async (): Promise<HeadersInit> => {
-  try {
-    await keycloak.updateToken(30)
-  } catch {
-    // Si el refresh falla, la petición vendrá sin token válido y el backend
-    // responderá 401; react-admin manejará la redirección al login.
-  }
+  const token = await TokenUtils.asegurarVigente()
   return {
     "X-API-KEY": INT_API_KEY || "",
-    Authorization: keycloak.token ? `Bearer ${keycloak.token}` : "",
+    Authorization: token ? `Bearer ${token}` : "",
   }
 }
 
