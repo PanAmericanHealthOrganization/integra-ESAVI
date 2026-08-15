@@ -1,6 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { withAuditOnCreate } from 'src/common/utils/audit.util';
+import {
+  DestinatarioNotificacion,
+  NivelNotificacion,
+  NuevaNotificacion,
+  TipoNotificacion,
+} from 'src/mensajes/models/notificacion.interface';
+import { MensajesService } from 'src/mensajes/services/mensajes.service';
 import { Identificator, IGetManyParams, IService } from 'src/utils/IController';
 import { GetListParams } from 'src/utils/interfaces/pagination';
 import { Repository } from 'typeorm';
@@ -11,6 +18,8 @@ import { SyncProcess, SyncSource, SyncStatus } from '../entity';
  */
 @Injectable()
 export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncDto> {
+  private readonly logger = new Logger(SyncService.name);
+
   /**
    *
    * @param syncProcessRepository
@@ -18,6 +27,7 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
   constructor(
     @InjectRepository(SyncProcess, 'POSTGRES_INTEGRATOR_DS')
     private syncProcessRepository: Repository<SyncProcess>,
+    private readonly mensajesService: MensajesService,
   ) {}
 
   /**
@@ -108,6 +118,11 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
    *
    * Cualquier excepción se registra y se vuelve a lanzar: quien llama decide si
    * la propaga o la absorbe.
+   *
+   * Si `opciones.usuario` identifica a quien lanzó el proceso, al cerrar la corrida se
+   * le deja una notificación en su buzón y se le empuja por WebSocket. Al estar aquí y
+   * no en cada servicio, todas las fuentes (MedDRA, WHODrug, datamart, VigiFlow, DHIS2,
+   * vacunómetro) notifican sin tocar su código.
    */
   public async ejecutarConRegistro<T>(
     source: SyncSource,
@@ -117,6 +132,8 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
       dataStartDate?: Date | null;
       dataEndDate?: Date | null;
       metadata?: Record<string, any>;
+      /** Quien disparó el proceso. Sin él no hay a quién notificar y se omite el aviso. */
+      usuario?: DestinatarioNotificacion | null;
     } = {},
   ): Promise<T> {
     const syncRecord = await this.createSyncProcess(
@@ -145,15 +162,60 @@ export class SyncService implements IService<CreateSyncDto, SyncDto, UpdateSyncD
         // fusionan con los que se pasaron al abrir la corrida.
         metadata: { ...(syncRecord.metadata ?? {}), ...(metadata ?? {}) },
       });
+
+      await this.notificar(opciones.usuario, {
+        tipo: TipoNotificacion.SINCRONIZACION,
+        nivel: NivelNotificacion.EXITO,
+        titulo: `${syncName}: completada`,
+        mensaje,
+        source,
+        syncId: syncRecord.id,
+      });
+
       return resultado;
     } catch (error) {
+      const motivo = error instanceof Error ? error.message : String(error);
+
       await this.update(syncRecord.id, {
         status: SyncStatus.FAILED,
         endTime: new Date(),
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage: motivo,
         errorStack: error instanceof Error ? error.stack : null,
       });
+
+      await this.notificar(opciones.usuario, {
+        tipo: TipoNotificacion.SINCRONIZACION,
+        nivel: NivelNotificacion.ERROR,
+        titulo: `${syncName}: falló`,
+        mensaje: motivo,
+        source,
+        syncId: syncRecord.id,
+      });
+
       throw error;
+    }
+  }
+
+  /**
+   * Deja el aviso en el buzón del usuario, si hay usuario.
+   *
+   * Nunca lanza: la corrida ya quedó registrada en TR_SYNC_PROCESS, que es la fuente de
+   * verdad. Que falle la notificación no puede convertir una sincronización correcta en
+   * un error, ni enmascarar el error original de una fallida.
+   */
+  private async notificar(
+    usuario: DestinatarioNotificacion | null | undefined,
+    notificacion: NuevaNotificacion,
+  ): Promise<void> {
+    if (!usuario?.id) return;
+    try {
+      await this.mensajesService.agregar(usuario, notificacion);
+    } catch (error) {
+      this.logger.error(
+        `No se pudo notificar a ${usuario.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 

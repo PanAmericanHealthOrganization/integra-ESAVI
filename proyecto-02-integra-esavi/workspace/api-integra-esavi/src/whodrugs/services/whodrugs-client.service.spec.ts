@@ -1,5 +1,6 @@
 import {HttpService} from '@nestjs/axios';
 import {Test,TestingModule} from '@nestjs/testing';
+import {createHash} from 'node:crypto';
 import {of,throwError} from 'rxjs';
 import {ParametroService} from '../../integrator/service/parametro.service';
 import {WhoDrugsClientService} from './whodrugs-client.service';
@@ -12,6 +13,11 @@ describe('WhoDrugsClientService', () => {
   /** Valores de TC_PARAMETRO por clave; cada prueba ajusta los que le interesan. */
   const parametros: Record<string, string> = {};
 
+  /** Cuerpo tal como lo devuelve UMC: JSON sin parsear. */
+  const CUERPO_CRUDO = JSON.stringify([{ drugName: 'PARACETAMOL' }]);
+  /** SHA-256 de CUERPO_CRUDO; el cliente lo calcula sobre esos mismos bytes. */
+  const SHA_CUERPO = createHash('sha256').update(CUERPO_CRUDO).digest('hex');
+
   const errorHttp = (status: number, data: unknown) =>
     Object.assign(new Error(`Request failed with status code ${status}`), {
       response: { status, data },
@@ -22,7 +28,9 @@ describe('WhoDrugsClientService', () => {
     parametros.WHD_UMC_LICENSE_KEY = 'licencia-real-1234';
     parametros.WHD_UMC_CLIENT_KEY = 'cliente-real-5678';
 
-    httpGet = jest.fn().mockReturnValue(of({ data: [{ drugName: 'PARACETAMOL' }] }));
+    // El cliente pide el cuerpo sin parsear (transformResponse) para poder hashearlo tal
+    // como llega, así que el transporte entrega texto, no un objeto.
+    httpGet = jest.fn().mockReturnValue(of({ data: CUERPO_CRUDO }));
     getValor = jest.fn(async (_modulo: string, clave: string) => parametros[clave]);
 
     const module: TestingModule = await Test.createTestingModule({
@@ -41,13 +49,16 @@ describe('WhoDrugsClientService', () => {
   // ─── Armado de la petición ────────────────────────────────────────────────
 
   it('envía los tres parámetros de consulta y las credenciales en las cabeceras', async () => {
-    const data = await service.getDrugs(3, 'es-ES', true);
+    const { drugs, sha256 } = await service.getDrugs(3, 'es-ES', true);
 
-    expect(data).toEqual([{ drugName: 'PARACETAMOL' }]);
+    expect(drugs).toEqual([{ drugName: 'PARACETAMOL' }]);
+    // El hash sale del cuerpo crudo, no de volver a serializar lo ya parseado.
+    expect(sha256).toBe(SHA_CUERPO);
     expect(httpGet).toHaveBeenCalledWith(
       '/whodrug/download/v2/regional-drugs?MedProdLevel=3&IngredientTranslations=es-ES&IncludeAtc=true',
       {
         baseURL: 'https://api.who-umc.org/',
+        transformResponse: [expect.any(Function)],
         headers: {
           'Ocp-Apim-Subscription-Key': 'cliente-real-5678',
           'umc-license-key': 'licencia-real-1234',

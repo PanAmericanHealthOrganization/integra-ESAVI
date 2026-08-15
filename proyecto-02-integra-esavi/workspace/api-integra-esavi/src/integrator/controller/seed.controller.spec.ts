@@ -73,6 +73,8 @@ describe('SeedController (protección)', () => {
  */
 describe('SeedController (corte por ambiente)', () => {
   const envOriginal = process.env.ENV;
+  /** Identidad que `@Usuario()` extrae del token; es el destinatario del aviso final. */
+  const usuario = { id: 'sub-123', username: 'admin', roles: ['admin'] };
   let controller: SeedController;
   let service: { seedSimulacionVacunacionDiaria: jest.Mock };
 
@@ -93,7 +95,7 @@ describe('SeedController (corte por ambiente)', () => {
     process.env.ENV = env;
 
     await expect(
-      controller.seedSimulacionVacunacion('2026-08-01', '2026-08-07'),
+      controller.seedSimulacionVacunacion('2026-08-01', '2026-08-07', usuario),
     ).rejects.toThrow(/producción/);
     expect(service.seedSimulacionVacunacionDiaria).not.toHaveBeenCalled();
   });
@@ -102,8 +104,27 @@ describe('SeedController (corte por ambiente)', () => {
     process.env.ENV = 'DEV';
 
     await expect(
-      controller.seedSimulacionVacunacion('2026-08-01', '2026-08-07'),
+      controller.seedSimulacionVacunacion('2026-08-01', '2026-08-07', usuario),
     ).resolves.toMatchObject({ dias: 1 });
     expect(service.seedSimulacionVacunacionDiaria).toHaveBeenCalled();
+  });
+
+  /*
+   * El aviso al buzón depende por completo de que el usuario del token llegue hasta
+   * `SyncService.ejecutarConRegistro`: si el controlador no lo reenvía, la simulación se
+   * ejecuta y se registra igual, pero la campana se queda vacía. Era exactamente el fallo
+   * que se veía —salía el toast del formulario y no aparecía ninguna notificación—, y como
+   * no rompe nada visible desde el servidor, sólo una prueba lo sujeta.
+   */
+  it('reenvía al servicio el usuario del token, que es quien recibirá la notificación', async () => {
+    process.env.ENV = 'DEV';
+
+    await controller.seedSimulacionVacunacion('2026-08-01', '2026-08-07', usuario);
+
+    expect(service.seedSimulacionVacunacionDiaria).toHaveBeenCalledWith(
+      expect.any(Date),
+      expect.any(Date),
+      usuario,
+    );
   });
 });

@@ -20,50 +20,37 @@ import {
   UpdateParams,
   UpdateResult,
 } from "react-admin"
-import { INT_ESAV_API, INT_API_KEY } from "./fetch.integra.esavi.client"
+import intESAVIClient from "./axios.client"
+import { INT_ESAV_API } from "./fetch.integra.esavi.client"
 
 /**
+ * Las tres importaciones van por `intESAVIClient` y no por `fetch` a pelo: su interceptor
+ * adjunta el token de Keycloak (y lo renueva si hace falta), que es lo que permite al API
+ * saber quién lanzó la corrida y dejarle la notificación en su buzón al terminar. Con la
+ * X-API-KEY sola el proceso quedaba registrado en TR_SYNC_PROCESS pero sin destinatario,
+ * así que nadie recibía el aviso.
  *
+ * VigiFlow va con URL absoluta porque su controlador no está versionado: cuelga de
+ * `/integrator/vigiflow`, mientras que el baseURL del cliente apunta a `/v1`.
  */
 export const integradorDataProvider: DataProvider = {
   importDataVigiflow: async (startDate: string, endDate: string) => {
-    const response = await fetch(
-      `${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=${startDate}&fechaFin=${endDate}`,
-      {
-        // const response = await fetch(`${INT_ESAV_API}/integrator/vigiflow/bulk?codigoATC=J07&fechaInicio=20240702&fechaFin=20240706`, {
-
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
-      }
+    const { data } = await intESAVIClient.get(
+      `${INT_ESAV_API}/integrator/vigiflow/bulk`,
+      { params: { codigoATC: "J07", fechaInicio: startDate, fechaFin: endDate } }
     )
-
-    const data = await response.json()
     return data
   },
   importDataVigiflowFromFile: async () => {
-    const response = await fetch(
-      `${INT_ESAV_API}/integrator/vigiflow/bulk-from-file`,
-      {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
-      }
+    const { data } = await intESAVIClient.get(
+      `${INT_ESAV_API}/integrator/vigiflow/bulk-from-file`
     )
-    const data = await response.json()
     return data
   },
   importDataDHIS2: async (startDate: string, endDate: string) => {
-    const response = await fetch(
-      `${INT_ESAV_API}/v1/integrator/dhis2/bulk?codigoATC=DHIS2&fechaInicio=${startDate}&fechaFin=${endDate}`,
-      {
-        headers: {
-          "X-API-KEY": INT_API_KEY || "",
-        },
-      }
-    )
-
-    const data = await response.json()
+    const { data } = await intESAVIClient.get("integrator/dhis2/bulk", {
+      params: { codigoATC: "DHIS2", fechaInicio: startDate, fechaFin: endDate },
+    })
     return data
   },
   getList: async (

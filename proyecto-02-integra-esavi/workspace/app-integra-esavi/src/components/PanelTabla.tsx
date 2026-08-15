@@ -1,7 +1,7 @@
 import { Avatar, Box, Divider, Paper, Stack, Typography } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import { ReactNode } from "react"
-import { LAYOUT } from "../theme"
+import { LAYOUT, SOMBRAS } from "../theme"
 
 /**
  * Marco y cabecera de las tablas y paneles del sistema.
@@ -114,8 +114,31 @@ export const PanelHeader = ({
         flexDirection={apilado ? "column" : "row"}
         alignItems={apilado ? "stretch" : "center"}
         gap={LAYOUT.gapCabecera}
+        /*
+         * `wrap` y no `nowrap`: identidad y acciones llevan `flexShrink: 0`, así que con
+         * `nowrap` nadie podía ceder y en los paneles estrechos —los dos catálogos lado a
+         * lado— el botón «Nuevo» se salía del recuadro y quedaba cortado. Envolviendo, lo
+         * que baja de línea es el bloque de filtros, que es lo que puede permitírselo.
+         */
         flexWrap="wrap"
-        sx={{ bgcolor: alpha(theme.palette[color].main, 0.04), ...sx }}>
+        sx={{
+          /*
+           * El tinte del 4% se apoya sobre blanco explícito, no sobre lo que haya debajo.
+           * Cuando el fondo de la página era blanco daba igual, pero desde que es gris
+           * azulado (#eef2f7) un 4% de azul sobre gris es indistinguible del propio fondo:
+           * en las pantallas donde la banda va suelta —Parámetros, sin tabla pegada
+           * debajo— parecía directamente no tener fondo.
+           *
+           * El tinte viaja como `backgroundImage` porque `backgroundColor` ya lo ocupa el
+           * blanco: son dos capas, no dos valores en pugna.
+           */
+          backgroundColor: "background.paper",
+          backgroundImage: `linear-gradient(${alpha(theme.palette[color].main, 0.04)}, ${alpha(
+            theme.palette[color].main,
+            0.04,
+          )})`,
+          ...sx,
+        }}>
         {apilado ? (
           <>
             <Box display="flex" alignItems="center" justifyContent="space-between" gap={1}>
@@ -137,7 +160,17 @@ export const PanelHeader = ({
               <Box sx={{ flex: 1, minWidth: 0 }}>{children}</Box>
             )}
             {acciones && (
-              <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
+              /*
+               * `ml: auto` ancla las acciones al borde derecho de la banda pase lo que
+               * pase: cuando no hay filtros —o cuando el bloque de filtros baja de línea—
+               * el hueco lo absorbe este margen, y los botones no se quedan pegados al
+               * título en mitad de la banda.
+               */
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{ flexShrink: 0, ml: "auto" }}>
                 {acciones}
               </Stack>
             )}
@@ -168,6 +201,10 @@ export const PanelTabla = ({ children, sx }: PanelTablaProps) => (
       borderRadius: LAYOUT.radioTarjeta,
       border: "1px solid",
       borderColor: "divider",
+      // La sombra va aquí y no en el tema: `MuiPaper` es también la base de la barra
+      // superior, el menú lateral y los diálogos, y darles a todos la sombra de tarjeta
+      // los aplanaba en el mismo plano. Ver la nota de `MuiPaper` en theme.ts.
+      boxShadow: SOMBRAS.tarjeta,
       overflow: "hidden",
       ...sx,
     }}>

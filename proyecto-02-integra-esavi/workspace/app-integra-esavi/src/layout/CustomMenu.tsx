@@ -15,10 +15,52 @@ import ListItem from "@mui/material/ListItem"
 import ListItemButton from "@mui/material/ListItemButton"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ListItemText from "@mui/material/ListItemText"
+import Typography from "@mui/material/Typography"
 import { useState } from "react"
-import { Menu } from "react-admin"
+import { Menu, useSidebarState } from "react-admin"
 import Authorize from "../authorization.utils"
+import { PALETA } from "../theme"
+import { CustomFooter } from "./CustomFooter"
 import SubMenu from "./SubMenu"
+
+/**
+ * Rótulo de sección del menú.
+ *
+ * La plataforma de referencia agrupa su navegación bajo encabezados en versalitas grises
+ * («Principal», «Atención clínica», «Operación», «Sistema») en lugar de dejar una lista
+ * plana. Aquí se replica el patrón sobre los destinos que ya existían: no se añade ni se
+ * quita ninguna pantalla, sólo se agrupan.
+ *
+ * Desaparece con la barra plegada, donde sólo quedan los iconos y un rótulo de texto no
+ * tendría a qué titular.
+ */
+const SeccionMenu = ({ children }: { children: string }) => {
+  const [sidebarIsOpen] = useSidebarState()
+  if (!sidebarIsOpen) return null
+
+  // `component="li"`: el `<Menu>` de react-admin es un `MenuList`, o sea un `<ul>`, y ahí
+  // sólo pueden colgar `<li>`.
+  return (
+    <Typography
+      component="li"
+      sx={{
+        fontSize: 11,
+        fontWeight: 600,
+        letterSpacing: "0.07em",
+        textTransform: "uppercase",
+        color: PALETA.textoTenue,
+        listStyle: "none",
+        px: "11px",
+        // El primer rótulo va pegado al borde superior; el resto respira más arriba que
+        // abajo, para que se lea como cabecera del bloque que sigue y no del anterior.
+        mt: 2.25,
+        mb: 0.9,
+      }}>
+      {children}
+    </Typography>
+  )
+}
+
 export const CustomMenu = () => {
   const [estandaresOpen, setEstandaresOpen] = useState(false)
   const [configuracionesOpen, setConfiguracionesOpen] = useState(false)
@@ -32,24 +74,60 @@ export const CustomMenu = () => {
   return (
     <>
       <Menu>
+        <SeccionMenu>Principal</SeccionMenu>
         <Menu.Item to="/esavis" primaryText="ESAVIS" leftIcon={<SickIcon />} />
+        <ListItem disablePadding>
+          <ListItemButton
+            component="a"
+            href={import.meta.env.VITE_DASH_APP}
+            sx={{ borderRadius: "8px", minHeight: 40, px: "11px" }}>
+            <ListItemIcon sx={{ minWidth: 34, color: "inherit" }}>
+              <DashboardIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary="ESAVIS Dashboard"
+              primaryTypographyProps={{ fontSize: "13.5px", fontWeight: 500 }}
+            />
+          </ListItemButton>
+        </ListItem>
+
+        <SeccionMenu>Análisis</SeccionMenu>
         <Menu.Item
           to="/calidad"
           primaryText="Calidad de Datos"
           leftIcon={<FlakyIcon />}
         />
-        <ListItem disablePadding>
-          <ListItemButton
-            component="a"
-            href={import.meta.env.VITE_DASH_APP}
-sx={{ pl: "16px", minHeight: 48 }}>
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="ESAVIS Dashboard" />
-          </ListItemButton>
-        </ListItem>
+        <Menu.Item
+          to="/vacunometro"
+          primaryText="Vacunometro"
+          leftIcon={<VaccinesIcon />}
+        />
 
+        <SeccionMenu>Estándares</SeccionMenu>
+        <SubMenu
+          dense={false}
+          handleToggle={() => setEstandaresOpen((v) => !v)}
+          icon={<MenuBookIcon />}
+          isOpen={estandaresOpen}
+          name="Diccionarios">
+          <Menu.Item
+            to="/meddra"
+            primaryText="MedDRA"
+            leftIcon={<LocalHospitalIcon />}
+          />
+          <Menu.Item
+            to="/whodrug"
+            primaryText="WHODrug"
+            leftIcon={<MedicationIcon />}
+          />
+        </SubMenu>
+
+        <SeccionMenu>Sistema</SeccionMenu>
+        <Menu.Item
+          to="/syncs"
+          primaryText="Procesos de sincronización"
+          leftIcon={<SyncIcon />}
+        />
         {/* Configuraciones — solo rol "admin" */}
         <Authorize allowedRoles={["admin"]} deniedRoles={[""]}>
           <SubMenu
@@ -90,35 +168,28 @@ sx={{ pl: "16px", minHeight: 48 }}>
             />
           </SubMenu>
         </Authorize>
-        <Menu.Item
-          to="/vacunometro"
-          primaryText="Vacunometro"
-          leftIcon={<VaccinesIcon />}
-        />
-        <Menu.Item
-          to="/syncs"
-          primaryText="Procesos de sincronización"
-          leftIcon={<SyncIcon />}
-        />
-        {/* Estándares */}
-        <SubMenu
-          dense={false}
-          handleToggle={() => setEstandaresOpen((v) => !v)}
-          icon={<MenuBookIcon />}
-          isOpen={estandaresOpen}
-          name="Estándares">
-          <Menu.Item
-            to="/meddra"
-            primaryText="MedDRA"
-            leftIcon={<LocalHospitalIcon />}
-          />
-          <Menu.Item
-            to="/whodrug"
-            primaryText="WHODrug"
-            leftIcon={<MedicationIcon />}
-          />
-        </SubMenu>
+
       </Menu>
+      {/*
+        El pie va fuera de <Menu>, no dentro.
+
+        Dentro quedaba al final de la lista y, en cuanto los puntos de menú superaban el
+        alto de la barra, se iba con el scroll. Como hermano del menú —los dos hijos del
+        contenedor .RaSidebar-fixed, que el tema convierte en columna flexible— el menú se
+        lleva el alto sobrante y scrollea, y el pie queda clavado al borde inferior.
+      */}
+      <PieMenu />
     </>
   )
+}
+
+/**
+ * Pie de la barra lateral: el aviso de derechos que antes vivía en una barra fija a lo
+ * ancho de la ventana. Se oculta con la barra plegada, donde no hay sitio para texto.
+ */
+const PieMenu = () => {
+  const [sidebarIsOpen] = useSidebarState()
+  if (!sidebarIsOpen) return null
+
+  return <CustomFooter />
 }

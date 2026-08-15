@@ -314,9 +314,6 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button onClick={() => setSearchProvincia("")} disabled={!searchProvincia} sx={{ minWidth: "auto", px: 1 }}>
-                Limpiar
-              </Button>
             </Stack>
           </PanelHeader>
           <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
@@ -457,9 +454,6 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button onClick={() => setSearchCanton("")} disabled={!searchCanton} sx={{ minWidth: "auto", px: 1 }}>
-                Limpiar
-              </Button>
             </Stack>
           </PanelHeader>
           <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>
@@ -609,9 +603,6 @@ export const DpaList = () => {
                   ),
                 }}
               />
-              <Button onClick={() => setSearchParroquia("")} disabled={!searchParroquia} sx={{ minWidth: "auto", px: 1 }}>
-                Limpiar
-              </Button>
             </Stack>
           </PanelHeader>
           <TableContainer sx={{ maxHeight: LAYOUT.alturaTabla, minHeight: LAYOUT.alturaTablaMinima }}>

@@ -2,10 +2,10 @@ import {Injectable,Logger} from '@nestjs/common';
 import {Cron,CronExpression} from '@nestjs/schedule';
 import {InjectRepository} from '@nestjs/typeorm';
 import {formatDate} from 'date-fns';
-import {createHash} from 'node:crypto';
 import {withAuditOnCreate} from 'src/common/utils/audit.util';
 import {Auditoria,SyncSource} from 'src/integrator/entity';
 import {SyncService} from 'src/integrator/service/sync.service';
+import {DestinatarioNotificacion} from 'src/mensajes/models/notificacion.interface';
 import {Repository} from 'typeorm';
 import {QueryDeepPartialEntity} from 'typeorm/query-builder/QueryPartialEntity';
 import {ActiveIngredient} from '../models/activeIngredient.entity';
@@ -16,7 +16,6 @@ import {Drug} from '../models/drug.entity';
 import {IDrugResponse} from '../models/dtos';
 import {IngredientTranslation} from '../models/ingredientTranslation.entity';
 import {Maholder} from '../models/maholder.entity';
-import * as cliProgress from 'cli-progress';
 import {WhoDrugsClientService} from './whodrugs-client.service';
 
 /**
@@ -24,6 +23,15 @@ import {WhoDrugsClientService} from './whodrugs-client.service';
  */
 @Injectable()
 export class WhoDrugsSyncService {
+  /** Cada cuántos medicamentos se devuelve el turno al event loop mientras se construyen entidades. */
+  private static readonly MEDICAMENTOS_POR_PAUSA = 2000;
+
+  /**
+   * Tope de argumentos por `push(...)`. El spread los pasa como argumentos de la llamada y
+   * un array grande desborda la pila; por eso se agrega en tramos en vez de `push(...todo)`.
+   */
+  private static readonly MAX_ARGUMENTOS_PUSH = 10000;
+
   constructor(
     private readonly whoDrugsClientService: WhoDrugsClientService,
 
@@ -54,7 +62,7 @@ export class WhoDrugsSyncService {
    * Este método se encarga de sincronizar el json proporcionado por whodrug en la base de datos postgres
    * @returns
    */
-  public async sync(): Promise<void> {
+  public async sync(usuario?: DestinatarioNotificacion | null): Promise<void> {
     await this.syncService.ejecutarConRegistro(
       SyncSource.WHODRUG,
       'Sincronización WHODrug',
@@ -62,11 +70,16 @@ export class WhoDrugsSyncService {
         try {
           // Obtener la sincronización
           this.logger.log('Iniciando sincronización, descargando archivo de whodrugs');
-          //
-          const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
-          const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
+          // El SHA-256 lo calcula el cliente sobre el cuerpo tal como llegó, mientras lo
+          // recibe; aquí ya no se vuelve a serializar el diccionario para obtenerlo.
+          const { drugs: drugsResponse, sha256 } = await this.whoDrugsClientService.getDrugs(
+            3,
+            'es-ES',
+            true,
+          );
 
-          // Verificar si hay actualizaciones
+          // Verificar si hay actualizaciones. Va antes de construir una sola entidad: si la
+          // versión ya está cargada, la corrida termina sin tocar la base ni la memoria.
           const existe = await this.existeSincronizacionConSHA(sha256);
           if (existe) {
             return {
@@ -92,6 +105,7 @@ export class WhoDrugsSyncService {
           this.logger.log('Proceso Finalizado');
         }
       },
+      { usuario },
     );
   }
 
@@ -109,8 +123,7 @@ export class WhoDrugsSyncService {
           'yyyy-MM-dd HH:mm:ss',
         )}`,
       );
-      const drugsResponse = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
-      const sha256 = createHash('sha256').update(JSON.stringify(drugsResponse)).digest('hex');
+      const { sha256 } = await this.whoDrugsClientService.getDrugs(3, 'es-ES', true);
 
       if (await this.existeSincronizacionConSHA(sha256)) {
         this.logger.log('No hay nuevas actualizaciones');
@@ -135,36 +148,44 @@ export class WhoDrugsSyncService {
   private async saveDrugs(drugs: IDrugResponse[], syncId: string): Promise<void> {
     await this.disableEntities();
 
-    const drugsEntities = [];
+    const drugsEntities: Drug[] = [];
     //1
-    let activeIngredientsEntities = [];
-    let ingredientTranslationsEntities = [];
+    const activeIngredientsEntities: ActiveIngredient[] = [];
+    const ingredientTranslationsEntities: IngredientTranslation[] = [];
     //2
-    let countryOfSalesEntities = [];
-    let maholdersEntities = [];
+    const countryOfSalesEntities: CountryOfSale[] = [];
+    const maholdersEntities: Maholder[] = [];
     //3
-    let atcsEntities = [];
-    const bar1 = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+    const atcsEntities: AnatomicalTherapeuticChemical[] = [];
 
-    bar1.start(drugs.length, 1);
-    (drugs || []).forEach((drugR, index) => {
-      bar1.update(index);
-      const drugAdapter = new DrugSchemaAdapter(drugR, syncId);
+    const total = drugs?.length ?? 0;
+    this.logger.log(`Construyendo entidades de ${total} medicamentos...`);
+
+    for (let index = 0; index < total; index++) {
+      const drugAdapter = new DrugSchemaAdapter(drugs[index], syncId);
       const { drug, activeIngredients, ingredientTranslations, countryOfSales, maholders, atcs } =
         drugAdapter.getEntities();
       drugsEntities.push(drug);
       //1
-      activeIngredientsEntities = activeIngredientsEntities.concat(activeIngredients);
-
-      ingredientTranslationsEntities =
-        ingredientTranslationsEntities.concat(ingredientTranslations);
+      // `agregar` en vez de `concat`: reasignar el acumulado copiaba en cada vuelta todo lo
+      // ya acumulado, con lo que construir el diccionario era cuadrático sobre el total de
+      // filas —el grueso del tiempo que la sincronización dejaba la API sin responder—.
+      WhoDrugsSyncService.agregar(activeIngredientsEntities, activeIngredients);
+      WhoDrugsSyncService.agregar(ingredientTranslationsEntities, ingredientTranslations);
       //2
-      countryOfSalesEntities = countryOfSalesEntities.concat(countryOfSales);
-      maholdersEntities = maholdersEntities.concat(maholders);
+      WhoDrugsSyncService.agregar(countryOfSalesEntities, countryOfSales);
+      WhoDrugsSyncService.agregar(maholdersEntities, maholders);
       //3
-      atcsEntities = atcsEntities.concat(atcs);
-    });
-    bar1.stop();
+      WhoDrugsSyncService.agregar(atcsEntities, atcs);
+
+      // Node es de un solo hilo: sin esta pausa el bucle entero corre sin ceder y ninguna
+      // petición HTTP —ni el healthcheck— se atiende hasta que termina.
+      if ((index + 1) % WhoDrugsSyncService.MEDICAMENTOS_POR_PAUSA === 0) {
+        this.logger.log(`|---- ${index + 1} de ${total} medicamentos procesados`);
+        await WhoDrugsSyncService.cederElTurno();
+      }
+    }
+
     await this.saveEntitiesGeneric<Drug>(this.drugRepository, drugsEntities, Drug.name);
     await this.saveEntitiesGeneric<ActiveIngredient>(
       this.activeIngredientsRepository,
@@ -211,32 +232,48 @@ export class WhoDrugsSyncService {
     return drogasCargadas > 0;
   }
 
+  /** Añade `origen` al final de `destino` sin reasignar el array ni desbordar la pila. */
+  private static agregar<T>(destino: T[], origen: T[]): void {
+    if (!origen?.length) return;
+    for (let i = 0; i < origen.length; i += WhoDrugsSyncService.MAX_ARGUMENTOS_PUSH) {
+      destino.push(...origen.slice(i, i + WhoDrugsSyncService.MAX_ARGUMENTOS_PUSH));
+    }
+  }
+
   /**
+   * Devuelve el turno al event loop.
    *
-   * @param entities
-   * @returns
+   * `setImmediate` y no `setTimeout(0)`: se encola tras la fase de I/O, de modo que las
+   * peticiones pendientes se atienden antes de reanudar el bucle de construcción.
+   */
+  private static cederElTurno(): Promise<void> {
+    return new Promise((resolve) => setImmediate(resolve));
+  }
+
+  /**
+   * Inserta las entidades por lotes.
+   *
+   * `insert` y no `save`: el id de estas entidades lo asigna el adaptador (`uuidGenerator`),
+   * así que para `save` son entidades "con id" y consulta la base antes de cada lote para
+   * decidir INSERT o UPDATE. Aquí siempre son altas de una versión recién descargada, y esa
+   * consulta previa sólo añade trabajo. Tampoco se acumula el resultado: nadie lo usa y con
+   * un diccionario completo era otro array gigante retenido en memoria hasta el final.
    */
   public async saveEntitiesGeneric<T extends Auditoria>(
     repositorySaver: Repository<T>,
     entities: T[],
     entityName: string,
-  ): Promise<T[]> {
-    let page = 0;
+  ): Promise<void> {
     const size = 5000;
-    const fullEntitiesSaved: T[] = [];
     this.logger.log(`Total: ${entities.length} entidades de ${entityName}`);
-    do {
+    for (let desde = 0; desde < entities.length; desde += size) {
       const entitiesToSave = entities
-        .slice(page * size, (page + 1) * size)
+        .slice(desde, desde + size)
         .map((entity) => withAuditOnCreate(entity));
-      this.logger.log(`|---- Guardado  de ${page * size} a ${(page + 1) * size}`);
-      let entitiesSaved = [];
-      entitiesSaved = await repositorySaver.save(entitiesToSave);
-      fullEntitiesSaved.push(...entitiesSaved);
-      page++;
-    } while (entities.length > page * size);
-    //
-    return fullEntitiesSaved;
+      this.logger.log(`|---- Guardado de ${desde} a ${desde + entitiesToSave.length}`);
+      await repositorySaver.insert(entitiesToSave as QueryDeepPartialEntity<T>[]);
+      await WhoDrugsSyncService.cederElTurno();
+    }
   }
   /**
    * Deshabilita TODAS las filas del diccionario antes de guardar la nueva versión.

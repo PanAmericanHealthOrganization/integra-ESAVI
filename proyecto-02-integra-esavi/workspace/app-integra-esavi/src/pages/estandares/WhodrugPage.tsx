@@ -131,9 +131,6 @@ export const WhodrugPage = () => {
                 ))}
               </Select>
             </FormControl>
-            <Button onClick={() => { setSearchName(""); setPage(0) }} disabled={!searchName}>
-              Limpiar
-            </Button>
           </Box>
         </PanelHeader>
 

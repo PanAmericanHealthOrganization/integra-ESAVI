@@ -9,6 +9,7 @@ import { SyncSource } from 'src/integrator/entity';
 import { IAuditoria } from 'src/integrator/entity/auditoria.entity';
 import { DatoEsaviService } from 'src/integrator/service/dato-esavi.service';
 import { SyncService } from 'src/integrator/service/sync.service';
+import { DestinatarioNotificacion } from 'src/mensajes/models/notificacion.interface';
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
@@ -141,8 +142,17 @@ export class VigiflowIntegradorService {
    * Así una importación larga no depende de una única descarga gigante de VigiFlow, y el fallo
    * de un mes no invalida los demás: se continúa con los siguientes y se reporta cuáles
    * fallaron. Un rango dentro de un mismo mes se comporta exactamente como antes (un tramo).
+   *
+   * `usuario` es quien lanzó la importación desde la interfaz; recibe una notificación por
+   * cada tramo, con su desenlace. El cron no lo aporta —no hay a quién avisar— y en ese caso
+   * la corrida sólo queda en TR_SYNC_PROCESS.
    */
-  async createInBulk(fechaInicio: Date, fechaFin: Date, codigoATC = 'J07'): Promise<ResumenImportacionVigiflow> {
+  async createInBulk(
+    fechaInicio: Date,
+    fechaFin: Date,
+    codigoATC = 'J07',
+    usuario?: DestinatarioNotificacion | null,
+  ): Promise<ResumenImportacionVigiflow> {
     if (fechaFin <= fechaInicio) {
       throw new BadRequestException();
     }
@@ -169,7 +179,7 @@ export class VigiflowIntegradorService {
         tramo.fechaFin,
       )}`;
       try {
-        await this.importarPeriodo(tramo.fechaInicio, tramo.fechaFin, codigoATC);
+        await this.importarPeriodo(tramo.fechaInicio, tramo.fechaFin, codigoATC, usuario);
         resumen.completados++;
       } catch (error: any) {
         // Se continúa con los meses restantes: cada tramo es independiente y ya quedó
@@ -191,13 +201,18 @@ export class VigiflowIntegradorService {
   /**
    * Descarga y procesa un único periodo (a lo sumo un mes) desde VigiFlow.
    */
-  private async importarPeriodo(fechaInicio: Date, fechaFin: Date, codigoATC: string) {
+  private async importarPeriodo(
+    fechaInicio: Date,
+    fechaFin: Date,
+    codigoATC: string,
+    usuario?: DestinatarioNotificacion | null,
+  ) {
     // Las fechas se envían con el formato YYYYMMDD, ejm: 20230113
     const fechaInicioFmrt = VigiflowUtils.formatoYYYYMMDD(fechaInicio);
     const fechaFinFmrt = VigiflowUtils.formatoYYYYMMDD(fechaFin);
 
     await this.ejecutarConRegistroSync(
-      'VIGIFLOW_BULK',
+      `Importación VigiFlow ${fechaInicioFmrt} – ${fechaFinFmrt}`,
       `Importación VigiFlow completada: ${fechaInicioFmrt} – ${fechaFinFmrt}`,
       async () => {
         const { jwt } = await this.vigiflowCrawlerService.retrieveJWT();
@@ -216,29 +231,42 @@ export class VigiflowIntegradorService {
       },
       fechaInicio,
       fechaFin,
+      usuario,
     );
   }
 
   /* ARCHIVOS LOCALES */
-  public async createInBulkFromFile() {
+  public async createInBulkFromFile(usuario?: DestinatarioNotificacion | null) {
     const aefiFilePath = this.configService.get<string>('VIGIFLOW_FILE_AEFI', './upload_files/files_meddra/aefi.xlsx');
     const reportFilePath = this.configService.get<string>('VIGIFLOW_FILE_REPORT', './upload_files/files_meddra/report.xlsx');
     const reportOne = read(await fs.readFile(aefiFilePath));
     const reportTwo = read(await fs.readFile(reportFilePath));
-    await this._processBulkWorkbooks(reportOne, reportTwo, 'VIGIFLOW_BULK_FILE');
+    await this._processBulkWorkbooks(reportOne, reportTwo, 'Importación VigiFlow desde archivo', usuario);
   }
 
-  public async createInBulkFromUploadedFiles(aefiBuffer: Buffer, reportBuffer: Buffer) {
+  public async createInBulkFromUploadedFiles(
+    aefiBuffer: Buffer,
+    reportBuffer: Buffer,
+    usuario?: DestinatarioNotificacion | null,
+  ) {
     const reportOne = read(aefiBuffer);
     const reportTwo = read(reportBuffer);
-    await this._processBulkWorkbooks(reportOne, reportTwo, 'VIGIFLOW_BULK_UPLOAD');
+    await this._processBulkWorkbooks(reportOne, reportTwo, 'Importación VigiFlow desde archivo cargado', usuario);
   }
 
-  private async _processBulkWorkbooks(reportOne: WorkBook, reportTwo: WorkBook, syncName: string) {
+  private async _processBulkWorkbooks(
+    reportOne: WorkBook,
+    reportTwo: WorkBook,
+    syncName: string,
+    usuario?: DestinatarioNotificacion | null,
+  ) {
     await this.ejecutarConRegistroSync(
       syncName,
       'Importación VigiFlow desde archivo completada',
       () => this.procesarWorkbooks(reportOne, reportTwo),
+      null,
+      null,
+      usuario,
     );
   }
 
@@ -269,8 +297,9 @@ export class VigiflowIntegradorService {
 
   /**
    * Envoltorio sobre el registro común. Sólo adapta la forma de llamar (aquí el
-   * mensaje de éxito se conoce de antemano); el registro en TR_SYNC_PROCESS lo
-   * hace `SyncService.ejecutarConRegistro`, igual que el resto de las fuentes.
+   * mensaje de éxito se conoce de antemano); el registro en TR_SYNC_PROCESS y el
+   * aviso al usuario los hace `SyncService.ejecutarConRegistro`, igual que el
+   * resto de las fuentes.
    */
   private async ejecutarConRegistroSync(
     syncName: string,
@@ -278,6 +307,7 @@ export class VigiflowIntegradorService {
     proceso: () => Promise<void>,
     dataStartDate: Date | null = null,
     dataEndDate: Date | null = null,
+    usuario?: DestinatarioNotificacion | null,
   ) {
     await this.syncService.ejecutarConRegistro(
       SyncSource.VIGIFLOW,
@@ -286,7 +316,7 @@ export class VigiflowIntegradorService {
         await proceso();
         return { mensaje: mensajeExito };
       },
-      { dataStartDate, dataEndDate },
+      { dataStartDate, dataEndDate, usuario },
     );
   }
 

@@ -7,6 +7,7 @@ import {RangoFechasUtils} from 'src/utils/rango-fechas.util';
 import {CausalidadEsavi,SyncSource} from 'src/integrator/entity';
 import {SyncService} from 'src/integrator/service/sync.service';
 import {IAuditoria} from 'src/integrator/entity/auditoria.entity';
+import {DestinatarioNotificacion} from 'src/mensajes/models/notificacion.interface';
 import {MeddraLLTService} from 'src/meddra/services/meddra-lt.service';
 import {MeddraPtService} from 'src/meddra/services/meddra-pt.service';
 import {DrugService} from 'src/whodrugs/services/drugs.service';
@@ -163,12 +164,17 @@ export class Dhis2IntegratorService {
    * Importación masiva desde DHIS2. Queda registrada en TR_SYNC_PROCESS igual
    * que el resto de las fuentes: antes DHIS2 era el único integrador que no
    * dejaba rastro en el log de sincronizaciones, sólo en los logs de proceso.
+   *
+   * `usuario` es quien la lanzó desde la interfaz: al cerrarse la corrida recibe la
+   * notificación con el desenlace. El cron no lo aporta —no hay a quién avisar— y en ese
+   * caso la corrida sólo queda registrada.
    */
   async createInBulk(
     fechaInicio: Date,
     fechaFin: Date,
     codigoATC: string,
     duplicateConfig?: DuplicateHandlingConfigDto,
+    usuario?: DestinatarioNotificacion | null,
   ) {
     const loteId = `DHIS2_${Date.now()}_${codigoATC}`;
 
@@ -176,7 +182,12 @@ export class Dhis2IntegratorService {
       SyncSource.DHIS2,
       `Importación DHIS2 ${codigoATC}`,
       () => this.ejecutarImportacion(loteId, fechaInicio, fechaFin, codigoATC, duplicateConfig),
-      { dataStartDate: fechaInicio, dataEndDate: fechaFin, metadata: { loteId, codigoATC } },
+      {
+        dataStartDate: fechaInicio,
+        dataEndDate: fechaFin,
+        metadata: { loteId, codigoATC },
+        usuario,
+      },
     );
   }
 

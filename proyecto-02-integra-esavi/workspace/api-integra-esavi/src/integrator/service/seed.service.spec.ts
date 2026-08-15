@@ -667,14 +667,59 @@ describe('SeedService', () => {
   // ─── truncateNotificacion ───────────────────────────────────────────────────
 
   describe('truncateNotificacion', () => {
-    it('trunca TR_NOTIFICACION en cascada', async () => {
+    /** QueryRunner cuyo SELECT al catálogo devuelve las tablas indicadas. */
+    const queryRunnerConTablas = (tablas: { table_schema: string; table_name: string }[]) => {
       const qr = makeQueryRunner();
+      qr.query.mockImplementation((sql: string) =>
+        Promise.resolve(sql.includes('information_schema.tables') ? tablas : undefined),
+      );
+      return qr;
+    };
+
+    it('trunca TR_NOTIFICACION junto con las tablas de WHO_DRUG y MEDDRA en un solo CASCADE', async () => {
+      const qr = queryRunnerConTablas([
+        { table_schema: 'MEDDRA', table_name: 'LLT' },
+        { table_schema: 'WHO_DRUG', table_name: 'DRUG' },
+      ]);
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateNotificacion();
+
+      expect(qr.query).toHaveBeenCalledWith(
+        'TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION", "MEDDRA"."LLT", "WHO_DRUG"."DRUG" CASCADE;',
+      );
+      expect(qr.release).toHaveBeenCalledTimes(1);
+    });
+
+    it('sólo consulta el catálogo por los esquemas de diccionarios', async () => {
+      const qr = queryRunnerConTablas([]);
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateNotificacion();
+
+      expect(qr.query).toHaveBeenCalledWith(expect.stringContaining('information_schema.tables'), [
+        ['WHO_DRUG', 'MEDDRA'],
+      ]);
+    });
+
+    it('conserva TC_PARAMETRO y TR_SYNC_PROCESS', async () => {
+      const qr = queryRunnerConTablas([{ table_schema: 'WHO_DRUG', table_name: 'DRUG' }]);
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateNotificacion();
+
+      const truncate = qr.query.mock.calls.map(([sql]) => sql).find((sql) => sql.startsWith('TRUNCATE'));
+      expect(truncate).not.toContain('TC_PARAMETRO');
+      expect(truncate).not.toContain('TR_SYNC_PROCESS');
+    });
+
+    it('trunca sólo TR_NOTIFICACION si los esquemas de diccionarios aún no existen', async () => {
+      const qr = queryRunnerConTablas([]);
       mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
 
       await service.truncateNotificacion();
 
       expect(qr.query).toHaveBeenCalledWith('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
-      expect(qr.release).toHaveBeenCalledTimes(1);
     });
 
     it('relanza el error y libera el queryRunner si falla', async () => {

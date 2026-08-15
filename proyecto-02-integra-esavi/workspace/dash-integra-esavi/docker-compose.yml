@@ -1,17 +1,19 @@
 services:
 
   # ── Pre-chequeo: el datamart DuckDB debe existir ─────────────────────────────
-  # El despliegue del dashboard es MANUAL y SEPARADO del de la API. La API genera
-  # ../api-integra-esavi/datos/esavi.duckdb (cron / POST /v1/datamart/regenerar).
+  # El despliegue del dashboard es MANUAL y SEPARADO del de la API. La API escribe el
+  # datamart aquí, en ./datos/esavi.duckdb (cron / POST /v1/datamart/regenerar).
   # Este servicio verifica que el archivo exista ANTES de arrancar el dashboard;
   # si no está, sale con código != 0 y el despliegue del dashboard FALLA.
+  # A diferencia del compose del stack completo aquí no espera: la API no forma parte
+  # de este despliegue, así que si el archivo no está ya, no va a aparecer solo.
   # Monta el directorio (no el archivo) para no caer en el bug de podman que crea
   # un directorio vacío cuando el archivo de origen no existe.
   duckdb-check:
     image: busybox:1.36
     container_name: esavi-duckdb-check
     volumes:
-      - ../api-integra-esavi/datos:/check:ro
+      - ./datos:/check:ro
     entrypoint:
       - /bin/sh
       - -c
@@ -19,7 +21,7 @@ services:
         if [ -f /check/esavi.duckdb ] && [ -s /check/esavi.duckdb ]; then
           echo "OK: esavi.duckdb encontrado; el dashboard puede desplegarse.";
         else
-          echo "ERROR: falta ../api-integra-esavi/datos/esavi.duckdb." >&2;
+          echo "ERROR: falta ./datos/esavi.duckdb." >&2;
           echo "       Genera el datamart con la API (POST /v1/datamart/regenerar" >&2;
           echo "       o el arranque de la API) antes de desplegar el dashboard." >&2;
           exit 1;
@@ -56,7 +58,8 @@ services:
       DB_PASS: ${DB_PASS}
       LOG_ACCESS_ATTEMPTS:       ${LOG_ACCESS_ATTEMPTS:-true}
       LOG_FILE_PATH:             /app/logs/access.log
-      # Datamart DuckDB generado por api-integra-esavi (reemplaza los RDS).
+      # Datamart DuckDB generado por api-integra-esavi (reemplaza los RDS). Llega por el
+      # montaje de ./datos, que es donde la API lo escribe.
       DUCKDB_PATH:               ${DUCKDB_PATH:-/app/datos/esavi.duckdb}
       INTEGRA_APP_URL:           ${INTEGRA_APP_URL:-http://localhost:8080}
       VITE_KEYCLOAK_URL:         ${VITE_KEYCLOAK_URL:-}
@@ -69,9 +72,6 @@ services:
       - ./datos:/app/datos
       - ./fuente_de_datos:/app/fuente_de_datos
       - ./logs:/app/logs
-      # datos/esavi.duckdb es un symlink relativo a ../../api-integra-esavi/datos/esavi.duckdb;
-      # dentro del contenedor ese destino no existe salvo que se monte también.
-      - ../api-integra-esavi/datos/esavi.duckdb:/app/datos/esavi.duckdb:ro
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:80/"]
       interval: 30s

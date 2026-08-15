@@ -18,12 +18,30 @@ const SubMenu = (props: Props) => {
 
 	const [sidebarIsOpen] = useSidebarState();
 
+	/*
+	 * La cabecera comparte forma con los ítems de primer nivel (pastilla de 8px, 40px de
+	 * alto, icono a 34px): antes era un MenuItem crudo, medio centímetro más alto y sin
+	 * redondeo, y rompía la columna del menú justo donde empieza un grupo.
+	 */
 	const header = (
-		<MenuItem dense={dense} onClick={handleToggle}>
-			<ListItemIcon sx={{ minWidth: 5 }}>{isOpen ? <ExpandMore /> : icon}</ListItemIcon>
-			<Typography variant="inherit" color="textSecondary">
-				{translate(name)}
-			</Typography>
+		<MenuItem
+			dense={dense}
+			onClick={handleToggle}
+			sx={{
+				borderRadius: '8px',
+				minHeight: 40,
+				px: '11px',
+				my: '2px',
+				color: 'text.secondary',
+				fontSize: '13.5px',
+				fontWeight: 500,
+				'&:hover': { backgroundColor: '#f0f5fc' }
+			}}
+		>
+			<ListItemIcon sx={{ minWidth: 34, color: 'inherit' }}>
+				{isOpen ? <ExpandMore /> : icon}
+			</ListItemIcon>
+			<Typography variant="inherit">{translate(name)}</Typography>
 		</MenuItem>
 	);
 

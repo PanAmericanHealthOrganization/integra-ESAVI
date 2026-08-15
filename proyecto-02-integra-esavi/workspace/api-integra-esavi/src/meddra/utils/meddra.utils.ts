@@ -38,4 +38,24 @@ export class MeddraUtils {
     }
     return lines;
   };
+
+  /**
+   * Misma lectura que {@link readFileContent} pero sobre un buffer en memoria, para los
+   * archivos que llegan por multipart y nunca se escriben en disco.
+   *
+   * El encoding es `latin1` por la misma razón que en la versión de disco: MedDRA
+   * distribuye los `.asc` en ISO-8859-1, y leerlos como UTF-8 corrompe cualquier término
+   * con tilde o eñe. Las líneas vacías se descartan —el archivo termina en salto de
+   * línea y produciría una fila de un solo campo vacío—.
+   *
+   * @param buffer contenido crudo del `.asc`
+   * @returns matriz de campos, separados por `$`
+   */
+  public static parseAsc = (buffer: Buffer): string[][] => {
+    return buffer
+      .toString('latin1')
+      .split(/\r?\n/)
+      .filter((linea) => linea.length > 0)
+      .map((linea) => linea.split('$'));
+  };
 }

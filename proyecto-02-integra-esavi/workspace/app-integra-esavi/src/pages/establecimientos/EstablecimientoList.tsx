@@ -278,9 +278,6 @@ export const EstablecimientoList = () => {
                   ),
                 }}
               />
-              <Button onClick={() => { setSearch(""); setDebouncedSearch(""); setPage(0) }} disabled={!search}>
-                Limpiar
-              </Button>
               <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>
                 Nuevo
               </Button>

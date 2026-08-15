@@ -7,9 +7,10 @@ import {Homologador} from 'src/homologator/entity/homologador.entity';
 import {TipoComparacion} from 'src/homologator/enum/tipo-comparacion.enum';
 import {TipoDato} from 'src/homologator/enum/tipo-dato.enum';
 import {format} from 'date-fns';
-import {Repository} from 'typeorm';
+import {QueryRunner,Repository} from 'typeorm';
 import {read,utils} from 'xlsx';
 import {RangoFechasUtils} from 'src/utils/rango-fechas.util';
+import {DestinatarioNotificacion} from 'src/mensajes/models/notificacion.interface';
 
 // Entidades
 import {IAuditoria,SyncSource} from '../entity';
@@ -53,6 +54,14 @@ interface ResumenCargaParametros {
 
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
+  /**
+   * Esquemas de diccionarios externos que se vacían junto con las
+   * notificaciones. Ninguno guarda ya su propia bitácora —MED_SYNC y DRUG_SYNC
+   * se sustituyeron por DHI_ESAVI.TR_SYNC_PROCESS—, así que se pueden truncar
+   * enteros sin perder historial.
+   */
+  private static readonly ESQUEMAS_DICCIONARIOS = ['WHO_DRUG', 'MEDDRA'];
+
   private readonly logger = new Logger(SeedService.name);
   constructor(
     @InjectRepository(Paciente, 'POSTGRES_INTEGRATOR_DS')
@@ -302,17 +311,27 @@ export class SeedService implements OnApplicationBootstrap {
    * El registro lo hace `SyncService.ejecutarConRegistro`, el mismo camino que
    * usan MedDRA, WHODrug, el datamart y el resto: antes este servicio abría y
    * cerraba las filas por su cuenta, duplicando la lógica.
+   *
+   * `usuario` es opcional a propósito: las cargas que corren al arrancar la aplicación
+   * (`onApplicationBootstrap`) no las lanza nadie, y sin destinatario `ejecutarConRegistro`
+   * simplemente omite el aviso. Sólo lo traen las que dispara una persona desde la interfaz.
    */
   private async runSyncProcess(
     name: string,
     action: () => Promise<void | ResumenSeed>,
+    usuario?: DestinatarioNotificacion | null,
   ): Promise<void> {
-    await this.syncService.ejecutarConRegistro(SyncSource.SEED, name, async () => {
-      // La acción puede devolver su propio resumen; si no, se registra uno genérico.
-      // El cast es necesario porque `void` no se estrecha solo con `??`.
-      const salida = (await action()) as ResumenSeed | undefined;
-      return salida ?? { mensaje: `Proceso ${name} completado exitosamente` };
-    });
+    await this.syncService.ejecutarConRegistro(
+      SyncSource.SEED,
+      name,
+      async () => {
+        // La acción puede devolver su propio resumen; si no, se registra uno genérico.
+        // El cast es necesario porque `void` no se estrecha solo con `??`.
+        const salida = (await action()) as ResumenSeed | undefined;
+        return salida ?? { mensaje: `Proceso ${name} completado exitosamente` };
+      },
+      { usuario },
+    );
   }
 
   //--inicio de la carga del catálogo para el mapeo de ICD-10 MedDRA desde el documento Excel------------------------------------------------------------------------------------------------------
@@ -1009,10 +1028,12 @@ export class SeedService implements OnApplicationBootstrap {
    *
    * @param fechaInicio primer día del rango a simular (incluido)
    * @param fechaFin último día del rango a simular (incluido)
+   * @param usuario quien lanzó la simulación, para dejarle el aviso en su buzón al terminar
    */
   async seedSimulacionVacunacionDiaria(
     fechaInicio: Date,
     fechaFin: Date,
+    usuario?: DestinatarioNotificacion | null,
   ): Promise<{ insertados: number; establecimientos: number; dias: number }> {
     // Nombres en mayúsculas, igual que UPPER(NOMBRE_VACUNA) en la consulta a la entidad de vacunación
     const VACUNAS = [
@@ -1099,26 +1120,90 @@ export class SeedService implements OnApplicationBootstrap {
             `✅ TR_VACUNOMETRO: día ${comoIso(fechaAplicacion)} simulado para ${totalEstablecimientos} establecimientos (${insertados} registros acumulados).`,
           );
         }
+
+        return {
+          mensaje:
+            `Simulación de vacunación generada: ${insertados} registros para ` +
+            `${totalEstablecimientos} establecimientos en ${diasASimular.length} días ` +
+            `(${comoIso(fechaInicio)} a ${comoIso(fechaFin)})`,
+        };
       },
+      usuario,
     );
 
     return { insertados, establecimientos: totalEstablecimientos, dias: diasASimular.length };
   }
 
+  /**
+   * Vacía los datos operativos y, con ellos, los diccionarios externos.
+   *
+   * Alcance:
+   * - `DHI_ESAVI.TR_NOTIFICACION` en cascada: arrastra vacunas, ESAVI,
+   *   desenlaces, gravedad, causalidad y medicamentos.
+   * - Los esquemas `WHO_DRUG` y `MEDDRA` completos. Viven en la misma base
+   *   física que `DHI_ESAVI` —sólo cambia el esquema—, así que se truncan por
+   *   esta misma conexión y no hace falta inyectar sus datasources, que
+   *   además crearían una dependencia circular: los módulos de WHODrug y
+   *   MedDRA ya importan IntegratorModule.
+   *
+   * Lo que NO se toca, a propósito:
+   * - `DHI_ESAVI.TC_PARAMETRO`: la configuración (credenciales y URLs de
+   *   DHIS2, VigiFlow, WHODrug, MedDRA) tiene que sobrevivir al borrado; sin
+   *   ella no hay forma de volver a sincronizar nada.
+   * - `DHI_ESAVI.TR_SYNC_PROCESS`: es el historial de corridas y, desde que
+   *   sustituyó a MED_SYNC, también el registro de las versiones de MedDRA
+   *   cargadas. Consecuencia a tener presente: al conservarlo,
+   *   `MeddraProcessFilesService.validarVersion` sigue viendo la versión como
+   *   cargada, de modo que reimportar esa misma versión responde 409 hasta que
+   *   se elimine su fila.
+   */
   async truncateNotificacion() {
-    console.log('🧹 Truncando TR_NOTIFICACION en cascada...');
+    console.log('🧹 Truncando notificaciones y diccionarios (WHO_DRUG, MEDDRA)...');
     const queryRunner = this.notificacionRepository.manager.connection.createQueryRunner();
     try {
+      // Se resuelven por catálogo en lugar de listarlas a mano: así una tabla
+      // nueva en cualquiera de los dos diccionarios entra sola en el borrado.
+      const tablasDiccionarios = await this.listarTablasDeEsquemas(
+        queryRunner,
+        SeedService.ESQUEMAS_DICCIONARIOS,
+      );
+      const objetivos = ['"DHI_ESAVI"."TR_NOTIFICACION"', ...tablasDiccionarios];
+
       await queryRunner.query('SET session_replication_role = replica;');
-      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
+      await queryRunner.query(`TRUNCATE TABLE ${objetivos.join(', ')} CASCADE;`);
       await queryRunner.query('SET session_replication_role = DEFAULT;');
-      console.log('✅ TR_NOTIFICACION truncada en cascada exitosamente');
+
+      console.log(
+        `✅ TR_NOTIFICACION y ${tablasDiccionarios.length} tabla(s) de ${SeedService.ESQUEMAS_DICCIONARIOS.join(
+          ' y ',
+        )} truncadas en cascada exitosamente`,
+      );
     } catch (error) {
-      console.error('❌ Error al truncar TR_NOTIFICACION:', error);
+      console.error('❌ Error al truncar notificaciones y diccionarios:', error);
       throw error;
     } finally {
       await queryRunner.release();
     }
+  }
+
+  /**
+   * Devuelve las tablas base de los esquemas indicados, ya citadas y listas
+   * para interpolar en un TRUNCATE. Si un esquema todavía no existe (primer
+   * arranque, antes de que TypeORM lo sincronice) simplemente no aporta filas.
+   */
+  private async listarTablasDeEsquemas(
+    queryRunner: QueryRunner,
+    esquemas: string[],
+  ): Promise<string[]> {
+    const tablas: { table_schema: string; table_name: string }[] = await queryRunner.query(
+      `SELECT t.table_schema, t.table_name
+         FROM information_schema.tables t
+        WHERE t.table_type = 'BASE TABLE'
+          AND t.table_schema = ANY($1)
+        ORDER BY t.table_schema, t.table_name`,
+      [esquemas],
+    );
+    return tablas.map((t) => `"${t.table_schema}"."${t.table_name}"`);
   }
 
   /**

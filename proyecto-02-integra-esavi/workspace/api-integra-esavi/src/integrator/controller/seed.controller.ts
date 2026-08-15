@@ -2,6 +2,7 @@ import { BadRequestException, Controller, Delete, ForbiddenException, HttpCode, 
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RangoFechasUtils } from 'src/utils/rango-fechas.util';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { Usuario, UsuarioAutenticado } from '../../common/decorators/usuario.decorator';
 import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { SeedService } from '../service/seed.service';
@@ -79,7 +80,14 @@ export class SeedController {
   @ApiResponse({ status: 400, description: 'Rango de fechas ausente, mal formado, invertido o demasiado amplio' })
   @ApiResponse({ status: 403, description: 'No disponible en ambiente de producción' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
-  async seedSimulacionVacunacion(@Query('desde') desde: string, @Query('hasta') hasta: string) {
+  async seedSimulacionVacunacion(
+    @Query('desde') desde: string,
+    @Query('hasta') hasta: string,
+    // El `sub` del token es la dirección del buzón: sin él la corrida queda registrada en
+    // TR_SYNC_PROCESS pero nadie recibe el aviso. La clase ya está tras KeycloakAuthGuard,
+    // así que el token siempre está disponible aquí.
+    @Usuario() usuario: UsuarioAutenticado,
+  ) {
     const env = String(process.env.ENV ?? '').toUpperCase();
     if (env.startsWith('PROD')) {
       throw new ForbiddenException('La simulación de vacunaciones no está disponible en el ambiente de producción');
@@ -102,7 +110,7 @@ export class SeedController {
     }
 
     const { insertados, establecimientos, dias: diasSimulados } =
-      await this.seedService.seedSimulacionVacunacionDiaria(fechaInicio, fechaFin);
+      await this.seedService.seedSimulacionVacunacionDiaria(fechaInicio, fechaFin, usuario);
     return {
       message: `Simulación de vacunaciones generada: ${insertados} registros para ${establecimientos} establecimientos en ${diasSimulados} días (${desde} a ${hasta})`,
       insertados,
@@ -142,13 +150,20 @@ export class SeedController {
 
   @Delete('truncate-notificacion')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Truncar TR_NOTIFICACION y todas sus tablas dependientes en cascada' })
-  @ApiResponse({ status: 200, description: 'TR_NOTIFICACION truncada en cascada exitosamente' })
+  @ApiOperation({
+    summary: 'Truncar notificaciones y diccionarios (WHO_DRUG y MEDDRA) en cascada',
+    description:
+      'Vacía TR_NOTIFICACION con todas sus tablas dependientes y, además, los esquemas WHO_DRUG y MEDDRA completos. ' +
+      'Se conservan a propósito TC_PARAMETRO (la configuración de las integraciones) y TR_SYNC_PROCESS (el historial ' +
+      'de corridas, que es también el registro de versiones de MedDRA cargadas): por eso, tras truncar, reimportar una ' +
+      'versión de MedDRA ya registrada sigue devolviendo 409 hasta que se elimine su fila del historial.',
+  })
+  @ApiResponse({ status: 200, description: 'Notificaciones y diccionarios truncados en cascada exitosamente' })
   @ApiResponse({ status: 500, description: 'Error interno del servidor' })
   async truncateNotificacion() {
     await this.seedService.truncateNotificacion();
     return {
-      message: 'TR_NOTIFICACION truncada en cascada exitosamente',
+      message: 'Notificaciones y diccionarios (WHODrug y MedDRA) truncados en cascada exitosamente',
       timestamp: new Date().toISOString(),
     };
   }

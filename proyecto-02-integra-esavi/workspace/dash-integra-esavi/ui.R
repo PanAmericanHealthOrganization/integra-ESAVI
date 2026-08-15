@@ -759,9 +759,11 @@ ui <- dashboardPage(
 
               # .. 4.d.1 Pareto estados ----
 
+              # Ocupa la fila entera mientras el mapa de al lado esté oculto (4.d.2).
+              # Al reactivar el mapa hay que devolver este width a 6.
               box( # class = "transparent-box",#"custom-border",
                 # title = tags$p("Pareto", class = "kpi-tittle"),
-                width = 6,
+                width = 12,
                 closable = FALSE,
                 # status = "info",
                 headerBorder = TRUE,
@@ -771,40 +773,58 @@ ui <- dashboardPage(
                 # background = "gray",
                 # headerBorder = FALSE,
                 highchartOutput("pareto_estado", height = "600px")
-              ),
-
-              # .. 4.d.2 Mapa ----
-
-              box(
-                title = tags$p("", class = "kpi-tittle"),
-                width = 6,
-                closable = FALSE,
-                # status = "info",
-                headerBorder = TRUE,
-                solidHeader = FALSE,
-                collapsible = FALSE,
-                sidebar = boxSidebar(
-                  id = "boxsidebar_mapa",
-                  width = 35,
-                  startOpen = FALSE,
-                  # ~ a. Tipo mapa ----
-                  selectInput("basemap", "Tipo de mapa base:",
-                    choices = c(
-                      "OpenStreetMap" = "OpenStreetMap",
-                      "Satélite" = "Esri.WorldImagery"
-                    ),
-                    selected = "OpenStreetMap"
-                  ),
-                  # ~ b. Transparencia ----
-                  sliderInput("transparencia", "Transparencia:",
-                    min = 0, max = 1, value = 0.7, step = 0.1
-                  ),
-                  # ~ c. Etiquetas ----
-                  checkboxInput("mostrar_etiquetas", "Mostrar etiquetas en el mapa", value = TRUE)
-                ),
-                leafletOutput("mapa", height = "600px"),
-                style = "padding: 0;"
               )
+
+              # .. 4.d.2 Mapa ---- (OCULTO)
+              #
+              # El mapa está oculto porque no hay geografía subnacional que mostrar, no
+              # por un problema de este componente.
+              #
+              # `tbl_mapa` (server.R) agrupa por `codigoEstadoNotificacao`, columna que el
+              # datamart DuckDB no genera: es un resto del pipeline RDS anterior, heredado
+              # del modelo brasileño de ESAVI donde cada notificación traía código de
+              # estado. Su reemplazo natural, `geonoti`, sí existe pero viene 100% nulo,
+              # porque su origen —`TR_NOTIFICACION.CTPARROQUIA_CODIGO`— está vacío en la
+              # base (el propio SQL del datamart lo documenta en datamart-sql.ts:74).
+              #
+              # Renombrar la columna solo cambiaría el error por un mapa vacío silencioso,
+              # que es peor. La vía alternativa —derivar la parroquia del establecimiento—
+              # tampoco sirve hoy: solo 2 de 85 notificaciones tienen ESTABLECIMIENTO_ID.
+              #
+              # Para reactivarlo: poblar CTPARROQUIA_CODIGO en TR_NOTIFICACION, apuntar
+              # `tbl_mapa` a `geonoti` con geodatos a nivel parroquia/cantón, descomentar
+              # este bloque y devolver el width del box 4.d.1 a 6.
+              #
+              # box(
+              #   title = tags$p("", class = "kpi-tittle"),
+              #   width = 6,
+              #   closable = FALSE,
+              #   # status = "info",
+              #   headerBorder = TRUE,
+              #   solidHeader = FALSE,
+              #   collapsible = FALSE,
+              #   sidebar = boxSidebar(
+              #     id = "boxsidebar_mapa",
+              #     width = 35,
+              #     startOpen = FALSE,
+              #     # ~ a. Tipo mapa ----
+              #     selectInput("basemap", "Tipo de mapa base:",
+              #       choices = c(
+              #         "OpenStreetMap" = "OpenStreetMap",
+              #         "Satélite" = "Esri.WorldImagery"
+              #       ),
+              #       selected = "OpenStreetMap"
+              #     ),
+              #     # ~ b. Transparencia ----
+              #     sliderInput("transparencia", "Transparencia:",
+              #       min = 0, max = 1, value = 0.7, step = 0.1
+              #     ),
+              #     # ~ c. Etiquetas ----
+              #     checkboxInput("mostrar_etiquetas", "Mostrar etiquetas en el mapa", value = TRUE)
+              #   ),
+              #   leafletOutput("mapa", height = "600px"),
+              #   style = "padding: 0;"
+              # )
             )
           ),
         )

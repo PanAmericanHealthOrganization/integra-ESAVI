@@ -241,7 +241,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
         SyncSource.VIGIFLOW,
-        'VIGIFLOW_BULK',
+        'Importación VigiFlow 20240101 – 20240131',
         expect.any(Function),
         expect.objectContaining({ dataStartDate: fechaInicio, dataEndDate: fechaFin }),
       );
@@ -311,7 +311,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockSync.ejecutarConRegistro).toHaveBeenNthCalledWith(
         2,
         SyncSource.VIGIFLOW,
-        'VIGIFLOW_BULK',
+        'Importación VigiFlow 20240201 – 20240229',
         expect.any(Function),
         expect.objectContaining({
           dataStartDate: new Date(Date.UTC(2024, 1, 1, 0, 0, 0, 0)),
@@ -365,7 +365,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(fsPromises.readFile).toHaveBeenCalledWith('/ruta/report.xlsx');
       expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
         SyncSource.VIGIFLOW,
-        'VIGIFLOW_BULK_FILE',
+        'Importación VigiFlow desde archivo',
         expect.any(Function),
         expect.anything(),
       );
@@ -384,7 +384,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
 
       expect(mockSync.ejecutarConRegistro).toHaveBeenCalledWith(
         SyncSource.VIGIFLOW,
-        'VIGIFLOW_BULK_UPLOAD',
+        'Importación VigiFlow desde archivo cargado',
         expect.any(Function),
         expect.anything(),
       );

@@ -1,14 +1,26 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 import { firstValueFrom } from 'rxjs';
 import { ParametroService } from '../../integrator/service/parametro.service';
 import { IDrug } from '../models/dtos';
 //import { readFile } from 'fs/promises';
+
+/** Descarga del diccionario junto con la huella de lo que vino en el cuerpo. */
+export interface DescargaWhoDrug {
+  drugs: IDrug[];
+  /** SHA-256 del cuerpo crudo; identifica la versión descargada. */
+  sha256: string;
+}
+
 /**
  * @description Clase que sentraliza los servicios de la API de whodrugs
  */
 @Injectable()
 export class WhoDrugsClientService {
+  /** Tamaño del tramo con el que se alimenta el hash antes de ceder el turno. */
+  private static readonly CARACTERES_POR_TRAMO = 4 * 1024 * 1024;
+
   //
   private readonly logger = new Logger(WhoDrugsClientService.name);
 
@@ -18,10 +30,19 @@ export class WhoDrugsClientService {
   ) {}
 
   /**
-   * Obtiene todos los datos desde la API de whodrugs
-   * @returns
+   * Obtiene todos los datos desde la API de whodrugs, junto con el SHA-256 del cuerpo.
+   *
+   * El hash se calcula aquí, sobre el texto tal como llegó, y no en el servicio de
+   * sincronización a partir del objeto ya parseado: aquello obligaba a volver a serializar
+   * el diccionario entero con `JSON.stringify` sólo para hashearlo —una copia más en
+   * memoria y un tramo síncrono largo con la API sin responder— para obtener exactamente
+   * lo mismo.
    */
-  public async getDrugs(level: number, ingredientTraslations: string, includeAtc: boolean): Promise<IDrug[]> {
+  public async getDrugs(
+    level: number,
+    ingredientTraslations: string,
+    includeAtc: boolean,
+  ): Promise<DescargaWhoDrug> {
     const ruta = `/whodrug/download/v2/regional-drugs?MedProdLevel=${level}&IngredientTranslations=${ingredientTraslations}&IncludeAtc=${includeAtc}`;
     let baseURL: string;
 
@@ -47,6 +68,10 @@ export class WhoDrugsClientService {
       const { data } = await firstValueFrom(
         this.httpService.get(ruta, {
           baseURL,
+          // El cuerpo se recibe sin parsear para poder hashearlo tal cual llegó. De paso, la
+          // respuesta de error también queda como texto, que es lo que `describirFallo`
+          // necesita para explicar un 401 de UMC.
+          transformResponse: [(cuerpo: string) => cuerpo],
           headers: {
             // La API de UMC está publicada detrás de Azure API Management, que corta la
             // petición en el borde si no trae su cabecera de suscripción: responde
@@ -61,10 +86,30 @@ export class WhoDrugsClientService {
         }),
       );
       this.logger.log('Descarga de archivo completada');
-      return data;
+      return await this.digerir(data);
     } catch (e) {
       throw this.describirFallo(e, `${baseURL ?? '(sin WHD_API_URL)'}${ruta}`);
     }
+  }
+
+  /**
+   * Calcula el SHA-256 del cuerpo y lo parsea.
+   *
+   * El hash se alimenta por tramos cediendo el turno entre uno y otro: el diccionario
+   * completo son varios MB y `update()` de una sola vez es un tramo síncrono que deja al
+   * proceso sin atender peticiones. El `JSON.parse` final sí es indivisible, pero es una
+   * sola pasada en lugar de las tres (parse + stringify + hash) que había antes.
+   */
+  private async digerir(cuerpo: string): Promise<DescargaWhoDrug> {
+    const hash = createHash('sha256');
+    const tramo = WhoDrugsClientService.CARACTERES_POR_TRAMO;
+
+    for (let desde = 0; desde < cuerpo.length; desde += tramo) {
+      hash.update(cuerpo.slice(desde, desde + tramo));
+      await new Promise((resolve) => setImmediate(resolve));
+    }
+
+    return { drugs: JSON.parse(cuerpo), sha256: hash.digest('hex') };
   }
 
   /**

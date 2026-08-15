@@ -4,11 +4,15 @@ import {
   ArrayMinSize,
   IsArray,
   IsBoolean,
+  IsIn,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   IsString,
+  Matches,
   ValidateNested,
 } from 'class-validator';
+import { MeddraArchivosUtils } from '../../utils/meddra-archivos.utils';
 
 export interface IMeddraQueryRequest {
   addlangs: string[];
@@ -201,4 +205,35 @@ export class ProcessVersionReqDTO implements IProcessVersion {
 
   @IsNotEmpty({ message: 'El Campo "lang", del lenguaje es requerido' })
   lang: string;
+}
+
+/**
+ * Campos de texto que acompañan a los `.asc` en la carga multipart.
+ *
+ * Llegan como strings porque un `FormData` no tiene tipos; el manifiesto viaja
+ * serializado en JSON y se valida ya deserializado en el controlador.
+ */
+export class CargarVersionReqDTO {
+  @IsNotEmpty({ message: 'El campo "version" es requerido' })
+  @Matches(MeddraArchivosUtils.PATRON_VERSION, {
+    message: 'La versión debe tener la forma 28 o 28_0 (ejemplos: 21_1, 22_2, 27_1, 28_0)',
+  })
+  version: string;
+
+  @IsNotEmpty({ message: 'El campo "lang" es requerido' })
+  @IsIn([...MeddraArchivosUtils.IDIOMAS], { message: 'El idioma debe ser ES o EN' })
+  lang: string;
+
+  /**
+   * Lista, en JSON, de los `.asc` que el navegador encontró al descomprimir el ZIP. Es
+   * lo que permite comprobar que la distribución está completa sin transferir los 21 MB
+   * de archivos que este API no lee.
+   */
+  @IsNotEmpty({ message: 'El campo "manifiesto" es requerido' })
+  @IsString()
+  manifiesto: string;
+
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
 }

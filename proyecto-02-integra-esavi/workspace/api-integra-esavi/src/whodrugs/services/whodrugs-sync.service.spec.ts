@@ -13,6 +13,8 @@ import { WhoDrugsSyncService } from './whodrugs-sync.service';
 
 /** Id de la corrida en TR_SYNC_PROCESS que el helper entrega al proceso. */
 const SYNC_ID = 'a3f1c2d4-0000-4000-8000-000000000001';
+/** El SHA-256 lo calcula ahora el cliente sobre el cuerpo crudo y lo entrega con la descarga. */
+const SHA_DESCARGA = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
 
 describe('WhoDrugsSyncService', () => {
   let service: WhoDrugsSyncService;
@@ -40,16 +42,16 @@ describe('WhoDrugsSyncService', () => {
   beforeEach(async () => {
     whoDrugsClientService = { getDrugs: jest.fn() };
     drugRepository = {
-      save: jest.fn(),
+      save: jest.fn(), insert: jest.fn(),
       count: jest.fn().mockResolvedValue(0),
       createQueryBuilder: jest.fn(),
       manager: { connection: {} },
     };
-    activeIngredientsRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
-    ingredientTranslationRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
-    countrySaleRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
-    anatomicalTherapeuticChemicalRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
-    maholderRepository = { save: jest.fn(), createQueryBuilder: jest.fn() };
+    activeIngredientsRepository = { save: jest.fn(), insert: jest.fn(), createQueryBuilder: jest.fn() };
+    ingredientTranslationRepository = { save: jest.fn(), insert: jest.fn(), createQueryBuilder: jest.fn() };
+    countrySaleRepository = { save: jest.fn(), insert: jest.fn(), createQueryBuilder: jest.fn() };
+    anatomicalTherapeuticChemicalRepository = { save: jest.fn(), insert: jest.fn(), createQueryBuilder: jest.fn() };
+    maholderRepository = { save: jest.fn(), insert: jest.fn(), createQueryBuilder: jest.fn() };
     // Ejecuta el proceso directamente y propaga el resultado (equivalente a SyncService real),
     // pasándole el id de la corrida como hace el helper real.
     syncService = {
@@ -109,19 +111,19 @@ describe('WhoDrugsSyncService', () => {
 
   describe('sync', () => {
     it('no procesa nada si el SHA-256 ya está sincronizado y el diccionario tiene datos', async () => {
-      whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
+      whoDrugsClientService.getDrugs.mockResolvedValue({ drugs: [makeDrugResponse()], sha256: SHA_DESCARGA });
       syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
       drugRepository.count.mockResolvedValue(5000);
 
       await service.sync();
 
-      expect(drugRepository.save).not.toHaveBeenCalled();
+      expect(drugRepository.insert).not.toHaveBeenCalled();
     });
 
     it('vuelve a sincronizar si el SHA-256 coincide pero el diccionario quedó vacío tras un truncate', async () => {
       // El log de sincronizaciones vive en otro esquema y sobrevive al TRUNCATE de
       // WHO_DRUG: sin la comprobación de filas, la base se quedaría vacía para siempre.
-      whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
+      whoDrugsClientService.getDrugs.mockResolvedValue({ drugs: [makeDrugResponse()], sha256: SHA_DESCARGA });
       syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
       drugRepository.count.mockResolvedValue(0);
       [
@@ -131,11 +133,11 @@ describe('WhoDrugsSyncService', () => {
         countrySaleRepository,
         maholderRepository,
         anatomicalTherapeuticChemicalRepository,
-      ].forEach((repo) => repo.save.mockImplementation((entities) => Promise.resolve(entities)));
+      ].forEach((repo) => repo.insert.mockResolvedValue(undefined));
 
       await service.sync();
 
-      expect(drugRepository.save).toHaveBeenCalled();
+      expect(drugRepository.insert).toHaveBeenCalled();
     });
 
     it('sincroniza y guarda todas las entidades cuando hay una nueva versión', async () => {
@@ -148,26 +150,26 @@ describe('WhoDrugsSyncService', () => {
         ],
         atcs: [{ code: 'J07BM03', text: 'HPV vaccine', officialFlag: 'Y' }],
       });
-      whoDrugsClientService.getDrugs.mockResolvedValue([drugResponse]);
+      whoDrugsClientService.getDrugs.mockResolvedValue({ drugs: [drugResponse], sha256: SHA_DESCARGA });
       syncService.buscarPorMetadatos.mockResolvedValue(null);
-      drugRepository.save.mockImplementation((entities) => Promise.resolve(entities));
-      activeIngredientsRepository.save.mockImplementation((entities) => Promise.resolve(entities));
-      ingredientTranslationRepository.save.mockImplementation((entities) => Promise.resolve(entities));
-      countrySaleRepository.save.mockImplementation((entities) => Promise.resolve(entities));
-      maholderRepository.save.mockImplementation((entities) => Promise.resolve(entities));
-      anatomicalTherapeuticChemicalRepository.save.mockImplementation((entities) => Promise.resolve(entities));
+      drugRepository.insert.mockResolvedValue(undefined);
+      activeIngredientsRepository.insert.mockResolvedValue(undefined);
+      ingredientTranslationRepository.insert.mockResolvedValue(undefined);
+      countrySaleRepository.insert.mockResolvedValue(undefined);
+      maholderRepository.insert.mockResolvedValue(undefined);
+      anatomicalTherapeuticChemicalRepository.insert.mockResolvedValue(undefined);
 
       await service.sync();
 
-      expect(drugRepository.save).toHaveBeenCalled();
-      expect(activeIngredientsRepository.save).toHaveBeenCalled();
-      expect(ingredientTranslationRepository.save).toHaveBeenCalled();
-      expect(countrySaleRepository.save).toHaveBeenCalled();
-      expect(maholderRepository.save).toHaveBeenCalled();
-      expect(anatomicalTherapeuticChemicalRepository.save).toHaveBeenCalled();
+      expect(drugRepository.insert).toHaveBeenCalled();
+      expect(activeIngredientsRepository.insert).toHaveBeenCalled();
+      expect(ingredientTranslationRepository.insert).toHaveBeenCalled();
+      expect(countrySaleRepository.insert).toHaveBeenCalled();
+      expect(maholderRepository.insert).toHaveBeenCalled();
+      expect(anatomicalTherapeuticChemicalRepository.insert).toHaveBeenCalled();
       // Cada fila del diccionario queda estampada con el id de la corrida, que es
       // lo que antes hacía la FK a DRUG_SYNC.
-      const drugsGuardados = drugRepository.save.mock.calls[0][0];
+      const drugsGuardados = drugRepository.insert.mock.calls[0][0];
       expect(drugsGuardados[0].syncId).toBe(SYNC_ID);
     });
 
@@ -182,14 +184,14 @@ describe('WhoDrugsSyncService', () => {
 
   describe('existNewVersion', () => {
     it('retorna true si hay una nueva versión disponible', async () => {
-      whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
+      whoDrugsClientService.getDrugs.mockResolvedValue({ drugs: [makeDrugResponse()], sha256: SHA_DESCARGA });
       syncService.buscarPorMetadatos.mockResolvedValue(null);
 
       expect(await service.existNewVersion()).toBe(true);
     });
 
     it('retorna false si no hay cambios', async () => {
-      whoDrugsClientService.getDrugs.mockResolvedValue([makeDrugResponse()]);
+      whoDrugsClientService.getDrugs.mockResolvedValue({ drugs: [makeDrugResponse()], sha256: SHA_DESCARGA });
       syncService.buscarPorMetadatos.mockResolvedValue({ id: 'CORRIDA-PREVIA' });
       drugRepository.count.mockResolvedValue(5000);
 
@@ -206,24 +208,36 @@ describe('WhoDrugsSyncService', () => {
   // ─── saveEntitiesGeneric ─────────────────────────────────────────────────
 
   describe('saveEntitiesGeneric', () => {
-    it('guarda las entidades en un solo lote cuando no superan el tamaño de página', async () => {
+    it('inserta las entidades en un solo lote cuando no superan el tamaño de página', async () => {
       const entities = [{ id: '1' }, { id: '2' }] as any[];
-      drugRepository.save.mockImplementation((batch) => Promise.resolve(batch));
 
-      const result = await service.saveEntitiesGeneric(drugRepository, entities, Drug.name);
+      await service.saveEntitiesGeneric(drugRepository, entities, Drug.name);
 
-      expect(drugRepository.save).toHaveBeenCalledTimes(1);
-      expect(result).toHaveLength(2);
+      expect(drugRepository.insert).toHaveBeenCalledTimes(1);
+      expect(drugRepository.insert.mock.calls[0][0]).toHaveLength(2);
     });
 
-    it('retorna un arreglo vacío cuando no hay entidades (el ciclo do-while igual ejecuta una vez)', async () => {
-      drugRepository.save.mockResolvedValue([]);
+    it('trocea en lotes de 5000 cuando hay más entidades', async () => {
+      const entities = Array.from({ length: 12000 }, (_, i) => ({ id: String(i) })) as any[];
 
-      const result = await service.saveEntitiesGeneric(drugRepository, [], Drug.name);
+      await service.saveEntitiesGeneric(drugRepository, entities, Drug.name);
 
-      expect(result).toEqual([]);
-      expect(drugRepository.save).toHaveBeenCalledTimes(1);
-      expect(drugRepository.save).toHaveBeenCalledWith([]);
+      expect(drugRepository.insert).toHaveBeenCalledTimes(3);
+      expect(drugRepository.insert.mock.calls[2][0]).toHaveLength(2000);
+    });
+
+    it('no toca la base cuando no hay entidades', async () => {
+      // Antes el ciclo era un do-while y ejecutaba una vuelta igualmente, lanzando un
+      // guardado con el arreglo vacío.
+      await service.saveEntitiesGeneric(drugRepository, [], Drug.name);
+
+      expect(drugRepository.insert).not.toHaveBeenCalled();
+    });
+
+    it('usa insert y no save: el id lo asigna el adaptador y la consulta previa sobra', async () => {
+      await service.saveEntitiesGeneric(drugRepository, [{ id: '1' }] as any[], Drug.name);
+
+      expect(drugRepository.save).not.toHaveBeenCalled();
     });
   });
 

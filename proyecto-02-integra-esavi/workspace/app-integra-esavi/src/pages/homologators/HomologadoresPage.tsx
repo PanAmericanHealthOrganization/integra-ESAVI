@@ -518,11 +518,6 @@ export const HomologadoresPage = () => {
                 onChange={(e) => { setFilterField(e.target.value); setHomPage(0) }}
                 sx={{ width: 170 }}
               />
-              <Button
-                onClick={() => { setFilterEntity(""); setFilterField(""); setHomPage(0) }}
-                disabled={!filterEntity && !filterField}>
-                Limpiar
-              </Button>
               <Button variant="contained" startIcon={<AddIcon />} onClick={openCreateHom}>
                 Nuevo
               </Button>

@@ -163,10 +163,10 @@ export const AdminPage = () => {
 
       <Stack spacing={2}>
         <AdminAction
-          title="Truncar notificaciones"
-          description="Elimina todas las notificaciones y sus datos dependientes (vacunas, ESAVI, desenlaces, gravedad, causalidad, medicamentos) mediante TRUNCATE CASCADE."
-          buttonLabel="Truncar notificaciones"
-          confirmMessage="¿Está seguro de que desea eliminar TODAS las notificaciones y sus datos relacionados? Esta acción no se puede deshacer."
+          title="Truncar datos y diccionarios"
+          description="Elimina todas las notificaciones y sus datos dependientes (vacunas, ESAVI, desenlaces, gravedad, causalidad, medicamentos) y vacía los diccionarios WHODrug y MedDRA, mediante TRUNCATE CASCADE. Se conservan los parámetros de configuración y el historial de sincronizaciones."
+          buttonLabel="Truncar"
+          confirmMessage="¿Está seguro de que desea eliminar TODAS las notificaciones y sus datos relacionados, junto con los diccionarios WHODrug y MedDRA? Los parámetros de configuración se conservan. Esta acción no se puede deshacer."
           onConfirm={() => intESAVIClient.delete("seed/truncate-notificacion")}
         />
       </Stack>

@@ -202,9 +202,6 @@ export const CatalogosConfigList = () => {
                     ),
                   }}
                 />
-                <Button onClick={() => setSearchCategoria("")} disabled={!searchCategoria}>
-                  Limpiar
-                </Button>
                 <Button variant="contained" startIcon={<AddIcon />} onClick={openNuevaCategoria}>
                   Nuevo
                 </Button>
@@ -358,9 +355,6 @@ export const CatalogosConfigList = () => {
                   ),
                 }}
               />
-              <Button onClick={() => setSearchSubcategoria("")} disabled={!searchSubcategoria}>
-                Limpiar
-              </Button>
               <Tooltip title={!selectedCategoria ? "Selecciona una categoría primero" : ""} placement="left">
                 <span>
                   <Button

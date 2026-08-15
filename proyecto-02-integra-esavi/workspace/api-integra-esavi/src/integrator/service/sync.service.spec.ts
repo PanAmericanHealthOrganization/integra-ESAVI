@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { MensajesService } from 'src/mensajes/services/mensajes.service';
 import { SyncProcess, SyncSource, SyncStatus } from '../entity';
 import { SyncService } from './sync.service';
 
@@ -11,8 +12,10 @@ import { SyncService } from './sync.service';
 describe('SyncService', () => {
   let service: SyncService;
   let repo: any;
+  let mensajes: { agregar: jest.Mock };
 
   beforeEach(async () => {
+    mensajes = { agregar: jest.fn().mockResolvedValue(null) };
     repo = {
       create: jest.fn((entity) => entity),
       save: jest.fn(async (entity) => ({ ...entity, id: 'corrida-1' })),
@@ -26,6 +29,7 @@ describe('SyncService', () => {
       providers: [
         SyncService,
         { provide: getRepositoryToken(SyncProcess, 'POSTGRES_INTEGRATOR_DS'), useValue: repo },
+        { provide: MensajesService, useValue: mensajes },
       ],
     }).compile();
 
@@ -33,6 +37,65 @@ describe('SyncService', () => {
   });
 
   afterEach(() => jest.clearAllMocks());
+
+  describe('notificación al usuario', () => {
+    const usuario = { id: 'sub-1', username: 'rcasigna' };
+
+    it('avisa del éxito a quien lanzó el proceso', async () => {
+      await service.ejecutarConRegistro(
+        SyncSource.MEDDRA,
+        'Carga 28_0/ES',
+        async () => ({ mensaje: 'listo' }),
+        { usuario },
+      );
+
+      expect(mensajes.agregar).toHaveBeenCalledTimes(1);
+      const [destinatario, notificacion] = mensajes.agregar.mock.calls[0];
+      expect(destinatario).toEqual(usuario);
+      expect(notificacion.nivel).toBe('EXITO');
+      expect(notificacion.titulo).toBe('Carga 28_0/ES: completada');
+      expect(notificacion.syncId).toBe('corrida-1');
+      expect(notificacion.source).toBe(SyncSource.MEDDRA);
+    });
+
+    it('avisa del fallo con el motivo, y deja que la excepción siga su curso', async () => {
+      await expect(
+        service.ejecutarConRegistro(
+          SyncSource.WHODRUG,
+          'Carga WHODrug',
+          async () => {
+            throw new Error('archivo corrupto');
+          },
+          { usuario },
+        ),
+      ).rejects.toThrow('archivo corrupto');
+
+      const [, notificacion] = mensajes.agregar.mock.calls[0];
+      expect(notificacion.nivel).toBe('ERROR');
+      expect(notificacion.mensaje).toBe('archivo corrupto');
+    });
+
+    it('no notifica cuando el proceso no lo lanzó nadie', async () => {
+      await service.ejecutarConRegistro(SyncSource.DATAMART, 'Regeneración', async () => ({
+        mensaje: 'ok',
+      }));
+
+      expect(mensajes.agregar).not.toHaveBeenCalled();
+    });
+
+    it('un fallo del buzón no altera el resultado de la sincronización', async () => {
+      mensajes.agregar.mockRejectedValueOnce(new Error('buzón caído'));
+
+      await expect(
+        service.ejecutarConRegistro(
+          SyncSource.MEDDRA,
+          'Carga 28_0/ES',
+          async () => ({ resultado: { ok: true }, mensaje: 'listo' }),
+          { usuario },
+        ),
+      ).resolves.toEqual({ ok: true });
+    });
+  });
 
   describe('ejecutarConRegistro', () => {
     it('abre la corrida en RUNNING con su fuente y la cierra en COMPLETED', async () => {

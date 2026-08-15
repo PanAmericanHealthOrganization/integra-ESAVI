@@ -31,6 +31,36 @@ Dashboard/
 └── README.md                 # Este archivo
 ```
 
+## Origen de los datos: el datamart DuckDB
+
+El dashboard **no** consulta la base de datos: lee `datos/esavi.duckdb`, un archivo que
+produce el módulo `datamart` de `api-integra-esavi` con las tablas `datos_procesados` y
+`dosis_admin` ya procesadas. Reemplaza al antiguo pipeline en R (`preparar_datos.R` +
+`scripts/procesamiento_datos.R`).
+
+El archivo vive aquí, en `datos/`, aunque quien lo produce sea el API: se guarda del lado
+del consumidor para que el dashboard lo encuentre en su ruta por defecto sin enlaces ni
+copias, dentro y fuera del contenedor. Corriendo el API en local, eso lo determina
+`DATAMART_DUCKDB_PATH` en el `.env` del API, que apunta a esta carpeta; en contenedor, el
+mismo directorio se monta en el API como `/app/datamart-out` y en el dashboard como
+`/app/datos`.
+
+Si el datamart todavía no existe, se genera con el API arriba mediante
+`POST /v1/datamart/regenerar` (rol `admin`), con el cron diario, o automáticamente al
+arrancar el API cuando el archivo falta.
+
+Como `datos/` está en `.gitignore`, en un clon nuevo el archivo no está. El síntoma de
+arrancar sin él es engañoso: el dashboard toma el `esavi.duckdb` de ejemplo, con cero
+filas, y las secciones aparecen vacías sin ningún error visible. Por eso ambos compose
+traen un servicio `duckdb-check` que corre antes del dashboard y aborta el despliegue con
+un mensaje claro. En el stack completo ese chequeo además **espera** hasta 10 minutos,
+porque el API genera el datamart en segundo plano y estar `healthy` no implica que el
+archivo ya esté escrito.
+
+Una vez en su sitio, el dashboard detecta las regeneraciones solo: sondea la fecha de
+modificación del archivo cada `DUCKDB_POLL_INTERVAL_MS` (60 s por defecto) y recarga los
+datos sin reiniciar.
+
 ## Formas de Ejecutar el Dashboard
 
 ### Opción 1: Script Completo (Recomendado)

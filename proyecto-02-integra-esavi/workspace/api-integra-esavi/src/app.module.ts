@@ -6,6 +6,7 @@ import { HealthModule } from './health/health.module';
 import { HomologadorModule } from './homologator/homologador.module';
 import { IntegratorModule } from './integrator/integrator.module';
 import { MeddraModule } from './meddra/meddra.module';
+import { MensajesModule } from './mensajes/mensajes.module';
 import { DataqualityModule } from './dataquality/dataquality.module';
 import { DatamartModule } from './datamart/datamart.module';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- se re-activa junto con el import comentado de abajo.
@@ -20,6 +21,7 @@ import { WhodrugsModule } from './whodrugs/whodrugs.module';
       envFilePath: '.env',
     }),
     IntegratorModule,
+    MensajesModule,
     HealthModule,
     Dhis2IntegratorModule,
     //VacunacionIntegratorModule, // Temporarily disabled. Enable when update the ORACLE DATABASE credentials.

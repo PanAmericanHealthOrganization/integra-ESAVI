@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Logger, Param, Post, Query } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Logger, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { AefiQuery } from 'src/vigiflow-integrator/dto';
+import { Usuario, UsuarioAutenticado } from '../../common/decorators/usuario.decorator';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import {
   DuplicateConfirmationDto,
   DuplicateHandlingConfigDto,
@@ -20,8 +22,17 @@ export class Dhis2IntegradorController {
     private readonly duplicateHandlerService: Dhis2DuplicateHandlerService,
   ) {}
 
+  /**
+   * Lanza la importación de un rango de fechas.
+   *
+   * Detrás del guard de Keycloak porque el desenlace se avisa al usuario que la lanzó: sin
+   * token no hay `sub` con el que identificar su buzón. La corrida en TR_SYNC_PROCESS se
+   * registra con token o sin él (el cron no lo tiene); lo que exige identidad es el aviso.
+   */
   @Get('/bulk')
-  async console(@Query() aefiQuery: AefiQuery) {
+  @UseGuards(KeycloakAuthGuard)
+  @ApiBearerAuth('keycloak-jwt')
+  async console(@Query() aefiQuery: AefiQuery, @Usuario() usuario: UsuarioAutenticado) {
     //  Asumiendo que aefiQuery.fechaInicio y aefiQuery.fechaFin son cadenas de texto en formato YYYYMMDD
     const fechaInicio: Date = new Date(
       `${aefiQuery.fechaInicio.slice(0, 4)}-${aefiQuery.fechaInicio.slice(
@@ -37,7 +48,13 @@ export class Dhis2IntegradorController {
     );
 
     try {
-      await this.dhis2IntegratorService.createInBulk(fechaInicio, fechaFin, aefiQuery.codigoATC);
+      await this.dhis2IntegratorService.createInBulk(
+        fechaInicio,
+        fechaFin,
+        aefiQuery.codigoATC,
+        undefined,
+        usuario,
+      );
     } catch (error) {
       this.logger.error(error);
       return {
@@ -52,9 +69,12 @@ export class Dhis2IntegradorController {
   }
 
   @Post('/bulk-with-duplicate-handling')
+  @UseGuards(KeycloakAuthGuard)
+  @ApiBearerAuth('keycloak-jwt')
   @ApiOperation({ summary: 'Importación masiva con manejo de duplicados' })
   async createInBulkWithDuplicateHandling(
     @Query() aefiQuery: AefiQuery,
+    @Usuario() usuario: UsuarioAutenticado,
     @Body() duplicateConfig?: DuplicateHandlingConfigDto,
   ) {
     const fechaInicio: Date = new Date(
@@ -76,6 +96,7 @@ export class Dhis2IntegradorController {
         fechaFin,
         aefiQuery.codigoATC,
         duplicateConfig,
+        usuario,
       );
     } catch (error) {
       this.logger.error(error);

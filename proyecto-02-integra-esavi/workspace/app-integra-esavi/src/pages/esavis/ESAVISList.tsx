@@ -13,6 +13,7 @@ import {
 } from "react-admin"
 import { PanelHeader } from "../../components/PanelTabla"
 import { RegenerarDatamartButton } from "../../components/SyncActions"
+import { useEsAdmin } from "../../authorization.utils"
 import { LAYOUT } from "../../theme"
 import BulkDialog from "./BulkDialog"
 
@@ -52,6 +53,7 @@ const postFilters = [
 const ESAVISListHeader = () => {
   const { total, isLoading } = useListContext()
   const [open, setOpen] = useState(false)
+  const esAdmin = useEsAdmin()
   return (
     <>
       <PanelHeader
@@ -63,9 +65,16 @@ const ESAVISListHeader = () => {
         acciones={
           <>
             <RegenerarDatamartButton />
-            <Button variant="contained" onClick={() => setOpen(true)}>
-              Importar datos
-            </Button>
+            {/*
+              Importar trae notificaciones desde VigiFlow o DHIS2 y las escribe en
+              TR_NOTIFICACION; un perfil de sólo análisis no debe verlo. `false` esconde el
+              botón mientras `usePermissions` resuelve, para que no asome y desaparezca.
+            */}
+            {esAdmin && (
+              <Button variant="contained" onClick={() => setOpen(true)}>
+                Importar datos
+              </Button>
+            )}
           </>
         }>
         <FilterForm filters={postFilters} />

@@ -1,20 +1,17 @@
 import { GlobalStyles } from '@mui/material';
 import { Layout, LayoutProps } from 'react-admin';
+import { NotificacionesProvider } from '../components/notificaciones/NotificacionesProvider';
 import { CustomMenu } from './CustomMenu';
 import { CustomAppBar } from './CustomAppBar';
-import { CustomFooter } from './CustomFooter';
-
-// Altura del footer en px — usada aquí para reservarle espacio y evitar que se
-// superponga al contenido, y en la marca de agua para no quedar detrás de él.
-export const FOOTER_HEIGHT = 40;
 
 /*
  * Ancla la cadena html→body→#root→.RaLayout-root al 100% del viewport.
  * Solo .RaDatagrid-tableWrapper scrollea (las filas de la tabla).
  * Toolbar de acciones y paginación permanecen siempre visibles.
- * El footer queda fijo en el borde inferior.
  *
- * 240px = AppBar(64) + toolbar-acciones(48) + paginación(52) + footer(40) + márgenes(36)
+ * El aviso de derechos ya no es una barra fija a lo ancho de la ventana: vive al pie del
+ * menú lateral (ver CustomFooter). Por eso el layout vuelve a ocupar el 100% del alto y
+ * ninguna medida descuenta ya esos 40px.
  */
 const globalLayoutFix = `
   html, body, #root {
@@ -22,17 +19,8 @@ const globalLayoutFix = `
     overflow: hidden;
   }
 
-  /*
-   * La altura se reduce aquí (en vez de con padding-bottom en .RaLayout-content)
-   * para reservar el espacio del footer fijo de forma estructural: así nunca se
-   * superpone al contenido, sin importar si el contenido llega a necesitar scroll
-   * o no. Con solo el padding-bottom, una página cuyo contenido termina justo al
-   * borde del viewport (sin activar scroll) quedaba tapada por el footer, porque
-   * el padding solo protege lo que queda "más allá" del contenido visible al
-   * hacer scroll hasta el final, no lo que ya cabe sin scrollear.
-   */
   .RaLayout-root {
-    height: calc(100% - ${FOOTER_HEIGHT}px) !important;
+    height: 100% !important;
     min-height: unset !important;
     overflow: hidden;
     display: flex;
@@ -75,6 +63,26 @@ const globalLayoutFix = `
     display: none !important;
   }
 
+  /*
+   * Contenido centrado y con ancho máximo, homologado con la plataforma de referencia
+   * (su <main> es full-width y dentro lleva un contenedor de 1320px con margin auto).
+   *
+   * Va aquí y no en cada página por dos razones: son quince pantallas, y ninguna tenía
+   * criterio propio —todas abrían con un <Box p={paddingPagina}> a sangre completa—, así
+   * que en un monitor ancho una tabla de cuatro columnas se estiraba de borde a borde y
+   * las filas se volvían ilegibles de tan largas.
+   *
+   * El selector apunta a los hijos directos, no a .RaLayout-content: el contenedor sigue
+   * ocupando todo el ancho para que la barra de scroll quede pegada al borde de la
+   * ventana, como en la referencia, y sea el contenido el que se centra dentro.
+   */
+  .RaLayout-content > * {
+    width: 100%;
+    max-width: 1320px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
   /* Encabezados de columna pegajosos al scrollear las filas */
   .RaDatagrid-tableWrapper thead th {
     position: sticky !important;
@@ -84,16 +92,17 @@ const globalLayoutFix = `
 
   /*
    * El contenedor de filas scrollea internamente; la altura deja espacio para
-   * toolbar + paginación + footer. El presupuesto de 240px asumía un toolbar
+   * AppBar + banda de acciones + paginación. El presupuesto asumía un toolbar
    * de una sola fila (~48px); en listas como ESAVIS, cuyo encabezado tiene
    * título + varios filtros + botón, esa fila es más alta y la caja de la
    * tabla terminaba reclamando más espacio del que quedaba libre, empujando
-   * la paginación fuera de la pantalla, tapada por el footer fijo. Se sube
-   * el presupuesto para dejar margen de sobra sin depender de medir cada
-   * encabezado por página.
+   * la paginación fuera de la pantalla. Se deja margen de sobra para no
+   * depender de medir cada encabezado por página.
+   *
+   * Baja de 340 a 300 porque ya no hay barra fija de 40px al pie que descontar.
    */
   .RaDatagrid-tableWrapper {
-    max-height: calc(100vh - 340px) !important;
+    max-height: calc(100vh - 300px) !important;
     overflow-y: auto !important;
     scrollbar-gutter: stable !important;
   }
@@ -108,15 +117,17 @@ const globalLayoutFix = `
     background: transparent;
   }
 
+  /* Pulgar gris azulado de la plataforma de referencia, en vez de un negro translúcido:
+     sobre el gris del fondo, el negro se veía como una mancha. */
   .RaDatagrid-tableWrapper::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 999px;
+    background-color: #cbd6e4;
+    border-radius: 7px;
     border: 2px solid transparent;
     background-clip: content-box;
   }
 
   .RaDatagrid-tableWrapper::-webkit-scrollbar-thumb:hover {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: #b4c2d6;
   }
 
   /* Marca de agua: escudo del Ecuador fijo en la esquina inferior derecha,
@@ -125,7 +136,7 @@ const globalLayoutFix = `
     content: '';
     position: fixed;
     right: clamp(12px, 2vw, 24px);
-    bottom: ${FOOTER_HEIGHT + 16}px;
+    bottom: 16px;
     width: clamp(110px, 28vw, 243px);
     aspect-ratio: 1000 / 1200;
     background: url('/logos/escudo_ecuador.png') no-repeat center / contain;
@@ -135,10 +146,14 @@ const globalLayoutFix = `
   }
 `;
 
+/*
+ * El provider de notificaciones envuelve todo el layout: la campana vive en la AppBar,
+ * pero el buzón tiene que seguir recibiendo por WebSocket mientras el usuario navega,
+ * sin reconectar en cada cambio de pantalla.
+ */
 export const CustomLayout = (props: LayoutProps) => (
-  <>
+  <NotificacionesProvider>
     <GlobalStyles styles={globalLayoutFix} />
     <Layout {...props} menu={CustomMenu} appBar={CustomAppBar} />
-    <CustomFooter />
-  </>
+  </NotificacionesProvider>
 );

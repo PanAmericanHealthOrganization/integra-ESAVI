@@ -15,9 +15,9 @@ import {
   SaveButton,
   useDataProvider,
   useNotify,
-  usePermissions,
   useRefresh,
 } from "react-admin"
+import { useEsAdmin } from "../../../authorization.utils"
 import { IVacunometroDataProvider } from "../../../dataProviders/vacunometro.dataprovider"
 import ENV_CONFIG from "../../../utils/env_utils"
 import { FechaUtils } from "../../../utils/fecha_utils"
@@ -80,10 +80,11 @@ export const SimularVacunacionDialog = ({
   const dataProvider = useDataProvider<IVacunometroDataProvider>()
   const notify = useNotify()
   const refresh = useRefresh()
-  const { permissions } = usePermissions()
+  // La comprobación de rol vive en `useEsAdmin`: estaba escrita a mano aquí y ahora la
+  // comparten las tres acciones de escritura de estas dos pantallas.
+  const esAdmin = useEsAdmin()
 
-  const isAdmin = Array.isArray(permissions) && permissions.includes("admin")
-  if (ENV_CONFIG.IS_PRODUCTION || !isAdmin) return null
+  if (ENV_CONFIG.IS_PRODUCTION || !esAdmin) return null
 
   const onSubmitHandler = async (values: any) => {
     try {

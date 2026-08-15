@@ -1,6 +1,5 @@
 import SyncIcon from "@mui/icons-material/Sync"
 import {
-  Alert,
   Button,
   CircularProgress,
   Dialog,
@@ -8,12 +7,11 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Snackbar,
-  TextField,
 } from "@mui/material"
 import { useState } from "react"
 import Authorize from "../authorization.utils"
 import intESAVIClient from "../dataProviders/axios.client"
+import { ROLES_SINCRONIZACION, mensajeError, useFeedback } from "./syncFeedback"
 
 /**
  * Botones de sincronización bajo demanda.
@@ -23,118 +21,12 @@ import intESAVIClient from "../dataProviders/axios.client"
  * agrupaba. Todos quedan restringidos al rol `admin`, el mismo que el API exige
  * en el endpoint: ocultar el botón por sí solo no era control de acceso.
  */
-const ROLES_SINCRONIZACION = ["admin"]
 
-// "warning" cubre los desenlaces que no son ni éxito ni error: por ejemplo una
-// regeneración de datamart que se descarta porque ya hay otra en curso.
-type Severidad = "success" | "error" | "warning"
-
-type Feedback = { open: boolean; message: string; severity: Severidad }
-
-const useFeedback = () => {
-  const [snack, setSnack] = useState<Feedback>({ open: false, message: "", severity: "success" })
-  const show = (message: string, severity: Severidad) =>
-    setSnack({ open: true, message, severity })
-  const node = (
-    <Snackbar
-      open={snack.open}
-      autoHideDuration={5000}
-      onClose={() => setSnack((s) => ({ ...s, open: false }))}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-      <Alert
-        severity={snack.severity}
-        onClose={() => setSnack((s) => ({ ...s, open: false }))}
-        variant="filled">
-        {snack.message}
-      </Alert>
-    </Snackbar>
-  )
-  return { show, node }
-}
-
-const mensajeError = (e: any, fallback: string) =>
-  e?.response?.status === 403
-    ? "No tienes permisos para ejecutar esta sincronización."
-    : (e?.response?.data?.message ?? e?.message ?? fallback)
-
-/** MedDRA: pide versión e idioma de los archivos ya cargados en el servidor. */
-export const SincronizarMeddraButton = ({ onDone }: { onDone?: () => void }) => {
-  const [open, setOpen] = useState(false)
-  const [version, setVersion] = useState("")
-  const [lang, setLang] = useState("")
-  const [syncing, setSyncing] = useState(false)
-  const { show, node } = useFeedback()
-
-  const sincronizar = async () => {
-    if (!version.trim() || !lang.trim()) return
-    setSyncing(true)
-    try {
-      await intESAVIClient.post("/meddra/version/process", {
-        version: version.trim(),
-        lang: lang.trim(),
-      })
-      show("Sincronización MedDRA iniciada correctamente.", "success")
-      setOpen(false)
-      setVersion("")
-      setLang("")
-      onDone?.()
-    } catch (e: any) {
-      show(mensajeError(e, "Error al sincronizar MedDRA."), "error")
-    } finally {
-      setSyncing(false)
-    }
-  }
-
-  return (
-    <Authorize allowedRoles={ROLES_SINCRONIZACION} deniedRoles={[]}>
-      <Button variant="contained" size="small" startIcon={<SyncIcon />} onClick={() => setOpen(true)}>
-        Sincronizar MedDRA
-      </Button>
-
-      <Dialog open={open} onClose={() => !syncing && setOpen(false)} maxWidth="xs" fullWidth>
-        <DialogTitle>Sincronizar MedDRA</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={{ mb: 2 }}>
-            Ingresa la versión y el idioma de los archivos MedDRA ya cargados en el servidor (ruta:{" "}
-            <code>upload_files/meddra/&lt;versión&gt;/&lt;idioma&gt;/</code>).
-          </DialogContentText>
-          <TextField
-            label="Versión"
-            placeholder="Ej: 27_1"
-            value={version}
-            onChange={(e) => setVersion(e.target.value)}
-            fullWidth
-            size="small"
-            sx={{ mb: 2 }}
-            disabled={syncing}
-          />
-          <TextField
-            label="Idioma"
-            placeholder="Ej: es"
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            fullWidth
-            size="small"
-            disabled={syncing}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)} disabled={syncing}>
-            Cancelar
-          </Button>
-          <Button
-            variant="contained"
-            onClick={sincronizar}
-            disabled={syncing || !version.trim() || !lang.trim()}
-            startIcon={syncing ? <CircularProgress size={16} color="inherit" /> : <SyncIcon />}>
-            {syncing ? "Procesando…" : "Sincronizar"}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {node}
-    </Authorize>
-  )
-}
+/**
+ * MedDRA vive en su propio archivo: su diálogo descomprime el ZIP de MSSO y valida la
+ * distribución, y no cabía aquí. Se re-exporta para no obligar a cambiar los imports.
+ */
+export { SincronizarMeddraButton } from "./meddra/SincronizarMeddraButton"
 
 /** WHODrug: descarga completa del diccionario, sólo confirmación. */
 export const SincronizarWhodrugButton = ({ onDone }: { onDone?: () => void }) => {

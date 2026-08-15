@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VigiflowIntegradorController } from './vigiflow-integrador.controller';
 
+/** Quien lanza la importación; el controlador lo propaga para que reciba la notificación. */
+const usuario = { id: 'sub-123', username: 'ana', roles: ['admin'] } as any;
+
 describe('VigiflowIntegradorController.bulk', () => {
   const mockIntegrador = { createInBulk: jest.fn() };
   const controller = new VigiflowIntegradorController(
@@ -18,12 +21,13 @@ describe('VigiflowIntegradorController.bulk', () => {
   it('convierte YYYYMMDD a Date antes de delegar en el servicio', async () => {
     mockIntegrador.createInBulk.mockResolvedValue({ totalPeriodos: 1, completados: 1, fallidos: [] });
 
-    await controller.bulk({ fechaInicio: '20240101', fechaFin: '20240131', codigoATC: 'J07' } as any);
+    await controller.bulk({ fechaInicio: '20240101', fechaFin: '20240131', codigoATC: 'J07' } as any, usuario);
 
     expect(mockIntegrador.createInBulk).toHaveBeenCalledWith(
       new Date('2024-01-01'),
       new Date('2024-01-31'),
       'J07',
+      usuario,
     );
   });
 
@@ -34,7 +38,7 @@ describe('VigiflowIntegradorController.bulk', () => {
       fechaInicio: '20240101',
       fechaFin: '20240131',
       codigoATC: 'J07',
-    } as any);
+    } as any, usuario);
 
     expect(respuesta).toEqual({ status: 'OK', msg: 'Datos importados exitosamente desde Vigiflow' });
   });
@@ -46,7 +50,7 @@ describe('VigiflowIntegradorController.bulk', () => {
       fechaInicio: '20240115',
       fechaFin: '20240410',
       codigoATC: 'J07',
-    } as any);
+    } as any, usuario);
 
     expect(respuesta).toEqual({
       status: 'OK',
@@ -65,7 +69,7 @@ describe('VigiflowIntegradorController.bulk', () => {
       fechaInicio: '20240101',
       fechaFin: '20240331',
       codigoATC: 'J07',
-    } as any);
+    } as any, usuario);
 
     expect(respuesta.status).toBe('PARTIAL');
     expect(respuesta.msg).toContain('2 de 3 periodos mensuales');
@@ -79,7 +83,7 @@ describe('VigiflowIntegradorController.bulk', () => {
       fechaInicio: '20240101',
       fechaFin: '20240131',
       codigoATC: 'J07',
-    } as any);
+    } as any, usuario);
 
     expect(respuesta).toEqual({
       status: 'ERROR',

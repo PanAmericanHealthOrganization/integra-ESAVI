@@ -30,7 +30,7 @@ import {
 import { alpha, useTheme } from "@mui/material/styles"
 import { useMemo, useState } from "react"
 import { PanelHeader } from "../../components/PanelTabla"
-import { LAYOUT } from "../../theme"
+import { LAYOUT, SOMBRAS } from "../../theme"
 import { Title, useGetList, useNotify, useUpdate } from "react-admin"
 
 enum TipoDato {
@@ -288,9 +288,13 @@ export const ParametrosList = () => {
                   key={group.modulo}
                   component="fieldset"
                   sx={{
+                    // Fondo propio: el recuadro sólo tenía borde, y sobre el gris de la
+                    // página los campos quedaban flotando sin tarjeta que los contuviera.
+                    bgcolor: "background.paper",
                     border: "1px solid",
                     borderColor: alpha(accent.main, 0.35),
-                    borderRadius: 2,
+                    borderRadius: LAYOUT.radioTarjeta,
+                    boxShadow: SOMBRAS.tarjeta,
                     px: 2,
                     pt: 0.5,
                     pb: 2,

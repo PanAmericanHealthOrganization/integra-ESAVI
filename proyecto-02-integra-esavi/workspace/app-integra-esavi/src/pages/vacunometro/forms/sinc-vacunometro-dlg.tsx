@@ -15,6 +15,7 @@ import {
   useDataProvider,
   useNotify,
 } from "react-admin"
+import { useEsAdmin } from "../../../authorization.utils"
 import { IVacunometroDataProvider } from "../../../dataProviders/vacunas.dataprovider"
 /**
  *
@@ -58,12 +59,19 @@ export const SyncVacunometroDialog = ({
   setOpen: (open: boolean) => void
 }) => {
   const dataProvider = useDataProvider<IVacunometroDataProvider>()
+  const esAdmin = useEsAdmin()
   /**
    *
    * @param e
    * @param values
    */
   const notify = useNotify()
+
+  // Traer datos desde el sistema de vacunación es una acción de escritura sobre
+  // TR_VACUNOMETRO, no una consulta: para un perfil de sólo análisis no tiene sentido y se
+  // retira de la banda. Va después de todos los ganchos, que no admiten salidas anticipadas.
+  if (!esAdmin) return null
+
   const onSubmitHandler = async (values: any) => {
     try {
       const { desde, hasta } = values

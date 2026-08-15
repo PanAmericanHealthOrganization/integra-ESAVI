@@ -4,6 +4,7 @@ import {TypeOrmModule} from '@nestjs/typeorm';
 import {Homologador} from 'src/homologator/entity/homologador.entity';
 import {ReglaHomologacion} from 'src/homologator/entity/regla-homologacion.entity';
 import {HomologadorModule} from 'src/homologator/homologador.module';
+import {MensajesModule} from 'src/mensajes/mensajes.module';
 import {dataSourceFactory} from 'src/utils/ensure-schemas.util';
 import {GacetaController} from './controller';
 import {AntecedenteEmbarazoController} from './controller/antecedente-embarazo.controller';
@@ -142,6 +143,9 @@ const POSTGRES_INTEGRATOR_DS = 'POSTGRES_INTEGRATOR_DS';
       POSTGRES_INTEGRATOR_DS,
     ),
     HomologadorModule,
+    // SyncService notifica al usuario el fin de cada corrida. MensajesModule no importa
+    // a su vez este módulo, así que no hay ciclo.
+    MensajesModule,
   ],
   controllers: [
     AntecedenteEmbarazoController,

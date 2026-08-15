@@ -4191,14 +4191,17 @@
         
         
         # Convertir los datos al formato necesario para el boxplot
+        # Sin `color`: data_to_boxplot recicla el vector contra el número de series
+        # (nomcomv x marca_grave), y colores_gravedad tiene largo fijo 2. Cuando el
+        # filtro activo deja un número de series que no es múltiplo de 2, el mutate
+        # interno falla con dplyr_internal_error. El color de las series lo fija
+        # hc_colors() más abajo, que sí respeta el orden de marca_grave.
         datos_boxplot <- data_to_boxplot(
           data = paso,
           variable = dias_vac_ini,
           group_var = nomcomv,
           group_var2 = marca_grave,
-          add_outliers = FALSE,
-          #name = ,
-          color = colores_gravedad
+          add_outliers = FALSE
         )
         
         # Obtener las categorías únicas
@@ -6137,6 +6140,10 @@
   # ---------------------------------------------------------------------------- -
     
     # 7.1 Renderización del mapa completo desde el inicio ----
+    #
+    # INACTIVO: el box del mapa está comentado en ui.R (4.d.2), así que este output no
+    # tiene binding y Shiny nunca lo evalúa. Se conserva para reactivarlo junto con la
+    # UI; el motivo de la baja y los pasos para revertirla están en ui.R.
     output$mapa <- renderLeaflet({
       req(datos_filtrados())
       
@@ -6281,6 +6288,10 @@
     })
     
     # 7.2 Observador para actualizar el mapa cuando los datos o controles cambian ----
+    #
+    # INACTIVO por el mismo motivo que 7.1: los tres inputs del req() viven en el box
+    # comentado de ui.R (4.d.2), así que valen NULL y req() corta la ejecución en
+    # silencio. Vuelve a activarse solo al descomentar la UI.
     observe({
       req(datos_filtrados(), input$transparencia, input$basemap, input$mostrar_etiquetas)
       

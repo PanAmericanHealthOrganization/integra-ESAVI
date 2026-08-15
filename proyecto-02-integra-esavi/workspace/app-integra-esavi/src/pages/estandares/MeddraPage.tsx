@@ -501,9 +501,6 @@ export const MeddraPage = () => {
                 ),
               }}
             />
-            <Button onClick={() => setSearchTerm("")} disabled={!searchTerm}>
-              Limpiar
-            </Button>
           </Box>
         </PanelHeader>
 

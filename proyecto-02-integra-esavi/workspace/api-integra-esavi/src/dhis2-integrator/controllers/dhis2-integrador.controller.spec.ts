@@ -4,6 +4,7 @@ import { Dhis2IntegratorService } from '../services/dhis2-integrator.service';
 import { Dhis2ProcessingLogService } from '../services/dhis2-processing-log.service';
 import { Dhis2DuplicateHandlerService } from '../services/dhis2-duplicate-handler.service';
 import { AefiQuery } from '../../vigiflow-integrator/dto';
+import { KeycloakAuthGuard } from '../../common/guards/keycloak-auth.guard';
 import { DuplicateAction } from '../dto';
 
 const mockDhis2IntegratorService = {
@@ -34,9 +35,17 @@ describe('Dhis2IntegradorController', () => {
         { provide: Dhis2ProcessingLogService, useValue: mockProcessingLogService },
         { provide: Dhis2DuplicateHandlerService, useValue: mockDuplicateHandlerService },
       ],
-    }).compile();
+    })
+      // El guard real exige KEYCLOAK_URL/KEYCLOAK_REALM ya en su constructor; aquí se
+      // sustituye porque lo que se prueba es el controlador, no la validación del token.
+      .overrideGuard(KeycloakAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
     controller = module.get<Dhis2IntegradorController>(Dhis2IntegradorController);
   });
+
+  /** Quien lanza la importación; el controlador lo propaga para que reciba la notificación. */
+  const usuario = { id: 'sub-123', username: 'ana', roles: ['admin'] } as any;
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
@@ -52,12 +61,14 @@ describe('Dhis2IntegradorController', () => {
     it('convierte las fechas YYYYMMDD y delega en dhis2IntegratorService.createInBulk', async () => {
       mockDhis2IntegratorService.createInBulk.mockResolvedValue(undefined);
 
-      const result = await controller.console(aefiQuery);
+      const result = await controller.console(aefiQuery, usuario);
 
       expect(mockDhis2IntegratorService.createInBulk).toHaveBeenCalledWith(
         new Date('2024-01-01'),
         new Date('2024-01-31'),
         'J07',
+        undefined,
+        usuario,
       );
       expect(result).toEqual({ status: 'OK', msg: 'Éxito' });
     });
@@ -65,7 +76,7 @@ describe('Dhis2IntegradorController', () => {
     it('retorna status ERROR si createInBulk lanza una excepción', async () => {
       mockDhis2IntegratorService.createInBulk.mockRejectedValue(new Error('fallo dhis2'));
 
-      const result = await controller.console(aefiQuery);
+      const result = await controller.console(aefiQuery, usuario);
 
       expect(result).toEqual({
         status: 'ERROR',
@@ -85,13 +96,14 @@ describe('Dhis2IntegradorController', () => {
       mockDhis2IntegratorService.createInBulk.mockResolvedValue(undefined);
       const duplicateConfig = { accionPorDefecto: DuplicateAction.SKIP };
 
-      const result = await controller.createInBulkWithDuplicateHandling(aefiQuery, duplicateConfig);
+      const result = await controller.createInBulkWithDuplicateHandling(aefiQuery, usuario, duplicateConfig);
 
       expect(mockDhis2IntegratorService.createInBulk).toHaveBeenCalledWith(
         new Date('2024-02-01'),
         new Date('2024-02-28'),
         'J07',
         duplicateConfig,
+        usuario,
       );
       expect(result).toEqual({ status: 'OK', msg: 'Éxito' });
     });
@@ -99,7 +111,7 @@ describe('Dhis2IntegradorController', () => {
     it('retorna status ERROR si createInBulk lanza una excepción', async () => {
       mockDhis2IntegratorService.createInBulk.mockRejectedValue(new Error('fallo dhis2'));
 
-      const result = await controller.createInBulkWithDuplicateHandling(aefiQuery, undefined);
+      const result = await controller.createInBulkWithDuplicateHandling(aefiQuery, usuario, undefined);
 
       expect(result).toEqual({
         status: 'ERROR',

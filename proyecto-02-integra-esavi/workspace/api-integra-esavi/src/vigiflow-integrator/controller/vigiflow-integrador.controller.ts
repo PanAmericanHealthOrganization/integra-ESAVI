@@ -1,8 +1,10 @@
-import {Controller,Get,Logger,Query,Res,UseFilters} from '@nestjs/common';
-import {ApiResponse,ApiTags} from '@nestjs/swagger';
+import {Controller,Get,Logger,Query,Res,UseFilters,UseGuards} from '@nestjs/common';
+import {ApiBearerAuth,ApiResponse,ApiTags} from '@nestjs/swagger';
 import {Response} from 'express';
 import {MaholderService} from 'src/whodrugs/services/maholder.service';
 import * as xlsx from 'xlsx';
+import {Usuario,UsuarioAutenticado} from '../../common/decorators/usuario.decorator';
+import {KeycloakAuthGuard} from '../../common/guards/keycloak-auth.guard';
 import {HttpExceptionFilter} from '../../providers/http-exception.filter';
 import {AefiQuery} from '../dto';
 import {VigiflowCrawlerService} from '../service/vigiflow-crawler.service';
@@ -47,8 +49,18 @@ export class VigiflowIntegradorController {
     res.send(excelBuffer);
   }
 
+  /**
+   * Lanza la importación de un rango de fechas.
+   *
+   * Va detrás del guard de Keycloak porque el desenlace se avisa al usuario que la lanzó:
+   * sin token no hay `sub` con el que identificar su buzón. La corrida en TR_SYNC_PROCESS
+   * se registra igual con token o sin él (el cron no lo tiene), pero la notificación sólo
+   * puede salir si se sabe a quién dirigirla.
+   */
   @Get('/bulk')
-  async bulk(@Query() aefiQuery: AefiQuery) {
+  @UseGuards(KeycloakAuthGuard)
+  @ApiBearerAuth('keycloak-jwt')
+  async bulk(@Query() aefiQuery: AefiQuery, @Usuario() usuario: UsuarioAutenticado) {
     // const fechaInicio: Date = new Date(aefiQuery.fechaInicio);
     // const fechaFin: Date = new Date(aefiQuery.fechaFin);
 
@@ -70,6 +82,7 @@ export class VigiflowIntegradorController {
         fechaInicio,
         fechaFin,
         aefiQuery.codigoATC,
+        usuario,
       );
 
       // Un rango de más de un mes se procesa mes a mes; el detalle importa porque algunos
@@ -103,9 +116,11 @@ export class VigiflowIntegradorController {
    *
    */
   @Get('/bulk-from-file')
-  async bulkFromFile(): Promise<{ status: string; msg: string }> {
+  @UseGuards(KeycloakAuthGuard)
+  @ApiBearerAuth('keycloak-jwt')
+  async bulkFromFile(@Usuario() usuario: UsuarioAutenticado): Promise<{ status: string; msg: string }> {
     try {
-      await this.vigiflowIntegradorService.createInBulkFromFile();
+      await this.vigiflowIntegradorService.createInBulkFromFile(usuario);
       return {
         status: 'OK',
         msg: 'Datos importados exitosamente desde archivo',

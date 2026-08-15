@@ -44,6 +44,18 @@ const AdminGuard = ({ component: Component }: { component: React.ComponentType }
   return <Component />
 }
 
+/**
+ * Página de entrada tras iniciar sesión.
+ *
+ * React-admin sirve en `/` lo que reciba en la prop `dashboard`; sin ella cae en el primer
+ * `<Resource>` con lista, que aquí era `dashboard` —un recurso que ni siquiera figura en el
+ * menú—. Se redirige a ESAVIS, que es el primer punto del menú y la pantalla de trabajo.
+ *
+ * Va antes que cualquier comprobación de rol a propósito: aterrizan ahí todos los usuarios,
+ * con el rol que sea.
+ */
+const PaginaDeEntrada = () => <Navigate to="/esavis" replace />
+
 // Referencias estables fuera de App para evitar desmontaje al re-renderizar
 const ParametrosPage      = () => <AdminGuard component={ParametrosList} />
 const CatalogosConfigPage = () => <AdminGuard component={CatalogosConfigList} />
@@ -81,6 +93,7 @@ const App = () => {
           return decoded.realm_access?.roles || []
         },
       })}
+      dashboard={PaginaDeEntrada}
       layout={CustomLayout}
       loginPage={CustomLoginPage}
       notification={NotificacionPersonalizada}
