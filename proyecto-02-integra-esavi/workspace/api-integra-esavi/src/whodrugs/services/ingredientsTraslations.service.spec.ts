@@ -118,18 +118,20 @@ describe('IngredientTranslationService', () => {
       expect(result).toBeNull();
     });
 
-    it('debe retornar el match con las 5 columnas planas cuando hay coincidencia', async () => {
+    /*
+     * El match devolvía cinco columnas planas; ahora sólo dos. `toEqual` es deliberado
+     * frente a `toMatchObject`: lo que esta prueba sujeta es que DRUG_CODE y los dos MPID
+     * *no* vuelvan por este camino mientras se rehace su identificación.
+     */
+    it('debe retornar solo el nombre estandarizado y el titular cuando hay coincidencia', async () => {
       ingredientTranslationRepository.find.mockResolvedValue(traduccionesMock);
       queryBuilder.getOne.mockResolvedValue(maholderMock);
 
       const result = await service.findVaccineByIngredientAndMaholder('Vacuna Antigripal', 'Merck Sharp & Dohme LLC');
 
       expect(result).toEqual({
-        drugCode: 'DRU123',
         drugName: 'GARDASIL 9',
-        medicinalProductId: '111',
         maHolder: 'Merck sharp & dohme',
-        maHolderMedicinalProductId: '555',
       });
     });
 
@@ -157,7 +159,12 @@ describe('IngredientTranslationService', () => {
       );
     });
 
-    it('debe retornar null (no "null" string) en los MPID cuando no existen en el diccionario', async () => {
+    /*
+     * Sustituye a la prueba que comprobaba que los MPID ausentes salieran como `null` y no
+     * como la cadena "null". Ya no hay MPID que devolver: lo que interesa comprobar es que
+     * su ausencia en el diccionario no rompe el resto del match.
+     */
+    it('debe resolver el match aunque el titular no tenga MPID en el diccionario', async () => {
       ingredientTranslationRepository.find.mockResolvedValue(traduccionesMock);
       queryBuilder.getOne.mockResolvedValue({
         ...maholderMock,
@@ -167,9 +174,7 @@ describe('IngredientTranslationService', () => {
 
       const result = await service.findVaccineByIngredientAndMaholder('Vacuna Antigripal', 'Merck');
 
-      expect(result.medicinalProductId).toBeNull();
-      expect(result.maHolderMedicinalProductId).toBeNull();
-      expect(result.drugCode).toBe('DRU123');
+      expect(result).toEqual({ drugName: 'GARDASIL 9', maHolder: 'Merck sharp & dohme' });
     });
   });
 });

@@ -337,13 +337,17 @@ export class Dhis2IntegratorService {
   }
 
   /**
-   * Homologa una vacuna reportada en DHIS2 contra el diccionario WHODrug y completa DRUG_CODE,
-   * DRUG_NAME, MEDICINAL_PRODUCT_ID, MA_HOLDER y CODIGO_ATC.
+   * Homologa una vacuna reportada en DHIS2 contra el diccionario WHODrug y completa
+   * DRUG_NAME, MA_HOLDER y CODIGO_ATC.
    *
    * Hasta ahora estos campos solo se poblaban desde VigiFlow, cuyo Excel ya llega codificado
    * por la UMC: los registros de DHIS2 quedaban con el nombre en texto libre y sin ningún
    * identificador de catálogo, de modo que las dos fuentes no eran comparables. Se usa el
    * mismo diccionario y el mismo país que el integrador VigiFlow.
+   *
+   * DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID quedan deliberadamente fuera:
+   * su identificación se rehará con otra lógica y, hasta entonces, ninguna fuente los
+   * escribe.
    *
    * Si no hay coincidencia el registro se conserva con NOMBRE_VACUNA_REPORTADO y sin
    * codificación: es información válida y homologable después, no un error.
@@ -362,24 +366,15 @@ export class Dhis2IntegratorService {
         return;
       }
 
-      datoVacuna.drugCode = drug.drugCode ?? null;
       datoVacuna.drugName = drug.drugName ?? null;
       datoVacuna.codigoAtc = await this.drugService.getAtcCodeOfDrug(drug.id);
 
-      // El MPID sale del catálogo oficial: MAHOLDER.MEDICINAL_PRODUCT_ID para el titular y
-      // COUNTRY_SALES.COS_MEDICINAL_PRODUCT_ID para el producto en el país de venta.
       const titulares = await this.maholderService.getMaholderOfDrug(drug.id, country);
       const titularPrincipal = titulares[0];
       if (titularPrincipal) {
         // MA_HOLDER se sobreescribe solo si WHODrug lo resuelve: si no, se conserva la casa
         // comercial que reportó DHIS2, que es mejor que dejar el campo vacío.
         datoVacuna.maHolder = titularPrincipal.name ?? datoVacuna.maHolder;
-        datoVacuna.maHolderMedicinalProductId =
-          titularPrincipal.medicinalProductID != null ? String(titularPrincipal.medicinalProductID) : null;
-        datoVacuna.medicinalProductId =
-          titularPrincipal.countrySale?.medicinalProductID != null
-            ? String(titularPrincipal.countrySale.medicinalProductID)
-            : null;
       }
     } catch (error: any) {
       this.logger.error(`[WHODrug] Error homologando la vacuna DHIS2 "${nombreReportado}": ${error?.message}`);

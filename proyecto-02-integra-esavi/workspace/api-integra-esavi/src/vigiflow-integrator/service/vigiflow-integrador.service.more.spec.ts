@@ -830,11 +830,8 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-003' }]);
       mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-003', [notificacion]]]));
       mockIngredientTranslation.findVaccineByIngredientAndMaholder.mockResolvedValue({
-        drugCode: 'D1',
         drugName: 'DrugName1',
-        medicinalProductId: 'M1',
         maHolder: 'Holder1',
-        maHolderMedicinalProductId: 'MH1',
       });
 
       // Dos filas con el mismo ingrediente+laboratorio: debe usarse la caché en la segunda.
@@ -848,7 +845,13 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDrug.getDrugsOnly).not.toHaveBeenCalled();
       expect(mockDatoVacuna.createByNotificacion).toHaveBeenCalledWith(
         notificacion,
-        expect.objectContaining({ drugCode: 'D1', drugName: 'DrugName1', maHolder: 'Holder1' }),
+        expect.objectContaining({ drugName: 'DrugName1', maHolder: 'Holder1' }),
+      );
+      // DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID salieron del match: se
+      // comprueba que la ruta primaria no los escriba mientras se rehace su identificación.
+      expect(mockDatoVacuna.createByNotificacion).not.toHaveBeenCalledWith(
+        notificacion,
+        expect.objectContaining({ drugCode: expect.anything() }),
       );
     });
 
@@ -877,14 +880,18 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(mockDatoVacuna.createByNotificacion).toHaveBeenCalledWith(
         notificacion,
         expect.objectContaining({
-          drugCode: 'DC1',
           drugName: 'DN1',
           maHolder: 'HolderX',
-          maHolderMedicinalProductId: 'MPID1',
-          medicinalProductId: 'CS1',
+          // MA_HOLDER_JSONB sigue llevando el MPID del titular: es otra columna y no entra
+          // en la retirada, que alcanza sólo a las tres planas de TR_DATO_VACUNA.
+          maHolderJsonb: [{ name: 'HolderX', medicinalProductID: 'MPID1' }],
           activeIngredientJson: [{ ingredient: 'IngX' }],
         }),
       );
+      const [, datoVacuna] = mockDatoVacuna.createByNotificacion.mock.calls[0];
+      expect(datoVacuna).not.toHaveProperty('drugCode');
+      expect(datoVacuna).not.toHaveProperty('medicinalProductId');
+      expect(datoVacuna).not.toHaveProperty('maHolderMedicinalProductId');
     });
 
     it('omite la fila cuando el paciente existe en BD pero su caso fue descartado (sin notificación)', async () => {

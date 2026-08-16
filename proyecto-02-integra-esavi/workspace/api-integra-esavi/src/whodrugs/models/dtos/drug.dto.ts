@@ -59,11 +59,13 @@ export interface IATC {
 /**
  * Resultado de la búsqueda de una vacuna en WHODrug por principio activo
  * (INGREDIENT_TRANSLATION.INT_INGREDIENT) + laboratorio titular (MAHOLDER.NAME).
+ *
+ * Devolvía además `drugCode`, `medicinalProductId` y `maHolderMedicinalProductId`, con los
+ * que se poblaban las columnas homónimas de TR_DATO_VACUNA. Se retiraron del contrato —y no
+ * sólo de quien los asignaba— para que ningún consumidor pueda volver a escribir esas
+ * columnas por este camino mientras se define la nueva forma de identificarlas.
  */
 export interface IWhodrugVaccineMatch {
-  drugCode: string;
   drugName: string;
-  medicinalProductId: string;
   maHolder: string;
-  maHolderMedicinalProductId: string;
 }

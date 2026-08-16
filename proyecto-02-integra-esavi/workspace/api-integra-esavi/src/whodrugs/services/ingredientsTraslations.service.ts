@@ -131,13 +131,13 @@ export class IngredientTranslationService {
       return null;
     }
 
+    // Sólo el nombre estandarizado y el titular. Este método derivaba también DRU_CODE y
+    // los dos MPID (el del titular y el del país de venta); esa identificación se retiró
+    // por completo a la espera de rehacerla.
     const drug = maholder.countrySale?.drug;
     return {
-      drugCode: drug?.drugCode ?? null,
       drugName: drug?.drugName ?? null,
-      medicinalProductId: maholder.countrySale?.medicinalProductID != null ? String(maholder.countrySale.medicinalProductID) : null,
       maHolder: maholder.name,
-      maHolderMedicinalProductId: maholder.medicinalProductID != null ? String(maholder.medicinalProductID) : null,
     };
   }
 

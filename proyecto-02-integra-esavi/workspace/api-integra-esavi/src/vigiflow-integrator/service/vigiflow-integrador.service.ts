@@ -809,17 +809,16 @@ export class VigiflowIntegradorService {
             }
 
             if (whodrugMatch) {
-              updateDatoVacuna.drugCode = whodrugMatch.drugCode;
+              // DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID ya no se
+              // resuelven aquí: su identificación se rehará con otra lógica. Lo que este
+              // cruce sigue aportando es el nombre estandarizado y el titular.
               updateDatoVacuna.drugName = whodrugMatch.drugName;
-              updateDatoVacuna.medicinalProductId = whodrugMatch.medicinalProductId;
               updateDatoVacuna.maHolder = whodrugMatch.maHolder;
-              updateDatoVacuna.maHolderMedicinalProductId = whodrugMatch.maHolderMedicinalProductId;
             } else {
               //Fallback: estandarización por nombre de patente (col E), utilizando el diccionario
               //oficial de WHODrug Global de Uppsala Monitoring Centre.
               const whodrug: any[] = await this.drugService.getDrugsOnly(nombreVacPatenteWHODrugVigiFlow, country);
               if (whodrug.length > 0) {
-                updateDatoVacuna.drugCode = whodrug[0]?.drugCode;
                 updateDatoVacuna.drugName = whodrug[0]?.drugName;
 
                 const mah = await this.maholderService.getMaholderOfDrug(whodrug[0]?.id, country);
@@ -829,13 +828,12 @@ export class VigiflowIntegradorService {
                   medicinalProductID: item.medicinalProductID, // El MPID principal del medicamento es diferente al valor del MPID del maHolder.
                 }));
 
-                // Poblar también las columnas planas (igual que el lookup primario) tomando el primer titular.
-                // Sin esto, un match por fallback dejaba MA_HOLDER / MEDICINAL_PRODUCT_ID / MA_HOLDER_MEDI_PROD_ID vacíos.
+                // Del primer titular sólo se conserva el nombre (MA_HOLDER). Los dos MPID
+                // que antes se derivaban aquí —MAHOLDER.MEDICINAL_PRODUCT_ID y
+                // COUNTRY_SALES.COS_MEDICINAL_PRODUCT_ID— se retiraron junto con DRUG_CODE.
                 const maHolderPrincipal = mah[0];
                 if (maHolderPrincipal) {
                   updateDatoVacuna.maHolder = maHolderPrincipal.name;
-                  updateDatoVacuna.maHolderMedicinalProductId = maHolderPrincipal.medicinalProductID != null ? String(maHolderPrincipal.medicinalProductID) : null;
-                  updateDatoVacuna.medicinalProductId = maHolderPrincipal.countrySale?.medicinalProductID != null ? String(maHolderPrincipal.countrySale.medicinalProductID) : null;
                 }
 
                 const ingredentActive = await this.activeIngredentService.getActiveIngredentsOfDrug(whodrug[0]?.id);
