@@ -148,6 +148,27 @@ export class SeedController {
     };
   }
 
+  @Delete('truncate-solo-notificaciones')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Truncar únicamente TR_NOTIFICACION (en cascada)',
+    description:
+      'Vacía DHI_ESAVI.TR_NOTIFICACION y, por cascada, todo lo que cuelga de cada notificación ' +
+      '(vacunas, ESAVI, desenlaces, gravedad, causalidad y medicamentos). No toca los diccionarios ' +
+      'WHO_DRUG ni MEDDRA, que es la diferencia con DELETE truncate-notificacion: recargar las ' +
+      'notificaciones no tiene por qué costar una resincronización completa de los diccionarios. ' +
+      'TC_PARAMETRO y TR_SYNC_PROCESS también se conservan.',
+  })
+  @ApiResponse({ status: 200, description: 'Notificaciones truncadas en cascada exitosamente' })
+  @ApiResponse({ status: 500, description: 'Error interno del servidor' })
+  async truncateSoloNotificaciones() {
+    await this.seedService.truncateSoloNotificaciones();
+    return {
+      message: 'Notificaciones (TR_NOTIFICACION) truncadas en cascada exitosamente',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
   @Delete('truncate-notificacion')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

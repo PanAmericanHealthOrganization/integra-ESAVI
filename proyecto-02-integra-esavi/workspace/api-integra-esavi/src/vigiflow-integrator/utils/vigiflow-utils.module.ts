@@ -55,6 +55,22 @@ export abstract class VigiflowUtils {
   }
 
   /**
+   * Nombre del archivo con el que se guarda una copia de los Excel que VigiFlow devolvió.
+   *
+   * Forma: `borrar.<AAAA_MM inicio>__<AAAA_MM fin>_<sufijo>.xlsx`, por ejemplo
+   * `borrar.2025_01__2025_03_aefi.xlsx`.
+   *
+   * El prefijo `borrar.` es deliberado y no decorativo: estas copias son material de
+   * depuración que se acumula en el directorio de trabajo, y el prefijo las agrupa al
+   * ordenar por nombre para poder barrerlas de una vez sin revisar cuál es cuál.
+   */
+  static nombreArchivoRespaldo(fechaInicio: Date, fechaFin: Date, sufijo: 'aefi' | 'report'): string {
+    const comoAnioMes = (fecha: Date) =>
+      `${fecha.getUTCFullYear()}_${String(fecha.getUTCMonth() + 1).padStart(2, '0')}`;
+    return `borrar.${comoAnioMes(fechaInicio)}__${comoAnioMes(fechaFin)}_${sufijo}.xlsx`;
+  }
+
+  /**
    * Convierte una cadena con formato YYYYMMDD (exactamente 8 dígitos) en una fecha UTC.
    * Retorna null si la cadena no cumple el formato o la fecha es inválida.
    */

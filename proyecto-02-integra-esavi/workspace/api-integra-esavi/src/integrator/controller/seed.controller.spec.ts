@@ -17,7 +17,7 @@ describe('SeedController (protección)', () => {
     (nombre) => nombre !== 'constructor',
   );
 
-  it('cubre los seis endpoints del controlador', () => {
+  it('cubre los siete endpoints del controlador', () => {
     expect(manejadores.sort()).toEqual([
       'cleanData',
       'cleanTRTables',
@@ -25,6 +25,7 @@ describe('SeedController (protección)', () => {
       'seedSimulacionVacunacion',
       'seedVacunometro',
       'truncateNotificacion',
+      'truncateSoloNotificaciones',
     ]);
   });
 
@@ -41,7 +42,7 @@ describe('SeedController (protección)', () => {
     expect(Reflect.getMetadata(ROLES_KEY, SeedController)).toEqual(['admin']);
   });
 
-  it.each(['cleanData', 'cleanTRTables', 'truncateNotificacion'])(
+  it.each(['cleanData', 'cleanTRTables', 'truncateNotificacion', 'truncateSoloNotificaciones'])(
     'el endpoint destructivo %s exige rol admin',
     (nombre) => {
       const roles = reflector.getAllAndOverride<string[]>(ROLES_KEY, [

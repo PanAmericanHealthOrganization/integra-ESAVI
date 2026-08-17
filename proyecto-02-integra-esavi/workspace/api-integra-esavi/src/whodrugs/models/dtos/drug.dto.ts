@@ -69,3 +69,24 @@ export interface IWhodrugVaccineMatch {
   drugName: string;
   maHolder: string;
 }
+
+/**
+ * Codificación WHODrug de una vacuna, tal como la devuelve la consulta que recorre
+ * INGREDIENT_TRANSLATION → ACTIVE_INGREDIENTS → DRUG → COUNTRY_SALES → MAHOLDER.
+ *
+ * Los dos identificadores de producto son distintos y vienen de tablas distintas; se
+ * nombran aquí igual que las columnas de TR_DATO_VACUNA a las que alimentan para que no
+ * puedan intercambiarse por descuido al asignarlos.
+ */
+export interface ICodificacionVacunaWhodrug {
+  /** DRUG.DRU_CODE → TR_DATO_VACUNA.DRUG_CODE */
+  drugCode: string;
+  /** DRUG.DRU_NAME → TR_DATO_VACUNA.DRUG_NAME */
+  drugName: string;
+  /** COUNTRY_SALES.COS_MEDICINAL_PRODUCT_ID → TR_DATO_VACUNA.MEDICINAL_PRODUCT_ID */
+  medicinalProductId: string;
+  /** MAHOLDER.NAME → TR_DATO_VACUNA.MA_HOLDER */
+  maHolder: string;
+  /** MAHOLDER.MEDICINAL_PRODUCT_ID → TR_DATO_VACUNA.MA_HOLDER_MEDI_PROD_ID */
+  maHolderMedicinalProductId: string;
+}

@@ -1135,6 +1135,42 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   /**
+   * Vacía únicamente las notificaciones: `DHI_ESAVI.TR_NOTIFICACION` en cascada.
+   *
+   * El `CASCADE` arrastra lo que cuelga de cada notificación —vacunas, ESAVI, desenlaces,
+   * gravedad, causalidad y medicamentos—, que es exactamente lo que se quiere: una
+   * notificación sin sus datos asociados no es un registro parcial, es basura.
+   *
+   * Es el hermano acotado de `truncateNotificacion`, que además vacía WHO_DRUG y MEDDRA.
+   * Se separan porque responden a necesidades distintas: recargar las notificaciones de
+   * una fuente es rutinario y no tiene por qué costar una resincronización completa de los
+   * diccionarios, que tarda varios minutos y depende de las credenciales de la UMC.
+   *
+   * No toca TC_PARAMETRO ni TR_SYNC_PROCESS, por las mismas razones que el otro: sin la
+   * configuración no hay forma de volver a sincronizar, y el historial de corridas es
+   * también el registro de versiones de MedDRA cargadas.
+   */
+  async truncateSoloNotificaciones() {
+    console.log('🧹 Truncando únicamente TR_NOTIFICACION (en cascada)...');
+    const queryRunner = this.notificacionRepository.manager.connection.createQueryRunner();
+    try {
+      // `session_replication_role = replica` desactiva las claves foráneas durante la
+      // operación: sin esto, PostgreSQL rechaza truncar una tabla referenciada por otras
+      // aunque se pida CASCADE desde fuera de la transacción.
+      await queryRunner.query('SET session_replication_role = replica;');
+      await queryRunner.query('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
+      await queryRunner.query('SET session_replication_role = DEFAULT;');
+
+      console.log('✅ TR_NOTIFICACION truncada en cascada exitosamente');
+    } catch (error) {
+      console.error('❌ Error al truncar TR_NOTIFICACION:', error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
    * Vacía los datos operativos y, con ellos, los diccionarios externos.
    *
    * Alcance:

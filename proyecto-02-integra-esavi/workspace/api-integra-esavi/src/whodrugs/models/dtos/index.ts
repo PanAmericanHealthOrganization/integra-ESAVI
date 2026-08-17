@@ -9,4 +9,5 @@ export {
   IIngredientTranslation,
   IATC,
   IWhodrugVaccineMatch,
+  ICodificacionVacunaWhodrug,
 } from './drug.dto';

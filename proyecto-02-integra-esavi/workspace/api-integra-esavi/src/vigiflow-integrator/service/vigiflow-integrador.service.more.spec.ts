@@ -6,9 +6,12 @@ import { SyncSource } from 'src/integrator/entity';
 import { VigiflowUtils } from '../utils/vigiflow-utils.module';
 import { VigiflowIntegradorService } from './vigiflow-integrador.service';
 
-// Se mockea el filesystem para createInBulkFromFile: nunca se debe leer un archivo real.
+// Se mockea el filesystem para createInBulkFromFile y para la copia de depuración:
+// ninguna prueba debe leer ni escribir un archivo real.
 jest.mock('fs/promises', () => ({
   readFile: jest.fn(),
+  mkdir: jest.fn(),
+  writeFile: jest.fn(),
 }));
 
 // Se mockea únicamente `read` de xlsx (usado para parsear buffers/archivos); `utils` se mantiene
@@ -123,6 +126,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
   };
   const mockIngredientTranslation = {
     findVaccineByIngredientAndMaholder: jest.fn().mockResolvedValue(null),
+    buscarCodificacionVacuna: jest.fn().mockResolvedValue(null),
   };
   // VigiFlow ya no abre y cierra la bitácora por su cuenta: delega en
   // SyncService.ejecutarConRegistro, igual que el resto de las fuentes. El mock
@@ -198,6 +202,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
     mockMaholder.getMaholderOfDrug.mockResolvedValue([]);
     mockActiveIngredient.getActiveIngredentsOfDrug.mockResolvedValue([]);
     mockIngredientTranslation.findVaccineByIngredientAndMaholder.mockResolvedValue(null);
+    mockIngredientTranslation.buscarCodificacionVacuna.mockResolvedValue(null);
     mockMeddraLlt.buscarCodigoPorSimilitud.mockResolvedValue(null);
     mockMeddraPt.searchPT.mockResolvedValue(null);
     mockMeddraSoc.searchSOC.mockResolvedValue(null);
@@ -894,6 +899,115 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       expect(datoVacuna).not.toHaveProperty('maHolderMedicinalProductId');
     });
 
+    /*
+     * La codificación WHODrug corre para todo lo que entra por VigiFlow, sin depender de
+     * VIGIFLOW_USE_WHODRUG_GLOBAL: el servicio se crea aquí con la bandera en su valor por
+     * defecto (false) y aun así debe consultarse.
+     */
+    it('codifica la vacuna con el principio activo y el laboratorio, al margen de la bandera de WHODrug global', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-cod' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-COD' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-COD', [notificacion]]]));
+      mockIngredientTranslation.buscarCodificacionVacuna.mockResolvedValueOnce({
+        drugCode: 'DRU123',
+        drugName: 'GARDASIL 9',
+        medicinalProductId: '111',
+        maHolder: 'Merck sharp & dohme',
+        maHolderMedicinalProductId: '555',
+      });
+
+      const row = rowFromCols({
+        A: 'EC-COD',
+        C: 'Vacuna',
+        E: 'PatenteX',
+        F: 'Vacuna antiVPH VLP rL1 9v (levadura)',
+        G: 'J07BX03',
+        I: 'Merck sharp & dohme',
+      });
+
+      await service.extractedFromJsonReportToCreateMedicamento(sheetAt(2, [row]));
+
+      // Los tres valores llegan en crudo: F (principios activos), I (titular) y E (patente).
+      expect(mockIngredientTranslation.buscarCodificacionVacuna).toHaveBeenCalledWith(
+        'Vacuna antiVPH VLP rL1 9v (levadura)',
+        'Merck sharp & dohme',
+        'PatenteX',
+      );
+      expect(mockDatoVacuna.createByNotificacion).toHaveBeenCalledWith(
+        notificacion,
+        expect.objectContaining({
+          drugCode: 'DRU123',
+          drugName: 'GARDASIL 9',
+          medicinalProductId: '111',
+          maHolder: 'Merck sharp & dohme',
+          maHolderMedicinalProductId: '555',
+        }),
+      );
+    });
+
+    /*
+     * El principio activo va en crudo, no por `limpiarCampoWHODrug`: esa utilidad cambia
+     * las comas por punto y coma y rompería la igualdad exacta contra INT_INGREDIENT en
+     * cualquier ingrediente cuyo nombre lleve coma.
+     */
+    it('pasa el principio activo tal como viene en la columna F, sin normalizar las comas', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-coma' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-COMA' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-COMA', [notificacion]]]));
+
+      const row = rowFromCols({
+        A: 'EC-COMA',
+        C: 'Vacuna',
+        F: 'Vacuna antitetánica, adsorbida',
+        G: 'J07BX03',
+        I: 'LabX',
+      });
+
+      await service.extractedFromJsonReportToCreateMedicamento(sheetAt(2, [row]));
+
+      expect(mockIngredientTranslation.buscarCodificacionVacuna).toHaveBeenCalledWith(
+        'Vacuna antitetánica, adsorbida',
+        'LabX',
+        // La fila de prueba no trae columna E.
+        null,
+      );
+    });
+
+    it('deja las tres columnas sin escribir cuando la vacuna no se puede codificar', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-sincod' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-SINCOD' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-SINCOD', [notificacion]]]));
+      mockIngredientTranslation.buscarCodificacionVacuna.mockResolvedValueOnce(null);
+
+      const row = rowFromCols({ A: 'EC-SINCOD', C: 'Vacuna', F: 'Ingrediente raro', G: 'J07BX03', I: 'LabY' });
+
+      await service.extractedFromJsonReportToCreateMedicamento(sheetAt(2, [row]));
+
+      const [, datoVacuna] = mockDatoVacuna.createByNotificacion.mock.calls[0];
+      expect(datoVacuna).not.toHaveProperty('drugCode');
+      expect(datoVacuna).not.toHaveProperty('medicinalProductId');
+      expect(datoVacuna).not.toHaveProperty('maHolderMedicinalProductId');
+      // El nombre reportado sobrevive: sin codificar sigue siendo homologable después.
+      expect(datoVacuna.nombreVacunaReportado).toBeDefined();
+    });
+
+    it('consulta una sola vez la codificación cuando varias filas repiten vacuna y laboratorio', async () => {
+      const service = createService();
+      const notificacion = { id: 'n-cache' };
+      mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-CACHE' }]);
+      mockNotifVigiflow.findAllByCodigosOrigen.mockResolvedValueOnce(new Map([['EC-CACHE', [notificacion]]]));
+
+      const row1 = rowFromCols({ A: 'EC-CACHE', C: 'Vacuna', F: 'IngredienteA', G: 'J07AL02', I: 'LabA' });
+      const row2 = rowFromCols({ A: 'EC-CACHE', C: 'Vacuna', F: 'IngredienteA', G: 'J07AL03', I: 'LabA' });
+
+      await service.extractedFromJsonReportToCreateMedicamento(sheetAt(2, [row1, row2]));
+
+      expect(mockIngredientTranslation.buscarCodificacionVacuna).toHaveBeenCalledTimes(1);
+    });
+
     it('omite la fila cuando el paciente existe en BD pero su caso fue descartado (sin notificación)', async () => {
       const service = createService();
       mockPaciente.findAll.mockResolvedValueOnce([{ id: 1, codigoOrigen: 'EC-006' }]);
@@ -1180,6 +1294,57 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
       jest.spyOn(service, 'createInBulk').mockRejectedValue(new Error('VigiFlow caído'));
 
       await expect((service as any).handleCron()).resolves.toBeUndefined();
+    });
+  });
+
+  /*
+   * Copia de depuración de los Excel que devuelve VigiFlow. Lo que se descarga es efímero
+   * —se parsea y se descarta—, así que sin esta copia no hay nada que inspeccionar cuando
+   * una importación produce datos raros.
+   */
+  describe('copia de depuración de los Excel de VigiFlow', () => {
+    const enero = new Date(Date.UTC(2025, 0, 1));
+    const finEnero = new Date(Date.UTC(2025, 0, 31, 23, 59, 59, 999));
+
+    it('con ENV=DEV escribe los dos libros en upload_files/files_meddra', async () => {
+      const service = createService({ ENV: 'DEV' });
+
+      await service.createInBulk(enero, finEnero);
+
+      expect(fsPromises.mkdir).toHaveBeenCalledWith(
+        expect.stringContaining(['upload_files', 'files_meddra'].join(require('path').sep)),
+        { recursive: true },
+      );
+      const nombresEscritos = (fsPromises.writeFile as jest.Mock).mock.calls.map(([ruta]) =>
+        String(ruta).split(require('path').sep).pop(),
+      );
+      expect(nombresEscritos).toEqual([
+        'borrar.2025_01__2025_01_aefi.xlsx',
+        'borrar.2025_01__2025_01_report.xlsx',
+      ]);
+    });
+
+    it('no escribe nada fuera de ENV=DEV', async () => {
+      const service = createService({ ENV: 'PROD' });
+
+      await service.createInBulk(enero, finEnero);
+
+      expect(fsPromises.writeFile).not.toHaveBeenCalled();
+      expect(fsPromises.mkdir).not.toHaveBeenCalled();
+    });
+
+    /*
+     * La copia es una ayuda de depuración: que falle por permisos o disco lleno no puede
+     * tumbar una importación que por lo demás iba bien.
+     */
+    it('no interrumpe la importación si no se puede escribir el archivo', async () => {
+      const service = createService({ ENV: 'DEV' });
+      (fsPromises.writeFile as jest.Mock).mockRejectedValueOnce(new Error('EACCES'));
+
+      const resumen = await service.createInBulk(enero, finEnero);
+
+      expect(resumen.completados).toBe(1);
+      expect(resumen.fallidos).toEqual([]);
     });
   });
 });

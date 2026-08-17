@@ -162,6 +162,18 @@ export const AdminPage = () => {
       </Alert>
 
       <Stack spacing={2}>
+        {/*
+          Va primero por ser la menos destructiva de las dos: si alguien entra a "limpiar
+          las notificaciones", lo primero que encuentra es la acción acotada y no la que
+          además se lleva por delante los diccionarios.
+        */}
+        <AdminAction
+          title="Truncar solo notificaciones"
+          description="Elimina todas las notificaciones y sus datos dependientes (vacunas, ESAVI, desenlaces, gravedad, causalidad, medicamentos) mediante TRUNCATE CASCADE. Los diccionarios WHODrug y MedDRA se conservan intactos, así que no hace falta volver a sincronizarlos."
+          buttonLabel="Truncar notificaciones"
+          confirmMessage="¿Está seguro de que desea eliminar TODAS las notificaciones y sus datos relacionados? Los diccionarios WHODrug y MedDRA, los parámetros de configuración y el historial de sincronizaciones se conservan. Esta acción no se puede deshacer."
+          onConfirm={() => intESAVIClient.delete("seed/truncate-solo-notificaciones")}
+        />
         <AdminAction
           title="Truncar datos y diccionarios"
           description="Elimina todas las notificaciones y sus datos dependientes (vacunas, ESAVI, desenlaces, gravedad, causalidad, medicamentos) y vacía los diccionarios WHODrug y MedDRA, mediante TRUNCATE CASCADE. Se conservan los parámetros de configuración y el historial de sincronizaciones."

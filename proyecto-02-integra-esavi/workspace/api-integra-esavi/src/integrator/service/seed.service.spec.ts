@@ -664,6 +664,59 @@ describe('SeedService', () => {
     });
   });
 
+  // ─── truncateSoloNotificaciones ─────────────────────────────────────────────
+
+  describe('truncateSoloNotificaciones', () => {
+    it('trunca TR_NOTIFICACION en cascada y libera el queryRunner', async () => {
+      const qr = makeQueryRunner();
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateSoloNotificaciones();
+
+      expect(qr.query).toHaveBeenCalledWith('TRUNCATE TABLE "DHI_ESAVI"."TR_NOTIFICACION" CASCADE;');
+      expect(qr.release).toHaveBeenCalledTimes(1);
+    });
+
+    /*
+     * Es lo que separa esta acción de `truncateNotificacion`: si algún día se le colara un
+     * esquema de diccionario, la diferencia entre las dos desaparecería sin que nada avise
+     * —y volver a cargar WHODrug cuesta varios minutos y credenciales de la UMC—.
+     */
+    it('no consulta el catálogo ni toca los esquemas de diccionarios', async () => {
+      const qr = makeQueryRunner();
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateSoloNotificaciones();
+
+      const sentencias = qr.query.mock.calls.map(([sql]) => sql as string);
+      expect(sentencias.some((sql) => sql.includes('information_schema.tables'))).toBe(false);
+      const truncate = sentencias.find((sql) => sql.startsWith('TRUNCATE'));
+      expect(truncate).not.toContain('WHO_DRUG');
+      expect(truncate).not.toContain('MEDDRA');
+      expect(truncate).not.toContain('TC_PARAMETRO');
+      expect(truncate).not.toContain('TR_SYNC_PROCESS');
+    });
+
+    it('restablece las claves foráneas antes de terminar', async () => {
+      const qr = makeQueryRunner();
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await service.truncateSoloNotificaciones();
+
+      expect(qr.query).toHaveBeenCalledWith('SET session_replication_role = replica;');
+      expect(qr.query).toHaveBeenCalledWith('SET session_replication_role = DEFAULT;');
+    });
+
+    it('relanza el error y libera el queryRunner si falla', async () => {
+      const qr = makeQueryRunner();
+      qr.query.mockRejectedValueOnce(new Error('sin permisos'));
+      mockNotificacionRepo.manager.connection.createQueryRunner.mockReturnValue(qr);
+
+      await expect(service.truncateSoloNotificaciones()).rejects.toThrow('sin permisos');
+      expect(qr.release).toHaveBeenCalledTimes(1);
+    });
+  });
+
   // ─── truncateNotificacion ───────────────────────────────────────────────────
 
   describe('truncateNotificacion', () => {

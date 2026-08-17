@@ -18,6 +18,29 @@ describe('VigiflowUtils', () => {
     });
   });
 
+  describe('nombreArchivoRespaldo', () => {
+    it('compone el nombre con el prefijo borrar y el rango en AAAA_MM', () => {
+      const inicio = new Date(Date.UTC(2025, 0, 1));
+      const fin = new Date(Date.UTC(2025, 2, 31));
+
+      expect(VigiflowUtils.nombreArchivoRespaldo(inicio, fin, 'aefi')).toBe(
+        'borrar.2025_01__2025_03_aefi.xlsx',
+      );
+      expect(VigiflowUtils.nombreArchivoRespaldo(inicio, fin, 'report')).toBe(
+        'borrar.2025_01__2025_03_report.xlsx',
+      );
+    });
+
+    it('rellena con cero el mes de un solo dígito', () => {
+      const inicio = new Date(Date.UTC(2024, 8, 5));
+      const fin = new Date(Date.UTC(2024, 8, 30));
+
+      expect(VigiflowUtils.nombreArchivoRespaldo(inicio, fin, 'aefi')).toBe(
+        'borrar.2024_09__2024_09_aefi.xlsx',
+      );
+    });
+  });
+
   describe('analizarCadenaFecha', () => {
     it('convierte una cadena YYYYMMDD válida a fecha UTC', () => {
       expect(VigiflowUtils.analizarCadenaFecha('20230113')).toEqual(new Date(Date.UTC(2023, 0, 13)));

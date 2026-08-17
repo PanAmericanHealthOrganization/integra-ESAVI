@@ -13,13 +13,14 @@ import { DestinatarioNotificacion } from 'src/mensajes/models/notificacion.inter
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
-import { IWhodrugVaccineMatch } from 'src/whodrugs/models/dtos';
+import { ICodificacionVacunaWhodrug, IWhodrugVaccineMatch } from 'src/whodrugs/models/dtos';
 import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { IngredientTranslationService } from 'src/whodrugs/services/ingredientsTraslations.service';
 import { MaholderService } from 'src/whodrugs/services/maholder.service';
 import { RangoFechasUtils } from 'src/utils/rango-fechas.util';
-import { read, utils, WorkBook } from 'xlsx';
+import * as path from 'path';
+import { read, utils, WorkBook, write } from 'xlsx';
 import {
   CreateCompleteDto,
   CreateDatoEsaviDto,
@@ -227,12 +228,58 @@ export class VigiflowIntegradorService {
         // Excel para actualizar los elementos
         const reportTwo = await this.vigiflowCrawlerService.retrieveJsonReport(fechaInicioFmrt, fechaFinFmrt, codigoATC, jwt);
 
+        await this.guardarCopiaDeDepuracion(reportOne, reportTwo, fechaInicio, fechaFin);
+
         await this.procesarWorkbooks(reportOne, reportTwo);
       },
       fechaInicio,
       fechaFin,
       usuario,
     );
+  }
+
+  /**
+   * Deja en disco una copia de los dos Excel que VigiFlow acaba de devolver.
+   *
+   * Sólo corre con `ENV=DEV`. Lo que llega de VigiFlow es efímero —se descarga, se parsea y
+   * se descarta—, así que cuando una importación produce datos raros no queda nada que
+   * inspeccionar. Con la copia se puede reproducir el caso contra el mismo archivo.
+   *
+   * Se serializan los WorkBook ya parseados y no el cuerpo original de la respuesta: es lo
+   * que el crawler entrega (`retrieveExcelReport` devuelve el resultado de `read`), y para
+   * depurar interesa precisamente lo que el parser vio, no lo que viajó por la red.
+   *
+   * Nunca lanza. Es una ayuda de depuración: que falle por permisos o por disco lleno no
+   * puede tumbar una importación que, por lo demás, iba bien.
+   */
+  private async guardarCopiaDeDepuracion(
+    aefi: WorkBook,
+    report: WorkBook,
+    fechaInicio: Date,
+    fechaFin: Date,
+  ): Promise<void> {
+    if (this.configService.get<string>('ENV') !== 'DEV') return;
+
+    const directorio = path.join(process.cwd(), 'upload_files', 'files_meddra');
+    try {
+      await fs.mkdir(directorio, { recursive: true });
+
+      for (const [libro, sufijo] of [
+        [aefi, 'aefi'],
+        [report, 'report'],
+      ] as const) {
+        const nombre = VigiflowUtils.nombreArchivoRespaldo(fechaInicio, fechaFin, sufijo);
+        // `Uint8Array` y no `Buffer`: xlsx declara su propio tipo `Buffer`, incompatible
+        // con el de Node, y writeFile acepta cualquier vista de ArrayBuffer.
+        const contenido = write(libro, { type: 'buffer', bookType: 'xlsx' }) as Uint8Array;
+        await fs.writeFile(path.join(directorio, nombre), contenido);
+        this.logger.log(`VigiFlow (ENV=DEV): copia guardada en upload_files/files_meddra/${nombre}`);
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `VigiFlow: no se pudo guardar la copia de depuración en ${directorio}: ${error?.message ?? error}`,
+      );
+    }
   }
 
   /* ARCHIVOS LOCALES */
@@ -670,6 +717,10 @@ export class VigiflowIntegradorService {
     // Varias filas de la hoja suelen repetir la misma vacuna/laboratorio.
     const whodrugVaccineCache = new Map<string, IWhodrugVaccineMatch | null>();
 
+    // Misma idea para la codificación WHODrug (DRUG_CODE y los dos MPID): un lote repite la
+    // misma vacuna decenas de veces y cada acierto cuesta una o dos consultas.
+    const codificacionVacunaCache = new Map<string, ICodificacionVacunaWhodrug | null>();
+
     // El bloque de embarazo es único por notificación, pero la edad gestacional viene a nivel de
     // fila (una por medicamento): se retiene la primera fila con un valor válido.
     this.edadGestacionalPorNotificacion.clear();
@@ -852,6 +903,53 @@ export class VigiflowIntegradorService {
                   );
                 }
               }
+            }
+          }
+
+          /*
+           * Codificación WHODrug: DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID.
+           *
+           * Va fuera del bloque anterior y no depende de VIGIFLOW_USE_WHODRUG_GLOBAL: es la
+           * estrategia definida para todo lo que entre por VigiFlow, y esa bandera viene en
+           * `false` por defecto, con lo que dentro no se ejecutaría nunca.
+           *
+           * El principio activo se toma en crudo de la columna F, no de
+           * `principioActivoWHODrugVigiFlow`: `limpiarCampoWHODrug` sustituye las comas por
+           * punto y coma, y eso rompería la igualdad exacta contra INT_INGREDIENT en
+           * cualquier ingrediente que lleve coma en su nombre.
+           */
+          const principioActivoCrudo = reg['F'] ? reg['F'].toString() : null;
+          const laboratorioTitularCrudo = reg['I'] ? reg['I'].toString() : null;
+          // Columna E en crudo, por el mismo motivo que la F: `limpiarCampoWHODrug`
+          // sustituye comas por punto y coma y alteraría el parecido contra DRU_NAME.
+          const nombreMedicamentoCrudo = reg['E'] ? reg['E'].toString() : null;
+          if (principioActivoCrudo?.trim()) {
+            const claveCodificacion = [
+              principioActivoCrudo.trim(),
+              laboratorioTitularCrudo?.trim() ?? '',
+              nombreMedicamentoCrudo?.trim() ?? '',
+            ].join('|');
+            let codificacion: ICodificacionVacunaWhodrug | null;
+            if (codificacionVacunaCache.has(claveCodificacion)) {
+              codificacion = codificacionVacunaCache.get(claveCodificacion);
+            } else {
+              codificacion = await this.ingredientTranslationService.buscarCodificacionVacuna(
+                principioActivoCrudo,
+                laboratorioTitularCrudo,
+                nombreMedicamentoCrudo,
+              );
+              codificacionVacunaCache.set(claveCodificacion, codificacion);
+            }
+
+            if (codificacion) {
+              updateDatoVacuna.drugCode = codificacion.drugCode;
+              updateDatoVacuna.medicinalProductId = codificacion.medicinalProductId;
+              updateDatoVacuna.maHolderMedicinalProductId = codificacion.maHolderMedicinalProductId;
+              // El nombre y el titular salen de la misma fila que los códigos: si se
+              // dejaran los que resolvió el bloque anterior, DRUG_NAME podría describir un
+              // medicamento distinto del que identifica DRUG_CODE.
+              updateDatoVacuna.drugName = codificacion.drugName;
+              updateDatoVacuna.maHolder = codificacion.maHolder;
             }
           }
 
