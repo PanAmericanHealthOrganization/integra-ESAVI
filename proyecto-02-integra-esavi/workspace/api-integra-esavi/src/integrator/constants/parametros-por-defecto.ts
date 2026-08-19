@@ -11,8 +11,8 @@
  * `WHD_UMC_LICENSE_KEY` del entorno.
  *
  * `es_encriptado` es true únicamente para contraseñas y llaves/tokens sensibles
- * (DHIS2_USER_KEY, *_PASSWD, WHD_UMC_*_KEY). El resto (URLs, usuarios, client id,
- * grant type, scope) no son secretos y viajan en texto plano.
+ * (*_PASSWD, WHD_UMC_*_KEY). El resto (URLs, usuarios, client id, grant type,
+ * scope) no son secretos y viajan en texto plano.
  */
 export interface ParametroPorDefecto {
   modulo: string;
@@ -37,13 +37,6 @@ export const PARAMETROS_POR_DEFECTO: ParametroPorDefecto[] = [
     valor: 'CcPKoI4rpPZ',
     descripcion: 'Unidad organizativa raíz sobre la que se consultan las instancias del tracker',
     es_encriptado: false,
-  },
-  {
-    modulo: 'DHIS2',
-    clave: 'DHIS2_USER_KEY',
-    valor: 'CAMBIAR_DHIS2_USER_KEY',
-    descripcion: 'Personal Access Token de DHIS2 (valor dummy de desarrollo, reemplazar antes de usar)',
-    es_encriptado: true,
   },
   {
     modulo: 'DHIS2',

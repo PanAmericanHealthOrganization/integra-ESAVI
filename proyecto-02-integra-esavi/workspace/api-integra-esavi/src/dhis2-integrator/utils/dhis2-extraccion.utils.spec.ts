@@ -14,16 +14,43 @@ describe('Dhis2ExtraccionUtils', () => {
   // ─── getConfig ───────────────────────────────────────────────────────────
 
   describe('getConfig', () => {
-    it('arma la cabecera Authorization con ApiToken desde DHIS2_USER_KEY (TC_PARAMETRO)', async () => {
+    it('arma la cabecera Authorization básica desde DHIS2_USERNAME y DHIS2_PASSWD (TC_PARAMETRO)', async () => {
       const config = await Dhis2ExtraccionUtils.getConfig(
-        makeParametroService({ DHIS2_USER_KEY: 'd2pat_xyz' }),
+        makeParametroService({ DHIS2_USERNAME: 'carlos.pinto', DHIS2_PASSWD: 'secreto' }),
       );
-      expect(config.headers.Authorization).toBe('ApiToken d2pat_xyz');
+      const esperado = Buffer.from('carlos.pinto:secreto').toString('base64');
+      expect(config.headers.Authorization).toBe(`Basic ${esperado}`);
       expect(config.maxBodyLength).toBe(Infinity);
     });
 
-    it('lanza cuando el parámetro DHIS2_USER_KEY no está configurado', async () => {
-      await expect(Dhis2ExtraccionUtils.getConfig(makeParametroService())).rejects.toThrow();
+    it('no usa Personal Access Token: los PAT de DHIS2 pueden restringirse por IP de origen', async () => {
+      const config = await Dhis2ExtraccionUtils.getConfig(
+        makeParametroService({ DHIS2_USERNAME: 'usuario', DHIS2_PASSWD: 'clave' }),
+      );
+      expect(config.headers.Authorization).not.toContain('ApiToken');
+    });
+
+    it('codifica correctamente contraseñas con caracteres no ASCII', async () => {
+      const config = await Dhis2ExtraccionUtils.getConfig(
+        makeParametroService({ DHIS2_USERNAME: 'usuario', DHIS2_PASSWD: 'contraseña#ñ' }),
+      );
+      const decodificado = Buffer.from(
+        config.headers.Authorization.replace('Basic ', ''),
+        'base64',
+      ).toString('utf8');
+      expect(decodificado).toBe('usuario:contraseña#ñ');
+    });
+
+    it('lanza cuando el parámetro DHIS2_USERNAME no está configurado', async () => {
+      await expect(
+        Dhis2ExtraccionUtils.getConfig(makeParametroService({ DHIS2_PASSWD: 'clave' })),
+      ).rejects.toThrow();
+    });
+
+    it('lanza cuando el parámetro DHIS2_PASSWD no está configurado', async () => {
+      await expect(
+        Dhis2ExtraccionUtils.getConfig(makeParametroService({ DHIS2_USERNAME: 'usuario' })),
+      ).rejects.toThrow();
     });
   });
 

@@ -10,4 +10,5 @@ export {
   IATC,
   IWhodrugVaccineMatch,
   ICodificacionVacunaWhodrug,
+  ICodificacionVacunaWhodrugConDrugId,
 } from './drug.dto';

@@ -79,14 +79,16 @@ export class DimCompletitudService {
     const resultados = [];
     for (const evalItem of evaluacion) {
       for (const columna of evalItem.columnas) {
+        // count(columna) sólo cuenta valores no nulos, así que la fila de inválidos
+        // —count(columna) restringido a las filas donde es nula— daba 0 por definición y la
+        // completitud salía 100% aunque el detalle sí listara notificaciones. El conteo va
+        // sobre count(*), que es el universo real de filas evaluadas.
         const query = `
             select
-            count(tp."${columna}") as "totalRegistros",
-            count(tp."${columna}") filter (where tp."${columna}" is not null) "totalRegistrosValidos",
-            count(tp."${columna}") filter (where tp."${columna}" is null) "totalRegistrosNoValidos",
-            coalesce(json_agg(DISTINCT tp."${
-              evalItem.joinColumn
-            }") filter (where tp."${columna}" is null), '[]') as "idNotificacionesNoValidos"
+            count(*) as "totalRegistros",
+            count(*) filter (where tp."${columna}" is not null) "totalRegistrosValidos",
+            count(*) filter (where tp."${columna}" is null) "totalRegistrosNoValidos",
+            coalesce(json_agg(DISTINCT tn."ID") filter (where tp."${columna}" is null), '[]') as "idNotificacionesNoValidos"
             from
               "DHI_ESAVI"."${evalItem.tabla}" tp inner 
               join "DHI_ESAVI"."TR_NOTIFICACION" tn

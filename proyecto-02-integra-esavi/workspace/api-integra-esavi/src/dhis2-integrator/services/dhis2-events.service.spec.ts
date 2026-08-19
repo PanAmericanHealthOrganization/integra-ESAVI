@@ -19,7 +19,8 @@ const mockParametroService = {
   getValor: jest.fn(async (modulo: string, clave: string) => {
     const valores: Record<string, string> = {
       DHIS2_URL: 'http://dhis2.test',
-      DHIS2_USER_KEY: 'd2pat_prueba',
+      DHIS2_USERNAME: 'usuario_prueba',
+      DHIS2_PASSWD: 'clave_prueba',
       DHIS2_ROOT_ORG_UNIT: ORG_UNIT_RAIZ,
     };
     if (modulo === 'DHIS2' && valores[clave] !== undefined) {
@@ -176,13 +177,15 @@ describe('Dhis2EventsService', () => {
       expect(uriTracker).toContain('enrollmentEnrolledBefore=2024-12-31');
     });
 
-    it('autentica cada petición con la cabecera ApiToken', async () => {
+    it('autentica cada petición con la cabecera básica', async () => {
       configurarHttp([[teiApi]]);
 
       await service.getEventsReports(PROGRAMA, fechaInicio, fechaFin);
 
+      const esperado = `Basic ${Buffer.from('usuario_prueba:clave_prueba').toString('base64')}`;
+      expect(mockHttpService.get.mock.calls.length).toBeGreaterThan(0);
       for (const [, config] of mockHttpService.get.mock.calls) {
-        expect(config.headers.Authorization).toBe('ApiToken d2pat_prueba');
+        expect(config.headers.Authorization).toBe(esperado);
       }
     });
 

@@ -22,16 +22,27 @@ export abstract class Dhis2ExtraccionUtils {
   }
 
   /**
-   * Configuración común de las peticiones HTTP a DHIS2: autenticación por
-   * Personal Access Token leído del parámetro DHIS2_USER_KEY en TC_PARAMETRO
-   * en cada consulta. Lanza si el parámetro no existe.
+   * Configuración común de las peticiones HTTP a DHIS2: autenticación básica con
+   * el usuario y la contraseña de los parámetros DHIS2_USERNAME y DHIS2_PASSWD
+   * en TC_PARAMETRO, leídos en cada consulta. Lanza si algún parámetro no existe.
+   *
+   * Se usa autenticación básica y no un Personal Access Token porque los PAT de
+   * DHIS2 admiten una lista blanca de IPs de origen: si el servidor que ejecuta
+   * la sincronización sale por una IP distinta a la registrada, DHIS2 responde
+   * «Failed to authenticate API token, request ip address is not allowed» y la
+   * importación falla entera. La autenticación básica no está sujeta a esa
+   * restricción, así que no se rompe al cambiar de red o de servidor.
    */
   static async getConfig(parametroService: ParametroService) {
-    const token = await parametroService.getValor(Dhis2ExtraccionUtils.MODULO, 'DHIS2_USER_KEY');
+    const [usuario, clave] = await Promise.all([
+      parametroService.getValor(Dhis2ExtraccionUtils.MODULO, 'DHIS2_USERNAME'),
+      parametroService.getValor(Dhis2ExtraccionUtils.MODULO, 'DHIS2_PASSWD'),
+    ]);
+    const credenciales = Buffer.from(`${usuario}:${clave}`).toString('base64');
     return {
       maxBodyLength: Infinity,
       headers: {
-        Authorization: `ApiToken ${token}`,
+        Authorization: `Basic ${credenciales}`,
       },
     };
   }

@@ -164,26 +164,31 @@ export class GeneralService {
     if (!ids || ids.length === 0) {
       return [];
     }
+    // El origen sale de la columna ORIGEN, que ambos integradores escriben. Antes se deducía
+    // de CODIGO_DHIS2_EVENTO, una columna que no existe en TR_NOTIFICACION: el detalle
+    // reventaba con un 500 en cuanto una regla encontraba notificaciones que listar.
+    //
+    // El join a TR_PACIENTE es LEFT: varias reglas señalan datos faltantes del paciente, y
+    // con INNER JOIN esas mismas notificaciones desaparecían del listado que las denuncia.
     const q = `
       SELECT
       tn."ID",
       tn."FECHA_NOTIFICACION",
-      CASE
-        WHEN tn."CODIGO_DHIS2_EVENTO" IS NOT NULL THEN 'DHIS2'
-        ELSE 'VIGIFLOW'
-      END AS "origen",
+      tn."CODIGO_ORIGEN_NOTIFICACION",
+      tn."ORIGEN"::text AS "origen",
       tp."NOMBRE",
       tp."IDENTIFICACION"
       FROM
       "DHI_ESAVI"."TR_NOTIFICACION" tn
-      INNER JOIN 
-      "DHI_ESAVI"."TR_PACIENTE" tp 
+      LEFT JOIN
+      "DHI_ESAVI"."TR_PACIENTE" tp
       ON
       tp."ID" = tn."PACIENTE_ID"
       WHERE
-      tn."ID" IN (${ids.map((id) => `'${id}'`).join(', ')})
+      tn."ID" = ANY($1)
+      ORDER BY tn."FECHA_NOTIFICACION" DESC NULLS LAST
     `;
-    const result = await this.dataSource.query(q);
+    const result = await this.dataSource.query(q, [ids]);
     // elminar duplicados
     const uniqueResults = Array.from(new Map(result.map((item) => [item.ID, item])).values());
     return uniqueResults;

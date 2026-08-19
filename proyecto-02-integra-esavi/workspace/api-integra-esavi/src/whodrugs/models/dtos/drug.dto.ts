@@ -90,3 +90,16 @@ export interface ICodificacionVacunaWhodrug {
   /** MAHOLDER.MEDICINAL_PRODUCT_ID → TR_DATO_VACUNA.MA_HOLDER_MEDI_PROD_ID */
   maHolderMedicinalProductId: string;
 }
+
+/**
+ * La misma codificación, más el DRUG.ID.
+ *
+ * El identificador interno del medicamento no se persiste en TR_DATO_VACUNA —por eso no está
+ * en `ICodificacionVacunaWhodrug`—, pero hace falta para derivar después el código ATC con
+ * `DrugService.getAtcCodeOfDrug()`, que trabaja con la clave del diccionario y no con
+ * DRU_CODE. Lo usa la homologación de DHIS2, que sí puebla CODIGO_ATC.
+ */
+export interface ICodificacionVacunaWhodrugConDrugId extends ICodificacionVacunaWhodrug {
+  /** DRUG.ID, clave interna del diccionario; no se persiste. */
+  drugId: string;
+}

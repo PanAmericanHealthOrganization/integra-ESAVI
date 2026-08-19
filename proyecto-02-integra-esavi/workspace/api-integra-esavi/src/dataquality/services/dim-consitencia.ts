@@ -24,6 +24,22 @@ export class DimConsistenciaService {
 
   private readonly logger = new Logger(DimConsistenciaService.name);
 
+  /** La notificación tiene al menos un ESAVI con término MedDRA homologado. */
+  private readonly EXISTE_ESAVI = `exists (
+    select 1 from "DHI_ESAVI"."TR_DATOS_ESAVI" e
+    where e."NOTIFICACION_ID" = tn."ID" and e."NOMBRE_ESAVI" is not null
+  )`;
+
+  /** La notificación tiene al menos una vacuna con fecha de administración y código ATC. */
+  private readonly EXISTE_VACUNA_COMPLETA = `exists (
+    select 1
+    from "DHI_ESAVI"."TR_DATO_VACUNACION" dv
+    inner join "DHI_ESAVI"."TR_DATO_VACUNA" v on v."DATO_VACUNACION_ID" = dv."ID"
+    where dv."NOTIFICACION_ID" = tn."ID"
+      and dv."FECHA_VACUNACION" is not null
+      and v."CODIGO_ATC" is not null
+  )`;
+
   /**
    *
    * @param day
@@ -177,16 +193,6 @@ export class DimConsistenciaService {
   private async _noFechasFuturas(day: Date): Promise<CalidadDatosResultadoDto[]> {
     this.logger.log(`Iniciando evaluación de no fechas futuras para el día ${day.toISOString()}`);
 
-    // Mapeo de tablas a sus columnas ID
-    const tableIdMap = {
-      TR_NOTIFICACION: 'ID',
-      TR_PACIENTE: 'ID',
-      TR_ESAVI_DURANTE_EMBARAZO: 'ID',
-      TR_DATO_VACUNACION: 'ID',
-      TR_DESENLACE_ESAVI: 'ID',
-      TR_DATOS_ESAVI: 'ID',
-    };
-
     const evaluacion = [
       {
         tabla: 'TR_NOTIFICACION',
@@ -199,21 +205,23 @@ export class DimConsistenciaService {
       { tabla: 'TR_ESAVI_DURANTE_EMBARAZO', columnas: ['FECHAULTIMAMENSTRUACIONESAVI'] },
       { tabla: 'TR_DATO_VACUNACION', columnas: ['FECHA_VACUNACION'] },
       { tabla: 'TR_DESENLACE_ESAVI', columnas: ['FECHAMUERTE', 'FECHANOTIFICAMUERTE'] },
-      { tabla: 'TR_PACIENTE', columnas: ['FECHA_NACIMIENTO'] },
     ];
     const resultados = [];
     for (const evalItem of evaluacion) {
-      const idColumn = tableIdMap[evalItem.tabla] || 'ID';
+      // Antes había aquí un mapa de tablas a su columna ID que devolvía 'ID' para todas: el
+      // detalle terminaba con el PK de la tabla evaluada y quedaba vacío al resolverse
+      // contra TR_NOTIFICACION.
+      const { from, idNotificacion, fechaNotificacion } = DataQualityUtils.origenNotificacion(evalItem.tabla, 'tp');
       for (const columna of evalItem.columnas) {
         const query = `
         select
         count(tp."${columna}") filter (where tp."${columna}" is not null) as "totalRegistros",
         count(tp."${columna}") filter (where tp."${columna}" <= tp."AUD_FECHA_CREACION") "totalRegistrosValidos",
         count(tp."${columna}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION") "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tp."${idColumn}") filter (where tp."${columna}" > tp."AUD_FECHA_CREACION"), '[]') as "idNotificacionesNoValidos"
+        coalesce(json_agg(DISTINCT ${idNotificacion}) filter (where tp."${columna}" > tp."AUD_FECHA_CREACION"), '[]') as "idNotificacionesNoValidos"
         from
-          "DHI_ESAVI"."${evalItem.tabla}" tp
-        where tp."AUD_FECHA_CREACION" <= '${day.toISOString()}';`;
+          ${from}
+        where ${fechaNotificacion} <= '${day.toISOString()}';`;
         const result = await this.dataSource.query(query);
         //
         const totales = await DataQualityUtils.construirResultado(result);
@@ -316,6 +324,11 @@ export class DimConsistenciaService {
    */
   private async _notificacionEnviada(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de notificación enviada para el día ${day.toISOString()}`);
+    // La regla busca notificaciones sin fecha de notificación, pero el WHERE exigía que esa
+    // fecha existiera: se anulaba a sí misma y siempre daba 100%. Como la ventana del periodo
+    // también se apoya en esa fecha, para las que no la tienen se cae a la fecha de carga;
+    // es el único caso del módulo donde AUD_FECHA_CREACION es el criterio correcto, porque
+    // sin fecha del hecho no hay otra forma de ubicar la notificación en el tiempo.
     const query = `
       select
       count(*) as "totalRegistros",
@@ -325,9 +338,7 @@ export class DimConsistenciaService {
       from 
       "DHI_ESAVI"."TR_NOTIFICACION" tn
       where
-      tn."FECHA_NOTIFICACION" is not null
-      and
-      tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+      coalesce(tn."FECHA_NOTIFICACION", tn."AUD_FECHA_CREACION") <= '${day.toISOString()}'
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -350,16 +361,18 @@ export class DimConsistenciaService {
    */
   private async _integridadEsavi(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad ESAVI para el día ${day.toISOString()}`);
+    // Con INNER JOIN a TR_DATOS_ESAVI, una notificación sin ningún evento registrado quedaba
+    // fuera del conjunto evaluado: la regla no podía detectar precisamente el caso que mide.
+    // El EXISTS la mantiene dentro y además evita contar varias veces las que tienen más de
+    // un ESAVI.
     const query = `
       select
       count(*) as "totalRegistros",
-      count(*) filter (where tde."NOMBRE_ESAVI" is not null) as "totalRegistrosValidos",
-      count(*) filter (where tde."NOMBRE_ESAVI" is null) as "totalRegistrosNoValidos",
-      coalesce(json_agg(DISTINCT tn."ID") filter (where tde."NOMBRE_ESAVI" is null), '[]') as "idNotificacionesNoValidos"
+      count(*) filter (where ${this.EXISTE_ESAVI}) as "totalRegistrosValidos",
+      count(*) filter (where not ${this.EXISTE_ESAVI}) as "totalRegistrosNoValidos",
+      coalesce(json_agg(DISTINCT tn."ID") filter (where not ${this.EXISTE_ESAVI}), '[]') as "idNotificacionesNoValidos"
       from
       "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
-      tde."NOTIFICACION_ID" = tn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
@@ -379,21 +392,9 @@ export class DimConsistenciaService {
     };
   }
 
-  private async _integridadLoteVacuna(day: Date): Promise<CalidadDatosResultadoDto> {
-    this.logger.log(`Iniciando evaluación de integridad Lote Vacuna para el día ${day.toISOString()}`);
-    const query = ``;
-    const result = await this.dataSource.query(query);
-    const totales = await DataQualityUtils.construirResultado(result);
-    return {
-      codigo: 'CON_INTRA_OO3',
-      subDimension: SUB_DIMENSION_CALIDAD.CONS_INTRARELACION,
-      regla: 'Integridad vacuna-lote',
-      condicion: 'La información del lote de la vacuna debe estar completa y asociada correctamente a la vacuna.',
-      descripcionRegla:
-        'Si se registra una vacuna administrada, debe existir un lote asociado con información completa.',
-      ...totales,
-    };
-  }
+  // _integridadLoteVacuna se retiró: su query era una cadena vacía y processAll nunca la
+  // invocaba, así que la regla CON_INTRA_OO3 no llegó a existir en el reporte. Si se
+  // reactiva, tiene que escribirse el SQL antes de sumarla a processAll.
 
   /**
    *
@@ -402,38 +403,11 @@ export class DimConsistenciaService {
    */
   private async _integridadFechaNacimiento(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Nacimiento para el día ${day.toISOString()}`);
-    const query = `
-      select
-        count(*) as "totalRegistros",
-        count(*) filter (
-          where
-            tp."FECHA_NACIMIENTO" < tdv."FECHA_VACUNACION"
-            and tp."FECHA_NACIMIENTO" < tde."FECHA_ESAVI"
-            and tp."FECHA_NACIMIENTO" < tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where
-            tp."FECHA_NACIMIENTO" >= tdv."FECHA_VACUNACION"
-            or tp."FECHA_NACIMIENTO" >= tde."FECHA_ESAVI"
-            or tp."FECHA_NACIMIENTO" >= tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tp."FECHA_NACIMIENTO" >= tdv."FECHA_VACUNACION" or tp."FECHA_NACIMIENTO" >= tde."FECHA_ESAVI" or tp."FECHA_NACIMIENTO" >= tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-        tn."PACIENTE_ID"= tp."ID" 
-      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
-        tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
-      where
-        tn."FECHA_NOTIFICACION" is not null
-        and tp."FECHA_NACIMIENTO" is not null
-        and tde."FECHA_ESAVI" is not null
-        and tdv."FECHA_VACUNACION" is not null
-        and tp."FECHA_NACIMIENTO" <= '${day.toISOString()}'
-      ;
-    `;
+    const query =
+      DataQualityUtils.cteFechasNotificacion(day) +
+      DataQualityUtils.selectIntegridadFechas(
+        'f_nacimiento < f_vacunacion and f_nacimiento < f_esavi and f_nacimiento < f_notificacion',
+      );
     const result = await this.dataSource.query(query);
 
     //
@@ -456,24 +430,16 @@ export class DimConsistenciaService {
    */
   private async _integridadVacunaAndFechaVacunacion(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Vacuna y Fecha de Vacunación para el día ${day.toISOString()}`);
+    // Igual que en _integridadEsavi: con INNER JOIN, una notificación sin ninguna vacuna
+    // registrada desaparecía del conjunto en lugar de contarse como no válida.
     const query = `
       select
         count(*) as "totalRegistros",
-        count(*) filter (
-        where
-        tdvn."FECHA_VACUNACION" is not null
-        and tdv."CODIGO_ATC" is not null) as "totalRegistrosValidos",
-        count(*) filter (
-        where
-        tdvn."FECHA_VACUNACION" is null
-        or tdv."CODIGO_ATC" is null) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tdvn."FECHA_VACUNACION" is null or tdv."CODIGO_ATC" is null), '[]') as "idNotificacionesNoValidos"
+        count(*) filter (where ${this.EXISTE_VACUNA_COMPLETA}) as "totalRegistrosValidos",
+        count(*) filter (where not ${this.EXISTE_VACUNA_COMPLETA}) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT tn."ID") filter (where not ${this.EXISTE_VACUNA_COMPLETA}), '[]') as "idNotificacionesNoValidos"
       from
         "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdvn on
-        tdvn."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNA" tdv on
-        tdv."DATO_VACUNACION_ID" = tdvn."ID"
       where
       tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
       ;
@@ -481,7 +447,10 @@ export class DimConsistenciaService {
     const result = await this.dataSource.query(query);
     const totale = await DataQualityUtils.construirResultado(result);
     return {
-      codigo: 'CON_DOM_02',
+      // Antes 'CON_DOM_02', el mismo código que la regla de fecha de nacimiento mínima. Como
+      // qualityProblems localiza la regla con un find() por código, la segunda quedaba
+      // inalcanzable y su detalle nunca se podía consultar.
+      codigo: 'CON_DOM_009',
       subDimension: SUB_DIMENSION_CALIDAD.CONS_INTERRELACION,
       regla: 'El registro de una vacuna debe ir asociado al registro de la fecha de administración de la vacuna',
       condicion:
@@ -498,38 +467,11 @@ export class DimConsistenciaService {
    */
   private async _integridadFechaVacunacion(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Vacunación para el día ${day.toISOString()}`);
-    const query = `
-      select
-        count(*) as "totalRegistros",
-        count(*) filter (
-          where
-             tdv."FECHA_VACUNACION" >= tp."FECHA_NACIMIENTO" AND 
-             tdv."FECHA_VACUNACION" <= tde."FECHA_ESAVI" AND
-              tdv."FECHA_VACUNACION" <= tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where
-             tdv."FECHA_VACUNACION" < tp."FECHA_NACIMIENTO" OR 
-             tdv."FECHA_VACUNACION" > tde."FECHA_ESAVI" OR
-              tdv."FECHA_VACUNACION" > tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tdv."FECHA_VACUNACION" < tp."FECHA_NACIMIENTO" or tdv."FECHA_VACUNACION" > tde."FECHA_ESAVI" or tdv."FECHA_VACUNACION" > tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-        tn."PACIENTE_ID" = tp."ID" 
-      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
-        tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
-      where
-        tn."FECHA_NOTIFICACION" is not null
-        and tp."FECHA_NACIMIENTO" is not null
-        and tde."FECHA_ESAVI" is not null
-        and tdv."FECHA_VACUNACION" is not null
-        and tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
-      ;
-    `;
+    const query =
+      DataQualityUtils.cteFechasNotificacion(day) +
+      DataQualityUtils.selectIntegridadFechas(
+        'f_vacunacion >= f_nacimiento and f_vacunacion <= f_esavi and f_vacunacion <= f_notificacion',
+      );
     const result = await this.dataSource.query(query);
     const totales = await DataQualityUtils.construirResultado(result);
     return {
@@ -550,38 +492,14 @@ export class DimConsistenciaService {
    */
   private async _integridadFechaESAVI(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Fecha de ESAVI para el día ${day.toISOString()}`);
-    const query = `
-      select
-        count(*) as "totalRegistros",
-        count(*) filter (
-          where
-             tde."FECHA_ESAVI" >= tp."FECHA_NACIMIENTO" AND 
-              tde."FECHA_ESAVI" <= tdv."FECHA_VACUNACION" AND
-              tde."FECHA_ESAVI" <= tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where
-              tde."FECHA_ESAVI" < tp."FECHA_NACIMIENTO" OR
-              tde."FECHA_ESAVI" > tdv."FECHA_VACUNACION" OR
-              tde."FECHA_ESAVI" > tn."FECHA_NOTIFICACION"
-        ) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (where tde."FECHA_ESAVI" < tp."FECHA_NACIMIENTO" or tde."FECHA_ESAVI" > tdv."FECHA_VACUNACION" or tde."FECHA_ESAVI" > tn."FECHA_NOTIFICACION"), '[]') as "idNotificacionesNoValidos"
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-        tp."ID" = tn."PACIENTE_ID"
-      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
-        tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
-      where
-        tn."FECHA_NOTIFICACION" is not null
-        and tp."FECHA_NACIMIENTO" is not null
-        and tde."FECHA_ESAVI" is not null
-        and tdv."FECHA_VACUNACION" is not null
-        and tn."FECHA_NOTIFICACION"<= '${day.toISOString()}'
-      ;
-    `;
+    // El evento adverso ocurre DESPUÉS de la vacunación: la versión anterior exigía
+    // FECHA_ESAVI <= FECHA_VACUNACION, contradiciendo la condición documentada abajo, y daba
+    // por válidos justamente los casos cronológicamente imposibles.
+    const query =
+      DataQualityUtils.cteFechasNotificacion(day) +
+      DataQualityUtils.selectIntegridadFechas(
+        'f_esavi >= f_nacimiento and f_esavi >= f_vacunacion and f_esavi <= f_notificacion',
+      );
     const result = await this.dataSource.query(query);
     const totales = await DataQualityUtils.construirResultado(result);
     return {
@@ -603,45 +521,13 @@ export class DimConsistenciaService {
    */
   private async _integridadFechaNotificacion(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Notificación para el día ${day.toISOString()}`);
-    const query = `
-      select
-      count(*) as "totalRegistros",
-      count(*) filter (
-      where
-        tn."FECHA_NOTIFICACION" >= tp."FECHA_NACIMIENTO" AND
-        tn."FECHA_NOTIFICACION" <= tdv."FECHA_VACUNACION" AND
-        tn."FECHA_NOTIFICACION" >= tde."FECHA_ESAVI"
-      ) as "totalRegistrosValidos",
-      count(*) filter (
-      where
-        tn."FECHA_NOTIFICACION" < tp."FECHA_NACIMIENTO" OR
-        tn."FECHA_NOTIFICACION" > tdv."FECHA_VACUNACION" OR
-        tn."FECHA_NOTIFICACION" < tde."FECHA_ESAVI"
-      ) as "totalRegistrosNoValidos",
-      coalesce(
-      json_agg(DISTINCT tn."ID") filter (
-      where
-        tn."FECHA_NOTIFICACION" < tp."FECHA_NACIMIENTO" OR
-        tn."FECHA_NOTIFICACION" > tdv."FECHA_VACUNACION" OR
-        tn."FECHA_NOTIFICACION" < tde."FECHA_ESAVI"
-      ), '[]'
-      ) as "idNotificacionesNoValidos"
-      from
-      "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-      tp."ID" = tn."PACIENTE_ID"
-      inner join "DHI_ESAVI"."TR_DATOS_ESAVI" tde on
-      tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
-      tdv."NOTIFICACION_ID" = tn."ID"
-      where
-      tn."FECHA_NOTIFICACION" is not null
-      and tp."FECHA_NACIMIENTO" is not null
-      and tde."FECHA_ESAVI" is not null
-      and tdv."FECHA_VACUNACION" is not null
-      and tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
-      ;
-    `;
+    // Se notifica DESPUÉS de vacunar: antes se exigía FECHA_NOTIFICACION <= FECHA_VACUNACION,
+    // al revés de la condición documentada abajo.
+    const query =
+      DataQualityUtils.cteFechasNotificacion(day) +
+      DataQualityUtils.selectIntegridadFechas(
+        'f_notificacion >= f_nacimiento and f_notificacion >= f_vacunacion and f_notificacion >= f_esavi',
+      );
     const result = await this.dataSource.query(query);
     const totales = await DataQualityUtils.construirResultado(result);
     return {
@@ -667,50 +553,49 @@ export class DimConsistenciaService {
     this.logger.log(`Iniciando evaluación de integridad Fecha de Muerte para el día ${day.toISOString()}`);
     // Las banderas de gravedad (MUERTE, RIESGO_VIDA, etc.) son varchar en la BD:
     // el integrador DHIS2 guarda '1'/'0' y el de Vigiflow 'true'/'false'.
+    //
+    // La regla sólo aplica a los casos fatales, así que las tres cifras y el detalle parten
+    // del mismo universo. Antes no era así: los válidos no filtraban por MUERTE y el detalle
+    // omitía ese filtro, de modo que listaba muchas más notificaciones de las que el propio
+    // contador de inválidos reportaba. Las fechas de evento y vacunación llegan agregadas por
+    // subconsulta para no multiplicar filas.
     const query = `
-      select
-        count(*) filter (where tge."MUERTE" in ('1', 'true')) as "totalRegistros",
-        count(*) filter (
-          where
-            tde."FECHAMUERTE" is not null
-            and tde."FECHAMUERTE" >= tp."FECHA_NACIMIENTO"
-            and tde."FECHAMUERTE" <= tn."FECHA_NOTIFICACION"
-            and tde."FECHAMUERTE" >= tdv."FECHA_VACUNACION"
-            and tde."FECHAMUERTE" >= tde2."FECHA_ESAVI"
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where 
-            tge."MUERTE" in ('1', 'true') and (
-            tde."FECHAMUERTE" is null
-            or tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO"
-            or tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION"
-            or tde."FECHAMUERTE" < tdv."FECHA_VACUNACION"
-            or tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
+      with casos as (
+        select
+          tn."ID" as id,
+          tn."FECHA_NOTIFICACION" as f_notificacion,
+          tp."FECHA_NACIMIENTO" as f_nacimiento,
+          tde."FECHAMUERTE" as f_muerte,
+          (select min(ev."FECHA_ESAVI") from "DHI_ESAVI"."TR_DATOS_ESAVI" ev
+             where ev."NOTIFICACION_ID" = tn."ID") as f_esavi,
+          (select min(vac."FECHA_VACUNACION") from "DHI_ESAVI"."TR_DATO_VACUNACION" vac
+             where vac."NOTIFICACION_ID" = tn."ID") as f_vacunacion
+        from "DHI_ESAVI"."TR_NOTIFICACION" tn
+        inner join "DHI_ESAVI"."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
+        inner join "DHI_ESAVI"."TR_DESENLACE_ESAVI" tde on tde."NOTIFICACION_ID" = tn."ID"
+        where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+          and exists (
+            select 1 from "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" g
+            where g."NOTIFICACION_ID" = tn."ID" and g."MUERTE" in ('1', 'true')
           )
-        ) as "totalRegistrosNoValidos"
-        
-      , coalesce(json_agg(DISTINCT tn."ID") filter (
-          where
-            tde."FECHAMUERTE" is null
-            or tde."FECHAMUERTE" < tp."FECHA_NACIMIENTO"
-            or tde."FECHAMUERTE" > tn."FECHA_NOTIFICACION"
-            or tde."FECHAMUERTE" < tdv."FECHA_VACUNACION"
-            or tde."FECHAMUERTE" < tde2."FECHA_ESAVI"
-        ), '[]') as "idNotificacionesNoValidos"
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-        tp."ID" = tn."PACIENTE_ID"
-      inner join "DHI_ESAVI"."TR_DESENLACE_ESAVI" tde on
-        tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DATO_VACUNACION" tdv on
-        tdv."NOTIFICACION_ID" = tn."ID"
-      left join "DHI_ESAVI"."TR_DATOS_ESAVI" tde2 on
-        tde2."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tge on
-        tge."NOTIFICACION_ID" = tn."ID"
-      where
-        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+      ),
+      evaluado as (
+        select id,
+          coalesce(
+            f_muerte is not null
+            and f_muerte >= f_nacimiento
+            and f_muerte <= f_notificacion
+            and (f_vacunacion is null or f_muerte >= f_vacunacion)
+            and (f_esavi is null or f_muerte >= f_esavi),
+          false) as es_valido
+        from casos
+      )
+      select
+        count(*) as "totalRegistros",
+        count(*) filter (where es_valido) as "totalRegistrosValidos",
+        count(*) filter (where not es_valido) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT id) filter (where not es_valido), '[]') as "idNotificacionesNoValidos"
+      from evaluado
     ;`;
 
     const result = await this.dataSource.query(query);
@@ -738,55 +623,36 @@ export class DimConsistenciaService {
    */
   private async _integridadGravedadEsavi(date: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Gravedad ESAVI para el día ${date.toISOString()}`);
+    // El universo son los ESAVI graves. Inválido es "no tiene ninguna bandera en verdadero",
+    // no "las tiene todas en falso": con la formulación anterior un caso con alguna bandera
+    // nula no caía ni en válidos ni en inválidos y el porcentaje se calculaba sobre un
+    // denominador que no cuadraba con sus partes.
     const query = `
+      with graves as (
+        select tn."ID" as id,
+          (
+            tge."MUERTE" in ('1', 'true') or
+            tge."RIESGO_VIDA" in ('1', 'true') or
+            tge."DISCAPACIDAD" in ('1', 'true') or
+            tge."HOSPITALIZACION" in ('1', 'true') or
+            tge."ANOMALIA_CONGENITA" in ('1', 'true') or
+            tge."ABORTO" in ('1', 'true') or
+            tge."MUERTE_FETAL" in ('1', 'true')
+          ) as tiene_motivo
+        from "DHI_ESAVI"."TR_NOTIFICACION" tn
+        inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tge on tge."NOTIFICACION_ID" = tn."ID"
+        where tn."FECHA_NOTIFICACION" <= '${date.toISOString()}'
+          and tge."TIPO_GRAVEDAD" = 'GRAVE'
+      ),
+      evaluado as (
+        select id, coalesce(tiene_motivo, false) as es_valido from graves
+      )
       select
-      count(*) filter (where tde."TIPO_GRAVEDAD" = 'GRAVE') as "totalRegistros",
-      count(*) filter (
-        where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
-        (
-          tde."MUERTE" in ('1', 'true') OR
-          tde."RIESGO_VIDA" in ('1', 'true') OR
-          tde."DISCAPACIDAD" in ('1', 'true') OR
-          tde."HOSPITALIZACION" in ('1', 'true') OR
-          tde."ANOMALIA_CONGENITA" in ('1', 'true') OR
-          tde."ABORTO" in ('1', 'true') OR
-          tde."MUERTE_FETAL" in ('1', 'true')
-        ))
-      ) as "totalRegistrosValidos",
-      count(*) filter (
-        where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
-        (
-          tde."MUERTE" in ('0', 'false') AND
-          tde."RIESGO_VIDA" in ('0', 'false') AND
-          tde."DISCAPACIDAD" in ('0', 'false') AND
-          tde."HOSPITALIZACION" in ('0', 'false') AND
-          tde."ANOMALIA_CONGENITA" in ('0', 'false') AND
-          tde."ABORTO" in ('0', 'false') AND
-          tde."MUERTE_FETAL" in ('0', 'false')
-        ))
-      ) as "totalRegistrosNoValidos"
-      , coalesce(json_agg(DISTINCT tn."ID") filter (
-        where
-        (tde."TIPO_GRAVEDAD" = 'GRAVE' and
-        (
-          tde."MUERTE" in ('0', 'false') AND
-          tde."RIESGO_VIDA" in ('0', 'false') AND
-          tde."DISCAPACIDAD" in ('0', 'false') AND
-          tde."HOSPITALIZACION" in ('0', 'false') AND
-          tde."ANOMALIA_CONGENITA" in ('0', 'false') AND
-          tde."ABORTO" in ('0', 'false') AND
-          tde."MUERTE_FETAL" in ('0', 'false')
-        ))
-      ), '[]') as "idNotificacionesNoValidos"
-      
-      from
-      "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tde on
-      tde."NOTIFICACION_ID" = tn."ID"
-      where
-      tn."FECHA_NOTIFICACION" <= '${date.toISOString()}'
+      count(*) as "totalRegistros",
+      count(*) filter (where es_valido) as "totalRegistrosValidos",
+      count(*) filter (where not es_valido) as "totalRegistrosNoValidos",
+      coalesce(json_agg(DISTINCT id) filter (where not es_valido), '[]') as "idNotificacionesNoValidos"
+      from evaluado
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -808,7 +674,7 @@ export class DimConsistenciaService {
           MUERTE_FETAL`,
 
       descripcionRegla:
-        'La fecha de NOTIFICACION  se debe relacionar en forma logica con otras variables de tipo fecha',
+        'Un ESAVI clasificado como grave debe indicar al menos un motivo de gravedad que justifique esa clasificación.',
       ...totales,
     };
   }
@@ -820,40 +686,31 @@ export class DimConsistenciaService {
    */
   private async _integridadCasosFatales(day: Date): Promise<CalidadDatosResultadoDto> {
     this.logger.log(`Iniciando evaluación de integridad Casos Fatales para el día ${day.toISOString()}`);
-    // TODO: Revisar la lógica
+    // La regla sólo habla de notificaciones con FECHAMUERTE, así que ese es el denominador.
+    // Antes el total era count(*) de todas las notificaciones mientras válidos e inválidos
+    // sólo contaban las fatales, y el porcentaje resultante hundía la dimensión entera.
     const query = `
+      with fatales as (
+        select tn."ID" as id,
+          exists (
+            select 1 from "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" g
+            where g."NOTIFICACION_ID" = tn."ID"
+              and g."TIPO_GRAVEDAD" = 'GRAVE'
+              and g."MUERTE" in ('1', 'true')
+          ) as es_valido
+        from "DHI_ESAVI"."TR_NOTIFICACION" tn
+        where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+          and exists (
+            select 1 from "DHI_ESAVI"."TR_DESENLACE_ESAVI" d
+            where d."NOTIFICACION_ID" = tn."ID" and d."FECHAMUERTE" is not null
+          )
+      )
       select
         count(*) as "totalRegistros",
-        count(*) filter (
-          where
-            tde2."FECHAMUERTE" is not null
-            and tde."TIPO_GRAVEDAD" = 'GRAVE'
-            and tde."MUERTE" in ('1', 'true')
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where
-            tde2."FECHAMUERTE" is not null
-            and (
-              tde."TIPO_GRAVEDAD" != 'GRAVE'
-              or tde."MUERTE" in ('0', 'false')
-            )
-        ) as "totalRegistrosNoValidos"
-      , coalesce(json_agg(DISTINCT tn."ID") filter (
-          where
-            tde2."FECHAMUERTE" is not null
-            and (
-              tde."TIPO_GRAVEDAD" != 'GRAVE'
-              or tde."MUERTE" in ('0', 'false')
-            )
-        ), '[]') as "idNotificacionesNoValidos" 
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_GRAVEDAD_ESAVI" tde on
-        tde."NOTIFICACION_ID" = tn."ID"
-      inner join "DHI_ESAVI"."TR_DESENLACE_ESAVI" tde2 on
-        tde2."NOTIFICACION_ID" = tn."ID"
-      where
-        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+        count(*) filter (where es_valido) as "totalRegistrosValidos",
+        count(*) filter (where not es_valido) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT id) filter (where not es_valido), '[]') as "idNotificacionesNoValidos"
+      from fatales
       ;
     `;
     const result = await this.dataSource.query(query);
@@ -872,34 +729,31 @@ export class DimConsistenciaService {
   }
 
   private async _integridadGestante(day: Date): Promise<CalidadDatosResultadoDto> {
+    // El universo son las notificaciones con embarazo declarado, no todas. Y un embarazo con
+    // sexo sin registrar tampoco es coherente: con la comparación anterior (`!= 'MUJER'`) el
+    // sexo nulo daba NULL y el caso se perdía sin contarse en ninguna de las dos cifras.
     const query = `
+      with gestantes as (
+        select tn."ID" as id, coalesce(upper(tc."NOMBRE") = 'MUJER', false) as es_valido
+        from "DHI_ESAVI"."TR_NOTIFICACION" tn
+        inner join "DHI_ESAVI"."TR_PACIENTE" tp on tp."ID" = tn."PACIENTE_ID"
+        left join "DHI_ESAVI"."TC_CATALOGO_PADRE" tc on tc."ID" = tp."CT_SEXO_ID"
+        where tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+          and exists (
+            select 1 from "DHI_ESAVI"."TR_ANTECEDENTES_EMBARAZO" e
+            where e."NOTIFICACION_ID" = tn."ID"
+              and (
+                e."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true')
+                or e."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true')
+              )
+          )
+      )
       select
-        count(*) as "totalRegistros", 
-        count(*) filter (
-          where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."NOMBRE") = 'MUJER'
-        ) as "totalRegistrosValidos",
-        count(*) filter (
-          where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."NOMBRE") != 'MUJER'
-        ) as "totalRegistrosNoValidos",
-        coalesce(json_agg(DISTINCT tn."ID") filter (
-          where
-            (tpe."EMBARAZADA_MOMENTO_VACUNA" in ('1', 'true') OR tpe."EMBARAZADA_MOMENTO_ESAVI" in ('1', 'true'))
-            and upper(tc."NOMBRE") != 'MUJER'
-        ), '[]') as "idNotificacionesNoValidos"
-      from
-        "DHI_ESAVI"."TR_NOTIFICACION" tn
-      inner join "DHI_ESAVI"."TR_PACIENTE" tp on
-        tp."ID" = tn."PACIENTE_ID"
-      inner join "DHI_ESAVI"."TR_ANTECEDENTES_EMBARAZO" tpe on
-        tpe."NOTIFICACION_ID" = tn."ID"
-      left join "DHI_ESAVI"."TC_CATALOGO_PADRE" tc on
-        tc."ID" = tp."CT_SEXO_ID"
-      where
-        tn."FECHA_NOTIFICACION" <= '${day.toISOString()}'
+        count(*) as "totalRegistros",
+        count(*) filter (where es_valido) as "totalRegistrosValidos",
+        count(*) filter (where not es_valido) as "totalRegistrosNoValidos",
+        coalesce(json_agg(DISTINCT id) filter (where not es_valido), '[]') as "idNotificacionesNoValidos"
+      from gestantes
     ;`;
 
     const result = await this.dataSource.query(query);

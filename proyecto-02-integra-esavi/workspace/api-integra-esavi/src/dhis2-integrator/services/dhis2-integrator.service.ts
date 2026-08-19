@@ -44,6 +44,7 @@ import {Dhis2EventsService} from './dhis2-events.service';
 import {Dhis2ProcessingLogService} from './dhis2-processing-log.service';
 import {Dhis2ProgramStageService} from './dhis2-program-stage.service';
 import {Dhis2ProgramService} from './dhis2-program.service';
+import {VacunasDhis2Utils} from '../utils/vacunas-dhis2.utils';
 @Injectable()
 export class Dhis2IntegratorService {
   private readonly logger = new Logger(Dhis2IntegratorService.name);
@@ -337,47 +338,113 @@ export class Dhis2IntegratorService {
   }
 
   /**
-   * Homologa una vacuna reportada en DHIS2 contra el diccionario WHODrug y completa
-   * DRUG_NAME, MA_HOLDER y CODIGO_ATC.
+   * Homologa una vacuna reportada en DHIS2 contra el diccionario WHODrug.
    *
-   * Hasta ahora estos campos solo se poblaban desde VigiFlow, cuyo Excel ya llega codificado
-   * por la UMC: los registros de DHIS2 quedaban con el nombre en texto libre y sin ningún
-   * identificador de catálogo, de modo que las dos fuentes no eran comparables. Se usa el
-   * mismo diccionario y el mismo país que el integrador VigiFlow.
+   * Se intenta en dos pasos, y el orden importa:
    *
-   * DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID quedan deliberadamente fuera:
-   * su identificación se rehará con otra lógica y, hasta entonces, ninguna fuente los
-   * escribe.
+   * 1. Tabla estática (`VacunasDhis2Utils`). DHIS2 entrega la vacuna como la etiqueta de un
+   *    option set —«01. BCG»—, que no se parece a ningún DRU_NAME. La tabla traduce cada
+   *    vacuna del esquema nacional al MAHOLDER.MEDICINAL_PRODUCT_ID del producto que el país
+   *    aplica, y con ese identificador el diccionario devuelve una única fila. Es el único
+   *    camino que resuelve los tres identificadores —DRUG_CODE, MEDICINAL_PRODUCT_ID y
+   *    MA_HOLDER_MEDI_PROD_ID—, porque es el único que identifica un producto sin ambigüedad.
    *
-   * Si no hay coincidencia el registro se conserva con NOMBRE_VACUNA_REPORTADO y sin
-   * codificación: es información válida y homologable después, no un error.
+   * 2. Búsqueda por nombre, para lo que no está en la tabla (vacunas fuera del esquema).
+   *    Compara el texto reportado contra DRU_NAME y sólo completa DRUG_NAME, CODIGO_ATC y
+   *    MA_HOLDER. No escribe los identificadores: una coincidencia de nombre no acredita que
+   *    sea el mismo producto, y un identificador equivocado es peor que ninguno.
+   *
+   * Si ninguno resuelve, el registro se conserva con NOMBRE_VACUNA_REPORTADO y sin codificar:
+   * es información válida y homologable después, no un error. A diferencia de VigiFlow, aquí
+   * no se descarta la fila —DHIS2 es la fuente primaria de notificación y perder la vacuna
+   * costaría más que guardarla sin codificar.
    */
   private async homologarVacunaWhodrug(datoVacuna: CreateDatoVacunaDto): Promise<void> {
     const nombreReportado = datoVacuna.nombreVacunaReportado?.trim();
     if (!nombreReportado) return;
 
-    const country = 'ECU';
-
     try {
-      const coincidencias = await this.drugService.getDrugsOnly(nombreReportado, country);
-      const drug = coincidencias[0];
-      if (!drug) {
-        this.logger.warn(`[WHODrug] Sin coincidencia para la vacuna DHIS2 "${nombreReportado}"`);
-        return;
-      }
-
-      datoVacuna.drugName = drug.drugName ?? null;
-      datoVacuna.codigoAtc = await this.drugService.getAtcCodeOfDrug(drug.id);
-
-      const titulares = await this.maholderService.getMaholderOfDrug(drug.id, country);
-      const titularPrincipal = titulares[0];
-      if (titularPrincipal) {
-        // MA_HOLDER se sobreescribe solo si WHODrug lo resuelve: si no, se conserva la casa
-        // comercial que reportó DHIS2, que es mejor que dejar el campo vacío.
-        datoVacuna.maHolder = titularPrincipal.name ?? datoVacuna.maHolder;
-      }
+      if (await this.homologarPorTablaEstatica(datoVacuna, nombreReportado)) return;
+      await this.homologarPorNombre(datoVacuna, nombreReportado);
     } catch (error: any) {
       this.logger.error(`[WHODrug] Error homologando la vacuna DHIS2 "${nombreReportado}": ${error?.message}`);
+    }
+  }
+
+  /**
+   * Paso 1: tabla estática NOMBRE_VACUNA_DHIS2 → MAHOLDER.MEDICINAL_PRODUCT_ID.
+   *
+   * @returns true si la vacuna quedó codificada por esta vía.
+   */
+  private async homologarPorTablaEstatica(
+    datoVacuna: CreateDatoVacunaDto,
+    nombreReportado: string,
+  ): Promise<boolean> {
+    const maHolderMpid = VacunasDhis2Utils.maHolderMedicinalProductId(nombreReportado);
+    if (maHolderMpid === null) return false;
+
+    const codificacion = await this.maholderService.buscarCodificacionPorMedicinalProductId(maHolderMpid);
+    if (!codificacion) {
+      // La tabla la mantiene el área funcional y el diccionario lo sincroniza la UMC: que un
+      // MPID de la tabla no exista en WHODrug significa que ambos se han desalineado, y eso
+      // hay que verlo en el log, no deducirlo de columnas vacías.
+      this.logger.warn(
+        `[WHODrug][DHIS2] La vacuna "${nombreReportado}" está en la LISTA ESTÁTICA con ` +
+          `MAHOLDER.MEDICINAL_PRODUCT_ID=${maHolderMpid}, pero ese identificador no existe en ` +
+          `el diccionario WHODrug. Revisar la tabla o la sincronización del diccionario.`,
+      );
+      return false;
+    }
+
+    datoVacuna.drugCode = codificacion.drugCode;
+    datoVacuna.drugName = codificacion.drugName;
+    datoVacuna.medicinalProductId = codificacion.medicinalProductId;
+    datoVacuna.maHolder = codificacion.maHolder ?? datoVacuna.maHolder;
+    datoVacuna.maHolderMedicinalProductId = codificacion.maHolderMedicinalProductId;
+    datoVacuna.codigoAtc = await this.drugService.getAtcCodeOfDrug(codificacion.drugId);
+
+    this.logger.log(
+      `[WHODrug][DHIS2] Vacuna "${nombreReportado}" homologada por comparación contra la ` +
+        `LISTA ESTÁTICA NOMBRE_VACUNA_DHIS2 → MAHOLDER.MEDICINAL_PRODUCT_ID (${maHolderMpid}), ` +
+        `no por búsqueda en el diccionario. Resultado: DRUG_CODE=${codificacion.drugCode}, ` +
+        `DRUG_NAME="${codificacion.drugName}", MEDICINAL_PRODUCT_ID=${codificacion.medicinalProductId}, ` +
+        `MA_HOLDER="${codificacion.maHolder}", ` +
+        `MA_HOLDER_MEDI_PROD_ID=${codificacion.maHolderMedicinalProductId}`,
+    );
+    return true;
+  }
+
+  /**
+   * Paso 2: búsqueda por nombre en el diccionario, para las vacunas ajenas a la tabla.
+   *
+   * Completa sólo los campos descriptivos. Los tres identificadores se dejan intactos por lo
+   * dicho en `homologarVacunaWhodrug`.
+   */
+  private async homologarPorNombre(
+    datoVacuna: CreateDatoVacunaDto,
+    nombreReportado: string,
+  ): Promise<void> {
+    const country = 'ECU';
+
+    const coincidencias = await this.drugService.getDrugsOnly(nombreReportado, country);
+    const drug = coincidencias[0];
+    if (!drug) {
+      this.logger.warn(
+        `[WHODrug][DHIS2] Sin coincidencia para la vacuna "${nombreReportado}": no está en la ` +
+          `lista estática ni coincide por nombre con el diccionario. Se guarda sin codificar.`,
+      );
+      return;
+    }
+
+    datoVacuna.drugName = drug.drugName ?? null;
+    datoVacuna.codigoAtc = await this.drugService.getAtcCodeOfDrug(drug.id);
+
+    const titulares = await this.maholderService.getMaholderOfDrug(drug.id, country);
+    const titularPrincipal = titulares[0];
+    if (titularPrincipal) {
+      // MA_HOLDER se sobreescribe solo si WHODrug lo resuelve: si no, se conserva la casa
+      // comercial que reportó DHIS2, que es mejor que dejar el campo vacío.
+      datoVacuna.maHolder = titularPrincipal.name ?? datoVacuna.maHolder;
     }
   }
 
