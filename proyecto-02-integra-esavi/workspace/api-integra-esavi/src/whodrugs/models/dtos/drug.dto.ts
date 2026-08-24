@@ -103,3 +103,28 @@ export interface ICodificacionVacunaWhodrugConDrugId extends ICodificacionVacuna
   /** DRUG.ID, clave interna del diccionario; no se persiste. */
   drugId: string;
 }
+
+/**
+ * La codificación, más la traza de cómo se llegó a ella.
+ *
+ * `buscarCodificacionVacuna` decide en dos fases y con varios criterios encadenados; sin
+ * dejar constancia de cuáles actuaron, una codificación correcta y una que se sostiene sólo
+ * en la cobertura parcial de principios activos son indistinguibles a posteriori. Estos
+ * campos no se persisten en TR_DATO_VACUNA: existen para el log de la importación y para
+ * poder auditar un lote sin volver a ejecutarlo.
+ */
+export interface ICodificacionVacunaWhodrugDetallada extends ICodificacionVacunaWhodrug {
+  /**
+   * COUNTRY_SALES.COS_COUNTRY de la fila de la que salieron MEDICINAL_PRODUCT_ID,
+   * MA_HOLDER y MA_HOLDER_MEDI_PROD_ID. `null` cuando el medicamento se identificó pero no
+   * tiene venta registrada en el país pedido, en cuyo caso esos tres campos van también en
+   * `null` y sólo se conservan DRUG_CODE y DRUG_NAME.
+   */
+  paisRegistro: string | null;
+  /** Cuántos de los principios activos reportados cubre el medicamento identificado. */
+  cobertura: number;
+  /** Cuántos principios activos traía la columna F. */
+  principiosReportados: number;
+  /** Criterios que estrecharon la búsqueda, en el orden en que actuaron. */
+  criterios: string[];
+}

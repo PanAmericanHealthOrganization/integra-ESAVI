@@ -51,39 +51,53 @@ describe('IngredientTranslationService', () => {
     jest.clearAllMocks();
   });
 
+  // Composiciones de referencia, tomadas de casos reales del libro de VigiFlow.
+  const SEIS_COMPONENTES = [
+    'Vacuna toxoide diftérico',
+    'Vacuna antihepatitis b rHBsAG',
+    'Vacuna antiinfluenza tipo B conjugada (tet tox)',
+    'Vacuna antipertussis acelular 2-componente',
+    'Vacuna antipoliomielítica inactivada 3v (Vero)',
+    'Vacuna toxoide tetánico',
+  ].join('\n');
+  const TRES_COMPONENTES = ['Difteria', 'Tetanos', 'Pertussis'].join('\n');
+  const DOS_COMPONENTES = ['Difteria', 'Tetanos'].join('\n');
+
   /*
-   * Estrategia de codificación: una sola consulta por principio activo, y el desempate
-   * resuelto en memoria sobre esas filas. Lo que se comprueba aquí es la cadena de
-   * decisión; el parecido de trigramas tiene sus propias pruebas.
+   * Estrategia de codificación en dos fases: una sola consulta con TODOS los principios
+   * activos reportados, y sobre esas filas una cascada de criterios que estrechan pero
+   * nunca vacían. Lo que se comprueba aquí es la cadena de decisión; el parecido de
+   * trigramas tiene sus propias pruebas.
    */
   describe('buscarCodificacionVacuna', () => {
     let qb: any;
 
+    /**
+     * Una fila del diccionario tal como la devuelve la consulta: un medicamento, en un país
+     * de venta, con un titular. `cobertura` y `totalIngredientes` llegan como texto porque
+     * COUNT devuelve bigint.
+     */
     const fila = (over: Record<string, any> = {}) => ({
       drugCode: 'DRU123',
       drugName: 'Gardasil 9',
+      paisRegistro: 'ECU',
       medicinalProductId: 111,
       maHolder: 'Merck sharp & dohme',
       maHolderMedicinalProductId: 555,
-      ...over,
-    });
-
-    const esperado = (over: Record<string, any> = {}) => ({
-      drugCode: 'DRU123',
-      drugName: 'Gardasil 9',
-      medicinalProductId: '111',
-      maHolder: 'Merck sharp & dohme',
-      maHolderMedicinalProductId: '555',
+      cobertura: '1',
+      totalIngredientes: '1',
       ...over,
     });
 
     beforeEach(() => {
       qb = {
-        distinct: jest.fn().mockReturnThis(),
         innerJoin: jest.fn().mockReturnThis(),
+        leftJoin: jest.fn().mockReturnThis(),
         select: jest.fn().mockReturnThis(),
         addSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
+        groupBy: jest.fn().mockReturnThis(),
+        addGroupBy: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
         addOrderBy: jest.fn().mockReturnThis(),
         getRawMany: jest.fn(),
@@ -91,113 +105,183 @@ describe('IngredientTranslationService', () => {
       (ingredientTranslationRepository.createQueryBuilder as jest.Mock).mockReturnValue(qb);
     });
 
-    it('compara el principio activo con LIKE insensible a mayúsculas y TRIM a ambos lados', async () => {
+    /*
+     * La diferencia de fondo con la estrategia anterior: los seis renglones de una vacuna
+     * combinada NO se consultan uno a uno, sino juntos, porque lo que identifica al producto
+     * es el conjunto. Una sola consulta, no seis.
+     */
+    it('consulta los principios activos como conjunto, en una única consulta y normalizados', async () => {
       qb.getRawMany.mockResolvedValueOnce([fila()]);
 
-      await service.buscarCodificacionVacuna('  Vacuna antiVPH VLP rL1 9v (levadura)  ', null, null);
+      await service.buscarCodificacionVacuna('  Vacuna toxoide diftérico  \r\nVacuna toxoide tetánico\r\n', null, null);
 
-      expect(qb.where).toHaveBeenCalledWith(
-        'UPPER(TRIM(t.ingredient)) LIKE UPPER(TRIM(:ingrediente))',
-        { ingrediente: 'Vacuna antiVPH VLP rL1 9v (levadura)' },
-      );
+      expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
+      expect(qb.where).toHaveBeenCalledWith('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', {
+        ingredientes: ['VACUNA TOXOIDE DIFTÉRICO', 'VACUNA TOXOIDE TETÁNICO'],
+      });
     });
 
-    it('aplica la única candidata cuando la consulta devuelve una', async () => {
-      qb.getRawMany.mockResolvedValueOnce([fila()]);
-
-      expect(await service.buscarCodificacionVacuna('Ingrediente', 'Merck', 'Gardasil 9')).toEqual(
-        esperado(),
-      );
-    });
-
-    it('toma la de la posición 0 cuando devuelve dos, sin mirar laboratorio ni nombre', async () => {
-      qb.getRawMany.mockResolvedValueOnce([fila(), fila({ drugCode: 'DRU999' })]);
-
-      const result = await service.buscarCodificacionVacuna('Ingrediente', 'Nada que ver', 'Nada');
-
-      expect(result).toEqual(esperado());
-    });
-
-    /*
-     * Con tres o más candidatas entra el desempate. Se filtra primero por titular; si queda
-     * una, esa es, y el nombre del medicamento ya no se mira.
-     */
-    it('con tres o más, filtra por titular y devuelve la única que supera el 0.6', async () => {
-      qb.getRawMany.mockResolvedValueOnce([
-        fila({ maHolder: 'Pfizer' }),
-        fila({ maHolder: 'Merck Sharp & Dohme', drugCode: 'DRU777' }),
-        fila({ maHolder: 'Sanofi Pasteur' }),
-      ]);
-
-      const result = await service.buscarCodificacionVacuna(
-        'Ingrediente',
-        'Merck Sharp & Dohme LLC',
-        'Cualquier cosa',
-      );
-
-      expect(result).toEqual(esperado({ maHolder: 'Merck Sharp & Dohme', drugCode: 'DRU777' }));
-    });
-
-    it('descarta el registro si ninguna candidata supera el parecido de titular', async () => {
-      qb.getRawMany.mockResolvedValueOnce([
-        fila({ maHolder: 'Pfizer' }),
-        fila({ maHolder: 'Sanofi Pasteur' }),
-        fila({ maHolder: 'Bharat Biotech' }),
-      ]);
-
-      expect(
-        await service.buscarCodificacionVacuna('Ingrediente', 'GlaxoSmithKline', 'X'),
-      ).toBeNull();
-    });
-
-    it('si el titular deja dos o más, afina por nombre y toma la primera de las que quedan', async () => {
-      qb.getRawMany.mockResolvedValueOnce([
-        fila({ drugName: 'Gardasil 9', drugCode: 'DRU-A' }),
-        fila({ drugName: 'Gardasil', drugCode: 'DRU-B' }),
-        fila({ drugName: 'Silgard', drugCode: 'DRU-C' }),
-      ]);
-
-      const result = await service.buscarCodificacionVacuna(
-        'Ingrediente',
-        'Merck sharp & dohme',
-        'Gardasil 9',
-      );
-
-      expect(result).toEqual(esperado({ drugName: 'Gardasil 9', drugCode: 'DRU-A' }));
-    });
-
-    /*
-     * La regla explícita de la estrategia: con más de dos candidatas todavía indistinguibles
-     * no se codifica, porque elegir una sería inventarse el dato.
-     */
-    it('descarta el registro si tras ambos filtros quedan más de dos candidatas', async () => {
-      const tresIguales = [
-        fila({ drugCode: 'DRU-A' }),
-        fila({ drugCode: 'DRU-B' }),
-        fila({ drugCode: 'DRU-C' }),
-      ];
-      qb.getRawMany.mockResolvedValueOnce(tresIguales);
-
-      expect(
-        await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Gardasil 9'),
-      ).toBeNull();
-    });
-
-    it('descarta el registro si el nombre del medicamento no deja ninguna candidata', async () => {
-      qb.getRawMany.mockResolvedValueOnce([
-        fila({ drugName: 'Boostrix', drugCode: 'DRU-A' }),
-        fila({ drugName: 'Infanrix', drugCode: 'DRU-B' }),
-        fila({ drugName: 'Priorix', drugCode: 'DRU-C' }),
-      ]);
-
-      expect(
-        await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Gardasil 9'),
-      ).toBeNull();
-    });
-
-    it('devuelve null sin consultar cuando el principio activo viene vacío', async () => {
+    it('devuelve null sin consultar cuando la columna F viene vacía', async () => {
       expect(await service.buscarCodificacionVacuna('   ', 'Merck', 'Gardasil')).toBeNull();
       expect(ingredientTranslationRepository.createQueryBuilder).not.toHaveBeenCalled();
+    });
+
+    it('devuelve null cuando ningún principio activo existe en el diccionario', async () => {
+      qb.getRawMany.mockResolvedValueOnce([]);
+      expect(await service.buscarCodificacionVacuna('Inexistente', 'Merck', 'Gardasil')).toBeNull();
+    });
+
+    /*
+     * Caso real EC-ARCSA-300078352: Hexaxim con seis principios activos, titular «Sanofi
+     * Aventis» y nombre «Hexaxim». Los tres criterios corroboran y la codificación sale
+     * entera, con los identificadores del registro ecuatoriano.
+     */
+    it('codifica la combinada cuando nombre, titular y composición coinciden', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'HEXAXIM', drugName: 'Hexaxim', maHolder: 'Sanofi aventis',
+               medicinalProductId: 5071627, maHolderMedicinalProductId: 5071626,
+               cobertura: '6', totalIngredientes: '6' }),
+        fila({ drugCode: 'OTRO', drugName: 'Tetracoq', maHolder: 'Sanofi aventis pas',
+               cobertura: '3', totalIngredientes: '4' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(SEIS_COMPONENTES, 'Sanofi Aventis', 'Hexaxim');
+
+      expect(result).toMatchObject({
+        drugCode: 'HEXAXIM',
+        drugName: 'Hexaxim',
+        medicinalProductId: '5071627',
+        maHolder: 'Sanofi aventis',
+        maHolderMedicinalProductId: '5071626',
+        paisRegistro: 'ECU',
+        cobertura: 6,
+        principiosReportados: 6,
+      });
+    });
+
+    /*
+     * El filtro de titular estrecha pero no vacía. Hexaxim se reporta a menudo como «Sanofi
+     * Pasteur» mientras que en ECU figura a nombre de «Sanofi aventis»: si un titular que no
+     * casa con nadie descartara el resultado, se perderían 7 de las 8 filas de Hexaxim del
+     * libro real.
+     */
+    it('ignora el titular reportado cuando no se parece a ninguno, en vez de descartar', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'HEXAXIM', drugName: 'Hexaxim', maHolder: 'Sanofi aventis',
+               medicinalProductId: 5071627, maHolderMedicinalProductId: 5071626,
+               cobertura: '6', totalIngredientes: '6' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(SEIS_COMPONENTES, 'Sanofi Pasteur', 'Hexaxim');
+
+      expect(result?.drugCode).toBe('HEXAXIM');
+      expect(result?.maHolder).toBe('Sanofi aventis');
+      expect(result?.criterios).not.toContain('laboratorio titular (col I)');
+    });
+
+    /*
+     * La composición exacta es lo que separa la combinada del producto que la contiene:
+     * Tetracoq cubre los tres componentes de una DTP pero además lleva polio, así que no es
+     * la reportada.
+     */
+    it('prefiere la composición exacta sobre la que solo contiene los principios reportados', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'TETRACOQ', drugName: 'Tetracoq', cobertura: '3', totalIngredientes: '4' }),
+        fila({ drugCode: 'DTP', drugName: 'Dtp', cobertura: '3', totalIngredientes: '3' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(TRES_COMPONENTES, null, null);
+
+      expect(result?.drugCode).toBe('DTP');
+      expect(result?.criterios).toContain('composición exacta');
+    });
+
+    /*
+     * Regla explícita: con varios medicamentos distintos todavía empatados no se codifica,
+     * porque elegir uno sería inventarse el dato. La vacuna conserva su
+     * NOMBRE_VACUNA_REPORTADO, que sigue siendo homologable después.
+     */
+    it('no codifica cuando quedan varios medicamentos distintos empatados', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'DRU-A', drugName: 'Uno', cobertura: '2', totalIngredientes: '2' }),
+        fila({ drugCode: 'DRU-B', drugName: 'Dos', cobertura: '2', totalIngredientes: '2' }),
+      ]);
+
+      expect(await service.buscarCodificacionVacuna(DOS_COMPONENTES, null, null)).toBeNull();
+    });
+
+    /*
+     * Una cobertura parcial, por sí sola, empareja cualquier vacuna que comparta un
+     * componente con la reportada. Sin nombre, titular ni composición que corroboren, no
+     * basta para escribir un DRUG_CODE.
+     */
+    it('no codifica si sólo la sostiene una cobertura parcial, sin corroboración', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'PARCIAL', drugName: 'Otra cosa', maHolder: 'Nadie',
+               cobertura: '1', totalIngredientes: '5' }),
+      ]);
+
+      expect(await service.buscarCodificacionVacuna(TRES_COMPONENTES, 'Bio Farma', 'Dtp vaccine')).toBeNull();
+    });
+
+    /*
+     * DRU_CODE y DRU_NAME son globales; los tres identificadores de registro son del país.
+     * BE Td y Tripvac existen en WHODrug sólo para SLV: el medicamento se identifica igual,
+     * pero sus MPID quedan en null en vez de copiarse de otro país, donde describirían un
+     * registro que no es el de este reporte.
+     */
+    it('identifica el medicamento sin registro en el país y deja los MPID en null', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'BETD', drugName: 'BE Td', paisRegistro: 'SLV',
+               medicinalProductId: 999, maHolder: 'Biological E', maHolderMedicinalProductId: 888,
+               cobertura: '2', totalIngredientes: '2' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(DOS_COMPONENTES, 'Biological E. Limited', 'BE Td');
+
+      expect(result).toMatchObject({
+        drugCode: 'BETD',
+        drugName: 'BE Td',
+        medicinalProductId: null,
+        maHolder: null,
+        maHolderMedicinalProductId: null,
+        paisRegistro: null,
+      });
+    });
+
+    /*
+     * Fase 2: el registro se busca entre TODAS las filas del medicamento, no sólo entre las
+     * que sobrevivieron a los filtros, y entre varios titulares del país gana el más parecido
+     * al reportado.
+     */
+    it('elige, entre los titulares del país, el más parecido al reportado', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'HEXAXIM', drugName: 'Hexaxim', maHolder: 'Sanofi Winthrop Industrie',
+               medicinalProductId: 5071627, maHolderMedicinalProductId: 6873373,
+               cobertura: '6', totalIngredientes: '6' }),
+        fila({ drugCode: 'HEXAXIM', drugName: 'Hexaxim', maHolder: 'Sanofi aventis',
+               medicinalProductId: 5071627, maHolderMedicinalProductId: 5071626,
+               cobertura: '6', totalIngredientes: '6' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(SEIS_COMPONENTES, 'Sanofi Aventis', 'Hexaxim');
+
+      expect(result?.maHolder).toBe('Sanofi aventis');
+      expect(result?.maHolderMedicinalProductId).toBe('5071626');
+    });
+
+    it('respeta el país pedido al resolver los identificadores de registro', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'X', drugName: 'Equis', paisRegistro: 'ECU', medicinalProductId: 1,
+               maHolderMedicinalProductId: 2, cobertura: '1', totalIngredientes: '1' }),
+        fila({ drugCode: 'X', drugName: 'Equis', paisRegistro: 'PER', medicinalProductId: 3,
+               maHolderMedicinalProductId: 4, cobertura: '1', totalIngredientes: '1' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Equis', 'PER');
+
+      expect(result?.paisRegistro).toBe('PER');
+      expect(result?.medicinalProductId).toBe('3');
     });
 
     /*
@@ -209,61 +293,21 @@ describe('IngredientTranslationService', () => {
         fila({ medicinalProductId: 0, maHolderMedicinalProductId: null }),
       ]);
 
-      const result = await service.buscarCodificacionVacuna('Ingrediente', null, null);
+      const result = await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Gardasil 9');
 
       expect(result.medicinalProductId).toBe('0');
       expect(result.maHolderMedicinalProductId).toBeNull();
     });
 
-    /*
-     * La columna F es multilínea: una vacuna combinada trae un principio activo por
-     * renglón. Caso real EC-ARCSA-300078439, con seis componentes.
-     */
-    describe('columna F multilínea', () => {
-      const SEIS_COMPONENTES = [
-        'Vacuna toxoide diftérico',
-        'Vacuna antihepatitis b rHBsAG',
-        'Vacuna antiinfluenza tipo B conjugada (tet tox)',
-        'Vacuna antipertussis acelular 2-componente',
-        'Vacuna antipoliomielítica inactivada 3v (Vero)',
-        'Vacuna toxoide tetánico',
-      ].join('\n');
-
-      it('consulta renglón a renglón y se queda con el primero que resuelve', async () => {
-        qb.getRawMany
-          .mockResolvedValueOnce([])
-          .mockResolvedValueOnce([])
-          .mockResolvedValueOnce([fila()]);
-
-        const result = await service.buscarCodificacionVacuna(SEIS_COMPONENTES, 'Merck', 'Gardasil 9');
-
-        expect(result).toEqual(esperado());
-        // Tres renglones, no seis: en cuanto uno resuelve se deja de buscar.
-        expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalledTimes(3);
-        expect(qb.where).toHaveBeenNthCalledWith(
-          3,
-          'UPPER(TRIM(t.ingredient)) LIKE UPPER(TRIM(:ingrediente))',
-          { ingrediente: 'Vacuna antiinfluenza tipo B conjugada (tet tox)' },
-        );
-      });
-
-      it('recorre los seis renglones y devuelve null si ninguno resuelve', async () => {
-        qb.getRawMany.mockResolvedValue([]);
-
-        expect(await service.buscarCodificacionVacuna(SEIS_COMPONENTES, 'GSK', 'X')).toBeNull();
-        expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalledTimes(6);
-      });
-
+    describe('separación de la columna F', () => {
       it('tolera saltos de línea de Windows y renglones en blanco', async () => {
         qb.getRawMany.mockResolvedValueOnce([fila()]);
 
         await service.buscarCodificacionVacuna('\r\n  \r\nVacuna toxoide tetánico\r\n\r\n', null, null);
 
-        expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
-        expect(qb.where).toHaveBeenCalledWith(
-          'UPPER(TRIM(t.ingredient)) LIKE UPPER(TRIM(:ingrediente))',
-          { ingrediente: 'Vacuna toxoide tetánico' },
-        );
+        expect(qb.where).toHaveBeenCalledWith('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', {
+          ingredientes: ['VACUNA TOXOIDE TETÁNICO'],
+        });
       });
 
       /*
@@ -275,11 +319,9 @@ describe('IngredientTranslationService', () => {
 
         await service.buscarCodificacionVacuna('Vacuna antitetánica, adsorbida', null, null);
 
-        expect(ingredientTranslationRepository.createQueryBuilder).toHaveBeenCalledTimes(1);
-        expect(qb.where).toHaveBeenCalledWith(
-          'UPPER(TRIM(t.ingredient)) LIKE UPPER(TRIM(:ingrediente))',
-          { ingrediente: 'Vacuna antitetánica, adsorbida' },
-        );
+        expect(qb.where).toHaveBeenCalledWith('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', {
+          ingredientes: ['VACUNA ANTITETÁNICA, ADSORBIDA'],
+        });
       });
     });
   });

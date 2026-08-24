@@ -13,7 +13,7 @@ import { DestinatarioNotificacion } from 'src/mensajes/models/notificacion.inter
 import { MeddraLLTService } from 'src/meddra/services/meddra-lt.service';
 import { MeddraPtService } from 'src/meddra/services/meddra-pt.service';
 import { MeddraSocService } from 'src/meddra/services/meddra-soc.service';
-import { ICodificacionVacunaWhodrug, IWhodrugVaccineMatch } from 'src/whodrugs/models/dtos';
+import { ICodificacionVacunaWhodrugDetallada, IWhodrugVaccineMatch } from 'src/whodrugs/models/dtos';
 import { ActiveIngredientsService } from 'src/whodrugs/services/activeIngredients.service';
 import { DrugService } from 'src/whodrugs/services/drugs.service';
 import { IngredientTranslationService } from 'src/whodrugs/services/ingredientsTraslations.service';
@@ -719,7 +719,7 @@ export class VigiflowIntegradorService {
 
     // Misma idea para la codificación WHODrug (DRUG_CODE y los dos MPID): un lote repite la
     // misma vacuna decenas de veces y cada acierto cuesta una o dos consultas.
-    const codificacionVacunaCache = new Map<string, ICodificacionVacunaWhodrug | null>();
+    const codificacionVacunaCache = new Map<string, ICodificacionVacunaWhodrugDetallada | null>();
 
     // El bloque de embarazo es único por notificación, pero la edad gestacional viene a nivel de
     // fila (una por medicamento): se retiene la primera fila con un valor válido.
@@ -907,16 +907,22 @@ export class VigiflowIntegradorService {
           }
 
           /*
-           * Codificación WHODrug: DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID.
+           * Codificación WHODrug: DRUG_CODE, DRUG_NAME, MEDICINAL_PRODUCT_ID, MA_HOLDER y
+           * MA_HOLDER_MEDI_PROD_ID.
            *
            * Va fuera del bloque anterior y no depende de VIGIFLOW_USE_WHODRUG_GLOBAL: es la
            * estrategia definida para todo lo que entre por VigiFlow, y esa bandera viene en
            * `false` por defecto, con lo que dentro no se ejecutaría nunca.
            *
-           * El principio activo se toma en crudo de la columna F, no de
-           * `principioActivoWHODrugVigiFlow`: `limpiarCampoWHODrug` sustituye las comas por
-           * punto y coma, y eso rompería la igualdad exacta contra INT_INGREDIENT en
-           * cualquier ingrediente que lleve coma en su nombre.
+           * Las tres columnas entran juntas —F principios activos, I titular, E nombre
+           * comercial— porque `buscarCodificacionVacuna` las pondera como un conjunto: la F
+           * completa identifica la combinación, y la I y la E estrechan. Sobre este mismo
+           * libro pasa de 13 a 38 vacunas codificadas de 44.
+           *
+           * Las tres se toman en crudo, no de las versiones ya limpiadas:
+           * `limpiarCampoWHODrug` sustituye las comas por punto y coma, lo que rompería la
+           * igualdad contra INT_INGREDIENT en los ingredientes que llevan coma en el nombre
+           * —«Vacuna antitetánica, adsorbida»— y alteraría el parecido contra DRU_NAME.
            */
           const principioActivoCrudo = reg['F'] ? reg['F'].toString() : null;
           const laboratorioTitularCrudo = reg['I'] ? reg['I'].toString() : null;
@@ -929,7 +935,7 @@ export class VigiflowIntegradorService {
               laboratorioTitularCrudo?.trim() ?? '',
               nombreMedicamentoCrudo?.trim() ?? '',
             ].join('|');
-            let codificacion: ICodificacionVacunaWhodrug | null;
+            let codificacion: ICodificacionVacunaWhodrugDetallada | null;
             if (codificacionVacunaCache.has(claveCodificacion)) {
               codificacion = codificacionVacunaCache.get(claveCodificacion);
             } else {
@@ -937,12 +943,26 @@ export class VigiflowIntegradorService {
                 principioActivoCrudo,
                 laboratorioTitularCrudo,
                 nombreMedicamentoCrudo,
+                country,
               );
               codificacionVacunaCache.set(claveCodificacion, codificacion);
+              // La traza se registra una sola vez por combinación distinta, no por fila: un
+              // lote repite la misma vacuna decenas de veces. Sin ella no hay forma de
+              // distinguir después una codificación resuelta por nombre y composición de otra
+              // que se apoyó sólo en una cobertura parcial de principios activos.
+              this.logger.log(
+                codificacion
+                  ? `[WHODrug] "${nombreMedicamentoCrudo ?? '(sin nombre)'}" → ${codificacion.drugCode} ` +
+                    `(${codificacion.criterios.join(' → ')}; registro ${codificacion.paisRegistro ?? `no hallado en ${country}`})`
+                  : `[WHODrug] "${nombreMedicamentoCrudo ?? '(sin nombre)'}" sin codificar: el diccionario no permite identificarla sin ambigüedad`,
+              );
             }
 
             if (codificacion) {
               updateDatoVacuna.drugCode = codificacion.drugCode;
+              // Los tres identificadores de registro son del país o no son: vienen todos de
+              // la misma fila de COUNTRY_SALES/MAHOLDER, y van en null cuando el medicamento
+              // se identificó pero WHODrug no lo registra a la venta en el país del reporte.
               updateDatoVacuna.medicinalProductId = codificacion.medicinalProductId;
               updateDatoVacuna.maHolderMedicinalProductId = codificacion.maHolderMedicinalProductId;
               // El nombre y el titular salen de la misma fila que los códigos: si se

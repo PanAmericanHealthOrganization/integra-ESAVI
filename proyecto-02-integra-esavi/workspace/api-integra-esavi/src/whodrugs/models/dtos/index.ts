@@ -11,4 +11,5 @@ export {
   IWhodrugVaccineMatch,
   ICodificacionVacunaWhodrug,
   ICodificacionVacunaWhodrugConDrugId,
+  ICodificacionVacunaWhodrugDetallada,
 } from './drug.dto';

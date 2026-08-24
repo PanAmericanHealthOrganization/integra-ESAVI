@@ -3,10 +3,51 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {withAuditOnCreate} from 'src/common/utils/audit.util';
 import {ILike,Repository} from 'typeorm';
 import {ActiveIngredient} from '../models/activeIngredient.entity';
-import {ICodificacionVacunaWhodrug,IIngredientTranslation,IWhodrugVaccineMatch} from '../models/dtos';
+import {
+  ICodificacionVacunaWhodrug,
+  ICodificacionVacunaWhodrugDetallada,
+  IIngredientTranslation,
+  IWhodrugVaccineMatch,
+} from '../models/dtos';
 import {SimilitudTrigramas} from '../utils/similitud-trigramas.utils';
 import {IngredientTranslation} from '../models/ingredientTranslation.entity';
 import {Maholder} from '../models/maholder.entity';
+
+/**
+ * Una fila del diccionario: un medicamento, en un país de venta, con un titular. Es la
+ * unidad sobre la que deciden las dos fases de `buscarCodificacionVacuna`, y añade a la
+ * codificación los dos contadores con los que se mide la composición.
+ */
+interface FilaCandidata extends ICodificacionVacunaWhodrug {
+  /** COUNTRY_SALES.COS_COUNTRY de esta fila. */
+  paisRegistro: string;
+  /** Cuántos de los principios activos reportados cubre este medicamento. */
+  cobertura: number;
+  /** Cuántos principios activos le atribuye el diccionario al medicamento. */
+  totalIngredientes: number;
+}
+
+/** Lo que resuelve la fase 1: qué medicamento es, y con qué evidencia se decidió. */
+interface MedicamentoIdentificado {
+  drugCode: string;
+  drugName: string;
+  cobertura: number;
+  criterios: string[];
+}
+
+// Etiquetas de los criterios que estrechan la búsqueda. Son constantes porque además de
+// documentar la traza deciden, en `CRITERIOS_CORROBORANTES`, si la codificación se sostiene.
+const CRITERIO_NOMBRE = 'nombre comercial (col E)';
+const CRITERIO_TITULAR = 'laboratorio titular (col I)';
+const CRITERIO_COMPOSICION = 'composición exacta';
+const CRITERIO_PAIS = 'venta en el país';
+
+/**
+ * Criterios que bastan para dar por buena una codificación. `CRITERIO_PAIS` no está: que un
+ * medicamento se venda en Ecuador no dice nada sobre si es el que se reportó, sólo desempata
+ * entre candidatos que ya venían igualados por otra evidencia.
+ */
+const CRITERIOS_CORROBORANTES = [CRITERIO_NOMBRE, CRITERIO_TITULAR, CRITERIO_COMPOSICION];
 
 @Injectable()
 export class IngredientTranslationService {
@@ -96,40 +137,63 @@ export class IngredientTranslationService {
   /**
    * Codificación WHODrug de una vacuna reportada en VigiFlow.
    *
-   * La columna F (principios activos) es multilínea: una vacuna combinada trae un principio
-   * activo por renglón —el caso EC-ARCSA-300078439 declara seis—. Se consulta renglón a
-   * renglón, en orden, y gana el primero que resuelve.
+   * La columna F es multilínea: una vacuna combinada trae un principio activo por renglón
+   * —el caso EC-ARCSA-300078352, Hexaxim, declara seis—. Los renglones NO se consultan uno
+   * a uno: entran juntos en una única consulta y lo que identifica al producto es el
+   * conjunto. Buscarlos por separado y quedarse con el primero que resuelva desaprovecha
+   * justamente la evidencia que distingue una combinada de sus componentes sueltos, y hace
+   * que el resultado dependa del orden de los renglones.
    *
-   * Consecuencia a tener presente: una combinada queda codificada por uno solo de sus
-   * componentes, no por el producto combinado. Es lo que permite el modelo actual, donde
-   * TR_DATO_VACUNA guarda un único DRUG_CODE por fila.
+   * La decisión va en dos fases, porque el diccionario mezcla dos ámbitos distintos:
    *
-   * Para cada renglón se lanza una sola consulta, por principio activo. El desempate, si
-   * hace falta, se resuelve en memoria sobre esas filas (ver `resolverCandidatas`): traer el
-   * conjunto una vez y filtrarlo aquí evita las dos o tres consultas encadenadas que exigía
-   * hacerlo en SQL, y deja el criterio de parecido a la vista en un solo sitio.
+   *   Fase 1 — QUÉ vacuna es. DRU_CODE y DRU_NAME son globales, así que aquí no se filtra
+   *   por país. Filtrar antes de identificar descarta productos que existen pero que
+   *   WHODrug no registra a la venta en Ecuador (BE Td y Tripvac sólo constan para SLV), y
+   *   filtrar por titular puede dejar fuera las filas del propio país cuando la columna I
+   *   nombra a otra sociedad del grupo —Hexaxim se reporta como «Sanofi Pasteur» y en ECU
+   *   figura a nombre de «Sanofi aventis»—.
+   *
+   *   Fase 2 — CON QUÉ registro sanitario. MEDICINAL_PRODUCT_ID, MA_HOLDER y
+   *   MA_HOLDER_MEDI_PROD_ID sí dependen del país y se toman de la fila del país pedido. Si
+   *   el medicamento no se vende allí, los tres quedan en null: es preferible a copiarlos de
+   *   otro país, donde describirían un registro que no es el de este reporte.
    *
    * @param principiosActivos columna F, con un principio activo por renglón
-   * @param laboratorioTitular columna I, para desempatar por titular del registro
-   * @param nombreMedicamento columna E, para desempatar por nombre comercial
+   * @param laboratorioTitular columna I, titular del registro
+   * @param nombreMedicamento columna E, nombre comercial (patente-WHODrug)
+   * @param pais país de venta del que salen los identificadores de registro (ISO 3166-1 alfa-3)
    */
   public async buscarCodificacionVacuna(
     principiosActivos: string,
     laboratorioTitular?: string | null,
     nombreMedicamento?: string | null,
-  ): Promise<ICodificacionVacunaWhodrug | null> {
+    pais = 'ECU',
+  ): Promise<ICodificacionVacunaWhodrugDetallada | null> {
     const ingredientes = IngredientTranslationService.separarPrincipiosActivos(principiosActivos);
     if (ingredientes.length === 0) return null;
+
+    const filas = await this.consultarPorPrincipiosActivos(ingredientes);
+    if (filas.length === 0) return null;
 
     const titular = laboratorioTitular?.trim() || null;
     const nombre = nombreMedicamento?.trim() || null;
 
-    for (const ingrediente of ingredientes) {
-      const candidatas = await this.consultarPorPrincipioActivo(ingrediente);
-      const codificacion = IngredientTranslationService.resolverCandidatas(candidatas, titular, nombre);
-      if (codificacion) return codificacion;
-    }
-    return null;
+    const identificado = IngredientTranslationService.identificarMedicamento(
+      filas,
+      titular,
+      nombre,
+      ingredientes.length,
+      pais,
+    );
+    if (!identificado) return null;
+
+    return IngredientTranslationService.resolverRegistroDelPais(
+      identificado,
+      filas,
+      titular,
+      ingredientes.length,
+      pais,
+    );
   }
 
   /**
@@ -148,98 +212,228 @@ export class IngredientTranslationService {
   }
 
   /**
-   * Decide qué candidata aplicar, sobre las filas que devolvió la consulta.
+   * Fase 1: decidir de qué medicamento se trata, sin mirar el país.
    *
-   * - Ninguna: no hay codificación.
-   * - Una: es la codificación.
-   * - Dos: se toma la primera.
-   * - Tres o más: se afina en dos pasos.
-   *     a) Se filtran por parecido del titular (columna I) por encima de 0.6. Si queda una,
-   *        esa es.
-   *     b) Si quedan dos o más, se vuelven a filtrar por parecido del nombre comercial
-   *        (columna E) por encima de 0.7. Con dos o menos se toma la primera; con más de
-   *        dos no se codifica.
+   * Los criterios se aplican en cascada y cada uno **estrecha pero nunca vacía**: si un
+   * filtro no deja ninguna candidata es que ese dato no discrimina aquí —el titular
+   * reportado no se parece a ninguno del diccionario, el nombre es una descripción genérica
+   * en vez de una marca— y descartarlo todo por eso perdería la codificación entera. Esa es
+   * la diferencia de fondo con la estrategia anterior, que ante un filtro sin resultados
+   * devolvía null.
    *
-   * Que tres candidatas indistinguibles no codifiquen es deliberado: elegir una sería
-   * inventarse el dato. La vacuna se queda con su NOMBRE_VACUNA_REPORTADO, que sigue siendo
-   * homologable después.
+   * El orden va de la evidencia más específica a la más general: el nombre comercial
+   * identifica un producto concreto, el titular acota un fabricante, y la composición
+   * confirma. Al final, si aún empatan varios medicamentos distintos, no se codifica:
+   * elegir uno sería inventarse el dato, y la vacuna conserva su NOMBRE_VACUNA_REPORTADO,
+   * que sigue siendo homologable después.
    */
-  private static resolverCandidatas(
-    candidatas: ICodificacionVacunaWhodrug[],
+  private static identificarMedicamento(
+    filas: FilaCandidata[],
     titular: string | null,
     nombreMedicamento: string | null,
-  ): ICodificacionVacunaWhodrug | null {
-    if (candidatas.length === 0) return null;
-    if (candidatas.length <= 2) return candidatas[0];
+    principiosReportados: number,
+    pais: string,
+  ): MedicamentoIdentificado | null {
+    const criterios: string[] = [];
 
-    const porTitular = candidatas.filter((candidata) =>
-      SimilitudTrigramas.superaUmbral(
-        candidata.maHolder,
-        titular,
-        IngredientTranslationService.UMBRAL_SIMILITUD_TITULAR,
-      ),
-    );
-    if (porTitular.length === 0) return null;
-    if (porTitular.length === 1) return porTitular[0];
+    const estrechar = (
+      candidatas: FilaCandidata[],
+      predicado: (fila: FilaCandidata) => boolean,
+      criterio: string,
+    ): FilaCandidata[] => {
+      const restantes = candidatas.filter(predicado);
+      if (restantes.length === 0) return candidatas;
+      if (restantes.length < candidatas.length) criterios.push(criterio);
+      return restantes;
+    };
 
-    const porNombre = porTitular.filter((candidata) =>
-      SimilitudTrigramas.superaUmbral(
-        candidata.drugName,
-        nombreMedicamento,
-        IngredientTranslationService.UMBRAL_SIMILITUD_NOMBRE,
-      ),
+    let candidatas = filas;
+    candidatas = estrechar(
+      candidatas,
+      (fila) =>
+        SimilitudTrigramas.superaUmbral(
+          fila.drugName,
+          nombreMedicamento,
+          IngredientTranslationService.UMBRAL_SIMILITUD_NOMBRE,
+        ),
+      CRITERIO_NOMBRE,
     );
-    return porNombre.length > 0 && porNombre.length <= 2 ? porNombre[0] : null;
+    candidatas = estrechar(
+      candidatas,
+      (fila) =>
+        SimilitudTrigramas.superaUmbral(
+          fila.maHolder,
+          titular,
+          IngredientTranslationService.UMBRAL_SIMILITUD_TITULAR,
+        ),
+      CRITERIO_TITULAR,
+    );
+
+    // Composición exacta: el medicamento tiene justo los principios activos reportados, ni
+    // más ni menos. Es lo que separa la combinada del producto que la contiene —Tetracoq
+    // cubre los tres componentes de una DTP, pero además lleva polio, así que no es ella—.
+    const exactas = candidatas.filter(
+      (fila) => fila.cobertura === fila.totalIngredientes && fila.cobertura === principiosReportados,
+    );
+    if (exactas.length > 0) {
+      candidatas = exactas;
+      criterios.push(CRITERIO_COMPOSICION);
+    } else {
+      const maxima = Math.max(...candidatas.map((fila) => fila.cobertura));
+      candidatas = candidatas.filter((fila) => fila.cobertura === maxima);
+      criterios.push(`cobertura ${maxima}/${principiosReportados}`);
+    }
+
+    // Último desempate, sólo si todavía compiten medicamentos distintos: entre productos por
+    // lo demás equivalentes, el que sí se vende en el país del reporte.
+    if (new Set(candidatas.map((fila) => fila.drugCode)).size > 1) {
+      candidatas = estrechar(candidatas, (fila) => fila.paisRegistro === pais, CRITERIO_PAIS);
+    }
+
+    const codigos = [...new Set(candidatas.map((fila) => fila.drugCode))];
+    if (codigos.length !== 1) return null;
+
+    // Sin ningún criterio corroborante, lo único que sostiene la elección es una cobertura
+    // parcial de principios activos, que por sí sola empareja cualquier vacuna que comparta
+    // un componente con la reportada. No basta para escribir un DRUG_CODE.
+    const corroborada = criterios.some((criterio) => CRITERIOS_CORROBORANTES.includes(criterio));
+    if (!corroborada) return null;
+
+    return {
+      drugCode: codigos[0],
+      drugName: candidatas[0].drugName,
+      cobertura: candidatas[0].cobertura,
+      criterios,
+    };
   }
 
   /**
-   * Trae todas las filas del diccionario para un principio activo.
+   * Fase 2: los identificadores del registro sanitario, que sí dependen del país.
+   *
+   * Se buscan entre **todas** las filas del medicamento identificado, no sólo entre las que
+   * sobrevivieron a los filtros de la fase 1. Un titular reportado que no coincide con
+   * ninguno de los del país no debe dejar sin MPID a una vacuna que sí está registrada allí:
+   * es el caso de Hexaxim reportado como «Sanofi Pasteur», que igualmente debe recibir el
+   * registro ecuatoriano a nombre de «Sanofi aventis».
+   *
+   * Cuando el país tiene varios titulares para el mismo medicamento se toma el más parecido
+   * al reportado. El orden de la consulta ya es estable y `sort` conserva el de los empates,
+   * así que el mismo Excel produce siempre la misma fila.
+   */
+  private static resolverRegistroDelPais(
+    identificado: MedicamentoIdentificado,
+    filas: FilaCandidata[],
+    titular: string | null,
+    principiosReportados: number,
+    pais: string,
+  ): ICodificacionVacunaWhodrugDetallada {
+    const registro =
+      filas
+        .filter((fila) => fila.drugCode === identificado.drugCode && fila.paisRegistro === pais)
+        .sort(
+          (a, b) =>
+            SimilitudTrigramas.entre(b.maHolder, titular) - SimilitudTrigramas.entre(a.maHolder, titular),
+        )[0] ?? null;
+
+    return {
+      drugCode: identificado.drugCode,
+      drugName: identificado.drugName,
+      medicinalProductId: registro?.medicinalProductId ?? null,
+      maHolder: registro?.maHolder ?? null,
+      maHolderMedicinalProductId: registro?.maHolderMedicinalProductId ?? null,
+      paisRegistro: registro ? pais : null,
+      cobertura: identificado.cobertura,
+      principiosReportados,
+      criterios: identificado.criterios,
+    };
+  }
+
+  /**
+   * Trae, en una sola consulta, todas las filas del diccionario que cubren alguno de los
+   * principios activos reportados.
    *
    * El grafo de joins es INGREDIENT_TRANSLATION → ACTIVE_INGREDIENTS → DRUG →
    * COUNTRY_SALES → MAHOLDER, expresado con las relaciones declaradas en las entidades para
    * no escribir a mano los nombres de las claves foráneas.
    *
-   * La comparación es `UPPER(...) LIKE UPPER(...)` con TRIM a ambos lados, sin comodines:
-   * equivale a una igualdad insensible a mayúsculas. Ojo si algún día se añaden comodines
-   * al parámetro, porque `%` y `_` dentro del valor pasarían a interpretarse como tales.
+   * Devuelve una fila por (medicamento, país de venta, titular) y añade los dos contadores
+   * con los que la fase 1 mide la composición: `cobertura`, cuántos de los principios
+   * reportados cubre ese medicamento, y `totalIngredientes`, cuántos le atribuye el
+   * diccionario en total. Agrupar por las columnas del país y del titular no altera la
+   * cobertura, porque el join de ingredientes es independiente de esas dos tablas.
+   *
+   * La comparación es igualdad sobre `UPPER(TRIM(...))`, no LIKE: sin comodines ambas son
+   * equivalentes, y la igualdad no corre el riesgo de que un `%` o un `_` dentro del nombre
+   * de un ingrediente pase a interpretarse como patrón.
    */
-  private async consultarPorPrincipioActivo(ingrediente: string): Promise<ICodificacionVacunaWhodrug[]> {
+  private async consultarPorPrincipiosActivos(ingredientes: string[]): Promise<FilaCandidata[]> {
+    const normalizados = ingredientes.map((ingrediente) => ingrediente.trim().toUpperCase());
+
     const filas = await this.ingredientTranslationRepository
       .createQueryBuilder('t')
-      .distinct(true)
       .innerJoin('t.activeIngredient', 'ai')
       .innerJoin('ai.drug', 'd')
       .innerJoin('d.countriesOfSale', 'cs')
       .innerJoin('cs.maholders', 'm')
+      .leftJoin(
+        '(SELECT "DRU_ID", COUNT(*) AS total FROM "WHO_DRUG"."ACTIVE_INGREDIENTS" GROUP BY "DRU_ID")',
+        'tot',
+        'tot."DRU_ID" = d."ID"',
+      )
       .select('d.drugCode', 'drugCode')
       .addSelect('d.drugName', 'drugName')
+      .addSelect('cs.iso3Code', 'paisRegistro')
       .addSelect('cs.medicinalProductID', 'medicinalProductId')
       .addSelect('m.name', 'maHolder')
       .addSelect('m.medicinalProductID', 'maHolderMedicinalProductId')
-      .where('UPPER(TRIM(t.ingredient)) LIKE UPPER(TRIM(:ingrediente))', { ingrediente })
-      // Orden estable: «la primera» tiene que significar siempre la misma fila. Sin ORDER BY
-      // explícito, PostgreSQL puede devolverlas en cualquier secuencia y el mismo Excel se
-      // codificaría distinto en cada corrida.
+      .addSelect('COUNT(DISTINCT UPPER(TRIM(t.ingredient)))', 'cobertura')
+      // Total de principios activos del medicamento. Se toma con MAX sobre un conteo ya
+      // agregado por DRU_ID, no con una subconsulta correlacionada por DRU_CODE: esa versión
+      // obligaba a PostgreSQL a recorrer entera la tabla DRUG una vez por grupo —no hay
+      // índice sobre DRU_CODE— y tardaba 19 s en el peor ingrediente frente a 0,4 s con esta.
+      // MAX y no SUM porque DRUG trae hoy cada medicamento duplicado (258.079 filas para
+      // 129.147 códigos) y ambas copias declaran los mismos principios activos: sumar los
+      // contaría dos veces y ninguna composición cuadraría.
+      .addSelect('MAX(tot.total)', 'totalIngredientes')
+      .where('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', { ingredientes: normalizados })
+      // Se agrupa por DRU_CODE y no por DRUG.ID, para que los duplicados de DRUG colapsen en
+      // una sola candidata en vez de competir entre sí.
+      .groupBy('d.drugCode')
+      .addGroupBy('d.drugName')
+      .addGroupBy('cs.iso3Code')
+      .addGroupBy('cs.medicinalProductID')
+      .addGroupBy('m.name')
+      .addGroupBy('m.medicinalProductID')
+      // Orden estable: los desempates de las dos fases tienen que resolver siempre igual.
+      // Sin ORDER BY explícito PostgreSQL puede devolver las filas en cualquier secuencia y
+      // el mismo Excel se codificaría distinto en cada corrida.
       .orderBy('d.drugCode', 'ASC')
+      .addOrderBy('cs.iso3Code', 'ASC')
       .addOrderBy('m.medicinalProductID', 'ASC')
       .getRawMany<{
         drugCode: string;
         drugName: string;
+        paisRegistro: string;
         medicinalProductId: number | null;
         maHolder: string;
         maHolderMedicinalProductId: number | null;
+        cobertura: string | number;
+        totalIngredientes: string | number;
       }>();
 
     // Los dos MPID son numéricos en WHODrug y texto en TR_DATO_VACUNA. La conversión se hace
     // aquí, comprobando contra `null` y no por veracidad, para que un identificador 0 no se
-    // convierta en nulo.
+    // convierta en nulo. Los dos contadores llegan como texto porque COUNT devuelve bigint.
     return filas.map((fila) => ({
       drugCode: fila.drugCode ?? null,
       drugName: fila.drugName ?? null,
+      paisRegistro: fila.paisRegistro ?? null,
       medicinalProductId: fila.medicinalProductId != null ? String(fila.medicinalProductId) : null,
       maHolder: fila.maHolder ?? null,
       maHolderMedicinalProductId:
         fila.maHolderMedicinalProductId != null ? String(fila.maHolderMedicinalProductId) : null,
+      cobertura: Number(fila.cobertura),
+      totalIngredientes: Number(fila.totalIngredientes),
     }));
   }
 

@@ -915,6 +915,10 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         medicinalProductId: '111',
         maHolder: 'Merck sharp & dohme',
         maHolderMedicinalProductId: '555',
+        paisRegistro: 'ECU',
+        cobertura: 1,
+        principiosReportados: 1,
+        criterios: ['laboratorio titular (col I)', 'composición exacta'],
       });
 
       const row = rowFromCols({
@@ -933,6 +937,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         'Vacuna antiVPH VLP rL1 9v (levadura)',
         'Merck sharp & dohme',
         'PatenteX',
+        'ECU',
       );
       expect(mockDatoVacuna.createByNotificacion).toHaveBeenCalledWith(
         notificacion,
@@ -972,6 +977,7 @@ describe('VigiflowIntegradorService (cobertura ampliada)', () => {
         'LabX',
         // La fila de prueba no trae columna E.
         null,
+        'ECU',
       );
     });
 
