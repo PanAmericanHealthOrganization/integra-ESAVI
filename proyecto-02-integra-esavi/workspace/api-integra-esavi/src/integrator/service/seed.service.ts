@@ -16,6 +16,7 @@ import {DestinatarioNotificacion} from 'src/mensajes/models/notificacion.interfa
 import {IAuditoria,SyncSource} from '../entity';
 import {Canton} from '../entity/canton.entity';
 import {CatalogoPadre} from '../entity/catalogo-padre.entity';
+import {CodigosTerritorialesUtils} from '../../utils/codigos-territoriales.util';
 import {Establecimiento} from '../entity/establecimiento.entity';
 import {CausalidadEsavi} from '../entity/causalidad-esavi.entity';
 import {DatoEsavi} from '../entity/dato-esavi.entity';
@@ -888,13 +889,23 @@ export class SeedService implements OnApplicationBootstrap {
       const tiposCache = new Map<string, CatalogoPadre>();
       let insertados = 0;
       let omitidos = 0;
+      // Establecimientos que traen código de parroquia pero no encuentran su fila en
+      // TC_DPA_PARROQUIA. Se cuentan y se avisan al final: cada uno es un establecimiento
+      // que quedará sin provincia ni cantón, y por tanto incapaz de aportar la residencia
+      // del paciente. Antes fallaba en silencio y por eso el 41% del catálogo estuvo mudo.
+      let sinParroquia = 0;
+      const parroquiasNoResueltas = new Set<string>();
 
       for (const row of rows) {
         const uniCodigo = String(row['UNI_CODIGO'] ?? '').trim().replace(/"/g, '').padStart(6, '0');
         const uniNombre = this.toSentenceCase(String(row['UNI_NOMBRE'] ?? '').trim());
         const direccion = String(row['UNI_DIRECCION'] ?? '').trim();
         const telefono = String(row['UNI_TELEFONO'] ?? '').trim();
-        const parCodigo = String(row['PAR_CODIGO'] ?? '').trim();
+        // El CSV se lee con `raw: false`, así que un código de parroquia como "070653" llega
+        // convertido a número y sin el cero inicial. Sin volver a rellenarlo no encuentra su
+        // fila en TC_DPA_PARROQUIA: eran 1.175 de 2.843 establecimientos —el 41%— los que se
+        // quedaban sin parroquia por esto, y con ella sin provincia ni cantón.
+        const parCodigo = CodigosTerritorialesUtils.parroquia(String(row['PAR_CODIGO'] ?? ''));
         const tipoNombre = String(row['TIPO_ENTIDAD'] ?? '').trim();
         const mail = String(row['MAIL'] ?? '').trim();
 
@@ -914,7 +925,12 @@ export class SeedService implements OnApplicationBootstrap {
 
         if (parCodigo) {
           const parroquia = await this.parroquiaRepository.findOne({ where: { codigo: parCodigo } });
-          if (parroquia) est.parroquiaResidencia = parroquia;
+          if (parroquia) {
+            est.parroquiaResidencia = parroquia;
+          } else {
+            sinParroquia++;
+            parroquiasNoResueltas.add(parCodigo);
+          }
         }
 
         if (tipoNombre) {
@@ -931,6 +947,14 @@ export class SeedService implements OnApplicationBootstrap {
         insertados++;
       }
 
+      if (sinParroquia > 0) {
+        const muestra = [...parroquiasNoResueltas].slice(0, 10).join(', ');
+        console.warn(
+          `⚠️ TR_ESTABLECIMIENTO: ${sinParroquia} establecimiento(s) con código de parroquia que no existe en ` +
+            `TC_DPA_PARROQUIA (${parroquiasNoResueltas.size} código(s) distinto(s)). Quedan sin provincia ni cantón, ` +
+            `y no podrán aportar la residencia del paciente. Muestra: ${muestra}`,
+        );
+      }
       console.log(`✅ TR_ESTABLECIMIENTO: ${insertados} insertado(s), ${omitidos} omitido(s).`);
     } catch (error) {
       console.error('❌ Error al cargar TR_ESTABLECIMIENTO desde CSV:', error);
