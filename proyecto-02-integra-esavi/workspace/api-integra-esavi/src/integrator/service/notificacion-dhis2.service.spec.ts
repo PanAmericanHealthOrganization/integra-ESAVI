@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotificacionDhis2Service } from './notificacion-dhis2.service';
 import { Notificacion } from '../entity/notificacion.entity';
 import { Parroquia } from '../entity/parroquia.entity';
-import { Establecimiento } from '../entity/establecimiento.entity';
+import { EstablecimientosService } from './establecimientos.service';
 import { NotificadorService } from './notificador.service';
 import { CatalogoPadreService } from './catalogo-padre.service';
 import { EntityNotFoundException } from '../exception/enntity-not-found.exception';
@@ -26,8 +26,8 @@ const mockParroquiaRepo = {
   findOne: jest.fn(),
 };
 
-const mockEstablecimientoRepo = {
-  findOne: jest.fn(),
+const mockEstablecimientosService = {
+  findByCodigoONombre: jest.fn(),
 };
 
 const mockNotificadorService = {
@@ -37,6 +37,7 @@ const mockNotificadorService = {
 
 const mockCatalogoPadreService = {
   buscarSubcategoriaPorSimilitud: jest.fn(),
+  findByCodigo: jest.fn(),
 };
 
 describe('NotificacionDhis2Service', () => {
@@ -44,13 +45,17 @@ describe('NotificacionDhis2Service', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockCatalogoPadreService.findByCodigo.mockImplementation((codigo: string) =>
+      Promise.resolve({ id: `cp-${codigo}`, codigo }),
+    );
+    mockEstablecimientosService.findByCodigoONombre.mockResolvedValue(null);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         NotificacionDhis2Service,
         { provide: getRepositoryToken(Notificacion, 'POSTGRES_INTEGRATOR_DS'), useValue: mockNotificacionRepo },
         { provide: getRepositoryToken(Parroquia, 'POSTGRES_INTEGRATOR_DS'), useValue: mockParroquiaRepo },
-        { provide: getRepositoryToken(Establecimiento, 'POSTGRES_INTEGRATOR_DS'), useValue: mockEstablecimientoRepo },
+        { provide: EstablecimientosService, useValue: mockEstablecimientosService },
         { provide: NotificadorService, useValue: mockNotificadorService },
         { provide: CatalogoPadreService, useValue: mockCatalogoPadreService },
       ],
@@ -91,7 +96,7 @@ describe('NotificacionDhis2Service', () => {
         Promise.resolve({ id: `cp-${tipo}` }),
       );
       mockParroquiaRepo.findOne.mockResolvedValue({ id: 'parr-1' });
-      mockEstablecimientoRepo.findOne.mockResolvedValue({ id: 'est-1' });
+      mockEstablecimientosService.findByCodigoONombre.mockResolvedValue({ id: 'est-1' });
 
       const result = await service.create(
         {
@@ -108,9 +113,9 @@ describe('NotificacionDhis2Service', () => {
       expect(result.parroquiaResidencia).toEqual({ id: 'parr-1' });
       expect(result.tipoEmisor).toEqual({ id: 'cp-TIPO_EMISOR' });
       expect(result.establecimiento).toEqual({ id: 'est-1' });
-      expect(mockEstablecimientoRepo.findOne).toHaveBeenCalledWith({
-        where: { uniCodigo: '170150', isEnabled: true },
-      });
+      expect(mockEstablecimientosService.findByCodigoONombre).toHaveBeenCalledWith('170150', null);
+      // La residencia venía declarada en el formulario, y así queda marcada.
+      expect(result.origenResidencia).toEqual({ id: 'cp-RESIDENCIA_DECLARADA', codigo: 'RESIDENCIA_DECLARADA' });
     });
 
     it('calcula edad automáticamente si no vienen edad ni unidadEdadPaciente juntas', async () => {
@@ -333,6 +338,134 @@ describe('NotificacionDhis2Service', () => {
     it('convierte MES/MESES > 11 a años', () => {
       const result = service.calcularEdadUnidadParaGrupoEtario(24, 'MESES');
       expect(result).toEqual({ edadCalculada: 2, unidadEdadCalculada: 'AÑOS' });
+    });
+  });
+
+  // ─── cascada de residencia ──────────────────────────────────────────────────
+
+  /*
+   * La residencia declarada llega sólo cuando quien notifica rellena los tres data elements
+   * de provincia/cantón/parroquia. Cuando no, se deriva del establecimiento —que es una
+   * aproximación—, y por eso cada valor queda marcado con su procedencia.
+   */
+  describe('resolución de la residencia', () => {
+    const parroquiaDelEstablecimiento = { codigo: '040651', nombre: 'Mariscal sucre' };
+    const establecimientoConParroquia = {
+      id: 'est-huaca',
+      uniCodigo: '002526',
+      uniNombre: 'Dispensario popular huaqueña',
+      parroquiaResidencia: parroquiaDelEstablecimiento,
+    };
+
+    const crear = (dto: Record<string, any>) =>
+      service.create({ codigoDhis2Evento: 'EVT-RES', residenciaPaciente: {}, ...dto } as any, { id: 'p1' } as any);
+
+    beforeEach(() => {
+      mockNotificacionRepo.findOne.mockResolvedValue(null);
+      mockNotificacionRepo.save.mockImplementation((n) => Promise.resolve(n));
+    });
+
+    it('deriva la residencia del establecimiento de atención cuando no viene declarada', async () => {
+      mockEstablecimientosService.findByCodigoONombre.mockResolvedValue(establecimientoConParroquia);
+
+      const result = await crear({ codigoUnidadSalud: '002526' });
+
+      expect(result.parroquiaResidencia).toEqual(parroquiaDelEstablecimiento);
+      expect(result.establecimiento).toEqual(establecimientoConParroquia);
+      expect(result.origenResidencia.codigo).toBe('RESIDENCIA_ESTABLECIMIENTO_ATENCION');
+    });
+
+    /*
+     * El caso que motivó todo esto: sin data elements de residencia y sin «Unicódigo», lo
+     * único que queda es la unidad organizativa que realizó la inscripción, que DHIS2 sí
+     * entrega siempre y que hasta ahora se extraía y se tiraba.
+     */
+    it('deriva la residencia de la unidad organizativa de inscripción como último recurso', async () => {
+      mockEstablecimientosService.findByCodigoONombre.mockImplementation((codigo: string, nombre: string) =>
+        Promise.resolve(codigo === '002526' || nombre === 'Dispensario Popular Huaqueña' ? establecimientoConParroquia : null),
+      );
+
+      const result = await crear({
+        organizacionUnitCode: '002526',
+        organizacionNotificador: 'Dispensario Popular Huaqueña',
+      });
+
+      expect(result.parroquiaResidencia).toEqual(parroquiaDelEstablecimiento);
+      expect(result.origenResidencia.codigo).toBe('RESIDENCIA_UNIDAD_INSCRIPCION');
+    });
+
+    it('prefiere el establecimiento de atención sobre la unidad de inscripción', async () => {
+      const deAtencion = { id: 'est-atencion', parroquiaResidencia: { codigo: '170150' } };
+      mockEstablecimientosService.findByCodigoONombre.mockImplementation((codigo: string) =>
+        Promise.resolve(codigo === '170150' ? deAtencion : establecimientoConParroquia),
+      );
+
+      const result = await crear({ codigoUnidadSalud: '170150', organizacionUnitCode: '002526' });
+
+      expect(result.parroquiaResidencia).toEqual({ codigo: '170150' });
+      expect(result.origenResidencia.codigo).toBe('RESIDENCIA_ESTABLECIMIENTO_ATENCION');
+    });
+
+    /*
+     * Un establecimiento sin parroquia no sirve para derivar residencia, pero sigue siendo el
+     * establecimiento de la notificación: se conserva y se pasa al siguiente escalón.
+     */
+    it('sigue a la unidad de inscripción si el establecimiento de atención no tiene parroquia', async () => {
+      const sinParroquia = { id: 'est-sin-parr', parroquiaResidencia: null };
+      mockEstablecimientosService.findByCodigoONombre.mockImplementation((codigo: string) =>
+        Promise.resolve(codigo === '999999' ? sinParroquia : establecimientoConParroquia),
+      );
+
+      const result = await crear({ codigoUnidadSalud: '999999', organizacionUnitCode: '002526' });
+
+      expect(result.parroquiaResidencia).toEqual(parroquiaDelEstablecimiento);
+      expect(result.establecimiento).toEqual(sinParroquia);
+      expect(result.origenResidencia.codigo).toBe('RESIDENCIA_UNIDAD_INSCRIPCION');
+    });
+
+    it('marca SIN_DATO cuando ningún escalón resuelve', async () => {
+      mockEstablecimientosService.findByCodigoONombre.mockResolvedValue(null);
+
+      const result = await crear({ codigoUnidadSalud: 'no-existe' });
+
+      expect(result.parroquiaResidencia).toBeUndefined();
+      expect(result.origenResidencia.codigo).toBe('RESIDENCIA_SIN_DATO');
+    });
+
+    it('no consulta establecimientos cuando no hay ni código ni nombre', async () => {
+      await crear({});
+      expect(mockEstablecimientosService.findByCodigoONombre).not.toHaveBeenCalled();
+    });
+
+    /*
+     * En una reimportación, un origen que dejó de traer el dato no debe borrar una residencia
+     * que ya se había resuelto bien. Sólo se escribe lo que se resolvió.
+     */
+    it('no borra la residencia existente cuando la reimportación no resuelve nada', async () => {
+      const existente: any = {
+        id: 'n-existente',
+        parroquiaResidencia: { codigo: '170150' },
+        establecimiento: { id: 'est-previo' },
+      };
+      mockNotificacionRepo.findOne.mockResolvedValue(existente);
+      mockEstablecimientosService.findByCodigoONombre.mockResolvedValue(null);
+
+      const result = await service.update(existente, { residenciaPaciente: {} } as any, { id: 'p1' } as any);
+
+      expect(result.parroquiaResidencia).toEqual({ codigo: '170150' });
+      expect(result.establecimiento).toEqual({ id: 'est-previo' });
+    });
+
+    it('consulta el catálogo de procedencia una sola vez por código', async () => {
+      mockEstablecimientosService.findByCodigoONombre.mockResolvedValue(establecimientoConParroquia);
+
+      await crear({ codigoUnidadSalud: '002526' });
+      await crear({ codigoUnidadSalud: '002526' });
+
+      const llamadas = mockCatalogoPadreService.findByCodigo.mock.calls.filter(
+        ([codigo]) => codigo === 'RESIDENCIA_ESTABLECIMIENTO_ATENCION',
+      );
+      expect(llamadas).toHaveLength(1);
     });
   });
 });

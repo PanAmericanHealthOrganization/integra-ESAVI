@@ -38,6 +38,21 @@ export class Notificacion extends Auditoria {
   @JoinColumn({ name: 'CTPARROQUIA_CODIGO', referencedColumnName: 'codigo' })
   parroquiaResidencia: Parroquia;
 
+  /**
+   * De dónde salió la parroquia de residencia.
+   *
+   * No todas las residencias valen lo mismo. La declarada en el formulario es un dato del
+   * paciente; la derivada del establecimiento es una aproximación —la gente suele atenderse
+   * cerca de casa, pero no siempre—. Mezclarlas sin distinguirlas haría que un brote
+   * aparente pudiera ser, en realidad, la parroquia donde está el centro de salud.
+   *
+   * Se propaga hasta `datos_procesados` del datamart para que el tablero pueda separarlas.
+   * Valores en TC_CATALOGO_PADRE bajo el código padre ORIGEN_RESIDENCIA.
+   */
+  @ManyToOne(() => CatalogoPadre, { nullable: true, eager: false })
+  @JoinColumn({ name: 'CT_ORIGEN_RESIDENCIA_ID' })
+  origenResidencia: CatalogoPadre;
+
 
 
   /**

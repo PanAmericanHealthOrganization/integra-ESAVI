@@ -3,6 +3,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {plainToClass} from 'class-transformer';
 import {Repository} from 'typeorm';
 import {CreateNotificacionDto} from '../dto';
+import {CatalogoPadre} from '../entity/catalogo-padre.entity';
 import {Establecimiento} from '../entity/establecimiento.entity';
 import {Notificacion} from '../entity/notificacion.entity';
 import {Notificador} from '../entity/notificador.entity';
@@ -11,7 +12,15 @@ import {Parroquia} from '../entity/parroquia.entity';
 import {SourceEnum} from '../enum/source-enum';
 import {EntityNotFoundException} from '../exception/enntity-not-found.exception';
 import {CatalogoPadreService} from './catalogo-padre.service';
+import {EstablecimientosService} from './establecimientos.service';
 import {NotificadorService} from './notificador.service';
+
+/** Lo que resuelve la cascada de residencia: dónde vive el paciente y con qué respaldo. */
+interface ResidenciaResuelta {
+  parroquia: Parroquia | null;
+  establecimiento: Establecimiento | null;
+  origen: CatalogoPadre | null;
+}
 
 @Injectable()
 export class NotificacionDhis2Service {
@@ -22,17 +31,131 @@ export class NotificacionDhis2Service {
     private readonly notificacionRepository: Repository<Notificacion>,
     @InjectRepository(Parroquia, 'POSTGRES_INTEGRATOR_DS')
     private readonly parroquiaRepository: Repository<Parroquia>,
-    @InjectRepository(Establecimiento, 'POSTGRES_INTEGRATOR_DS')
-    private readonly establecimientoRepository: Repository<Establecimiento>,
+    private readonly establecimientosService: EstablecimientosService,
     private readonly notificadorService: NotificadorService,
     private readonly catalogoPadreService: CatalogoPadreService,
   ) {}
 
-  private async findEstablecimientoByCodigo(codigoUnidadSalud: string): Promise<Establecimiento | null> {
-    if (!codigoUnidadSalud) return null;
-    return this.establecimientoRepository.findOne({
-      where: { uniCodigo: codigoUnidadSalud.trim(), isEnabled: true },
-    });
+  /**
+   * Memo de los cuatro valores de ORIGEN_RESIDENCIA. Una importación crea cientos de
+   * notificaciones y todas resuelven su procedencia entre esos cuatro: sin memo serían
+   * cientos de consultas idénticas.
+   */
+  private readonly origenResidenciaCache = new Map<string, CatalogoPadre | null>();
+
+  /**
+   * Resuelve la residencia del paciente y deja constancia de de dónde salió.
+   *
+   * DHIS2 sólo trae la residencia declarada cuando quien notifica rellena los tres data
+   * elements de provincia/cantón/parroquia, cosa que a menudo no ocurre: en la base, ninguna
+   * notificación tenía CTPARROQUIA_CODIGO, y el datamart la mapea a `geonoti`, el eje
+   * territorial del tablero. Lo que sí llega casi siempre es el establecimiento, y de él
+   * cuelga la cadena parroquia → cantón → provincia.
+   *
+   * De ahí la cascada, de más fiable a menos:
+   *
+   *   1. La residencia declarada en el formulario. Es un dato del paciente.
+   *   2. El establecimiento de atención (data element «Unicódigo»).
+   *   3. La unidad organizativa que realizó la inscripción, que DHIS2 entrega como
+   *      «Organisation unit code/name». Hasta ahora se extraía y se descartaba.
+   *
+   * Las dos últimas son aproximaciones —la gente suele atenderse cerca de casa, pero no
+   * siempre—, y por eso se marcan como tales en ORIGEN_RESIDENCIA en vez de hacerse pasar
+   * por declaradas.
+   *
+   * Cobertura: sólo alcanza a los establecimientos presentes en TR_ESTABLECIMIENTO, que hoy
+   * son los del MSP. Lo notificado desde IESS o prestadores privados no resolverá por los
+   * pasos 2 y 3 mientras el catálogo no se amplíe.
+   */
+  private async resolverResidencia(createDto: CreateNotificacionDto): Promise<ResidenciaResuelta> {
+    // 1. Declarada en el formulario.
+    if (createDto.residenciaPaciente?.parroquia) {
+      try {
+        const parroquia = await this.findParroquiaByCodigo(createDto.residenciaPaciente.parroquia);
+        if (parroquia) {
+          return {
+            parroquia,
+            establecimiento: await this.resolverEstablecimiento(createDto),
+            origen: await this.buscarOrigenResidencia('RESIDENCIA_DECLARADA'),
+          };
+        }
+      } catch (error: any) {
+        this.logger.warn(`No se pudo resolver la parroquia declarada: ${error.message}`);
+      }
+    }
+
+    // 2. Establecimiento de atención (data element «Unicódigo»).
+    const deAtencion = await this.buscarEstablecimiento(createDto.codigoUnidadSalud, null);
+    if (deAtencion?.parroquiaResidencia) {
+      return {
+        parroquia: deAtencion.parroquiaResidencia,
+        establecimiento: deAtencion,
+        origen: await this.buscarOrigenResidencia('RESIDENCIA_ESTABLECIMIENTO_ATENCION'),
+      };
+    }
+
+    // 3. Unidad organizativa que realizó la inscripción.
+    const deInscripcion = await this.buscarEstablecimiento(
+      createDto.organizacionUnitCode,
+      createDto.organizacionNotificador ?? createDto.organizacionUnit,
+    );
+    if (deInscripcion?.parroquiaResidencia) {
+      return {
+        parroquia: deInscripcion.parroquiaResidencia,
+        // El establecimiento de atención manda si se resolvió, aunque no tuviese parroquia.
+        establecimiento: deAtencion ?? deInscripcion,
+        origen: await this.buscarOrigenResidencia('RESIDENCIA_UNIDAD_INSCRIPCION'),
+      };
+    }
+
+    return {
+      parroquia: null,
+      establecimiento: deAtencion ?? deInscripcion,
+      origen: await this.buscarOrigenResidencia('RESIDENCIA_SIN_DATO'),
+    };
+  }
+
+  /** El establecimiento de atención, para las ramas de la cascada que no lo derivan. */
+  private resolverEstablecimiento(createDto: CreateNotificacionDto): Promise<Establecimiento | null> {
+    return this.buscarEstablecimiento(createDto.codigoUnidadSalud, null);
+  }
+
+  private async buscarEstablecimiento(codigo?: string | null, nombre?: string | null): Promise<Establecimiento | null> {
+    if (!codigo?.trim() && !nombre?.trim()) return null;
+    try {
+      return await this.establecimientosService.findByCodigoONombre(codigo, nombre);
+    } catch (error: any) {
+      this.logger.warn(`No se pudo resolver el establecimiento "${codigo ?? nombre}": ${error.message}`);
+      return null;
+    }
+  }
+
+  private async buscarOrigenResidencia(codigo: string): Promise<CatalogoPadre | null> {
+    if (this.origenResidenciaCache.has(codigo)) return this.origenResidenciaCache.get(codigo);
+    try {
+      const valor = (await this.catalogoPadreService.findByCodigo(codigo)) ?? null;
+      if (!valor) {
+        this.logger.warn(`ORIGEN_RESIDENCIA "${codigo}" no existe en TC_CATALOGO_PADRE; ¿falta sembrar el catálogo?`);
+      }
+      this.origenResidenciaCache.set(codigo, valor);
+      return valor;
+    } catch (error: any) {
+      this.logger.warn(`No se pudo resolver ORIGEN_RESIDENCIA "${codigo}": ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
+   * Aplica la residencia resuelta sobre la notificación.
+   *
+   * Nunca sobrescribe con nulo lo que ya estaba: en una reimportación, una parroquia que
+   * antes se resolvió y esta vez no —porque el origen dejó de traer el dato, o el catálogo
+   * cambió— borraría un dato bueno sin dejar rastro. Sólo se escribe lo que se resolvió.
+   */
+  private aplicarResidencia(notificacion: Notificacion, residencia: ResidenciaResuelta): void {
+    if (residencia.parroquia) notificacion.parroquiaResidencia = residencia.parroquia;
+    if (residencia.establecimiento) notificacion.establecimiento = residencia.establecimiento;
+    if (residencia.origen) notificacion.origenResidencia = residencia.origen;
   }
 
   // async create(
@@ -131,29 +254,13 @@ export class NotificacionDhis2Service {
           if (unidadEdad) notificacion.unidadEdad = unidadEdad;
         }
 
-        if (createDto.residenciaPaciente.parroquia) {
-          try {
-            notificacion.parroquiaResidencia = await this.findParroquiaByCodigo(
-              createDto.residenciaPaciente.parroquia,
-            );
-          } catch (error:any) {
-            console.error(`Error al buscar parroquia: ${error.message}`);
-          }
-        }
+        this.aplicarResidencia(notificacion, await this.resolverResidencia(createDto));
 
         if (createDto.tipoEmisor) {
           try {
             notificacion.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
           } catch (error: any) {
             console.error(`Error al buscar tipoEmisor: ${error.message}`);
-          }
-        }
-
-        if (createDto.codigoUnidadSalud) {
-          try {
-            notificacion.establecimiento = await this.findEstablecimientoByCodigo(createDto.codigoUnidadSalud);
-          } catch (error: any) {
-            console.error(`Error al buscar establecimiento: ${error.message}`);
           }
         }
 
@@ -295,15 +402,7 @@ export class NotificacionDhis2Service {
       if (unidadEdad) notificacionExistente.unidadEdad = unidadEdad;
     }
 
-    if (createDto.residenciaPaciente.parroquia) {
-      try {
-        notificacionExistente.parroquiaResidencia = await this.findParroquiaByCodigo(
-          createDto.residenciaPaciente.parroquia,
-        );
-      } catch (error:any) {
-        console.error(`Error al buscar parroquia: ${error.message}`);
-      }
-    }
+    this.aplicarResidencia(notificacionExistente, await this.resolverResidencia(createDto));
 
     // GRUPO ETARIO
     // if (createDto.edad) {
@@ -337,14 +436,6 @@ export class NotificacionDhis2Service {
         notificacionExistente.tipoEmisor = await this.catalogoPadreService.buscarSubcategoriaPorSimilitud('TIPO_EMISOR', createDto.tipoEmisor);
       } catch (error: any) {
         console.error(`Error al buscar tipoEmisor: ${error.message}`);
-      }
-    }
-
-    if (createDto.codigoUnidadSalud) {
-      try {
-        notificacionExistente.establecimiento = await this.findEstablecimientoByCodigo(createDto.codigoUnidadSalud);
-      } catch (error: any) {
-        console.error(`Error al buscar establecimiento: ${error.message}`);
       }
     }
 

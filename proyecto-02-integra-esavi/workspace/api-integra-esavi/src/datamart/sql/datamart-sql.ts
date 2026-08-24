@@ -71,7 +71,11 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
 
     // 1.2 Reportes (notificaciones)
     //   caseid  = CODIGO_ORIGEN_NOTIFICACION (reemplaza el coalesce DHIS2/VIGIFLOW del R)
-    //   geonoti = CTPARROQUIA_CODIGO (unidad geográfica; hoy sin poblar en la BD)
+    //   geonoti = CTPARROQUIA_CODIGO (unidad geográfica)
+    //   origen_residencia = de dónde salió esa parroquia. No todas valen lo mismo: la
+    //   declarada es un dato del paciente, la derivada del establecimiento es una
+    //   aproximación. Sin esta marca, un brote aparente puede ser sólo la parroquia donde
+    //   está el centro de salud, así que viaja hasta datos_procesados.
     `CREATE OR REPLACE TABLE raw_report AS
      SELECT tn."ID"::VARCHAR                     AS id,
             tn."PACIENTE_ID"::VARCHAR            AS patient_id,
@@ -80,9 +84,11 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
             tn."EDAD"                            AS edadinicreg,
             cu."DESCRIPCION"                     AS unidadedad,
             tn."CTPARROQUIA_CODIGO"              AS geonoti,
+            COALESCE(cor."NOMBRE", 'Sin info')   AS origen_residencia,
             tn."FECHA_NOTIFICACION"::DATE        AS fechanot
      FROM ${S}."TR_NOTIFICACION" tn
-     LEFT JOIN ${S}."TC_CATALOGO_PADRE" cu ON cu."ID" = tn."CTUNIDADEDAD_ID"
+     LEFT JOIN ${S}."TC_CATALOGO_PADRE" cu  ON cu."ID"  = tn."CTUNIDADEDAD_ID"
+     LEFT JOIN ${S}."TC_CATALOGO_PADRE" cor ON cor."ID" = tn."CT_ORIGEN_RESIDENCIA_ID"
      WHERE tn."FECHA_NOTIFICACION" IS NOT NULL`,
 
     // 1.3 Eventos ESAVI (codmeddraesavip = CODIGO_ESAVI_MEDDRA_LLT, antes CODIGO_LLT)
@@ -251,7 +257,7 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
     `CREATE OR REPLACE TABLE dim_report AS
      WITH base AS (
        SELECT r.id AS report_id, r.caseid, r.pais_iso, r.edadinicreg, r.unidadedad,
-              r.geonoti, r.fechanot,
+              r.geonoti, r.origen_residencia, r.fechanot,
               p.sexo AS sexo_raw, p.fechanac, p.etnia,
               fv.fvacunac, fi.fecinesavi
        FROM raw_report r
@@ -380,6 +386,7 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
      SELECT DISTINCT
        u.report_id, r.caseid, r.fechanot, r."añoNoti", r."mesNoti", r."periodoNoti", r."semEpiNoti",
        r.edad, r.grupo_etario, r.grupo_etario_menores, r.grupo_etario_hcue, r.sexo, r.geo_pais, r.pais_iso, r.geonoti,
+       r.origen_residencia,
        r.desenesv, r.marca_grave, r.marca_menores, r.marca_embarazo, r.marca_muerte,
        r.fvacunac, r.fecinesavi, r.dias_vac_ini_cat, r.dias_vac_ini,
        u.id_event_smq, ev.event_id, ev.pt, ev.hlt, ev.hlgt, ev.soc, ev.smq,

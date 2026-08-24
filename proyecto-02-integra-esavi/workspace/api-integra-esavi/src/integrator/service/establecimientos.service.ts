@@ -5,6 +5,7 @@ import { CreateEstablecimientoDto, UpdateEstablecimientoDto } from '../dto/estab
 import { CatalogoPadre } from '../entity/catalogo-padre.entity';
 import { Establecimiento } from '../entity/establecimiento.entity';
 import { Parroquia } from '../entity/parroquia.entity';
+import { CodigosTerritorialesUtils } from '../../utils/codigos-territoriales.util';
 
 const FALLBACK_USER = process.env.USUARIO_INSERTA_REGISTRO || 'SYSTEM';
 
@@ -14,8 +15,21 @@ const toSentenceCase = (text: string): string => {
   return lower.charAt(0).toUpperCase() + lower.slice(1);
 };
 
-const padUniCodigo = (codigo: string): string =>
-  /^[0-9]+$/.test(codigo) ? codigo.padStart(6, '0') : codigo;
+const padUniCodigo = (codigo: string): string => CodigosTerritorialesUtils.unicodigo(codigo) ?? codigo;
+
+/**
+ * Normaliza un nombre de establecimiento para poder compararlo: sin tildes, sin puntuación
+ * ni espacios repetidos, en minúsculas. DHIS2 entrega la unidad organizativa en mayúsculas
+ * («DISPENSARIO POPULAR HUAQUEÑA») y TR_ESTABLECIMIENTO la guarda en sentence-case, así que
+ * una igualdad literal entre ambas no acierta nunca.
+ */
+const normalizarNombre = (nombre: string): string =>
+  nombre
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 
 @Injectable()
 export class EstablecimientosService {
@@ -69,6 +83,7 @@ export class EstablecimientosService {
     }
 
     try {
+      this.invalidarIndicePorNombre();
       return await this.establecimientoRepository.save(establecimiento);
     } catch (err) {
       this.logger.error('Error al guardar establecimiento', err);
@@ -152,6 +167,67 @@ export class EstablecimientosService {
     return est;
   }
 
+  /**
+   * Índice en memoria por nombre normalizado, para resolver la unidad organizativa de DHIS2
+   * sin una consulta por notificación. Se llena la primera vez que hace falta y vive lo que
+   * viva el proceso: TR_ESTABLECIMIENTO sólo cambia cuando alguien la edita a mano o se
+   * vuelve a sembrar, y en ambos casos `invalidarIndicePorNombre()` lo descarta.
+   *
+   * Los nombres duplicados se guardan como colisión y no resuelven: hay establecimientos
+   * distintos con el mismo nombre en cantones distintos —«Mariscal Sucre» aparece varias
+   * veces—, y elegir uno al azar pondría al paciente en otra provincia.
+   */
+  private indicePorNombre: Map<string, Establecimiento | null> | null = null;
+
+  /** Descarta el índice por nombre. Se llama al crear, actualizar o borrar un establecimiento. */
+  invalidarIndicePorNombre(): void {
+    this.indicePorNombre = null;
+  }
+
+  private async obtenerIndicePorNombre(): Promise<Map<string, Establecimiento | null>> {
+    if (this.indicePorNombre) return this.indicePorNombre;
+
+    const todos = await this.establecimientoRepository.find({
+      where: { isEnabled: true },
+      relations: this.RELATIONS,
+    });
+
+    const indice = new Map<string, Establecimiento | null>();
+    for (const est of todos) {
+      const clave = normalizarNombre(est.uniNombre ?? '');
+      if (!clave) continue;
+      // `null` marca un nombre ambiguo: existe más de un establecimiento que lo lleva.
+      indice.set(clave, indice.has(clave) ? null : est);
+    }
+    this.indicePorNombre = indice;
+    return indice;
+  }
+
+  /**
+   * Resuelve un establecimiento a partir de lo que DHIS2 entrega de la unidad organizativa:
+   * primero por código —normalizado a seis dígitos, porque el catálogo se sembró así y DHIS2
+   * puede entregarlo sin los ceros iniciales— y, si no aparece, por nombre normalizado.
+   *
+   * Devuelve el establecimiento con la cadena parroquia → cantón → provincia ya cargada, que
+   * es lo que necesita quien deriva de aquí la residencia del paciente.
+   */
+  async findByCodigoONombre(codigo?: string | null, nombre?: string | null): Promise<Establecimiento | null> {
+    const uniCodigo = CodigosTerritorialesUtils.unicodigo(codigo);
+    if (uniCodigo) {
+      const porCodigo = await this.establecimientoRepository.findOne({
+        where: { uniCodigo, isEnabled: true },
+        relations: this.RELATIONS,
+      });
+      if (porCodigo) return porCodigo;
+    }
+
+    const clave = normalizarNombre(nombre ?? '');
+    if (!clave) return null;
+
+    const indice = await this.obtenerIndicePorNombre();
+    return indice.get(clave) ?? null;
+  }
+
   async update(id: string, dto: UpdateEstablecimientoDto, currentUser = FALLBACK_USER): Promise<Establecimiento> {
     const est = await this.findOne(id);
 
@@ -186,6 +262,7 @@ export class EstablecimientosService {
       updatedAt: new Date(),
     });
 
+    this.invalidarIndicePorNombre();
     return this.establecimientoRepository.save(est);
   }
 
@@ -194,6 +271,7 @@ export class EstablecimientosService {
     est.isEnabled = false;
     est.deletedAt = new Date();
     est.deletedBy = currentUser;
+    this.invalidarIndicePorNombre();
     return this.establecimientoRepository.save(est);
   }
 }

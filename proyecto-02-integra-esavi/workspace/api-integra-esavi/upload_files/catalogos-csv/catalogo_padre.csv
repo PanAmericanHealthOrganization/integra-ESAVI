@@ -66,3 +66,8 @@ UE_HORA,UNIDAD_EDAD,Hora,
 UE_MES,UNIDAD_EDAD,Mes,
 UE_MESES,UNIDAD_EDAD,Meses,
 UE_SEMANA,UNIDAD_EDAD,Semana,
+ORIGEN_RESIDENCIA,,Procedencia de la residencia del paciente,
+RESIDENCIA_DECLARADA,ORIGEN_RESIDENCIA,Declarada en el formulario de notificación,1
+RESIDENCIA_ESTABLECIMIENTO_ATENCION,ORIGEN_RESIDENCIA,Derivada del establecimiento de atención,2
+RESIDENCIA_UNIDAD_INSCRIPCION,ORIGEN_RESIDENCIA,Derivada de la unidad organizativa que realizó la inscripción,3
+RESIDENCIA_SIN_DATO,ORIGEN_RESIDENCIA,No fue posible determinar la residencia,4
