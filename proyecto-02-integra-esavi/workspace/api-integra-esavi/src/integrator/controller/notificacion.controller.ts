@@ -72,7 +72,22 @@ export class NotificacionController {
   @ApiResponse({ status: 404, description: 'The record has not been found.' })
   findOne(@Param('uuid', new ParseUUIDPipe()) uuid: string, @Query('r') relation?: string) {
     if (relation) {
-      const allowedRelations: string[] = ['paciente', 'paciente.sexo', 'notificador', 'notificador.profesion', 'tipoReporte', 'tipoEmisor'];
+      // La cadena de residencia ya viene por defecto desde el servicio; se admite igualmente
+      // aquí para que un cliente que la pida explícitamente no reciba un 400.
+      const allowedRelations: string[] = [
+        'paciente',
+        'paciente.sexo',
+        'paciente.autoIdentificacion',
+        'notificador',
+        'notificador.profesion',
+        'tipoReporte',
+        'tipoEmisor',
+        'establecimiento',
+        'parroquiaResidencia',
+        'parroquiaResidencia.canton',
+        'parroquiaResidencia.canton.provincia',
+        'origenResidencia',
+      ];
       const requestedRelations: string[] = relation.split(',');
 
       const invalidRelations = requestedRelations.filter((rel) => !allowedRelations.includes(rel));

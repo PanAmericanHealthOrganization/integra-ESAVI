@@ -50,7 +50,20 @@ export class NotificacionService {
   }
 
   async findOne(uuid: string, relation?: string): Promise<Notificacion> {
-    const relations: string[] = ['establecimiento', 'tipoReporte', 'tipoEmisor'];
+    // La residencia va en las relaciones por defecto, no a petición del cliente: la ficha
+    // del ESAVI siempre la muestra, y sin la cadena parroquia → cantón → provincia sólo
+    // podría pintar la parroquia. `origenResidencia` viaja con ella porque una residencia
+    // derivada del establecimiento no significa lo mismo que una declarada por el paciente,
+    // y quien la lea tiene que poder distinguirlas.
+    const relations: string[] = [
+      'establecimiento',
+      'tipoReporte',
+      'tipoEmisor',
+      'parroquiaResidencia',
+      'parroquiaResidencia.canton',
+      'parroquiaResidencia.canton.provincia',
+      'origenResidencia',
+    ];
     if (relation) {
       for (const r of relation.split(',')) {
         if (!relations.includes(r)) relations.push(r);

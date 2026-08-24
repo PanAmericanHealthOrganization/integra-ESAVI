@@ -104,6 +104,57 @@ const FieldCell = ({ label, value }: FieldRowProps) => (
   </Box>
 )
 
+/*
+ * Procedencia de la residencia (TC_CATALOGO_PADRE, código padre ORIGEN_RESIDENCIA).
+ *
+ * Sólo la declarada es un dato que dio el paciente. Las otras dos se derivan del
+ * establecimiento y son una aproximación razonable pero no un hecho, así que se marcan en
+ * ámbar para que nadie las lea como si lo fueran.
+ */
+const PROCEDENCIA_RESIDENCIA: Record<
+  string,
+  { etiqueta: string; detalle: string; color: "success" | "warning" | "default" }
+> = {
+  RESIDENCIA_DECLARADA: {
+    etiqueta: "Declarada",
+    detalle: "La residencia la declaró quien notificó el caso.",
+    color: "success",
+  },
+  RESIDENCIA_ESTABLECIMIENTO_ATENCION: {
+    etiqueta: "Derivada del establecimiento de atención",
+    detalle:
+      "No se declaró la residencia: se tomó la ubicación del establecimiento donde se atendió al paciente.",
+    color: "warning",
+  },
+  RESIDENCIA_UNIDAD_INSCRIPCION: {
+    etiqueta: "Derivada de la unidad de inscripción",
+    detalle:
+      "No se declaró la residencia ni el establecimiento de atención: se tomó la ubicación de la unidad organizativa que realizó la inscripción.",
+    color: "warning",
+  },
+  RESIDENCIA_SIN_DATO: {
+    etiqueta: "Sin determinar",
+    detalle: "No fue posible establecer la residencia con los datos recibidos.",
+    color: "default",
+  },
+}
+
+const ProcedenciaResidencia = ({ origen }: { origen?: string | null }) => {
+  const procedencia = origen ? PROCEDENCIA_RESIDENCIA[origen] : undefined
+  if (!procedencia) return null
+
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1, flexWrap: "wrap" }}>
+      <Typography variant="caption" color="text.secondary">
+        Procedencia del dato
+      </Typography>
+      <Tooltip title={procedencia.detalle}>
+        <Chip size="small" label={procedencia.etiqueta} color={procedencia.color} variant="outlined" />
+      </Tooltip>
+    </Box>
+  )
+}
+
 // RESULTADO_EVENTO se guarda homologado a código numérico (ver TR_DESENLACE_ESAVI).
 const RESULTADO_EVENTO: Record<string, string> = {
   "0": "Desconocido",
@@ -372,13 +423,13 @@ const TabPaciente = () => {
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Provincia"
-              value={record.provinciaResidencia?.nombre}
+              value={record.parroquiaResidencia?.canton?.provincia?.nombre}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <FieldRow
               label="Cantón"
-              value={record.cantonResidencia?.nombre}
+              value={record.parroquiaResidencia?.canton?.nombre}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -387,6 +438,17 @@ const TabPaciente = () => {
               value={record.parroquiaResidencia?.nombre}
             />
           </Grid>
+          {/*
+            La procedencia no es un adorno: sólo la residencia declarada es un dato del
+            paciente. Las derivadas del establecimiento son una aproximación —la gente suele
+            atenderse cerca de casa, pero no siempre—, y presentarlas sin distinguirlas
+            llevaría a leer como residencia lo que es la ubicación del centro de salud.
+          */}
+          {record.parroquiaResidencia && (
+            <Grid item xs={12}>
+              <ProcedenciaResidencia origen={record.origenResidencia?.codigo} />
+            </Grid>
+          )}
         </Grid>
       </Grid>
 

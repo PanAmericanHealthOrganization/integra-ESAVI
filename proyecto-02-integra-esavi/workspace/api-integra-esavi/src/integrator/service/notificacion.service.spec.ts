@@ -34,6 +34,21 @@ const mockAntecedenteEmbarazoService = { findAntecedenteEmbarazoByNotificacionUU
 const mockAntecedenteEventoService = { findAntecedenteEventoByNotificacionUUID: jest.fn() };
 const mockAntecedentePreexistenciaService = { findAntecedentePreexistenciaByNotificacionUUID: jest.fn() };
 
+/*
+ * Relaciones que findOne carga siempre. La cadena de residencia va aquí y no a petición del
+ * cliente porque la ficha del ESAVI la muestra en todos los casos, y sin cantón y provincia
+ * sólo podría pintar la parroquia.
+ */
+const RELACIONES_POR_DEFECTO = [
+  'establecimiento',
+  'tipoReporte',
+  'tipoEmisor',
+  'parroquiaResidencia',
+  'parroquiaResidencia.canton',
+  'parroquiaResidencia.canton.provincia',
+  'origenResidencia',
+];
+
 describe('NotificacionService', () => {
   let service: NotificacionService;
 
@@ -95,7 +110,7 @@ describe('NotificacionService', () => {
       const result = await service.findOne('n1');
       expect(mockNotificacionRepo.findOne).toHaveBeenCalledWith({
         where: { id: 'n1' },
-        relations: ['establecimiento', 'tipoReporte', 'tipoEmisor'],
+        relations: RELACIONES_POR_DEFECTO,
       });
       expect(result).toEqual({ id: 'n1' });
     });
@@ -105,7 +120,7 @@ describe('NotificacionService', () => {
       await service.findOne('n1', 'paciente,tipoReporte,paciente.sexo');
       expect(mockNotificacionRepo.findOne).toHaveBeenCalledWith({
         where: { id: 'n1' },
-        relations: ['establecimiento', 'tipoReporte', 'tipoEmisor', 'paciente', 'paciente.sexo'],
+        relations: [...RELACIONES_POR_DEFECTO, 'paciente', 'paciente.sexo'],
       });
     });
 

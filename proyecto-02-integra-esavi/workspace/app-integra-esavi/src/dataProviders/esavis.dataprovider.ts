@@ -67,8 +67,11 @@ export const esaviDataProvider: DataProvider = {
     const { id } = params
 
     try {
+      // La cadena parroquia → cantón → provincia y la procedencia de la residencia las
+      // añade el API por defecto; aquí sólo se piden las relaciones del paciente y de quien
+      // notifica, que no forman parte de ese conjunto.
       const response = await intESAVIClient.get(
-        `${ENDPOINTS.NOTIFICACIONES}/${id}?r=paciente,paciente.sexo,notificador,notificador.profesion`
+        `${ENDPOINTS.NOTIFICACIONES}/${id}?r=paciente,paciente.sexo,paciente.autoIdentificacion,notificador,notificador.profesion`
       )
 
       return {
