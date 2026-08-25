@@ -20,6 +20,7 @@ import { useState } from "react"
 import { Menu, useSidebarState } from "react-admin"
 import Authorize from "../authorization.utils"
 import { PALETA } from "../theme"
+import ENV_CONFIG from "../utils/env_utils"
 import { CustomFooter } from "./CustomFooter"
 import SubMenu from "./SubMenu"
 
@@ -79,7 +80,7 @@ export const CustomMenu = () => {
         <ListItem disablePadding>
           <ListItemButton
             component="a"
-            href={import.meta.env.VITE_DASH_APP}
+            href={ENV_CONFIG.INT_DASH_APP}
             sx={{ borderRadius: "8px", minHeight: 40, px: "11px" }}>
             <ListItemIcon sx={{ minWidth: 34, color: "inherit" }}>
               <DashboardIcon />
