@@ -15,20 +15,30 @@ export function useHealthCheck(intervalMs = 30000) {
   });
 
   const check = useCallback(async () => {
+    let siguiente: HealthState;
     try {
       const data = await checkHealth();
-      setHealth({
+      siguiente = {
         status: data.status === 'ok' ? 'ok' : 'error',
         data,
         lastChecked: new Date(),
-      });
+      };
     } catch {
-      setHealth({
+      siguiente = {
         status: 'error',
         data: null,
         lastChecked: new Date(),
-      });
+      };
     }
+
+    // Mientras el backend siga sano se conserva el estado anterior. Publicar un objeto
+    // nuevo en cada sondeo volvía a renderizar toda la aplicación cada `intervalMs`, y ese
+    // re-render recreaba el authProvider de <Admin>, lo que hacía recargar sola la pantalla
+    // de Calidad de Datos. `lastChecked` sólo se muestra en la pantalla de mantenimiento,
+    // es decir cuando el estado ya dejó de ser 'ok'.
+    setHealth(previo =>
+      previo.status === 'ok' && siguiente.status === 'ok' ? previo : siguiente
+    );
   }, []);
 
   useEffect(() => {

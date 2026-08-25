@@ -6,6 +6,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
@@ -256,6 +257,15 @@ export const CalidadDataQualityProvider: React.FC<PropsWithChildren> = ({
     formatMonth(new Date())
   )
 
+  // El proxy del dataProvider de react-admin y el `notify` cambian de identidad cuando se
+  // rerenderiza <Admin>. Si entraran como dependencias de `fetchData`, cualquier re-render
+  // de la aplicación volvería a lanzar la consulta y la pantalla se recargaría sola: se
+  // leen por ref para que la carga dependa únicamente del mes seleccionado.
+  const dataProviderRef = useRef(dataProvider)
+  dataProviderRef.current = dataProvider
+  const notifyRef = useRef(notify)
+  notifyRef.current = notify
+
   const fetchData = useCallback(async () => {
     if (!selectedDate) {
       setData(null)
@@ -267,7 +277,7 @@ export const CalidadDataQualityProvider: React.FC<PropsWithChildren> = ({
     setError(null)
 
     try {
-      const response = await dataProvider.getDataQualitySummary("dataquality", {
+      const response = await dataProviderRef.current.getDataQualitySummary("dataquality", {
         filter: { date: selectedDate },
       } as any)
 
@@ -281,11 +291,11 @@ export const CalidadDataQualityProvider: React.FC<PropsWithChildren> = ({
           ? err.message
           : "No se pudo cargar la información de calidad de datos."
       setError(message)
-      notify(message, { type: "warning" })
+      notifyRef.current(message, { type: "warning" })
     } finally {
       setLoading(false)
     }
-  }, [dataProvider, notify, selectedDate])
+  }, [selectedDate])
 
   useEffect(() => {
     fetchData()

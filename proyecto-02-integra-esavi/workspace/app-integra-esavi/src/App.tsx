@@ -1,5 +1,5 @@
 import {keycloakAuthProvider} from "ra-keycloak"
-import {lazy,useContext,useRef} from "react"
+import {lazy,useContext,useMemo,useRef} from "react"
 import {Admin,Resource,usePermissions,Notification} from "react-admin"
 import {Navigate} from "react-router-dom"
 
@@ -72,16 +72,23 @@ const CalidadDashList = lazy(() =>
 )
 
 const App = () => {
-  const { updateInformationUser, authState } = useContext(AuthenticationContext)
+  const { updateInformationUser } = useContext(AuthenticationContext)
 
-  return (
-    <Admin
-      requireAuth
-      dataProvider={dataProvider}
-      authProvider={keycloakAuthProvider(keycloak, {
+  // `updateInformationUser` cambia de identidad en cada render de AuthProvider, así que se
+  // guarda en una ref para poder construir el authProvider una sola vez.
+  const actualizarUsuarioRef = useRef(updateInformationUser)
+  actualizarUsuarioRef.current = updateInformationUser
+
+  // El authProvider tiene que ser estable: react-admin lo usa como dependencia del proxy
+  // del dataProvider (`useLogoutIfAccessDenied` → `useDataProvider`), de modo que un objeto
+  // nuevo en cada render invalida ese proxy y dispara de nuevo los efectos que dependen de
+  // él —entre ellos el de Calidad de Datos, que volvía a consultar al servidor sola.
+  const authProvider = useMemo(
+    () =>
+      keycloakAuthProvider(keycloak, {
         initOptions: { onLoad: 'login-required', checkLoginIframe: false },
         onPermissions: (decoded) => {
-          updateInformationUser({
+          actualizarUsuarioRef.current({
             email: decoded.email || null,
             given_name: decoded.given_name || null,
             family_name: decoded.family_name || null,
@@ -92,7 +99,15 @@ const App = () => {
           })
           return decoded.realm_access?.roles || []
         },
-      })}
+      }),
+    []
+  )
+
+  return (
+    <Admin
+      requireAuth
+      dataProvider={dataProvider}
+      authProvider={authProvider}
       dashboard={PaginaDeEntrada}
       layout={CustomLayout}
       loginPage={CustomLoginPage}
