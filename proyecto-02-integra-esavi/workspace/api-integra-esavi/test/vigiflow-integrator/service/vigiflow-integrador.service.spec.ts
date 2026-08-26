@@ -1,25 +1,22 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 // Mock the entire service to avoid import issues
-jest.mock(
-  '../../../src/vigiflow-integrator/service/vigiflow-integrador.service',
-  () => {
-    return {
-      VigiflowIntegradorService: jest.fn().mockImplementation(() => ({
-        createInBulk: jest.fn(),
-        formatoFecha: jest.fn(),
-        formatoInteger: jest.fn(),
-        formatoFloat: jest.fn(),
-        eliminarTildes: jest.fn(),
-        obtenerPrimerComentario: jest.fn(),
-        normalizarTexto: jest.fn(),
-        encontrarCoincidencia: jest.fn(),
-        esAfirmativo: jest.fn(),
-        sleep: jest.fn(),
-      })),
-    };
-  },
-);
+jest.mock('src/vigiflow-integrator/service/vigiflow-integrador.service', () => {
+  return {
+    VigiflowIntegradorService: jest.fn().mockImplementation(() => ({
+      createInBulk: jest.fn(),
+      formatoFecha: jest.fn(),
+      formatoInteger: jest.fn(),
+      formatoFloat: jest.fn(),
+      eliminarTildes: jest.fn(),
+      obtenerPrimerComentario: jest.fn(),
+      normalizarTexto: jest.fn(),
+      encontrarCoincidencia: jest.fn(),
+      esAfirmativo: jest.fn(),
+      sleep: jest.fn(),
+    })),
+  };
+});
 
 describe('VigiflowIntegradorService', () => {
   let service: any;
