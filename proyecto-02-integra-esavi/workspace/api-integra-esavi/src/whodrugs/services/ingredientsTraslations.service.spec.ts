@@ -65,17 +65,17 @@ describe('IngredientTranslationService', () => {
 
   /*
    * Estrategia de codificación en dos fases: una sola consulta con TODOS los principios
-   * activos reportados, y sobre esas filas una cascada de criterios que estrechan pero
-   * nunca vacían. Lo que se comprueba aquí es la cadena de decisión; el parecido de
+   * activos reportados, limitada a los medicamentos registrados en el país, y sobre esas
+   * filas una cascada de criterios que estrechan pero nunca vacían. Lo que se comprueba aquí es la cadena de decisión; el parecido de
    * trigramas tiene sus propias pruebas.
    */
   describe('buscarCodificacionVacuna', () => {
     let qb: any;
 
     /**
-     * Una fila del diccionario tal como la devuelve la consulta: un medicamento, en un país
-     * de venta, con un titular. `cobertura` y `totalIngredientes` llegan como texto porque
-     * COUNT devuelve bigint.
+     * Una fila del diccionario tal como la devuelve la consulta: un medicamento registrado
+     * en el país pedido, con un titular. `cobertura` y `totalIngredientes` llegan como texto
+     * porque COUNT devuelve bigint.
      */
     const fila = (over: Record<string, any> = {}) => ({
       drugCode: 'DRU123',
@@ -96,6 +96,7 @@ describe('IngredientTranslationService', () => {
         select: jest.fn().mockReturnThis(),
         addSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
         groupBy: jest.fn().mockReturnThis(),
         addGroupBy: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
@@ -119,6 +120,21 @@ describe('IngredientTranslationService', () => {
       expect(qb.where).toHaveBeenCalledWith('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', {
         ingredientes: ['VACUNA TOXOIDE DIFTÉRICO', 'VACUNA TOXOIDE TETÁNICO'],
       });
+    });
+
+    /*
+     * La regla de negocio vive en la consulta: sólo entran medicamentos registrados en el
+     * país del reporte y con sus dos MPID. Es lo que garantiza que una vacuna codificada
+     * traiga siempre MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID.
+     */
+    it('limita la búsqueda al país del reporte y a las filas con los dos MPID', async () => {
+      qb.getRawMany.mockResolvedValueOnce([fila()]);
+
+      await service.buscarCodificacionVacuna('Ingrediente', null, null);
+
+      expect(qb.andWhere).toHaveBeenCalledWith('cs.iso3Code = :pais', { pais: 'ECU' });
+      expect(qb.andWhere).toHaveBeenCalledWith('cs.medicinalProductID IS NOT NULL');
+      expect(qb.andWhere).toHaveBeenCalledWith('m.medicinalProductID IS NOT NULL');
     });
 
     it('devuelve null sin consultar cuando la columna F viene vacía', async () => {
@@ -225,28 +241,38 @@ describe('IngredientTranslationService', () => {
     });
 
     /*
-     * DRU_CODE y DRU_NAME son globales; los tres identificadores de registro son del país.
-     * BE Td y Tripvac existen en WHODrug sólo para SLV: el medicamento se identifica igual,
-     * pero sus MPID quedan en null en vez de copiarse de otro país, donde describirían un
-     * registro que no es el de este reporte.
+     * Caso real EC-ARCSA-300079062: «BE Td» de Biological E, que WHODrug sólo registra para
+     * SLV. Antes se codificaba con su DRUG_CODE y los tres identificadores de registro en
+     * null; ahora la consulta ni siquiera lo devuelve —está fuera del país— y la vacuna se
+     * queda sin codificar, conservando su NOMBRE_VACUNA_REPORTADO. Media codificación no
+     * vale más que ninguna.
      */
-    it('identifica el medicamento sin registro en el país y deja los MPID en null', async () => {
-      qb.getRawMany.mockResolvedValueOnce([
-        fila({ drugCode: 'BETD', drugName: 'BE Td', paisRegistro: 'SLV',
-               medicinalProductId: 999, maHolder: 'Biological E', maHolderMedicinalProductId: 888,
-               cobertura: '2', totalIngredientes: '2' }),
-      ]);
+    it('no codifica la vacuna que no está registrada en el país', async () => {
+      qb.getRawMany.mockResolvedValueOnce([]);
 
       const result = await service.buscarCodificacionVacuna(DOS_COMPONENTES, 'Biological E. Limited', 'BE Td');
 
-      expect(result).toMatchObject({
-        drugCode: 'BETD',
-        drugName: 'BE Td',
-        medicinalProductId: null,
-        maHolder: null,
-        maHolderMedicinalProductId: null,
-        paisRegistro: null,
-      });
+      expect(result).toBeNull();
+    });
+
+    /*
+     * El contrato que se pide cumplir: si sale DRUG_CODE, salen también los dos MPID y el
+     * titular. No hay camino que devuelva unos sin los otros.
+     */
+    it('devuelve los dos MPID siempre que identifica el DRUG_CODE', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'DTP', drugName: 'Dtp', medicinalProductId: 6885172,
+               maHolder: 'Biological E.', maHolderMedicinalProductId: 6885171,
+               cobertura: '2', totalIngredientes: '2' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(DOS_COMPONENTES, 'Biological E. Limited', 'Dtp');
+
+      expect(result.drugCode).toBe('DTP');
+      expect(result.medicinalProductId).toBe('6885172');
+      expect(result.maHolderMedicinalProductId).toBe('6885171');
+      expect(result.maHolder).toBe('Biological E.');
+      expect(result.paisRegistro).toBe('ECU');
     });
 
     /*
@@ -270,33 +296,33 @@ describe('IngredientTranslationService', () => {
       expect(result?.maHolderMedicinalProductId).toBe('5071626');
     });
 
-    it('respeta el país pedido al resolver los identificadores de registro', async () => {
+    it('respeta el país pedido, tanto al consultar como al resolver el registro', async () => {
       qb.getRawMany.mockResolvedValueOnce([
-        fila({ drugCode: 'X', drugName: 'Equis', paisRegistro: 'ECU', medicinalProductId: 1,
-               maHolderMedicinalProductId: 2, cobertura: '1', totalIngredientes: '1' }),
         fila({ drugCode: 'X', drugName: 'Equis', paisRegistro: 'PER', medicinalProductId: 3,
                maHolderMedicinalProductId: 4, cobertura: '1', totalIngredientes: '1' }),
       ]);
 
       const result = await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Equis', 'PER');
 
+      expect(qb.andWhere).toHaveBeenCalledWith('cs.iso3Code = :pais', { pais: 'PER' });
       expect(result?.paisRegistro).toBe('PER');
       expect(result?.medicinalProductId).toBe('3');
     });
 
     /*
      * Los dos MPID son numéricos en WHODrug y texto en TR_DATO_VACUNA. La comprobación no
-     * puede ser por veracidad: el identificador 0 es válido y se perdería.
+     * puede ser por veracidad: el identificador 0 es válido y se perdería. Ya no se prueba
+     * el caso nulo porque la consulta descarta esas filas.
      */
-    it('convierte los MPID a texto conservando el 0 y dejando null los ausentes', async () => {
+    it('convierte los MPID a texto conservando el 0', async () => {
       qb.getRawMany.mockResolvedValueOnce([
-        fila({ medicinalProductId: 0, maHolderMedicinalProductId: null }),
+        fila({ medicinalProductId: 0, maHolderMedicinalProductId: 0 }),
       ]);
 
       const result = await service.buscarCodificacionVacuna('Ingrediente', 'Merck sharp & dohme', 'Gardasil 9');
 
       expect(result.medicinalProductId).toBe('0');
-      expect(result.maHolderMedicinalProductId).toBeNull();
+      expect(result.maHolderMedicinalProductId).toBe('0');
     });
 
     describe('separación de la columna F', () => {

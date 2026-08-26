@@ -908,7 +908,9 @@ export class VigiflowIntegradorService {
 
           /*
            * Codificación WHODrug: DRUG_CODE, DRUG_NAME, MEDICINAL_PRODUCT_ID, MA_HOLDER y
-           * MA_HOLDER_MEDI_PROD_ID.
+           * MA_HOLDER_MEDI_PROD_ID, siempre contra vacunas con registro sanitario en el
+           * país del reporte —un ESAVI ecuatoriano se codifica con una vacuna registrada en
+           * Ecuador— y siempre las cinco columnas o ninguna.
            *
            * Va fuera del bloque anterior y no depende de VIGIFLOW_USE_WHODRUG_GLOBAL: es la
            * estrategia definida para todo lo que entre por VigiFlow, y esa bandera viene en
@@ -953,16 +955,19 @@ export class VigiflowIntegradorService {
               this.logger.log(
                 codificacion
                   ? `[WHODrug] "${nombreMedicamentoCrudo ?? '(sin nombre)'}" → ${codificacion.drugCode} ` +
-                    `(${codificacion.criterios.join(' → ')}; registro ${codificacion.paisRegistro ?? `no hallado en ${country}`})`
-                  : `[WHODrug] "${nombreMedicamentoCrudo ?? '(sin nombre)'}" sin codificar: el diccionario no permite identificarla sin ambigüedad`,
+                    `(${codificacion.criterios.join(' → ')}; registro ${codificacion.paisRegistro})`
+                  : `[WHODrug] "${nombreMedicamentoCrudo ?? '(sin nombre)'}" sin codificar: el diccionario no permite ` +
+                    `identificarla sin ambigüedad entre las vacunas registradas en ${country}`,
               );
             }
 
             if (codificacion) {
               updateDatoVacuna.drugCode = codificacion.drugCode;
-              // Los tres identificadores de registro son del país o no son: vienen todos de
-              // la misma fila de COUNTRY_SALES/MAHOLDER, y van en null cuando el medicamento
-              // se identificó pero WHODrug no lo registra a la venta en el país del reporte.
+              // Los cinco campos van juntos: `buscarCodificacionVacuna` sólo considera
+              // vacunas registradas en el país del reporte y con sus dos MPID, así que si
+              // hay DRUG_CODE hay también MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID.
+              // Cuando no puede identificarlas así no devuelve nada y estas columnas se
+              // quedan vacías, que es preferible a una codificación a medias.
               updateDatoVacuna.medicinalProductId = codificacion.medicinalProductId;
               updateDatoVacuna.maHolderMedicinalProductId = codificacion.maHolderMedicinalProductId;
               // El nombre y el titular salen de la misma fila que los códigos: si se

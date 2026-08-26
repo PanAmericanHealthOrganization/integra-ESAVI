@@ -40,20 +40,20 @@ interface MedicamentoIdentificado {
 const CRITERIO_NOMBRE = 'nombre comercial (col E)';
 const CRITERIO_TITULAR = 'laboratorio titular (col I)';
 const CRITERIO_COMPOSICION = 'composición exacta';
-const CRITERIO_PAIS = 'venta en el país';
 
 /**
- * Criterios que bastan para dar por buena una codificación. `CRITERIO_PAIS` no está: que un
- * medicamento se venda en Ecuador no dice nada sobre si es el que se reportó, sólo desempata
- * entre candidatos que ya venían igualados por otra evidencia.
+ * Criterios que bastan para dar por buena una codificación. La venta en el país ya no figura
+ * entre ellos porque dejó de ser un criterio de desempate: la consulta sólo trae
+ * medicamentos registrados en el país del reporte, así que todas las candidatas lo cumplen y
+ * ninguna se distingue por ello.
  */
 const CRITERIOS_CORROBORANTES = [CRITERIO_NOMBRE, CRITERIO_TITULAR, CRITERIO_COMPOSICION];
 
 @Injectable()
 export class IngredientTranslationService {
   /**
-   * Parecido mínimo (0 a 1) entre el laboratorio reportado y el titular del diccionario
-   * para aceptarlo como el mismo. Con pg_trgm, 0.6 tolera puntuación y sufijos societarios
+   * Parecido mínimo (0 a 1) entre el laboratorio reportado y el titular del diccionario para
+   * aceptarlo como el mismo. Con pg_trgm, 0.6 tolera puntuación y sufijos societarios
    * —«SK Bioscience Co., Ltd.» contra «Sk bioscience»— sin llegar a emparejar laboratorios
    * distintos que comparten una palabra genérica.
    *
@@ -144,24 +144,38 @@ export class IngredientTranslationService {
    * justamente la evidencia que distingue una combinada de sus componentes sueltos, y hace
    * que el resultado dependa del orden de los renglones.
    *
-   * La decisión va en dos fases, porque el diccionario mezcla dos ámbitos distintos:
+   * El universo de búsqueda son las vacunas registradas en el país del reporte, y sólo
+   * ésas: un ESAVI ecuatoriano se codifica con una vacuna con registro sanitario
+   * ecuatoriano. La consulta exige además que la fila traiga sus dos MPID, de modo que
+   * **si se identifica el DRUG_CODE, MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID
+   * existen**; no hay codificación a medias.
    *
-   *   Fase 1 — QUÉ vacuna es. DRU_CODE y DRU_NAME son globales, así que aquí no se filtra
-   *   por país. Filtrar antes de identificar descarta productos que existen pero que
-   *   WHODrug no registra a la venta en Ecuador (BE Td y Tripvac sólo constan para SLV), y
-   *   filtrar por titular puede dejar fuera las filas del propio país cuando la columna I
-   *   nombra a otra sociedad del grupo —Hexaxim se reporta como «Sanofi Pasteur» y en ECU
-   *   figura a nombre de «Sanofi aventis»—.
+   * Antes no se filtraba por país al identificar, con el argumento de que DRU_CODE y
+   * DRU_NAME son globales. El efecto era escribir un DRUG_CODE que WHODrug sólo registra en
+   * otro país —BE Td y Tripvac constan sólo para SLV— dejando vacíos los dos MPID y el
+   * titular. Sobre esas filas el DRUG_CODE no describía el producto que se administró en
+   * Ecuador, así que se prefiere no codificar.
    *
-   *   Fase 2 — CON QUÉ registro sanitario. MEDICINAL_PRODUCT_ID, MA_HOLDER y
-   *   MA_HOLDER_MEDI_PROD_ID sí dependen del país y se toman de la fila del país pedido. Si
-   *   el medicamento no se vende allí, los tres quedan en null: es preferible a copiarlos de
-   *   otro país, donde describirían un registro que no es el de este reporte.
+   * La decisión sigue yendo en dos fases:
+   *
+   *   Fase 1 — QUÉ vacuna es, entre las registradas en el país. Una cascada de criterios que
+   *   estrechan pero nunca vacían: filtrar por titular dentro de la fase dejaría fuera las
+   *   filas del propio país cuando la columna I nombra a otra sociedad del grupo —Hexaxim se
+   *   reporta como «Sanofi Pasteur» y en ECU figura a nombre de «Sanofi aventis»—.
+   *
+   *   Fase 2 — CON QUÉ registro sanitario. Entre las filas del medicamento identificado —una
+   *   por titular— gana la del titular más parecido al reportado, y de ella salen
+   *   MEDICINAL_PRODUCT_ID, MA_HOLDER y MA_HOLDER_MEDI_PROD_ID.
+   *
+   * Cuando el diccionario no permite identificar sin ambigüedad una vacuna registrada en el
+   * país, no se codifica nada: ni DRUG_CODE ni DRUG_NAME. La vacuna conserva su
+   * NOMBRE_VACUNA_REPORTADO, que sigue siendo homologable después.
    *
    * @param principiosActivos columna F, con un principio activo por renglón
    * @param laboratorioTitular columna I, titular del registro
    * @param nombreMedicamento columna E, nombre comercial (patente-WHODrug)
-   * @param pais país de venta del que salen los identificadores de registro (ISO 3166-1 alfa-3)
+   * @param pais país de registro al que se limita la búsqueda y del que salen los
+   *             identificadores de registro (ISO 3166-1 alfa-3)
    */
   public async buscarCodificacionVacuna(
     principiosActivos: string,
@@ -172,7 +186,7 @@ export class IngredientTranslationService {
     const ingredientes = IngredientTranslationService.separarPrincipiosActivos(principiosActivos);
     if (ingredientes.length === 0) return null;
 
-    const filas = await this.consultarPorPrincipiosActivos(ingredientes);
+    const filas = await this.consultarPorPrincipiosActivos(ingredientes, pais);
     if (filas.length === 0) return null;
 
     const titular = laboratorioTitular?.trim() || null;
@@ -183,7 +197,6 @@ export class IngredientTranslationService {
       titular,
       nombre,
       ingredientes.length,
-      pais,
     );
     if (!identificado) return null;
 
@@ -212,7 +225,10 @@ export class IngredientTranslationService {
   }
 
   /**
-   * Fase 1: decidir de qué medicamento se trata, sin mirar el país.
+   * Fase 1: decidir de qué medicamento se trata, entre los registrados en el país.
+   *
+   * El país no se comprueba aquí: `consultarPorPrincipiosActivos` ya sólo devuelve filas del
+   * país del reporte, así que todas las candidatas están registradas allí.
    *
    * Los criterios se aplican en cascada y cada uno **estrecha pero nunca vacía**: si un
    * filtro no deja ninguna candidata es que ese dato no discrimina aquí —el titular
@@ -232,7 +248,6 @@ export class IngredientTranslationService {
     titular: string | null,
     nombreMedicamento: string | null,
     principiosReportados: number,
-    pais: string,
   ): MedicamentoIdentificado | null {
     const criterios: string[] = [];
 
@@ -284,12 +299,6 @@ export class IngredientTranslationService {
       criterios.push(`cobertura ${maxima}/${principiosReportados}`);
     }
 
-    // Último desempate, sólo si todavía compiten medicamentos distintos: entre productos por
-    // lo demás equivalentes, el que sí se vende en el país del reporte.
-    if (new Set(candidatas.map((fila) => fila.drugCode)).size > 1) {
-      candidatas = estrechar(candidatas, (fila) => fila.paisRegistro === pais, CRITERIO_PAIS);
-    }
-
     const codigos = [...new Set(candidatas.map((fila) => fila.drugCode))];
     if (codigos.length !== 1) return null;
 
@@ -308,7 +317,7 @@ export class IngredientTranslationService {
   }
 
   /**
-   * Fase 2: los identificadores del registro sanitario, que sí dependen del país.
+   * Fase 2: los identificadores del registro sanitario.
    *
    * Se buscan entre **todas** las filas del medicamento identificado, no sólo entre las que
    * sobrevivieron a los filtros de la fase 1. Un titular reportado que no coincide con
@@ -319,6 +328,10 @@ export class IngredientTranslationService {
    * Cuando el país tiene varios titulares para el mismo medicamento se toma el más parecido
    * al reportado. El orden de la consulta ya es estable y `sort` conserva el de los empates,
    * así que el mismo Excel produce siempre la misma fila.
+   *
+   * La fila existe siempre —el medicamento se identificó a partir de estas mismas filas, que
+   * son todas del país—, pero si por lo que fuera no se encontrase, se devuelve `null` y la
+   * vacuna se queda sin codificar: media codificación no vale más que ninguna.
    */
   private static resolverRegistroDelPais(
     identificado: MedicamentoIdentificado,
@@ -326,22 +339,23 @@ export class IngredientTranslationService {
     titular: string | null,
     principiosReportados: number,
     pais: string,
-  ): ICodificacionVacunaWhodrugDetallada {
+  ): ICodificacionVacunaWhodrugDetallada | null {
     const registro =
       filas
-        .filter((fila) => fila.drugCode === identificado.drugCode && fila.paisRegistro === pais)
+        .filter((fila) => fila.drugCode === identificado.drugCode)
         .sort(
           (a, b) =>
             SimilitudTrigramas.entre(b.maHolder, titular) - SimilitudTrigramas.entre(a.maHolder, titular),
         )[0] ?? null;
+    if (!registro) return null;
 
     return {
       drugCode: identificado.drugCode,
       drugName: identificado.drugName,
-      medicinalProductId: registro?.medicinalProductId ?? null,
-      maHolder: registro?.maHolder ?? null,
-      maHolderMedicinalProductId: registro?.maHolderMedicinalProductId ?? null,
-      paisRegistro: registro ? pais : null,
+      medicinalProductId: registro.medicinalProductId,
+      maHolder: registro.maHolder,
+      maHolderMedicinalProductId: registro.maHolderMedicinalProductId,
+      paisRegistro: pais,
       cobertura: identificado.cobertura,
       principiosReportados,
       criterios: identificado.criterios,
@@ -350,7 +364,13 @@ export class IngredientTranslationService {
 
   /**
    * Trae, en una sola consulta, todas las filas del diccionario que cubren alguno de los
-   * principios activos reportados.
+   * principios activos reportados **y están registradas en el país del reporte**.
+   *
+   * Ese filtro es la regla de negocio, no una optimización: las vacunas de un ESAVI
+   * ecuatoriano tienen que ser vacunas registradas en Ecuador. Va acompañado de exigir que
+   * la fila traiga sus dos MPID —el del país y el del titular—, con lo que ningún
+   * medicamento puede identificarse sin ellos y desaparece la codificación a medias que
+   * escribía DRUG_CODE dejando MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID vacíos.
    *
    * El grafo de joins es INGREDIENT_TRANSLATION → ACTIVE_INGREDIENTS → DRUG →
    * COUNTRY_SALES → MAHOLDER, expresado con las relaciones declaradas en las entidades para
@@ -366,7 +386,7 @@ export class IngredientTranslationService {
    * equivalentes, y la igualdad no corre el riesgo de que un `%` o un `_` dentro del nombre
    * de un ingrediente pase a interpretarse como patrón.
    */
-  private async consultarPorPrincipiosActivos(ingredientes: string[]): Promise<FilaCandidata[]> {
+  private async consultarPorPrincipiosActivos(ingredientes: string[], pais: string): Promise<FilaCandidata[]> {
     const normalizados = ingredientes.map((ingrediente) => ingrediente.trim().toUpperCase());
 
     const filas = await this.ingredientTranslationRepository
@@ -396,6 +416,12 @@ export class IngredientTranslationService {
       // contaría dos veces y ninguna composición cuadraría.
       .addSelect('MAX(tot.total)', 'totalIngredientes')
       .where('UPPER(TRIM(t.ingredient)) IN (:...ingredientes)', { ingredientes: normalizados })
+      // Sólo medicamentos con venta registrada en el país del reporte, y sólo filas con los
+      // dos identificadores de registro presentes: son los que garantizan que una vacuna
+      // identificada traiga siempre MEDICINAL_PRODUCT_ID y MA_HOLDER_MEDI_PROD_ID.
+      .andWhere('cs.iso3Code = :pais', { pais })
+      .andWhere('cs.medicinalProductID IS NOT NULL')
+      .andWhere('m.medicinalProductID IS NOT NULL')
       // Se agrupa por DRU_CODE y no por DRUG.ID, para que los duplicados de DRUG colapsen en
       // una sola candidata en vez de competir entre sí.
       .groupBy('d.drugCode')

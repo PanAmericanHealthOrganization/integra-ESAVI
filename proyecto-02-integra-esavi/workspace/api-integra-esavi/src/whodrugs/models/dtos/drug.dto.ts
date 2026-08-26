@@ -79,6 +79,11 @@ export interface IWhodrugVaccineMatch {
  * puedan intercambiarse por descuido al asignarlos.
  */
 export interface ICodificacionVacunaWhodrug {
+  /*
+   * Los cinco campos van juntos o no van: una codificación con DRUG_CODE pero sin los dos
+   * MPID describía un medicamento registrado en otro país, así que ese resultado dejó de
+   * existir —`buscarCodificacionVacuna` devuelve `null` en su lugar—.
+   */
   /** DRUG.DRU_CODE → TR_DATO_VACUNA.DRUG_CODE */
   drugCode: string;
   /** DRUG.DRU_NAME → TR_DATO_VACUNA.DRUG_NAME */
@@ -115,12 +120,11 @@ export interface ICodificacionVacunaWhodrugConDrugId extends ICodificacionVacuna
  */
 export interface ICodificacionVacunaWhodrugDetallada extends ICodificacionVacunaWhodrug {
   /**
-   * COUNTRY_SALES.COS_COUNTRY de la fila de la que salieron MEDICINAL_PRODUCT_ID,
-   * MA_HOLDER y MA_HOLDER_MEDI_PROD_ID. `null` cuando el medicamento se identificó pero no
-   * tiene venta registrada en el país pedido, en cuyo caso esos tres campos van también en
-   * `null` y sólo se conservan DRUG_CODE y DRUG_NAME.
+   * COUNTRY_SALES.COS_COUNTRY de la fila de la que salieron MEDICINAL_PRODUCT_ID, MA_HOLDER
+   * y MA_HOLDER_MEDI_PROD_ID. Es siempre el país pedido: la búsqueda sólo considera
+   * medicamentos registrados allí, y si ninguno se identifica no se devuelve codificación.
    */
-  paisRegistro: string | null;
+  paisRegistro: string;
   /** Cuántos de los principios activos reportados cubre el medicamento identificado. */
   cobertura: number;
   /** Cuántos principios activos traía la columna F. */
