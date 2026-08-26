@@ -227,6 +227,81 @@ describe('IngredientTranslationService', () => {
     });
 
     /*
+     * Caso real: una penta declarada por «Serum Institute of India Pvt. Ltd.» que sólo casa
+     * con la penta de Biological E registrada en Ecuador, por parecido del nombre genérico y
+     * 3 de 5 principios activos. Con la composición a medias el nombre no basta —las vacunas
+     * del programa se reportan con descripciones que se parecen entre fabricantes—, así que
+     * no se codifica en vez de escribir un MA_HOLDER que contradice al notificador.
+     */
+    it('no codifica con cobertura parcial si el titular no corrobora, aunque el nombre sí', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'PENTA-BE', drugName: 'Diphtheria, tetanus, pertussis, hepatitis-b and haemophilus type b',
+               maHolder: 'Ministerio de Salud Publica - Ecuador, Biological E.',
+               cobertura: '3', totalIngredientes: '5' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(
+        ['Difteria', 'Tetanos', 'Pertussis', 'Hepatitis B', 'Haemophilus'].join('\n'),
+        'Serum Institute of India Pvt. Ltd.',
+        'Diphtheria, tetanus, pertussis, hepatitis b and haemophilus type b conjugate vaccine',
+      );
+
+      expect(result).toBeNull();
+    });
+
+    /*
+     * La otra cara: con cobertura parcial pero titular que sí corrobora, la codificación se
+     * sostiene. Es lo que separa «no tengo con qué decidir» de «el fabricante coincide y el
+     * diccionario describe la composición con menos renglones».
+     */
+    it('codifica con cobertura parcial cuando el titular corrobora', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'PENTA-SII', drugName: 'Pentavalente',
+               maHolder: 'Ministerio de Salud Publica - Ecuador, Serum Institute of India',
+               medicinalProductId: 6874924, maHolderMedicinalProductId: 6874925,
+               cobertura: '3', totalIngredientes: '5' }),
+        fila({ drugCode: 'PENTA-BE', drugName: 'Pentavalente',
+               maHolder: 'Ministerio de Salud Publica - Ecuador, Biological E.',
+               cobertura: '3', totalIngredientes: '5' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(
+        ['Difteria', 'Tetanos', 'Pertussis', 'Hepatitis B', 'Haemophilus'].join('\n'),
+        'Serum Institute of India Pvt. Ltd.',
+        null,
+      );
+
+      expect(result?.drugCode).toBe('PENTA-SII');
+      expect(result?.criterios).toContain('laboratorio titular (col I)');
+    });
+
+    /*
+     * El titular corrobora aunque no haya estrechado nada. `criterios` registra qué redujo el
+     * conjunto, así que un titular que coincide con la única candidata no aparece ahí; leer
+     * la regla de esa lista, y no de las candidatas, dejaría sin codificar una vacuna cuyo
+     * fabricante reportado coincide exactamente con el del diccionario.
+     */
+    it('acepta el titular que coincide con la única candidata, aunque no estreche', async () => {
+      qb.getRawMany.mockResolvedValueOnce([
+        fila({ drugCode: 'PENTA-SII', drugName: 'Pentavalente siil',
+               maHolder: 'Ministerio de Salud Publica - Ecuador, Serum Institute of India',
+               medicinalProductId: 6874924, maHolderMedicinalProductId: 6874925,
+               cobertura: '3', totalIngredientes: '5' }),
+        fila({ drugCode: 'OTRA', drugName: 'Cosa distinta', maHolder: 'Otro laboratorio',
+               cobertura: '1', totalIngredientes: '2' }),
+      ]);
+
+      const result = await service.buscarCodificacionVacuna(
+        ['Difteria', 'Tetanos', 'Pertussis', 'Hepatitis B', 'Haemophilus'].join('\n'),
+        'Serum Institute of India Pvt. Ltd.',
+        'Pentavalente siil',
+      );
+
+      expect(result?.drugCode).toBe('PENTA-SII');
+      expect(result?.criterios).not.toContain('laboratorio titular (col I)');
+    });
+
+    /*
      * Una cobertura parcial, por sí sola, empareja cualquier vacuna que comparta un
      * componente con la reportada. Sin nombre, titular ni composición que corroboren, no
      * basta para escribir un DRUG_CODE.

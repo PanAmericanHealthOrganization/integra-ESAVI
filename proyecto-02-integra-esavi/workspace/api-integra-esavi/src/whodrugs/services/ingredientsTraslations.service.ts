@@ -9,6 +9,7 @@ import {
   IIngredientTranslation,
   IWhodrugVaccineMatch,
 } from '../models/dtos';
+import {SimilitudFabricante} from '../utils/similitud-fabricante.utils';
 import {SimilitudTrigramas} from '../utils/similitud-trigramas.utils';
 import {IngredientTranslation} from '../models/ingredientTranslation.entity';
 import {Maholder} from '../models/maholder.entity';
@@ -53,9 +54,13 @@ const CRITERIOS_CORROBORANTES = [CRITERIO_NOMBRE, CRITERIO_TITULAR, CRITERIO_COM
 export class IngredientTranslationService {
   /**
    * Parecido mínimo (0 a 1) entre el laboratorio reportado y el titular del diccionario para
-   * aceptarlo como el mismo. Con pg_trgm, 0.6 tolera puntuación y sufijos societarios
-   * —«SK Bioscience Co., Ltd.» contra «Sk bioscience»— sin llegar a emparejar laboratorios
-   * distintos que comparten una palabra genérica.
+   * aceptarlo como el mismo, medido con `SimilitudFabricante`.
+   *
+   * Sobre los titulares reales del libro el umbral cae en una banda ancha y vacía: los pares
+   * que son el mismo laboratorio puntúan de 0,75 a 1 —«Serum Institute of India Pvt. Ltd.»
+   * contra «Ministerio de Salud Publica - Ecuador, Serum Institute of India» da 0,75— y los
+   * que no, 0,5 o menos —«Sanofi Pasteur» contra «Sanofi aventis» da 0,5—. 0.6 parte esa
+   * banda por el medio.
    *
    * Bajarlo hace la codificación más permisiva y más propensa a falsos positivos; subirlo,
    * al contrario. Es el único parámetro con el que se ajusta ese equilibrio.
@@ -239,7 +244,9 @@ export class IngredientTranslationService {
    *
    * El orden va de la evidencia más específica a la más general: el nombre comercial
    * identifica un producto concreto, el titular acota un fabricante, y la composición
-   * confirma. Al final, si aún empatan varios medicamentos distintos, no se codifica:
+   * confirma. Cuánta evidencia hace falta depende de la composición: si es exacta, ella
+   * sola identifica el producto; si sólo se cubre en parte, se exige además el titular.
+   * Al final, si aún empatan varios medicamentos distintos, no se codifica:
    * elegir uno sería inventarse el dato, y la vacuna conserva su NOMBRE_VACUNA_REPORTADO,
    * que sigue siendo homologable después.
    */
@@ -276,7 +283,7 @@ export class IngredientTranslationService {
     candidatas = estrechar(
       candidatas,
       (fila) =>
-        SimilitudTrigramas.superaUmbral(
+        SimilitudFabricante.superaUmbral(
           fila.maHolder,
           titular,
           IngredientTranslationService.UMBRAL_SIMILITUD_TITULAR,
@@ -290,7 +297,8 @@ export class IngredientTranslationService {
     const exactas = candidatas.filter(
       (fila) => fila.cobertura === fila.totalIngredientes && fila.cobertura === principiosReportados,
     );
-    if (exactas.length > 0) {
+    const composicionExacta = exactas.length > 0;
+    if (composicionExacta) {
       candidatas = exactas;
       criterios.push(CRITERIO_COMPOSICION);
     } else {
@@ -307,6 +315,22 @@ export class IngredientTranslationService {
     // un componente con la reportada. No basta para escribir un DRUG_CODE.
     const corroborada = criterios.some((criterio) => CRITERIOS_CORROBORANTES.includes(criterio));
     if (!corroborada) return null;
+
+    // Y si la composición sólo se cubre en parte, el nombre tampoco basta: hace falta el
+    // titular. Las vacunas del programa ampliado se reportan con descripciones genéricas
+    // —«Diphtheria, Tetanus, Pertussis, Hepatitis B and Haemophilus Influenzae type b
+    // conjugate vaccine adsorbed»— que se parecen entre fabricantes distintos, así que el
+    // nombre empareja la penta de un laboratorio con la de otro y MA_HOLDER acaba
+    // contradiciendo al notificador. Con la composición exacta no hace falta: identifica el
+    // producto por sí sola.
+    //
+    // Se comprueba contra las candidatas que quedan, no contra `criterios`: esa lista
+    // registra qué *estrechó* la búsqueda, y un titular que coincide con la única candidata
+    // no estrecha nada y no se anota, pese a corroborar tanto como el que descarta a otras.
+    const titularCorrobora = candidatas.some((fila) =>
+      SimilitudFabricante.superaUmbral(fila.maHolder, titular, IngredientTranslationService.UMBRAL_SIMILITUD_TITULAR),
+    );
+    if (!composicionExacta && !titularCorrobora) return null;
 
     return {
       drugCode: codigos[0],
@@ -345,7 +369,7 @@ export class IngredientTranslationService {
         .filter((fila) => fila.drugCode === identificado.drugCode)
         .sort(
           (a, b) =>
-            SimilitudTrigramas.entre(b.maHolder, titular) - SimilitudTrigramas.entre(a.maHolder, titular),
+            SimilitudFabricante.entre(b.maHolder, titular) - SimilitudFabricante.entre(a.maHolder, titular),
         )[0] ?? null;
     if (!registro) return null;
 
