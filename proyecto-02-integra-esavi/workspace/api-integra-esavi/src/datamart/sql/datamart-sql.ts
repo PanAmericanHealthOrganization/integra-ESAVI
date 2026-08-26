@@ -286,7 +286,7 @@ export function buildTransformStatements(opts: BuildSqlOptions): string[] {
        FROM base
      )
      SELECT
-       report_id, caseid, pais_iso, geonoti_norm AS geonoti, fechanot, fvacunac, fecinesavi,
+       report_id, caseid, pais_iso, geonoti_norm AS geonoti, origen_residencia, fechanot, fvacunac, fecinesavi,
        edad, dias_vac_ini,
        -- categoría de días vacuna→inicio
        CASE WHEN dias_vac_ini = 999999 THEN 'Sin Info'
