@@ -86,7 +86,9 @@ filter <- dplyr::filter
 
 # 1.3 Variables globales ----
 
-integra_app_url <- Sys.getenv("INTEGRA_APP_URL", unset = "http://localhost:8080")
+# Destino del enlace "Ir a Integra App" del sidebar. El default es la app
+# (app-integra-esavi, puerto 5173 de Vite); NO Keycloak, que vive en el 8080.
+integra_app_url <- Sys.getenv("INTEGRA_APP_URL", unset = "http://localhost:5173")
 
 # ── Keycloak ────────────────────────────────────────────────────────────────────
 kc_url      <- Sys.getenv("VITE_KEYCLOAK_URL",      unset = "")

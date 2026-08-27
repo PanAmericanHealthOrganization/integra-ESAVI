@@ -9,6 +9,54 @@ import Keycloak from "./keycloak.js";
 
   var kc = new Keycloak({ url: cfg.url, realm: cfg.realm, clientId: cfg.clientId });
 
+  // Exponer logout global para el botón del sidebar.
+  //
+  // Se define ANTES de kc.init() y sin depender de él: si init falla (p. ej.
+  // el origen del dashboard no está en los "Web origins" del cliente y el
+  // navegador bloquea por CORS el intercambio del code por el token), el
+  // .then() nunca corre y el botón se quedaría sin handler — clic sin efecto.
+  // Por lo mismo se arma la URL de end-session a mano en vez de usar
+  // kc.logout(), que revienta si el adapter no llegó a inicializarse.
+  //
+  // El dashboard es alcanzable por dos caminos y cada uno deja su propia
+  // sesión, así que hay que cerrar la que corresponda:
+  //
+  //   https://localhost/  → nginx → oauth2-proxy → dashboard
+  //        oauth2-proxy guarda la cookie _esavi_session (168 h). Cerrar
+  //        sesión solo en Keycloak la dejaría viva y se seguiría entrando.
+  //        Se pasa por /oauth2/sign_out y desde ahí (rd=) al end-session.
+  //
+  //   http://localhost:3838 → directo al Shiny, sin proxy
+  //        Solo existe la sesión de Keycloak: se va directo al end-session.
+  //
+  // Cuál aplica se detecta preguntando por /oauth2/auth: oauth2-proxy
+  // responde (202/401/403) y Shiny devuelve 404.
+  window.keycloakLogout = function () {
+    var origin = window.location.origin;
+
+    // id_token_hint es imprescindible: sin él, Keycloak 26 no cierra la
+    // sesión de una, muestra una pantalla de confirmación (así lo define OIDC
+    // RP-Initiated Logout). Solo existe si init terminó bien; si no, se manda
+    // client_id, que al menos lleva a esa pantalla de confirmación.
+    var kcLogout = cfg.url + "/realms/" + cfg.realm +
+      "/protocol/openid-connect/logout" +
+      "?post_logout_redirect_uri=" + encodeURIComponent(origin) +
+      (kc.idToken
+        ? "&id_token_hint=" + encodeURIComponent(kc.idToken)
+        : "&client_id=" + encodeURIComponent(cfg.clientId));
+
+    fetch("/oauth2/auth", { method: "GET", credentials: "include" })
+      .then(function (r) {
+        window.location.href = (r.status === 404)
+          ? kcLogout                                   // acceso directo
+          : "/oauth2/sign_out?rd=" + encodeURIComponent(kcLogout);
+      })
+      .catch(function () {
+        window.location.href = kcLogout;               // sin red: al menos Keycloak
+      });
+  };
+
+
   kc.init({ onLoad: "login-required", pkceMethod: "S256", checkLoginIframe: false })
     .then(function (authenticated) {
 
@@ -38,7 +86,7 @@ import Keycloak from "./keycloak.js";
           "<h2>Acceso denegado</h2>" +
           "<p>Tu cuenta no tiene ninguno de los roles necesarios (<strong>" +
             required.join(", ") + "</strong>) para acceder a esta aplicación.</p>" +
-          '<button onclick="window.location.href=\'' + cfg.url + '/realms/' + cfg.realm + '/protocol/openid-connect/logout?redirect_uri=' + encodeURIComponent(window.location.origin) + '\'">Cerrar sesión</button>' +
+          '<button onclick="window.keycloakLogout()">Cerrar sesión</button>' +
           "</div></body></html>"
         );
         document.close();
@@ -57,51 +105,14 @@ import Keycloak from "./keycloak.js";
         kc.updateToken(70).catch(function () { kc.login(); });
       }, 4 * 60 * 1000);
 
-      // Exponer logout global para el botón del sidebar.
-      //
-      // El dashboard es alcanzable por dos caminos y cada uno deja su propia
-      // sesión, así que hay que cerrar la que corresponda:
-      //
-      //   https://localhost/  → nginx → oauth2-proxy → dashboard
-      //        oauth2-proxy guarda la cookie _esavi_session (168 h). Cerrar
-      //        sesión solo en Keycloak la dejaría viva y se seguiría entrando.
-      //        Se pasa por /oauth2/sign_out y desde ahí (rd=) al end-session.
-      //
-      //   http://localhost:3838 → directo al Shiny, sin proxy
-      //        Solo existe la sesión de Keycloak: basta kc.logout().
-      //
-      // Cuál aplica se detecta preguntando por /oauth2/auth: oauth2-proxy
-      // responde (202/401/403) y Shiny devuelve 404.
-      window.keycloakLogout = function () {
-        var origin = window.location.origin;
-
-        // id_token_hint es imprescindible: sin él, Keycloak 26 no cierra la
-        // sesión, muestra una pantalla de confirmación (así lo define OIDC
-        // RP-Initiated Logout) y la sesión SSO sobrevive. kc.logout() lo añade
-        // solo; aquí, que se construye a mano, hay que ponerlo.
-        var kcLogout = cfg.url + "/realms/" + cfg.realm +
-          "/protocol/openid-connect/logout" +
-          "?post_logout_redirect_uri=" + encodeURIComponent(origin) +
-          (kc.idToken
-            ? "&id_token_hint=" + encodeURIComponent(kc.idToken)
-            : "&client_id=" + encodeURIComponent(cfg.clientId));
-
-        fetch("/oauth2/auth", { method: "GET", credentials: "include" })
-          .then(function (r) {
-            if (r.status === 404) {
-              kc.logout({ redirectUri: origin });          // acceso directo
-            } else {
-              window.location.href =                        // detrás del proxy
-                "/oauth2/sign_out?rd=" + encodeURIComponent(kcLogout);
-            }
-          })
-          .catch(function () {
-            kc.logout({ redirectUri: origin });             // sin red: al menos Keycloak
-          });
-      };
 
     })
-    .catch(function () {
-      console.error("[ESAVI] Error al inicializar Keycloak");
+    .catch(function (e) {
+      console.error("[ESAVI] Error al inicializar Keycloak:", e);
+      console.error(
+        "[ESAVI] Revisa que " + window.location.origin + " esté en los " +
+        "'Web origins' y en los 'Valid redirect URIs' del cliente " +
+        cfg.clientId + " del realm " + cfg.realm + "."
+      );
     });
 })();

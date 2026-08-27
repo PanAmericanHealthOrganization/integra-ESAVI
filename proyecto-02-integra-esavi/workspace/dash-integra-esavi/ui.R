@@ -102,7 +102,7 @@ ui <- dashboardPage(
     minified = TRUE,
     collapsed = TRUE,
     sidebarMenu(
-      menuItem("Ir a Integra App", icon = icon("external-link-alt", class = "menu-icon"), href = integra_app_url, newtab = TRUE),
+      menuItem("Ir a Integra App", icon = icon("external-link-alt", class = "menu-icon"), href = integra_app_url, newtab = FALSE),
       br(),
       menuItem("Inicio", tabName = "home", icon = icon(vIcon_home, class = "menu-icon")),
       menuItem("Introducción", tabName = "intro", icon = icon(vIcon_intr, class = "menu-icon")),

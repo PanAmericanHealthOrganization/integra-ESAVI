@@ -61,7 +61,7 @@ services:
       # Datamart DuckDB generado por api-integra-esavi (reemplaza los RDS). Llega por el
       # montaje de ./datos, que es donde la API lo escribe.
       DUCKDB_PATH:               ${DUCKDB_PATH:-/app/datos/esavi.duckdb}
-      INTEGRA_APP_URL:           ${INTEGRA_APP_URL:-http://localhost:8080}
+      INTEGRA_APP_URL:           ${INTEGRA_APP_URL:-http://localhost:5173}
       VITE_KEYCLOAK_URL:         ${VITE_KEYCLOAK_URL:-}
       VITE_KEYCLOAK_REALM:       ${VITE_KEYCLOAK_REALM:-}
       VITE_KEYCLOAK_CLIENT_ID:   ${VITE_KEYCLOAK_CLIENT_ID:-}
