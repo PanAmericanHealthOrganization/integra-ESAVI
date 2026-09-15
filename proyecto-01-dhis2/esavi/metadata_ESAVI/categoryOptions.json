@@ -1,0 +1,21 @@
+{
+    "categoryOptions": [
+        {
+            "code": "default",
+            "name": "default",
+            "created": "2022-11-18T15:19:57.260",
+            "lastUpdated": "2022-11-18T15:19:57.268",
+            "translations": [],
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rwrw----"
+            },
+            "shortName": "default",
+            "organisationUnits": [],
+            "id": "xYerKDKCefk",
+            "attributeValues": []
+        }
+    ]
+}

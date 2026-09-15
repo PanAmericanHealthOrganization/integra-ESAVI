@@ -1,0 +1,25 @@
+{
+    "categoryCombos": [
+        {
+            "code": "default",
+            "name": "default",
+            "created": "2022-11-18T15:19:57.264",
+            "lastUpdated": "2024-09-03T12:38:53.698",
+            "translations": [],
+            "sharing": {
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "categories": [
+                {
+                    "id": "GLevLNI9wkl"
+                }
+            ],
+            "dataDimensionType": "DISAGGREGATION",
+            "skipTotal": false,
+            "id": "bjDvmb4bfuf"
+        }
+    ]
+}
