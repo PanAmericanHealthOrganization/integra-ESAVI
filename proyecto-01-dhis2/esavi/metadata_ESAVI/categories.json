@@ -1,0 +1,28 @@
+{
+    "categories": [
+        {
+            "code": "default",
+            "name": "default",
+            "created": "2022-11-18T15:19:57.263",
+            "lastUpdated": "2026-09-05T02:16:08.911",
+            "translations": [],
+            "sharing": {
+                "owner": "system-process",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "default",
+            "dataDimensionType": "DISAGGREGATION",
+            "dataDimension": false,
+            "categoryOptions": [
+                {
+                    "id": "xYerKDKCefk"
+                }
+            ],
+            "id": "GLevLNI9wkl",
+            "attributeValues": []
+        }
+    ]
+}
