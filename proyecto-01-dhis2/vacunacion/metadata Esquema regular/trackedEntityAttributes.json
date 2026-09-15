@@ -1,0 +1,555 @@
+{
+    "trackedEntityAttributes": [
+        {
+            "code": "SEXO",
+            "name": "Sexo",
+            "created": "2021-10-18T20:33:13.915",
+            "lastUpdated": "2026-07-03T13:43:43.420",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Sexo",
+            "formName": "Sexo",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "jbYmLpFDvuA"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "MiZMsOXYy0h",
+            "attributeValues": []
+        },
+        {
+            "code": "PUEBLO",
+            "name": "Pueblo",
+            "created": "2021-10-18T20:34:39.717",
+            "lastUpdated": "2026-07-03T13:43:43.420",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Pueblo",
+            "formName": "Pueblo",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "x8DTxw9IdTf"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "bHCqRecTH3R",
+            "attributeValues": []
+        },
+        {
+            "code": "ORIGEN DATOS",
+            "name": "Origen Datos",
+            "created": "2022-03-15T08:11:58.217",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Origen Datos",
+            "description": "Campo para verificar cuál es el origen de los datos de la persona",
+            "formName": "Origen de Datos",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "fieldMask": "Origen de Datos",
+            "orgunitScope": false,
+            "skipSynchronization": true,
+            "id": "nULJ6aJQMg6",
+            "attributeValues": []
+        },
+        {
+            "code": "ESTADOCIVIL",
+            "name": "Estado civil",
+            "created": "2021-10-18T20:32:30.798",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Estado civil",
+            "formName": "Estado civil",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "C8dcIVFVTZk"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "SguXpHxhqtd",
+            "attributeValues": []
+        },
+        {
+            "code": "AUTOIDENTIFICACION",
+            "name": "Autoidentificación",
+            "created": "2021-10-18T20:33:49.772",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Autoidentificación",
+            "formName": "Autoidentificación",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "MNzV8zdhfNj"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "lwTNuRsSGYb",
+            "attributeValues": []
+        },
+        {
+            "code": "NACIONALIDAD",
+            "name": "Nacionalidad",
+            "created": "2021-10-18T20:31:45.727",
+            "lastUpdated": "2026-07-03T13:43:43.420",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Nacionalidad",
+            "formName": "Nacionalidad",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "aRtFeDF7SNg"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "BnJ69jHTPcO",
+            "attributeValues": []
+        },
+        {
+            "code": "NACIONALIDADETNICA",
+            "name": "Nacionalidad étnica",
+            "created": "2021-10-18T20:35:22.020",
+            "lastUpdated": "2026-07-03T13:43:43.420",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Nacionalidad étnica",
+            "formName": "Nacionalidad étnica",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "TZDq9HcFIG0"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "LkgcmIRlM0h",
+            "attributeValues": []
+        },
+        {
+            "code": "IDENTIFICACION",
+            "name": "Nro. de identificación",
+            "created": "2021-10-18T20:30:57.955",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Nro. de identificación",
+            "formName": "Nro. de identificación",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": true,
+            "confidential": false,
+            "unique": true,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "d8PiRnvGHEN",
+            "attributeValues": []
+        },
+        {
+            "code": "FECHANACIMIENTO",
+            "name": "Fecha de nacimiento",
+            "created": "2021-10-18T20:45:47.486",
+            "lastUpdated": "2026-07-03T13:43:43.420",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Fecha de nacimiento",
+            "formName": "Fecha de nacimiento",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "DATE",
+            "inherit": false,
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "h0zzlWpQr5E",
+            "attributeValues": []
+        },
+        {
+            "code": "TIPO IDENTIFICACION",
+            "name": "Tipo de identificación",
+            "created": "2021-10-18T20:29:08.492",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Tipo de identificación",
+            "formName": "Tipo de identificación",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "optionSet": {
+                "id": "TFpbT13UT5q"
+            },
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "mJyGzNXYzTa",
+            "attributeValues": []
+        },
+        {
+            "code": "APELLIDOS",
+            "name": "Apellidos",
+            "created": "2021-10-18T17:22:19.797",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Apellidos",
+            "formName": "Apellidos",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "cEb5FvyVzfw",
+            "attributeValues": []
+        },
+        {
+            "code": "NOMBRES",
+            "name": "Nombres",
+            "created": "2021-10-18T17:13:27.600",
+            "lastUpdated": "2026-07-03T13:43:43.421",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Nombres",
+            "formName": "Nombres",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "TEXT",
+            "inherit": false,
+            "displayOnVisitSchedule": false,
+            "displayInListNoProgram": false,
+            "confidential": false,
+            "unique": false,
+            "generated": false,
+            "pattern": "",
+            "orgunitScope": false,
+            "skipSynchronization": false,
+            "id": "aZ18xLVTHwh",
+            "attributeValues": []
+        }
+    ]
+}

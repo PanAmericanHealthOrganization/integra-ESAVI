@@ -1,0 +1,543 @@
+{
+    "programs": [
+        {
+            "code": "ERE-VAC",
+            "name": "ESQUEMA REGULAR",
+            "created": "2023-05-29T12:06:19.451",
+            "lastUpdated": "2026-07-15T19:18:03.961",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {
+                    "elsGOyVWIB1": {
+                        "displayName": "usuario captura",
+                        "access": "rwrw----",
+                        "id": "elsGOyVWIB1"
+                    }
+                },
+                "userGroups": {
+                    "fSupO5te1VM": {
+                        "displayName": "ESRE - Capturista",
+                        "access": "rwrw----",
+                        "id": "fSupO5te1VM"
+                    }
+                },
+                "public": "rwrw----"
+            },
+            "shortName": "ESQ-REG",
+            "description": "Esquema regular de vacunación",
+            "version": 17,
+            "enrollmentDateLabel": "Fecha de registro",
+            "incidentDateLabel": "Fecha del evento",
+            "programType": "WITH_REGISTRATION",
+            "displayIncidentDate": true,
+            "ignoreOverdueEvents": false,
+            "onlyEnrollOnce": false,
+            "notificationTemplates": [],
+            "selectEnrollmentDatesInFuture": false,
+            "selectIncidentDatesInFuture": false,
+            "trackedEntityType": {
+                "id": "eL5WFnzkqNe"
+            },
+            "dataEntryForm": {
+                "id": "JslYnjM8axI"
+            },
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "skipOffline": false,
+            "displayFrontPageList": true,
+            "useFirstStageDuringRegistration": false,
+            "expiryDays": 0,
+            "completeEventsExpiryDays": 0,
+            "openDaysAfterCoEndDate": 0,
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "accessLevel": "OPEN",
+            "id": "VZOdJ8z1PbL",
+            "attributeValues": [],
+            "organisationUnits": [
+                {
+                    "id": "xRnhAxA7THb"
+                },
+                {
+                    "id": "wDdQPcLC2Fo"
+                },
+                {
+                    "id": "zldhN2PRvGT"
+                }
+            ],
+            "programStages": [
+                {
+                    "id": "Hea3cujMUCN"
+                }
+            ],
+            "programSections": [
+                {
+                    "id": "gNJRPrvwhZA"
+                }
+            ],
+            "programTrackedEntityAttributes": [
+                {
+                    "name": "ESQUEMA REGULAR Nro. de identificación",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.965",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 1,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Nro. de identificación",
+                    "displayName": "ESQUEMA REGULAR Nro. de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "IJPiyyZ0Zxz",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "d8PiRnvGHEN"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Nombres",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.966",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 2,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Nombres",
+                    "displayName": "ESQUEMA REGULAR Nombres",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "exg91gEl5dG",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "aZ18xLVTHwh"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Apellidos",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.966",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 3,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Apellidos",
+                    "displayName": "ESQUEMA REGULAR Apellidos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "WfX6Y0dSQJv",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "cEb5FvyVzfw"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Tipo de identificación",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 4,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Tipo de identificación",
+                    "displayName": "ESQUEMA REGULAR Tipo de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "mN6wgNhelp0",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "mJyGzNXYzTa"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Autoidentificación",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 5,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Autoidentificación",
+                    "displayName": "ESQUEMA REGULAR Autoidentificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "n4poovpDZI2",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "lwTNuRsSGYb"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Nacionalidad",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 6,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Nacionalidad",
+                    "displayName": "ESQUEMA REGULAR Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "jLb4ze9ZpCb",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "BnJ69jHTPcO"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Fecha de nacimiento",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 7,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "DATE",
+                    "displayShortName": "ESQ-REG Fecha de nacimiento",
+                    "displayName": "ESQUEMA REGULAR Fecha de nacimiento",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "FyWq9kn457f",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "h0zzlWpQr5E"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Sexo",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 8,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Sexo",
+                    "displayName": "ESQUEMA REGULAR Sexo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "n7Fh5kyRqnz",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "MiZMsOXYy0h"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Nacionalidad étnica",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 9,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Nacionalidad étnica",
+                    "displayName": "ESQUEMA REGULAR Nacionalidad étnica",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "sfkHfqGAaJV",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "LkgcmIRlM0h"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Origen Datos",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 10,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Origen Datos",
+                    "displayName": "ESQUEMA REGULAR Origen Datos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "blWH1ViE9Ov",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "nULJ6aJQMg6"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Estado civil",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 11,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Estado civil",
+                    "displayName": "ESQUEMA REGULAR Estado civil",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "B55vVLtBJA0",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "SguXpHxhqtd"
+                    }
+                },
+                {
+                    "name": "ESQUEMA REGULAR Pueblo",
+                    "created": "2023-05-29T12:06:19.296",
+                    "lastUpdated": "2026-07-15T19:18:03.967",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "VZOdJ8z1PbL"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 12,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "ESQ-REG Pueblo",
+                    "displayName": "ESQUEMA REGULAR Pueblo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "pOQ5QpkOkFa",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "bHCqRecTH3R"
+                    }
+                }
+            ]
+        }
+    ]
+}

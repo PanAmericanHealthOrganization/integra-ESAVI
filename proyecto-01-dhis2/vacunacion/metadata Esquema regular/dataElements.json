@@ -1,0 +1,904 @@
+{
+    "dataElements": [
+        {
+            "code": "ERE_EDAD_AÑOS",
+            "name": "DNVE ERE TRK - Edad Años",
+            "created": "2023-05-29T11:46:46.231",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Edad años",
+            "description": "Edad en años a la fecha de vacunación",
+            "formName": "Años:",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "UpPrf9dT2xx",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "CAM_ESTADSCR",
+            "name": "DNVE ERE TRK - Establecimiento Adscripción",
+            "created": "2023-05-29T11:49:50.264",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE -  Establecimiento Adscripción",
+            "description": "Establecimiento al que está adscrito",
+            "formName": "Establecimiento adscrito",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "fsKLfEawIyD",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_DOSIS",
+            "name": "DNVE ERE TRK - Dosis",
+            "created": "2023-06-09T08:53:24.792",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Dosis",
+            "description": "Número de dosis aplicada",
+            "formName": "Dosis aplicada",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "vxhEsDee5bZ"
+            },
+            "id": "pZUM71Yrh0Y",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_SEMGESTACION",
+            "name": "DNVE ERE TRK - Semanas gestación",
+            "created": "2023-06-21T11:39:35.977",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Semanas gestación",
+            "description": "Número de semanas de gestación",
+            "formName": "Semanas de gestación",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "KHHUYQWpj1a"
+            },
+            "id": "WKMC438hSRp",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_EDAD_DIAS",
+            "name": "DNVE ERE TRK - Edad días",
+            "created": "2023-05-29T11:47:34.995",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Edad días",
+            "description": "Edad en días a la fecha de vacunación",
+            "formName": "Días:",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "K7V895pDdlX",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_FECHAVAC",
+            "name": "DNVE ERE TRK - Fecha vacunación",
+            "created": "2023-05-29T11:35:56.336",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DVNE ERE - Fecha vacunación",
+            "formName": "Fecha de vacunación",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "DATE",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "Zg3TTwdEZp3",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_TOTALDIAS",
+            "name": "DNVE ERE TRK - Total días de vida",
+            "created": "2023-06-21T11:21:11.367",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DVNE ERE - Total días de vida",
+            "formName": "Total de Edad en días",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "PJjJjbFEeVI",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_PROVINCIADOM",
+            "name": "DNVE ERE TRK - Provincia domicilio",
+            "created": "2023-05-29T11:50:54.562",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Provincia domicilio",
+            "description": "Provincia en la que se encuentra el domicilio",
+            "formName": "Provincia del Domicilio",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "cwC8AsIgLo7"
+            },
+            "id": "fKwppcIgHtf",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_UNICODIGO",
+            "name": "DNVE VAC ERE - Unicódigo",
+            "created": "2023-05-29T11:45:53.733",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Unicódigo",
+            "description": "Código único del establecimiento",
+            "formName": "Unicódigo",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "wQiPlPXKGYO",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_RESPONSABLE",
+            "name": "DNVE ERE TRK - Responsable niño",
+            "created": "2023-05-30T08:10:26.767",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Responsable niño",
+            "description": "La persona está adscrita al establecimiento de vacunación",
+            "formName": "Padre o responsable del niño",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "dC2c8rLlYCO",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_EMBARAZADA",
+            "name": "DNVE ERE TRK - Embarazada",
+            "created": "2023-06-21T11:38:40.273",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Embarazada",
+            "description": "La mujer está en estado de gestación",
+            "formName": "Está embarazada",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "BOOLEAN",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "xq6YCf1ns8R",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_EDAD_MES",
+            "name": "DNVE ERE TRK - Edad Mes",
+            "created": "2023-05-29T11:47:05.072",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Edad Mes",
+            "description": "Edad en meses a la fecha de vacunación",
+            "formName": "Meses:",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "valueType": "NUMBER",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "QPM5xIqdBwc",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_FECHANAC",
+            "name": "DNVE ERE TRK - Fecha de nacimiento",
+            "created": "2023-05-29T11:36:49.995",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE TRK - Fecha nacimiento",
+            "formName": "Fecha de nacimiento",
+            "legendSets": [],
+            "aggregationType": "SUM",
+            "valueType": "DATE",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "tjH5BgCKY2I",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_VACUNA",
+            "name": "DNVE ERE TRK - Vacuna",
+            "created": "2023-05-29T12:07:48.716",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Vacuna",
+            "description": "Vacuna aplicada",
+            "formName": "Vacuna",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "optionSet": {
+                "id": "jcjNuP6Gvlc"
+            },
+            "id": "HKDU3ENmIqZ",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_LUGAT",
+            "name": "DNVE ERE TRK - Lugar atencion",
+            "created": "2023-05-29T11:35:04.398",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Lugar atencion",
+            "formName": "Lugar de atención",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "kFHIm9Gkfbx"
+            },
+            "id": "u1UzZq9DoBa",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_DOMCANTON",
+            "name": "DNVE ERE TRK - Cantón domicilio",
+            "created": "2023-05-29T11:51:35.695",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Cantón domicilio",
+            "description": "Cantón en el que se encuentra el domicilio",
+            "formName": "Cantón del Domicilio",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "OTrv7F6GQBW"
+            },
+            "id": "XglVhFOogLu",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_LOTEVAC",
+            "name": "DNVE ERE TRK - Lote de vacuna",
+            "created": "2023-05-29T11:54:10.401",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Lote de vacuna",
+            "description": "Lote de la vacuna aplicada",
+            "formName": "Lote de vacuna:",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "optionSet": {
+                "id": "h2p3BCrdyga"
+            },
+            "id": "jjvQUsgcwoV",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_ADSCRIPCION",
+            "name": "DNVE ERE TRK - Adscripción",
+            "created": "2023-05-29T11:48:12.532",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Adscripcion",
+            "description": "La persona está adscrita al establecimiento de vacunación",
+            "formName": "Está adscrito al establecimiento de salud",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "BOOLEAN",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "id": "wbUA1r6hyGM",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_VACUNADOR",
+            "name": "DNVE ERE TRK - Vacunador",
+            "created": "2023-05-29T11:24:38.202",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Vacunador",
+            "formName": "Vacunador",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "rtBgpPA5nCA",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_IDVACUNADOR",
+            "name": "DNVE ERE TRK - Identificacion vacunador",
+            "created": "2023-05-29T11:25:39.579",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE ERE - Identificacion vacunador",
+            "formName": "Identificación del vacunador",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": true,
+            "id": "d89LKQ6toXt",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        },
+        {
+            "code": "ERE_PARROQUIADOM",
+            "name": "DNVE ERE TRK - Parroquia domicilio",
+            "created": "2023-05-29T11:52:18.915",
+            "lastUpdated": "2023-07-07T10:47:17.773",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "DNVE VAC - Parroquia domicilio",
+            "description": "Parroquia en la que se encuentra el domicilio",
+            "formName": "Parroquia del Domicilio",
+            "legendSets": [],
+            "aggregationType": "NONE",
+            "valueType": "TEXT",
+            "domainType": "TRACKER",
+            "aggregationLevels": [],
+            "zeroIsSignificant": false,
+            "optionSet": {
+                "id": "G51yxPXluxh"
+            },
+            "id": "CrT0OsFxTMV",
+            "attributeValues": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            }
+        }
+    ]
+}

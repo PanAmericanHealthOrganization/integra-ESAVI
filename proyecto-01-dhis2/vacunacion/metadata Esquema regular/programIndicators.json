@@ -1,0 +1,91 @@
+{
+    "programIndicators": [
+        {
+            "name": "ERE - Total vacunados",
+            "created": "2023-06-22T10:37:34.492",
+            "lastUpdated": "2023-07-07T10:47:18.550",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ERE-TOTVAC",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "expression": "V{event_count}",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2023-06-22T10:37:34.492",
+                    "lastUpdated": "2023-07-07T10:47:18.551",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "uxYUAnk5XQw",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-06-22T10:37:34.492",
+                    "lastUpdated": "2023-07-07T10:47:18.551",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "gQckCdbMJSn",
+                    "attributeValues": []
+                }
+            ],
+            "id": "HFpAU0xs1IL",
+            "attributeValues": []
+        }
+    ]
+}

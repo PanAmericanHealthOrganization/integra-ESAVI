@@ -1,0 +1,845 @@
+{
+    "programStages": [
+        {
+            "name": "ERE-Vacunación",
+            "created": "2023-05-29T12:06:19.407",
+            "lastUpdated": "2026-07-15T19:18:03.734",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {
+                    "elsGOyVWIB1": {
+                        "displayName": "usuario captura",
+                        "access": "rwrw----",
+                        "id": "elsGOyVWIB1"
+                    }
+                },
+                "userGroups": {
+                    "fSupO5te1VM": {
+                        "displayName": "ESRE - Capturista",
+                        "access": "rwrw----",
+                        "id": "fSupO5te1VM"
+                    }
+                },
+                "public": "rwrw----"
+            },
+            "minDaysFromStart": 0,
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "programStageDataElements": [
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "wbUA1r6hyGM"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 1,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "D70b1rHFQRL",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "XglVhFOogLu"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 2,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "qJS1nVVuelE",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "UpPrf9dT2xx"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 3,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "gViZWuHe0ty",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.407",
+                    "lastUpdated": "2026-07-15T19:18:03.750",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "K7V895pDdlX"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 4,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "fj1HoseOTTP",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.407",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "QPM5xIqdBwc"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 5,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "wrafDJqtlxu",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "fsKLfEawIyD"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 6,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "zqV7bDzSC8P",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "tjH5BgCKY2I"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 7,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "kOl6f9SaKz6",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "Zg3TTwdEZp3"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 8,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "XTo1RYYU1xP",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "d89LKQ6toXt"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 9,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "PXUyaPq4U2K",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.407",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "jjvQUsgcwoV"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 10,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "L2S45qD5sxc",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "u1UzZq9DoBa"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 11,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "oJALb1UPMZj",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "CrT0OsFxTMV"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 12,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "CGb8BhXzodn",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.407",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "fKwppcIgHtf"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 13,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Qn8WlezhZH8",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "rtBgpPA5nCA"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 14,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "ngapwRg71QZ",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:06:19.408",
+                    "lastUpdated": "2026-07-15T19:18:03.753",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "wQiPlPXKGYO"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 15,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Gyb39Jyt62f",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-29T12:11:15.442",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "HKDU3ENmIqZ"
+                    },
+                    "compulsory": true,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 16,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "siPrVp9a6EZ",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-05-30T08:18:46.150",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "dC2c8rLlYCO"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 17,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "milH5WT8b6i",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-06-09T08:53:57.858",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "pZUM71Yrh0Y"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 18,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "tZXNHxxdEn4",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-06-21T11:21:40.301",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "PJjJjbFEeVI"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 19,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "QpZ46CIHAmU",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-06-21T11:40:57.248",
+                    "lastUpdated": "2026-07-15T19:18:03.756",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "xq6YCf1ns8R"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 20,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "ee7cvyzE4Rt",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2023-06-21T11:40:57.248",
+                    "lastUpdated": "2026-07-15T19:18:03.752",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "programStage": {
+                        "id": "Hea3cujMUCN"
+                    },
+                    "dataElement": {
+                        "id": "WKMC438hSRp"
+                    },
+                    "compulsory": false,
+                    "allowProvidedElsewhere": false,
+                    "sortOrder": 21,
+                    "displayInReports": false,
+                    "allowFutureDate": false,
+                    "renderOptionsAsRadio": false,
+                    "skipSynchronization": false,
+                    "skipAnalytics": false,
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "ZWkzKqGHjhb",
+                    "attributeValues": []
+                }
+            ],
+            "dataEntryForm": {
+                "id": "J7vivJVqpml"
+            },
+            "autoGenerateEvent": true,
+            "validationStrategy": "ON_COMPLETE",
+            "displayGenerateEventBox": true,
+            "blockEntryForm": true,
+            "preGenerateUID": true,
+            "remindCompleted": false,
+            "generatedByEnrollmentDate": false,
+            "allowGenerateNextVisit": false,
+            "openAfterEnrollment": true,
+            "sortOrder": 1,
+            "hideDueDate": false,
+            "enableUserAssignment": false,
+            "referral": false,
+            "id": "Hea3cujMUCN",
+            "attributeValues": [],
+            "repeatable": true,
+            "programStageSections": [
+                {
+                    "id": "T3u7ldaG6gg"
+                },
+                {
+                    "id": "e2vuy9d8OtE"
+                },
+                {
+                    "id": "rt9iTTCcLEj"
+                },
+                {
+                    "id": "abNYbG2BUMs"
+                },
+                {
+                    "id": "XEWUx4ABepq"
+                },
+                {
+                    "id": "wGhm2THOEXJ"
+                }
+            ],
+            "notificationTemplates": []
+        }
+    ]
+}

@@ -1,0 +1,65 @@
+{
+    "programSections": [
+        {
+            "name": "Registro de personas",
+            "created": "2023-06-28T11:20:12.618",
+            "lastUpdated": "2026-07-01T17:03:03.333",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "trackedEntityAttributes": [
+                {
+                    "id": "mJyGzNXYzTa"
+                },
+                {
+                    "id": "d8PiRnvGHEN"
+                },
+                {
+                    "id": "aZ18xLVTHwh"
+                },
+                {
+                    "id": "cEb5FvyVzfw"
+                },
+                {
+                    "id": "MiZMsOXYy0h"
+                },
+                {
+                    "id": "h0zzlWpQr5E"
+                },
+                {
+                    "id": "SguXpHxhqtd"
+                },
+                {
+                    "id": "BnJ69jHTPcO"
+                },
+                {
+                    "id": "lwTNuRsSGYb"
+                },
+                {
+                    "id": "LkgcmIRlM0h"
+                },
+                {
+                    "id": "bHCqRecTH3R"
+                }
+            ],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "gNJRPrvwhZA"
+        }
+    ]
+}

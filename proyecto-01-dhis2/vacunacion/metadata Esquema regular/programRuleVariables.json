@@ -1,0 +1,533 @@
+{
+    "programRuleVariables": [
+        {
+            "name": "ERE-LOTE-POR-ESTABLECIMIENTO",
+            "created": "2023-06-14T08:31:40.355",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "jjvQUsgcwoV"
+            },
+            "useCodeForOptionSet": true,
+            "id": "WDVsK1dMzEt",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Ultimo responsable",
+            "created": "2023-06-16T09:08:00.625",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "dC2c8rLlYCO"
+            },
+            "useCodeForOptionSet": true,
+            "id": "QLNBe6C7ZpP",
+            "programRuleVariableSourceType": "DATAELEMENT_PREVIOUS_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE-Nacionalidad etnica",
+            "created": "2023-06-09T08:56:25.577",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "G0Cl2sHN1ku",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "LkgcmIRlM0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Edad anios",
+            "created": "2023-06-01T10:38:36.343",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "UpPrf9dT2xx"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Pnuv6aNsenD",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ERE - Total dias de vida",
+            "created": "2023-06-21T11:22:00.981",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "PJjJjbFEeVI"
+            },
+            "useCodeForOptionSet": true,
+            "id": "KhFYXQfHXzr",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ERE - Fecha Vacunacion",
+            "created": "2023-07-01T17:36:51.368",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "Zg3TTwdEZp3"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rsbjuPoQubQ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ERE - Fecha nacimiento",
+            "created": "2023-06-01T10:54:58.046",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "hxA4CDCPKPi",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "h0zzlWpQr5E"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "ERE - Vacuna seleccionada",
+            "created": "2023-06-09T08:36:16.456",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "HKDU3ENmIqZ"
+            },
+            "useCodeForOptionSet": true,
+            "id": "sPpgOrHgEDX",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Edad meses",
+            "created": "2023-06-01T10:38:03.090",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "QPM5xIqdBwc"
+            },
+            "useCodeForOptionSet": true,
+            "id": "A7eIPclURM2",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ERE - Sexo",
+            "created": "2023-06-21T11:43:12.924",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "aAJyvuwMqni",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MiZMsOXYy0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Unicodigo",
+            "created": "2023-07-01T17:44:17.662",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "wQiPlPXKGYO"
+            },
+            "useCodeForOptionSet": true,
+            "id": "hcuSiC5oGDR",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Domicilio canton",
+            "created": "2023-06-16T14:33:27.991",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "XglVhFOogLu"
+            },
+            "useCodeForOptionSet": true,
+            "id": "eMzunWpvbuX",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE-Nacionalidad",
+            "created": "2023-06-09T08:56:11.354",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "bU8cwVsH0wd",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "BnJ69jHTPcO"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Embarazada",
+            "created": "2023-06-21T11:41:14.953",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "xq6YCf1ns8R"
+            },
+            "useCodeForOptionSet": true,
+            "id": "m2BmAhhTdeH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ERE-Pueblo indigena",
+            "created": "2023-06-09T08:56:44.727",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "FuST6dz6FN6",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "bHCqRecTH3R"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Edad dias",
+            "created": "2023-06-01T10:38:24.614",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "K7V895pDdlX"
+            },
+            "useCodeForOptionSet": true,
+            "id": "cK8oAxEtXH5",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ERE - Domicilio parroquia",
+            "created": "2023-06-16T15:19:52.204",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "CrT0OsFxTMV"
+            },
+            "useCodeForOptionSet": true,
+            "id": "QjtOV1pQbe3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE-Tipo identificacion",
+            "created": "2023-06-09T08:57:30.494",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Ny27d8vX9Sk",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mJyGzNXYzTa"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Adscripcion",
+            "created": "2023-06-16T15:20:17.648",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "wbUA1r6hyGM"
+            },
+            "useCodeForOptionSet": true,
+            "id": "MxX4VKfxEPj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ERE-Identificacion",
+            "created": "2023-06-09T08:57:15.186",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": false,
+            "id": "irfKNfEDHyV",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "d8PiRnvGHEN"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Domicilio provincia",
+            "created": "2023-06-16T14:48:26.443",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "fKwppcIgHtf"
+            },
+            "useCodeForOptionSet": true,
+            "id": "URxBTczbyX8",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ERE - Fecha de ultimo evento",
+            "created": "2023-06-16T09:12:17.587",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "dataElement": {
+                "id": "Zg3TTwdEZp3"
+            },
+            "useCodeForOptionSet": true,
+            "id": "OgNuOjXkAYY",
+            "programRuleVariableSourceType": "DATAELEMENT_PREVIOUS_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ERE-Autoidentificacion",
+            "created": "2023-06-09T08:58:28.095",
+            "lastUpdated": "2023-07-07T10:47:18.600",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "program": {
+                "id": "VZOdJ8z1PbL"
+            },
+            "useCodeForOptionSet": true,
+            "id": "acLrrZnRNRZ",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "lwTNuRsSGYb"
+            },
+            "valueType": "TEXT"
+        }
+    ]
+}
