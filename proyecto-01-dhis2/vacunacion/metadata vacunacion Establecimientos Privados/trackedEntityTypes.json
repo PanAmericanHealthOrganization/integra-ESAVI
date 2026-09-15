@@ -1,0 +1,141 @@
+{
+    "trackedEntityTypes": [
+        {
+            "name": "Persona",
+            "created": "2021-10-18T17:04:57.567",
+            "lastUpdated": "2026-07-13T16:18:37.535",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rwrw----"
+            },
+            "trackedEntityTypeAttributes": [
+                {
+                    "name": "Persona Nro. de identificación",
+                    "created": "2021-11-08T17:22:29.571",
+                    "lastUpdated": "2026-07-13T12:38:16.624",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "eL5WFnzkqNe"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "d8PiRnvGHEN"
+                    },
+                    "displayInList": true,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Nro. de identificación",
+                    "displayName": "Persona Nro. de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "me8Zaco29L2",
+                    "attributeValues": []
+                },
+                {
+                    "name": "Persona Nombres",
+                    "created": "2021-11-08T17:22:29.571",
+                    "lastUpdated": "2026-07-13T12:38:16.624",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "eL5WFnzkqNe"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "aZ18xLVTHwh"
+                    },
+                    "displayInList": true,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Nombres",
+                    "displayName": "Persona Nombres",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "QqZVkjxwdCc",
+                    "attributeValues": []
+                },
+                {
+                    "name": "Persona Apellidos",
+                    "created": "2021-11-08T17:22:29.571",
+                    "lastUpdated": "2026-07-13T12:38:16.624",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "trackedEntityType": {
+                        "id": "eL5WFnzkqNe"
+                    },
+                    "trackedEntityAttribute": {
+                        "id": "cEb5FvyVzfw"
+                    },
+                    "displayInList": true,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "null Apellidos",
+                    "displayName": "Persona Apellidos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "eY5Pncj7PD0",
+                    "attributeValues": []
+                }
+            ],
+            "featureType": "NONE",
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "allowAuditLog": false,
+            "id": "eL5WFnzkqNe",
+            "attributeValues": []
+        }
+    ]
+}

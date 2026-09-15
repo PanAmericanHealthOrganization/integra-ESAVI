@@ -1,0 +1,602 @@
+{
+    "programRuleVariables": [
+        {
+            "name": "EREP-CantonResidencia",
+            "created": "2026-08-12T23:35:52.660",
+            "lastUpdated": "2026-08-12T23:35:52.660",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": true,
+            "id": "YwCn7X5y4Re",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "wHlsucrrLQh"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Texto Sexo",
+            "created": "2024-08-27T10:57:01.540",
+            "lastUpdated": "2026-07-03T13:47:10.347",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": false,
+            "id": "BLzg0kbrA5W",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MthQ3fTXChs"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Abreviatura_vacuna_feeback",
+            "created": "2026-08-11T21:42:40.055",
+            "lastUpdated": "2026-08-11T21:42:40.055",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "Hw3reTayQGm"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Kw2cFhzXDld",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Vacuna aplicada",
+            "created": "2024-08-30T11:26:36.636",
+            "lastUpdated": "2026-07-03T13:47:10.348",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "uXPd9Jw33az"
+            },
+            "useCodeForOptionSet": true,
+            "id": "EuTvJ5ImC2y",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Nacionalidad Etnica",
+            "created": "2026-08-03T16:58:59.980",
+            "lastUpdated": "2026-08-03T19:05:09.845",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": true,
+            "id": "xpjvlbbTnSE",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "LkgcmIRlM0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Edad calculada - meses",
+            "created": "2024-09-06T08:19:46.832",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "aFThyNtvuJ0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FCyAHgRJczH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_ZERO_OR_POSITIVE"
+        },
+        {
+            "name": "EREP-Edad calculada - dias",
+            "created": "2024-09-06T08:20:54.757",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "PQHo6OynaUJ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "vLVZ4xlYMBG",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_ZERO_OR_POSITIVE"
+        },
+        {
+            "name": "EREP-Vacuna aplicada_feeback",
+            "created": "2026-08-11T21:41:51.798",
+            "lastUpdated": "2026-08-11T21:41:51.798",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "uXPd9Jw33az"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ZwnhuHP75J9",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Vacuna aplicada anterior",
+            "created": "2024-08-30T10:23:01.097",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "uXPd9Jw33az"
+            },
+            "useCodeForOptionSet": true,
+            "id": "aEPpIrApvJF",
+            "programRuleVariableSourceType": "DATAELEMENT_PREVIOUS_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Fecha Nacimiento",
+            "created": "2024-08-27T15:54:00.534",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": false,
+            "id": "QzyNNUuTfrY",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "h0zzlWpQr5E"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "EREP- Autoidentificacion",
+            "created": "2026-08-03T19:00:24.669",
+            "lastUpdated": "2026-08-03T19:00:32.580",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": true,
+            "id": "NzdzUJRX5sR",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "lwTNuRsSGYb"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-ProvinciaResidencia",
+            "created": "2026-08-12T23:34:59.203",
+            "lastUpdated": "2026-08-12T23:34:59.203",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": true,
+            "id": "i64VP0s5PCF",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "jHQ2zpmB6Vg"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Identificacion vacunador ingresado",
+            "created": "2024-09-06T08:54:50.444",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "nXmNta3AqNf"
+            },
+            "useCodeForOptionSet": false,
+            "id": "n0EfxZi5VaJ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Abreviatura",
+            "created": "2025-10-24T15:12:58.665",
+            "lastUpdated": "2026-07-03T13:47:10.303",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "Hw3reTayQGm"
+            },
+            "useCodeForOptionSet": true,
+            "id": "eDiutjTpzC3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Dosis aplicada",
+            "created": "2024-08-30T11:26:17.927",
+            "lastUpdated": "2026-07-03T13:47:10.348",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "diBBB5EAqeO"
+            },
+            "useCodeForOptionSet": false,
+            "id": "HTwhuLWrKDT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Texto Estado Civil",
+            "created": "2024-08-27T11:02:33.546",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VACrtXEToho",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "OR7FLkFQvTe"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Fabricante",
+            "created": "2025-10-27T04:34:41.141",
+            "lastUpdated": "2026-07-03T13:47:10.306",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "HHesIEIpJRI"
+            },
+            "useCodeForOptionSet": true,
+            "id": "T4wt2mT5ulX",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Edad calculada - anios",
+            "created": "2024-09-06T08:12:46.262",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "fzBFm6RojZF"
+            },
+            "useCodeForOptionSet": false,
+            "id": "PQKW3kYyMB9",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_ZERO_OR_POSITIVE"
+        },
+        {
+            "name": "EREP-Dosis aplicada anterior",
+            "created": "2024-08-30T10:24:24.854",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "diBBB5EAqeO"
+            },
+            "useCodeForOptionSet": false,
+            "id": "qD4pceDMqcm",
+            "programRuleVariableSourceType": "DATAELEMENT_PREVIOUS_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Fecha Vacunacion",
+            "created": "2024-08-27T15:58:38.283",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "srMQWv4sHNc"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Fwz1RbIXBwv",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EREP- Lote",
+            "created": "2026-08-11T21:11:49.811",
+            "lastUpdated": "2026-08-11T21:11:49.811",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "IIeVXsFuYjB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "PbTyRti4rZh",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Lote ingresado",
+            "created": "2024-09-06T08:38:42.730",
+            "lastUpdated": "2026-08-19T16:11:33.534",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "o55a8Rsmb8k"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ykEpGWmVd2w",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Nombre vacunador ingresado",
+            "created": "2024-09-06T09:02:55.376",
+            "lastUpdated": "2026-07-03T13:47:10.349",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "vWjyFxV2EMr"
+            },
+            "useCodeForOptionSet": false,
+            "id": "hw6KjoxbE1l",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP- Nacionalidad",
+            "created": "2024-08-27T11:03:40.809",
+            "lastUpdated": "2026-08-03T18:51:23.099",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "useCodeForOptionSet": true,
+            "id": "RxxmxBOs8WG",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "BnJ69jHTPcO"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "VAC EREP-Telefono",
+            "created": "2025-10-27T02:46:12.340",
+            "lastUpdated": "2026-07-03T13:47:10.307",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "S3P3eI6dX50"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VA0vu1Rj44U",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EREP-Fecha Caducidad",
+            "created": "2025-10-23T16:51:56.951",
+            "lastUpdated": "2026-07-03T13:47:10.307",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "qHdJ7oslcuG"
+            },
+            "dataElement": {
+                "id": "NLpUeHN6ekP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "dG4U6ARSq4c",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        }
+    ]
+}

@@ -1,0 +1,790 @@
+{
+    "programs": [
+        {
+            "code": "VAC-PRIVADOS",
+            "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS",
+            "created": "2024-08-27T08:05:23.814",
+            "lastUpdated": "2026-08-04T03:23:01.070",
+            "translations": [],
+            "createdBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "S3VhPLeux9e",
+                "external": false,
+                "users": {},
+                "userGroups": {
+                    "xFRnXA5ZmF3": {
+                        "displayName": "Capturista_all",
+                        "access": "rwrw----",
+                        "id": "xFRnXA5ZmF3"
+                    }
+                },
+                "public": "rw------"
+            },
+            "shortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS",
+            "description": "Programa para el registro de vacunación para establecimientos privados",
+            "version": 114,
+            "enrollmentDateLabel": "Fecha de registro",
+            "programType": "WITH_REGISTRATION",
+            "displayIncidentDate": false,
+            "ignoreOverdueEvents": false,
+            "onlyEnrollOnce": true,
+            "notificationTemplates": [],
+            "selectEnrollmentDatesInFuture": false,
+            "selectIncidentDatesInFuture": false,
+            "trackedEntityType": {
+                "id": "eL5WFnzkqNe"
+            },
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "skipOffline": false,
+            "displayFrontPageList": true,
+            "useFirstStageDuringRegistration": false,
+            "featureType": "NONE",
+            "expiryDays": 0,
+            "completeEventsExpiryDays": 0,
+            "openDaysAfterCoEndDate": 0,
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "accessLevel": "OPEN",
+            "id": "qHdJ7oslcuG",
+            "attributeValues": [],
+            "organisationUnits": [
+                {
+                    "id": "J95BSPmynSN"
+                },
+                {
+                    "id": "wDdQPcLC2Fo"
+                }
+            ],
+            "programStages": [
+                {
+                    "id": "fns8sAIJr7o"
+                }
+            ],
+            "programSections": [
+                {
+                    "id": "R4JNoc7gBOJ"
+                }
+            ],
+            "programTrackedEntityAttributes": [
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Tipo de identificación",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.071",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 1,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Tipo de identificación",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Tipo de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Uz2Tn5KqtxR",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "mJyGzNXYzTa"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nro. de identificación",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.071",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 2,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nro. de identificación",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nro. de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "rgPrhN8mzSA",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "d8PiRnvGHEN"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nombres",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.071",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 3,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nombres",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nombres",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "yK268F5XSsN",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "aZ18xLVTHwh"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Apellidos",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 4,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Apellidos",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Apellidos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "yqWWFKBiWPv",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "cEb5FvyVzfw"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Fecha de nacimiento",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 5,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "DATE",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Fecha de nacimiento",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Fecha de nacimiento",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "WCIq6bzc0Nh",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "h0zzlWpQr5E"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Sexo",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 6,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Sexo",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Sexo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "z8FoH366bkc",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "MiZMsOXYy0h"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Estado civil",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 7,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Estado civil",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Estado civil",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "vELL8Qcu3NH",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "SguXpHxhqtd"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 8,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "YJsKnvsdnbO",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "BnJ69jHTPcO"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Autoidentificación",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 9,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Autoidentificación",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Autoidentificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Rc4dnfpOqpV",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "lwTNuRsSGYb"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad étnica",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 10,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad étnica",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Nacionalidad étnica",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "z4OInqmbVWY",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "LkgcmIRlM0h"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Pueblo",
+                    "created": "2024-08-27T08:18:29.247",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 11,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Pueblo",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Pueblo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "I8EHCTmA2Jy",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "bHCqRecTH3R"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Origen Datos",
+                    "created": "2024-08-27T09:48:36.903",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 12,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Origen Datos",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Origen Datos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Jbyn5qSs2cK",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "nULJ6aJQMg6"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Sexo",
+                    "created": "2024-08-27T09:48:36.903",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 13,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Sexo",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Sexo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "P7Evm0TnCaG",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "MthQ3fTXChs"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Nacionalidad",
+                    "created": "2024-08-27T09:48:36.903",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 14,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Nacionalidad",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "JTY1Eqk3ViU",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "b7Ucql3BOtL"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Estado Civil",
+                    "created": "2024-08-27T09:48:36.903",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 15,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Estado Civil",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Texto Estado Civil",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "VUeEVUNAGli",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "OR7FLkFQvTe"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Canton domicilio",
+                    "created": "2026-08-04T02:57:17.673",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 16,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Canton domicilio",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Canton domicilio",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "qI5ganMXjZp",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "wHlsucrrLQh"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Parroquia domicilio",
+                    "created": "2026-08-04T02:57:17.673",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 17,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Parroquia domicilio",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Parroquia domicilio",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "FhD32PgLPja",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "GEvQf3N5iLN"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Provincia domicilio",
+                    "created": "2026-08-04T02:57:17.673",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 18,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Provincia domicilio",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS VAC EREP TRK - Provincia domicilio",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "rDcHDq3fJvK",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "jHQ2zpmB6Vg"
+                    }
+                },
+                {
+                    "name": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Teléfono ",
+                    "created": "2026-08-04T03:23:01.008",
+                    "lastUpdated": "2026-08-04T03:23:01.072",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "qHdJ7oslcuG"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 19,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "INTEGER_POSITIVE",
+                    "displayShortName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Teléfono",
+                    "displayName": "VACUNACIÓN ESTABLECIMIENTOS PRIVADOS Teléfono ",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "xa6r0EbvRkR",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "gYjFuYbevwY"
+                    }
+                }
+            ]
+        }
+    ]
+}

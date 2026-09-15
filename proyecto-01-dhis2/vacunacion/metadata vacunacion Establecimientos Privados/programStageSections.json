@@ -1,0 +1,107 @@
+{
+    "programStageSections": [
+        {
+            "name": "Datos Vacunador",
+            "created": "2024-08-30T10:19:15.486",
+            "lastUpdated": "2026-08-19T16:04:03.851",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "fns8sAIJr7o"
+            },
+            "dataElements": [
+                {
+                    "id": "nXmNta3AqNf"
+                },
+                {
+                    "id": "vWjyFxV2EMr"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "LesdoWvcZaD"
+        },
+        {
+            "name": "Datos vacunación",
+            "created": "2024-08-27T09:28:09.351",
+            "lastUpdated": "2026-08-19T16:04:03.851",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "fns8sAIJr7o"
+            },
+            "dataElements": [
+                {
+                    "id": "pVxXIsehElm"
+                },
+                {
+                    "id": "srMQWv4sHNc"
+                },
+                {
+                    "id": "fzBFm6RojZF"
+                },
+                {
+                    "id": "aFThyNtvuJ0"
+                },
+                {
+                    "id": "PQHo6OynaUJ"
+                },
+                {
+                    "id": "Hw3reTayQGm"
+                },
+                {
+                    "id": "uXPd9Jw33az"
+                },
+                {
+                    "id": "HHesIEIpJRI"
+                },
+                {
+                    "id": "IIeVXsFuYjB"
+                },
+                {
+                    "id": "NLpUeHN6ekP"
+                },
+                {
+                    "id": "diBBB5EAqeO"
+                },
+                {
+                    "id": "Y9W9HNzMHjQ"
+                },
+                {
+                    "id": "jFnJCBSWyXk"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "TnHQhIRauuL"
+        }
+    ]
+}
