@@ -1,0 +1,1499 @@
+{
+    "programIndicators": [
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 10-19 años",
+            "created": "2021-12-07T13:00:00.187",
+            "lastUpdated": "2023-05-19T15:56:47.706",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 10-19",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED004'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.709",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "ZEKQZdrFIdL",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.709",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "hJJymzLbr4z",
+                    "attributeValues": []
+                }
+            ],
+            "id": "wnPBA4PiT3J",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 50-64 años",
+            "created": "2021-12-07T13:00:50.465",
+            "lastUpdated": "2023-05-19T15:56:47.709",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 50-64",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED006'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.710",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "HTX36A85HaI",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.710",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "hfugrNLiDHX",
+                    "attributeValues": []
+                }
+            ],
+            "id": "jgTaZj8NxSe",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número de notificaciones de ESAVI grave oportunas",
+            "created": "2021-12-08T19:43:36.093",
+            "lastUpdated": "2023-05-19T15:56:47.710",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Notificaciones de ESAVI grave oportunas ",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "( d2:daysBetween( #{s8zAZcXZCt9.v815reutsgq}, V{enrollment_date}) ) <= 2",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-08T19:43:36.093",
+                    "lastUpdated": "2023-05-19T15:56:47.711",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "N5YjyVcQKjM",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-08T19:43:36.094",
+                    "lastUpdated": "2023-05-19T15:56:47.711",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "WbZ848kPXmn",
+                    "attributeValues": []
+                }
+            ],
+            "id": "ko8EUzaGjyF",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos reportados",
+            "created": "2021-12-08T15:49:11.888",
+            "lastUpdated": "2023-05-19T15:56:47.711",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos reportados",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.711",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "KtVDCeGpLtD",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.712",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "uHCH2yiicVm",
+                    "attributeValues": []
+                }
+            ],
+            "id": "TXKmz4EwycU",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 0-1 años",
+            "created": "2021-12-07T12:55:40.906",
+            "lastUpdated": "2023-05-19T15:56:47.712",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 0-1",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED001'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.713",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Fd8GNYvwUx5",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.713",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "xrj2QvU9W3k",
+                    "attributeValues": []
+                }
+            ],
+            "id": "JEAgmwrkRvC",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 5-9 años",
+            "created": "2021-12-07T12:59:34.447",
+            "lastUpdated": "2023-05-19T15:56:47.713",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 5-9",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED003'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.713",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "W4sJm4UmJlv",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.713",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "X90i45LEg4U",
+                    "attributeValues": []
+                }
+            ],
+            "id": "ikspBsk1BGL",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por sexo hombres",
+            "created": "2021-12-07T23:58:21.423",
+            "lastUpdated": "2023-05-19T15:56:47.713",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos por sexo hombres",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "A{MiZMsOXYy0h} == 'SEX001' && #{YNPgKL4Fe4S.AR6DnBgPQzp} == 'CFI001'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.714",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "rWBUBQmmRYX",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.714",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "JJP4N0E4LTm",
+                    "attributeValues": []
+                }
+            ],
+            "id": "AfF6vYL6SPh",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 20-49 años",
+            "created": "2021-12-07T13:00:25.688",
+            "lastUpdated": "2023-05-19T15:56:47.714",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 20-49",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED005'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.715",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "lc2q8U8UZJS",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.715",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "OSe6jO0vs92",
+                    "attributeValues": []
+                }
+            ],
+            "id": "n97VOzMLEa2",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad 1-4 años",
+            "created": "2021-12-07T12:58:26.740",
+            "lastUpdated": "2023-05-19T15:56:47.715",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad 1-4",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED002'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.715",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "EpISY1dFZII",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.715",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "bRfUQOwDXV6",
+                    "attributeValues": []
+                }
+            ],
+            "id": "ZqbJVSCJ0Lq",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos evaluados y clasificados",
+            "created": "2021-12-08T16:22:39.748",
+            "lastUpdated": "2023-05-19T15:56:47.716",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total eventos evaluados clasificados",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": " isNotNull( #{YNPgKL4Fe4S.LPttcTLpOVt} )",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.716",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "HYu0q5fec9d",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.716",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Lor2hZjBN1S",
+                    "attributeValues": []
+                }
+            ],
+            "id": "vPvZr8PbaJP",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por sexo mujeres",
+            "created": "2021-12-07T23:58:43.987",
+            "lastUpdated": "2023-05-19T15:56:47.716",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos por sexo mujeres",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "A{MiZMsOXYy0h} == 'SEX002' && #{YNPgKL4Fe4S.AR6DnBgPQzp} == 'CFI001'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.717",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "xhLX6f4uYd0",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:55:40.906",
+                    "lastUpdated": "2023-05-19T15:56:47.717",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "RyqVz8MBYWo",
+                    "attributeValues": []
+                }
+            ],
+            "id": "rmXIdbZrkoC",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de fallecidos por ESAVI-Grave",
+            "created": "2021-12-08T13:04:17.538",
+            "lastUpdated": "2023-05-19T15:56:47.717",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de fallecidos por ESAVI-Grave",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{YNPgKL4Fe4S.lGZvbh067zp} == 'CEG002'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-08T13:04:17.538",
+                    "lastUpdated": "2023-05-19T15:56:47.717",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "gPQclxsh1eC",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-08T13:04:17.538",
+                    "lastUpdated": "2023-05-19T15:56:47.717",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "QFQMhbtpbjU",
+                    "attributeValues": []
+                }
+            ],
+            "id": "Pms0YTtdjMp",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número de eventos relacionados a la vacuna",
+            "created": "2021-10-25T17:56:14.954",
+            "lastUpdated": "2023-05-19T15:56:47.717",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número de eventos relacionados a la vacuna",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{YNPgKL4Fe4S.AR6DnBgPQzp} == 'CFI001'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.718",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "lhqwsR1Obl8",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.718",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "SQaJUGFdNE2",
+                    "attributeValues": []
+                }
+            ],
+            "id": "N3QtHyPCWs2",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos investigados",
+            "created": "2021-12-08T15:55:28.785",
+            "lastUpdated": "2023-05-19T15:56:47.718",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos investigados",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": " isNotNull( #{VP7XYKUIrO8.xOmjbhsK5mn} )",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.718",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "Br8Ib0sudxP",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.718",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "yoPjZdmMHCK",
+                    "attributeValues": []
+                }
+            ],
+            "id": "ajiDldbfpLB",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI - Número de personas relacionados a la vacuna",
+            "created": "2021-10-25T18:05:18.069",
+            "lastUpdated": "2023-05-19T15:56:47.718",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI - Personas relacionados a la vacuna",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{tei_count}",
+            "filter": "#{YNPgKL4Fe4S.AR6DnBgPQzp} == 'CFI001'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.719",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "ZqgyZ0nJwmH",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-10-25T17:56:14.954",
+                    "lastUpdated": "2023-05-19T15:56:47.719",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "vjTFkaujRQL",
+                    "attributeValues": []
+                }
+            ],
+            "id": "V7Faft5Ifh1",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI - Número de eventos por de parroquia de residencia",
+            "created": "2021-12-08T20:19:56.459",
+            "lastUpdated": "2023-05-19T15:56:47.719",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "Eventos por de parroquia de residencia",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "d2:hasValue(A{XkjCksF6qve})",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-08T20:19:56.460",
+                    "lastUpdated": "2023-05-19T15:56:47.719",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "kvVWIV8DfmB",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-08T20:19:56.460",
+                    "lastUpdated": "2023-05-19T15:56:47.719",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "L8rJmxzKRbL",
+                    "attributeValues": []
+                }
+            ],
+            "id": "Fg50f2rJ6vm",
+            "attributeValues": []
+        },
+        {
+            "name": "ESAVI-Número total de eventos por grupo de edad > 64 años",
+            "created": "2021-12-07T13:01:12.876",
+            "lastUpdated": "2023-05-19T15:56:47.719",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "S3VhPLeux9e",
+                "code": null,
+                "name": "Lenín Echeverría",
+                "displayName": "Lenín Echeverría",
+                "username": "lenin.echeverria"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {},
+                "public": "rw------"
+            },
+            "shortName": "ESAVI-Número total de eventos grupo de edad > 64",
+            "legendSets": [],
+            "aggregationType": "COUNT",
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "expression": "V{enrollment_count}",
+            "filter": "#{s8zAZcXZCt9.TizLcD67GRm} == 'GED007'",
+            "analyticsType": "EVENT",
+            "analyticsPeriodBoundaries": [
+                {
+                    "created": "2021-12-07T12:58:26.740",
+                    "lastUpdated": "2023-05-19T15:56:47.720",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "BEFORE_END_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "VFTFSONeSF9",
+                    "attributeValues": []
+                },
+                {
+                    "created": "2021-12-07T12:58:26.741",
+                    "lastUpdated": "2023-05-19T15:56:47.720",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "boundaryTarget": "EVENT_DATE",
+                    "analyticsPeriodBoundaryType": "AFTER_START_OF_REPORTING_PERIOD",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "GMeoGQ0gI3G",
+                    "attributeValues": []
+                }
+            ],
+            "id": "qEW05UugkwM",
+            "attributeValues": []
+        }
+    ]
+}

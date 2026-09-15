@@ -1,0 +1,24 @@
+{
+    "programNotificationTemplates": [
+        {
+            "name": "Notificar a Laboratorio al culminar la etapa de investigación para que llene los resultados de laboratorio",
+            "created": "2021-11-29T22:04:12.123",
+            "lastUpdated": "2026-07-13T12:38:17.321",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "subjectTemplate": "Culminación etapa de investigación",
+            "messageTemplate": "<h3>\nESAVI-DHIS2\n</h3>\n<p>\nNos complace informarle que el caso reportado con el n&uacute;mero de\nidenEficaci&oacute;n <b>A{d8PiRnvGHEN}</b>, ha completado su fase de\ninvesEgaci&oacute;n.\n</p>\n<p>\nPara obtener m&aacute;s detalles sobre el caso, le invitamos a acceder a la\naplicaci&oacute;n <a href=\"hip://gss.msp.gob.ec/dhis-web-tracker-\ncapture/index.html#/?program=NrEU7cRCZd7\">DHIS2-ESAVI</a>, al programa ESAVI en\nel establecimiento <b> V{org_unit_name} </b>\nLe recordamos que este mensaje es automaEzado, por lo que le solicitamos que no\nresponda al mismo.\n</p>",
+            "notificationTrigger": "COMPLETION",
+            "notificationRecipient": "USERS_AT_ORGANISATION_UNIT",
+            "deliveryChannels": [],
+            "sendRepeatable": false,
+            "id": "Cam3OcEQ3UQ"
+        }
+    ]
+}

@@ -1,0 +1,2583 @@
+{
+    "programStageSections": [
+        {
+            "name": "Investigación de antecedentes patológicos",
+            "created": "2022-09-08T16:23:20.285",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "ki93q8rrbgz"
+                },
+                {
+                    "id": "OBB1SoIN5il"
+                },
+                {
+                    "id": "WbqHEShwPJl"
+                },
+                {
+                    "id": "MyeIxnZT7lk"
+                },
+                {
+                    "id": "xFbTUovxuTC"
+                },
+                {
+                    "id": "v4IRbsdBS9j"
+                },
+                {
+                    "id": "ba0z6fTghcw"
+                },
+                {
+                    "id": "bBl5E4RRWuP"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 11,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "SmeW1eufgNe"
+        },
+        {
+            "name": "Criterio para dar inicio a la investigación del evento",
+            "created": "2021-12-13T16:33:16.462",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "r7osBRQSsc0"
+                },
+                {
+                    "id": "ouDdIzt7SMV"
+                },
+                {
+                    "id": "LvOgL2NWvSt"
+                },
+                {
+                    "id": "yO8m0nW2eDh"
+                },
+                {
+                    "id": "Q95VprtBLEP"
+                },
+                {
+                    "id": "FqD8GXs9Gvf"
+                },
+                {
+                    "id": "LxGx2ExbZ6F"
+                },
+                {
+                    "id": "zbrF1XdJobC"
+                },
+                {
+                    "id": "LbP32iaAF2i"
+                },
+                {
+                    "id": "L0O3nLOPO8T"
+                },
+                {
+                    "id": "V8revv03Cma"
+                },
+                {
+                    "id": "YWXEKNQA5KG"
+                },
+                {
+                    "id": "dcsxtuVCy6M"
+                },
+                {
+                    "id": "yjtX7lMBXEc"
+                },
+                {
+                    "id": "XacUjsOqxSX"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 4,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "fPCLGI37PBP"
+        },
+        {
+            "name": "Investigación de antecedentes quirúrgicos previos a la vacunación (en el último año)",
+            "created": "2022-06-02T12:35:54.292",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "QjypVHUPuGp"
+                },
+                {
+                    "id": "W7QfmL4Jsnw"
+                },
+                {
+                    "id": "PZdfj0grFVI"
+                },
+                {
+                    "id": "C6SiDc30GGD"
+                },
+                {
+                    "id": "xeOvSpudUqi"
+                },
+                {
+                    "id": "F4w4iOkOyrd"
+                },
+                {
+                    "id": "njV5KYKlcZA"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 10,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "VTPymcoDQnX"
+        },
+        {
+            "name": "Resultado de laboratorio muestra 4",
+            "created": "2021-11-12T21:17:25.530",
+            "lastUpdated": "2026-07-13T12:38:17.064",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "ugUWH5U4Tyn"
+            },
+            "dataElements": [
+                {
+                    "id": "YFnxCW7EQhT"
+                },
+                {
+                    "id": "r2u6tpXU7eI"
+                },
+                {
+                    "id": "X1Isj9NfPB1"
+                },
+                {
+                    "id": "TabF8sISiIU"
+                },
+                {
+                    "id": "WBolQmEDElU"
+                },
+                {
+                    "id": "b1YAsrsSjDt"
+                },
+                {
+                    "id": "zFmdv3Q5bk8"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 3,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "ZC7ziMJNcVj"
+        },
+        {
+            "name": "Muestra 3 para laboratorio",
+            "created": "2021-11-12T21:08:58.083",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "x4apdyEWrXy"
+                },
+                {
+                    "id": "ZPtcXItlRIG"
+                },
+                {
+                    "id": "tGg5A2Xf1FJ"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 15,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "VIopSxMnYAm"
+        },
+        {
+            "name": "Investigación de antecedente vacunal 2 (Hasta dos meses anteriores)",
+            "created": "2021-11-12T16:37:19.837",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "EcCN1gL3Bx5"
+                },
+                {
+                    "id": "ouNGHI4uUTi"
+                },
+                {
+                    "id": "WMB103sY9Mq"
+                },
+                {
+                    "id": "AtK3gLKnk0G"
+                },
+                {
+                    "id": "u3WJnL5xZ8Y"
+                },
+                {
+                    "id": "Lr44Ajtqwfe"
+                },
+                {
+                    "id": "p6VZV90ub4t"
+                },
+                {
+                    "id": "j6xxrS5ZWZQ"
+                },
+                {
+                    "id": "Q2T18muRRHu"
+                },
+                {
+                    "id": "ClrygRzUZzb"
+                },
+                {
+                    "id": "FNfy4YncDTT"
+                },
+                {
+                    "id": "mgJ6sJBhqe7"
+                },
+                {
+                    "id": "dl9vgkZObqb"
+                },
+                {
+                    "id": "C6IeBwh6e3a"
+                },
+                {
+                    "id": "amZDDQBfVGF"
+                },
+                {
+                    "id": "WOTz2xwG4Y6"
+                },
+                {
+                    "id": "DXB5Vr4zB1e"
+                },
+                {
+                    "id": "URLK1nvsQhR"
+                },
+                {
+                    "id": "I7DMSfTJHHo"
+                },
+                {
+                    "id": "y76qnSjy5bX"
+                },
+                {
+                    "id": "iu7rD8hyvJY"
+                },
+                {
+                    "id": "L5tVd1WhOWD"
+                },
+                {
+                    "id": "p85K6pFiBjt"
+                },
+                {
+                    "id": "PFBQPhd9u0k"
+                },
+                {
+                    "id": "ZAJWtyObU4C"
+                },
+                {
+                    "id": "iyvlqFVy5UA"
+                },
+                {
+                    "id": "Vvocdh6uUe9"
+                },
+                {
+                    "id": "kUF0YTGM6pi"
+                },
+                {
+                    "id": "P9mI4XHERkv"
+                },
+                {
+                    "id": "G1j1SmynaQ1"
+                },
+                {
+                    "id": "nUbIeGMXx2e"
+                },
+                {
+                    "id": "kLlcEvGUYHG"
+                },
+                {
+                    "id": "Glz6T5Nl79n"
+                },
+                {
+                    "id": "OpKXHXBAeXv"
+                },
+                {
+                    "id": "lqRiwzJNRyH"
+                },
+                {
+                    "id": "QiK0IDIhgsT"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 5,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "Aa0bPy0aNEe"
+        },
+        {
+            "name": "PluginSetionsResearch",
+            "created": "2026-07-10T18:14:44.596",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "t3Qj09unidT"
+                },
+                {
+                    "id": "vwOlG5l0rIk"
+                },
+                {
+                    "id": "Ew1r8QCTdQA"
+                },
+                {
+                    "id": "bXTHOzMlWbp"
+                },
+                {
+                    "id": "CHQXYJt7CW8"
+                },
+                {
+                    "id": "HeGGJPPyKe1"
+                },
+                {
+                    "id": "ERJq0LNhtji"
+                },
+                {
+                    "id": "Pc0aJiu7RVU"
+                },
+                {
+                    "id": "TeNOti8ebHr"
+                },
+                {
+                    "id": "EqKPoI0jRBf"
+                },
+                {
+                    "id": "a8Q8gsfmnSI"
+                },
+                {
+                    "id": "ZE1zqgUqzWb"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 18,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "lkWT0tUx8Ij"
+        },
+        {
+            "name": "Muestra 4 para laboratorio",
+            "created": "2021-11-12T21:08:58.083",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "jIteMEkpgbH"
+                },
+                {
+                    "id": "zNClJodsbSh"
+                },
+                {
+                    "id": "buUYC2zTI73"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 16,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "iz1Z2b1QUOI"
+        },
+        {
+            "name": "Investigación en territorio",
+            "created": "2021-12-12T11:57:16.318",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "ldsXgZosabT"
+                },
+                {
+                    "id": "w7V403O1xDo"
+                },
+                {
+                    "id": "K0dVyWddf0N"
+                },
+                {
+                    "id": "FiuShGS2fL4"
+                },
+                {
+                    "id": "bHJarHERA7g"
+                },
+                {
+                    "id": "Q2UzvXdMc1B"
+                },
+                {
+                    "id": "XXu1yd40Zl3"
+                },
+                {
+                    "id": "N1o6Pb8hWky"
+                },
+                {
+                    "id": "WA4NmQ3a3YC"
+                },
+                {
+                    "id": "LewOZjUQPB2"
+                },
+                {
+                    "id": "yEauZUxC10I"
+                },
+                {
+                    "id": "AOabQxSHc0P"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 12,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "HYvAlEWLhVZ"
+        },
+        {
+            "name": "Clasificación final del evento #3",
+            "created": "2026-08-21T20:58:55.211",
+            "lastUpdated": "2026-08-21T20:58:55.211",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "v7McTOEBsZF"
+                },
+                {
+                    "id": "GODyX53OWCZ"
+                },
+                {
+                    "id": "nddgRWhD0sn"
+                },
+                {
+                    "id": "LyYtVkaB2G0"
+                },
+                {
+                    "id": "sz5s65UaUQz"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 3,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "EXDJIvJKFA9"
+        },
+        {
+            "name": "Responsable",
+            "created": "2021-10-19T15:15:59.305",
+            "lastUpdated": "2026-08-21T20:58:55.416",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "yPZX74NQzuH"
+                },
+                {
+                    "id": "WCJwp9rgWST"
+                },
+                {
+                    "id": "pZx7cWH8rx6"
+                },
+                {
+                    "id": "n1zhkMW3nkh"
+                },
+                {
+                    "id": "Otv57WLaClw"
+                },
+                {
+                    "id": "ZDj2ORgJOp3"
+                },
+                {
+                    "id": "fAXqQN53WxI"
+                },
+                {
+                    "id": "mAErPhy6RLU"
+                },
+                {
+                    "id": "TQaahIw1dq8"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 4,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "yIexv7JroFB"
+        },
+        {
+            "name": "Investigación de antecedente vacunal 5 (Hasta dos meses anteriores)",
+            "created": "2021-11-12T17:08:50.841",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "ZxzDHpKRVXb"
+                },
+                {
+                    "id": "Gp6yV8jsDAW"
+                },
+                {
+                    "id": "vACc9Jpq4mg"
+                },
+                {
+                    "id": "w5URia4dDpX"
+                },
+                {
+                    "id": "fP8x5ATfmA4"
+                },
+                {
+                    "id": "P6EssqlBApF"
+                },
+                {
+                    "id": "L6moQXPiEAZ"
+                },
+                {
+                    "id": "L0VKJzrZ7fo"
+                },
+                {
+                    "id": "qf9blRlYjRR"
+                },
+                {
+                    "id": "lr5vsRgUGmd"
+                },
+                {
+                    "id": "ZoAccKb6qQv"
+                },
+                {
+                    "id": "exjI0R9TFtP"
+                },
+                {
+                    "id": "M5yWNp6hiaJ"
+                },
+                {
+                    "id": "p3sukz69kw1"
+                },
+                {
+                    "id": "nGuGUPpQTvX"
+                },
+                {
+                    "id": "iW91dPsjNI3"
+                },
+                {
+                    "id": "Ee0sCTFBc2N"
+                },
+                {
+                    "id": "F6iIqNA3pVN"
+                },
+                {
+                    "id": "ouXvK5UtZ2s"
+                },
+                {
+                    "id": "SJG3LZsnorJ"
+                },
+                {
+                    "id": "RMz8GdGbAAc"
+                },
+                {
+                    "id": "YBFxAVjsSJo"
+                },
+                {
+                    "id": "NNvmbRHPGDy"
+                },
+                {
+                    "id": "mnGEHwoPjHF"
+                },
+                {
+                    "id": "HHNrLeluwtn"
+                },
+                {
+                    "id": "ZPPmqAmtVNA"
+                },
+                {
+                    "id": "mGKgrKWSz4W"
+                },
+                {
+                    "id": "Gst2ngOOcLj"
+                },
+                {
+                    "id": "XIHPtoMnqzO"
+                },
+                {
+                    "id": "NYmT0V1WW67"
+                },
+                {
+                    "id": "NBC5jHA6juu"
+                },
+                {
+                    "id": "nsJOySU7q39"
+                },
+                {
+                    "id": "a8KHCenr46E"
+                },
+                {
+                    "id": "hJxjcUMO6eN"
+                },
+                {
+                    "id": "IQqhPmgLyq4"
+                },
+                {
+                    "id": "R1IFk22hvjp"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 8,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "bp3GgX1nMO2"
+        },
+        {
+            "name": "PluginSetionsFinalStandings",
+            "created": "2026-07-13T11:55:49.343",
+            "lastUpdated": "2026-08-21T20:58:55.416",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "YlThqH7Ot4G"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 5,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "yqx9NL6TegW"
+        },
+        {
+            "name": "Datos clínicos del paciente",
+            "created": "2021-12-10T21:35:24.487",
+            "lastUpdated": "2026-08-07T18:55:10.829",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "xOmjbhsK5mn"
+                },
+                {
+                    "id": "v815reutsgq"
+                },
+                {
+                    "id": "IxOxWdjAmRM"
+                },
+                {
+                    "id": "VMOTHtV1oVB"
+                },
+                {
+                    "id": "UU75ppNydbI"
+                },
+                {
+                    "id": "swFGRiTc1hZ"
+                },
+                {
+                    "id": "divNYZcYdub"
+                },
+                {
+                    "id": "aZq9xTX6ZlL"
+                },
+                {
+                    "id": "wMTmpdmYjUv"
+                },
+                {
+                    "id": "Y8rxSNcFfac"
+                },
+                {
+                    "id": "F6RkpicDfL1"
+                },
+                {
+                    "id": "z1ymhLEXsg0"
+                },
+                {
+                    "id": "qsXXKamK8oS"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "uNXJXs0McvB"
+        },
+        {
+            "name": "Resultado de laboratorio muestra 2",
+            "created": "2021-11-12T21:17:25.530",
+            "lastUpdated": "2026-07-13T12:38:17.064",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "ugUWH5U4Tyn"
+            },
+            "dataElements": [
+                {
+                    "id": "fOn3CqxgeCT"
+                },
+                {
+                    "id": "r9fm0MvjEmN"
+                },
+                {
+                    "id": "alLJseTGC4R"
+                },
+                {
+                    "id": "PDhtCR0We9j"
+                },
+                {
+                    "id": "vK3rL8bkjFJ"
+                },
+                {
+                    "id": "TBNvmb5S7xv"
+                },
+                {
+                    "id": "dkqC1NXz7hc"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "fg9wyJs9erJ"
+        },
+        {
+            "name": "Investigación de antecedente vacunal 3 (Hasta dos meses anteriores)",
+            "created": "2021-11-12T17:08:50.841",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "CWyVHlAuvy9"
+                },
+                {
+                    "id": "XneOpUsRpwp"
+                },
+                {
+                    "id": "Ioit8tP0gUy"
+                },
+                {
+                    "id": "r6FssWH5AgY"
+                },
+                {
+                    "id": "iuwZwX82sEn"
+                },
+                {
+                    "id": "NmOOVYZtYHt"
+                },
+                {
+                    "id": "cShBHcB1jN8"
+                },
+                {
+                    "id": "jYZrTKsIZMR"
+                },
+                {
+                    "id": "zIWhsqJjJv1"
+                },
+                {
+                    "id": "Fh0qOC9Zgiq"
+                },
+                {
+                    "id": "wjqftfk5WIU"
+                },
+                {
+                    "id": "PxitdqpTDd2"
+                },
+                {
+                    "id": "TiOizOUDE3Y"
+                },
+                {
+                    "id": "gupJWjoTmdC"
+                },
+                {
+                    "id": "Ishxh21WNfS"
+                },
+                {
+                    "id": "eTR55fq0QPj"
+                },
+                {
+                    "id": "CFLHBmZjuNj"
+                },
+                {
+                    "id": "D6ncEDcffJR"
+                },
+                {
+                    "id": "jMlfWenWk5v"
+                },
+                {
+                    "id": "yE8zZGNSfiG"
+                },
+                {
+                    "id": "URyQILIUyxa"
+                },
+                {
+                    "id": "sM5oiw9RjUI"
+                },
+                {
+                    "id": "Yv3z0SMscgM"
+                },
+                {
+                    "id": "hDI4LFx1uaB"
+                },
+                {
+                    "id": "AqwLQUAPSeh"
+                },
+                {
+                    "id": "k7OaFbJzIo5"
+                },
+                {
+                    "id": "JAW2dKc4f0m"
+                },
+                {
+                    "id": "cjiwvazmMBx"
+                },
+                {
+                    "id": "T4fdNHeuuB4"
+                },
+                {
+                    "id": "F6gv6d5Ibm3"
+                },
+                {
+                    "id": "NSGIkhx2Eml"
+                },
+                {
+                    "id": "vIicyDR0mUi"
+                },
+                {
+                    "id": "s34BgoVanjI"
+                },
+                {
+                    "id": "ThMB0AGvxxW"
+                },
+                {
+                    "id": "OIE4NW5r5oW"
+                },
+                {
+                    "id": "zx3Ru24u29Q"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 6,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "OeHXqpmFJB7"
+        },
+        {
+            "name": "Muestra 2 para laboratorio",
+            "created": "2021-11-12T21:08:58.083",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "hs4ptQtbuKv"
+                },
+                {
+                    "id": "f7bbshQz4vj"
+                },
+                {
+                    "id": "QfVepP2cwsC"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 14,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "swGQJgmehMI"
+        },
+        {
+            "name": "Datos clínicos del paciente",
+            "created": "2021-10-18T18:33:19.620",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "jg1oKNFCTVz"
+                },
+                {
+                    "id": "st5aDCkVy02"
+                },
+                {
+                    "id": "EHs7AEI0HKB"
+                },
+                {
+                    "id": "OjJ4UDVQl2U"
+                },
+                {
+                    "id": "b6bbuO3PCx9"
+                },
+                {
+                    "id": "M0vz9unPbjb"
+                },
+                {
+                    "id": "je6zPOvX0YX"
+                },
+                {
+                    "id": "BMUQTeSr4MK"
+                },
+                {
+                    "id": "RCmLz8p274H"
+                },
+                {
+                    "id": "S5CfUgFnSo0"
+                },
+                {
+                    "id": "GdGJHQtR9sg"
+                },
+                {
+                    "id": "zK9puueJQCH"
+                },
+                {
+                    "id": "fmyJvsr0fkR"
+                },
+                {
+                    "id": "ojFWUAvmCVb"
+                },
+                {
+                    "id": "v8Q8iafN6Uc"
+                },
+                {
+                    "id": "HVNli8UWPTc"
+                },
+                {
+                    "id": "IAOK5lflsOH"
+                },
+                {
+                    "id": "Q4hAFyq8OXk"
+                },
+                {
+                    "id": "rSSHQ9ehfEx"
+                },
+                {
+                    "id": "s3SEhPlqwBU"
+                },
+                {
+                    "id": "wfd6zV8iYDw"
+                },
+                {
+                    "id": "I09AkR0y9oi"
+                },
+                {
+                    "id": "dtVO9MROgTE"
+                },
+                {
+                    "id": "f7ymm1GRE30"
+                },
+                {
+                    "id": "sdfauJzP5yV"
+                },
+                {
+                    "id": "XwTzh5WGTb7"
+                },
+                {
+                    "id": "oSjrxct7UJS"
+                },
+                {
+                    "id": "qtjDk1qk2kD"
+                },
+                {
+                    "id": "wDNe2KcUZIJ"
+                },
+                {
+                    "id": "lABbRFU5I9u"
+                },
+                {
+                    "id": "bQ2OaEAt0Bw"
+                },
+                {
+                    "id": "uub6PETeymq"
+                },
+                {
+                    "id": "c7mHGZQBPkd"
+                },
+                {
+                    "id": "x5E6lp67bYB"
+                },
+                {
+                    "id": "U52WoWtxaED"
+                },
+                {
+                    "id": "G8bNtmb6XrN"
+                },
+                {
+                    "id": "K7MTP6hX9Yp"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 5,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "uL2ddmQ6RJI"
+        },
+        {
+            "name": "Condición final del paciente",
+            "created": "2021-10-19T15:15:59.305",
+            "lastUpdated": "2026-08-21T20:58:55.416",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "lGZvbh067zp"
+                },
+                {
+                    "id": "YGyOYXtk5zS"
+                },
+                {
+                    "id": "RyYY9NUP7in"
+                },
+                {
+                    "id": "c0WBIfGcS7j"
+                },
+                {
+                    "id": "zzF2Bk9NdnM"
+                },
+                {
+                    "id": "tuxCgI9adgv"
+                },
+                {
+                    "id": "N0jXyOzkY71"
+                },
+                {
+                    "id": "A5OT0vnA8qZ"
+                },
+                {
+                    "id": "nLWEazW5QOC"
+                },
+                {
+                    "id": "YIk7r0m1cAA"
+                },
+                {
+                    "id": "RgAbnB3dsyZ"
+                },
+                {
+                    "id": "MBKuem2xfFE"
+                },
+                {
+                    "id": "NqVLQPHfGN1"
+                },
+                {
+                    "id": "VDatG6TsBKE"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "A6vL1j1Fyrf"
+        },
+        {
+            "name": "INDICACIONES IMPORTANTES",
+            "created": "2022-09-03T15:27:34.813",
+            "lastUpdated": "2026-08-05T14:48:48.814",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "bfK9AZmXzWh"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "FYgmGv41TmK"
+        },
+        {
+            "name": "Investigación de antecedentes clínicos agudos previos a la aplicación de la vacuna",
+            "created": "2021-10-19T11:03:05.110",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "EDmUudvcUm9"
+                },
+                {
+                    "id": "UWbb3zxqalT"
+                },
+                {
+                    "id": "qWZnNIvffpt"
+                },
+                {
+                    "id": "yvDvLGXv7eb"
+                },
+                {
+                    "id": "P0H6EyI2Yhx"
+                },
+                {
+                    "id": "PtNdja0GPLx"
+                },
+                {
+                    "id": "kD4PLQeaNeh"
+                },
+                {
+                    "id": "b5mq97nFnOw"
+                },
+                {
+                    "id": "pOBTwdJduco"
+                },
+                {
+                    "id": "w0p47hFPORy"
+                },
+                {
+                    "id": "H4NmVULWpMH"
+                },
+                {
+                    "id": "JpwFTu1cA31"
+                },
+                {
+                    "id": "UWPfTHFYpTo"
+                },
+                {
+                    "id": "aIT7IDl7348"
+                },
+                {
+                    "id": "AOlqd10hHQi"
+                },
+                {
+                    "id": "eNuOL0ongeF"
+                },
+                {
+                    "id": "QONyDiWqf1q"
+                },
+                {
+                    "id": "PH2zX5cazsN"
+                },
+                {
+                    "id": "ImDTFf0nVOo"
+                },
+                {
+                    "id": "nCwAamLzhIP"
+                },
+                {
+                    "id": "Ke4Ml2rdfjo"
+                },
+                {
+                    "id": "gEEJvfcWj8e"
+                },
+                {
+                    "id": "eKOvqrzU0IC"
+                },
+                {
+                    "id": "i8GlxgWceYV"
+                },
+                {
+                    "id": "kotHvlHCxQ0"
+                },
+                {
+                    "id": "SIJLC3ys5sQ"
+                },
+                {
+                    "id": "erzUXDQDIIF"
+                },
+                {
+                    "id": "Q6IWkD74BVh"
+                },
+                {
+                    "id": "YOQNztDJtu6"
+                },
+                {
+                    "id": "I6coWIY7su7"
+                },
+                {
+                    "id": "oNQrJr0lQ9f"
+                },
+                {
+                    "id": "UtmHGaVo9Zp"
+                },
+                {
+                    "id": "IosYy8rlHPP"
+                },
+                {
+                    "id": "ctFi9iaIgxi"
+                },
+                {
+                    "id": "AEPccDDSukH"
+                },
+                {
+                    "id": "K8wuMHifn1Z"
+                },
+                {
+                    "id": "Ht6OUDHfPYd"
+                },
+                {
+                    "id": "ECcPXCjzfhw"
+                },
+                {
+                    "id": "kUy4QdYuuDi"
+                },
+                {
+                    "id": "TzL7WAHoiIC"
+                },
+                {
+                    "id": "diQEiUedZ5H"
+                },
+                {
+                    "id": "fSfcGSeJhZM"
+                },
+                {
+                    "id": "cApcQgZb1nA"
+                },
+                {
+                    "id": "jxKkY8Xc6jf"
+                },
+                {
+                    "id": "O7gVStDh9ej"
+                },
+                {
+                    "id": "gW5GmZuY6wZ"
+                },
+                {
+                    "id": "sx5sqPlWqnr"
+                },
+                {
+                    "id": "e5xl27RrBep"
+                },
+                {
+                    "id": "oq7w8YOqKqs"
+                },
+                {
+                    "id": "kB3WzIB7TNe"
+                },
+                {
+                    "id": "K3TfZ1ucN8W"
+                },
+                {
+                    "id": "rgNeJyagxaa"
+                },
+                {
+                    "id": "t68u08P5EnU"
+                },
+                {
+                    "id": "Ndf6zxQK7VM"
+                },
+                {
+                    "id": "x9JyyFJLrT2"
+                },
+                {
+                    "id": "e0KNzz1is6Y"
+                },
+                {
+                    "id": "APmRCRCfvKt"
+                },
+                {
+                    "id": "puKULGmvPpz"
+                },
+                {
+                    "id": "K49FnDFbdzc"
+                },
+                {
+                    "id": "WG9AO7HeLbG"
+                },
+                {
+                    "id": "rE6yXLCFG3W"
+                },
+                {
+                    "id": "WBpoLiwXws1"
+                },
+                {
+                    "id": "egusOnDc1eQ"
+                },
+                {
+                    "id": "zHQfByglFys"
+                },
+                {
+                    "id": "huXFaor6B6Q"
+                },
+                {
+                    "id": "BWZlGLAdEzn"
+                },
+                {
+                    "id": "FJrPS6t9RQn"
+                },
+                {
+                    "id": "LrxGE64FCRC"
+                },
+                {
+                    "id": "PqH9IGsPU7w"
+                },
+                {
+                    "id": "Ub6dp3nS0eZ"
+                },
+                {
+                    "id": "Iuk1M2q3Ugw"
+                },
+                {
+                    "id": "AUBjZQjhChV"
+                },
+                {
+                    "id": "Kw9FPNHDQvd"
+                },
+                {
+                    "id": "o7jdXusGrck"
+                },
+                {
+                    "id": "yHcMx5bQLhM"
+                },
+                {
+                    "id": "xIRqMvkWUyL"
+                },
+                {
+                    "id": "RKjIBkOfZOd"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 9,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "eZVzffiCKOB"
+        },
+        {
+            "name": "Datos de identificación del caso",
+            "created": "2021-10-18T21:25:39.140",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "Z6FiWqPS5of"
+                },
+                {
+                    "id": "arZ74dz1YeA"
+                },
+                {
+                    "id": "fHn6kWO65zS"
+                },
+                {
+                    "id": "eLf6OfzxVnD"
+                },
+                {
+                    "id": "TizLcD67GRm"
+                },
+                {
+                    "id": "NRoDp2vXWEN"
+                },
+                {
+                    "id": "WKHwHedoiFt"
+                },
+                {
+                    "id": "QnTmov25vZB"
+                },
+                {
+                    "id": "HK9JbISg5uo"
+                },
+                {
+                    "id": "XvgTGoxvV2j"
+                },
+                {
+                    "id": "XGvSitd9Ywl"
+                },
+                {
+                    "id": "EZwuRjPKuXa"
+                },
+                {
+                    "id": "BjfKqGxxL4S"
+                },
+                {
+                    "id": "SbD0bGtTl19"
+                },
+                {
+                    "id": "ycd2FqhnPxc"
+                },
+                {
+                    "id": "c4fM8Neuh3o"
+                },
+                {
+                    "id": "XWAkkmvXxUR"
+                },
+                {
+                    "id": "NuOXglrMh6M"
+                },
+                {
+                    "id": "OkcC8LGaL51"
+                },
+                {
+                    "id": "vl6s4JPNIRE"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 3,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "OxIseZVddkA"
+        },
+        {
+            "name": "Clasificación final del evento #2",
+            "created": "2026-08-21T20:58:55.211",
+            "lastUpdated": "2026-08-21T20:58:55.211",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "JZegN2j2oTf"
+                },
+                {
+                    "id": "lEiuh6YWH2N"
+                },
+                {
+                    "id": "ySGfSkrTJ8g"
+                },
+                {
+                    "id": "lCq5qgnym4k"
+                },
+                {
+                    "id": "M24mFhFf9y4"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 2,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "ypde13MzO4J"
+        },
+        {
+            "name": "Resultado de laboratorio muestra 3",
+            "created": "2021-11-12T21:17:25.530",
+            "lastUpdated": "2026-07-13T12:38:17.065",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "ugUWH5U4Tyn"
+            },
+            "dataElements": [
+                {
+                    "id": "piOl4JruzYL"
+                },
+                {
+                    "id": "KVbNHUM2Tvt"
+                },
+                {
+                    "id": "PgVvbW1Z7jA"
+                },
+                {
+                    "id": "p6ovNvB7pDl"
+                },
+                {
+                    "id": "LIDgmRXNKNa"
+                },
+                {
+                    "id": "dvasdY3XKv3"
+                },
+                {
+                    "id": "KjXNZNaVmqc"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 2,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "CdsHwwzS25A"
+        },
+        {
+            "name": "PluginSetionsNotification",
+            "created": "2026-07-10T02:17:40.329",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "WWoYvGEJTdM"
+                },
+                {
+                    "id": "a4N5QesK9x7"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 6,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "XNOMuqjPvbi"
+        },
+        {
+            "name": "Clasificación final del evento #1",
+            "created": "2021-10-19T11:05:54.562",
+            "lastUpdated": "2026-08-21T20:58:55.416",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "YNPgKL4Fe4S"
+            },
+            "dataElements": [
+                {
+                    "id": "LPttcTLpOVt"
+                },
+                {
+                    "id": "AR6DnBgPQzp"
+                },
+                {
+                    "id": "UoYpbHtoVgG"
+                },
+                {
+                    "id": "SPURWAIsaGV"
+                },
+                {
+                    "id": "W4vVHwVVg6i"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "Fwf7189tTzg"
+        },
+        {
+            "name": "Muestra 1 para laboratorio",
+            "created": "2021-10-19T13:25:28.684",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "Va6TwoNepKK"
+                },
+                {
+                    "id": "CJDKh8sN0wE"
+                },
+                {
+                    "id": "r8JIc2kA3rR"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 13,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "yN8tVsd9uXT"
+        },
+        {
+            "name": "Datos de la Unidad",
+            "created": "2021-11-09T16:38:22.049",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "zEfNaTusvkK"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "uk2OCvFnNX3"
+        },
+        {
+            "name": "Resultado de laboratorio muestra 1",
+            "created": "2021-10-22T19:19:12.008",
+            "lastUpdated": "2026-07-13T12:38:17.065",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "ugUWH5U4Tyn"
+            },
+            "dataElements": [
+                {
+                    "id": "BflaDeHJDrw"
+                },
+                {
+                    "id": "MultaOyWaPp"
+                },
+                {
+                    "id": "d63oJ3omLKb"
+                },
+                {
+                    "id": "mulnuezxIHO"
+                },
+                {
+                    "id": "PGKGM2amXiP"
+                },
+                {
+                    "id": "mC1kWnpCUhg"
+                },
+                {
+                    "id": "qwEe71eryCD"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "jsXmbwx20Vn"
+        },
+        {
+            "name": "Investigación de antecedentes de estado gestacional en mujeres y edad fértil",
+            "created": "2021-12-12T11:22:01.742",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "dFM8g5r2Wqd"
+                },
+                {
+                    "id": "jLjulX3TekT"
+                },
+                {
+                    "id": "ptpsOF2TqPm"
+                },
+                {
+                    "id": "ZAKQ4p0mtPZ"
+                },
+                {
+                    "id": "Ct5Lq1mHJ8h"
+                },
+                {
+                    "id": "huGD0AF9rmA"
+                },
+                {
+                    "id": "Ct5Lq1mHJ82"
+                },
+                {
+                    "id": "VbA7cepkbxa"
+                },
+                {
+                    "id": "Ct5Lq1mHJ83"
+                },
+                {
+                    "id": "VciQVQbu4OP"
+                },
+                {
+                    "id": "prSGoJCLk3c"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "BKqHfsVbXdh"
+        },
+        {
+            "name": "Investigación de antecedente vacunal 1 (Hasta dos meses anteriores)",
+            "created": "2021-11-12T16:37:19.837",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "sG8EjNlcqfY"
+                },
+                {
+                    "id": "cdzPHEdeRYf"
+                },
+                {
+                    "id": "zLoiCvLRhiC"
+                },
+                {
+                    "id": "ZbTewdGCdRc"
+                },
+                {
+                    "id": "vKUMRtlp9xm"
+                },
+                {
+                    "id": "RkOuHtRBwaE"
+                },
+                {
+                    "id": "tEsq9B4Krxi"
+                },
+                {
+                    "id": "BlAP9GcLaoH"
+                },
+                {
+                    "id": "HDxz3J0fRz2"
+                },
+                {
+                    "id": "mAJFi4cW628"
+                },
+                {
+                    "id": "nAQFS8JWxGr"
+                },
+                {
+                    "id": "zVlb4Eyd3gc"
+                },
+                {
+                    "id": "f0DUuJnIhli"
+                },
+                {
+                    "id": "F8oMX7k0mF2"
+                },
+                {
+                    "id": "f0OwLZ0f4kr"
+                },
+                {
+                    "id": "Gb2afCi4nlF"
+                },
+                {
+                    "id": "puTvXo5K8A9"
+                },
+                {
+                    "id": "BK4jihUeymE"
+                },
+                {
+                    "id": "yNly1ff8dUy"
+                },
+                {
+                    "id": "wmmgogfGCuR"
+                },
+                {
+                    "id": "dBbl2htBBkf"
+                },
+                {
+                    "id": "b6rDvvnaWnq"
+                },
+                {
+                    "id": "Uw7xYhHitwf"
+                },
+                {
+                    "id": "mHBoBm4j9oY"
+                },
+                {
+                    "id": "sWejbJuZOmx"
+                },
+                {
+                    "id": "YmyNAsx9CHq"
+                },
+                {
+                    "id": "bP56FsnNcSX"
+                },
+                {
+                    "id": "ZOoUkmx46tZ"
+                },
+                {
+                    "id": "N922Qx3MnzX"
+                },
+                {
+                    "id": "i1jGHehzXz3"
+                },
+                {
+                    "id": "fO0l7SZBbUB"
+                },
+                {
+                    "id": "ZNkylerJSH6"
+                },
+                {
+                    "id": "Am6fzhKZXV3"
+                },
+                {
+                    "id": "Vfzvx4emYNq"
+                },
+                {
+                    "id": "EioClpCGSeW"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 4,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "SSlb29xAxiL"
+        },
+        {
+            "name": "Investigación de antecedente vacunal 4 (Hasta dos meses anteriores)",
+            "created": "2021-11-12T17:08:50.841",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "tTK8jIGuGMg"
+                },
+                {
+                    "id": "yb5YMOCpxmu"
+                },
+                {
+                    "id": "Ff32TWNojaW"
+                },
+                {
+                    "id": "T8BSnYbYkX6"
+                },
+                {
+                    "id": "nnzmYk8VxJN"
+                },
+                {
+                    "id": "ojRdmlPP5gw"
+                },
+                {
+                    "id": "VCIdNTGz7Q5"
+                },
+                {
+                    "id": "sxRAZWPdvBp"
+                },
+                {
+                    "id": "xq4ePa8uVSS"
+                },
+                {
+                    "id": "Qp5jd1CyWrR"
+                },
+                {
+                    "id": "apOrG7zf9Kv"
+                },
+                {
+                    "id": "UhUlcUtyBrQ"
+                },
+                {
+                    "id": "H0UVONaek2X"
+                },
+                {
+                    "id": "VV4i9SAQ5NL"
+                },
+                {
+                    "id": "immTvkYBYGA"
+                },
+                {
+                    "id": "nARUulPj97f"
+                },
+                {
+                    "id": "C3Bx8KIU1XA"
+                },
+                {
+                    "id": "MPt5U04AF9D"
+                },
+                {
+                    "id": "DbYNjspXsNL"
+                },
+                {
+                    "id": "z33hrKUcPdA"
+                },
+                {
+                    "id": "UR3ggCq3Hnb"
+                },
+                {
+                    "id": "pzwszwqO9lp"
+                },
+                {
+                    "id": "zhlnUF2meDW"
+                },
+                {
+                    "id": "VmHUkYVG5XY"
+                },
+                {
+                    "id": "YxGHfFHwaYg"
+                },
+                {
+                    "id": "FLQYuxbt3fu"
+                },
+                {
+                    "id": "cIDf4wnmkbu"
+                },
+                {
+                    "id": "kwAn2f3iRtB"
+                },
+                {
+                    "id": "HvsDEEzoUSy"
+                },
+                {
+                    "id": "cO2wj8skEUz"
+                },
+                {
+                    "id": "yEQXzO0lUaS"
+                },
+                {
+                    "id": "cZuU3YXIytv"
+                },
+                {
+                    "id": "NYKUhkHzl9S"
+                },
+                {
+                    "id": "omQ4NywxBzN"
+                },
+                {
+                    "id": "gXpRKBJxC0m"
+                },
+                {
+                    "id": "yYbiVLliiuC"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 7,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "LOBtbzX0jLS"
+        },
+        {
+            "name": "Investigación de atenciones médicas recibidas frente al evento",
+            "created": "2021-12-12T11:22:01.742",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "Ocf1WPytgBJ"
+                },
+                {
+                    "id": "bGQ37xWSGDo"
+                },
+                {
+                    "id": "m4GgJaIjtEC"
+                },
+                {
+                    "id": "gzJtJLiJSI1"
+                },
+                {
+                    "id": "yP2aAs4ObzF"
+                },
+                {
+                    "id": "Uzrd8tjAYkk"
+                },
+                {
+                    "id": "IsriVVkbmUi"
+                },
+                {
+                    "id": "zmfHtFUwgJx"
+                },
+                {
+                    "id": "GflJv00Mwpi"
+                },
+                {
+                    "id": "VfppgTvgi4g"
+                },
+                {
+                    "id": "PJLfklqUFRU"
+                },
+                {
+                    "id": "tlz3tYqOnSP"
+                },
+                {
+                    "id": "pqTM1Pn2Jep"
+                },
+                {
+                    "id": "XhWKwDYgg9N"
+                },
+                {
+                    "id": "JgUKjaghHAl"
+                },
+                {
+                    "id": "FUjPziAv4go"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 2,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "aOjxcgtOawF"
+        },
+        {
+            "name": "Investigación del antecedente vacunal (hasta dos meses anteriores)",
+            "created": "2021-12-13T15:09:56.065",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "gnK5UTXIKUy"
+                },
+                {
+                    "id": "VxN7EZ2bgk0"
+                },
+                {
+                    "id": "Y444T5GHcSI"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 3,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "V5evPnKNBnA"
+        },
+        {
+            "name": "Datos de la persona que capta el evento",
+            "created": "2021-10-19T10:15:28.262",
+            "lastUpdated": "2026-08-05T14:48:48.816",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "s8zAZcXZCt9"
+            },
+            "dataElements": [
+                {
+                    "id": "imesY6LzkTu"
+                },
+                {
+                    "id": "orAwCTtqR8w"
+                },
+                {
+                    "id": "OF69ZkbdcU9"
+                },
+                {
+                    "id": "trmzREvnxCr"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 2,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "CRGMTHpgeO0"
+        },
+        {
+            "name": "Datos del laboratorio",
+            "created": "2021-11-14T11:09:31.387",
+            "lastUpdated": "2026-08-07T18:55:10.830",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "VP7XYKUIrO8"
+            },
+            "dataElements": [
+                {
+                    "id": "W4bIMqzE4BT"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 17,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "lsjB2jXIuRV"
+        },
+        {
+            "name": "Resultado general de laboratorio",
+            "created": "2021-11-12T21:20:19.387",
+            "lastUpdated": "2026-07-13T12:38:17.065",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "ugUWH5U4Tyn"
+            },
+            "dataElements": [
+                {
+                    "id": "PId7n0IVzDw"
+                },
+                {
+                    "id": "G9jLfWFY7XU"
+                },
+                {
+                    "id": "OMwIkuRdwl0"
+                },
+                {
+                    "id": "oheuhOxAu12"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 4,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "CfxOXrkGSZP"
+        }
+    ]
+}

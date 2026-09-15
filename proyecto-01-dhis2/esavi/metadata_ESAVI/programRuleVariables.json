@@ -1,0 +1,5286 @@
+{
+    "programRuleVariables": [
+        {
+            "name": "ESAVI-Abreviatura vacuna 5",
+            "created": "2025-12-26T03:29:12.166",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ZxzDHpKRVXb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "EQM4mqAy9Qi",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra2_FechaEntrega",
+            "created": "2021-11-18T19:59:41.690",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "TBNvmb5S7xv"
+            },
+            "useCodeForOptionSet": false,
+            "id": "YXl6Brwaptw",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Complicacion en ambarazo SiNo",
+            "created": "2021-11-11T22:39:09.091",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ZAKQ4p0mtPZ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "cKgJH2cRjpW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Antecedente quirugico 1",
+            "created": "2022-05-20T15:37:44.763",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "W7QfmL4Jsnw"
+            },
+            "useCodeForOptionSet": false,
+            "id": "exE5ZJswhYB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Busqueda casos similar sintomatologia recibio vacuna SiNo",
+            "created": "2021-12-13T20:53:57.005",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "N1o6Pb8hWky"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GCfjCOWFNUc",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra3_FechaEnvio",
+            "created": "2021-11-16T19:04:22.134",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "tGg5A2Xf1FJ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "aQaUq3uayb9",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Sexo",
+            "created": "2021-11-11T22:10:18.164",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "AqtGM7ioxq1",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MiZMsOXYy0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias - vacuna 5",
+            "created": "2022-09-03T09:47:53.947",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "tu0JKGzvM6Z",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Criterio investigacion cluster",
+            "created": "2022-09-09T15:24:03.578",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "L0O3nLOPO8T"
+            },
+            "useCodeForOptionSet": false,
+            "id": "gU3CErPskan",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios",
+            "created": "2021-11-09T17:23:49.329",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fS6Bq2sfEhZ",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Uso de medicamentos otro",
+            "created": "2022-09-07T11:42:40.571",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "IosYy8rlHPP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "U7NtOXi0cgq",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra2_FechaEnvio",
+            "created": "2021-11-16T19:04:08.345",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "QfVepP2cwsC"
+            },
+            "useCodeForOptionSet": false,
+            "id": "KGh8hWPPCtw",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Resultado laboratorio",
+            "created": "2021-12-14T17:15:49.445",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PId7n0IVzDw"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Nw8Hy6wnwpe",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-CasoAnalizadoSiNo3",
+            "created": "2026-08-21T21:23:06.727",
+            "lastUpdated": "2026-08-21T21:23:06.727",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "v7McTOEBsZF"
+            },
+            "useCodeForOptionSet": false,
+            "id": "p3pSX5uZ8mB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico 2",
+            "created": "2021-12-14T10:50:01.858",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "H4NmVULWpMH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "uk4jJonc1ev",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico personal SiNo",
+            "created": "2022-09-08T16:29:59.622",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ki93q8rrbgz"
+            },
+            "useCodeForOptionSet": false,
+            "id": "M7ffs7KH49X",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra1_FechaEntrega",
+            "created": "2021-11-18T19:58:16.767",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "mC1kWnpCUhg"
+            },
+            "useCodeForOptionSet": false,
+            "id": "o4bX9y9jO7e",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-EstablecimientoInstitucion",
+            "created": "2021-11-19T20:32:24.900",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Om6MzhnhFfh"
+            },
+            "useCodeForOptionSet": true,
+            "id": "kiP8bgjqz9B",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Evidencio problema biologico",
+            "created": "2021-12-14T11:07:13.903",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Q2UzvXdMc1B"
+            },
+            "useCodeForOptionSet": false,
+            "id": "i1AGhxnWXbp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Recibio vacuna 30 dias previo",
+            "created": "2021-11-13T20:48:01.512",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "kIWIfkRQA62"
+            },
+            "useCodeForOptionSet": false,
+            "id": "iq93lHphMnj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Fecha signos y sintomas previos",
+            "created": "2022-09-13T10:15:20.105",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "UWbb3zxqalT"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wxmCssOXGaU",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Fecha dilucion vacuna 3",
+            "created": "2022-09-13T10:01:56.821",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ThMB0AGvxxW"
+            },
+            "useCodeForOptionSet": false,
+            "id": "iQAthiWJSlr",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TIME"
+        },
+        {
+            "name": "ESAVI-Fecha vacunacion vacuna 2",
+            "created": "2021-12-13T17:47:07.196",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "WOTz2xwG4Y6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "RjLJcizAO2m",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - ANOMALIA CONGENITA",
+            "created": "2022-09-02T11:54:27.823",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Q95VprtBLEP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zNQtU9YP727",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Numero_muestras",
+            "created": "2021-11-16T19:51:45.151",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "cOU8Nltsi6C"
+            },
+            "useCodeForOptionSet": false,
+            "id": "al0zHoTJKsL",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Fecha dilucion vacuna 5",
+            "created": "2022-09-13T10:02:20.387",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "a8KHCenr46E"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ia9DyBtwXtF",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-VacunaEventoAdversoAnterior",
+            "created": "2026-08-05T16:05:42.733",
+            "lastUpdated": "2026-08-05T16:05:42.733",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "cApcQgZb1nA"
+            },
+            "useCodeForOptionSet": false,
+            "id": "F7mjjakqj8F",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Abreviatura vacuna 4",
+            "created": "2025-12-26T03:29:01.705",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "tTK8jIGuGMg"
+            },
+            "useCodeForOptionSet": false,
+            "id": "NnnGrXto1Tn",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-CantonDomicilioNotificacion",
+            "created": "2022-02-14T12:38:37.732",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "WKHwHedoiFt"
+            },
+            "useCodeForOptionSet": true,
+            "id": "qaZPHvPsi5f",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Medicamentos previo 3",
+            "created": "2022-09-04T11:23:49.955",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Ht6OUDHfPYd"
+            },
+            "useCodeForOptionSet": false,
+            "id": "R8N6tUiLK7W",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra3_FechaProcesamiento",
+            "created": "2021-11-18T17:56:35.980",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LIDgmRXNKNa"
+            },
+            "useCodeForOptionSet": false,
+            "id": "gfA948Z0B06",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Valor vacuna 4",
+            "created": "2022-05-09T11:04:56.624",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "tTK8jIGuGMg"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Y1glv2WrnR8",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Tiene antecedente vacunal SiNoDeconoce",
+            "created": "2021-12-13T15:11:47.305",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "gnK5UTXIKUy"
+            },
+            "useCodeForOptionSet": false,
+            "id": "bNNzUgwbcIG",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Diagnostico final 3",
+            "created": "2022-09-04T12:17:05.909",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "YIk7r0m1cAA"
+            },
+            "useCodeForOptionSet": false,
+            "id": "HGvo6IaISW8",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios - vacuna 1",
+            "created": "2021-11-13T20:18:11.683",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "JppW5tgnIWb",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-EstablecimientoDistrito",
+            "created": "2021-11-19T20:32:51.239",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "I8S03jMozTb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "YaZjnaXL8To",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-TelefonoResponsableInmunizaciones",
+            "created": "2022-03-15T08:29:23.264",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "mAErPhy6RLU"
+            },
+            "useCodeForOptionSet": false,
+            "id": "hOMkT1NnjhY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Fuente informacion",
+            "created": "2022-05-18T10:43:27.406",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "VxN7EZ2bgk0"
+            },
+            "useCodeForOptionSet": true,
+            "id": "JSEBll2Dl26",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Telefono SiNo",
+            "created": "2022-05-18T15:46:50.391",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "BjfKqGxxL4S"
+            },
+            "useCodeForOptionSet": false,
+            "id": "EmXoUKlTHZM",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Diagnostico inicial 1",
+            "created": "2021-11-11T19:13:14.906",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "XwTzh5WGTb7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "jY50DNtKJ1e",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Abreviatura vacuna 2",
+            "created": "2025-12-26T03:23:47.985",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "EcCN1gL3Bx5"
+            },
+            "useCodeForOptionSet": false,
+            "id": "UrP2hAAW20C",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Confirmado muestra 4",
+            "created": "2022-05-16T11:18:50.380",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "cRZpSEAvBXE"
+            },
+            "useCodeForOptionSet": false,
+            "id": "HptaD1mAMgp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios - vacuna 4",
+            "created": "2022-09-03T09:33:10.207",
+            "lastUpdated": "2026-07-13T12:38:18.793",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "PYzG6xB8MPZ",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico 3",
+            "created": "2022-09-04T10:18:59.230",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "JpwFTu1cA31"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wsyQJgzEXnn",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Recibio atenciones ambulatorias SiNo",
+            "created": "2021-11-12T14:42:12.031",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Uzrd8tjAYkk"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ERZ9Q8k3CPY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos 1",
+            "created": "2021-11-12T20:10:05.792",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "qWZnNIvffpt"
+            },
+            "useCodeForOptionSet": false,
+            "id": "aRULRESCdbl",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Fecha investigacion",
+            "created": "2022-09-07T12:05:42.046",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "xOmjbhsK5mn"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SkzLlpTLJ9h",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Fabricante vacuna 1",
+            "created": "2026-01-06T02:53:29.365",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "tEsq9B4Krxi"
+            },
+            "useCodeForOptionSet": false,
+            "id": "A8U6mcVDWxz",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Medicamentos previo SiNo",
+            "created": "2022-09-04T11:22:37.305",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ctFi9iaIgxi"
+            },
+            "useCodeForOptionSet": false,
+            "id": "nbi0fsEfBRp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - MUERTE FETAL",
+            "created": "2022-09-02T11:56:25.150",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LxGx2ExbZ6F"
+            },
+            "useCodeForOptionSet": false,
+            "id": "vfZg2o71vck",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - PROLONGACION HOSPITALIZACION",
+            "created": "2022-09-02T11:58:46.459",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LbP32iaAF2i"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kB8k06Eozne",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 4",
+            "created": "2021-11-12T13:38:31.829",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ojFWUAvmCVb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "qRcSjq1apBx",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Fecha atencion",
+            "created": "2021-11-11T19:59:27.955",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "v815reutsgq"
+            },
+            "useCodeForOptionSet": false,
+            "id": "P83ZiNyJ63O",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Sintomatologia 1",
+            "created": "2021-11-11T19:14:28.164",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "divNYZcYdub"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ead5Ux2XBX0",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Valor vacuna 3",
+            "created": "2022-05-09T11:04:49.294",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "CWyVHlAuvy9"
+            },
+            "useCodeForOptionSet": true,
+            "id": "DznAHLR2Nep",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-TipoProfesionalCapacitadoInmunizaciones",
+            "created": "2021-11-17T22:05:07.880",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "FiuShGS2fL4"
+            },
+            "useCodeForOptionSet": true,
+            "id": "ZB0ax3GyDCa",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre responsable inmunizaciones",
+            "created": "2022-10-11T08:38:07.363",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "fAXqQN53WxI"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TFN0e6oqgO6",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Fecha vacunacion vacuna 1",
+            "created": "2021-11-13T20:16:25.442",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "f0DUuJnIhli"
+            },
+            "useCodeForOptionSet": false,
+            "id": "mO0gtiuCG5z",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico personal 1",
+            "created": "2022-09-08T16:37:04.411",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "OBB1SoIN5il"
+            },
+            "useCodeForOptionSet": false,
+            "id": "mBGbh06LExh",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Telefono 1",
+            "created": "2022-03-14T13:42:37.453",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "SbD0bGtTl19"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ecFBIjvd7iy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 2",
+            "created": "2021-11-12T13:38:08.209",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "M0vz9unPbjb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kem2MKJ5ccz",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses - vacuna 4",
+            "created": "2022-09-03T09:48:13.014",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "h1RYXgn9r1m",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Fecha vacunacion vacuna 3",
+            "created": "2022-09-03T09:38:36.124",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "eTR55fq0QPj"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Q9TBN4TYntB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Texto Fecha nacimiento",
+            "created": "2022-08-16T14:23:29.206",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "RNex9oPUgi6",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mm3yPvcs1LG"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Recibio tratamientoSiNo",
+            "created": "2021-11-12T13:53:59.363",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Ocf1WPytgBJ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Eh5VQzEQFhy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Antecedente diagnostico SARSCOV2",
+            "created": "2022-06-02T14:28:54.683",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "UWPfTHFYpTo"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GLV3z515ufG",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - AMENAZA A LA VIDA",
+            "created": "2022-09-02T11:27:09.914",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LvOgL2NWvSt"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Qry3mFDcfxr",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Fecha fallecimiento",
+            "created": "2022-10-11T11:14:49.786",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "YGyOYXtk5zS"
+            },
+            "useCodeForOptionSet": false,
+            "id": "gMF4XjQouZf",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Dato Nacionalidad",
+            "created": "2022-03-21T10:01:02.047",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "ImdiGt4rXYW",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "uWro9jLblJg"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios - vacuna 3",
+            "created": "2022-09-03T09:33:03.495",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "CUNmRFlZjom",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Telefono 2",
+            "created": "2022-03-14T13:44:51.120",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ycd2FqhnPxc"
+            },
+            "useCodeForOptionSet": false,
+            "id": "aWZfrFGyQqD",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Comorbilidad SiNo",
+            "created": "2021-11-11T22:58:41.886",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "jg1oKNFCTVz"
+            },
+            "useCodeForOptionSet": false,
+            "id": "viNvCjTfE9o",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Busqueda casos similar sintomatologia sin antecedente vacuna SiNo",
+            "created": "2021-12-13T20:54:35.395",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LewOZjUQPB2"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Jt7LY53OkOc",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios - vacuna 5",
+            "created": "2022-09-03T09:33:15.976",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "O9Tpxdl7BJk",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Cumple estandares de calidad",
+            "created": "2021-12-14T10:53:22.988",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ldsXgZosabT"
+            },
+            "useCodeForOptionSet": false,
+            "id": "KG81if4OU7q",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra4_FechaEnvio",
+            "created": "2021-11-16T19:04:42.630",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "buUYC2zTI73"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ca4J4Ojvo2a",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-EmbarazadaSiNo",
+            "created": "2021-11-11T22:22:00.044",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "dFM8g5r2Wqd"
+            },
+            "useCodeForOptionSet": false,
+            "id": "dspwIGGVCkp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Nombre tutor",
+            "created": "2022-10-11T09:50:02.215",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "OkcC8LGaL51"
+            },
+            "useCodeForOptionSet": false,
+            "id": "oEX1b399gBu",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-ProfesionNotifica",
+            "created": "2022-03-14T15:40:00.153",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "OF69ZkbdcU9"
+            },
+            "useCodeForOptionSet": true,
+            "id": "YyFOqhQngU5",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Fecha dilucion vacuna 1",
+            "created": "2022-09-13T10:01:30.751",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "fO0l7SZBbUB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "tZ1fv98IoRC",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Muestra1_FechaProcesamiento",
+            "created": "2021-11-18T17:56:06.452",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PGKGM2amXiP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "NVm89TrDtzm",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Medicamentos SiNo",
+            "created": "2022-05-10T16:04:38.920",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Q6IWkD74BVh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "oYaO7oGHen2",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Fecha vacunacion vacuna 5",
+            "created": "2022-09-03T09:39:05.240",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "nGuGUPpQTvX"
+            },
+            "useCodeForOptionSet": false,
+            "id": "mUYJEjvoBR1",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Fecha nacimiento",
+            "created": "2021-10-20T23:08:51.223",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SDqbpJlYI5F",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "h0zzlWpQr5E"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Muestra3_tipo",
+            "created": "2021-11-16T17:29:46.811",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "x4apdyEWrXy"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TONU0Fqg8AP",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos 2",
+            "created": "2021-11-12T20:10:24.118",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "yvDvLGXv7eb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FaUmhzYKdXp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra3-adecuada",
+            "created": "2021-11-18T17:24:28.655",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "p6ovNvB7pDl"
+            },
+            "useCodeForOptionSet": false,
+            "id": "yFaXY2Ct657",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra1-adecuada",
+            "created": "2021-11-18T17:23:55.102",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "mulnuezxIHO"
+            },
+            "useCodeForOptionSet": false,
+            "id": "yeIPagMPaWc",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Criterio investigacion evento nuevo",
+            "created": "2022-09-09T15:24:29.262",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "yjtX7lMBXEc"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Zvl3C04zhNU",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Tiene diluyente SiNo vacuna 1",
+            "created": "2021-11-12T21:50:25.938",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "bP56FsnNcSX"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ouRake4BMge",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Uso de medicamentos 3",
+            "created": "2021-11-12T20:47:00.693",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "oNQrJr0lQ9f"
+            },
+            "useCodeForOptionSet": false,
+            "id": "n5WPd4oymLt",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses - vacuna 3",
+            "created": "2022-09-03T09:48:06.134",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TOs2vkTL1VV",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Personal de salud capacitado SiNo",
+            "created": "2021-11-14T10:54:26.060",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "K0dVyWddf0N"
+            },
+            "useCodeForOptionSet": false,
+            "id": "e5UkmaA0500",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra4-adecuada",
+            "created": "2021-11-18T17:24:41.682",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "TabF8sISiIU"
+            },
+            "useCodeForOptionSet": false,
+            "id": "g438rTN6Fzj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Inmunodeficiencias 1",
+            "created": "2021-11-12T20:26:36.523",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "kotHvlHCxQ0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "i1M9whXC3fH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico familiar 3",
+            "created": "2022-09-08T16:36:50.480",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "bBl5E4RRWuP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "mVu23MpNGV5",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra4_FechaToma",
+            "created": "2021-11-16T19:02:50.179",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "zNClJodsbSh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ZcyE9KDaL05",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Unicodigo",
+            "created": "2022-02-14T14:57:46.471",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "zEfNaTusvkK"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ZsPdYJ3BTAy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre Usuario",
+            "created": "2021-11-25T13:35:42.853",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TEJzB0ngIc4",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "i1qTjGlVOaW"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-TelefonoResponsableProvision",
+            "created": "2022-03-15T08:29:43.365",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ZDj2ORgJOp3"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ATS3rhQlyCD",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Clasificacion final 2",
+            "created": "2026-08-21T21:20:44.171",
+            "lastUpdated": "2026-08-21T21:20:44.171",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ySGfSkrTJ8g"
+            },
+            "useCodeForOptionSet": true,
+            "id": "b4ubf3yQcow",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Identificacion",
+            "created": "2021-11-15T13:13:09.478",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "DSo1RUzGaqf",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "d8PiRnvGHEN"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Tipo Identificacion",
+            "created": "2022-03-21T16:08:38.134",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "ELZQmuFCyz7",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mJyGzNXYzTa"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre aplica vacuna 4",
+            "created": "2022-10-11T08:32:50.168",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "kwAn2f3iRtB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zl2ZDunYUDX",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico agudo SiNo",
+            "created": "2022-05-17T07:40:59.621",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "b5mq97nFnOw"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wT07DdC0eIC",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra1_FechaToma",
+            "created": "2021-11-16T17:43:01.035",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "CJDKh8sN0wE"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VdSf6RXN6oc",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Presento sintomas de COVID19",
+            "created": "2021-12-14T13:36:39.617",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "aIT7IDl7348"
+            },
+            "useCodeForOptionSet": false,
+            "id": "iF5Z2DBz8Rq",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra4_FechaRecepcion",
+            "created": "2021-11-18T13:38:37.082",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "X1Isj9NfPB1"
+            },
+            "useCodeForOptionSet": false,
+            "id": "HQ1GS1t2qyX",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Calibre aguja vacuna 5",
+            "created": "2022-09-20T08:38:38.285",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "mnGEHwoPjHF"
+            },
+            "useCodeForOptionSet": true,
+            "id": "CYiW7Mff0uH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-CasoAnalizadoSiNo",
+            "created": "2021-11-18T22:15:24.919",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "LPttcTLpOVt"
+            },
+            "useCodeForOptionSet": false,
+            "id": "gCA88lk96sv",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Fecha termina investigacion",
+            "created": "2022-10-11T10:48:40.894",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "VDatG6TsBKE"
+            },
+            "useCodeForOptionSet": false,
+            "id": "WlL40LLJPew",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Muestra1_FechaRecepcion",
+            "created": "2021-11-18T13:37:29.370",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "d63oJ3omLKb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "KwKsZ2jpvEI",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Calibre aguja vacuna 4",
+            "created": "2022-09-20T08:38:27.013",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "YxGHfFHwaYg"
+            },
+            "useCodeForOptionSet": true,
+            "id": "oZ1yBDx8azE",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Valor vacuna 2",
+            "created": "2022-05-09T11:04:41.445",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "EcCN1gL3Bx5"
+            },
+            "useCodeForOptionSet": true,
+            "id": "zwR1TjsCpXY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Medicamentos previo 2",
+            "created": "2022-09-04T11:23:34.330",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "K8wuMHifn1Z"
+            },
+            "useCodeForOptionSet": false,
+            "id": "m0mwedvhTlg",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - anios - vacuna 2",
+            "created": "2021-12-13T17:53:55.500",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ZoZsCih0bAV",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-EventoAdversoAnterior",
+            "created": "2021-11-17T20:05:46.950",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "kUy4QdYuuDi"
+            },
+            "useCodeForOptionSet": false,
+            "id": "lYZc7KrgF0i",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 3",
+            "created": "2021-11-12T13:38:19.011",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "S5CfUgFnSo0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ikO9d9OiSfU",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 6",
+            "created": "2022-09-03T14:58:43.245",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "I09AkR0y9oi"
+            },
+            "useCodeForOptionSet": false,
+            "id": "G9PV6RUAEUw",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Condicion de egreso",
+            "created": "2021-11-12T22:42:50.903",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "lGZvbh067zp"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Ylp55ucX2lr",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre aplica vacuna 2",
+            "created": "2022-10-11T08:32:27.277",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "P9mI4XHERkv"
+            },
+            "useCodeForOptionSet": false,
+            "id": "M5UgHGgym9D",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Hospitalizado SiNo",
+            "created": "2021-11-12T14:49:40.590",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "VfppgTvgi4g"
+            },
+            "useCodeForOptionSet": false,
+            "id": "c6w7tkDY6jt",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Ingreso a UCI SiNo",
+            "created": "2021-11-12T14:53:50.572",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "XhWKwDYgg9N"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kze7lmqbZeU",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra4_tipo",
+            "created": "2021-11-16T17:31:08.026",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "jIteMEkpgbH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "mncu1IkNtPJ",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Sintomatologia 5",
+            "created": "2022-09-04T12:06:38.554",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "F6RkpicDfL1"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wuHbfBFZsap",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Confirmado muestra 1",
+            "created": "2022-05-16T11:18:10.784",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "EY2NDhjFC4j"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kR7av6reixI",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico 1",
+            "created": "2021-12-14T10:49:38.763",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "w0p47hFPORy"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wCjkJNzrYms",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Criterio investigacion cumple con criterios esavi",
+            "created": "2022-09-09T15:10:58.913",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "r7osBRQSsc0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SOtAo7VN4Yy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias",
+            "created": "2021-11-09T20:04:00.924",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Eogg95ERuGZ",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-CasoAnalizadoSiNo2",
+            "created": "2026-08-21T21:22:50.634",
+            "lastUpdated": "2026-08-21T21:22:50.634",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "JZegN2j2oTf"
+            },
+            "useCodeForOptionSet": false,
+            "id": "weUJWxbSOyh",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Fecha inicio de sintomas",
+            "created": "2021-11-09T22:49:54.483",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "VMOTHtV1oVB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "YUIUQog9rgg",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-TextoEstadoCivil",
+            "created": "2022-03-21T09:43:40.607",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "MtyKbTAMHIB",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "OR7FLkFQvTe"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre aplica vacuna 5",
+            "created": "2022-10-11T08:33:01.367",
+            "lastUpdated": "2026-07-13T12:38:18.794",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "mGKgrKWSz4W"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Wtsa5PO8N2D",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente quirugico 2",
+            "created": "2022-05-20T15:38:15.364",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "C6SiDc30GGD"
+            },
+            "useCodeForOptionSet": false,
+            "id": "vSZY8M398tv",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Clasificacion final",
+            "created": "2022-09-05T05:30:26.378",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "AR6DnBgPQzp"
+            },
+            "useCodeForOptionSet": true,
+            "id": "tluwBcGBVPH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Uso de medicamentos 2",
+            "created": "2021-11-12T20:28:54.566",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "I6coWIY7su7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pg7lBktwEdK",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-VacunaRelacionadaConEsteEvento",
+            "created": "2021-11-25T15:45:30.155",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "diQEiUedZ5H"
+            },
+            "useCodeForOptionSet": false,
+            "id": "bbVOlskS8VY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-EstablecimientoProvincia",
+            "created": "2021-11-19T20:14:40.287",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "imxJ2JJnVhc"
+            },
+            "useCodeForOptionSet": true,
+            "id": "WlCIbRiUI7v",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Telefono 3",
+            "created": "2022-03-14T13:45:03.381",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "XWAkkmvXxUR"
+            },
+            "useCodeForOptionSet": false,
+            "id": "cCsnKqfU1MF",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Tiene diluyente SiNo vacuna 2",
+            "created": "2021-12-13T19:42:31.409",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "G1j1SmynaQ1"
+            },
+            "useCodeForOptionSet": false,
+            "id": "MziUQu6x22W",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Calibre aguja vacuna 1",
+            "created": "2022-05-18T09:08:22.630",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Uw7xYhHitwf"
+            },
+            "useCodeForOptionSet": true,
+            "id": "dK9Ajwv4xph",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos 3",
+            "created": "2021-11-12T20:10:36.757",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "P0H6EyI2Yhx"
+            },
+            "useCodeForOptionSet": false,
+            "id": "jvzJw0Q6R6T",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Abreviatura vacuna 1",
+            "created": "2025-12-25T17:16:03.057",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "sG8EjNlcqfY"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SDr7rhqvg6B",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos 4",
+            "created": "2022-09-04T19:40:18.038",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PtNdja0GPLx"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zT05z9Iz1YO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra1_FechaEnvio",
+            "created": "2021-11-16T19:03:29.821",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "r8JIc2kA3rR"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wbus4vXgHAG",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Fecha dilucion vacuna 2",
+            "created": "2022-09-13T10:01:46.768",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Glz6T5Nl79n"
+            },
+            "useCodeForOptionSet": false,
+            "id": "hGEhr85kMZW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-AsintomaticaSiNo",
+            "created": "2021-11-22T20:46:07.329",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "IImK1Dv3d9U"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rel4P10GP2D",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-SemanaEpidemiologica",
+            "created": "2021-11-22T21:03:32.066",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "swFGRiTc1hZ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fVvw9zHscTO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_POSITIVE"
+        },
+        {
+            "name": "ESAVI-Sintomatologia 4",
+            "created": "2022-05-18T10:28:37.858",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Y8rxSNcFfac"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GcihXiIlgvJ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Uso de medicamentos 1",
+            "created": "2021-11-12T20:27:09.051",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "YOQNztDJtu6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pTOEi6B5vGw",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Enfermedades neurologicas 1",
+            "created": "2021-11-12T20:27:53.187",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "qhHZbmaQcpH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "UthZLOG3a3J",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra2_FechaRecepcion",
+            "created": "2021-11-18T13:37:44.283",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "alLJseTGC4R"
+            },
+            "useCodeForOptionSet": false,
+            "id": "IJJjj2vrbDJ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 5",
+            "created": "2021-11-12T13:38:41.762",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Q4hAFyq8OXk"
+            },
+            "useCodeForOptionSet": false,
+            "id": "PAnQgxEcnku",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias - vacuna 1",
+            "created": "2021-11-13T20:18:22.687",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "S7vk4FkTdwK",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Sintomatologia 2",
+            "created": "2021-11-11T19:14:54.557",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "aZq9xTX6ZlL"
+            },
+            "useCodeForOptionSet": false,
+            "id": "J034BMHyAIt",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra3_FechaToma",
+            "created": "2021-11-16T19:02:28.969",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ZPtcXItlRIG"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ZZjyuY75Dr2",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Muestra1_tipo",
+            "created": "2021-11-16T16:45:17.935",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Va6TwoNepKK"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zh8gkIopRDG",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Establecimiento de red privada",
+            "created": "2022-05-23T05:45:01.706",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "glEv9Bj7GUs"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Of26YAn5OY0",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-FechaVacunacionNotificacion",
+            "created": "2021-11-17T18:22:14.000",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ikG895AX3Jn"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pTEiLgy96BT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Texto Tipo identificacion",
+            "created": "2022-03-21T16:06:37.417",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "tsNzeSKodLP",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mJyGzNXYzTa"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico personal 2",
+            "created": "2022-09-08T16:37:17.683",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "WbqHEShwPJl"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ptuNL6ed8gq",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Concentracion vacuna 1",
+            "created": "2026-01-06T02:27:34.476",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "zVlb4Eyd3gc"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FRvJfekPGo7",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre responsable calidad",
+            "created": "2022-10-11T08:37:25.297",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "pZx7cWH8rx6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "D2v5PtE2RKB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-ProvinciaDomicilioNotificacion",
+            "created": "2022-02-10T13:05:29.900",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "NRoDp2vXWEN"
+            },
+            "useCodeForOptionSet": true,
+            "id": "wY570QtlHLD",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Abreviatura vacuna 3",
+            "created": "2025-12-26T03:28:49.011",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "CWyVHlAuvy9"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VIcoRYZeBNL",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Alergias 1",
+            "created": "2021-11-12T20:26:07.461",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ImDTFf0nVOo"
+            },
+            "useCodeForOptionSet": false,
+            "id": "t1DoOoCRULp",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - DISCAPACIDAD SIGNIFICATIVA",
+            "created": "2022-09-02T11:33:45.141",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "yO8m0nW2eDh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Cl8g1PueWB9",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias - vacuna 3",
+            "created": "2022-09-03T09:47:36.063",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Gsdx6Ar5PK0",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Valor vacuna 5",
+            "created": "2022-05-09T11:05:05.166",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ZxzDHpKRVXb"
+            },
+            "useCodeForOptionSet": true,
+            "id": "dE9xtX8UFpy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra3_FechaEntrega",
+            "created": "2021-11-18T20:00:01.381",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "dvasdY3XKv3"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Zr0zd6B35DJ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Sintomatologia 3",
+            "created": "2021-11-11T19:15:18.416",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "wMTmpdmYjUv"
+            },
+            "useCodeForOptionSet": false,
+            "id": "BxarjQwqp1x",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Diagnostico final 2",
+            "created": "2022-09-04T12:16:47.590",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "N0jXyOzkY71"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FVdemszgX6a",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-EstablecimientoZona",
+            "created": "2021-11-22T14:32:19.262",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ASiYN5pBJJP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "sT2wEfbA3ze",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-NACIONALIDAD ETNICA",
+            "created": "2022-10-19T14:58:07.601",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "RT0FaKP6Xz2",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "LkgcmIRlM0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico familiar 1",
+            "created": "2022-09-08T16:36:20.812",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "v4IRbsdBS9j"
+            },
+            "useCodeForOptionSet": false,
+            "id": "bMbFDK0OxRW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico personal 3",
+            "created": "2022-09-08T16:37:45.480",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "MyeIxnZT7lk"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TNDCo0Kr7Md",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente quirugico SiNo",
+            "created": "2022-05-20T15:32:20.483",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "QjypVHUPuGp"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zf1G3eKZduT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Nombre notifica",
+            "created": "2022-10-11T08:26:09.670",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "imesY6LzkTu"
+            },
+            "useCodeForOptionSet": false,
+            "id": "JKcsRRBsY8F",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses - vacuna 5",
+            "created": "2022-09-03T09:48:20.882",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kVzyw0QWAkY",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Clasificacion final 3",
+            "created": "2026-08-21T21:21:10.303",
+            "lastUpdated": "2026-08-21T21:21:10.303",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "GODyX53OWCZ"
+            },
+            "useCodeForOptionSet": true,
+            "id": "XkCUPAFXZC4",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico familiar SiNo",
+            "created": "2022-09-08T16:30:27.110",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "xFbTUovxuTC"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Am5Ls8KVM7V",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Fecha dilucion vacuna 4",
+            "created": "2022-09-13T10:02:07.635",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "NYKUhkHzl9S"
+            },
+            "useCodeForOptionSet": false,
+            "id": "WGVzawX43vN",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Codigo del caso",
+            "created": "2022-05-30T17:37:36.236",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Z6FiWqPS5of"
+            },
+            "useCodeForOptionSet": false,
+            "id": "NvzMoFHKGe3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - MUERTE",
+            "created": "2022-05-20T11:20:06.246",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ouDdIzt7SMV"
+            },
+            "useCodeForOptionSet": false,
+            "id": "DukgRzRFlEz",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Tiene diluyente SiNo vacuna 4",
+            "created": "2022-09-03T14:13:59.648",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "HvsDEEzoUSy"
+            },
+            "useCodeForOptionSet": false,
+            "id": "AIpjOuCJMqH",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Especificar comorbilidad 1",
+            "created": "2021-11-12T13:37:49.743",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "st5aDCkVy02"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fNgfwl65zN0",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Inmunodeficiencias SiNo",
+            "created": "2022-05-10T16:02:16.564",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "i8GlxgWceYV"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VMWOMI3pBaT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Calibre aguja vacuna 2",
+            "created": "2022-05-18T09:08:35.684",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "iyvlqFVy5UA"
+            },
+            "useCodeForOptionSet": true,
+            "id": "yKOHMuJg2ky",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Valor vacuna 1",
+            "created": "2022-05-09T11:04:24.813",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "sG8EjNlcqfY"
+            },
+            "useCodeForOptionSet": true,
+            "id": "h0yDA7NLAns",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra2_FechaProcesamiento",
+            "created": "2021-11-18T17:56:24.732",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "vK3rL8bkjFJ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "MckgkyJdX9G",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - HOSPITALIZACION",
+            "created": "2022-09-02T11:57:53.177",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "zbrF1XdJobC"
+            },
+            "useCodeForOptionSet": false,
+            "id": "EWfP98QOfgO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Alergias SiNo",
+            "created": "2022-05-10T16:01:49.395",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PH2zX5cazsN"
+            },
+            "useCodeForOptionSet": false,
+            "id": "N4IbLl8YBop",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Calibre aguja vacuna 3",
+            "created": "2022-09-20T08:38:06.549",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "k7OaFbJzIo5"
+            },
+            "useCodeForOptionSet": true,
+            "id": "dLRqZ8lWhXZ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-EstablecimientoCanton",
+            "created": "2021-11-19T20:21:04.842",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "O8ltMVOzYSB"
+            },
+            "useCodeForOptionSet": true,
+            "id": "Sg3KESYaDZ8",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre aplica vacuna 3",
+            "created": "2022-10-11T08:32:39.515",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "T4fdNHeuuB4"
+            },
+            "useCodeForOptionSet": false,
+            "id": "UDku3p9aOGx",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses - vacuna 1",
+            "created": "2021-11-13T20:18:37.973",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Lz9fgx0h4yx",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Muestra2-adecuada",
+            "created": "2021-11-18T17:24:14.988",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PDhtCR0We9j"
+            },
+            "useCodeForOptionSet": false,
+            "id": "qKhnPHQh2Ad",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Telefono 4",
+            "created": "2022-03-15T08:48:04.956",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "NuOXglrMh6M"
+            },
+            "useCodeForOptionSet": false,
+            "id": "U0MptHasaSQ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Diagnostico inicial 3",
+            "created": "2022-09-02T14:37:24.317",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "x5E6lp67bYB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "BXcNTKGv2HM",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Diagnostico final 1",
+            "created": "2022-09-04T12:16:26.352",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "c0WBIfGcS7j"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Bux9hYm1GGc",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Diagnostico inicial 2",
+            "created": "2021-11-11T19:13:35.873",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "lABbRFU5I9u"
+            },
+            "useCodeForOptionSet": false,
+            "id": "DybMBhoSVto",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Antecedente patologico familiar 2",
+            "created": "2022-09-08T16:36:38.002",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "ba0z6fTghcw"
+            },
+            "useCodeForOptionSet": false,
+            "id": "eEeudnS5Btq",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias - vacuna 4",
+            "created": "2022-09-03T09:47:46.545",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "oVbhJCXZ5zE",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-SE",
+            "created": "2026-08-05T22:53:56.041",
+            "lastUpdated": "2026-08-07T18:17:04.071",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "swFGRiTc1hZ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "UimvSOrAMtw",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_POSITIVE"
+        },
+        {
+            "name": "ESAVI-TelefonoResponsableCalidad",
+            "created": "2022-03-15T08:27:02.463",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "n1zhkMW3nkh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "S2y6VX6Pgez",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Registrar muestra de laboratorio SiNo",
+            "created": "2021-11-14T11:01:44.190",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "AOabQxSHc0P"
+            },
+            "useCodeForOptionSet": false,
+            "id": "KIET0VS6NCa",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Muestra2_tipo",
+            "created": "2021-11-16T17:29:28.929",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "hs4ptQtbuKv"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fA0ERwO2dPG",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Texto Sexo",
+            "created": "2022-03-21T09:34:10.839",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "MrxWuLwj0LY",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MthQ3fTXChs"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Confirmado muestra 3",
+            "created": "2022-05-16T11:18:38.397",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "w57MKhelr7h"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GYsLgKLDgle",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Nacionalidad",
+            "created": "2022-03-18T16:09:20.767",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "A9Ittaqqbmy",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "BnJ69jHTPcO"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra2_FechaToma",
+            "created": "2021-11-16T19:01:57.645",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "f7bbshQz4vj"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Q1wc01nvdNr",
+            "programRuleVariableSourceType": "DATAELEMENT_NEWEST_EVENT_PROGRAM",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Muestra4_FechaEntrega",
+            "created": "2021-11-18T20:00:12.811",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "b1YAsrsSjDt"
+            },
+            "useCodeForOptionSet": false,
+            "id": "INm5jqGslTV",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Registrar antecedente vacuna 2 SiNo",
+            "created": "2021-11-12T16:49:30.706",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "aeTL9dFBDxC"
+            },
+            "useCodeForOptionSet": false,
+            "id": "QbIgSB3krF1",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses - vacuna 2",
+            "created": "2021-12-13T17:54:13.185",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "IV9OKyavZrH",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Criterio notificacion - ABORTO",
+            "created": "2022-09-02T11:55:32.268",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "FqD8GXs9Gvf"
+            },
+            "useCodeForOptionSet": false,
+            "id": "kUPtap68xPe",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Country_medicinalProductID vacuna 1",
+            "created": "2025-12-25T18:18:25.697",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "RkOuHtRBwaE"
+            },
+            "useCodeForOptionSet": false,
+            "id": "hZJDBj1Y6Fc",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Uso de medicamentos 4",
+            "created": "2022-09-04T12:45:19.208",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "UtmHGaVo9Zp"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rtE4FVp9XbW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra4_FechaProcesamiento",
+            "created": "2021-11-18T17:56:48.892",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "WBolQmEDElU"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ERcKCCqF0S3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Nombre aplica vacuna 1",
+            "created": "2022-10-11T08:32:09.159",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "YmyNAsx9CHq"
+            },
+            "useCodeForOptionSet": false,
+            "id": "L9GnxJVggGB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Tiene diluyente SiNo vacuna 3",
+            "created": "2022-09-03T14:13:45.053",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "F6gv6d5Ibm3"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VxIUYZY5wf6",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Medicamentos previo 1",
+            "created": "2022-09-04T11:23:16.599",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "AEPccDDSukH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "aiesat33SHN",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos Otro",
+            "created": "2022-09-07T11:07:08.929",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "kD4PLQeaNeh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "KdzIrvuttdW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Texto Nacionalidad",
+            "created": "2022-03-21T09:52:38.587",
+            "lastUpdated": "2026-07-13T12:38:18.795",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "bD8kRO5wStX",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "b7Ucql3BOtL"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Nombre responsable provision",
+            "created": "2022-10-11T08:38:37.816",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Otv57WLaClw"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pkAflXMjvGW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-AUTOIDENTIFICACION",
+            "created": "2021-10-20T22:56:36.528",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "LYVSkfUfFDI",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "lwTNuRsSGYb"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "ESAVI-Muestra3_FechaRecepcion",
+            "created": "2021-11-18T13:38:03.184",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "PgVvbW1Z7jA"
+            },
+            "useCodeForOptionSet": false,
+            "id": "bWKuCCuaQI3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Signos y sintomas previos inmunizacion SiNo",
+            "created": "2022-01-31T17:21:06.039",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "EDmUudvcUm9"
+            },
+            "useCodeForOptionSet": false,
+            "id": "uGb1KOJtdhu",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "ESAVI-Edad calculada - dias - vacuna 2",
+            "created": "2021-12-13T17:54:04.249",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "xneWsponuvD",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Confirmado muestra 2",
+            "created": "2022-05-16T11:18:26.777",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "l0Iw4MFrQWE"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rfgvmJagTdT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "ESAVI-Edad calculada - meses",
+            "created": "2021-11-09T20:03:49.773",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FgjyIM4VN9d",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "NUMBER"
+        },
+        {
+            "name": "ESAVI-Fecha vacunacion vacuna 4",
+            "created": "2022-09-03T09:38:52.218",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "nARUulPj97f"
+            },
+            "useCodeForOptionSet": false,
+            "id": "niIJVn4bzS5",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "ESAVI-Tiene diluyente SiNo vacuna 5",
+            "created": "2022-09-03T14:14:12.019",
+            "lastUpdated": "2026-07-13T12:38:18.796",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "NrEU7cRCZd7"
+            },
+            "dataElement": {
+                "id": "Gst2ngOOcLj"
+            },
+            "useCodeForOptionSet": false,
+            "id": "j0mTJE3QNsR",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        }
+    ]
+}
