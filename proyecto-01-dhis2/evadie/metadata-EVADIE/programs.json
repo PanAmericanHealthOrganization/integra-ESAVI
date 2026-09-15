@@ -1,0 +1,900 @@
+{
+    "programs": [
+        {
+            "code": "PROGRAM_EVADIE",
+            "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL",
+            "created": "2022-02-19T08:17:49.087",
+            "lastUpdated": "2026-08-21T19:14:44.582",
+            "translations": [],
+            "createdBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "sharing": {
+                "owner": "M5zQapPyTZI",
+                "external": false,
+                "users": {},
+                "userGroups": {
+                    "xFRnXA5ZmF3": {
+                        "displayName": "Capturista_all",
+                        "access": "rwrw----",
+                        "id": "xFRnXA5ZmF3"
+                    }
+                },
+                "public": "rwrw----"
+            },
+            "shortName": "EVADIE",
+            "description": "FICHA DE NOTIFICACIÓN DE EVENTO ADVERSO DE INTERÉS ESPECIAL (EVADIE/AESI)",
+            "version": 78,
+            "enrollmentDateLabel": "Fecha de notificación",
+            "programType": "WITH_REGISTRATION",
+            "displayIncidentDate": false,
+            "ignoreOverdueEvents": false,
+            "onlyEnrollOnce": false,
+            "notificationTemplates": [],
+            "selectEnrollmentDatesInFuture": false,
+            "selectIncidentDatesInFuture": false,
+            "trackedEntityType": {
+                "id": "eL5WFnzkqNe"
+            },
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "skipOffline": false,
+            "displayFrontPageList": true,
+            "useFirstStageDuringRegistration": false,
+            "expiryDays": 0,
+            "completeEventsExpiryDays": 0,
+            "openDaysAfterCoEndDate": 0,
+            "minAttributesRequiredToSearch": 1,
+            "maxTeiCountToReturn": 0,
+            "accessLevel": "OPEN",
+            "id": "StFhfptAmF6",
+            "attributeValues": [],
+            "organisationUnits": [
+                {
+                    "id": "wDdQPcLC2Fo"
+                }
+            ],
+            "programStages": [
+                {
+                    "id": "BDS49EHHrho"
+                },
+                {
+                    "id": "N55WFW3WWyk"
+                }
+            ],
+            "programSections": [
+                {
+                    "id": "QwvZkQudUMb"
+                }
+            ],
+            "programTrackedEntityAttributes": [
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Tipo de identificación",
+                    "created": "2022-02-19T08:57:18.294",
+                    "lastUpdated": "2026-08-21T19:14:44.585",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 1,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Tipo de identificación",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Tipo de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "L1zJEu2SkST",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "mJyGzNXYzTa"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nro. de identificación",
+                    "created": "2022-02-19T08:17:48.465",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 2,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Nro. de identificación",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nro. de identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "EnomJcgLSVX",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "d8PiRnvGHEN"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nombres",
+                    "created": "2022-02-19T08:17:48.468",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 3,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Nombres",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nombres",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "x6CO6g2fU58",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "aZ18xLVTHwh"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Apellidos",
+                    "created": "2022-02-19T08:17:48.468",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": true,
+                    "sortOrder": 4,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": true,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Apellidos",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Apellidos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "yHfHYjYydGl",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "cEb5FvyVzfw"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Fecha de nacimiento",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 5,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "DATE",
+                    "displayShortName": "EVADIE Fecha de nacimiento",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Fecha de nacimiento",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "AR2c7TIwWJ3",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "h0zzlWpQr5E"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Sexo",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 6,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Sexo",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Sexo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "pR88FIagLdf",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "MiZMsOXYy0h"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Estado civil",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 7,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Estado civil",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Estado civil",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "nKpTDHPNUth",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "SguXpHxhqtd"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nacionalidad",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 8,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Nacionalidad",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "t0cVIZJn42h",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "BnJ69jHTPcO"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Autoidentificación",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 9,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Autoidentificación",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Autoidentificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "k75BFGYTeIT",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "lwTNuRsSGYb"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nacionalidad étnica",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 10,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Nacionalidad étnica",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Nacionalidad étnica",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "MBapwjieCmd",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "LkgcmIRlM0h"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Pueblo",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 11,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Pueblo",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Pueblo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "xf6OEJ3AoIT",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "bHCqRecTH3R"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Ocupación",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.586",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 12,
+                    "mandatory": true,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Ocupación",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Ocupación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "xCsDurwNzhn",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "W4hYWyu4cWu"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Autoidentificacion",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.587",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 13,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto Autoidentificacion",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Autoidentificacion",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "r3j3RuWf2Gt",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "S0vbirMA89F"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Usuario",
+                    "created": "2022-02-19T08:57:18.295",
+                    "lastUpdated": "2026-08-21T19:14:44.587",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 14,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Usuario",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Usuario",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "JmFgksRo9D5",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "i1qTjGlVOaW"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Sexo",
+                    "created": "2022-03-25T09:19:37.915",
+                    "lastUpdated": "2026-08-21T19:14:44.587",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 15,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto Sexo",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Sexo",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "lzn73nCXr30",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "MthQ3fTXChs"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Estado Civil",
+                    "created": "2022-03-25T09:19:37.915",
+                    "lastUpdated": "2026-08-21T19:14:44.587",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 16,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto Estado Civil",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Estado Civil",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "WJPcL59KWLv",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "OR7FLkFQvTe"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Dato Nacionalidad",
+                    "created": "2022-03-25T09:19:37.915",
+                    "lastUpdated": "2026-08-21T19:14:44.587",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 17,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Dato Nacionalidad",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Dato Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "jTxfk5wDz00",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "uWro9jLblJg"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Origen Datos",
+                    "created": "2022-03-25T09:19:37.915",
+                    "lastUpdated": "2026-08-21T19:14:44.588",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 18,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Origen Datos",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Origen Datos",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "spcoNpvZa9Z",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "nULJ6aJQMg6"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto tipo identificación",
+                    "created": "2022-03-25T09:33:16.652",
+                    "lastUpdated": "2026-08-21T19:14:44.588",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 19,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto tipo identificación",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto tipo identificación",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "oDp0P1Z8IJZ",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "hu1mUoStxga"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Nacionalidad",
+                    "created": "2022-05-27T19:54:02.651",
+                    "lastUpdated": "2026-08-21T19:14:44.588",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 20,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto Nacionalidad",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Nacionalidad",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "tmUinvG3ZLG",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "b7Ucql3BOtL"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Fecha de nacimiento",
+                    "created": "2022-08-16T14:39:42.660",
+                    "lastUpdated": "2026-08-21T19:14:44.588",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 21,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "DATE",
+                    "displayShortName": "EVADIE Texto Fecha de nacimiento",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Fecha de nacimiento",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "BSiablLDRJN",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "mm3yPvcs1LG"
+                    }
+                },
+                {
+                    "name": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Nacionalidad Etnica",
+                    "created": "2022-10-21T15:07:46.906",
+                    "lastUpdated": "2026-08-21T19:14:44.588",
+                    "translations": [],
+                    "favorites": [],
+                    "sharing": {
+                        "external": false,
+                        "users": {},
+                        "userGroups": {}
+                    },
+                    "program": {
+                        "id": "StFhfptAmF6"
+                    },
+                    "displayInList": false,
+                    "sortOrder": 22,
+                    "mandatory": false,
+                    "renderOptionsAsRadio": false,
+                    "searchable": false,
+                    "valueType": "TEXT",
+                    "displayShortName": "EVADIE Texto Nacionalidad Etnica",
+                    "displayName": "EVADIE-EVENTO ADVERSO DE INTERÉS ESPECIAL Texto Nacionalidad Etnica",
+                    "access": {
+                        "manage": true,
+                        "externalize": true,
+                        "write": true,
+                        "read": true,
+                        "update": true,
+                        "delete": true
+                    },
+                    "favorite": false,
+                    "id": "UcaSIA0VqeG",
+                    "attributeValues": [],
+                    "trackedEntityAttribute": {
+                        "id": "CE7EklgfsJj"
+                    }
+                }
+            ]
+        }
+    ]
+}

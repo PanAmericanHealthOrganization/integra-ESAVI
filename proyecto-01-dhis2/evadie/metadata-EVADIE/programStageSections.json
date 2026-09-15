@@ -1,0 +1,1644 @@
+{
+    "programStageSections": [
+        {
+            "name": "Vacuna 4 diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "X9oDmX0pVkp"
+                },
+                {
+                    "id": "Ca1gjUwJKkB"
+                },
+                {
+                    "id": "ZOUF7NtnTlZ"
+                },
+                {
+                    "id": "GTsgnfX7zV2"
+                },
+                {
+                    "id": "plV7raA2esT"
+                },
+                {
+                    "id": "a0S2QMIWoDd"
+                },
+                {
+                    "id": "Njic5CL5E0v"
+                },
+                {
+                    "id": "gQaYMtuPY91"
+                },
+                {
+                    "id": "spN2QezrqoL"
+                },
+                {
+                    "id": "zGTGYzH7vC2"
+                },
+                {
+                    "id": "B1YmbRWzwou"
+                },
+                {
+                    "id": "EgNXda3b94x"
+                },
+                {
+                    "id": "Dhujgamsh7n"
+                },
+                {
+                    "id": "vWnVCDEOb3D"
+                },
+                {
+                    "id": "pgjAXRPim5G"
+                },
+                {
+                    "id": "q3QlMyg8eaZ"
+                },
+                {
+                    "id": "NX4cnYwA1pN"
+                },
+                {
+                    "id": "ITKmssK3nFm"
+                },
+                {
+                    "id": "ow3j3dk1ZQz"
+                },
+                {
+                    "id": "YrnrQJXGcOL"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 18,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "unUNErRi4Fa"
+        },
+        {
+            "name": "Datos de estado gestacional en mujeres y edad fértil",
+            "created": "2022-09-09T19:50:39.853",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "ZhScofyfc57"
+                },
+                {
+                    "id": "ve4KRIaljxl"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 3,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "DdmKcBXHxTx"
+        },
+        {
+            "name": "Antecedente vacunal contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "zLwvtOdXGEH"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 8,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "gccxayehuxr"
+        },
+        {
+            "name": "Datos de identificación del caso",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "wRcah0fGlnM"
+                },
+                {
+                    "id": "FH90uxrmlmQ"
+                },
+                {
+                    "id": "JN6VcdKaNif"
+                },
+                {
+                    "id": "wFoOfZJhIQS"
+                },
+                {
+                    "id": "NI50XwYXqCx"
+                },
+                {
+                    "id": "TP45rVGdRIG"
+                },
+                {
+                    "id": "hMgub888g1e"
+                },
+                {
+                    "id": "uS6PkilcbEV"
+                },
+                {
+                    "id": "pFGUnT1G70i"
+                },
+                {
+                    "id": "ta1jqD9qTeq"
+                },
+                {
+                    "id": "rr2IgO0KNSS"
+                },
+                {
+                    "id": "XZsZSUnM0r9"
+                },
+                {
+                    "id": "pXkpH2ByTRe"
+                },
+                {
+                    "id": "r5mFZdHhwsG"
+                },
+                {
+                    "id": "iUfimapC6vU"
+                },
+                {
+                    "id": "GIMKe6C5KLi"
+                },
+                {
+                    "id": "v5dkcuVg42n"
+                },
+                {
+                    "id": "snNoWew8eat"
+                },
+                {
+                    "id": "laBxhgeLY81"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 1,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "oZoQUKs2i2y"
+        },
+        {
+            "name": "Vacuna 3 contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:39:28.730",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "kSFQIOixGZW"
+                },
+                {
+                    "id": "MJ81ebACxTW"
+                },
+                {
+                    "id": "gQUzR26J9bW"
+                },
+                {
+                    "id": "kib5kl4rakh"
+                },
+                {
+                    "id": "kuB4Dvc8t5n"
+                },
+                {
+                    "id": "DFQm69rpjih"
+                },
+                {
+                    "id": "LesB9AzwtZD"
+                },
+                {
+                    "id": "isppEDkddE3"
+                },
+                {
+                    "id": "jdq9ljAVtqL"
+                },
+                {
+                    "id": "KmORbJqDADJ"
+                },
+                {
+                    "id": "LH4D8TT02Ra"
+                },
+                {
+                    "id": "PBb1YGoGuPy"
+                },
+                {
+                    "id": "b81beWIowDL"
+                },
+                {
+                    "id": "Tzdc5qvONTv"
+                },
+                {
+                    "id": "EsHLUrOrIoU"
+                },
+                {
+                    "id": "OT5KRGBB7oD"
+                },
+                {
+                    "id": "oEY7qukYvgT"
+                },
+                {
+                    "id": "qVkXHExn5rx"
+                },
+                {
+                    "id": "KxgLaoUazQK"
+                },
+                {
+                    "id": "UDLwthBlqkz"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 11,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "QI8bfsVNSFF"
+        },
+        {
+            "name": "Vacuna 1 contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "dKXQimZJw2O"
+                },
+                {
+                    "id": "SIJYkseUKvK"
+                },
+                {
+                    "id": "xm92ObxO4K1"
+                },
+                {
+                    "id": "NE8TD4f9I3C"
+                },
+                {
+                    "id": "dYJocFAfwsP"
+                },
+                {
+                    "id": "s0c4MdhAYwO"
+                },
+                {
+                    "id": "lAjynOA4nG5"
+                },
+                {
+                    "id": "cIYdWUsYGIC"
+                },
+                {
+                    "id": "AvMlyynAnHf"
+                },
+                {
+                    "id": "Rg18thMGtJs"
+                },
+                {
+                    "id": "tDUpkFueCrb"
+                },
+                {
+                    "id": "hjxtgsxroIr"
+                },
+                {
+                    "id": "olRK9mXZBRw"
+                },
+                {
+                    "id": "GTHAggvbwRp"
+                },
+                {
+                    "id": "bBLcVkzJ1KC"
+                },
+                {
+                    "id": "LY0f4qIsvlF"
+                },
+                {
+                    "id": "oQgqrKYPmKz"
+                },
+                {
+                    "id": "vSmLmBBn65x"
+                },
+                {
+                    "id": "xuJKCZc4BI0"
+                },
+                {
+                    "id": "W44mi77t2JF"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 9,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "M3ehsurhAhP"
+        },
+        {
+            "name": "Antecedente vacunal diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "pPYIi0Q9DIU"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 14,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "b5hCB4Qpu39"
+        },
+        {
+            "name": "Vacuna 2 diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "NJrM4CJHyTz"
+                },
+                {
+                    "id": "qRnobymRMRv"
+                },
+                {
+                    "id": "nlsbEiJlf7j"
+                },
+                {
+                    "id": "ggMdWumTKzM"
+                },
+                {
+                    "id": "AS7EcPXF0o6"
+                },
+                {
+                    "id": "zHC5Gpyh7Q9"
+                },
+                {
+                    "id": "CAbyYa0aV90"
+                },
+                {
+                    "id": "LIoiuvZQLRr"
+                },
+                {
+                    "id": "It74TTGI9mc"
+                },
+                {
+                    "id": "JjtosYuh94g"
+                },
+                {
+                    "id": "dcLkNvoGlRu"
+                },
+                {
+                    "id": "u95IHxeyWlU"
+                },
+                {
+                    "id": "T2rNq5yS3kb"
+                },
+                {
+                    "id": "czqYuAEnT13"
+                },
+                {
+                    "id": "uxfBKaAbMMl"
+                },
+                {
+                    "id": "fwTMFu05H76"
+                },
+                {
+                    "id": "tOhLVVCLHbq"
+                },
+                {
+                    "id": "faewwJtncHN"
+                },
+                {
+                    "id": "Pg8lNeu8lj7"
+                },
+                {
+                    "id": "PrydXWveJFX"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 16,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "qYADgCsUcyA"
+        },
+        {
+            "name": "Antecedentes patológicos personales",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "TBreWIbk7nH"
+                },
+                {
+                    "id": "xixIoFwy5U0"
+                },
+                {
+                    "id": "nZPHYyvgTzy"
+                },
+                {
+                    "id": "INUQEVDarSo"
+                },
+                {
+                    "id": "iCss8XpnDpH"
+                },
+                {
+                    "id": "S5bB5PyojDk"
+                },
+                {
+                    "id": "qyMO5aGVKyh"
+                },
+                {
+                    "id": "QryAsRXfI1M"
+                },
+                {
+                    "id": "n250S5LPcL0"
+                },
+                {
+                    "id": "E4BOnJt4Bys"
+                },
+                {
+                    "id": "eY8m5uZGKEM"
+                },
+                {
+                    "id": "fd89vt8sVWq"
+                },
+                {
+                    "id": "KJi5GNGph8M"
+                },
+                {
+                    "id": "WOccUHjy1N7"
+                },
+                {
+                    "id": "cUUjJENJa1o"
+                },
+                {
+                    "id": "yad0YzBGGKd"
+                },
+                {
+                    "id": "YWcyvjyN9j9"
+                },
+                {
+                    "id": "kjeEnFjilJX"
+                },
+                {
+                    "id": "DneDqPIN79l"
+                },
+                {
+                    "id": "QJIAoTiteRQ"
+                },
+                {
+                    "id": "I2vYYQ3mfFW"
+                },
+                {
+                    "id": "gqrqOeYtonC"
+                },
+                {
+                    "id": "Xq9tkpXxL4c"
+                },
+                {
+                    "id": "g3aKqM9sLOQ"
+                },
+                {
+                    "id": "gYM7krDgaVf"
+                },
+                {
+                    "id": "p6hqzGIwUxR"
+                },
+                {
+                    "id": "BkfFc7FlEne"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 2,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "vdFpmYyneyq"
+        },
+        {
+            "name": "Diagnósticos binomio madre-hijo",
+            "created": "2022-03-16T16:55:18.096",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "FjmsjYFV2Gn"
+                },
+                {
+                    "id": "fc4OmdOpL6s"
+                },
+                {
+                    "id": "cbWmXZCO3EJ"
+                },
+                {
+                    "id": "Wq70lSLDbvA"
+                },
+                {
+                    "id": "WXNmLn5kIen"
+                },
+                {
+                    "id": "cu5BtX7IRvI"
+                },
+                {
+                    "id": "Skq4fBh8s6z"
+                },
+                {
+                    "id": "qkGx6d3kW2r"
+                },
+                {
+                    "id": "RKrAPDR3f3e"
+                },
+                {
+                    "id": "WcaOBCRTTDZ"
+                },
+                {
+                    "id": "hktjpUjYm9N"
+                },
+                {
+                    "id": "VYovSAeiRZh"
+                },
+                {
+                    "id": "ZlYkAnj46Ol"
+                },
+                {
+                    "id": "GDjOIx2bF7e"
+                },
+                {
+                    "id": "LSFfztETiI9"
+                },
+                {
+                    "id": "MUtNHTFSY1m"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 5,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "mBoqFmAXwgB"
+        },
+        {
+            "name": "Vacuna 5 diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "aoE8LEX1QN6"
+                },
+                {
+                    "id": "OkcKV1Fy0mx"
+                },
+                {
+                    "id": "QaBd9DWkdBL"
+                },
+                {
+                    "id": "JOZZiE9T2Rb"
+                },
+                {
+                    "id": "WLFXfRNky8z"
+                },
+                {
+                    "id": "KwXBuWk5Lbt"
+                },
+                {
+                    "id": "tJmnbpzhH3D"
+                },
+                {
+                    "id": "TDqN2nMcPUI"
+                },
+                {
+                    "id": "zMwYf41hBYf"
+                },
+                {
+                    "id": "pyhERV5iviB"
+                },
+                {
+                    "id": "wAY7DKoftG3"
+                },
+                {
+                    "id": "Qtfk45K4jAB"
+                },
+                {
+                    "id": "PvsGa5WG8Po"
+                },
+                {
+                    "id": "iJ9Tqydi65u"
+                },
+                {
+                    "id": "ObryAFr2WPj"
+                },
+                {
+                    "id": "Kr6VT4hUP34"
+                },
+                {
+                    "id": "Q7ydW6bfOC5"
+                },
+                {
+                    "id": "cRe1XMCsRmF"
+                },
+                {
+                    "id": "BggbmUz5jeZ"
+                },
+                {
+                    "id": "BxZ3Ryiti7R"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 19,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "aOPU6CjSaiE"
+        },
+        {
+            "name": "Vacuna 4 contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "snoHiDdaBc6"
+                },
+                {
+                    "id": "u8MEzSdyuve"
+                },
+                {
+                    "id": "c2E0AwinTki"
+                },
+                {
+                    "id": "qcs5Wi6ReAG"
+                },
+                {
+                    "id": "HJ3zB3NEyaK"
+                },
+                {
+                    "id": "ihnzctdvu7r"
+                },
+                {
+                    "id": "XbAfjcQdQQc"
+                },
+                {
+                    "id": "QafyIqyMnTM"
+                },
+                {
+                    "id": "jxqf76YYUQs"
+                },
+                {
+                    "id": "SLfbrAHo8m4"
+                },
+                {
+                    "id": "nCzpqgWa7L8"
+                },
+                {
+                    "id": "pjf1017jtlQ"
+                },
+                {
+                    "id": "YsZISYcrKOp"
+                },
+                {
+                    "id": "l6zo6ceulXH"
+                },
+                {
+                    "id": "Wlc2Gi6ptDV"
+                },
+                {
+                    "id": "ouzwFL04863"
+                },
+                {
+                    "id": "KdyACvirzg9"
+                },
+                {
+                    "id": "un09rrSSJNP"
+                },
+                {
+                    "id": "aKzn5q2snrK"
+                },
+                {
+                    "id": "CYfj9Y2APAw"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 12,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "j3H2ppOLZ55"
+        },
+        {
+            "name": "Vacuna 2 contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "OmkgPTvZoT7"
+                },
+                {
+                    "id": "SKQO7b9omzs"
+                },
+                {
+                    "id": "y0rTmwTyEnJ"
+                },
+                {
+                    "id": "XoiYttB4hMP"
+                },
+                {
+                    "id": "gy0b7r5x5l0"
+                },
+                {
+                    "id": "u13Awyly7J3"
+                },
+                {
+                    "id": "iZ6KeuWhhuM"
+                },
+                {
+                    "id": "e76uFEwHNcz"
+                },
+                {
+                    "id": "BHLLPCpIIaZ"
+                },
+                {
+                    "id": "ckjwTTIXEWF"
+                },
+                {
+                    "id": "EbVPwSPT7rx"
+                },
+                {
+                    "id": "z4WNO5q9Gmz"
+                },
+                {
+                    "id": "qeJQtuMehQo"
+                },
+                {
+                    "id": "snlXOAtO7Gw"
+                },
+                {
+                    "id": "d6yJ5bIsGUv"
+                },
+                {
+                    "id": "SV1tgL1PtbC"
+                },
+                {
+                    "id": "O1ZfK56vHZF"
+                },
+                {
+                    "id": "gF5mg4LZpD3"
+                },
+                {
+                    "id": "TEjkydGFDDY"
+                },
+                {
+                    "id": "YPskCcdm5ZI"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 10,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "vHnZjZOgeSD"
+        },
+        {
+            "name": "Datos de la unidad",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "RSGq8mROKDJ"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 0,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "ORY5JB6UDfS"
+        },
+        {
+            "name": "Vacuna 5 contra la COVID-19 (hasta un año)",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "tmMT6188xpm"
+                },
+                {
+                    "id": "SWSLklssi46"
+                },
+                {
+                    "id": "Szuv0ewvGEP"
+                },
+                {
+                    "id": "JKW0gcK4nL6"
+                },
+                {
+                    "id": "NMFNd42RJD1"
+                },
+                {
+                    "id": "yhM2dkSGAd7"
+                },
+                {
+                    "id": "JN5fqI0ks2O"
+                },
+                {
+                    "id": "KAZqGPIAnLp"
+                },
+                {
+                    "id": "pzGGIjI9LRa"
+                },
+                {
+                    "id": "kn2AGnM6XIk"
+                },
+                {
+                    "id": "fiTItwvSWSF"
+                },
+                {
+                    "id": "XmQa1YI5Qzr"
+                },
+                {
+                    "id": "aVVRyuFeebN"
+                },
+                {
+                    "id": "GxEdGaHXg8R"
+                },
+                {
+                    "id": "TwaOFilBmDz"
+                },
+                {
+                    "id": "Iyg46CvN4pr"
+                },
+                {
+                    "id": "jnW8tQ2qNMu"
+                },
+                {
+                    "id": "fV0SBTSUJST"
+                },
+                {
+                    "id": "zGwZRm42GlP"
+                },
+                {
+                    "id": "APE1kApOQOh"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 13,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "T4ufTnC8uTY"
+        },
+        {
+            "name": "Vacuna 3 diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "RUzzOWVTSxu"
+                },
+                {
+                    "id": "eCBwchef6Yt"
+                },
+                {
+                    "id": "mzhkMJY7od2"
+                },
+                {
+                    "id": "M3LSSfQucy0"
+                },
+                {
+                    "id": "k8ygQuIrdts"
+                },
+                {
+                    "id": "NZDjzpRUXyg"
+                },
+                {
+                    "id": "WB8dk2ePdtw"
+                },
+                {
+                    "id": "nJ06liq546h"
+                },
+                {
+                    "id": "LGjQRqjBcDC"
+                },
+                {
+                    "id": "fry4WjHi5ev"
+                },
+                {
+                    "id": "EHgjLN0UfCv"
+                },
+                {
+                    "id": "pQx4C9ijlHX"
+                },
+                {
+                    "id": "fgZqsDyJ7bp"
+                },
+                {
+                    "id": "CtuGgflapBe"
+                },
+                {
+                    "id": "GLyn3FMWD0Y"
+                },
+                {
+                    "id": "intc6hR1SVS"
+                },
+                {
+                    "id": "cDbTN0wmSZC"
+                },
+                {
+                    "id": "z9p9t95hrNV"
+                },
+                {
+                    "id": "nmyFyuZgs9M"
+                },
+                {
+                    "id": "Wi9SNhgNkh4"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 17,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "K85tvhQE0PY"
+        },
+        {
+            "name": "PLUGINSETCIONSNOTIFICACTIONS",
+            "created": "2026-07-13T22:25:34.388",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "wfliA7TOAlu"
+                },
+                {
+                    "id": "blJmFs707pB"
+                },
+                {
+                    "id": "MgeysGapAni"
+                },
+                {
+                    "id": "R2ta0XUfump"
+                },
+                {
+                    "id": "x9WCcP7acn4"
+                },
+                {
+                    "id": "Sz9y5YoHnKC"
+                },
+                {
+                    "id": "j1n8diL6soa"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 21,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "bC9ynkeknU1"
+        },
+        {
+            "name": "Datos clínicos del paciente",
+            "created": "2022-02-24T11:29:02.740",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "yyHXNlYTFzo"
+                },
+                {
+                    "id": "PnAtc83vSRQ"
+                },
+                {
+                    "id": "KBlPqyL3PMt"
+                },
+                {
+                    "id": "QXrnRKkoXQ4"
+                },
+                {
+                    "id": "QGl4l8RxRYB"
+                },
+                {
+                    "id": "ExTzsdV585I"
+                },
+                {
+                    "id": "YKbUwTfRave"
+                },
+                {
+                    "id": "bBiYBLJfFc9"
+                },
+                {
+                    "id": "ZMvtlovKh7V"
+                },
+                {
+                    "id": "vH3a8r1WU1E"
+                },
+                {
+                    "id": "oIl747KPnYR"
+                },
+                {
+                    "id": "qas5CDqaiyR"
+                },
+                {
+                    "id": "kBg5YWF4y4c"
+                },
+                {
+                    "id": "fC5e0mnjYx4"
+                },
+                {
+                    "id": "ZovUILiwMME"
+                },
+                {
+                    "id": "TMT6X00nPyb"
+                },
+                {
+                    "id": "agZle9q12VH"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 7,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "TIZBJ6ln27G"
+        },
+        {
+            "name": "Observaciones del EVADIE",
+            "created": "2022-06-10T11:58:50.763",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "r7hvJ3CAU95"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 6,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "pR5yijXodmO"
+        },
+        {
+            "name": "EVADIE que notifica",
+            "created": "2022-06-10T11:15:10.049",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "mb0gDXihPoP"
+                },
+                {
+                    "id": "ofP7CZoLMsS"
+                },
+                {
+                    "id": "lRSvKuOqgKf"
+                },
+                {
+                    "id": "twhIjidAKd5"
+                },
+                {
+                    "id": "V6jXUKEMYpG"
+                },
+                {
+                    "id": "o2ReLtDp0jJ"
+                },
+                {
+                    "id": "Pu3tKPFrTXt"
+                },
+                {
+                    "id": "CtaWB9Rpgdv"
+                },
+                {
+                    "id": "CETZDPdIWaY"
+                },
+                {
+                    "id": "mLKN3GZBZJq"
+                },
+                {
+                    "id": "vFFc8Dko9Fm"
+                },
+                {
+                    "id": "izOwFNILhgR"
+                },
+                {
+                    "id": "CK75HeaVrSM"
+                },
+                {
+                    "id": "K85droBPDLa"
+                },
+                {
+                    "id": "Iqjd8VIgcMr"
+                },
+                {
+                    "id": "rZxyhHLQ7pV"
+                },
+                {
+                    "id": "TlgUqdCG5Dx"
+                },
+                {
+                    "id": "PZRAq00DE8H"
+                },
+                {
+                    "id": "sGdJnKJkJGe"
+                },
+                {
+                    "id": "Xc46SyndOrk"
+                },
+                {
+                    "id": "cf3mtyjkjZM"
+                },
+                {
+                    "id": "cICnpcdGoz6"
+                },
+                {
+                    "id": "pKX4GIdJasI"
+                },
+                {
+                    "id": "xeuT1ZhXwPA"
+                },
+                {
+                    "id": "YKzSq3XbmZK"
+                },
+                {
+                    "id": "d1PP7RTTSug"
+                },
+                {
+                    "id": "jrO4D1mestF"
+                },
+                {
+                    "id": "QgbZQOOyqVn"
+                },
+                {
+                    "id": "HqFg5NHoObL"
+                },
+                {
+                    "id": "hHhT2VDVA2V"
+                },
+                {
+                    "id": "q5QdkylgegV"
+                },
+                {
+                    "id": "Q3lWPPxtlMV"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 4,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "MATRIX"
+                }
+            },
+            "id": "S7nRxXYrfaJ"
+        },
+        {
+            "name": "Vacuna 1 diferente de la contra de COVID-19 en los últimos 60 días",
+            "created": "2022-02-24T11:39:28.731",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "z7AbTD2Egac"
+                },
+                {
+                    "id": "nCpVzT6UHnk"
+                },
+                {
+                    "id": "iA4ZPVukuFL"
+                },
+                {
+                    "id": "wB7mGiZkbw0"
+                },
+                {
+                    "id": "DhnVR99xrYo"
+                },
+                {
+                    "id": "pmRQjWfwQCc"
+                },
+                {
+                    "id": "jvx3VCxskXR"
+                },
+                {
+                    "id": "zFlnUvSlewG"
+                },
+                {
+                    "id": "aesPyaKfzvo"
+                },
+                {
+                    "id": "L8JKznw8rMd"
+                },
+                {
+                    "id": "qqPPaLCu2ID"
+                },
+                {
+                    "id": "t18NIJHoUJs"
+                },
+                {
+                    "id": "Cm56kiHuqoi"
+                },
+                {
+                    "id": "EnYf6uLRcAE"
+                },
+                {
+                    "id": "pvciFJeuamp"
+                },
+                {
+                    "id": "VSAwzn7Sbao"
+                },
+                {
+                    "id": "DJSjMgho0TE"
+                },
+                {
+                    "id": "otCfUVjl0eD"
+                },
+                {
+                    "id": "yTbnflyyoBX"
+                },
+                {
+                    "id": "v4yW2dCNsxp"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 15,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "bla301RYxUg"
+        },
+        {
+            "name": "Datos del cierre del evento",
+            "created": "2022-02-24T11:44:38.376",
+            "lastUpdated": "2026-08-07T21:17:47.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "programStage": {
+                "id": "BDS49EHHrho"
+            },
+            "dataElements": [
+                {
+                    "id": "LJPGFqLasd0"
+                },
+                {
+                    "id": "wr2StmI8yoL"
+                },
+                {
+                    "id": "mUP5zjcXCnP"
+                },
+                {
+                    "id": "ljwPlRQnvC4"
+                },
+                {
+                    "id": "dHbzjvVnf7n"
+                },
+                {
+                    "id": "XzTq5bATrQa"
+                },
+                {
+                    "id": "uw6f9xsrVuX"
+                },
+                {
+                    "id": "PXHKQmmDZiu"
+                },
+                {
+                    "id": "B2l6bgD2pUs"
+                },
+                {
+                    "id": "p5eDRrVlcbM"
+                }
+            ],
+            "programIndicators": [],
+            "sortOrder": 20,
+            "renderType": {
+                "MOBILE": {
+                    "type": "LISTING"
+                },
+                "DESKTOP": {
+                    "type": "LISTING"
+                }
+            },
+            "id": "plOnwCUQ7M8"
+        }
+    ]
+}

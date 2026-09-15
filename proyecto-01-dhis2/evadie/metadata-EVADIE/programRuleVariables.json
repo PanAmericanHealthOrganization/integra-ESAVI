@@ -1,0 +1,2042 @@
+{
+    "programRuleVariables": [
+        {
+            "name": "EVADIE-Contra la COVID19",
+            "created": "2022-02-24T11:57:42.703",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "zLwvtOdXGEH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VyJZvuyfDrr",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna2",
+            "created": "2022-09-29T05:47:53.332",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "LIoiuvZQLRr"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TeljsCdJW1G",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Diagnostico inicial 3",
+            "created": "2022-09-09T19:17:42.972",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "C1pHzsZEwJb"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Tl77HO4V5b7",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna3 covid19",
+            "created": "2022-09-29T05:46:56.768",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "jdq9ljAVtqL"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Jut2HP9DFPZ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Fecha inicio de sintomas",
+            "created": "2022-05-25T14:36:40.964",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "QGl4l8RxRYB"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fSBMfto9h0q",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-TieneDiscapacidad",
+            "created": "2022-03-29T12:45:10.954",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "I2vYYQ3mfFW"
+            },
+            "useCodeForOptionSet": false,
+            "id": "wfP45tR7ae1",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Vacuna4",
+            "created": "2022-03-07T11:06:32.811",
+            "lastUpdated": "2026-06-11T04:34:24.235",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "X9oDmX0pVkp"
+            },
+            "useCodeForOptionSet": true,
+            "id": "HLabNfSX83p",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna5",
+            "created": "2022-03-07T11:06:49.016",
+            "lastUpdated": "2026-06-11T04:34:38.538",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "aoE8LEX1QN6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "S72fLGCYRlU",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Evento similar",
+            "created": "2022-02-24T11:05:55.653",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "DneDqPIN79l"
+            },
+            "useCodeForOptionSet": false,
+            "id": "CVMQKDCfcGe",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Medicacion SiNo",
+            "created": "2022-02-24T11:02:06.531",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "QryAsRXfI1M"
+            },
+            "useCodeForOptionSet": false,
+            "id": "nlRkwZUjsEj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna5",
+            "created": "2022-09-29T05:48:31.786",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "TDqN2nMcPUI"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pjit24RNnVi",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Edad calculada - meses",
+            "created": "2022-02-24T10:18:37.051",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "xFgl7gNjS82",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna2 covid19",
+            "created": "2022-03-07T11:03:15.680",
+            "lastUpdated": "2026-06-13T22:14:48.355",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "OmkgPTvZoT7"
+            },
+            "useCodeForOptionSet": true,
+            "id": "RiFonMJdvSO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-BMH-Anomalias congenitas",
+            "created": "2022-06-13T21:56:45.318",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "fc4OmdOpL6s"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GUayZpDWI6T",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-ValorCodigo",
+            "created": "2022-04-28T20:48:49.175",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "wRcah0fGlnM"
+            },
+            "useCodeForOptionSet": false,
+            "id": "I1dgpSzZMxV",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-FechaEgreso",
+            "created": "2022-02-24T11:48:43.248",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "KBlPqyL3PMt"
+            },
+            "useCodeForOptionSet": false,
+            "id": "jOKY0VArn1v",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Texto Sexo",
+            "created": "2022-06-20T18:31:30.030",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "PharoNXAjWC",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MthQ3fTXChs"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna1 covid19",
+            "created": "2022-09-29T05:46:22.727",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "AvMlyynAnHf"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fcSYlvdfrN3",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Desenlace",
+            "created": "2022-02-24T11:55:26.895",
+            "lastUpdated": "2026-08-07T15:31:13.819",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "oIl747KPnYR"
+            },
+            "useCodeForOptionSet": true,
+            "id": "OSpJnbMYzeE",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Medicacion 1",
+            "created": "2022-09-09T19:14:32.372",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "n250S5LPcL0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "YgIEgii9ljj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Telefono2",
+            "created": "2022-03-28T16:18:57.776",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "v5dkcuVg42n"
+            },
+            "useCodeForOptionSet": false,
+            "id": "cKmXjqAXhv2",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Telefono1",
+            "created": "2022-03-28T16:18:28.102",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "GIMKe6C5KLi"
+            },
+            "useCodeForOptionSet": false,
+            "id": "QIgCK7ok1Rz",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna3",
+            "created": "2022-09-29T05:48:07.183",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "nJ06liq546h"
+            },
+            "useCodeForOptionSet": false,
+            "id": "VxgIeM473Ex",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Diagnostico inicial 2",
+            "created": "2022-09-09T19:17:31.241",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "SEX6ZUPBOSP"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SmQIgJg972a",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-TextoEstadoCivil",
+            "created": "2022-06-20T18:34:26.211",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Guqzo7W56pW",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "OR7FLkFQvTe"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Codigo del caso",
+            "created": "2022-06-06T15:53:49.025",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "wRcah0fGlnM"
+            },
+            "useCodeForOptionSet": false,
+            "id": "T7Xox7ZxQSn",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha nacimiento",
+            "created": "2022-02-24T10:07:51.261",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "qwAWKtoT3Qm",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "h0zzlWpQr5E"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 5",
+            "created": "2022-06-14T08:05:06.757",
+            "lastUpdated": "2026-06-15T03:04:34.598",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "S5bB5PyojDk"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Hujw2NbOTqP",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna5 covid19",
+            "created": "2022-09-29T05:47:23.907",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "pzGGIjI9LRa"
+            },
+            "useCodeForOptionSet": false,
+            "id": "XMiNVBCqe4i",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Vacuna3",
+            "created": "2022-03-07T11:06:19.274",
+            "lastUpdated": "2026-06-11T04:34:09.831",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "RUzzOWVTSxu"
+            },
+            "useCodeForOptionSet": true,
+            "id": "KSuTUesGCar",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 4",
+            "created": "2022-06-14T08:04:55.102",
+            "lastUpdated": "2026-06-15T03:04:16.752",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "iCss8XpnDpH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "ctEkB8fe9FL",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-EVADIE otro",
+            "created": "2022-06-15T11:50:22.735",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "QgbZQOOyqVn"
+            },
+            "useCodeForOptionSet": false,
+            "id": "XL65VBonktF",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Medicacion 2",
+            "created": "2022-09-09T19:14:47.200",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "E4BOnJt4Bys"
+            },
+            "useCodeForOptionSet": false,
+            "id": "nw88AGcBIVY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Medicacion 3",
+            "created": "2022-09-09T19:15:00.724",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "eY8m5uZGKEM"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SuC4DTL3GkB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Dato Nacionalidad",
+            "created": "2022-03-25T11:10:00.172",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "tlcIOKml744",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "uWro9jLblJg"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Diagnostico inicial 1",
+            "created": "2022-09-09T19:17:13.145",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "wGQlQFRWgZY"
+            },
+            "useCodeForOptionSet": false,
+            "id": "fPShuZdEGJO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna1",
+            "created": "2022-03-07T11:05:36.134",
+            "lastUpdated": "2026-06-11T03:18:16.629",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "z7AbTD2Egac"
+            },
+            "useCodeForOptionSet": true,
+            "id": "C0q08qefdEC",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna1",
+            "created": "2022-09-29T05:47:39.121",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "zFlnUvSlewG"
+            },
+            "useCodeForOptionSet": false,
+            "id": "FnH8eOsBUiw",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Texto Nacionalidad",
+            "created": "2022-06-20T18:35:22.736",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "SbS3anYMDmz",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "b7Ucql3BOtL"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-ProvinciaEstablecimiento",
+            "created": "2022-02-25T10:07:32.896",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "DN78UlvLT76"
+            },
+            "useCodeForOptionSet": true,
+            "id": "fx4U8hx1ofM",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-ProvinciaResidencia",
+            "created": "2022-02-25T10:06:05.999",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "pFGUnT1G70i"
+            },
+            "useCodeForOptionSet": true,
+            "id": "VldC450Q5Lf",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-SE",
+            "created": "2026-08-07T18:08:05.919",
+            "lastUpdated": "2026-08-07T18:08:05.919",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "YKbUwTfRave"
+            },
+            "useCodeForOptionSet": false,
+            "id": "pUGxfX22ZNY",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "INTEGER_POSITIVE"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 1",
+            "created": "2022-06-14T08:04:05.361",
+            "lastUpdated": "2026-06-15T03:03:11.994",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "xixIoFwy5U0"
+            },
+            "useCodeForOptionSet": false,
+            "id": "nSUXrUQaNUt",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Diagnostico final 2",
+            "created": "2022-09-09T19:04:06.711",
+            "lastUpdated": "2026-06-15T17:50:25.172",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "dHbzjvVnf7n"
+            },
+            "useCodeForOptionSet": false,
+            "id": "lshhXS3U8l9",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna2 covid19",
+            "created": "2022-09-29T05:46:44.578",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "BHLLPCpIIaZ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "YThI5oyarVM",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-BMH-Mortinato",
+            "created": "2022-06-13T22:14:13.808",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "Skq4fBh8s6z"
+            },
+            "useCodeForOptionSet": false,
+            "id": "HyKxfdXCOjo",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Telefono3",
+            "created": "2022-03-28T16:19:09.542",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "BnUgUpdP4av"
+            },
+            "useCodeForOptionSet": false,
+            "id": "DlGe2EMjcF4",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-BMH-Bajo peso al nacer",
+            "created": "2022-06-13T21:39:45.726",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "cbWmXZCO3EJ"
+            },
+            "useCodeForOptionSet": false,
+            "id": "S2SdnuIJuUO",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Sexo",
+            "created": "2022-02-25T10:40:13.522",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "QKzWZv1q5Un",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "MiZMsOXYy0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Telefono4",
+            "created": "2022-03-28T16:19:19.563",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "mX2i1BkWMa5"
+            },
+            "useCodeForOptionSet": false,
+            "id": "Ee9JVDSfiC7",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-EstablecimientoInstitucion",
+            "created": "2022-03-07T12:23:50.837",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "By0Zys9pxve"
+            },
+            "useCodeForOptionSet": true,
+            "id": "OI87vHQXPVV",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna1 covid19",
+            "created": "2022-03-07T10:32:07.459",
+            "lastUpdated": "2026-06-13T22:13:59.540",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "dKXQimZJw2O"
+            },
+            "useCodeForOptionSet": true,
+            "id": "gKaUP5sMo9e",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Identificacion",
+            "created": "2022-06-06T15:56:54.483",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "zuGkIB9WBvO",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "d8PiRnvGHEN"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna4 covid19",
+            "created": "2022-09-29T05:47:10.041",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "jxqf76YYUQs"
+            },
+            "useCodeForOptionSet": false,
+            "id": "eLCZXkrrQSy",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Diferente contra la COVID19",
+            "created": "2022-02-24T12:00:19.641",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "pPYIi0Q9DIU"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TAX0Fc6OpJa",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Comorbilidad SiNo",
+            "created": "2022-02-24T10:58:39.069",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "TBreWIbk7nH"
+            },
+            "useCodeForOptionSet": false,
+            "id": "gcutg5FBUsv",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Otro evento SiNo",
+            "created": "2022-06-15T12:41:28.254",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "ZovUILiwMME"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GXCVtuWKLdo",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-EVADIE04",
+            "created": "2022-04-05T08:01:57.539",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "twhIjidAKd5"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TtccUnCd9rT",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 3",
+            "created": "2022-06-14T08:04:39.085",
+            "lastUpdated": "2026-06-15T03:03:58.674",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "INUQEVDarSo"
+            },
+            "useCodeForOptionSet": false,
+            "id": "aqkChTBJG8B",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Tipo identificacion",
+            "created": "2022-04-04T19:36:19.825",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "NgU8GIn9nXG",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mJyGzNXYzTa"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Clasificacion final",
+            "created": "2022-09-09T19:00:09.938",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "LJPGFqLasd0"
+            },
+            "useCodeForOptionSet": true,
+            "id": "OvZRl6BQeWW",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Texto Fecha nacimiento",
+            "created": "2022-08-16T14:41:08.989",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "H1zk3NbfBbI",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "mm3yPvcs1LG"
+            },
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-BMH-Trastornos hipertensivos embarazo",
+            "created": "2022-06-13T22:18:18.462",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "GDjOIx2bF7e"
+            },
+            "useCodeForOptionSet": false,
+            "id": "byuBtZt5mUu",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-EmbarazadaSiNo",
+            "created": "2022-02-24T11:17:09.986",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "ZhScofyfc57"
+            },
+            "useCodeForOptionSet": false,
+            "id": "snLKViVPNg4",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-CantonEstablecimiento",
+            "created": "2022-02-25T10:09:54.241",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "RJJ0uyfLXkE"
+            },
+            "useCodeForOptionSet": true,
+            "id": "es8chKWxrSv",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-NACIONALIDAD ETNICA",
+            "created": "2022-10-21T15:30:53.588",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "IYbXZIvzjoh",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "LkgcmIRlM0h"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna4 covid19",
+            "created": "2022-03-07T11:04:41.657",
+            "lastUpdated": "2026-06-13T22:15:33.099",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "snoHiDdaBc6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "cFzcrTpD0wa",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Edad calculada - dias",
+            "created": "2022-02-24T10:18:20.758",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "E7ADfe6Vkhc",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Diagnostico final 1",
+            "created": "2022-09-09T19:03:41.068",
+            "lastUpdated": "2026-06-15T17:50:07.143",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "wr2StmI8yoL"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rmiFOETqclZ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna5 covid19",
+            "created": "2022-03-07T11:04:57.627",
+            "lastUpdated": "2026-06-13T22:15:52.073",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "tmMT6188xpm"
+            },
+            "useCodeForOptionSet": true,
+            "id": "YICA4DjA12o",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-BMH-Infeccion neonatal",
+            "created": "2022-06-13T22:13:19.602",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "WXNmLn5kIen"
+            },
+            "useCodeForOptionSet": false,
+            "id": "NPV4zHWipVo",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-BMH-Parto prematuro",
+            "created": "2022-03-16T16:08:57.974",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "hktjpUjYm9N"
+            },
+            "useCodeForOptionSet": false,
+            "id": "T64QeI9uarB",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-BMH-Pequenio para la edad gestacional",
+            "created": "2022-06-13T22:17:45.363",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "ZlYkAnj46Ol"
+            },
+            "useCodeForOptionSet": false,
+            "id": "XvVZsnWeWRQ",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-CantonResidencia",
+            "created": "2022-02-25T10:06:42.247",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "ta1jqD9qTeq"
+            },
+            "useCodeForOptionSet": true,
+            "id": "u7VHUpedfZj",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Alergias SiNo",
+            "created": "2022-02-24T11:02:35.325",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "KJi5GNGph8M"
+            },
+            "useCodeForOptionSet": false,
+            "id": "JCKpmPEAkI4",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "BOOLEAN"
+        },
+        {
+            "name": "EVADIE-Vacuna3 covid19",
+            "created": "2022-03-07T11:03:56.182",
+            "lastUpdated": "2026-06-13T22:15:10.321",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "kSFQIOixGZW"
+            },
+            "useCodeForOptionSet": true,
+            "id": "KP8wbj3nBft",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 2",
+            "created": "2022-06-14T08:04:18.542",
+            "lastUpdated": "2026-06-15T03:03:37.365",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "nZPHYyvgTzy"
+            },
+            "useCodeForOptionSet": false,
+            "id": "I6oWhC5boq0",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-BMH-Eventos tromboticos maternos",
+            "created": "2022-06-13T21:45:32.639",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "Wq70lSLDbvA"
+            },
+            "useCodeForOptionSet": false,
+            "id": "odAfTSmifyg",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Nombre tutor",
+            "created": "2022-10-11T10:00:38.837",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "snNoWew8eat"
+            },
+            "useCodeForOptionSet": false,
+            "id": "u4YWaPWu8ak",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Check-DBMH-Otro",
+            "created": "2022-03-16T16:56:04.834",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "LSFfztETiI9"
+            },
+            "useCodeForOptionSet": false,
+            "id": "TR92gFtFn1E",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Autoidentificacion",
+            "created": "2022-02-19T15:54:37.981",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "iSsA65GjiSo",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "lwTNuRsSGYb"
+            },
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-FechaIngreso",
+            "created": "2022-02-24T11:48:24.969",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "yyHXNlYTFzo"
+            },
+            "useCodeForOptionSet": false,
+            "id": "rkC8wlidymq",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Edad calculada - anios",
+            "created": "2022-02-24T10:18:51.036",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": false,
+            "id": "JccICBdnTZL",
+            "programRuleVariableSourceType": "CALCULATED_VALUE",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Vacuna2",
+            "created": "2022-03-07T11:06:03.591",
+            "lastUpdated": "2026-06-11T04:33:34.676",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "NJrM4CJHyTz"
+            },
+            "useCodeForOptionSet": true,
+            "id": "EIyi1plxTzI",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-BMH-Microcefalia",
+            "created": "2022-06-13T22:13:55.854",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "cu5BtX7IRvI"
+            },
+            "useCodeForOptionSet": false,
+            "id": "GFgIyhnloq0",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TRUE_ONLY"
+        },
+        {
+            "name": "EVADIE-Diagnostico final 3",
+            "created": "2022-09-09T19:04:28.754",
+            "lastUpdated": "2026-06-15T17:50:43.602",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "PXHKQmmDZiu"
+            },
+            "useCodeForOptionSet": false,
+            "id": "UykeoKXnVRg",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Fecha vacunacion Vacuna4",
+            "created": "2022-09-29T05:48:18.387",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "gQaYMtuPY91"
+            },
+            "useCodeForOptionSet": false,
+            "id": "l7Z43oGqNa8",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "DATE"
+        },
+        {
+            "name": "EVADIE-Especificar comorbilidad 6",
+            "created": "2022-09-12T11:36:48.989",
+            "lastUpdated": "2026-06-15T03:04:53.107",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "dataElement": {
+                "id": "qyMO5aGVKyh"
+            },
+            "useCodeForOptionSet": false,
+            "id": "AlJCGW0SN1B",
+            "programRuleVariableSourceType": "DATAELEMENT_CURRENT_EVENT",
+            "valueType": "TEXT"
+        },
+        {
+            "name": "EVADIE-Nacionalidad",
+            "created": "2022-03-25T09:40:30.743",
+            "lastUpdated": "2022-11-18T15:49:25.127",
+            "translations": [],
+            "lastUpdatedBy": {
+                "id": "M5zQapPyTZI",
+                "code": "admin",
+                "name": "admin admin",
+                "displayName": "admin admin",
+                "username": "admin"
+            },
+            "program": {
+                "id": "StFhfptAmF6"
+            },
+            "useCodeForOptionSet": true,
+            "id": "dGjEQhqPZ8d",
+            "programRuleVariableSourceType": "TEI_ATTRIBUTE",
+            "trackedEntityAttribute": {
+                "id": "BnJ69jHTPcO"
+            },
+            "valueType": "TEXT"
+        }
+    ]
+}

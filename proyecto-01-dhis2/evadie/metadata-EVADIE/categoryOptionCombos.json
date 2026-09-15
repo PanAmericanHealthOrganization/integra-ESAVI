@@ -1,0 +1,22 @@
+{
+    "categoryOptionCombos": [
+        {
+            "code": "default",
+            "name": "default",
+            "created": "2022-11-18T15:19:57.265",
+            "lastUpdated": "2022-11-18T15:19:57.268",
+            "translations": [],
+            "categoryCombo": {
+                "id": "bjDvmb4bfuf"
+            },
+            "categoryOptions": [
+                {
+                    "id": "xYerKDKCefk"
+                }
+            ],
+            "ignoreApproval": false,
+            "id": "HllvX50cXC0",
+            "attributeValues": []
+        }
+    ]
+}
