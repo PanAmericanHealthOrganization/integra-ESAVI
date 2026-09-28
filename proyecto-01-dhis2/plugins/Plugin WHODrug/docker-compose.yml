@@ -1,0 +1,36 @@
+
+version: '3'
+services:
+  db_postgres_whodug:
+    image: postgis/postgis:15-3.4
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile    
+    container_name: postgres_whodug
+    env_file: ./postgres/.env
+    ports:
+      - "127.0.0.1:5432:5432" 
+    volumes:
+      - postgres_whodug:/var/lib/postgresql/data
+
+  backend_whodrug:
+    build:
+      context: ./whodhis
+      dockerfile: Dockerfile
+    command: sh -c "cd /app && npm install && npm start"
+    container_name: backend_whodrug
+    
+    ports:
+      - "127.0.0.1:8026:4095" 
+    depends_on:
+      - db_postgres_whodug
+    env_file:
+      - ./whodhis/.env
+    volumes:
+      - ./whodhis:/app
+
+
+volumes:
+  postgres_whodug:
+  postgres_whodhis:
+  
