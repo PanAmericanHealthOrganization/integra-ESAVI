@@ -1,0 +1,5 @@
+*.env*
+node_modules/
+.qodo/
+.d2/
+dist/
