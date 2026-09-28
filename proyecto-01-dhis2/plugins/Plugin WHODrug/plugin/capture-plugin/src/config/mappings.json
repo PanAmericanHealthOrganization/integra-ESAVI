@@ -1,0 +1,316 @@
+{
+    "_comment": "Aliases IdFromPlugin que deben configurarse en Tracker Plugin Configurator. Cada slot representa una vacuna registrable: abbreviationText/Code = par abreviatura visible + codigo de abreviatura; vaccineText/Code = par nombre de vacuna visible + codigo WHODrug del medicamento.",
+    "defaultContext": "InvestigacionAntecedenteVacunal",
+    "contextAliases": {
+        "pluginInvestigacionAntecedenteVacunal": {
+            "value": "INVESTIGACION_ANTECEDENTE_VACUNAL",
+            "context": "InvestigacionAntecedenteVacunal"
+        },
+        "pluginInvestigacionVacunalEventoAdverso": {
+            "value": "INVESTIGACION_EVENTO_ADVERSO",
+            "context": "InvestigacionVacunalEventoAdverso"
+        },
+        "pluginEVADIEVacunaCOVID": {
+            "value": "EVADIE_COVID_19",
+            "context": "VacunaEVADIECOVID19"
+        },
+        "pluginEVADIEVacunaNonCOVID": {
+            "value": "EVADIE_Non_COVID_19",
+            "context": "VacunaEVADIENonCOVID19"
+        }
+    },
+    "contexts": {
+        "InvestigacionAntecedenteVacunal": {
+            "label": "Seleccione la investigación de antecedente vacunal",
+            "slots": [
+                {
+                    "id": 1,
+                    "abbreviationCode": "abreviaturaCodigoUno",
+                    "abbreviationText": "abreviaturaNombreUno",
+                    "vaccineCode": "vaccineCodigoUno",
+                    "vaccineText": "vaccineNombreUno",
+                    "drugCode": "vaccineDrugCodeUno",
+                    "drugName": "vaccineDrugNameUno",
+                    "medicinalProductID": "vaccineMedicinalProductIDUno",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDUno",
+                    "maHolders": "vaccineMaHoldersUno",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDUno",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformUno",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDUno",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDUno",
+                    "vaccineStrengths": "vaccineStrengthsUno"
+                },
+                {
+                    "id": 2,
+                    "abbreviationCode": "abreviaturaCodigoDos",
+                    "abbreviationText": "abreviaturaNombreDos",
+                    "vaccineCode": "vaccineCodigoDos",
+                    "vaccineText": "vaccineNombreDos",
+                    "drugCode": "vaccineDrugCodeDos",
+                    "drugName": "vaccineDrugNameDos",
+                    "medicinalProductID": "vaccineMedicinalProductIDDos",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDDos",
+                    "maHolders": "vaccineMaHoldersDos",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDDos",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformDos",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDDos",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDDos",
+                    "vaccineStrengths": "vaccineStrengthsDos"
+                },
+                {
+                    "id": 3,
+                    "abbreviationCode": "abreviaturaCodigoTres",
+                    "abbreviationText": "abreviaturaNombreTres",
+                    "vaccineCode": "vaccineCodigoTres",
+                    "vaccineText": "vaccineNombreTres",
+                    "drugCode": "vaccineDrugCodeTres",
+                    "drugName": "vaccineDrugNameTres",
+                    "medicinalProductID": "vaccineMedicinalProductIDTres",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDTres",
+                    "maHolders": "vaccineMaHoldersTres",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDTres",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformTres",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDTres",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDTres",
+                    "vaccineStrengths": "vaccineStrengthsTres"
+                },
+                {
+                    "id": 4,
+                    "abbreviationCode": "abreviaturaCodigoCuatro",
+                    "abbreviationText": "abreviaturaNombreCuatro",
+                    "vaccineCode": "vaccineCodigoCuatro",
+                    "vaccineText": "vaccineNombreCuatro",
+                    "drugCode": "vaccineDrugCodeCuatro",
+                    "drugName": "vaccineDrugNameCuatro",
+                    "medicinalProductID": "vaccineMedicinalProductIDCuatro",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCuatro",
+                    "maHolders": "vaccineMaHoldersCuatro",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCuatro",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCuatro",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCuatro",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCuatro",
+                    "vaccineStrengths": "vaccineStrengthsCuatro"
+                },
+                {
+                    "id": 5,
+                    "abbreviationCode": "abreviaturaCodigoCinco",
+                    "abbreviationText": "abreviaturaNombreCinco",
+                    "vaccineCode": "vaccineCodigoCinco",
+                    "vaccineText": "vaccineNombreCinco",
+                    "drugCode": "vaccineDrugCodeCinco",
+                    "drugName": "vaccineDrugNameCinco",
+                    "medicinalProductID": "vaccineMedicinalProductIDCinco",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCinco",
+                    "maHolders": "vaccineMaHoldersCinco",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCinco",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCinco",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCinco",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCinco",
+                    "vaccineStrengths": "vaccineStrengthsCinco"
+                }
+            ]
+        },
+        "InvestigacionVacunalEventoAdverso": {
+            "label": "Seleccione la vacuna",
+            "slots": [
+                {
+                    "id": 1,
+                    "abbreviationCode": "abreviaturaCodigoEvent",
+                    "abbreviationText": "abreviaturaNombreEvent",
+                    "vaccineCode": "vaccineCodigoEvent",
+                    "vaccineText": "vaccineNombreEvent",
+                    "drugCode": "vaccineDrugCodeEvent",
+                    "drugName": "vaccineDrugNameEvent",
+                    "medicinalProductID": "vaccineMedicinalProductIDEvent",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDEvent",
+                    "maHolders": "vaccineMaHoldersEvent",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDEvent",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformEvent",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDEvent",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDEvent",
+                    "vaccineStrengths": "vaccineStrengthsEvent"
+                }
+            ]
+        },
+        "VacunaEVADIECOVID19": {
+            "label": "Seleccione la Vacuna aplicada contra la COVID-19",
+            "slots": [
+                {
+                    "id": 1,
+                    "abbreviationCode": "abreviaturaCodigoCovidUno",
+                    "abbreviationText": "abreviaturaNombreCovidUno",
+                    "vaccineCode": "vaccineCodigoCovidUno",
+                    "vaccineText": "vaccineNombreCovidUno",
+                    "drugCode": "vaccineDrugCodeCovidUno",
+                    "drugName": "vaccineDrugNameCovidUno",
+                    "medicinalProductID": "vaccineMedicinalProductIDCovidUno",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCovidUno",
+                    "maHolders": "vaccineMaHoldersCovidUno",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCovidUno",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCovidUno",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCovidUno",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCovidUno",
+                    "vaccineStrengths": "vaccineStrengthsCovidUno"
+                },
+                {
+                    "id": 2,
+                    "abbreviationCode": "abreviaturaCodigoCovidDos",
+                    "abbreviationText": "abreviaturaNombreCovidDos",
+                    "vaccineCode": "vaccineCodigoCovidDos",
+                    "vaccineText": "vaccineNombreCovidDos",
+                    "drugCode": "vaccineDrugCodeCovidDos",
+                    "drugName": "vaccineDrugNameCovidDos",
+                    "medicinalProductID": "vaccineMedicinalProductIDCovidDos",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCovidDos",
+                    "maHolders": "vaccineMaHoldersCovidDos",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCovidDos",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCovidDos",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCovidDos",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCovidDos",
+                    "vaccineStrengths": "vaccineStrengthsCovidDos"
+                },
+                {
+                    "id": 3,
+                    "abbreviationCode": "abreviaturaCodigoCovidTres",
+                    "abbreviationText": "abreviaturaNombreCovidTres",
+                    "vaccineCode": "vaccineCodigoCovidTres",
+                    "vaccineText": "vaccineNombreCovidTres",
+                    "drugCode": "vaccineDrugCodeCovidTres",
+                    "drugName": "vaccineDrugNameCovidTres",
+                    "medicinalProductID": "vaccineMedicinalProductIDCovidTres",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCovidTres",
+                    "maHolders": "vaccineMaHoldersCovidTres",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCovidTres",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCovidTres",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCovidTres",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCovidTres",
+                    "vaccineStrengths": "vaccineStrengthsCovidTres"
+                },
+                {
+                    "id": 4,
+                    "abbreviationCode": "abreviaturaCodigoCovidCuatro",
+                    "abbreviationText": "abreviaturaNombreCovidCuatro",
+                    "vaccineCode": "vaccineCodigoCovidCuatro",
+                    "vaccineText": "vaccineNombreCovidCuatro",
+                    "drugCode": "vaccineDrugCodeCovidCuatro",
+                    "drugName": "vaccineDrugNameCovidCuatro",
+                    "medicinalProductID": "vaccineMedicinalProductIDCovidCuatro",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCovidCuatro",
+                    "maHolders": "vaccineMaHoldersCovidCuatro",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCovidCuatro",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCovidCuatro",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCovidCuatro",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCovidCuatro",
+                    "vaccineStrengths": "vaccineStrengthsCovidCuatro"
+                },
+                {
+                    "id": 5,
+                    "abbreviationCode": "abreviaturaCodigoCovidCinco",
+                    "abbreviationText": "abreviaturaNombreCovidCinco",
+                    "vaccineCode": "vaccineCodigoCovidCinco",
+                    "vaccineText": "vaccineNombreCovidCinco",
+                    "drugCode": "vaccineDrugCodeCovidCinco",
+                    "drugName": "vaccineDrugNameCovidCinco",
+                    "medicinalProductID": "vaccineMedicinalProductIDCovidCinco",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDCovidCinco",
+                    "maHolders": "vaccineMaHoldersCovidCinco",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDCovidCinco",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformCovidCinco",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDCovidCinco",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDCovidCinco",
+                    "vaccineStrengths": "vaccineStrengthsCovidCinco"
+                }
+            ]
+        },
+        "VacunaEVADIENonCOVID19": {
+            "label": "Seleccione la Vacuna aplicada contra la COVID-19",
+            "slots": [
+                {
+                    "id": 1,
+                    "abbreviationCode": "abreviaturaCodigoNonCovidUno",
+                    "abbreviationText": "abreviaturaNombreNonCovidUno",
+                    "vaccineCode": "vaccineCodigoNonCovidUno",
+                    "vaccineText": "vaccineNombreNonCovidUno",
+                    "drugCode": "vaccineDrugCodeNonCovidUno",
+                    "drugName": "vaccineDrugNameNonCovidUno",
+                    "medicinalProductID": "vaccineMedicinalProductIDNonCovidUno",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDNonCovidUno",
+                    "maHolders": "vaccineMaHoldersNonCovidUno",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDNonCovidUno",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformNonCovidUno",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDNonCovidUno",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDNonCovidUno",
+                    "vaccineStrengths": "vaccineStrengthsNonCovidUno"
+                },
+                {
+                    "id": 2,
+                    "abbreviationCode": "abreviaturaCodigoNonCovidDos",
+                    "abbreviationText": "abreviaturaNombreNonCovidDos",
+                    "vaccineCode": "vaccineCodigoNonCovidDos",
+                    "vaccineText": "vaccineNombreNonCovidDos",
+                    "drugCode": "vaccineDrugCodeNonCovidDos",
+                    "drugName": "vaccineDrugNameNonCovidDos",
+                    "medicinalProductID": "vaccineMedicinalProductIDNonCovidDos",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDNonCovidDos",
+                    "maHolders": "vaccineMaHoldersNonCovidDos",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDNonCovidDos",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformNonCovidDos",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDNonCovidDos",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDNonCovidDos",
+                    "vaccineStrengths": "vaccineStrengthsNonCovidDos"
+                },
+                {
+                    "id": 3,
+                    "abbreviationCode": "abreviaturaCodigoNonCovidTres",
+                    "abbreviationText": "abreviaturaNombreNonCovidTres",
+                    "vaccineCode": "vaccineCodigoNonCovidTres",
+                    "vaccineText": "vaccineNombreNonCovidTres",
+                    "drugCode": "vaccineDrugCodeNonCovidTres",
+                    "drugName": "vaccineDrugNameNonCovidTres",
+                    "medicinalProductID": "vaccineMedicinalProductIDNonCovidTres",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDNonCovidTres",
+                    "maHolders": "vaccineMaHoldersNonCovidTres",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDNonCovidTres",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformNonCovidTres",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDNonCovidTres",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDNonCovidTres",
+                    "vaccineStrengths": "vaccineStrengthsNonCovidTres"
+                },
+                {
+                    "id": 4,
+                    "abbreviationCode": "abreviaturaCodigoNonCovidCuatro",
+                    "abbreviationText": "abreviaturaNombreNonCovidCuatro",
+                    "vaccineCode": "vaccineCodigoNonCovidCuatro",
+                    "vaccineText": "vaccineNombreNonCovidCuatro",
+                    "drugCode": "vaccineDrugCodeNonCovidCuatro",
+                    "drugName": "vaccineDrugNameNonCovidCuatro",
+                    "medicinalProductID": "vaccineMedicinalProductIDNonCovidCuatro",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDNonCovidCuatro",
+                    "maHolders": "vaccineMaHoldersNonCovidCuatro",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDNonCovidCuatro",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformNonCovidCuatro",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDNonCovidCuatro",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDNonCovidCuatro",
+                    "vaccineStrengths": "vaccineStrengthsNonCovidCuatro"
+                },
+                {
+                    "id": 5,
+                    "abbreviationCode": "abreviaturaCodigoNonCovidCinco",
+                    "abbreviationText": "abreviaturaNombreNonCovidCinco",
+                    "vaccineCode": "vaccineCodigoNonCovidCinco",
+                    "vaccineText": "vaccineNombreNonCovidCinco",
+                    "drugCode": "vaccineDrugCodeNonCovidCinco",
+                    "drugName": "vaccineDrugNameNonCovidCinco",
+                    "medicinalProductID": "vaccineMedicinalProductIDNonCovidCinco",
+                    "countryMedicinalProductID": "vaccineCountryMedicinalProductIDNonCovidCinco",
+                    "maHolders": "vaccineMaHoldersNonCovidCinco",
+                    "maHoldersMedicinalProductID": "vaccineMaHoldersMedicinalProductIDNonCovidCinco",
+                    "pharmaceuticalform": "vaccinePharmaceuticalformNonCovidCinco",
+                    "formsMedicinalProductID": "vaccineFormsMedicinalProductIDNonCovidCinco",
+                    "strengthsMedicinalProductID": "vaccineStrengthsMedicinalProductIDNonCovidCinco",
+                    "vaccineStrengths": "vaccineStrengthsNonCovidCinco"
+                }
+            ]
+        }
+    }
+}

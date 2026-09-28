@@ -1,0 +1,14 @@
+node_modules/
+build/
+capture-plugin/build/
+.d2/
+capture-plugin/.d2/
+dist/
+*.log
+.DS_Store
+.env.local
+.env.*.local
+.idea/
+.vscode/
+.qodo/
+*.skill.md

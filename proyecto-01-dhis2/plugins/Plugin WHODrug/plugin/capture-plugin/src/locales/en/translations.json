@@ -1,0 +1,4 @@
+{
+    "__MANIFEST_APP_TITLE_Application title": "WHODrug Form Field Plugin",
+    "__MANIFEST_APP_DESCRIPTION_Application description": "Form Field Plugin de DHIS2 Capture que asigna vacunas a data elements vía dropdowns en cascada consumiendo la API WHODrug."
+}

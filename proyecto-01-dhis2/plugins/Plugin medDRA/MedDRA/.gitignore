@@ -1,0 +1,11 @@
+node_modules/
+.d2/
+capture-plugin/.d2/
+build/
+dist/
+capture-plugin/build/
+.env
+*.local
+*.skill.md
+.idea/
+.qodo/

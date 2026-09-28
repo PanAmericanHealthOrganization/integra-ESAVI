@@ -1,0 +1,27 @@
+{
+    "name": "capture-plugin",
+    "version": "1.0.0",
+    "description": "DHIS2 Capture Field Form Plugin para asignacion de vacunas via API WHODrug.",
+    "license": "BSD-3-Clause",
+    "private": true,
+    "scripts": {
+        "prebuild": "node scripts/bootstrap-shell.cjs",
+        "build": "node scripts/run-d2-app-scripts.cjs build --no-verify",
+        "prestart": "node scripts/bootstrap-shell.cjs",
+        "start": "node scripts/start-plugin-dev.cjs",
+        "start:plugin:raw": "node scripts/run-d2-app-scripts.cjs start --plugin",
+        "start:all": "node scripts/run-d2-app-scripts.cjs start",
+        "start:app": "node scripts/run-d2-app-scripts.cjs start --app",
+        "test": "node scripts/run-d2-app-scripts.cjs test"
+    },
+    "devDependencies": {
+        "@dhis2/cli-app-scripts": "^11.7.0"
+    },
+    "dependencies": {
+        "@dhis2/app-runtime": "^3.11.2",
+        "@dhis2/ui": "^9.11.3",
+        "prop-types": "^15.8.1",
+        "react": "18.3.1",
+        "react-dom": "18.3.1"
+    }
+}

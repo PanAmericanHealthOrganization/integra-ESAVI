@@ -1,0 +1,177 @@
+/* =========================================================
+   CONTENEDOR PRINCIPAL
+   ========================================================= */
+
+.whodrug-plugin {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    padding: 8px;
+}
+
+/*
+ * Importante:
+ * Todos los elementos dentro del plugin utilizan border-box
+ * para evitar problemas de overflow.
+ */
+.whodrug-plugin,
+.whodrug-plugin *,
+.whodrug-plugin *::before,
+.whodrug-plugin *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================================
+   MODO VISTA / SOLO LECTURA
+   ========================================================= */
+
+.whodrug-plugin--view {
+    min-height: 80px;
+
+    padding: 16px;
+
+    color: #666;
+}
+
+.whodrug-plugin__view-title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+
+    color: #333;
+}
+
+.whodrug-plugin__view-info {
+    margin: 8px 0 0;
+
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* =========================================================
+   ESTADO DE CARGA
+   ========================================================= */
+
+.whodrug-plugin--loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    min-height: 80px;
+
+    padding: 16px;
+
+    text-align: center;
+}
+
+.whodrug-plugin__loading-text {
+    margin: 10px 0 0;
+
+    color: #666;
+
+    font-size: 14px;
+    line-height: 20px;
+}
+
+/* =========================================================
+   MENSAJES / ERRORES
+   ========================================================= */
+
+.whodrug-plugin__message {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* =========================================================
+   AVISOS
+   ========================================================= */
+
+.whodrug-plugin__notice {
+    width: 100%;
+    max-width: 100%;
+
+    margin-bottom: 16px;
+}
+
+/* =========================================================
+   CASCADA WHODRUG
+   ========================================================= */
+
+.whodrug-plugin__cascade {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+/*
+ * Evita que elementos internos demasiado anchos
+ * provoquen overflow horizontal.
+ */
+.whodrug-plugin__cascade > * {
+    max-width: 100%;
+}
+
+/* =========================================================
+   ELEMENTOS CODE
+   ========================================================= */
+
+.whodrug-plugin code {
+    padding: 2px 5px;
+
+    border-radius: 3px;
+
+    background-color: #f1f3f5;
+
+    font-family: monospace;
+    font-size: 0.9em;
+
+    word-break: break-word;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 768px) {
+    .whodrug-plugin {
+        padding: 6px;
+    }
+
+    .whodrug-plugin--view {
+        padding: 12px;
+    }
+
+    .whodrug-plugin__notice {
+        margin-bottom: 12px;
+    }
+}
+
+/* =========================================================
+   MÓVIL
+   ========================================================= */
+
+@media (max-width: 480px) {
+    .whodrug-plugin {
+        padding: 4px;
+    }
+
+    .whodrug-plugin--view {
+        padding: 10px;
+    }
+
+    .whodrug-plugin__view-title {
+        font-size: 13px;
+    }
+
+    .whodrug-plugin__view-info {
+        font-size: 13px;
+    }
+
+    .whodrug-plugin__loading-text {
+        font-size: 13px;
+    }
+}
