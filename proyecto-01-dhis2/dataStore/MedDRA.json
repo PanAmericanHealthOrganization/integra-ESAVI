@@ -1,0 +1,47 @@
+{
+    "pager": {
+        "page": 1,
+        "pageSize": 50
+    },
+    "entries": [
+        {
+            "key": "API-CONFIG",
+            "value": {
+                "key": "",
+                "code": ""
+            }
+        },
+        {
+            "key": "SEARCH-CONFIG",
+            "value": {
+                "pt": false,
+                "hlt": false,
+                "llt": true,
+                "smq": false,
+                "soc": false,
+                "hlgt": false,
+                "kana": false,
+                "skip": 0,
+                "take": 20,
+                "bview": "SOC",
+                "stype": 1,
+                "rsview": "release",
+                "filters": [],
+                "synonym": true,
+                "version": 28,
+                "addlangs": [],
+                "contains": true,
+                "language": "Spanish",
+                "separator": 2,
+                "searchterms": [
+                    {
+                        "searchterm": "",
+                        "searchtype": 0,
+                        "searchlogic": 0
+                    }
+                ],
+                "idiacritical": true
+            }
+        }
+    ]
+}

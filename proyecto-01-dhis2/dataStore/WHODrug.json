@@ -1,0 +1,16 @@
+{
+    "pager": {
+        "page": 1,
+        "pageSize": 50
+    },
+    "entries": [
+        {
+            "key": "API-CONFIG",
+            "value": {
+                "country": "PRY",
+                "routeCode": "api/vaccines-whodrug",
+                "backendUrl": "https://dominio.com/api-whodrug/vaccines-whodrug"
+            }
+        }
+    ]
+}

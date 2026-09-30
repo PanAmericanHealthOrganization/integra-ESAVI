@@ -1,0 +1,121 @@
+{
+    "pager": {
+        "page": 1,
+        "pageSize": 50
+    },
+    "entries": [
+        {
+            "key": "keyDefaultLayoutLocked",
+            "value": {
+                "qHdJ7oslcuG": false
+            }
+        },
+        {
+            "key": "keyTrackerDashboardDefaultLayout",
+            "value": {
+                "qHdJ7oslcuG": {
+                    "program": "qHdJ7oslcuG",
+                    "widgets": [
+                        {
+                            "show": true,
+                            "view": "components/enrollment/enrollment.html",
+                            "order": 0,
+                            "title": "enrollment",
+                            "expand": true,
+                            "parent": "biggerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/rulebound/rulebound.html",
+                            "order": 1,
+                            "title": "indicators",
+                            "expand": true,
+                            "parent": "biggerWidget",
+                            "topBarView": "components/rulebound/rulebound-topbar.html#indicators",
+                            "canBeUsedAsTopBar": true
+                        },
+                        {
+                            "show": true,
+                            "view": "components/dataentry/dataentry.html",
+                            "order": 3,
+                            "title": "dataentry",
+                            "expand": true,
+                            "parent": "biggerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/dataentry/dataentry-tabular-layout.html",
+                            "order": 4,
+                            "title": "dataentryTabular",
+                            "expand": true,
+                            "parent": "biggerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/report/tei-report.html",
+                            "order": 5,
+                            "title": "report",
+                            "expand": true,
+                            "parent": "biggerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/selected/selected.html",
+                            "order": 0,
+                            "title": "current_selections",
+                            "expand": true,
+                            "parent": "smallerWidget"
+                        },
+                        {
+                            "show": true,
+                            "view": "components/rulebound/rulebound.html",
+                            "order": 2,
+                            "title": "feedback",
+                            "expand": true,
+                            "parent": "biggerWidget",
+                            "topBarView": "components/rulebound/rulebound-topbar.html#feedback",
+                            "useAsTopBar": false,
+                            "canBeUsedAsTopBar": true
+                        },
+                        {
+                            "show": true,
+                            "view": "components/profile/profile.html",
+                            "order": 1,
+                            "title": "profile",
+                            "expand": true,
+                            "parent": "smallerWidget",
+                            "topBarView": "components/profile/profile-topbar.html",
+                            "canBeUsedAsTopBar": true
+                        },
+                        {
+                            "show": false,
+                            "view": "components/relationship/relationship.html",
+                            "order": 2,
+                            "title": "relationships",
+                            "expand": true,
+                            "parent": "smallerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/notes/notes.html",
+                            "order": 3,
+                            "title": "notes",
+                            "expand": true,
+                            "parent": "smallerWidget"
+                        },
+                        {
+                            "show": false,
+                            "view": "components/messaging/messaging.html",
+                            "order": 4,
+                            "title": "messaging",
+                            "expand": true,
+                            "parent": "smallerWidget"
+                        }
+                    ],
+                    "topBarSettings": {},
+                    "programStageTimeLineLayout": {}
+                }
+            }
+        }
+    ]
+}
