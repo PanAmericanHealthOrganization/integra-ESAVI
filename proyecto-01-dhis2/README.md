@@ -8,6 +8,8 @@ Contiene todos los artefactos de configuración y metadatos para los programas D
 proyecto-01-dhis2/
 ├── esavi/          # Programa Tracker DHIS2 para notificación de ESAVI
 ├── evadie/         # Programa Tracker DHIS2 para EVADIE
+├── datastore/      # Configuraciones de los plugins y formularios en Capture
+├── plugins/        # Código fuente de los plugins o herramientas para las implementaciones de funciones avanzadas en Capture
 ├── vacunacion/     # Programa DHIS2 para registro de vacunación
 ├── scripts/        # Scripts transversales de administración de la instancia DHIS2
 └── docs/           # Documentación específica del proyecto DHIS2
